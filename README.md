@@ -3,10 +3,9 @@
 ### Maintenance Information:
 
 #### Quarterly Maintenance Window Schedule:
-|  Scheduled Date | Start Time | End Time | TimeZone |
-|---|---|--|--|
-| Month DAY, 2017 | 3pm | 5pm | EDT| 
-
+|  Scheduled Date | Eastern Daylight Time (UTC - 4)  | British Summer Time (UTC + 1) |
+|---|---|--|
+| Month DAY, 2017 | 3pm - 5pm | 15:00 - 17:00 |
 
 #### Backups:
 The following items are stored in GitHub.
