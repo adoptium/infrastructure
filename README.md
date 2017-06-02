@@ -4,11 +4,11 @@
 
 ***\*\*Proposed Schedule\*\****
 
-|  Scheduled Date | Day of the week | Eastern Time Zone | British Time Zone |
-|---|---|--|--|
-| July 21, 2017 | Wednesday | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
-| October 11, 2017 | Wednesday | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
-| January 17, 2018 | Wednesday | 3pm - 5pm - Standard Time (UTC - 5) | 15:00 - 17:00 - Greenwich Mean Time (UTC + 0) |
+|  Scheduled Date | Eastern Time Zone | British Time Zone |
+|---|---|--|
+| July 21, 2017 | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
+| October 11, 2017 | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
+| January 17, 2018 | 3pm - 5pm - Standard Time (UTC - 5) | 15:00 - 17:00 - Greenwich Mean Time (UTC + 0) |
 
 
 #### Standard Action Items:
