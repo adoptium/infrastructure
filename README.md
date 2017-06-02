@@ -1,15 +1,23 @@
-# openjdk-maintenance
-
-### Maintenance Information:
+# Maintenance Information:
 
 #### Quarterly Maintenance Window Schedule:
-|  Scheduled Date | Eastern Daylight Time (UTC - 4)  | British Summer Time (UTC + 1) |
-|---|---|--|
-| Month DAY, 2017 | 3pm - 5pm | 15:00 - 17:00 |
+
+***\*\*Proposed Schedule\*\****
+
+|  Scheduled Date | Day of the week | Eastern Time Zone | British Time Zone |
+|---|---|--|--|
+| July 21, 2017 | Wednesday | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
+| October 11, 2017 | Wednesday | 3pm - 5pm - Daylight Time (UTC - 4) | 15:00 - 17:00 - Summer Time (UTC + 1) |
+| January 17, 2018 | Wednesday | 3pm - 5pm - Standard Time (UTC - 5) | 15:00 - 17:00 - Greenwich Mean Time (UTC + 0) |
+
+
+#### Standard Action Items:
+- Apply non-security patches to infrastructure systems.
+- Apply Application patches to: Nagios, Jenkins, Semaphore, etc.
 
 #### Backups:
 The following items are stored in GitHub.
-Source code, System deployment scripts (Ansible), Instructions/How to Information
+- Source code, System deployment scripts (Ansible), Instructions/How to Information
 
 |  Description | Storage Location | Frequency  |
 |---|---|---|
@@ -27,17 +35,19 @@ Backup retention:
 - How many copies?
 
 #### OS Patch Management: 
-*Most of our systems are internet facing*
+*Most of our systems are internet facing and we need to stay vigilant of the potential security risks this presents.*
 
-| Vulnerability Type | Time Line|
+##### Patch Management Time Frame:
+| Vulnerability Type | Time Frame|
 |---|---|
 | Critical severity | 72 hours or less |
 | High severity | 7 days |
 | Moderate and low severity | 60 days|
 
-- Nagios is configured to monitor patches that are required.
-- I would recommend enabling auto updates on our systems and configure it to run weekly.
+- Nagios is configured to monitor each system and report on the status of OS patches required.
+- Non-infrastructure systems are configured to automatically apply all patches. (Sundays at 5am local host time)
+- Infrastructure systems are configured to automatically apply security patches only. (Sundays at 5am local host time) This information is logged on the localhost: /var/log/apt-security-updates
 
 #### Application Updates:
-- Quarterly maintenance window to manually update and patch our applications.
-- More often when a critical or high severity vulnerability is announced.
+- During our quarterly maintenance window application patches will be applied manually.
+- When a critical or high severity vulnerability is announced patching will take place within the time frame stated above.
