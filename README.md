@@ -22,12 +22,12 @@ The following items are stored in GitHub.
 |  Description | Storage Location | Frequency  |
 |---|---|---|
 | Jenkins - Configuration and Settings | not currently backed up | N/A |
-| Nagios - Configuration and Settings | not currently backed up | N/A |
+| Nagios - Configuration and Settings | localhost /root/backups | Weekly |
 | Semaphore - Configuration and Settings | not currently backed up | N/A |
 
 ##### Questions:
 Backup schedule:
-- How often should be backup?)
+- How often should be backup?
 - Where should it be stored?
 
 Backup retention:
