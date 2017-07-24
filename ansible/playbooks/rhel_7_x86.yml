@@ -122,10 +122,6 @@
       shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
       become: yes
 
-    - name:  Install CPANm
-      shell: curl -L http://cpanmin.us | perl - App::cpanminus
-      when:  result|failed
-            
     - name: Install JSON
       shell: |
         cpanm --with-recommends JSON
