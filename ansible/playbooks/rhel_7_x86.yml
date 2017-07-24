@@ -23,6 +23,7 @@
       with_items:
         - alsa-lib-devel
         - bind-utils
+        - cpanminus
         - cpio
         - cups-devel
         - freetype-devel
