@@ -26,6 +26,7 @@
       apt: pkg={{ item }} state=latest
       with_items:
         - ccache
+        - cpanminus
         - cpio
         - g++
         - gcc
@@ -77,6 +78,9 @@
         groups=audio
         append=yes
 
+    #######################
+    # Additional Packages #
+    #######################
     - name: download ccache.tar.gz
       get_url:
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
@@ -92,6 +96,14 @@
     - name: Running ./configure & make for CCACHE
       shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
       become: yes
+      
+    - name: Install JSON
+      shell: |
+        cpanm --with-recommends JSON
+
+    - name: Install Text::CSV
+      shell: |
+        cpanm --with-recommends Text::CSV   
 
     ##################
     # Nagios plugins #
