@@ -14,11 +14,11 @@
 - hosts: all
 
   vars:
-  # Cygwin vars for installation
-  Cygwin_SITE_URL: http://mirrors.kernel.org/sourceware/cygwin/
-  Cygwin_PACKAGE_DIR: c:\cygwin_packages
-  Cygwin_ROOT_INST_DIR: C:\cygwin64
-  Cygwin_PACKAGES: curl, curl-debuginfo, gcc-core, gdb, git, libcurl-devel, libpng15, libpng-devel, make, perl-Text-CSV, tar, unzip, vim, wget, xinit, xorg-server, xterm, zip
+    # Cygwin vars for installation
+    Cygwin_SITE_URL: http://mirrors.kernel.org/sourceware/cygwin/
+    Cygwin_PACKAGE_DIR: c:\cygwin_packages
+    Cygwin_ROOT_INST_DIR: C:\cygwin64
+    Cygwin_PACKAGES: curl, curl-debuginfo, gcc-core, gdb, git, libcurl-devel, libpng15, libpng-devel, make, perl-Text-CSV, tar, unzip, vim, wget, xinit, xorg-server, xterm, zip
 
   tasks:
   - block:
