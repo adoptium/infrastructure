@@ -60,6 +60,10 @@
       apt: name=xserver-xorg-legacy state=installed
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
 
+    - name: Install libfreetype6-dev on Ubuntu 16 s390
+      apt: name=libfreetype6-dev state=installed
+      when: (ansible_architecture == "s390x")
+      
     ################
     # Jenkins user #
     ################
