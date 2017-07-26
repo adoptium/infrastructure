@@ -1,6 +1,6 @@
-########################################################################
-# AdoptOpenJDK - Ansible Playbook for Ubuntu 14 and 16 on x86 hardware #
-########################################################################
+##############################################################################################
+# AdoptOpenJDK - Ansible Playbook for Ubuntu 14 and 16 on x86 hardware and Ubuntu 16 on s390 #
+##############################################################################################
 
 - hosts: all
   remote_user: root
@@ -77,6 +77,15 @@
       user: name=jenkins
         groups=audio
         append=yes
+
+    - name: Create Jenkins home folder
+      file:
+        path: /home/jenkins
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: 0700
+      when: (ansible_architecture == "s390x")
 
     #######################
     # Additional Packages #
