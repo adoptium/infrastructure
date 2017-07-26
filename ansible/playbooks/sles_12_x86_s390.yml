@@ -70,6 +70,8 @@
       file:
         path: /home/jenkins
         state: directory
+        owner: jenkins
+        group: jenkins
         mode: 0700
       when: (ansible_architecture == "s390x")
 
