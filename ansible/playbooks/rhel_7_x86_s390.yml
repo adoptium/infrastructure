@@ -1,6 +1,6 @@
-##############################################################
-# AdoptOpenJDK - Ansible Playbook for RHEL 7 on x86 hardware #
-##############################################################
+#######################################################################
+# AdoptOpenJDK - Ansible Playbook for RHEL 7 on x86 and s390 hardware #
+#######################################################################
 #
 # Please Note:
 # RHEL systems must be registered with the Red Hat Subscription Management service before this Playbook can be used.
