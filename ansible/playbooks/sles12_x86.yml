@@ -1,0 +1,171 @@
+###############################################################
+# AdoptOpenJDK - Ansible Playbook for SLES 12 on x86 hardware #
+###############################################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+
+  tasks:
+  - block:
+
+    ###############################
+    # Update and Install Packages #
+    ###############################
+    - name: zypper upgrade all packages
+      zypper: name='*' state=latest update_cache=yes
+
+    - name: Install Build tools
+      zypper: name={{item}} state=installed
+      with_items:
+        - ccache
+        - cpio
+        - make
+        - gcc
+        - gcc-c++
+        - java-1_8_0-openjdk
+        - libXtst-devel
+        - libXt-devel
+        - libXrender-devel
+        - libXext-devel
+        - libXrender-devel
+        - libXtst-devel
+        - libXt-devel
+        - cups-devel
+        - freetype-devel
+        - alsa-lib-devel
+        - ntp
+        - unzip
+        - zip
+        - wget
+        - git
+
+    - name: Install Test tools
+      zypper: name={{item}} state=installed
+      with_items:
+        - ant
+        - ant-contrib
+        - perl
+        - pulseaudio
+        - xauth
+        - xorg-x11-server
+        - xorg-x11
+
+    - name: Create jenkins user
+      action: user name=jenkins state=present
+      ignore_errors: yes
+
+    - name: Set authorized key for jenkins
+      authorized_key:
+        user: jenkins
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+
+    - name: Add jenkins to the audio group
+      user: name=jenkins
+        groups=audio
+        append=yes
+
+    #######################
+    # Additional Packages #
+    #######################
+    - name: download ccache.tar.gz
+      get_url:
+        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
+        dest: /home/jenkins/ccache.tar.gz
+        mode: 0440
+
+    - name: extract ccache
+      unarchive:
+        src: /home/jenkins/ccache.tar.gz
+        dest: /home/jenkins
+        copy: False
+
+    - name: Running ./configure & make for CCACHE
+      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      become: yes
+
+    - name: Download and Install JQ
+      get_url:
+        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        dest: /usr/bin/jq
+        mode: 0755
+
+    - name: Install App::cpanminus
+      shell: |
+         curl -L 'http://cpanmin.us' | perl -  App::cpanminus
+
+    - name: Install JSON
+      shell: |
+        cpanm --with-recommends JSON
+
+    - name: Install Text::CSV
+      shell: |
+        cpanm --with-recommends Text::CSV
+
+    ##################
+    # Nagios plugins #
+    ##################
+    - debug: msg='Host OS setup completed, Calling Nagios playbook'
+    - include: nagios/nagios_rhel_7_x86.yml
+      static: yes
+
+    ####################
+    # Auto OS patching #
+    ####################
+    - name: Add cron job to check for updates
+      cron: name="Check for Updates every Sunday at 5am"
+            weekday="6"
+            minute="0"
+            hour="5"
+            user=root
+            job="/usr/bin/zypper up -y"
+            state=present
+
+    ###############
+    # X11 Support #
+    ###############
+    - name: Create X11 Wrapper config file
+      copy:
+        content: |
+          allowed_users=anybody
+          needs_root_rights=yes
+        dest: /etc/X11/Xwrapper.config
+        group: root
+        owner: root
+        mode: 0644
+
+    - name: Start X11
+      become: yes
+      become_user: jenkins
+      shell: startx -- :1 &
+      ignore_errors: yes
+      no_log: True
+
+    ###################
+    # NTP Time Server #
+    ###################
+    - name: Set timedatectl set-ntp no
+      shell: timedatectl set-ntp no
+
+    - name: Configure NTP pool Servers
+      lineinfile: dest=/etc/ntp.conf
+                line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
+                state=present
+
+    - name: Start NTP
+      service:
+        name: ntpd
+        state: restarted
+
+    ################
+    # Pass or Fail #
+    ################
+    - debug: msg='Send Slack notification, successful'
+    - include: slack_notification/successful_slack.yml
+      static: yes
+
+    rescue:
+    - debug: msg='Something went wrong... Sending Slack notification failure'
+    - include: slack_notification/failure_slack.yml
+      static: yes
