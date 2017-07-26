@@ -50,11 +50,18 @@
 
     - name: Install Test tools
       yum: name={{item}} state=installed
-      with_items:    
+      with_items:
         - ant
         - perl
         - xorg-x11-xauth
-        - xorg-x11-server-Xorg
+
+    - name: Install xorg-x11-server-Xorg if host is x86_64
+      yum: name=xorg-x11-server-Xorg state=installed
+      when: (ansible_architecture == "x86_64")
+
+    - name: Install xorg-x11-server-common if host is s390x
+      yum: name=xorg-x11-server-common state=installed
+      when: (ansible_architecture == "s390x")
 
     - name: Download and Install JQ
       get_url:
@@ -102,6 +109,15 @@
         user: jenkins
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+        
+    - name: Create Jenkins home folder
+      file:
+        path: /home/jenkins
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: 0700
+      when: (ansible_architecture == "s390x")
 
     #######################
     # Additional Packages #
