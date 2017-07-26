@@ -1,6 +1,6 @@
-###############################################################
-# AdoptOpenJDK - Ansible Playbook for SLES 12 on x86 hardware #
-###############################################################
+########################################################################
+# AdoptOpenJDK - Ansible Playbook for SLES 12 on x86 and s390 hardware #
+########################################################################
 
 - hosts: all
   remote_user: root
@@ -65,6 +65,13 @@
       user: name=jenkins
         groups=audio
         append=yes
+
+    - name: Create Jenkins home folder
+      file:
+        path: /home/jenkins
+        state: directory
+        mode: 0700
+      when: (ansible_architecture == "s390x")
 
     #######################
     # Additional Packages #
