@@ -60,215 +60,215 @@
       - xorg-x11-xauth
       - xorg-x11-server-Xorg   
 
-    - name: Download and Install JQ
-      get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: /usr/bin/jq
-        mode: 0755
+  - name: Download and Install JQ
+    get_url:
+      url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+      dest: /usr/bin/jq
+      mode: 0755
             
-    ###############
-    # ant-contrib #
-    ###############
-    - name: Download ant-contrib
-      get_url:
-        url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
-        dest: /tmp/
-        mode: 0440
-        timeout: 25
+  ###############
+  # ant-contrib #
+  ###############
+  - name: Download ant-contrib
+    get_url:
+      url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
 
-    - name: Extract ant-contrib
-      unarchive:
-        src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
-        dest: /tmp/
-        copy: False
+  - name: Extract ant-contrib
+    unarchive:
+      src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
+      dest: /tmp/
+      copy: False
 
-    - name: Move ant-contrib.jar to lib folder
-      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+  - name: Move ant-contrib.jar to lib folder
+    command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
 
-    - name: Clean ant-contrib tmp files
-      file:
-        state: absent
-        path: "/tmp/ant-contrib/"
+  - name: Clean ant-contrib tmp files
+    file:
+      state: absent
+      path: "/tmp/ant-contrib/"
 
-    - file:
-        state: absent
-        path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
+  - file:
+      state: absent
+      path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
 
-    ################
-    # Jenkins user #
-    ################
-    - name: Create jenkins user
-      action: user name=jenkins state=present
-      ignore_errors: yes
+  ################
+  # Jenkins user #
+  ################
+  - name: Create jenkins user
+    action: user name=jenkins state=present
+    ignore_errors: yes
           
-    - name: Set authorized key for jenkins
-      authorized_key:
-        user: jenkins
-        state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+  - name: Set authorized key for jenkins
+    authorized_key:
+      user: jenkins
+      state: present
+      key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
             
-    #######################
-    # Additional Packages #
-    #######################
-    - name: Download ccache.tar.gz
-      get_url:
-        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
-        mode: 0440
+  #######################
+  # Additional Packages #
+  #######################
+  - name: Download ccache.tar.gz
+    get_url:
+      url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
+      dest: /home/jenkins/ccache.tar.gz
+      mode: 0440
 
-    - name: Extract ccache
-      unarchive:
-        src: /home/jenkins/ccache.tar.gz
-        dest: /home/jenkins
-        copy: False
+  - name: Extract ccache
+    unarchive:
+      src: /home/jenkins/ccache.tar.gz
+      dest: /home/jenkins
+      copy: False
 
-    - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
-      become: yes
+  - name: Running ./configure & make for CCACHE
+    shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+    become: yes
 
-    - name: Install JSON
-      shell: |
-        cpanm --with-recommends JSON
+  - name: Install JSON
+    shell: |
+      cpanm --with-recommends JSON
 
-    - name: Install Text::CSV
-      shell: |
-        cpanm --with-recommends Text::CSV      
+  - name: Install Text::CSV
+    shell: |
+      cpanm --with-recommends Text::CSV      
 
-    ##################
-    # Nagios plugins #
-    ##################
-    - debug: msg='Host OS setup completed, Calling Nagios playbook'
-    - include: nagios/nagios_rhel_7_x86.yml
-      static: yes
+  ##################
+  # Nagios plugins #
+  ##################
+  - debug: msg='Host OS setup completed, Calling Nagios playbook'
+  - include: nagios/nagios_rhel_7_x86.yml
+    static: yes
 
-    #####################
-    # superuser account #
-    #####################
-    - name: Setup zeus user
-      shell: useradd zeus --shell /bin/bash -m 
-      ignore_errors: yes
+  #####################
+  # superuser account #
+  #####################
+  - name: Setup zeus user
+    shell: useradd zeus --shell /bin/bash -m 
+    ignore_errors: yes
 
-    - name: Create SSH Key folder for zeus
-      file: 
-        path: /home/zeus/.ssh
-        owner: zeus
-        group: zeus
-        mode: 0700
-        state: directory
+  - name: Create SSH Key folder for zeus
+    file: 
+      path: /home/zeus/.ssh
+      owner: zeus
+      group: zeus
+      mode: 0700
+      state: directory
 
-    - name: Add key
-      authorized_key:
-        user: zeus
-        state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+  - name: Add key
+    authorized_key:
+      user: zeus
+      state: present
+      key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
 
-    - name: Grant zeus sudo powers
-      lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: '^zeus'
-        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+  - name: Grant zeus sudo powers
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^zeus'
+      line: 'zeus ALL=(ALL) NOPASSWD: ALL'
 
-    #############
-    # swap file #
-    #############
-    - name: Check if swap file exists
-      shell: cat /etc/fstab
-      register: check_fstab
+  #############
+  # swap file #
+  #############
+  - name: Check if swap file exists
+    shell: cat /etc/fstab
+    register: check_fstab
 
-    - name: Create swap file
-      command: fallocate -l 2G /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+  - name: Create swap file
+    command: fallocate -l 2G /swapfile
+    when: check_fstab.stdout.find('swap') == ""
 
-    - name: Set swap file permissions
-      file: path=/swapfile
-            owner=root
-            group=root
-            mode=0600
-      when: check_fstab.stdout.find('swap') == ""
+  - name: Set swap file permissions
+    file: path=/swapfile
+          owner=root
+          group=root
+          mode=0600
+    when: check_fstab.stdout.find('swap') == ""
 
-    - name: Create swap area device
-      command: mkswap /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+  - name: Create swap area device
+    command: mkswap /swapfile
+    when: check_fstab.stdout.find('swap') == ""
 
-    - name: Mount swap file
-      command: swapon /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+  - name: Mount swap file
+    command: swapon /swapfile
+    when: check_fstab.stdout.find('swap') == ""
 
-    - name: Add swap to fstab
-      mount: src=/swapfile
-        name=none
-        fstype=swap
-        opts=sw
-        passno=0
-        dump=0
-        state=present
-      when: check_fstab.stdout.find('swap') == ""
+  - name: Add swap to fstab
+    mount: src=/swapfile
+      name=none
+      fstype=swap
+      opts=sw
+      passno=0
+      dump=0
+      state=present
+    when: check_fstab.stdout.find('swap') == ""
 
-    ####################
-    # Auto OS patching #
-    ####################    
-    - name: Add cron job to check for updates
-      cron: name="Check for Updates every Sunday at 5am"
-            weekday="6"
-            minute="0"
-            hour="5"
-            user=root
-            job="/usr/bin/dnf -y update"
-            state=present
+  ####################
+  # Auto OS patching #
+  ####################    
+  - name: Add cron job to check for updates
+    cron: name="Check for Updates every Sunday at 5am"
+          weekday="6"
+          minute="0"
+          hour="5"
+          user=root
+          job="/usr/bin/dnf -y update"
+          state=present
 
-    ###############
-    # X11 Support #
-    ###############
-    - name: Create X11 Wrapper config file
-      copy:
-        content: |
-          allowed_users=anybody
-          needs_root_rights=yes
-        dest: /etc/X11/Xwrapper.config
-        group: root
-        owner: root
-        mode: 0644
+  ###############
+  # X11 Support #
+  ###############
+  - name: Create X11 Wrapper config file
+    copy:
+      content: |
+        allowed_users=anybody
+        needs_root_rights=yes
+      dest: /etc/X11/Xwrapper.config
+      group: root
+      owner: root
+      mode: 0644
 
-    - name: Start X11
-      become: yes
-      become_user: jenkins
-      shell: startx -- :1 &
-      ignore_errors: yes
-      no_log: True
+  - name: Start X11
+    become: yes
+    become_user: jenkins
+    shell: startx -- :1 &
+    ignore_errors: yes
+    no_log: True
                   
-    ###################
-    # NTP Time Server #
-    ###################
-    - name: Set timedatectl set-ntp no
-      shell: timedatectl set-ntp no
+  ###################
+  # NTP Time Server #
+  ###################
+  - name: Set timedatectl set-ntp no
+    shell: timedatectl set-ntp no
 
-    - name: Configure NTP pool Servers
-      lineinfile: dest=/etc/ntp.conf
-                line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
-                state=present
+  - name: Configure NTP pool Servers
+    lineinfile: dest=/etc/ntp.conf
+              line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
+              state=present
 
-    - name: Start NTP
-      service:
-        name: ntpd
-        state: restarted
+  - name: Start NTP
+    service:
+      name: ntpd
+      state: restarted
 
-    ############
-    # Clean up #
-    ############
-    - name: Remove DNF dependencies that are no longer required
-      command: dnf -y autoremove
-      args:
-         warn: no
+  ############
+  # Clean up #
+  ############
+  - name: Remove DNF dependencies that are no longer required
+    command: dnf -y autoremove
+    args:
+       warn: no
 
-    ################
-    # Pass or Fail #
-    ################
-    - debug: msg='Send Slack notification, successful'
-    - include: slack_notification/successful_slack.yml
-      static: yes
+  ################
+  # Pass or Fail #
+  ################
+  - debug: msg='Send Slack notification, successful'
+  - include: slack_notification/successful_slack.yml
+    static: yes
 
-    rescue:
-    - debug: msg='Something went wrong... Sending Slack notification failure'
-    - include: slack_notification/failure_slack.yml
-      static: yes
+  rescue:
+  - debug: msg='Something went wrong... Sending Slack notification failure'
+  - include: slack_notification/failure_slack.yml
+    static: yes
