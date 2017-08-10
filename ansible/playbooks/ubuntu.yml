@@ -125,7 +125,7 @@
     # Nagios plugins #
     ##################
     - debug: msg='Host OS setup completed. Calling Nagios playbook'
-    - include: nagios/nagios_ub14-16_x86.yml
+    - include: nagios/nagios_ubuntu.yml
       static: yes
 
     #####################
