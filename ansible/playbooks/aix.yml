@@ -1,0 +1,184 @@
+### Not working yet ###
+##### Do not use #####
+
+###########################################
+# AdoptOpenJDK - Ansible Playbook for AIX #
+###########################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+
+  tasks:
+  - block:
+
+### call in filesystem script
+    #########################
+    # AIX Toolbox for Linux #
+    #########################
+    - name: Download installation script for AIX Toolbox for Linux
+      get_url:
+        url: https://ftp.software.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+        dest: /tmp/AIX_yum.sh
+        mode: 0775
+        validate_certs: no
+
+    - name: Install AIX Toolbox for Linux
+      shell: /tmp/AIX_yum.sh
+
+    #############################################
+    # Install and configure additional packages #
+    #############################################
+    - name: Remove cloud-init
+      yum: name='cloud-init-0.7.5-4.1.ppc' state=removed
+      ignore_errors: yes
+
+    - name: Install Build tools
+      yum: name={{item}} state=installed exclude=python*
+      with_items:
+        - autoconf
+        - automake
+        - bc
+        - bind-utils
+        - bison
+        - bzip2
+        - coreutils
+        - cpio
+        - cups-devel
+        - curl
+        - freetype2-devel
+        - gawk
+        - gcc
+        - gcc-c++
+        - git
+        - glib2
+        - glib2-devel
+        - gzip
+        - libXrender
+        - libXrender-devel
+        - make
+        - perl
+        - perl-Git
+        - sed
+        - sudo
+        - unzip
+        - vim-enhanced
+        - wget
+        - zip
+
+    - name: yum upgrade all packages
+      yum: name='*' state=latest update_cache=yes exclude=python*
+
+    ##############
+    # IBM Java 8 #
+    ##############
+### Where to get java from?
+    - name: Extract Java
+      shell: gzip -d /tmp/Java8_64.jre.tar.gz && tar -xvf /tmp/Java8_64.jre.tar
+
+    - name: Install Java 8 - installp
+      shell: installp -agXYd /tmp Java8_64.jre && lslpp -l "Java*"
+
+    - name: Create symlink to plugins
+      file: src=/usr/java8_64/jre/bin/java dest=/usr/bin/java state=link
+
+    - name: Clean up Java tmp files
+      file: path=/tmp/Java8_64.jre.tar state=absent
+    - file: path=/tmp/Java8_64.jre state=absent
+
+    ################
+    # Jenkins user #
+    ################
+    - name: Create jenkins user
+      action: user name=jenkins state=present
+      ignore_errors: yes
+
+    - name: Set authorized key for jenkins
+      authorized_key:
+        user: jenkins
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+
+    #######################
+    # Additional Packages #
+    #######################
+    - name: download ccache.tar.gz
+      get_url:
+        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
+        dest: /home/jenkins/ccache.tar.gz
+        mode: 0440
+
+    - name: extract ccache
+      shell: cd /home/jenkins && gzip -d ccache.tar.gz && tar -xvf ccache.tar
+
+    - name: Running ./configure & make for CCACHE
+      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      become: yes
+
+    #################
+    # Nagios plugins #
+    ##################
+    - debug: msg='Host OS setup completed. Calling Nagios playbook'
+    - include: nagios/nagios_aix.yml
+      static: yes
+
+    #####################
+    # superuser account #
+    #####################
+    - name: Setup zeus user
+      shell: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
+      ignore_errors: yes
+
+    - name: Create SSH Key folder for zeus
+      file:
+        path: /home/zeus/.ssh
+        owner: zeus
+        group: staff
+        mode: 0700
+        state: directory
+
+    - name: Add key
+      authorized_key:
+        user: zeus
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+
+    - name: Grant zeus sudo powers
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^zeus'
+        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+
+    ###################
+    # NTP Time Server #
+    ###################
+    - name: Rewrite ntp.conf
+      copy:
+        content: |
+          server 1.pool.ntp.org
+          server 2.pool.ntp.org
+          server 3.pool.ntp.org
+          driftfile /etc/ntp.drift
+          tracefile /etc/ntp.trace
+        dest: /etc/ntp.conf
+        owner: root
+        group: system
+        mode: 0664
+
+    - name: Start NTP
+      service:
+        name: xntpd
+        state: restarted
+
+    ################
+    # Pass or Fail #
+    ################
+    - debug: msg='Send Slack notification, successful'
+    - include: slack_notification/successful_slack.yml
+      static: yes
+
+    rescue:
+    - debug: msg='Something went wrong... Sending Slack notification failure'
+    - include: slack_notification/failure_slack.yml
+     static: yes
