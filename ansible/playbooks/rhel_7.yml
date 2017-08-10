@@ -150,7 +150,7 @@
     # Nagios plugins #
     ##################
     - debug: msg='Host OS setup completed, Calling Nagios playbook'
-    - include: nagios/nagios_rhel_7_x86.yml
+    - include: nagios/nagios_rhel_7.yml
       static: yes
 
     #####################
