@@ -115,9 +115,9 @@
     ##################
     # Nagios plugins #
     ##################
-    - debug: msg='Host OS setup completed, Calling Nagios playbook'
-    - include: nagios/nagios_rhel_7_x86.yml
-      static: yes
+#    - debug: msg='Host OS setup completed, Calling Nagios playbook'
+#    - include: nagios/nagios_sles_12.yml
+#      static: yes
 
     ####################
     # Auto OS patching #
