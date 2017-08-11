@@ -1,6 +1,3 @@
-### Not working yet ###
-##### Do not use #####
-
 ###########################################
 # AdoptOpenJDK - Ansible Playbook for AIX #
 ###########################################
@@ -12,77 +9,152 @@
   tasks:
   - block:
 
-### call in filesystem script
-    #########################
-    # AIX Toolbox for Linux #
-    #########################
-    - name: Download installation script for AIX Toolbox for Linux
+    ##########
+    # Layout #
+    ##########
+    - name: Create tmp folder /tmp/playbook_tmp
+      file: path=/tmp/playbook_tmp state=directory mode=0755
+
+    - name: Create rpm tmp folder /tmp/playbook_tmp/rpms
+      file: path=/tmp/playbook_tmp/rpms state=directory mode=0755
+
+    - name: Create java tmp folder /tmp/playbook_tmp/java
+      file: path=/tmp/playbook_tmp/java state=directory mode=0755
+
+    - name: Create xlc tmp folder /tmp/playbook_tmp/xlc
+      file: path=/tmp/playbook_tmp/xlc state=directory mode=0755
+
+    ################################
+    # AIX filesystem configuration #
+    ################################
+    - name: Download AIX filesystem configuration script
       get_url:
-        url: https://ftp.software.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
-        dest: /tmp/AIX_yum.sh
+        url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
+        dest: /tmp/playbook_tmp/AIX_filesystem_config.sh
+        mode: 0775
+        validate_certs: no
+        
+    - name: Execute AIX filesystem configuration script
+      command: /tmp/playbook_tmp/AIX_filesystem_config.sh
+
+    ######################################
+    # Install and configure RPM Packages #
+    ######################################
+
+    - name: Transfer RPM Packages to remote host
+      copy:
+        src: "{{ item }}"
+        dest: /tmp/playbook_tmp/rpms/
+        mode: 0755
+      with_fileglob:
+        - /home/ubuntu/aix/rpms/*
+
+    - name: Download script to install RPM packages
+      get_url:
+        url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_RPM_PKGs_Install.sh 
+        dest: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
         mode: 0775
         validate_certs: no
 
-    - name: Install AIX Toolbox for Linux
-      shell: /tmp/AIX_yum.sh
-
-    #############################################
-    # Install and configure additional packages #
-    #############################################
-    - name: Remove cloud-init
-      yum: name='cloud-init-0.7.5-4.1.ppc' state=removed
-      ignore_errors: yes
-
-    - name: Install Build tools
-      yum: name={{item}} state=installed exclude=python*
-      with_items:
-        - autoconf
-        - automake
-        - bc
-        - bind-utils
-        - bison
-        - bzip2
-        - coreutils
-        - cpio
-        - cups-devel
-        - curl
-        - freetype2-devel
-        - gawk
-        - git
-        - glib2
-        - glib2-devel
-        - gzip
-        - libXrender
-        - libXrender-devel
-        - make
-        - perl
-        - perl-Git
-        - sed
-        - sudo
-        - unzip
-        - vim-enhanced
-        - wget
-        - zip
-
-    - name: yum upgrade all packages
-      yum: name='*' state=latest update_cache=yes exclude=python*
+    - name: Execute script to install RPM packages
+      command: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
 
     ##############
     # IBM Java 8 #
     ##############
-### Where to get java from?
-    - name: Extract Java
-      shell: gzip -d /tmp/Java8_64.jre.tar.gz && tar -xvf /tmp/Java8_64.jre.tar
+    - name: Transfer Java to remote host
+      copy:
+        src: /home/ubuntu/aix/java/Java8_64.jre.tar.gz
+        dest: /tmp/playbook_tmp/java/Java8_64.jre.tar.gz
+
+    - name: Extract Java 
+      shell: gzip -d /tmp/playbook_tmp/java/Java8_64.jre.tar.gz 
+    - shell: tar -xvf /tmp/playbook_tmp/java/Java8_64.jre.tar -C /tmp/playbook_tmp/java/
 
     - name: Install Java 8 - installp
-      shell: installp -agXYd /tmp Java8_64.jre && lslpp -l "Java*"
+      shell: installp -agXYd /tmp/playbook_tmp/java/ Java8_64.jre
 
-    - name: Create symlink to plugins
+    - name: Create symlink for Java
       file: src=/usr/java8_64/jre/bin/java dest=/usr/bin/java state=link
 
-    - name: Clean up Java tmp files
-      file: path=/tmp/Java8_64.jre.tar state=absent
-    - file: path=/tmp/Java8_64.jre state=absent
+    - name: Test Java
+      command: /usr/bin/java -version
+      register: java_version
+
+    - name: Display Java version information
+      debug:
+        msg: "{{ java_version.stderr }}"
+
+    ############
+    # IBM XL C #
+    ############
+    - name: Transfer IBM XL C to remote host
+      copy:
+        src: /home/ubuntu/aix/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+        dest: /tmp/playbook_tmp/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+
+    - name: Extract IBM XL C
+      shell: cd /tmp/playbook_tmp/xlc/ && uncompress IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+    - shell: cd /tmp/playbook_tmp/xlc/ && tar -xvf IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar
+
+    - name: Install IBM XL C - installp
+      shell: installp -aXYgd /tmp/playbook_tmp/xlc/usr/sys/inst.images all
+      register: result
+      ignore_errors: yes
+
+    - debug: msg='Erorrs from the previous installp command normal'
+
+    - name: TestIBM XL C
+      command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
+      register: xlc_qversion
+
+    - name: Display XL C qversion information
+      debug:
+        msg: "{{ xlc_qversion.stdout }}"
+
+    - name: Symlink - /usr/bin/xlc
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
+    - name: Symlink - /usr/bin/xlc++
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
+    - name: Symkink - /usr/bin/xlC 
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
+    - name: Symkink - /usr/bin/xlc_r
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
+    - name: Symkink - /usr/bin/xlC_r 
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
+    - name: Symkink - /usr/bin/gxlC
+      file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+
+    #########################
+    # Configure system logs #
+    #########################
+    - name: Ensure /etc/syslog.conf entries are present
+      blockinfile:
+        backup: yes
+        dest: /etc/syslog.conf
+        block: |
+          *.debug;*.emerg;*.alert;*.crit;*.warning /var/log/messages rotate size 1000k files 4
+          syslog.debug /var/log/syslog rotate size 1000k files 4
+          *.err;kern.debug;daemon.notice;mail.crit /var/adm/messages rotate size 1000k files 4
+
+    - name: Ensure log files exist
+      file:
+        path: "{{ item }}"
+        state: touch
+        mode: 0644
+      with_items:
+        - /var/log/syslog
+        - /var/adm/messages
+        - /var/log/messages
+      changed_when: False
+
+    - name: Reload syslogd
+      service: name=syslogd state=reloaded
+      changed_when: False
+
+    - name: Ensure full core files are enabled
+      command: chdev -l sys0 -a fullcore=true
+      changed_when: False
 
     ################
     # Jenkins user #
@@ -97,10 +169,10 @@
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
 
-    #################
+    ##################
     # Nagios plugins #
     ##################
-    - debug: msg='Host OS setup completed. Calling Nagios playbook'
+    - debug: msg='Calling Nagios playbook'
     - include: nagios/nagios_aix.yml
       static: yes
 
@@ -152,6 +224,12 @@
       service:
         name: xntpd
         state: restarted
+
+    ############
+    # Clean up #
+    ############
+    - name: Clean up - Remove /tmp/playbook_tmp/
+      file: path=/tmp/playbook_tmp/ state=absent
 
     ################
     # Pass or Fail #
