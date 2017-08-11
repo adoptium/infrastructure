@@ -1,9 +1,9 @@
 #!/bin/bash
-##########################################################
-# AdoptOpenJDK - Script to install RPMS packages for AIX #
-##########################################################
+#########################################################
+# AdoptOpenJDK - Script to install RPM packages for AIX #
+#########################################################
 #
-# Ansible requires 'python' to be available on the remote AIX system
+# Ansible requires 'python' to be available on the remote AIX system when exectuing a playbook
 # Removing 'python' within the playbook will cause Ansible to error out.
 # This script provides a workaround to uninstalling and upgrading 'python' along with installing all other required packages
 #
