@@ -7,7 +7,7 @@
 # Removing 'python' within the playbook will cause Ansible to error out.
 # This script provides a workaround to uninstalling and upgrading 'python' along with installing all other required packages
 #
-cd /tmp/rpms/
+cd /tmp/playbook_tmp/rpms/
 #
 rpm -e $(rpm -qa | grep cloud-init)					# Remove 'cloud-init' 
 rpm -Uvh libsigsegv-*
