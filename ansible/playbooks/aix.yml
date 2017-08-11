@@ -48,8 +48,6 @@
         - curl
         - freetype2-devel
         - gawk
-        - gcc
-        - gcc-c++
         - git
         - glib2
         - glib2-devel
@@ -98,22 +96,6 @@
         user: jenkins
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
-
-    #######################
-    # Additional Packages #
-    #######################
-    - name: download ccache.tar.gz
-      get_url:
-        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
-        mode: 0440
-
-    - name: extract ccache
-      shell: cd /home/jenkins && gzip -d ccache.tar.gz && tar -xvf ccache.tar
-
-    - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
-      become: yes
 
     #################
     # Nagios plugins #
