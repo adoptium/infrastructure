@@ -5,8 +5,6 @@
 |  Linaro |  build-linaro-armv8-centos7-2 |  192.168.1.14 |  arch64 |  Centos7 |  centos |  (ssh via build-linaro-armv8-centos7-1) |
 | MacStadium  |  build-macstadium-macos1010-1 |  207.254.50.138 | x64  |  MacOS10.10 | administrator  ||
 | MacStadium  |  build-macstadium-macos1010-2 |  208.83.1.242 | x64  |  MacOS10.10 | administrator  ||
-|  Marist |  build-marist-s390x-rhel-6 |  148.100.110.55 | s390x  | Rhel6  |  linux1 ||
-|  Marist |  build-marist-s390x-rhel-7.3 |  148.100.5.162 | s390x  | Rhel7.3  |  linux1 ||
 |  Marist |  build-marist-s390x-sles-12 |  148.100.110.56 | s390x  | Sles12  |  linux1 ||
 |  Marist |  build-marist-s390x-ubuntu-16.04 |  148.100.33.147 | s390x  | Ubuntu16.04  |  linux1 ||
 |  Marist |  build-marist-s390x-zOS-1 |  148.100.36.136 | s390x  | zOS 2.1  |  OPEN1 ||
