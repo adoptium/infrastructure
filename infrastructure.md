@@ -6,7 +6,9 @@
 | MacStadium  |  build-macstadium-macos1010-1 |  207.254.50.138 | x64  |  MacOS10.10 | administrator  ||
 | MacStadium  |  build-macstadium-macos1010-2 |  208.83.1.242 | x64  |  MacOS10.10 | administrator  ||
 |  Marist |  build-marist-s390x-sles-12 |  148.100.110.56 | s390x  | Sles12  |  linux1 ||
-|  Marist |  build-marist-s390x-ubuntu-16.04 |  148.100.33.147 | s390x  | Ubuntu16.04  |  linux1 ||
+|  Marist |  build-marist-s390x-ubuntu-16.04-1 |  148.100.33.147 | s390x  | Ubuntu16.04  |  linux1 ||
+|  Marist |  build-marist-s390x-ubuntu-16.04-2 |  148.100.33.178 | s390x  | Ubuntu16.04  |  linux1 ||
+|  Marist |  build-marist-s390x-ubuntu-16.04-3 |  148.100.33.179 | s390x  | Ubuntu16.04  |  linux1 ||
 |  Marist |  build-marist-s390x-zOS-1 |  148.100.36.136 | s390x  | zOS 2.1  |  OPEN1 ||
 |  Marist |  build-marist-s390x-zOS-2 |  148.100.36.137 | s390x  | zOS 2.1  |  OPEN1 ||
 |  osuosl |  build-osuosl-ppc64le-centos-7.2 |  140.211.168.138 | ppc64le  | Centos72  |  centos ||
