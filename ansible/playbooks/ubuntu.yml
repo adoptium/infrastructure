@@ -28,6 +28,7 @@
     - name: Install Build tools
       apt: pkg={{ item }} state=latest
       with_items:
+        - autoconf
         - ccache
         - cpanminus
         - cpio
@@ -42,8 +43,10 @@
         - libxrender-dev
         - libxt-dev
         - libxtst-dev
+        - libnuma-dev
         - make
         - ntp
+        - openjdk-7-jdk
         - openjdk-8-jdk
         - wget
         - zip
