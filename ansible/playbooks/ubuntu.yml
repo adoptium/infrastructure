@@ -43,7 +43,6 @@
         - libxrender-dev
         - libxt-dev
         - libxtst-dev
-        - libnuma-dev
         - make
         - ntp
         - openjdk-7-jdk
