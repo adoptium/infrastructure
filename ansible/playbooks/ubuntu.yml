@@ -49,6 +49,7 @@
         - openjdk-8-jdk
         - wget
         - zip
+        - pkgconfig
 
     - name: Install Test tools
       apt: name={{item}} state=installed
