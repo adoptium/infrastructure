@@ -50,6 +50,8 @@ rpm -Uvh wget-1.19.1-1.aix5.1.ppc.rpm
 rpm -Uvh zip-3.0-2.aix5.1.ppc.rpm 
 rpm -Uvh perl-5.8.8-2.aix5.1.ppc.rpm 
 rpm -Uvh perl-Text-CSV_XS-0.52-1.aix5.1.ppc.rpm
+rpm -Uvh perl-URI-1.58-1.aix5.1.noarch.rpm
+rpm -Uvh perl-XML-Parser-2.41-1.aix5.1.ppc.rpm
 rpm -Uvh perl-Text-Glob-0.08-1.aix5.1.noarch.rpm
 rpm -Uvh perl-gettext-1.05-1.aix5.1.ppc.rpm 
 rpm -Uvh curl-7.54.1-1.aix5.1.ppc.rpm 

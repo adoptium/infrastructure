@@ -175,6 +175,11 @@
         cpanm --with-recommends Text::CSV   
       tags: text_csv
 
+    - name: Install XML::Parser
+      shell: |
+        cpanm --with-recommends XML::Parser
+      tags: xml_parser
+
     #########
     # cmake #
     #########

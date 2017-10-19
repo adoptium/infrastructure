@@ -131,6 +131,10 @@
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
       tags: text_cvs
 
+    - name: Install XML::Parser
+      win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install XML::Parser"
+      tags: xml_parser
+
     #########
     # cmake #
     #########
