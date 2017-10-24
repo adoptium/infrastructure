@@ -8,9 +8,14 @@
 - hosts: all
   remote_user: root
   become: yes
-
   tasks:
   - block:
+  
+    ######################
+    # Load variable file #
+    ######################
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: adoptopenjdk_variables.yml
 
     ###############################
     # Update and Install Packages #
@@ -73,48 +78,56 @@
     ################
     # Jenkins user #
     ################
-    - name: Create jenkins user
-      action: user name=jenkins state=present
+    - name: Create Jenkins user
+      action: user name={{ Jenkins_Username }} state=present
       ignore_errors: yes
-
-    - name: Set authorized key for jenkins
-      authorized_key:
-        user: jenkins
-        state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
-
-    - name: Add jenkins to the audio group
-      user: name=jenkins
-        groups=audio
-        append=yes
-
-    - name: Create Jenkins home folder
+      
+    - name: Create Jenkins user home folder
       file:
-        path: /home/jenkins
+        path: /home/{{ Jenkins_Username }}
         state: directory
-        owner: jenkins
-        group: jenkins
+        owner: "{{ Jenkins_Username }}"
+        group: "{{ Jenkins_Username }}"
         mode: 0700
       when: (ansible_architecture == "s390x")
 
+    - name: Set authorized key for Jenkins user
+      authorized_key:
+        user: "{{ Jenkins_Username }}"
+        state: present
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+
+    - name: Add Jenkins user to the audio group
+      user: name={{ Jenkins_Username }}
+        groups=audio
+        append=yes
+        
     #######################
     # Additional Packages #
     #######################
-    - name: download ccache.tar.gz
+    - name: Check if ccache is already installed
+      shell: dpkg-query -l ccache
+      register: ccache_status
+      ignore_errors: yes
+        
+    - name: Download ccache.tar.gz
       get_url:
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
         mode: 0440
-
-    - name: extract ccache
+      when: ccache_status.stdout.find('no packages found') != -1
+      
+    - name: Extract ccache
       unarchive:
-        src: /home/jenkins/ccache.tar.gz
-        dest: /home/jenkins
+        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}
         copy: False
+      when: ccache_status.stdout.find('no packages found') != -1
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make && sudo make install
       become: yes
+      when: ccache_status.stdout.find('no packages found') != -1
       
     - name: Install JSON
       shell: |
@@ -127,9 +140,9 @@
     ##################
     # Nagios plugins #
     ##################
-    - debug: msg='Host OS setup completed. Calling Nagios playbook'
-    - include: nagios/nagios_ubuntu.yml
-      static: yes
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_ubuntu.yml
+      when: Nagios_Plugins == "Enabled"
 
     #####################
     # superuser account #
@@ -137,6 +150,7 @@
     - name: Setup zeus user
       shell: adduser zeus --shell /bin/bash --disabled-password --gecos ""
       ignore_errors: yes
+      when: Superuser_Account == "Enabled"
 
     - name: Create SSH Key folder for zeus
       file:
@@ -145,12 +159,14 @@
         group: zeus
         mode: 0700
         state: directory
+      when: Superuser_Account == "Enabled"
 
     - name: Add key
       authorized_key:
         user: zeus
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+      when: Superuser_Account == "Enabled"
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -158,6 +174,7 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      when: Superuser_Account == "Enabled"
 
     #############
     # swap file #
@@ -223,7 +240,7 @@
 
     - name: Start X11
       become: yes
-      become_user: jenkins
+      become_user: "{{ Jenkins_Username }}"
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
@@ -233,12 +250,18 @@
     ###################
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
+      
+    - name: Check if NTP pools are already configured
+      shell: cat /etc/ntp.conf | grep "1.pool.ntp.org"
+      register: check_ntp_pool
+      ignore_errors: yes
 
     - name: Configure NTP pool Servers
       lineinfile: dest=/etc/ntp.conf
                 insertafter='^NTP servers'
                 line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
                 state=present
+      when: check_ntp_pool.stdout.find('1.pool.ntp.org') == ""
 
     - name: Start NTP
       service:
@@ -248,6 +271,10 @@
     ############
     # Clean up #
     ############
+    - name: Remove unneeded packages from the cache
+      apt:
+        autoclean: yes
+    
     - name: Remove apt dependencies that are no longer required
       apt:
         autoremove: yes
@@ -255,11 +282,11 @@
     ################
     # Pass or Fail #
     ################
-    - debug: msg='Send Slack notification, successful'
-    - include: slack_notification/successful_slack.yml
-      static: yes
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
 
     rescue:
-    - debug: msg='Something went wrong... Sending Slack notification failure'
-    - include: slack_notification/failure_slack.yml
-      static: yes
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
