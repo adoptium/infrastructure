@@ -165,7 +165,7 @@
       authorized_key:
         user: zeus
         state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
       when: Superuser_Account == "Enabled"
 
     - name: Grant zeus sudo powers
