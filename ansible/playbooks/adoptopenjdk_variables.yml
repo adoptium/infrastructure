@@ -1,6 +1,6 @@
 ---
 # AdoptOpenJDK variables file
-Jenkins_User_SSHKey: /home/ubuntu/keys/id_rsa.pub
+Jenkins_User_SSHKey: /root/keys/id_rsa.pub
 Jenkins_Username: jenkins
 Nagios_Plugins: Enabled
 Slack_Notification: Enabled
