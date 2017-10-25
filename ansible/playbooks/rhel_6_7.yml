@@ -1,6 +1,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
 # ----- RHEL 7 on x86 and s390 ------  #
+# ----------- RHEL 6 on x86 ---------- #
 ########################################
 
 ################
@@ -31,7 +32,6 @@
       with_items:
         - alsa-lib-devel
         - bind-utils
-        - cpanminus
         - cpio
         - cups-devel
         - freetype-devel
@@ -53,6 +53,7 @@
         - ntp
         - openssl-devel
         - perl-CPAN
+        - perl-devel
         - wget
         - zip
 
@@ -71,12 +72,17 @@
       yum: name=xorg-x11-server-common state=installed
       when: (ansible_architecture == "s390x")
       
-    - name: Download and Install JQ
-      get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: /usr/bin/jq
-        mode: 0755
-        
+    - name: Install cpanminus RHEL 6
+      shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
+      ignore_errors: yes
+      when: ansible_distribution_major_version == "6"
+
+    - name: Install cpanminus RHEL 7
+      yum: 
+        name: cpanminus 
+        state: installed 
+      when: ansible_distribution_major_version == "7"
+       
     ###############
     # ant-contrib #
     ###############
@@ -152,7 +158,13 @@
 
     - name: Install Text::CSV
       shell: |
-        cpanm --with-recommends Text::CSV      
+        cpanm --with-recommends Text::CSV    
+    
+    - name: Download and Install JQ
+      get_url:
+        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        dest: /usr/bin/jq
+        mode: 0755
 
     ##################
     # Nagios plugins #
@@ -265,10 +277,11 @@
     ###################
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
+      when: ansible_distribution_major_version == "7"
 
     - name: Configure NTP server pools
-      shell: cat /etc/ntp.conf | grep "1.pool.ntp.org" && echo "" || echo -e "pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org" >> /etc/ntp.conf
-      
+      shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
+     
     - name: Start NTP
       service:
         name: ntpd
@@ -281,6 +294,7 @@
       command: yum -y autoremove
       args:
          warn: no
+      when: ansible_distribution_major_version == "7"
 
     ################
     # Pass or Fail #
