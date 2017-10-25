@@ -105,5 +105,13 @@ crontab -e
 # Backup AWX's docker containers weekly at 5am on Mondays
 0 5 * * 2 /root/backup_docker_AWX.sh 
 chattr +i /etc/resolv.conf 
-# Next steps see Ansible_Tower_Post_setup_configuration.txt
+# Working with local files
+# Files on rt-ansible-tower
+docker ps
+# Find the CONTAINER_ID for ansible/awx_task
+# Enter the containter 
+docker exec -it CONTAINER_ID bash
+# Create a folder to work out of
+mkdir /Vendor_Files
+# You can place any files we need for Playbooks here
 ```
