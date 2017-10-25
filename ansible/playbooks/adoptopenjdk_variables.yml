@@ -4,5 +4,5 @@ Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub
 Zeus_User_SSHKey: /Vendor_Files/keys/zeus.key
 Jenkins_Username: jenkins
 Nagios_Plugins: Enabled
-Slack_Notification: Enabled
+Slack_Notification: Disabled
 Superuser_Account: Enabled
