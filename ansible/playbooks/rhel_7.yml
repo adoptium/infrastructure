@@ -1,17 +1,25 @@
-#######################################################################
-# AdoptOpenJDK - Ansible Playbook for RHEL 7 on x86 and s390 hardware #
-#######################################################################
-#
-# Please Note:
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# ----- RHEL 7 on x86 and s390 ------  #
+########################################
+
+################
+# Please Note: #
+################
 # RHEL systems must be registered with the Red Hat Subscription Management service before this Playbook can be used.
 
 - hosts: all
   remote_user: root
   become: yes
-
   tasks:
   - block:
 
+    ######################
+    # Load variable file #
+    ######################
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: adoptopenjdk_variables.yml
+      
     ###############################
     # Update and Install Packages #
     ###############################
@@ -62,7 +70,7 @@
     - name: Install xorg-x11-server-common if host is s390x
       yum: name=xorg-x11-server-common state=installed
       when: (ansible_architecture == "s390x")
-
+      
     - name: Download and Install JQ
       get_url:
         url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
@@ -101,23 +109,23 @@
     # Jenkins user #
     ################
     - name: Create jenkins user
-      action: user name=jenkins state=present
+      action: user name={{ Jenkins_Username }} state=present
       ignore_errors: yes
-      
-    - name: Set authorized key for jenkins
-      authorized_key:
-        user: jenkins
-        state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
-        
-    - name: Create Jenkins home folder
+
+    - name: Create Jenkins user home folder
       file:
-        path: /home/jenkins
+        path: /home/{{ Jenkins_Username }}
         state: directory
-        owner: jenkins
-        group: jenkins
+        owner: "{{ Jenkins_Username }}"
+        group: "{{ Jenkins_Username }}"
         mode: 0700
       when: (ansible_architecture == "s390x")
+      
+    - name: Set authorized key for jenkins user
+      authorized_key:
+        user: "{{ Jenkins_Username }}"
+        state: present
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
 
     #######################
     # Additional Packages #
@@ -125,17 +133,17 @@
     - name: Download ccache.tar.gz
       get_url:
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
         mode: 0440
-
+      
     - name: Extract ccache
       unarchive:
-        src: /home/jenkins/ccache.tar.gz
-        dest: /home/jenkins
+        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}
         copy: False
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make && sudo make install
       become: yes
 
     - name: Install JSON
@@ -149,9 +157,9 @@
     ##################
     # Nagios plugins #
     ##################
-    - debug: msg='Host OS setup completed, Calling Nagios playbook'
-    - include: nagios/nagios_rhel_7.yml
-      static: yes
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_rhel_7.yml
+      when: Nagios_Plugins == "Enabled"
 
     #####################
     # superuser account #
@@ -159,6 +167,7 @@
     - name: Setup zeus user
       shell: useradd zeus --shell /bin/bash -m 
       ignore_errors: yes
+      when: Superuser_Account == "Enabled"
 
     - name: Create SSH Key folder for zeus
       file: 
@@ -167,12 +176,14 @@
         group: zeus
         mode: 0700
         state: directory
+      when: Superuser_Account == "Enabled"
 
     - name: Add key
       authorized_key:
         user: zeus
         state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+      when: Superuser_Account == "Enabled"
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -180,32 +191,32 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      when: Superuser_Account == "Enabled"
 
     #############
     # swap file #
-    #############
-    - name: Check if swap file exists
-      shell: cat /etc/fstab
-      register: check_fstab
+    ############# 
+    - stat: path=/swapfile
+      register: swap_test
 
     - name: Create swap file
       command: fallocate -l 2G /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false 
 
     - name: Set swap file permissions
       file: path=/swapfile
             owner=root
             group=root
             mode=0600
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
 
     - name: Create swap area device
       command: mkswap /swapfile
-      when: check_fstab.stdout.find('swap') == ""
-
+      when: swap_test.stat.exists == false
+      
     - name: Mount swap file
       command: swapon /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
 
     - name: Add swap to fstab
       mount: src=/swapfile
@@ -215,8 +226,8 @@
         passno=0
         dump=0
         state=present
-      when: check_fstab.stdout.find('swap') == ""
-
+      when: swap_test.stat.exists == false
+      
     ####################
     # Auto OS patching #
     ####################    
@@ -244,7 +255,7 @@
 
     - name: Start X11
       become: yes
-      become_user: jenkins
+      become_user: "{{ Jenkins_Username }}"
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
@@ -255,11 +266,9 @@
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
 
-    - name: Configure NTP pool Servers
-      lineinfile: dest=/etc/ntp.conf
-                line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
-                state=present
-
+    - name: Configure NTP server pools
+      shell: cat /etc/ntp.conf | grep "1.pool.ntp.org" && echo "" || echo -e "pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org" >> /etc/ntp.conf
+      
     - name: Start NTP
       service:
         name: ntpd
@@ -276,11 +285,11 @@
     ################
     # Pass or Fail #
     ################
-    - debug: msg='Send Slack notification, successful'
-    - include: slack_notification/successful_slack.yml
-      static: yes
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
 
     rescue:
-    - debug: msg='Something went wrong... Sending Slack notification failure'
-    - include: slack_notification/failure_slack.yml
-      static: yes
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
