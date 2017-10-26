@@ -1,8 +1,12 @@
-###############################################
-# AdoptOpenJDK - Ansible Playbook for Windows #
-###############################################
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# -------- Windows Systems ----------  #
+########################################
 
-# *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it ***
+################
+# Please Note: #
+################
+# *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it (WINRM)***
 # Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
 # Run powershell as the Administrator
 # wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
@@ -12,9 +16,11 @@
 # .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
 - hosts: all
-
+  
+  ####################
+  # Cygwin Variables #
+  ####################
   vars:
-    # Cygwin vars for installation
     Cygwin_SITE_URL: http://mirrors.kernel.org/sourceware/cygwin/
     Cygwin_PACKAGE_DIR: c:\cygwin_packages
     Cygwin_ROOT_INST_DIR: C:\cygwin64
@@ -32,6 +38,8 @@
 
     - name: Reboot machine if necessary
       win_reboot:
+        shutdown_timeout: 3600
+        reboot_timeout: 3600
         when: update_result.reboot_required
 
     ################
@@ -39,26 +47,33 @@
     ################
     - name: Create Jenkins user
       win_user:
-        name: jenkins
+        name: "{{ Jenkins_Username }}"
         fullname: AdoptOpenJDK Jenkins User
-        password: "{{ lookup('file', 'jenkins_passwd')}}"
+        password: "{{ lookup('file', '{{ Jenkins_Win_Passwd }}') }}"
         state: present
         password_never_expires: yes
         groups:
           - Users, Remote Desktop Users
 
+    ######################
+    # Tools and Packages #
+    ######################
     - name: Create C:\temp directory
       win_file:
         path: C:\temp
         state: directory
-
-    ######################
-    # Tools and Packages #
-    ######################
+        
+    - name: Create cmd.exe shortcut
+      win_shortcut:
+        src: C:\Windows\System32\cmd.exe
+        dest: C:\Users\Public\Desktop\cmd.lnk
+        icon: C:\Windows\System32\cmd.exe,0
+        
     - name: Download Cygwin installer
       win_get_url:
         url: https://cygwin.com/setup-x86_64.exe
         dest: 'C:\temp\cygwin.exe'
+        force: no
 
     - name: Install Cygwin and its packages
       win_command: c:\Temp\cygwin.exe --quiet-mode --download --local-install --upgrade-also --delete-orphans --site {{ Cygwin_SITE_URL }} --local-package-dir {{ Cygwin_PACKAGE_DIR }} --root {{ Cygwin_ROOT_INST_DIR }} --categories Base --packages {{ Cygwin_PACKAGES }}
@@ -66,15 +81,18 @@
     - name: Add c:\cygwin64\bin to the start of the %PATH%
       raw: setx path "C:\cygwin64\bin;$ENV:PATH" /M
 
-    - name: Deploy JQ
-      win_get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe
-        dest: 'C:\windows\system32\jq-win64.exe'
+#    - name: Deploy JQ
+#      win_get_url:
+#        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe
+#        dest: 'C:\windows\system32\jq-win64.exe'
+#        force: no
+#        ignore_errors: yes
 
     - name: Download Firefox
       win_get_url:
         url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
         dest: c:\Temp\firefox.exe
+        force: no
 
     - name: Install Firefox
       raw: c:\Temp\firefox.exe -ms
@@ -83,6 +101,7 @@
       win_get_url:
         url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
         dest: c:\Temp\strawberry-perl.zip
+        force: no
 
     - name: Unzip Strawberry Perl
       win_unzip:
@@ -93,22 +112,19 @@
       win_path:
           elements:
           - 'C:\Strawberry\bin'
+          state: present
 
     - name: Install Text::CSV_XS
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
 
-    - name: Download Java 6
-      win_get_url:
-        url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=43883
-        dest: 'C:\TEMP\java6.exe'
-
-    - name: Install Java 6
-      raw: 'C:\TEMP\java6.exe /s SPONSORS=0 /l*v C:\TEMP\java6_install_log.txt'
-
+    #####################
+    # Java Installation #
+    #####################
     - name: Download Java 7
       win_get_url:
         url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=81821
         dest: 'C:\TEMP\java7.exe'
+        force: no
 
     - name: Install Java 7
       raw: 'C:\TEMP\java7.exe /s SPONSORS=0 /l*v C:\TEMP\java7_install_log.txt'
@@ -117,6 +133,7 @@
       win_get_url:
         url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=109708
         dest: 'C:\TEMP\java8.exe'
+        force: no
 
     - name: Install Java 8
       raw: 'C:\TEMP\java8.exe /s SPONSORS=0 /l*v C:\TEMP\java8_install_log.txt'
@@ -126,16 +143,22 @@
         name: JAVA_HOME
         elements: C:\Program Files\Java\jre1.8.0_60\jre8\bin
         scope: machine
+        state: present
 
+    ###########################
+    # Apache ANT Installation #
+    ###########################
     - name: Download Apache ANT
       win_get_url:
         url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.1-bin.zip
         dest: c:\temp\ant.zip
+        force: no
 
     - name: Deploy Apache ANT
       win_unzip:
         src: c:\temp\ant.zip
         dest: c:\apache-ant\
+        creates: c:\apache-ant
 
     - name: Set ANT_HOME
       raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.1" /M
@@ -144,28 +167,43 @@
       win_path:
           elements:
           - '%ANT_HOME%\bin'
+          state: present
 
     - name: Download ant-contrib
       win_get_url:
         url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
         dest: c:\temp\ant-contrib.zip
+        force: no
 
     - name: unzip ant-contrib
       win_unzip:
         src: c:\temp\ant-contrib.zip
         dest: c:\temp\ant-contrib
+        creates: c:\temp\ant-contrib
 
     - name: Copy the ant-contrib.jar to ANT's lib folder
       win_copy:
         src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
         dest: C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar
         remote_src: True
+        
+    ################################
+    # Visual Studio Community 2013 #
+    ################################
+    - name: Download Visual Studio Community 2013
+      win_get_url:
+        url: 'https://go.microsoft.com/fwlink/?LinkId=532495'
+        dest: 'C:\TEMP\vs2013_community.exe'
+        force: no
+      tags: [download, visualstudio]
 
-    - name: Create cmd.exe shortcut
-      win_shortcut:
-        src: C:\Windows\System32\cmd.exe
-        dest: C:\Users\Public\Desktop\cmd.lnk
-        icon: C:\Windows\System32\cmd.exe,0
+    - name: Install Visual Studio Community 2013
+      raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
+            /Log C:\TEMP\vs2013_install_log.txt'
+      tags: [install, visualstudio]
+
+    - name: Reboot machine after Visual Studio installation
+      win_reboot:
 
     ###################
     # NTP Time Server #
@@ -209,15 +247,15 @@
       win_service:
         name: w32time
         state: restarted
-    
-  ################
-  # Pass or Fail #
-  ################
-  - debug: msg='Send Slack notification, successful'
-  - include: slack_notification/successful_slack.yml
-    static: yes
 
-  rescue:
-  - debug: msg='Something went wrong... Sending Slack notification failure'
-  - include: slack_notification/failure_slack.yml
-    static: yes
+    ################
+    # Pass or Fail #
+    ################
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
+
+    rescue:
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
