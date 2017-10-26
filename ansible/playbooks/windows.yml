@@ -137,17 +137,17 @@
 
     - name: Download Java 8
       win_get_url:
-        url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=109708
-        dest: 'C:\TEMP\java8.exe'
+        url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.exe
+        dest: C:\temp\java8.exe
         force: no
 
     - name: Install Java 8
-      raw: 'C:\TEMP\java8.exe /s SPONSORS=0 /l*v C:\TEMP\java8_install_log.txt'
+      raw: C:\temp\java8.exe /s SPONSORS=0 /l*v C:\temp\java8_install_log.txt
 
     - name: Set JAVA_HOME to version 8
       win_path:
         name: JAVA_HOME
-        elements: C:\Program Files\Java\jre1.8.0_60\jre8\bin
+        elements: C:\Program Files\OpenJDK\jdk8u144-b01\bin
         scope: machine
         state: present
 
