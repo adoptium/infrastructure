@@ -29,6 +29,12 @@
   tasks:
   - block:
 
+    ######################
+    # Load variable file #
+    ######################
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: adoptopenjdk_variables_windows.yml
+      
     ###################
     # Windows Updates #
     ###################
