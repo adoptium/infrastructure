@@ -251,18 +251,9 @@
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
       
-    - name: Check if NTP pools are already configured
-      shell: cat /etc/ntp.conf | grep "1.pool.ntp.org"
-      register: check_ntp_pool
-      ignore_errors: yes
-
-    - name: Configure NTP pool Servers
-      lineinfile: dest=/etc/ntp.conf
-                insertafter='^NTP servers'
-                line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
-                state=present
-      when: check_ntp_pool.stdout.find('1.pool.ntp.org') == ""
-
+    - name: Configure NTP server pools
+      shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
+     
     - name: Start NTP
       service:
         name: ntp
