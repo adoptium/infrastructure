@@ -137,6 +137,52 @@
       shell: |
         cpanm --with-recommends Text::CSV   
 
+    ##########
+    # Docker #
+    ##########
+    - name: Add Docker Repo
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+      when: (ansible_architecture != "s390x")
+        
+    - name: Install Docker prerequisites
+      apt: pkg={{ item }} state=latest update_cache=yes
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+      when: (ansible_architecture != "s390x")
+      
+    - name: Install Additional Docker prerequisites for Ubuntu 14
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - linux-image-extra-{{ ansible_kernel }}
+        - linux-image-extra-virtual
+      when: (ansible_distribution_major_version == "14" and ansible_architecture != "s390x")
+
+    - name: Import Docker Repo key
+      shell: "wget -qO- https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
+      when: (ansible_architecture != "s390x")
+      
+    - name: Install Docker
+      apt: name=docker-ce state=latest update_cache=yes
+      when: (ansible_architecture != "s390x")
+      
+    - name: Add jenkins user to the docker group
+      user: name="{{ Jenkins_Username }}"
+            groups=docker
+            append=yes
+      when: (ansible_architecture != "s390x")
+      
+    - name: Enable and Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      when: (ansible_architecture != "s390x")
+
     ##################
     # Nagios plugins #
     ##################
