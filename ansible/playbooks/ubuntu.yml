@@ -125,7 +125,7 @@
       when: ccache_status.stdout.find('no packages found') != -1
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make && sudo make install
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
       when: ccache_status.stdout.find('no packages found') != -1
       
