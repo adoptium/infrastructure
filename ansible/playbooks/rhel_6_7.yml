@@ -83,6 +83,26 @@
         state: installed 
       when: ansible_distribution_major_version == "7"
 
+    #########
+    # cmake #
+    #########
+    - name: Download cmake
+      get_url:
+        url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+        dest: /tmp/cmake-3.7.2.tar.gz
+        mode: 0440
+        force: no
+        validate_certs: no
+      
+    - name: Extract ccache
+      unarchive:
+        src: /tmp/cmake-3.7.2.tar.gz
+        dest: /tmp
+        copy: False  
+
+    - name: Running ./configure & make for cmake
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      
     #####################
     # Docker for RHEL 7 #
     #####################
