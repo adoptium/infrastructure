@@ -87,13 +87,6 @@
     - name: Add c:\cygwin64\bin to the start of the %PATH%
       raw: setx path "C:\cygwin64\bin;$ENV:PATH" /M
 
-#    - name: Deploy JQ
-#      win_get_url:
-#        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe
-#        dest: 'C:\windows\system32\jq-win64.exe'
-#        force: no
-#        ignore_errors: yes
-
     - name: Download Firefox
       win_get_url:
         url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
@@ -123,6 +116,31 @@
     - name: Install Text::CSV_XS
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
 
+    #########
+    # cmake #
+    #########
+    - name: Download cmake installer
+      win_get_url:
+        url: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.msi
+        dest: 'C:\temp\cmake.msi'
+        force: no
+
+    - name: Install cmake
+      raw: C:\temp\cmake.msi /quite
+      ignore_errors: yes
+
+    #######
+    # GIT #
+    #######
+    - name: Download GIT installer
+      win_get_url:
+        url: https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe
+        dest: 'C:\temp\git.exe'
+        force: no
+
+    - name: Install GIT
+      win_command: 'C:\temp\git.exe /SILENT /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
+      
     #####################
     # Java Installation #
     #####################
