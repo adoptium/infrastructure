@@ -157,6 +157,9 @@
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       
+    ##########
+    # Docker #
+    ##########
     - name: Ensure the system can use the HTTPS transport for APT
       stat:
         path: /usr/lib/apt/methods/https
@@ -168,9 +171,6 @@
         state: installed
       when: not apt_https_transport.stat.exists
       
-    ##########
-    # Docker #
-    ##########
     - name: Add Docker Repo
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
