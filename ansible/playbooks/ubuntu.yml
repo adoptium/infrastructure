@@ -157,6 +157,17 @@
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       
+    - name: Ensure the system can use the HTTPS transport for APT
+      stat:
+        path: /usr/lib/apt/methods/https
+      register: apt_https_transport
+
+    - name: Install HTTPS transport for APT
+      apt:
+        pkg: apt-transport-https
+        state: installed
+      when: not apt_https_transport.stat.exists
+      
     ##########
     # Docker #
     ##########
