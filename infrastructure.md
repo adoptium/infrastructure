@@ -17,8 +17,8 @@
 |  osuosl |  build-osuosl-ppc64le-ubuntu-16.10 |  140.211.168.135 | ppc64le  | Ubuntu16.10  |  ubuntu ||
 |  osuosl |  build-osuosl-ppc64-aix-71-1|  140.211.9.10 | ppc64  | aix71  |  root ||
 |  osuosl |  build-osuosl-ppc64-aix-71-2|  140.211.9.12 | ppc64  | aix71  |  root ||
-|  Packet |  build-packet-armv8-ubuntu-16.04  |  147.75.94.130 | aarch64  |  Ubuntu16.04 | root ||
-|  Packet |  test-packet-armv8-ubuntu-16.04  |  147.75.111.190 | aarch64  |  Ubuntu16.04 | root ||
+|  Packet |  build-packet-armv8-ubuntu-16.04  |  147.75.196.30 | aarch64  |  Ubuntu16.04 | root ||
+|  Packet |  test-packet-armv8-ubuntu-16.04  |  147.75.74.50 | aarch64  |  Ubuntu16.04 | root ||
 |  Packet |  test-packet-x64-ubuntu-16.04-1  |  147.75.204.239 | x64  |  Ubuntu16.04 | root ||
 |  Packet |  test-packet-x64-windows-2012r2-1 | 147.75.101.30 | x64 | Win Server 2012r2  |  Admin ||
 | MacInCloud  |  test-macincloud-macos1010-1 |  74.80.250.151 | x64  |  MacOS10.10 | admin  ||
