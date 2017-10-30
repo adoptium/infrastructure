@@ -23,12 +23,15 @@
     - name: Ensure aptitude is installed on Ubuntu 16 systems
       apt: pkg=aptitude state=latest update_cache=yes
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+      tags: patch_update
 
     - name: Add the openjdk repository to apt
       apt_repository: repo='ppa:openjdk-r/ppa'
+      tags: patch_update
 
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
+      tags: patch_update
 
     - name: Install Build tools
       apt: pkg={{ item }} state=latest
@@ -55,6 +58,7 @@
         - wget
         - zip
         - pkg-config
+      tags: build_tools
 
     - name: Install Test tools
       apt: name={{item}} state=installed
@@ -66,21 +70,25 @@
         - pulseaudio
         - xauth
         - xorg
+      tags: test_tools
 
     - name: Install xserver-xorg-legacy on Ubuntu 16
       apt: name=xserver-xorg-legacy state=installed
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+      tags: test_tools
 
     - name: Install libfreetype6-dev on Ubuntu 16 s390
       apt: name=libfreetype6-dev state=installed
       when: (ansible_architecture == "s390x")
-      
+      tags: test_tools
+
     ################
     # Jenkins user #
     ################
     - name: Create Jenkins user
       action: user name={{ Jenkins_Username }} state=present
       ignore_errors: yes
+      tags: jenkins_user
       
     - name: Create Jenkins user home folder
       file:
@@ -90,18 +98,29 @@
         group: "{{ Jenkins_Username }}"
         mode: 0700
       when: (ansible_architecture == "s390x")
+      tags: jenkins_user
 
     - name: Set authorized key for Jenkins user
       authorized_key:
         user: "{{ Jenkins_Username }}"
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+      tags: jenkins_user
 
     - name: Add Jenkins user to the audio group
       user: name={{ Jenkins_Username }}
         groups=audio
         append=yes
-        
+      tags: jenkins_user
+ 
+    ################
+    # Default Java #
+    ################
+    - name: Set default java version 
+      shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")
+      tags: default_java
+
     #######################
     # Additional Packages #
     #######################
@@ -109,6 +128,7 @@
       shell: dpkg-query -l ccache
       register: ccache_status
       ignore_errors: yes
+      tags: ccache
         
     - name: Download ccache.tar.gz
       get_url:
@@ -116,26 +136,31 @@
         dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
         mode: 0440
       when: ccache_status.stdout.find('no packages found') != -1
-      
+      tags: ccache
+
     - name: Extract ccache
       unarchive:
         src: /home/{{ Jenkins_Username }}/ccache.tar.gz
         dest: /home/{{ Jenkins_Username }}
         copy: False
       when: ccache_status.stdout.find('no packages found') != -1
+      tags: ccache
 
     - name: Running ./configure & make for CCACHE
       shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
       when: ccache_status.stdout.find('no packages found') != -1
-      
+      tags: ccache
+
     - name: Install JSON
       shell: |
         cpanm --with-recommends JSON
+      tags: json
 
     - name: Install Text::CSV
       shell: |
         cpanm --with-recommends Text::CSV   
+      tags: text_csv
 
     #########
     # cmake #
@@ -147,35 +172,28 @@
         mode: 0440
         force: no
         validate_certs: no
+      tags: cmake 
       
-    - name: Extract cmake
+    - name: Extract ccache
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
-        copy: False  
+        copy: False 
+      tags: cmake  
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
-      
+      tags: cmake 
+
     ##########
     # Docker #
     ##########
-    - name: Ensure the system can use the HTTPS transport for APT
-      stat:
-        path: /usr/lib/apt/methods/https
-      register: apt_https_transport
-
-    - name: Install HTTPS transport for APT
-      apt:
-        pkg: apt-transport-https
-        state: installed
-      when: not apt_https_transport.stat.exists
-      
     - name: Add Docker Repo
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
       when: (ansible_architecture != "s390x")
+      tags: docker
         
     - name: Install Docker prerequisites
       apt: pkg={{ item }} state=latest update_cache=yes
@@ -185,6 +203,7 @@
         - curl
         - software-properties-common
       when: (ansible_architecture != "s390x")
+      tags: docker
       
     - name: Install Additional Docker prerequisites for Ubuntu 14
       apt: pkg={{ item }} state=latest
@@ -192,27 +211,32 @@
         - linux-image-extra-{{ ansible_kernel }}
         - linux-image-extra-virtual
       when: (ansible_distribution_major_version == "14" and ansible_architecture != "s390x")
+      tags: docker
 
     - name: Import Docker Repo key
       shell: "wget -qO- https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
       when: (ansible_architecture != "s390x")
-      
+      tags: docker
+
     - name: Install Docker
       apt: name=docker-ce state=latest update_cache=yes
       when: (ansible_architecture != "s390x")
-      
+      tags: docker
+
     - name: Add jenkins user to the docker group
       user: name="{{ Jenkins_Username }}"
             groups=docker
             append=yes
       when: (ansible_architecture != "s390x")
-      
+      tags: docker
+
     - name: Enable and Start Docker Service
       service:
         name: docker
         state: started
         enabled: yes
       when: (ansible_architecture != "s390x")
+      tags: docker
 
     ##################
     # Nagios plugins #
@@ -228,6 +252,7 @@
       shell: adduser zeus --shell /bin/bash --disabled-password --gecos ""
       ignore_errors: yes
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Create SSH Key folder for zeus
       file:
@@ -237,13 +262,15 @@
         mode: 0700
         state: directory
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Add key
       authorized_key:
         user: zeus
         state: present
-        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -252,6 +279,7 @@
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     #############
     # swap file #
@@ -260,10 +288,12 @@
     - name: Check if swap file exists
       shell: cat /etc/fstab
       register: check_fstab
+      tags: swap
 
     - name: Create swap file
       command: fallocate -l 2G /swapfile
       when: check_fstab.stdout.find('swap') == ""
+      tags: swap
 
     - name: Set swap file permissions
       file: path=/swapfile
@@ -271,14 +301,17 @@
           group=root
           mode=0600
       when: check_fstab.stdout.find('swap') == ""
+      tags: swap
 
     - name: Create swap area device
       command: mkswap /swapfile
       when: check_fstab.stdout.find('swap') == ""
+      tags: swap
 
     - name: Mount swap file
       command: swapon /swapfile
       when: check_fstab.stdout.find('swap') == ""
+      tags: swap
 
     - name: Add swap to fstab
       mount: src=/swapfile
@@ -289,6 +322,7 @@
         dump=0
         state=present
       when: check_fstab.stdout.find('swap') == ""
+      tags: swap
 
     ####################
     # Auto OS patching #
@@ -301,6 +335,7 @@
             user=root
             job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
             state=present
+      tags: cron
 
     ###############
     # X11 Support #
@@ -314,6 +349,7 @@
         group: root
         owner: root
         mode: 0644
+      tags: x11
 
     - name: Start X11
       become: yes
@@ -321,20 +357,24 @@
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
+      tags: x11
 
     ###################
     # NTP Time Server #
     ###################
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
+      tags: ntp
       
     - name: Configure NTP server pools
       shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
-     
+      tags: ntp
+
     - name: Start NTP
       service:
         name: ntp
         state: restarted
+      tags: ntp
 
     ############
     # Clean up #
@@ -342,10 +382,12 @@
     - name: Remove unneeded packages from the cache
       apt:
         autoclean: yes
+      tags: cleanup
     
     - name: Remove apt dependencies that are no longer required
       apt:
         autoremove: yes
+      tags: cleanup
 
     ################
     # Pass or Fail #
@@ -353,8 +395,10 @@
     - name: Send Slack notification, successful
       include_tasks: slack_notification/successful_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
 
     rescue:
     - name: Send Slack notification, failure
       include_tasks: slack_notification/failure_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
