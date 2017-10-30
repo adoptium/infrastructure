@@ -73,7 +73,7 @@
       authorized_key:
         user: jenkins
         state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
       tags: jenkins_user
 
     - name: Add jenkins to the audio group
