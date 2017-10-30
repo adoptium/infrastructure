@@ -1,7 +1,8 @@
-################################################################
-# AdoptOpenJDK - Ansible Playbook for CentOS 7 on x86 hardware #
-################################################################
-#
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# --------- CentOS 7 on x86 ---------  #
+########################################
+
 - hosts: all
   remote_user: root
   become: yes
@@ -9,266 +10,330 @@
   tasks:
   - block:
 
-  ###############################
-  # Update and Install Packages #
-  ###############################
-  - name: Enable EPEL release
-    yum: name='epel-release' state=installed update_cache=yes
+    ######################
+    # Load variable file #
+    ######################
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: adoptopenjdk_variables.yml
 
-  - name: Ensure DNF is installed
-    yum: name='dnf' state=installed update_cache=yes
+    ###############################
+    # Update and Install Packages #
+    ###############################
+    - name: Enable EPEL release
+      yum: name='epel-release' state=installed update_cache=yes
+      tags: patch_update
 
-  - name: DNF upgrade all packages
-    dnf: name='*' state=latest
+    - name: Ensure DNF is installed
+      yum: name='dnf' state=installed update_cache=yes
+      tags: patch_update
 
-  - name: Install Build tools
-    dnf: name={{item}} state=installed
-    with_items:
-      - alsa-lib-devel
-      - bind-utils
-      - cpanminus
-      - cpio
-      - cups-devel
-      - freetype-devel
-      - gcc
-      - gcc-c++
-      - git
-      - glibc
-      - glibc-common
-      - java-1.8.0-openjdk-devel
-      - libXext-devel
-      - libXrender-devel
-      - libXrender-devel
-      - libXt-devel
-      - libXt-devel
-      - libXtst-devel
-      - libXtst-devel
-      - make
-      - mesa-libGL-devel
-      - ntp
-      - openssl-devel
-      - perl-CPAN
-      - unzip
-      - wget
-      - zip
+    - name: DNF upgrade all packages
+      dnf: name='*' state=latest
+      tags: patch_update
 
-  - name: Install Test tools
-    dnf: name={{item}} state=installed
-    with_items:
-      - ant
-      - perl
-      - xorg-x11-xauth
-      - xorg-x11-server-Xorg   
+    - name: Install Build tools
+      dnf: name={{item}} state=installed
+      with_items:
+        - alsa-lib-devel
+        - bind-utils
+        - cpanminus
+        - cpio
+        - cups-devel
+        - freetype-devel
+        - gcc
+        - gcc-c++
+        - git
+        - glibc
+        - glibc-common
+        - java-1.8.0-openjdk-devel
+        - libXext-devel
+        - libXrender-devel
+        - libXrender-devel
+        - libXt-devel
+        - libXt-devel
+        - libXtst-devel
+        - libXtst-devel
+        - make
+        - mesa-libGL-devel
+        - ntp
+        - openssl-devel
+        - perl-CPAN
+        - unzip
+        - wget
+        - zip
+      tags: build_tools
 
-  - name: Download and Install JQ
-    get_url:
-      url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-      dest: /usr/bin/jq
-      mode: 0755
-            
-  ###############
-  # ant-contrib #
-  ###############
-  - name: Download ant-contrib
-    get_url:
-      url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
-      dest: /tmp/
-      mode: 0440
-      timeout: 25
+    - name: Install Test tools
+      dnf: name={{item}} state=installed
+      with_items:
+        - ant
+        - perl
+        - xorg-x11-xauth
+        - xorg-x11-server-Xorg  
+      tags: test_tools 
 
-  - name: Extract ant-contrib
-    unarchive:
-      src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
-      dest: /tmp/
-      copy: False
-
-  - name: Move ant-contrib.jar to lib folder
-    command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
-
-  - name: Clean ant-contrib tmp files
-    file:
-      state: absent
-      path: "/tmp/ant-contrib/"
-
-  - file:
-      state: absent
-      path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
-
-  ################
-  # Jenkins user #
-  ################
-  - name: Create jenkins user
-    action: user name=jenkins state=present
-    ignore_errors: yes
+    ################
+    # Jenkins user #
+    ################
+    - name: Create jenkins user
+      action: user name=jenkins state=present
+      ignore_errors: yes
+      tags: jenkins_user
           
-  - name: Set authorized key for jenkins
-    authorized_key:
-      user: jenkins
-      state: present
-      key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
-            
-  #######################
-  # Additional Packages #
-  #######################
-  - name: Download ccache.tar.gz
-    get_url:
-      url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-      dest: /home/jenkins/ccache.tar.gz
-      mode: 0440
+    - name: Set authorized key for jenkins
+      authorized_key:
+        user: jenkins
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+      tags: jenkins_user
+          
+    #######################
+    # Additional Packages #
+    #######################
+    - name: Download ccache.tar.gz
+      get_url:
+        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
+        dest: /home/jenkins/ccache.tar.gz
+        mode: 0440
+      tags: ccache
 
-  - name: Extract ccache
-    unarchive:
-      src: /home/jenkins/ccache.tar.gz
-      dest: /home/jenkins
-      copy: False
+    - name: Extract ccache
+      unarchive:
+        src: /home/jenkins/ccache.tar.gz
+        dest: /home/jenkins
+        copy: False
+      tags: ccache
 
-  - name: Running ./configure & make for CCACHE
-    shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
-    become: yes
+    - name: Running ./configure & make for CCACHE
+      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      become: yes
+      tags: ccache
 
-  - name: Install JSON
-    shell: |
-      cpanm --with-recommends JSON
+    - name: Install JSON
+      shell: |
+        cpanm --with-recommends JSON
+      tags: json
 
-  - name: Install Text::CSV
-    shell: |
-      cpanm --with-recommends Text::CSV      
+    - name: Install Text::CSV
+      shell: |
+        cpanm --with-recommends Text::CSV  
+      tags: text_csv
+  
+    - name: Download and Install JQ
+      get_url:
+        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        dest: /usr/bin/jq
+        mode: 0755
+      tags: jq_test  
 
-  ##################
-  # Nagios plugins #
-  ##################
-  - debug: msg='Host OS setup completed, Calling Nagios playbook'
-  - include: nagios/nagios_rhel_7.yml
-    static: yes
+    ###############
+    # ant-contrib #
+    ###############
+    - name: Download ant-contrib
+      get_url:
+        url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+        dest: /tmp/
+        mode: 0440
+        timeout: 25
+      tags: ant
 
-  #####################
-  # superuser account #
-  #####################
-  - name: Setup zeus user
-    shell: useradd zeus --shell /bin/bash -m 
-    ignore_errors: yes
+    - name: Extract ant-contrib
+      unarchive:
+        src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
+        dest: /tmp/
+        copy: False
+      tags: ant
 
-  - name: Create SSH Key folder for zeus
-    file: 
-      path: /home/zeus/.ssh
-      owner: zeus
-      group: zeus
-      mode: 0700
-      state: directory
+    - name: Move ant-contrib.jar to lib folder
+      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+      tags: ant
 
-  - name: Add key
-    authorized_key:
-      user: zeus
-      state: present
-      key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+    - name: Clean ant-contrib tmp files
+      file:
+        state: absent
+        path: "/tmp/ant-contrib/"
+      tags: ant
 
-  - name: Grant zeus sudo powers
-    lineinfile:
-      dest: /etc/sudoers
-      state: present
-      regexp: '^zeus'
-      line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+    - file:
+        state: absent
+        path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
+      tags: ant
 
-  #############
-  # swap file #
-  #############
-  - name: Check if swap file exists
-    shell: cat /etc/fstab
-    register: check_fstab
+    #########
+    # cmake #
+    #########
+    - name: Download cmake
+      get_url:
+        url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+        dest: /tmp/cmake-3.7.2.tar.gz
+        mode: 0440
+        force: no
+        validate_certs: no
+      tags: cmake 
+      
+    - name: Extract ccache
+      unarchive:
+        src: /tmp/cmake-3.7.2.tar.gz
+        dest: /tmp
+        copy: False 
+      tags: cmake  
 
-  - name: Create swap file
-    command: fallocate -l 2G /swapfile
-    when: check_fstab.stdout.find('swap') == ""
+    - name: Running ./configure & make for cmake
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      tags: cmake 
 
-  - name: Set swap file permissions
-    file: path=/swapfile
-          owner=root
-          group=root
-          mode=0600
-    when: check_fstab.stdout.find('swap') == ""
+    ##################
+    # Nagios plugins #
+    ##################
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_ubuntu.yml
+      when: Nagios_Plugins == "Enabled"
 
-  - name: Create swap area device
-    command: mkswap /swapfile
-    when: check_fstab.stdout.find('swap') == ""
+    #####################
+    # superuser account #
+    #####################
+    - name: Setup zeus user
+      shell: useradd zeus --shell /bin/bash -m 
+      ignore_errors: yes
+      tags: supperuser
 
-  - name: Mount swap file
-    command: swapon /swapfile
-    when: check_fstab.stdout.find('swap') == ""
+    - name: Create SSH Key folder for zeus
+      file: 
+        path: /home/zeus/.ssh
+        owner: zeus
+        group: zeus
+        mode: 0700
+        state: directory
+      tags: supperuser
 
-  - name: Add swap to fstab
-    mount: src=/swapfile
-      name=none
-      fstype=swap
-      opts=sw
-      passno=0
-      dump=0
-      state=present
-    when: check_fstab.stdout.find('swap') == ""
+    - name: Add key
+      authorized_key:
+        user: zeus
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+      tags: supperuser
 
-  ####################
-  # Auto OS patching #
-  ####################    
-  - name: Add cron job to check for updates
-    cron: name="Check for Updates every Sunday at 5am"
-          weekday="6"
-          minute="0"
-          hour="5"
-          user=root
-          job="/usr/bin/dnf -y update"
-          state=present
+    - name: Grant zeus sudo powers
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^zeus'
+        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      tags: supperuser
 
-  ###############
-  # X11 Support #
-  ###############
-  - name: Create X11 Wrapper config file
-    copy:
-      content: |
-        allowed_users=anybody
-        needs_root_rights=yes
-      dest: /etc/X11/Xwrapper.config
-      group: root
-      owner: root
-      mode: 0644
+    #############
+    # swap file #
+    #############
+    - name: Check if swap file exists
+      shell: cat /etc/fstab
+      register: check_fstab
+      tags: swap
 
-  - name: Start X11
-    become: yes
-    become_user: jenkins
-    shell: startx -- :1 &
-    ignore_errors: yes
-    no_log: True
+    - name: Create swap file
+      command: fallocate -l 2G /swapfile
+      when: check_fstab.stdout.find('swap') == ""
+      tags: swap
+
+    - name: Set swap file permissions
+      file: path=/swapfile
+            owner=root
+            group=root
+            mode=0600
+      when: check_fstab.stdout.find('swap') == ""
+      tags: swap
+
+    - name: Create swap area device
+      command: mkswap /swapfile
+      when: check_fstab.stdout.find('swap') == ""
+      tags: swap
+
+    - name: Mount swap file
+      command: swapon /swapfile
+      when: check_fstab.stdout.find('swap') == ""
+      tags: swap
+
+    - name: Add swap to fstab
+      mount: src=/swapfile
+        name=none
+        fstype=swap
+        opts=sw
+        passno=0
+        dump=0
+        state=present
+      when: check_fstab.stdout.find('swap') == ""
+      tags: swap
+
+    ####################
+    # Auto OS patching #
+    ####################    
+    - name: Add cron job to check for updates
+      cron: name="Check for Updates every Sunday at 5am"
+            weekday="6"
+            minute="0"
+            hour="5"
+            user=root
+            job="/usr/bin/dnf -y update"
+            state=present
+      tags: cron
+
+    ###############
+    # X11 Support #
+    ###############
+    - name: Create X11 Wrapper config file
+      copy:
+        content: |
+          allowed_users=anybody
+          needs_root_rights=yes
+        dest: /etc/X11/Xwrapper.config
+        group: root
+        owner: root
+        mode: 0644
+      tags: x11
+
+    - name: Start X11
+      become: yes
+      become_user: jenkins
+      shell: startx -- :1 &
+      ignore_errors: yes
+      no_log: True
+      tags: x11
                   
-  ###################
-  # NTP Time Server #
-  ###################
-  - name: Set timedatectl set-ntp no
-    shell: timedatectl set-ntp no
+    ###################
+    # NTP Time Server #
+    ###################
+    - name: Set timedatectl set-ntp no
+      shell: timedatectl set-ntp no
+      tags: ntp
 
-  - name: Configure NTP pool Servers
-    lineinfile: dest=/etc/ntp.conf
-              line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
-              state=present
+    - name: Configure NTP server pools
+      shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
+      tags: ntp
 
-  - name: Start NTP
-    service:
-      name: ntpd
-      state: restarted
+    - name: Start NTP
+      service:
+        name: ntpd
+        state: restarted
+      tags: ntp
 
-  ############
-  # Clean up #
-  ############
-  - name: Remove DNF dependencies that are no longer required
-    command: dnf -y autoremove
-    args:
-       warn: no
+    ############
+    # Clean up #
+    ############
+    - name: Remove DNF dependencies that are no longer required
+      command: dnf -y autoremove
+      args:
+         warn: no
+      tags: cleanup
 
-  ################
-  # Pass or Fail #
-  ################
-  - debug: msg='Send Slack notification, successful'
-  - include: slack_notification/successful_slack.yml
-    static: yes
+    ################
+    # Pass or Fail #
+    ################
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
 
-  rescue:
-  - debug: msg='Something went wrong... Sending Slack notification failure'
-  - include: slack_notification/failure_slack.yml
-    static: yes
+    rescue:
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
