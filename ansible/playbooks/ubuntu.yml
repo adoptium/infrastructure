@@ -59,6 +59,13 @@
         - zip
         - pkg-config
       tags: build_tools
+      
+    - name: Install libpng-dev on aarch64
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - libpng-dev
+      when: (ansible_architecture == "aarch64")
+      tags: build_tools
 
     - name: Install Test tools
       apt: name={{item}} state=installed
