@@ -1,6 +1,7 @@
-###########################################
-# AdoptOpenJDK - Ansible Playbook for AIX #
-###########################################
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# --------------- AIX ---------------  #
+########################################
 
 - hosts: all
   remote_user: root
@@ -14,15 +15,19 @@
     ##########
     - name: Create tmp folder /tmp/playbook_tmp
       file: path=/tmp/playbook_tmp state=directory mode=0755
+      tags: layout
 
     - name: Create rpm tmp folder /tmp/playbook_tmp/rpms
       file: path=/tmp/playbook_tmp/rpms state=directory mode=0755
+      tags: layout
 
     - name: Create java tmp folder /tmp/playbook_tmp/java
       file: path=/tmp/playbook_tmp/java state=directory mode=0755
+      tags: layout
 
     - name: Create xlc tmp folder /tmp/playbook_tmp/xlc
       file: path=/tmp/playbook_tmp/xlc state=directory mode=0755
+      tags: layout
 
     ################################
     # AIX filesystem configuration #
@@ -33,14 +38,15 @@
         dest: /tmp/playbook_tmp/AIX_filesystem_config.sh
         mode: 0775
         validate_certs: no
+      tags: filesystem
         
     - name: Execute AIX filesystem configuration script
       command: /tmp/playbook_tmp/AIX_filesystem_config.sh
+      tags: filesystem
 
     ######################################
     # Install and configure RPM Packages #
     ######################################
-
     - name: Transfer RPM Packages to remote host
       copy:
         src: "{{ item }}"
@@ -48,6 +54,7 @@
         mode: 0755
       with_fileglob:
         - /home/ubuntu/aix/rpms/*
+      tags: additional_rpms
 
     - name: Download script to install RPM packages
       get_url:
@@ -55,9 +62,11 @@
         dest: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
         mode: 0775
         validate_certs: no
+      tags: additional_rpms
 
     - name: Execute script to install RPM packages
       command: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
+      tags: additional_rpms
 
     ##############
     # IBM Java 8 #
@@ -66,24 +75,32 @@
       copy:
         src: /home/ubuntu/aix/java/Java8_64.jre.tar.gz
         dest: /tmp/playbook_tmp/java/Java8_64.jre.tar.gz
+      tags: java8
 
     - name: Extract Java 
       shell: gzip -d /tmp/playbook_tmp/java/Java8_64.jre.tar.gz 
+      tags: java8
+
     - shell: tar -xvf /tmp/playbook_tmp/java/Java8_64.jre.tar -C /tmp/playbook_tmp/java/
+      tags: java8
 
     - name: Install Java 8 - installp
       shell: installp -agXYd /tmp/playbook_tmp/java/ Java8_64.jre
+      tags: java8
 
     - name: Create symlink for Java
       file: src=/usr/java8_64/jre/bin/java dest=/usr/bin/java state=link
+      tags: java8
 
     - name: Test Java
       command: /usr/bin/java -version
       register: java_version
+      tags: java8
 
     - name: Display Java version information
       debug:
         msg: "{{ java_version.stderr }}"
+      tags: java8
 
     ############
     # IBM XL C #
@@ -92,38 +109,52 @@
       copy:
         src: /home/ubuntu/aix/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
         dest: /tmp/playbook_tmp/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+      tags: xlc
 
     - name: Extract IBM XL C
       shell: cd /tmp/playbook_tmp/xlc/ && uncompress IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+      tags: xlc
+
     - shell: cd /tmp/playbook_tmp/xlc/ && tar -xvf IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar
+      tags: xlc
 
     - name: Install IBM XL C - installp
       shell: installp -aXYgd /tmp/playbook_tmp/xlc/usr/sys/inst.images all
       register: result
       ignore_errors: yes
+      tags: xlc
 
     - debug: msg='Erorrs from the previous installp command normal'
+      tags: xlc
 
     - name: TestIBM XL C
       command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
       register: xlc_qversion
+      tags: xlc
 
     - name: Display XL C qversion information
       debug:
         msg: "{{ xlc_qversion.stdout }}"
+      tags: xlc
 
     - name: Symlink - /usr/bin/xlc
       file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
+      tags: xlc
     - name: Symlink - /usr/bin/xlc++
       file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
+      tags: xlc
     - name: Symkink - /usr/bin/xlC 
       file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
+      tags: xlc
     - name: Symkink - /usr/bin/xlc_r
       file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
+      tags: xlc
     - name: Symkink - /usr/bin/xlC_r 
       file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
+      tags: xlc
     - name: Symkink - /usr/bin/gxlC
       file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+      tags: xlc
 
     #########################
     # Configure system logs #
@@ -136,6 +167,7 @@
           *.debug;*.emerg;*.alert;*.crit;*.warning /var/log/messages rotate size 1000k files 4
           syslog.debug /var/log/syslog rotate size 1000k files 4
           *.err;kern.debug;daemon.notice;mail.crit /var/adm/messages rotate size 1000k files 4
+      tags: syslog
 
     - name: Ensure log files exist
       file:
@@ -147,14 +179,17 @@
         - /var/adm/messages
         - /var/log/messages
       changed_when: False
+      tags: syslog
 
     - name: Reload syslogd
       service: name=syslogd state=reloaded
       changed_when: False
+      tags: syslog
 
     - name: Ensure full core files are enabled
       command: chdev -l sys0 -a fullcore=true
       changed_when: False
+      tags: syslog
 
     ################
     # Jenkins user #
@@ -162,19 +197,21 @@
     - name: Create jenkins user
       action: user name=jenkins state=present
       ignore_errors: yes
+      tags: jenkins_user
 
     - name: Set authorized key for jenkins
       authorized_key:
         user: jenkins
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+      tags: jenkins_user
 
     ##################
     # Nagios plugins #
     ##################
-    - debug: msg='Calling Nagios playbook'
-    - include: nagios/nagios_aix.yml
-      static: yes
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_ubuntu.yml
+      when: Nagios_Plugins == "Enabled"
 
     #####################
     # superuser account #
@@ -182,6 +219,7 @@
     - name: Setup zeus user
       shell: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
       ignore_errors: yes
+      tags: supperuser
 
     - name: Create SSH Key folder for zeus
       file:
@@ -190,12 +228,14 @@
         group: staff
         mode: 0700
         state: directory
+      tags: supperuser
 
     - name: Add key
       authorized_key:
         user: zeus
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+      tags: supperuser
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -203,6 +243,7 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      tags: supperuser
 
     ###################
     # NTP Time Server #
@@ -219,26 +260,31 @@
         owner: root
         group: system
         mode: 0664
+      tags: x11
 
     - name: Start NTP
       service:
         name: xntpd
         state: restarted
+      tags: x11
 
     ############
     # Clean up #
     ############
     - name: Clean up - Remove /tmp/playbook_tmp/
       file: path=/tmp/playbook_tmp/ state=absent
+      tags: cleanup
 
     ################
     # Pass or Fail #
     ################
-    - debug: msg='Send Slack notification, successful'
-    - include: slack_notification/successful_slack.yml
-      static: yes
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
 
     rescue:
-    - debug: msg='Something went wrong... Sending Slack notification failure'
-    - include: slack_notification/failure_slack.yml
-     static: yes
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
