@@ -1,6 +1,7 @@
-########################################################################
-# AdoptOpenJDK - Ansible Playbook for SLES 12 on x86 and s390 hardware #
-########################################################################
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# ----- SLES 12 on x86 and s390------  #
+########################################
 
 - hosts: all
   remote_user: root
@@ -9,11 +10,18 @@
   tasks:
   - block:
 
+    ######################
+    # Load variable file #
+    ######################
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: adoptopenjdk_variables.yml
+
     ###############################
     # Update and Install Packages #
     ###############################
     - name: zypper upgrade all packages
       zypper: name='*' state=latest update_cache=yes
+      tags: patch_update
 
     - name: Install Build tools
       zypper: name={{item}} state=installed
@@ -39,6 +47,7 @@
         - zip
         - wget
         - git
+      tags: build_tools
 
     - name: Install Test tools
       zypper: name={{item}} state=installed
@@ -50,21 +59,28 @@
         - xauth
         - xorg-x11-server
         - xorg-x11
+      tags: test_tools
 
+    ################
+    # Jenkins user #
+    ################
     - name: Create jenkins user
       action: user name=jenkins state=present
       ignore_errors: yes
+      tags: jenkins_user
 
     - name: Set authorized key for jenkins
       authorized_key:
         user: jenkins
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+      tags: jenkins_user
 
     - name: Add jenkins to the audio group
       user: name=jenkins
         groups=audio
         append=yes
+      tags: jenkins_user
 
     - name: Create Jenkins home folder
       file:
@@ -74,6 +90,7 @@
         group: jenkins
         mode: 0700
       when: (ansible_architecture == "s390x")
+      tags: jenkins_user
 
     #######################
     # Additional Packages #
@@ -83,41 +100,81 @@
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
         dest: /home/jenkins/ccache.tar.gz
         mode: 0440
+      tags: ccache
 
     - name: extract ccache
       unarchive:
         src: /home/jenkins/ccache.tar.gz
         dest: /home/jenkins
         copy: False
+      tags: ccache
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
+      tags: ccache
+
+    - name: Install App::cpanminus
+      shell: |
+         curl -L 'http://cpanmin.us' | perl -  App::cpanminus
+      tags: cpanminus
+
+    - name: Install JSON
+      shell: |
+        cpanm --with-recommends JSON
+      tags: json
+
+    - name: Install Text::CSV
+      shell: |
+        cpanm --with-recommends Text::CSV
+      tags: text_csv
 
     - name: Download and Install JQ
       get_url:
         url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
         dest: /usr/bin/jq
         mode: 0755
+      tags: jq_test 
 
-    - name: Install App::cpanminus
-      shell: |
-         curl -L 'http://cpanmin.us' | perl -  App::cpanminus
+    #########
+    # cmake #
+    #########
+    - name: Download cmake
+      get_url:
+        url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+        dest: /tmp/cmake-3.7.2.tar.gz
+        mode: 0440
+        force: no
+        validate_certs: no
+      tags: cmake 
+      
+    - name: Extract ccache
+      unarchive:
+        src: /tmp/cmake-3.7.2.tar.gz
+        dest: /tmp
+        copy: False 
+      tags: cmake  
 
-    - name: Install JSON
-      shell: |
-        cpanm --with-recommends JSON
-
-    - name: Install Text::CSV
-      shell: |
-        cpanm --with-recommends Text::CSV
+    - name: Running ./configure & make for cmake
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      tags: cmake 
 
     ##################
     # Nagios plugins #
     ##################
-#    - debug: msg='Host OS setup completed, Calling Nagios playbook'
-#    - include: nagios/nagios_sles_12.yml
-#      static: yes
+#    - name: Include Nagios Playbook
+#      include_tasks: nagios/nagios_ubuntu.yml
+#      when: Nagios_Plugins == "Enabled"
+
+    #####################
+    # superuser account #
+    #####################
+# missing superuser account
+
+    #############
+    # swap file #
+    #############
+# missing swap 
 
     ####################
     # Auto OS patching #
@@ -130,6 +187,7 @@
             user=root
             job="/usr/bin/zypper up -y"
             state=present
+      tags: cron
 
     ###############
     # X11 Support #
@@ -143,6 +201,7 @@
         group: root
         owner: root
         mode: 0644
+      tags: x11
 
     - name: Start X11
       become: yes
@@ -150,31 +209,35 @@
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
+      tags: x11
 
     ###################
     # NTP Time Server #
     ###################
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
+      tags: ntp
 
-    - name: Configure NTP pool Servers
-      lineinfile: dest=/etc/ntp.conf
-                line='pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org'
-                state=present
+    - name: Configure NTP server pools
+      shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
+      tags: ntp
 
     - name: Start NTP
       service:
         name: ntpd
         state: restarted
+      tags: ntp
 
     ################
     # Pass or Fail #
     ################
-    - debug: msg='Send Slack notification, successful'
-    - include: slack_notification/successful_slack.yml
-      static: yes
+    - name: Send Slack notification, successful
+      include_tasks: slack_notification/successful_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
 
     rescue:
-    - debug: msg='Something went wrong... Sending Slack notification failure'
-    - include: slack_notification/failure_slack.yml
-      static: yes
+    - name: Send Slack notification, failure
+      include_tasks: slack_notification/failure_slack.yml
+      when: Slack_Notification == "Enabled"
+      tags: slack
