@@ -22,7 +22,8 @@
     ###############################
     - name: Ensure aptitude is installed on Ubuntu 16 systems
       apt: pkg=aptitude state=latest update_cache=yes
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+      when:
+        - ansible_distribution_major_version == "16"
       tags: patch_update
 
     - name: Add the openjdk repository to apt
@@ -64,7 +65,8 @@
       apt: pkg={{ item }} state=latest
       with_items:
         - libpng-dev
-      when: (ansible_architecture == "aarch64")
+      when:
+        - ansible_architecture == "aarch64"
       tags: build_tools
 
     - name: Install Test tools
@@ -81,12 +83,14 @@
 
     - name: Install xserver-xorg-legacy on Ubuntu 16
       apt: name=xserver-xorg-legacy state=installed
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+      when:
+        - ansible_distribution_major_version == "16"
       tags: test_tools
 
     - name: Install libfreetype6-dev on Ubuntu 16 s390
       apt: name=libfreetype6-dev state=installed
-      when: (ansible_architecture == "s390x")
+      when:
+       - ansible_architecture == "s390x"
       tags: test_tools
 
     ################
@@ -104,7 +108,8 @@
         owner: "{{ Jenkins_Username }}"
         group: "{{ Jenkins_Username }}"
         mode: 0700
-      when: (ansible_architecture == "s390x")
+      when: 
+       - ansible_architecture == "s390x"
       tags: jenkins_user
 
     - name: Set authorized key for Jenkins user
@@ -125,7 +130,8 @@
     ################
     - name: Set default java version 
       shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")
+      when:
+       - ansible_distribution_major_version == "14"
       tags: default_java
 
     #######################
@@ -199,7 +205,10 @@
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when: 
+        - ansible_architecture != "s390x"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
         
     - name: Install Docker prerequisites
@@ -209,7 +218,10 @@
         - ca-certificates
         - curl
         - software-properties-common
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when:
+        - ansible_architecture != "s390x"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
       
     - name: Install Additional Docker prerequisites for Ubuntu 14
@@ -217,24 +229,37 @@
       with_items:
         - linux-image-extra-{{ ansible_kernel }}
         - linux-image-extra-virtual
-      when: (ansible_distribution_major_version == "14") and ((ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64"))
+      when: 
+        - ansible_distribution_major_version == "14"
+        - ansible_architecture != "s390x" 
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
 
     - name: Import Docker Repo key
       shell: "wget -qO- https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when:
+       - ansible_architecture != "s390x"
+       - ansible_architecture != "armv7l"
+       - ansible_architecture != "aarch64"
       tags: docker
 
     - name: Install Docker
       apt: name=docker-ce state=latest update_cache=yes
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when: 
+        - ansible_architecture != "s390x"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
 
     - name: Add jenkins user to the docker group
       user: name="{{ Jenkins_Username }}"
             groups=docker
             append=yes
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when: 
+        - ansible_architecture != "s390x"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
 
     - name: Enable and Start Docker Service
@@ -242,7 +267,10 @@
         name: docker
         state: started
         enabled: yes
-      when: (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when:
+        - ansible_architecture != "s390x"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "aarch64"
       tags: docker
 
     ##################
