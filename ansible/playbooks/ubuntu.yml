@@ -181,7 +181,7 @@
         validate_certs: no
       tags: cmake 
       
-    - name: Extract ccache
+    - name: Extract cmake
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
