@@ -217,7 +217,7 @@
       with_items:
         - linux-image-extra-{{ ansible_kernel }}
         - linux-image-extra-virtual
-      when: (ansible_distribution_major_version == "14") or (ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64")
+      when: (ansible_distribution_major_version == "14") and ((ansible_architecture != "s390x") or (ansible_architecture != "armv7l") or (ansible_architecture != "aarch64"))
       tags: docker
 
     - name: Import Docker Repo key
