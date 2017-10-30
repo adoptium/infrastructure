@@ -1,6 +1,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
-# -------- Windows Systems ----------  #
+# -------- Windows 7, 8, 10 ---------  #
+# - Windows Server 2008, 2012, 2016  - # 
 ########################################
 
 ################
@@ -41,12 +42,14 @@
     - name: Download and Install Windows Updates
       win_updates:
         register: update_result
+      tags: patch_update
 
     - name: Reboot machine if necessary
       win_reboot:
         shutdown_timeout: 3600
         reboot_timeout: 3600
         when: update_result.reboot_required
+      tags: patch_update
 
     ################
     # Jenkins user #
@@ -60,6 +63,7 @@
         password_never_expires: yes
         groups:
           - Users, Remote Desktop Users
+      tags: jenkins_user
 
     ######################
     # Tools and Packages #
@@ -68,53 +72,64 @@
       win_file:
         path: C:\temp
         state: directory
+      tags: basic_config
         
     - name: Create cmd.exe shortcut
       win_shortcut:
         src: C:\Windows\System32\cmd.exe
         dest: C:\Users\Public\Desktop\cmd.lnk
         icon: C:\Windows\System32\cmd.exe,0
+      tags: basic_config
         
     - name: Download Cygwin installer
       win_get_url:
         url: https://cygwin.com/setup-x86_64.exe
         dest: 'C:\temp\cygwin.exe'
         force: no
+      tags: cygwin
 
     - name: Install Cygwin and its packages
       win_command: c:\Temp\cygwin.exe --quiet-mode --download --local-install --upgrade-also --delete-orphans --site {{ Cygwin_SITE_URL }} --local-package-dir {{ Cygwin_PACKAGE_DIR }} --root {{ Cygwin_ROOT_INST_DIR }} --categories Base --packages {{ Cygwin_PACKAGES }}
+      tags: cygwin
 
     - name: Add c:\cygwin64\bin to the start of the %PATH%
       raw: setx path "C:\cygwin64\bin;$ENV:PATH" /M
+      tags: cygwin
 
     - name: Download Firefox
       win_get_url:
         url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
         dest: c:\Temp\firefox.exe
         force: no
+      tags: firefox
 
     - name: Install Firefox
       raw: c:\Temp\firefox.exe -ms
+      tags: firefox
 
     - name: Download Strawberry Perl
       win_get_url:
         url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
         dest: c:\Temp\strawberry-perl.zip
         force: no
+      tags: strawberry_perl
 
     - name: Unzip Strawberry Perl
       win_unzip:
         src: c:\Temp\strawberry-perl.zip
         dest: C:\Strawberry
+      tags: strawberry_perl
 
     - name: Add Strawberry Perl to %PATH%
       win_path:
           elements:
           - 'C:\Strawberry\bin'
           state: present
+      tags: strawberry_perl
 
     - name: Install Text::CSV_XS
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
+      tags: text_cvs
 
     #########
     # cmake #
@@ -124,10 +139,12 @@
         url: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.msi
         dest: 'C:\temp\cmake.msi'
         force: no
+      tags: cmake
 
     - name: Install cmake
       raw: C:\temp\cmake.msi /quite
       ignore_errors: yes
+      tags: cmake
 
     #######
     # GIT #
@@ -137,9 +154,11 @@
         url: https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe
         dest: 'C:\temp\git.exe'
         force: no
+      tags: git
 
     - name: Install GIT
       win_command: 'C:\temp\git.exe /SILENT /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
+      tags: git
       
     #####################
     # Java Installation #
@@ -149,18 +168,22 @@
         url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=81821
         dest: 'C:\TEMP\java7.exe'
         force: no
+      tags: java7
 
     - name: Install Java 7
       raw: 'C:\TEMP\java7.exe /s SPONSORS=0 /l*v C:\TEMP\java7_install_log.txt'
+      tags: java7
 
     - name: Download Java 8
       win_get_url:
         url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.exe
         dest: C:\temp\java8.exe
         force: no
+      tags: java8
 
     - name: Install Java 8
       raw: C:\temp\java8.exe /s SPONSORS=0 /l*v C:\temp\java8_install_log.txt
+      tags: java8
 
     - name: Set JAVA_HOME to version 8
       win_path:
@@ -168,6 +191,7 @@
         elements: C:\Program Files\OpenJDK\jdk8u144-b01\bin
         scope: machine
         state: present
+      tags: java8
 
     ###########################
     # Apache ANT Installation #
@@ -177,40 +201,47 @@
         url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.1-bin.zip
         dest: c:\temp\ant.zip
         force: no
+      tags: ant
 
     - name: Deploy Apache ANT
       win_unzip:
         src: c:\temp\ant.zip
         dest: c:\apache-ant\
         creates: c:\apache-ant
+      tags: ant
 
     - name: Set ANT_HOME
       raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.1" /M
+      tags: ant
 
     - name: Add %ANT_HOME%\bin to %PATH%
       win_path:
           elements:
           - '%ANT_HOME%\bin'
           state: present
+      tags: ant
 
     - name: Download ant-contrib
       win_get_url:
         url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
         dest: c:\temp\ant-contrib.zip
         force: no
+      tags: ant
 
     - name: unzip ant-contrib
       win_unzip:
         src: c:\temp\ant-contrib.zip
         dest: c:\temp\ant-contrib
         creates: c:\temp\ant-contrib
+      tags: ant
 
     - name: Copy the ant-contrib.jar to ANT's lib folder
       win_copy:
         src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
         dest: C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar
         remote_src: True
-        
+      tags: ant
+
     ################################
     # Visual Studio Community 2013 #
     ################################
@@ -219,15 +250,16 @@
         url: 'https://go.microsoft.com/fwlink/?LinkId=532495'
         dest: 'C:\TEMP\vs2013_community.exe'
         force: no
-      tags: [download, visualstudio]
+      tags: visual_studio_2013
 
     - name: Install Visual Studio Community 2013
       raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
             /Log C:\TEMP\vs2013_install_log.txt'
-      tags: [install, visualstudio]
+      tags: tags: visual_studio_2013
 
     - name: Reboot machine after Visual Studio installation
       win_reboot:
+      tags: visual_studio_2013
 
     ###################
     # NTP Time Server #
@@ -238,6 +270,7 @@
         name: Type
         data: NTP
         type: string
+      tags: ntp
 
     - name: NTP - regedit - Set AnnounceFlags 
       win_regedit:
@@ -245,6 +278,7 @@
         name: AnnounceFlags
         data: 5
         type: dword
+      tags: ntp
 
     - name: NTP - regedit - Enable
       win_regedit:
@@ -252,6 +286,7 @@
         name: Enabled
         data: 1
         type: dword
+      tags: ntp
 
     - name: NTP - regedit - Specify time sources
       win_regedit:
@@ -259,6 +294,7 @@
         name: NtpServer
         data: 1.pool.ntp.org,0x1
         type: string
+      tags: ntp
 
     - name: NTP - regedit - Set MaxPosPhaseCorrection
       win_regedit:
@@ -266,11 +302,13 @@
         name: MaxNegPhaseCorrection
         data: 708
         type: dword
+      tags: ntp
 
     - name: NTP - Service w32time restart
       win_service:
         name: w32time
         state: restarted
+      tags: ntp
 
     ################
     # Pass or Fail #
@@ -278,8 +316,10 @@
     - name: Send Slack notification, successful
       include_tasks: slack_notification/successful_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
 
     rescue:
     - name: Send Slack notification, failure
       include_tasks: slack_notification/failure_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
