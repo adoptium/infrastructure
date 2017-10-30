@@ -26,6 +26,7 @@
     ###############################
     - name: yum upgrade all packages
       yum: name='*' state=latest update_cache=yes
+      tags: patch_update
   
     - name: Install Build tools
       yum: name={{item}} state=installed 
@@ -56,6 +57,7 @@
         - perl-devel
         - wget
         - zip
+      tags: build_tools
 
     - name: Install Test tools
       yum: name={{item}} state=installed
@@ -63,25 +65,94 @@
         - ant
         - perl
         - xorg-x11-xauth
+      tags: test_tools
 
     - name: Install xorg-x11-server-Xorg if host is x86_64
       yum: name=xorg-x11-server-Xorg state=installed
       when: (ansible_architecture == "x86_64")
+      tags: test_tools
 
     - name: Install xorg-x11-server-common if host is s390x
       yum: name=xorg-x11-server-common state=installed
       when: (ansible_architecture == "s390x")
-      
+      tags: test_tools
+
     - name: Install cpanminus RHEL 6
       shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
       ignore_errors: yes
       when: ansible_distribution_major_version == "6"
+      tags: test_tools
 
     - name: Install cpanminus RHEL 7
       yum: 
         name: cpanminus 
         state: installed 
       when: ansible_distribution_major_version == "7"
+      tags: test_tools
+
+    ################
+    # Jenkins user #
+    ################
+    - name: Create jenkins user
+      action: user name={{ Jenkins_Username }} state=present
+      ignore_errors: yes
+      tags: jenkins_user
+
+    - name: Create Jenkins user home folder
+      file:
+        path: /home/{{ Jenkins_Username }}
+        state: directory
+        owner: "{{ Jenkins_Username }}"
+        group: "{{ Jenkins_Username }}"
+        mode: 0700
+      when: (ansible_architecture == "s390x")
+      tags: jenkins_user
+      
+    - name: Set authorized key for jenkins user
+      authorized_key:
+        user: "{{ Jenkins_Username }}"
+        state: present
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+      tags: jenkins_user
+
+    #######################
+    # Additional Packages #
+    #######################
+    - name: Download ccache.tar.gz
+      get_url:
+        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
+        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        mode: 0440
+      tags: ccache
+      
+    - name: Extract ccache
+      unarchive:
+        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}
+        copy: False
+      tags: ccache
+
+    - name: Running ./configure & make for CCACHE
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
+      become: yes
+      tags: ccache
+
+    - name: Install JSON
+      shell: |
+        cpanm --with-recommends JSON
+      tags: json
+
+    - name: Install Text::CSV
+      shell: |
+        cpanm --with-recommends Text::CSV
+      tags: text_csv    
+    
+    - name: Download and Install JQ
+      get_url:
+        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        dest: /usr/bin/jq
+        mode: 0755
+      tags: jq_tool
 
     #########
     # cmake #
@@ -93,15 +164,18 @@
         mode: 0440
         force: no
         validate_certs: no
+      tags: cmake
       
     - name: Extract ccache
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
         copy: False  
+      tags: cmake
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      tags: cmake
             
     ###############
     # ant-contrib #
@@ -112,46 +186,30 @@
         dest: /tmp/
         mode: 0440
         timeout: 25
+      tags: ant
 
     - name: Extract ant-contrib
       unarchive:
         src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
         dest: /tmp/
         copy: False
+      tags: ant
 
     - name: Move ant-contrib.jar to lib folder
       command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+      tags: ant
 
     - name: Clean ant-contrib tmp files
       file:
         state: absent
         path: "/tmp/ant-contrib/"
+      tags: ant
 
     - file:
         state: absent
         path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
+      tags: ant
 
-    ################
-    # Jenkins user #
-    ################
-    - name: Create jenkins user
-      action: user name={{ Jenkins_Username }} state=present
-      ignore_errors: yes
-
-    - name: Create Jenkins user home folder
-      file:
-        path: /home/{{ Jenkins_Username }}
-        state: directory
-        owner: "{{ Jenkins_Username }}"
-        group: "{{ Jenkins_Username }}"
-        mode: 0700
-      when: (ansible_architecture == "s390x")
-      
-    - name: Set authorized key for jenkins user
-      authorized_key:
-        user: "{{ Jenkins_Username }}"
-        state: present
-        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
 
     #####################
     # Docker for RHEL 7 #
@@ -162,16 +220,19 @@
         state: present
       ignore_errors: yes
       when: ansible_distribution_major_version == "7"
+      tags: docker
 
     - name: Enable rhel-7-server-extras-rpms Repo
       shell: subscription-manager repos --enable=rhel-7-server-extras-rpms
       when: ansible_distribution_major_version == "7"
-      
+      tags: docker
+
     - name: Import Docker Repo key
       rpm_key:
         key: https://download.docker.com/linux/centos/gpg
         state: present
       when: ansible_distribution_major_version == "7"
+      tags: docker
 
     - name: Add Docker Repo
       get_url:
@@ -182,6 +243,7 @@
         group: root
         mode: 0644
       when: ansible_distribution_major_version == "7"
+      tags: docker
 
     - name: Install Docker CE
       yum:
@@ -189,12 +251,14 @@
         state: present
         update_cache: yes
       when: ansible_distribution_major_version == "7"
+      tags: docker
 
     - name: Add jenkins user to the docker group
       user: name="{{ Jenkins_Username }}"
             groups=docker
             append=yes
       when: ansible_distribution_major_version == "7"
+      tags: docker
       
     - name: Enable and Start Docker Service
       service:
@@ -202,40 +266,8 @@
         state: started
         enabled: yes
       when: ansible_distribution_major_version == "7"
+      tags: docker
       
-    #######################
-    # Additional Packages #
-    #######################
-    - name: Download ccache.tar.gz
-      get_url:
-        url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
-        mode: 0440
-      
-    - name: Extract ccache
-      unarchive:
-        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
-        dest: /home/{{ Jenkins_Username }}
-        copy: False
-
-    - name: Running ./configure & make for CCACHE
-      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
-      become: yes
-
-    - name: Install JSON
-      shell: |
-        cpanm --with-recommends JSON
-
-    - name: Install Text::CSV
-      shell: |
-        cpanm --with-recommends Text::CSV    
-    
-    - name: Download and Install JQ
-      get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: /usr/bin/jq
-        mode: 0755
-
     ##################
     # Nagios plugins #
     ##################
@@ -250,6 +282,7 @@
       shell: useradd zeus --shell /bin/bash -m 
       ignore_errors: yes
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Create SSH Key folder for zeus
       file: 
@@ -259,6 +292,7 @@
         mode: 0700
         state: directory
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Add key
       authorized_key:
@@ -266,6 +300,7 @@
         state: present
         key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -274,16 +309,19 @@
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
       when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     #############
     # swap file #
     ############# 
     - stat: path=/swapfile
       register: swap_test
+      tags: swap
 
     - name: Create swap file
       command: fallocate -l 2G /swapfile
       when: swap_test.stat.exists == false 
+      tags: swap
 
     - name: Set swap file permissions
       file: path=/swapfile
@@ -291,14 +329,17 @@
             group=root
             mode=0600
       when: swap_test.stat.exists == false
+      tags: swap
 
     - name: Create swap area device
       command: mkswap /swapfile
       when: swap_test.stat.exists == false
+      tags: swap
       
     - name: Mount swap file
       command: swapon /swapfile
       when: swap_test.stat.exists == false
+      tags: swap
 
     - name: Add swap to fstab
       mount: src=/swapfile
@@ -309,6 +350,7 @@
         dump=0
         state=present
       when: swap_test.stat.exists == false
+      tags: swap
       
     ####################
     # Auto OS patching #
@@ -321,6 +363,7 @@
             user=root
             job="/usr/bin/yum -y update"
             state=present
+      tags: cron
 
     ###############
     # X11 Support #
@@ -334,6 +377,7 @@
         group: root
         owner: root
         mode: 0644
+      tags: x11
 
     - name: Start X11
       become: yes
@@ -341,6 +385,7 @@
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
+      tags: x11
               
     ###################
     # NTP Time Server #
@@ -348,14 +393,17 @@
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
       when: ansible_distribution_major_version == "7"
+      tags: ntp
 
     - name: Configure NTP server pools
       shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
+      tags: ntp
      
     - name: Start NTP
       service:
         name: ntpd
         state: restarted
+      tags: ntp
 
     ############
     # Clean up #
@@ -365,6 +413,7 @@
       args:
          warn: no
       when: ansible_distribution_major_version == "7"
+      tags: cleanup
 
     ################
     # Pass or Fail #
@@ -372,8 +421,10 @@
     - name: Send Slack notification, successful
       include_tasks: slack_notification/successful_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
 
     rescue:
     - name: Send Slack notification, failure
       include_tasks: slack_notification/failure_slack.yml
       when: Slack_Notification == "Enabled"
+      tags: slack
