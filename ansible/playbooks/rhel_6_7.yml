@@ -146,7 +146,12 @@
       shell: |
         cpanm --with-recommends Text::CSV
       tags: text_csv    
-    
+
+    - name: Install XML::Parser
+      shell: |
+        cpanm --with-recommends XML::Parser
+      tags: xml_parser
+
     - name: Download and Install JQ
       get_url:
         url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
