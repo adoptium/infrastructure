@@ -25,7 +25,7 @@
     Cygwin_SITE_URL: http://mirrors.kernel.org/sourceware/cygwin/
     Cygwin_PACKAGE_DIR: c:\cygwin_packages
     Cygwin_ROOT_INST_DIR: C:\cygwin64
-    Cygwin_PACKAGES: curl, curl-debuginfo, gcc-core, gdb, git, libcurl-devel, libpng15, libpng-devel, make, perl-Text-CSV, tar, unzip, vim, wget, xinit, xorg-server, xterm, zip
+    Cygwin_CATEGORIES: Devel
 
   tasks:
   - block:
@@ -80,7 +80,7 @@
         dest: C:\Users\Public\Desktop\cmd.lnk
         icon: C:\Windows\System32\cmd.exe,0
       tags: basic_config
-        
+
     - name: Download Cygwin installer
       win_get_url:
         url: https://cygwin.com/setup-x86_64.exe
@@ -89,7 +89,32 @@
       tags: cygwin
 
     - name: Install Cygwin and its packages
-      win_command: c:\Temp\cygwin.exe --quiet-mode --download --local-install --upgrade-also --delete-orphans --site {{ Cygwin_SITE_URL }} --local-package-dir {{ Cygwin_PACKAGE_DIR }} --root {{ Cygwin_ROOT_INST_DIR }} --categories Base --packages {{ Cygwin_PACKAGES }}
+      win_command: c:\temp\cygwin.exe --quiet-mode --download --local-install 
+                    --delete-orphans --site {{ Cygwin_SITE_URL }} 
+                    --local-package-dir {{ Cygwin_PACKAGE_DIR }} 
+                    --root {{ Cygwin_ROOT_INST_DIR }} 
+                    --categories {{ Cygwin_CATEGORIE }}
+      tags: cygwin
+
+    - name: Install Cygwin build extra packages
+      win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
+      with_items:
+        - unzip
+        - zip
+      tags: cygwin
+
+    - name: Install Cygwin test extra packages
+      win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
+      with_items:
+        - curl
+        - curl-debuginfo
+        - libcurl-devel
+        - libpng15
+        - libpng-devel
+        - perl-Text-CSV
+        - xinit
+        - xorg-server
+        - xterm
       tags: cygwin
 
     - name: Add c:\cygwin64\bin to the start of the %PATH%
@@ -130,6 +155,26 @@
     - name: Install Text::CSV_XS
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
       tags: text_cvs
+
+    - name: Download freemarker
+      win_get_url: 
+        url: http://central.maven.org/maven2/freemarker/freemarker/2.3.8/freemarker-2.3.8.jar
+        dest: 'C:\temp\freemarker.jar'
+        force: no
+      tags: freemarker
+
+    - name: Install freetype
+      win_get_url:
+        url: https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
+        dest: C:\temp\ft253.zip
+        force: no
+      tags: freetype
+
+    - name: Unpack freetype
+      win_unzip:
+        src: C:\temp\ft253.zip
+        dest: C:\temp
+      tags: freetype
 
     #########
     # cmake #
@@ -176,22 +221,24 @@
 
     - name: Download Java 8
       win_get_url:
-        url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.exe
-        dest: C:\temp\java8.exe
+        url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.zip
+        dest: C:\temp\jdk8u144-b01.zip
         force: no
       tags: java8
 
-    - name: Install Java 8
-      raw: C:\temp\java8.exe /s SPONSORS=0 /l*v C:\temp\java8_install_log.txt
+    - name: Install Java 8 into C:\temp\sdk
+      win_unzip:
+        src: C:\temp\jdk8u144-b01.zip
+        dest: C:\temp\sdk
       tags: java8
 
-    - name: Set JAVA_HOME to version 8
-      win_path:
-        name: JAVA_HOME
-        elements: C:\Program Files\OpenJDK\jdk8u144-b01\bin
-        scope: machine
-        state: present
-      tags: java8
+#    - name: Set JAVA_HOME to version 8
+#      win_path:
+#        name: JAVA_HOME
+#        elements: C:\Program Files\OpenJDK\jdk8u144-b01\bin
+#        scope: machine
+#        state: present
+#      tags: java8
 
     ###########################
     # Apache ANT Installation #
@@ -255,7 +302,7 @@
     - name: Install Visual Studio Community 2013
       raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
             /Log C:\TEMP\vs2013_install_log.txt'
-      tags: tags: visual_studio_2013
+      tags: visual_studio_2013
 
     - name: Reboot machine after Visual Studio installation
       win_reboot:
