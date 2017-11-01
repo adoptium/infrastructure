@@ -1,6 +1,6 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
-# ----- RHEL 7 on x86 and s390 ------  #
+# -- RHEL 7 on x86, ppc64 and s390 --  #
 # ----------- RHEL 6 on x86 ---------- #
 ########################################
 
@@ -210,7 +210,6 @@
         path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
       tags: ant
 
-
     #####################
     # Docker for RHEL 7 #
     #####################
@@ -219,19 +218,25 @@
         name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
         state: present
       ignore_errors: yes
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
 
     - name: Enable rhel-7-server-extras-rpms Repo
       shell: subscription-manager repos --enable=rhel-7-server-extras-rpms
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
 
     - name: Import Docker Repo key
       rpm_key:
         key: https://download.docker.com/linux/centos/gpg
         state: present
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
 
     - name: Add Docker Repo
@@ -242,7 +247,9 @@
         owner: root
         group: root
         mode: 0644
-      when: ansible_distribution_major_version == "7"
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
 
     - name: Install Docker CE
@@ -250,14 +257,18 @@
         name: docker-ce
         state: present
         update_cache: yes
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
 
     - name: Add jenkins user to the docker group
       user: name="{{ Jenkins_Username }}"
             groups=docker
             append=yes
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
       
     - name: Enable and Start Docker Service
@@ -265,7 +276,9 @@
         name: docker
         state: started
         enabled: yes
-      when: ansible_distribution_major_version == "7"
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
       tags: docker
       
     ##################
