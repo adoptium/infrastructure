@@ -59,6 +59,16 @@
         - zip
       tags: build_tools
 
+    - name: Additional build tools for RHEL 7
+      yum: name={{item}} state=installed
+      with_items:
+        - bison
+        - elfutils-libelf-devel
+        - flex
+        - libdwarf-devel
+      when: ansible_distribution_major_version == "7"
+      tags: build_tools
+
     - name: Install Test tools
       yum: name={{item}} state=installed
       with_items:
