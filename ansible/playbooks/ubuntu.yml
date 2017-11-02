@@ -38,14 +38,18 @@
       apt: pkg={{ item }} state=latest
       with_items:
         - autoconf
+        - bison
         - ccache
         - cpanminus
         - cpio
+        - flex
         - g++
         - gcc
         - git
         - libasound2-dev
         - libcups2-dev
+        - libdwarf-dev
+        - libelf-dev
         - libffi-dev
         - libx11-dev
         - libxext-dev
@@ -56,9 +60,9 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
+        - pkg-config
         - wget
         - zip
-        - pkg-config
       tags: build_tools
       
     - name: Install libpng-dev on aarch64
