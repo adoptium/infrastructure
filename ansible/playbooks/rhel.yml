@@ -1,6 +1,6 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
-# -- RHEL 7 on x86, ppc64 and s390 --  #
+# - RHEL 7 on x86, ppc64, ppc64le s390 #
 # ----------- RHEL 6 on x86 ---------- #
 ########################################
 
@@ -231,6 +231,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Enable rhel-7-server-extras-rpms Repo
@@ -238,6 +239,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Import Docker Repo key
@@ -247,6 +249,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Add Docker Repo
@@ -260,6 +263,7 @@
       when:
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Install Docker CE
@@ -270,6 +274,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Add jenkins user to the docker group
@@ -279,6 +284,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
       
     - name: Enable and Start Docker Service
@@ -289,6 +295,7 @@
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
       tags: docker
       
     ##################
