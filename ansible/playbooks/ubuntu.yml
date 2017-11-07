@@ -277,6 +277,33 @@
         - ansible_architecture != "aarch64"
       tags: docker
 
+    #######################
+    # NVidia Cuda Toolkit #
+    #######################
+    - name: Check if NVidia CUDA toolkit is aready installed
+      stat: 
+          path: /usr/local/cuda-9.0
+      register: cuda_installed
+      tags: Cuda_Toolkit
+      
+    - name: Download NVidia CUDA toolkit
+      get_url: 
+        url="https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
+        dest="/tmp/cuda9_linux-run"
+      when: 
+        - cuda_installed.stat.islnk is not defined
+        - ansible_distribution_major_version == "16"
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+
+    - name: Install NVidia CUDA toolkit
+      shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
+      when: 
+        - cuda_installed.stat.islnk is not defined
+        - ansible_distribution_major_version == "16"
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+      
     ##################
     # Nagios plugins #
     ##################
