@@ -93,7 +93,7 @@
                     --delete-orphans --site {{ Cygwin_SITE_URL }} 
                     --local-package-dir {{ Cygwin_PACKAGE_DIR }} 
                     --root {{ Cygwin_ROOT_INST_DIR }} 
-                    --categories {{ Cygwin_CATEGORIE }}
+                    --categories {{ Cygwin_CATEGORIES }}
       tags: cygwin
 
     - name: Install Cygwin build extra packages
