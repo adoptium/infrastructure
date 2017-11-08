@@ -59,6 +59,18 @@
         - zip
       tags: build_tools
 
+    - name: Enable rhel-7-server-extras-rpms Repo
+      shell: |
+        subscription-manager repos --enable=rhel-7-server-extras-rpms
+        subscription-manager repos --enable rhel-7-server-optional-rpms
+      when: 
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture != "ppc64"
+        - ansible_architecture != "ppc64le"
+      tags: 
+        - build_tools
+        - docker
+        
     - name: Additional build tools for RHEL 7
       yum: name={{item}} state=installed
       with_items:
@@ -220,6 +232,7 @@
         path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
       tags: ant
 
+
     #####################
     # Docker for RHEL 7 #
     #####################
@@ -228,14 +241,6 @@
         name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
         state: present
       ignore_errors: yes
-      when: 
-        - ansible_distribution_major_version == "7"
-        - ansible_architecture != "ppc64"
-        - ansible_architecture != "ppc64le"
-      tags: docker
-
-    - name: Enable rhel-7-server-extras-rpms Repo
-      shell: subscription-manager repos --enable=rhel-7-server-extras-rpms
       when: 
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
@@ -352,7 +357,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture == "ppc64le"
       tags: Cuda_Toolkit
-      
+           
     ##################
     # Nagios plugins #
     ##################
