@@ -221,6 +221,7 @@
         - ansible_architecture != "s390x"
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
         
     - name: Install Docker prerequisites
@@ -234,6 +235,7 @@
         - ansible_architecture != "s390x"
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
       
     - name: Install Additional Docker prerequisites for Ubuntu 14
@@ -246,6 +248,7 @@
         - ansible_architecture != "s390x" 
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Import Docker Repo key
@@ -254,6 +257,7 @@
        - ansible_architecture != "s390x"
        - ansible_architecture != "armv7l"
        - ansible_architecture != "aarch64"
+       - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Install Docker
@@ -262,6 +266,7 @@
         - ansible_architecture != "s390x"
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Add jenkins user to the docker group
@@ -272,6 +277,7 @@
         - ansible_architecture != "s390x"
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     - name: Enable and Start Docker Service
@@ -283,6 +289,7 @@
         - ansible_architecture != "s390x"
         - ansible_architecture != "armv7l"
         - ansible_architecture != "aarch64"
+        - ansible_architecture != "ppc64le"
       tags: docker
 
     #######################
