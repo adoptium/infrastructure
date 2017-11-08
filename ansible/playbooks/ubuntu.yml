@@ -132,10 +132,18 @@
     ################
     # Default Java #
     ################
-    - name: Set default java version 
+    - name: Set default java version - X86_64
       shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
       when:
        - ansible_distribution_major_version == "14"
+       - ansible_architecture == "x86_64"
+      tags: default_java
+
+    - name: Set default java version - PPC64LE
+      shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-ppc64el/jre/bin/java
+      when:
+       - ansible_distribution_major_version == "14"
+       - ansible_architecture == "ppc64le"
       tags: default_java
 
     #######################
