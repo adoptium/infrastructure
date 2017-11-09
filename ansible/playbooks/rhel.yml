@@ -232,6 +232,13 @@
         path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
       tags: ant
 
+    - name: Install ant-nodeps on RHEL 6
+      yum: name={{item}} state=installed
+      with_items:
+        - ant-nodeps
+      when: 
+        - ansible_distribution_major_version == "6"
+        - ansible_architecture == "x86_64"
 
     #####################
     # Docker for RHEL 7 #
