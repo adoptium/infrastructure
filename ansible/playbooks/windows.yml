@@ -42,6 +42,7 @@
     - name: Download and Install Windows Updates
       win_updates:
         register: update_result
+      ignore_errors: yes
       tags: patch_update
 
     - name: Reboot machine if necessary
@@ -128,28 +129,56 @@
       raw: setx PATH "C:\cygwin64\bin;$env:Path" -m
       tags: cygwin
 
+    # Firefox
+    - name: Test if Firefox is already installed
+      win_stat:
+          path: 'C:\Program Files\Mozilla Firefox\firefox.exe'
+      register: firefox_installed
+      tags: firefox
+
+    - name: Check if Firefox is already downloaded
+      win_stat:
+          path: 'c:\Temp\firefox.exe'
+      register: firefox_download
+      tags: firefox
+
     - name: Download Firefox
       win_get_url:
         url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
         dest: c:\Temp\firefox.exe
-        force: no
+      when: (firefox_download.stat.exists == false) and (firefox_installed.stat.exists == false)
       tags: firefox
 
     - name: Install Firefox
       raw: c:\Temp\firefox.exe -ms
+      when: (firefox_installed.stat.exists == false)
       tags: firefox
+
+    # Strawberry Perl
+    - name: Test if Strawberry Perl is already installed
+      win_stat:
+          path: 'C:\Strawberry\perl'
+      register: strawberry_perl_installed
+      tags: strawberry_perl
+
+    - name: Check if Strawberry Perl is already downloaded
+      win_stat:
+          path: 'c:\Temp\strawberry-perl.zip'
+      register: strawberry_perl_download
+      tags: strawberry_perl
 
     - name: Download Strawberry Perl
       win_get_url:
         url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
         dest: c:\Temp\strawberry-perl.zip
-        force: no
+      when: (strawberry_perl_download.stat.exists == false) and (strawberry_perl_installed.stat.exists == false)
       tags: strawberry_perl
 
     - name: Unzip Strawberry Perl
       win_unzip:
         src: c:\Temp\strawberry-perl.zip
         dest: C:\Strawberry
+      when: (strawberry_perl_installed.stat.exists == false)
       tags: strawberry_perl
 
     - name: Add Strawberry Perl to %PATH%
@@ -157,6 +186,7 @@
           elements:
           - 'C:\Strawberry\bin'
           state: present
+      when: (strawberry_perl_installed.stat.exists == false)
       tags: strawberry_perl
 
     - name: Install Text::CSV_XS
@@ -201,51 +231,94 @@
     #######
     # GIT #
     #######
+    - name: Test if GIT is already installed
+      win_stat:
+          path: 'C:\Program Files\Git'
+      register: git_installed
+      tags: git
+
+    - name: Check if GIT installer is already downloaded
+      win_stat:
+          path: 'C:\temp\git.exe'
+      register: git_download
+      tags: git
+
     - name: Download GIT installer
       win_get_url:
-        url: https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe
+        url: 'https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe'
         dest: 'C:\temp\git.exe'
-        force: no
+      when: (git_download.stat.exists == false) and (git_installed.stat.exists == false)
       tags: git
 
     - name: Install GIT
       win_command: 'C:\temp\git.exe /SILENT /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
+      when: (git_installed.stat.exists == false)
       tags: git
-      
+     
     #####################
     # Java Installation #
     #####################
+    # Java 7
+    - name: Test if Java 7 is already installed
+      win_stat:
+          path: 'C:\Program Files\Java\jre7'
+      register: java7_installed
+      tags: java7
+
+    - name: Check if Java 7 is already downloaded
+      win_stat:
+          path: 'C:\TEMP\java7.exe'
+      register: java7_download
+      tags: java7
+
     - name: Download Java 7
       win_get_url:
         url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=81821
         dest: 'C:\TEMP\java7.exe'
-        force: no
+      when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
       tags: java7
 
     - name: Install Java 7
       raw: 'C:\TEMP\java7.exe /s SPONSORS=0 /l*v C:\TEMP\java7_install_log.txt'
+      when: (java7_installed.stat.exists == false)
       tags: java7
+
+    # Java 8
+    - name: Test if Java 8 is already installed
+      win_stat:
+          path: 'C:\Program Files\Java\jdk8u144-b01'
+      register: java8_installed
+      tags: java8
+
+    - name: Check if Java 8 is already downloaded
+      win_stat:
+          path: 'C:\temp\jdk8u144-b01.zip'
+      register: java8_download
+      tags: java8
 
     - name: Download Java 8
       win_get_url:
         url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.zip
-        dest: C:\temp\jdk8u144-b01.zip
-        force: no
+        dest: 'C:\temp\jdk8u144-b01.zip'
+      when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
       tags: java8
 
     - name: Install Java 8 into C:\temp\sdk
       win_unzip:
         src: C:\temp\jdk8u144-b01.zip
-        dest: C:\temp\sdk
+        dest: C:\Program Files\Java
+      when: (java8_installed.stat.exists == false)
       tags: java8
 
-#    - name: Set JAVA_HOME to version 8
-#      win_path:
-#        name: JAVA_HOME
-#        elements: C:\temp\sdk\jdk8u144-b01
-#        scope: machine
-#        state: present
-#      tags: java8
+    - name: Set JAVA_HOME to version 8
+      win_path:
+        name: JAVA_HOME
+        elements: 
+          - 'C:\Program Files\Java\jdk8u144-b01'
+        scope: machine
+        state: present
+      when: (java8_installed.stat.exists == false)
+      tags: java8
 
     ###########################
     # Apache ANT Installation #
