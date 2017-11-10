@@ -41,7 +41,6 @@
         - git
         - glibc
         - glibc-common
-        - java-1.8.0-openjdk-devel
         - libXext-devel
         - libXrender-devel
         - libXrender-devel
@@ -57,6 +56,14 @@
         - perl-devel
         - wget
         - zip
+      tags: build_tools
+
+    - name: Install Java 8
+      yum: name={{item}} state=installed
+      with_items:
+        - java-1.8.0-openjdk-devel
+      when: 
+        - ansible_distribution_major_version != "6"
       tags: build_tools
 
     - name: Enable rhel-7-server-extras-rpms Repo
@@ -168,7 +175,7 @@
       shell: |
         cpanm --with-recommends Text::CSV
       tags: text_csv    
-
+    
     #########
     # cmake #
     #########
@@ -179,17 +186,23 @@
         mode: 0440
         force: no
         validate_certs: no
+      when: 
+        - ansible_architecture != "ppc64"
       tags: cmake
       
     - name: Extract ccache
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
-        copy: False  
+        copy: False
+      when: 
+        - ansible_architecture != "ppc64"
       tags: cmake
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      when: 
+        - ansible_architecture != "ppc64"
       tags: cmake
             
     ###############
