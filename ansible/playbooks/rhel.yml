@@ -353,6 +353,16 @@
         - ansible_architecture == "x86_64"
       tags: Cuda_Toolkit
 
+    - name: Cleanup NVidia CUDA toolkit
+      file:
+        path: /tmp/cuda9_linux-run
+        state: absent
+      when:
+        - cuda_installed.stat.islnk is not defined
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+
     # RHEL 7 PPC64LE
     - name: Download NVidia CUDA Repo RPM - PPC64LE
       get_url:
@@ -377,6 +387,16 @@
       when:
         - cuda_installed.stat.islnk is not defined
         - ansible_distribution_major_version == "7"
+        - ansible_architecture == "ppc64le"
+      tags: Cuda_Toolkit
+
+    - name: Cleanup NVidia CUDA toolkit
+      file:
+        path: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
+        state: absent
+      when:
+        - cuda_installed.stat.islnk is not defined
+        - ansible_distribution_major_version == "16"
         - ansible_architecture == "ppc64le"
       tags: Cuda_Toolkit
            
