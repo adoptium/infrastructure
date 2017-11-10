@@ -326,6 +326,16 @@
         - ansible_distribution_major_version == "16"
         - ansible_architecture == "x86_64"
       tags: Cuda_Toolkit
+
+    - name: Cleanup NVidia CUDA toolkit
+      file:
+        path: /tmp/cuda9_linux-run
+        state: absent
+      when:
+        - cuda_installed.stat.islnk is not defined
+        - ansible_distribution_major_version == "16"
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
       
     ##################
     # Nagios plugins #
