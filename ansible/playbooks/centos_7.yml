@@ -182,6 +182,15 @@
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       tags: cmake 
 
+    - name: Cleanup cmake
+      file:
+        path: "{{ item }}"
+        state: absent
+      with items:
+        - /tmp/cmake-3.7.2.tar.gz
+        - /tmp/cmake-3.7.2
+      tags: cmake
+
     ##################
     # Nagios plugins #
     ##################

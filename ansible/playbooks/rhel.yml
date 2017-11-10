@@ -213,6 +213,15 @@
       when: 
         - ansible_architecture != "ppc64"
       tags: cmake
+
+    - name: Cleanup cmake
+      file:
+        path: "{{ item }}"
+        state: absent
+      with items:
+        - /tmp/cmake-3.7.2.tar.gz
+        - /tmp/cmake-3.7.2
+      tags: cmake
             
     ###############
     # ant-contrib #
