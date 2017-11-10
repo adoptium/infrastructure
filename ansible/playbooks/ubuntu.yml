@@ -73,6 +73,15 @@
         - ansible_architecture == "aarch64"
       tags: build_tools
 
+    - name: Create symlink for gmake to make
+      file:
+        src: /usr/bin/make
+        dest: /usr/bin/gmake
+        owner: root
+        group: root
+        state: link
+      tags: build_tools
+
     - name: Install Test tools
       apt: name={{item}} state=installed
       with_items:
