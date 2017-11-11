@@ -228,6 +228,12 @@
       ignore_errors: yes
       tags: cmake
 
+    - name: Cleanup cmake
+      file:
+        path: C:\temp\cmake.msi
+        state: absent
+      tags: cmake
+
     #######
     # GIT #
     #######
