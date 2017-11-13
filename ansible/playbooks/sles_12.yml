@@ -3,10 +3,14 @@
 # ----- SLES 12 on x86 and s390------  #
 ########################################
 
+################
+# Please Note: #
+################
+# SLES systems must be registered with SuSE's Subscription Management service before this Playbook can be used.
+
 - hosts: all
   remote_user: root
   become: yes
-
   tasks:
   - block:
 
@@ -26,34 +30,37 @@
     - name: Install Build tools
       zypper: name={{item}} state=installed
       with_items:
-        - ccache
+        - bind-utils
+        - bison
         - cpio
-        - make
+        - flex
         - gcc
         - gcc-c++
+        - git-core
+        - glibc
+        - glibc-devel
         - java-1_8_0-openjdk
-        - libXtst-devel
-        - libXt-devel
-        - libXrender-devel
-        - libXext-devel
-        - libXrender-devel
-        - libXtst-devel
-        - libXt-devel
-        - cups-devel
-        - freetype-devel
-        - alsa-lib-devel
+        - libdw1
+        - libelf0
+        - libelf1
+        - libfreetype6
+        - libXext6
+        - libXrender1
+        - libXt6
+        - libXtst6
+        - make
+        - Mesa-libGL1 
         - ntp
+        - perl-CPAN-Meta
         - unzip
-        - zip
         - wget
-        - git
+        - zip
       tags: build_tools
 
     - name: Install Test tools
       zypper: name={{item}} state=installed
       with_items:
         - ant
-        - ant-contrib
         - perl
         - pulseaudio
         - xauth
@@ -61,56 +68,65 @@
         - xorg-x11
       tags: test_tools
 
+    - name: Create symlink for gmake to make
+      file:
+        src: /usr/bin/make
+        dest: /usr/bin/gmake
+        owner: root
+        group: root
+        state: link
+      tags: build_tools
+
     ################
     # Jenkins user #
     ################
-    - name: Create jenkins user
-      action: user name=jenkins state=present
+    - name: Create Jenkins user home folder
+      file:
+        path: /home/{{ Jenkins_Username }}
+        state: directory
+        owner: "{{ Jenkins_Username }}"
+        group: "{{ Jenkins_Username }}"
+        mode: 0700
+      when: (ansible_architecture == "s390x")
+      tags: jenkins_user
+      
+    - name: Create Jenkins user
+      action: user name={{ Jenkins_Username }} state=present
       ignore_errors: yes
       tags: jenkins_user
 
-    - name: Set authorized key for jenkins
+    - name: Set authorized key for Jenkins user
       authorized_key:
-        user: jenkins
+        user: "{{ Jenkins_Username }}"
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
       tags: jenkins_user
 
-    - name: Add jenkins to the audio group
-      user: name=jenkins
+    - name: Add Jenkins to the audio group
+      user: name="{{ Jenkins_Username }}"
         groups=audio
         append=yes
-      tags: jenkins_user
-
-    - name: Create Jenkins home folder
-      file:
-        path: /home/jenkins
-        state: directory
-        owner: jenkins
-        group: jenkins
-        mode: 0700
-      when: (ansible_architecture == "s390x")
       tags: jenkins_user
 
     #######################
     # Additional Packages #
     #######################
-    - name: download ccache.tar.gz
+    - name: Download ccache.tar.gz
       get_url:
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
         mode: 0440
       tags: ccache
 
-    - name: extract ccache
+    - name: Extract ccache
       unarchive:
-        src: /home/jenkins/ccache.tar.gz
-        dest: /home/jenkins
+        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}
         copy: False
       tags: ccache
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
       tags: ccache
 
@@ -136,6 +152,39 @@
         mode: 0755
       tags: jq_test 
 
+    ###############
+    # ant-contrib #
+    ###############
+    - name: Download ant-contrib
+      get_url:
+        url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+        dest: /tmp/
+        mode: 0440
+        timeout: 25
+      tags: ant
+
+    - name: Extract ant-contrib
+      unarchive:
+        src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
+        dest: /tmp/
+        copy: False
+      tags: ant
+
+    - name: Move ant-contrib.jar to lib folder
+      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+      tags: ant
+
+    - name: Clean ant-contrib tmp files
+      file:
+        state: absent
+        path: "/tmp/ant-contrib/"
+      tags: ant
+
+    - file:
+        state: absent
+        path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
+      tags: ant
+      
     #########
     # cmake #
     #########
@@ -146,28 +195,91 @@
         mode: 0440
         force: no
         validate_certs: no
-      tags: cmake 
+      when: 
+        - ansible_architecture != "ppc64"
+      tags: cmake
       
     - name: Extract ccache
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
-        copy: False 
-      tags: cmake  
+        copy: False
+      when: 
+        - ansible_architecture != "ppc64"
+      tags: cmake
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
-      tags: cmake 
-
-    - name: Cleanup cmake
-      file:
-        path: "{{ item }}"
-        state: absent
-      with items:
-        - /tmp/cmake-3.7.2.tar.gz
-        - /tmp/cmake-3.7.2
+      when: 
+        - ansible_architecture != "ppc64"
       tags: cmake
 
+    ##########
+    # Docker #
+    ##########
+    - name: Install Docker
+      zypper: pkg={{ item }} state=latest update_cache=yes
+      with_items:
+        - apparmor-parser
+        - bridge-utils 
+        - ca-certificates
+        - curl
+        - docker
+      when:
+        - ansible_architecture != "s390x"
+      tags: docker
+
+    - name: Add jenkins user to the docker group
+      user: name="{{ Jenkins_Username }}"
+            groups=docker
+            append=yes
+      when: 
+        - ansible_architecture != "s390x"
+      tags: docker
+
+    - name: Enable and Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      when:
+        - ansible_architecture != "s390x"
+      tags: docker
+
+    #######################
+    # NVidia Cuda Toolkit #
+    #######################
+    - name: Check if NVidia CUDA toolkit is aready installed
+      stat: 
+          path: /usr/local/cuda-9.0
+      register: cuda_installed
+      tags: Cuda_Toolkit
+      
+    - name: Download NVidia CUDA toolkit Repo RPM
+      get_url: 
+        url="http://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm"
+        dest="/tmp/sles12_cuda9_repo.rpm"
+      when: 
+        - cuda_installed.stat.islnk is not defined
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+
+    - name: Enable NVidia CUDA toolkit Repo
+      shell: |
+        rpm -i /tmp/sles12_cuda9_repo.rpm
+        sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
+      when: 
+        - cuda_installed.stat.islnk is not defined
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+      
+    - name: Install NVidia CUDA toolkit
+      zypper: pkg=cuda state=latest update_cache=yes
+      when: 
+        - cuda_installed.stat.islnk is not defined
+        - ansible_architecture == "x86_64"
+      tags: Cuda_Toolkit
+      
     ##################
     # Nagios plugins #
     ##################
@@ -178,12 +290,79 @@
     #####################
     # superuser account #
     #####################
-# missing superuser account
+    - name: Setup zeus user
+      shell: useradd zeus --shell /bin/bash -m 
+      ignore_errors: yes
+      when: Superuser_Account == "Enabled"
+      tags: supperuser
+
+    - name: Create SSH Key folder for zeus
+      file: 
+        path: /home/zeus/.ssh
+        owner: zeus
+        group: zeus
+        mode: 0700
+        state: directory
+      when: Superuser_Account == "Enabled"
+      tags: supperuser
+
+    - name: Add key
+      authorized_key:
+        user: zeus
+        state: present
+        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+      when: Superuser_Account == "Enabled"
+      tags: supperuser
+
+    - name: Grant zeus sudo powers
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^zeus'
+        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      when: Superuser_Account == "Enabled"
+      tags: supperuser
 
     #############
     # swap file #
-    #############
-# missing swap 
+    ############# 
+    - stat: path=/swapfile
+      register: swap_test
+      tags: swap
+
+    - name: Create swap file
+      command: fallocate -l 2G /swapfile
+      when: swap_test.stat.exists == false 
+      tags: swap
+
+    - name: Set swap file permissions
+      file: path=/swapfile
+            owner=root
+            group=root
+            mode=0600
+      when: swap_test.stat.exists == false
+      tags: swap
+
+    - name: Create swap area device
+      command: mkswap /swapfile
+      when: swap_test.stat.exists == false
+      tags: swap
+      
+    - name: Mount swap file
+      command: swapon /swapfile
+      when: swap_test.stat.exists == false
+      tags: swap
+
+    - name: Add swap to fstab
+      mount: src=/swapfile
+        name=none
+        fstype=swap
+        opts=sw
+        passno=0
+        dump=0
+        state=present
+      when: swap_test.stat.exists == false
+      tags: swap
 
     ####################
     # Auto OS patching #
@@ -214,7 +393,7 @@
 
     - name: Start X11
       become: yes
-      become_user: jenkins
+      become_user: "{{ Jenkins_Username }}"
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
