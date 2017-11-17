@@ -1,6 +1,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
 # ----- SLES 12 on x86 and s390------  #
+# ---------- SLES 11 on x86 ---------- #
 ########################################
 
 ################
@@ -36,25 +37,51 @@
         - flex
         - gcc
         - gcc-c++
-        - git-core
         - glibc
         - glibc-devel
-        - java-1_8_0-openjdk
         - libdw1
         - libelf0
         - libelf1
+        - make
+        - ntp
+        - unzip
+        - wget
+        - zip
+      tags: build_tools
+
+    - name: Install Build tools - SLES 12
+      zypper: name={{item}} state=installed
+      with_items:
+        - git-core
+        - java-1_8_0-openjdk
         - libfreetype6
         - libXext6
         - libXrender1
         - libXt6
         - libXtst6
-        - make
-        - Mesa-libGL1 
-        - ntp
+        - Mesa-libGL1
         - perl-CPAN-Meta
-        - unzip
-        - wget
-        - zip
+      when:
+        - ansible_distribution_major_version == "12"
+      tags: build_tools
+      
+    - name: Enable git-core repos on SLES 11
+      shell: |
+        zypper addrepo 'http://download.opensuse.org/repositories/devel:/tools:/scm/SLE_11_SP4/devel:tools:scm.repo'
+        zypper addrepo 'http://download.opensuse.org/repositories/devel:/languages:/perl/SLE_11_SP3/devel:languages:perl.repo'
+        sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/devel_tools_scm.repo
+        sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/devel_languages_perl.repo
+      when:
+        - ansible_distribution_major_version == "11"
+      tags: build_tools
+
+    - name: Install git-core on SLES 11
+      zypper: name={{item}} state=installed update_cache=yes
+      with_items:
+        - git-core
+        - perl-Error
+      when:
+        - ansible_distribution_major_version == "11"
       tags: build_tools
 
     - name: Install Test tools
@@ -63,11 +90,26 @@
         - ant
         - perl
         - pulseaudio
-        - xauth
         - xorg-x11-server
         - xorg-x11
       tags: test_tools
 
+    - name: Install Test tools - xauth
+      zypper: name={{item}} state=installed 
+      with_items:
+        - xauth
+      when:
+        - ansible_distribution_major_version == "12"
+      tags: test_tools
+
+    - name: Install Test tools - xorg-x11-xauth
+      zypper: name={{item}} state=installed
+      with_items:
+        - xorg-x11-xauth
+      when:
+        - ansible_distribution_major_version == "11"
+      tags: test_tools
+      
     - name: Create symlink for gmake to make
       file:
         src: /usr/bin/make
@@ -77,6 +119,55 @@
         state: link
       tags: build_tools
 
+    ####################
+    # Java 8 - SLES 11 #
+    ####################
+    - name: Test if IBM Java 8 is already installed - SLES 11
+      stat:
+        path: /opt/ibm/java/bin
+      register: java8_installed
+      when:
+        - ansible_distribution_major_version == "11"
+      tags: java8
+
+    - name: Check if IBM Java 8 is already downloaded - SLES 11
+      stat:
+        path: /tmp/ibm-java.bin
+      when:
+        - ansible_distribution_major_version == "11"
+      register: java8_download
+      tags: java8
+
+    - name: Download IBM Java 8
+      get_url:
+        url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.3.0/linux/x64/ibm-java-sdk-8.0-3.0-x86_64-archive.bin
+        dest: /tmp/ibm-java.bin
+        validate_certs: no
+      when: 
+        - (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
+        - ansible_distribution_major_version == "11"
+      tags: java8
+
+    - name: Create IBM Java 8 response file
+      shell: |
+        echo "INSTALLER_UI=silent" > /tmp/ibm-java.response.properties
+        echo "USER_INSTALL_DIR=/opt/ibm/java" >> /tmp/ibm-java.response.properties
+        echo "LICENSE_ACCEPTED=TRUE" >> /tmp/ibm-java.response.properties
+      when: 
+        - (java8_installed.stat.exists == false)
+        - ansible_distribution_major_version == "11"
+      tags: java8
+
+    - name: Install Java 8 
+      shell: |
+        mkdir -p /opt/ibm 
+        chmod +x /tmp/ibm-java.bin
+        /tmp/ibm-java.bin -i silent -f /tmp/response.properties
+      when: 
+        - (java8_installed.stat.exists == false)
+        - ansible_distribution_major_version == "11"
+      tags: java8
+      
     ################
     # Jenkins user #
     ################
@@ -161,6 +252,7 @@
         dest: /tmp/
         mode: 0440
         timeout: 25
+        validate_certs: no
       tags: ant
 
     - name: Extract ant-contrib
@@ -227,6 +319,7 @@
         - docker
       when:
         - ansible_architecture != "s390x"
+        - ansible_distribution_major_version == "12"
       tags: docker
 
     - name: Add jenkins user to the docker group
@@ -235,6 +328,7 @@
             append=yes
       when: 
         - ansible_architecture != "s390x"
+        - ansible_distribution_major_version == "12"
       tags: docker
 
     - name: Enable and Start Docker Service
@@ -244,6 +338,7 @@
         enabled: yes
       when:
         - ansible_architecture != "s390x"
+        - ansible_distribution_major_version == "12"
       tags: docker
 
     #######################
@@ -262,6 +357,7 @@
       when: 
         - cuda_installed.stat.islnk is not defined
         - ansible_architecture == "x86_64"
+        - ansible_distribution_major_version == "12"
       tags: Cuda_Toolkit
 
     - name: Enable NVidia CUDA toolkit Repo
@@ -271,6 +367,7 @@
       when: 
         - cuda_installed.stat.islnk is not defined
         - ansible_architecture == "x86_64"
+        - ansible_distribution_major_version == "12"
       tags: Cuda_Toolkit
       
     - name: Install NVidia CUDA toolkit
@@ -278,6 +375,7 @@
       when: 
         - cuda_installed.stat.islnk is not defined
         - ansible_architecture == "x86_64"
+        - ansible_distribution_major_version == "12"
       tags: Cuda_Toolkit
       
     ##################
@@ -330,11 +428,20 @@
       register: swap_test
       tags: swap
 
-    - name: Create swap file
+    - name: Create swap file - via fallocate
       command: fallocate -l 2G /swapfile
-      when: swap_test.stat.exists == false 
+      when: 
+        - swap_test.stat.exists == false 
+        - ansible_distribution_major_version == "12"
       tags: swap
-
+      
+    - name: Create swap file - via DD
+      command: dd if=/dev/zero of=/swapfile bs=250M count=8
+      when: 
+        - swap_test.stat.exists == false 
+        - ansible_distribution_major_version == "11"
+      tags: swap
+      
     - name: Set swap file permissions
       file: path=/swapfile
             owner=root
@@ -404,18 +511,30 @@
     ###################
     - name: Set timedatectl set-ntp no
       shell: timedatectl set-ntp no
+      when:
+        - ansible_distribution_major_version == "12"
       tags: ntp
 
     - name: Configure NTP server pools
       shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
       tags: ntp
 
-    - name: Start NTP
+    - name: Start NTPD
       service:
         name: ntpd
         state: restarted
+      when:
+        - ansible_distribution_major_version == "12"
       tags: ntp
 
+    - name: Start NTP
+      service:
+        name: ntp
+        state: restarted
+      when:
+        - ansible_distribution_major_version == "11"
+      tag: ntp
+      
     ################
     # Pass or Fail #
     ################
