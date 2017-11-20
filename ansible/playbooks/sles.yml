@@ -1,7 +1,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
 # ----- SLES 12 on x86 and s390------  #
-# ---------- SLES 11 on x86 ---------- #
+# ----- SLES 11 on x86 and PPC64 ----- #
 ########################################
 
 ################
@@ -65,7 +65,7 @@
         - ansible_distribution_major_version == "12"
       tags: build_tools
       
-    - name: Enable git-core repos on SLES 11
+    - name: Enable git-core repos - SLES 11 x86
       shell: |
         zypper addrepo 'http://download.opensuse.org/repositories/devel:/tools:/scm/SLE_11_SP4/devel:tools:scm.repo'
         zypper addrepo 'http://download.opensuse.org/repositories/devel:/languages:/perl/SLE_11_SP3/devel:languages:perl.repo'
@@ -73,16 +73,74 @@
         sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/devel_languages_perl.repo
       when:
         - ansible_distribution_major_version == "11"
+        - ansible_architecture == "x86"
       tags: build_tools
 
-    - name: Install git-core on SLES 11
+    - name: Install git-core - SLES 11 x86
       zypper: name={{item}} state=installed update_cache=yes
       with_items:
         - git-core
         - perl-Error
       when:
         - ansible_distribution_major_version == "11"
+        - ansible_architecture == "x86"
       tags: build_tools
+      
+    - name: Download Zlib - SLES 11 PPC64
+      get_url:
+        url: http://www.zlib.net/zlib-1.2.11.tar.gz
+        dest: /tmp/zlib-1.2.11.tar.gz
+        mode: 0440
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: zlib
+
+    - name: Extract Zlib - SLES 11 PPC64
+      unarchive:
+        src: /tmp/zlib-1.2.11.tar.gz
+        dest: /tmp
+        copy: False
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: zlib
+
+    - name: Running ./configure & make for Zlib - SLES 11 PPC64
+      shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      become: yes
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: zlib
+
+    - name: Download git - SLES 11 PPC64
+      get_url:
+        url: https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.gz
+        dest: /tmp/git-2.15.0.tar.gz
+        mode: 0440
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: git
+
+    - name: Extract git - SLES 11 PPC64
+      unarchive:
+        src: /tmp/git-2.15.0.tar.gz
+        dest: /tmp
+        copy: False
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: git
+
+    - name: Running ./configure & make for git - SLES 11 PPC64
+      shell: cd /tmp/git-2.15.0 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      become: yes
+      when:
+        - ansible_distribution_major_version == "11"
+        - ansible_architecture == "ppc64"
+      tags: git
 
     - name: Install Test tools
       zypper: name={{item}} state=installed
@@ -162,7 +220,7 @@
       shell: |
         mkdir -p /opt/ibm 
         chmod +x /tmp/ibm-java.bin
-        /tmp/ibm-java.bin -i silent -f /tmp/response.properties
+        /tmp/ibm-java.bin -i silent -f /tmp/ibm-java.response.properties
       when: 
         - (java8_installed.stat.exists == false)
         - ansible_distribution_major_version == "11"
@@ -241,6 +299,7 @@
         url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
         dest: /usr/bin/jq
         mode: 0755
+        validate_certs: no
       tags: jq_test 
 
     ###############
