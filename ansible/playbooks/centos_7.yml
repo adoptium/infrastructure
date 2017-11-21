@@ -186,7 +186,7 @@
       file:
         path: "{{ item }}"
         state: absent
-      with items:
+      with_items:
         - /tmp/cmake-3.7.2.tar.gz
         - /tmp/cmake-3.7.2
       tags: cmake
