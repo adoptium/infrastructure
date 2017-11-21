@@ -74,6 +74,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: 
         - build_tools
         - docker
@@ -173,6 +174,15 @@
     - name: Running ./configure & make for CCACHE
       shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
+      when: 
+        - ansible_architecture != "S390"
+      tags: ccache
+
+    - name: Running ./configure & make for CCACHE - S390
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_cores }} && sudo make install
+      become: yes
+      when: 
+        - ansible_architecture == "S390"
       tags: ccache
 
     - name: Install JSON
@@ -212,6 +222,13 @@
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       when: 
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "s390x"
+      tags: cmake
+
+    - name: Running ./configure & make for cmake - S390
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_cores }} && make install
+      when: 
+        - ansible_architecture == "s390x"
       tags: cmake
 
     - name: Cleanup cmake
@@ -276,6 +293,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
 
     - name: Import Docker Repo key
@@ -286,6 +304,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
 
     - name: Add Docker Repo
@@ -300,6 +319,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
 
     - name: Install Docker CE
@@ -311,6 +331,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
 
     - name: Add jenkins user to the docker group
@@ -321,6 +342,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
       
     - name: Enable and Start Docker Service
@@ -332,6 +354,7 @@
         - ansible_distribution_major_version == "7"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "ppc64le"
+        - ansible_architecture != "s390x"
       tags: docker
 
     #######################
