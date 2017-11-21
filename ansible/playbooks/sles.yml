@@ -202,8 +202,8 @@
         dest: /tmp/ibm-java.bin
         validate_certs: no
       when: 
-        - (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
         - ansible_distribution_major_version == "11"
+        - (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
       tags: java8
 
     - name: Create IBM Java 8 response file
@@ -211,9 +211,9 @@
         echo "INSTALLER_UI=silent" > /tmp/ibm-java.response.properties
         echo "USER_INSTALL_DIR=/opt/ibm/java" >> /tmp/ibm-java.response.properties
         echo "LICENSE_ACCEPTED=TRUE" >> /tmp/ibm-java.response.properties
-      when: 
-        - (java8_installed.stat.exists == false)
+      when:
         - ansible_distribution_major_version == "11"
+        - (java8_installed.stat.exists == false)
       tags: java8
 
     - name: Install Java 8 
@@ -222,8 +222,8 @@
         chmod +x /tmp/ibm-java.bin
         /tmp/ibm-java.bin -i silent -f /tmp/ibm-java.response.properties
       when: 
-        - (java8_installed.stat.exists == false)
         - ansible_distribution_major_version == "11"
+        - (java8_installed.stat.exists == false)
       tags: java8
       
     ################
@@ -277,6 +277,15 @@
     - name: Running ./configure & make for CCACHE
       shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
+      when: 
+        - ansible_architecture != "s390x"
+      tags: ccache
+
+    - name: Running ./configure & make for CCACHE - s390x
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_cores }} && sudo make install
+      become: yes
+      when: 
+        - ansible_architecture == "s390x"
       tags: ccache
 
     - name: Install App::cpanminus
@@ -363,6 +372,13 @@
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       when: 
         - ansible_architecture != "ppc64"
+        - ansible_architecture != "s390x"
+      tags: cmake
+
+    - name: Running ./configure & make for cmake - s390x
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_cores }} && make install
+      when: 
+        - ansible_architecture == "s390x"
       tags: cmake
 
     ##########
