@@ -89,6 +89,17 @@
       when: ansible_distribution_major_version == "7"
       tags: build_tools
       
+    - name: Additional build tools for RHEL 7 dependency for git source compile
+      yum: name={{item}} state=installed
+      with_items:
+        - expat-devel
+        - libstdc++-static
+        - libcurl-devel
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture == "ppc64le"
+      tags: build_tools
+
     - name: Create symlink for gmake to make
       file:
         src: /usr/bin/make
@@ -184,6 +195,34 @@
       when: 
         - ansible_architecture == "S390"
       tags: ccache
+
+    - name: Download git-2.15.0.tar.xz
+      get_url:
+        url: https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz
+        dest: /home/{{ Jenkins_Username }}/git-2.15.0.tar.xz
+        mode: 0440
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture == "ppc64le"
+      tags: git-src
+
+    - name: Extract git sources
+      unarchive:
+        src: /home/{{ Jenkins_Username }}/git-2.15.0.tar.xz
+        dest: /home/{{ Jenkins_Username }}
+        copy: False
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture == "ppc64le"
+      tags: git-src
+
+    - name: Compile and install git 2.15
+      shell: cd /home/{{ Jenkins_Username }}/git-2.15.0 && make prefix=/usr all && make prefix=/usr install
+      become: yes
+      when:
+        - ansible_distribution_major_version == "7"
+        - ansible_architecture == "ppc64le"
+      tags: git-src
 
     - name: Install JSON
       shell: |
