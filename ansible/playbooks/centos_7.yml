@@ -6,7 +6,6 @@
 - hosts: all
   remote_user: root
   become: yes
-
   tasks:
   - block:
 
@@ -20,25 +19,28 @@
     # Update and Install Packages #
     ###############################
     - name: Enable EPEL release
-      yum: name='epel-release' state=installed update_cache=yes
+      yum: 
+        name: epel-release
+        state: installed 
+        update_cache: yes
+        validate_certs: no
       tags: patch_update
 
-    - name: Ensure DNF is installed
-      yum: name='dnf' state=installed update_cache=yes
-      tags: patch_update
-
-    - name: DNF upgrade all packages
-      dnf: name='*' state=latest
+    - name: YUM upgrade all packages
+      yum: name='*' state=latest
       tags: patch_update
 
     - name: Install Build tools
-      dnf: name={{item}} state=installed
+      yum: name={{item}} state=installed
       with_items:
         - alsa-lib-devel
         - bind-utils
+        - bison
         - cpanminus
         - cpio
         - cups-devel
+        - elfutils-libelf-devel
+        - flex
         - freetype-devel
         - gcc
         - gcc-c++
@@ -46,25 +48,24 @@
         - glibc
         - glibc-common
         - java-1.8.0-openjdk-devel
+        - libdwarf-devel
         - libXext-devel
         - libXrender-devel
-        - libXrender-devel
         - libXt-devel
-        - libXt-devel
-        - libXtst-devel
         - libXtst-devel
         - make
         - mesa-libGL-devel
         - ntp
         - openssl-devel
         - perl-CPAN
+        - perl-devel
         - unzip
         - wget
         - zip
       tags: build_tools
 
     - name: Install Test tools
-      dnf: name={{item}} state=installed
+      yum: name={{item}} state=installed
       with_items:
         - ant
         - perl
@@ -72,17 +73,26 @@
         - xorg-x11-server-Xorg  
       tags: test_tools 
 
+    - name: Create symlink for gmake to make
+      file:
+        src: /usr/bin/make
+        dest: /usr/bin/gmake
+        owner: root
+        group: root
+        state: link
+      tags: build_tools
+        
     ################
     # Jenkins user #
     ################
-    - name: Create jenkins user
-      action: user name=jenkins state=present
+    - name: Create Jenkins user
+      action: user name={{ Jenkins_Username }} state=present
       ignore_errors: yes
       tags: jenkins_user
           
-    - name: Set authorized key for jenkins
+    - name: Set authorized key for Jenkins user
       authorized_key:
-        user: jenkins
+        user: "{{ Jenkins_Username }}"
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
       tags: jenkins_user
@@ -93,19 +103,19 @@
     - name: Download ccache.tar.gz
       get_url:
         url: https://www.samba.org/ftp/ccache/ccache-3.1.9.tar.gz
-        dest: /home/jenkins/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
         mode: 0440
       tags: ccache
 
     - name: Extract ccache
       unarchive:
-        src: /home/jenkins/ccache.tar.gz
-        dest: /home/jenkins
+        src: /home/{{ Jenkins_Username }}/ccache.tar.gz
+        dest: /home/{{ Jenkins_Username }}
         copy: False
       tags: ccache
 
     - name: Running ./configure & make for CCACHE
-      shell: cd /home/jenkins/ccache-3.1.9 && ./configure && make && sudo make install
+      shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
       become: yes
       tags: ccache
 
@@ -119,12 +129,37 @@
         cpanm --with-recommends Text::CSV  
       tags: text_csv
   
-    - name: Download and Install JQ
+    #########
+    # cmake #
+    #########
+    - name: Download cmake
       get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: /usr/bin/jq
-        mode: 0755
-      tags: jq_test  
+        url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+        dest: /tmp/cmake-3.7.2.tar.gz
+        mode: 0440
+        force: no
+        validate_certs: no
+      tags: cmake 
+      
+    - name: Extract ccache
+      unarchive:
+        src: /tmp/cmake-3.7.2.tar.gz
+        dest: /tmp
+        copy: False 
+      tags: cmake  
+
+    - name: Running ./configure & make for cmake
+      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      tags: cmake 
+
+    - name: Cleanup cmake
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/cmake-3.7.2.tar.gz
+        - /tmp/cmake-3.7.2
+      tags: cmake
 
     ###############
     # ant-contrib #
@@ -159,44 +194,89 @@
         path: "/tmp/ant-contrib-1.0b2-bin.tar.gz"
       tags: ant
 
-    #########
-    # cmake #
-    #########
-    - name: Download cmake
+    ##########
+    # Docker #
+    ##########
+    - name: Install EPEL repo
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        state: present
+      ignore_errors: yes
+      tags: docker
+
+    - name: Import Docker Repo key
+      rpm_key:
+        key: https://download.docker.com/linux/centos/gpg
+        state: present
+      tags: docker
+
+    - name: Add Docker Repo
       get_url:
-        url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-        dest: /tmp/cmake-3.7.2.tar.gz
-        mode: 0440
-        force: no
-        validate_certs: no
-      tags: cmake 
-      
-    - name: Extract ccache
-      unarchive:
-        src: /tmp/cmake-3.7.2.tar.gz
-        dest: /tmp
-        copy: False 
-      tags: cmake  
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        force: yes
+        owner: root
+        group: root
+        mode: 0644
+      tags: docker
 
-    - name: Running ./configure & make for cmake
-      shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
-      tags: cmake 
+    - name: Install Docker CE
+      yum:
+        name: docker-ce
+        state: present
+        update_cache: yes
+      tags: docker
 
-    - name: Cleanup cmake
+    - name: Add jenkins user to the docker group
+      user: name="{{ Jenkins_Username }}"
+            groups=docker
+            append=yes
+      tags: docker
+        
+    - name: Enable and Start Docker Service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      tags: docker
+
+    #######################
+    # NVidia Cuda Toolkit #
+    #######################
+    - name: Check if NVidia CUDA toolkit is already installed
+      stat: 
+          path: /usr/local/cuda-9.0
+      register: cuda_installed
+      tags: Cuda_Toolkit
+        
+    - name: Download NVidia CUDA toolkit
+      get_url: 
+        url="https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
+        dest="/tmp/cuda9_linux-run"
+      when: 
+        - cuda_installed.stat.islnk is not defined
+      tags: Cuda_Toolkit
+
+    - name: Install NVidia CUDA toolkit
+      shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
+      when: 
+        - cuda_installed.stat.islnk is not defined
+      tags: Cuda_Toolkit
+
+    - name: Cleanup NVidia CUDA toolkit
       file:
-        path: "{{ item }}"
+        path: /tmp/cuda9_linux-run
         state: absent
-      with_items:
-        - /tmp/cmake-3.7.2.tar.gz
-        - /tmp/cmake-3.7.2
-      tags: cmake
+      when:
+        - cuda_installed.stat.islnk is not defined
+      tags: Cuda_Toolkit
 
     ##################
     # Nagios plugins #
     ##################
-    - name: Include Nagios Playbook
-      include_tasks: nagios/nagios_ubuntu.yml
-      when: Nagios_Plugins == "Enabled"
+#    - name: Include Nagios Playbook
+#      include_tasks: nagios/nagios_centos.yml
+#      when: Nagios_Plugins == "Enabled"
 
     #####################
     # superuser account #
@@ -204,6 +284,7 @@
     - name: Setup zeus user
       shell: useradd zeus --shell /bin/bash -m 
       ignore_errors: yes
+      when: Superuser_Account == "Enabled"
       tags: supperuser
 
     - name: Create SSH Key folder for zeus
@@ -213,6 +294,7 @@
         group: zeus
         mode: 0700
         state: directory
+      when: Superuser_Account == "Enabled"
       tags: supperuser
 
     - name: Add key
@@ -220,6 +302,7 @@
         user: zeus
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+      when: Superuser_Account == "Enabled"
       tags: supperuser
 
     - name: Grant zeus sudo powers
@@ -228,19 +311,19 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      when: Superuser_Account == "Enabled"
       tags: supperuser
 
     #############
     # swap file #
     #############
-    - name: Check if swap file exists
-      shell: cat /etc/fstab
-      register: check_fstab
+    - stat: path=/swapfile
+      register: swap_test
       tags: swap
 
     - name: Create swap file
-      command: fallocate -l 2G /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+      command: dd if=/dev/zero of=/swapfile bs=250M count=8
+      when: swap_test.stat.exists == false 
       tags: swap
 
     - name: Set swap file permissions
@@ -248,17 +331,17 @@
             owner=root
             group=root
             mode=0600
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
       tags: swap
 
     - name: Create swap area device
       command: mkswap /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
       tags: swap
 
     - name: Mount swap file
       command: swapon /swapfile
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
       tags: swap
 
     - name: Add swap to fstab
@@ -269,7 +352,7 @@
         passno=0
         dump=0
         state=present
-      when: check_fstab.stdout.find('swap') == ""
+      when: swap_test.stat.exists == false
       tags: swap
 
     ####################
@@ -301,7 +384,7 @@
 
     - name: Start X11
       become: yes
-      become_user: jenkins
+      become_user: "{{ Jenkins_Username }}"
       shell: startx -- :1 &
       ignore_errors: yes
       no_log: True
@@ -327,8 +410,8 @@
     ############
     # Clean up #
     ############
-    - name: Remove DNF dependencies that are no longer required
-      command: dnf -y autoremove
+    - name: Remove yum dependencies that are no longer required
+      command: yum -y autoremove
       args:
          warn: no
       tags: cleanup
