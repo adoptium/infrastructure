@@ -1,8 +1,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
-# ----- Ubuntu 14 and 16 on x86 -----  #
-# -------- Ubuntu 16 on s390 --------  #
-# -------- Ubuntu 16 on ARM ---------  #
+# ----- Ubuntu 14 on x86, ppc64le ---- #
+# Ubuntu 16 on x86, ppc64le, s390, ARM #
 ########################################
 
 - hosts: all
