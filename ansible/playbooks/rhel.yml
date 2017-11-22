@@ -43,10 +43,7 @@
         - glibc-common
         - libXext-devel
         - libXrender-devel
-        - libXrender-devel
         - libXt-devel
-        - libXt-devel
-        - libXtst-devel
         - libXtst-devel
         - make
         - mesa-libGL-devel
@@ -461,13 +458,13 @@
         - ansible_architecture == "ppc64le"
       tags: Cuda_Toolkit
 
-    - name: Cleanup NVidia CUDA toolkit
+    - name: Cleanup NVidia CUDA toolkit - PPC64LE
       file:
         path: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
         state: absent
       when:
         - cuda_installed.stat.islnk is not defined
-        - ansible_distribution_major_version == "16"
+        - ansible_distribution_major_version == "7"
         - ansible_architecture == "ppc64le"
       tags: Cuda_Toolkit
            
