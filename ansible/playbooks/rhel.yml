@@ -86,12 +86,16 @@
       when: ansible_distribution_major_version == "7"
       tags: build_tools
       
-    - name: Additional build tools for RHEL 7 dependency for git source compile
+    - name: Additional build tools for RHEL7 PPCLE
       yum: name={{item}} state=installed
       with_items:
+        # dependencies for git source compile
         - expat-devel
-        - libstdc++-static
         - libcurl-devel
+        # openj9 compilation requirement
+        - libstdc++-static
+        # use offical package instead of tag:ant actions
+        - ant-contrib
       when:
         - ansible_distribution_major_version == "7"
         - ansible_architecture == "ppc64le"
@@ -245,7 +249,7 @@
         - ansible_architecture != "ppc64"
       tags: cmake
       
-    - name: Extract ccache
+    - name: Extract cmake
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
@@ -285,6 +289,8 @@
         dest: /tmp/
         mode: 0440
         timeout: 25
+      when:
+        - (ansible_architecture != "ppc64le" and ansible_distribution_major_version == "7")
       tags: ant
 
     - name: Extract ant-contrib
@@ -292,10 +298,14 @@
         src: /tmp/ant-contrib-1.0b2-bin.tar.gz 
         dest: /tmp/
         copy: False
+      when:
+        - (ansible_architecture != "ppc64le" and ansible_distribution_major_version == "7")
       tags: ant
 
     - name: Move ant-contrib.jar to lib folder
       command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+      when:
+        - (ansible_architecture != "ppc64le" and ansible_distribution_major_version == "7")
       tags: ant
 
     - name: Clean ant-contrib tmp files
