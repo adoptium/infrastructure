@@ -17,10 +17,24 @@ On RHEL 7.x
 For Ubuntu 14.x
 `sudo apt-add-repository ppa:ansible/ansible`
 `sudo apt update`
-`sudo install ansible`
+`sudo apt install ansible`
 
 2) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
-`ansible-playbook -s ubuntu_14_x86.yml` 
+`ansible-playbook -s ubuntu_14_x86.yml`
+
+or  
+
+`ansible-playbook -s playbooks/ubuntu.yml`
+
+Ensure that you have created `host` file in the root directory of the repo or in `/etc/ansible/`. For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
+
+You are better off running it inside a Virtual Machine isolate from your own local system. A `Vagrantfile` has been provided, usual `vagrant` commands should get it up and running.
+```
+   $ vagrant up
+   $ vagrant ssh
+   
+   (ssh login: vagrant   password: vagrant)
+```
 
 3) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
