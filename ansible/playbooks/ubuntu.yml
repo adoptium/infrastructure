@@ -61,6 +61,7 @@
         - libxtst-dev
         - make
         - ntp
+        - zulu-9
         - openjdk-7-jdk
         - openjdk-8-jdk
         - zulu-9
