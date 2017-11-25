@@ -64,7 +64,7 @@
         - zulu-9
         - openjdk-7-jdk
         - openjdk-8-jdk
-        - zulu-9
+        - zulu-9-amd64
         - pkg-config
         - wget
         - zip
