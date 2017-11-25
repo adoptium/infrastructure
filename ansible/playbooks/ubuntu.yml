@@ -28,6 +28,10 @@
     - name: Add the openjdk repository to apt
       apt_repository: repo='ppa:openjdk-r/ppa'
       tags: patch_update
+      
+    - name: Add the azul repository to apt
+      apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+      tags: patch_update
 
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
@@ -59,7 +63,7 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
-        - http://cdn.azul.com/zulu/bin/zulu9.0.1.3-jdk9.0.1-linux_amd64.deb
+        - zulu-9
         - pkg-config
         - wget
         - zip
