@@ -59,7 +59,6 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
-        - openjdk-9-jdk
         - pkg-config
         - wget
         - zip
