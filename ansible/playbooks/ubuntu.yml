@@ -59,6 +59,7 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
+        - http://cdn.azul.com/zulu/bin/zulu9.0.1.3-jdk9.0.1-linux_amd64.deb
         - pkg-config
         - wget
         - zip
