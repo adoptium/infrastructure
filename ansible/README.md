@@ -20,7 +20,7 @@ e.g. `/home/karianna/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
 1) Ensure that you have edited `hosts` file in `/etc/ansible/`. 
 For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
 
-1) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
+2) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
 
 `ansible-playbook -s ubuntu.yml`
 
@@ -49,7 +49,7 @@ For Ubuntu 14.x
 
 `ansible-playbook -s playbooks/ubuntu.yml`
 
-Ensure that you have created `host` file in the root directory of the repo or in `/etc/ansible/`. For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
+Ensure that you have edited the `hosts` in `/etc/ansible/`. For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
 
 3) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
