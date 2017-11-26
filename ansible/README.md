@@ -4,23 +4,25 @@
 
 You are better off running it inside a Virtual Machine isolate from your own local system. 
 A `Vagrantfile` has been provided and the usual `vagrant` commands should get it up and running.
+
+**NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from 
+e.g. `/home/karianna/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
+
 ```
    $ vagrant up
    $ vagrant ssh
    
-   (ssh login: vagrant   password: vagrant)
+   (uses default ssh login: vagrant   password: vagrant)
    
-   cd /vagrant/ansible/playbooks   
+   cd /vagrant/playbooks   
 ```
 
+1) Ensure that you have edited `hosts` file in `/etc/ansible/`. 
+For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
+
 1) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
-`ansible-playbook -s ubuntu_14_x86.yml`
 
-or  
-
-`ansible-playbook -s playbooks/ubuntu.yml`
-
-Ensure that you have created `host` file in the root directory of the repo or in `/etc/ansible/`. For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
+`ansible-playbook -s ubuntu.yml`
 
 # Running Manually
 
@@ -43,10 +45,7 @@ For Ubuntu 14.x
 `sudo apt update`
 `sudo apt install ansible`
 
-2) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
-`ansible-playbook -s ubuntu_14_x86.yml`
-
-or
+2) Run a playbook to install dependencies, e.g. for Ubuntu 14.x on x86:
 
 `ansible-playbook -s playbooks/ubuntu.yml`
 
