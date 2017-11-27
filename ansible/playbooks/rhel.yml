@@ -35,6 +35,7 @@
         - bind-utils
         - cpio
         - cups-devel
+        - expat-devel
         - freetype-devel
         - gcc
         - gcc-c++
@@ -91,7 +92,6 @@
       yum: name={{item}} state=installed
       with_items:
         # dependencies for git source compile
-        - expat-devel
         - libcurl-devel
         # openj9 compilation requirement
         - libstdc++-static
@@ -235,6 +235,11 @@
       shell: |
         cpanm --with-recommends Text::CSV
       tags: text_csv    
+
+    - name: Install XML::Parser
+      shell: |
+        cpanm --with-recommends XML::Parser
+      tags: xml_parser
     
     #########
     # cmake #
