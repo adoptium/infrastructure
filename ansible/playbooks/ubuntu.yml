@@ -33,6 +33,13 @@
       apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
       tags: patch_update
 
+    - name: Add the azul key
+      apt_key:
+        # id: 0x219BD9C9
+        id: 27BC0C8CB3D81623F59BDADCB1998361219BD9C9
+        keyserver: keyserver.ubuntu.com
+        state: present
+
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
       tags: patch_update
@@ -63,10 +70,10 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
-        - zulu-9-amd64
         - pkg-config
         - wget
         - zip
+        - zulu-9
       tags: build_tools
       
     - name: Install libpng-dev on aarch64
