@@ -47,6 +47,7 @@
         - libXtst-devel
         - make
         - mesa-libGL-devel
+        - numactl-devel
         - ntp
         - openssl-devel
         - perl-CPAN
