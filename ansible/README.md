@@ -2,7 +2,7 @@
 
 # Running via Vagrant and VirtualBox 
 
-You are better off running it inside a Virtual Machine isolate from your own local system. 
+You are better off running it inside a Virtual Machine isolated from your own local system. 
 A `Vagrantfile` has been provided and the usual `vagrant` commands should get it up and running.
 
 **NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from 
