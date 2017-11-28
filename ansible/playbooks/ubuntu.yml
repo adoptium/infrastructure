@@ -36,6 +36,11 @@
       apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
       tags: patch_update
 
+    - name: Add Azul Zulu GPG Package Signing Key
+      apt_key:
+        url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+        state: present
+        
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
       tags: patch_update
@@ -66,10 +71,17 @@
         - ntp
         - openjdk-7-jdk
         - openjdk-8-jdk
-        - zulu-9-amd64
         - pkg-config
         - wget
         - zip
+      tags: build_tools
+
+    - name: Install zulu-9-amd64
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - zulu-9-amd64
+      when:
+        - ansible_architecture == "x86_64"
       tags: build_tools
       
     - name: Install libpng-dev on aarch64
