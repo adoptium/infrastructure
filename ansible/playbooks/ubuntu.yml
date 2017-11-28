@@ -2,6 +2,7 @@
 #   AdoptOpenJDK - Ansible Playbook for:   #
 # ----- Ubuntu 14 on x86 and ppc64le ----- #
 # Ubuntu 16 on x86, ppc64le, s390, aarch64 #
+# - Raspbian 8 on armv7l  Raspberry Pi 2 - #
 ############################################
 
 - hosts: all
@@ -27,19 +28,19 @@
 
     - name: Add the openjdk repository to apt
       apt_repository: repo='ppa:openjdk-r/ppa'
+      when:
+        - ansible_architecture != "armv7l"
       tags: patch_update
       
     - name: Add the azul repository to apt
       apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
       tags: patch_update
 
-    - name: Add the azul key
+    - name: Add Azul Zulu GPG Package Signing Key
       apt_key:
-        # id: 0x219BD9C9
-        id: 27BC0C8CB3D81623F59BDADCB1998361219BD9C9
-        keyserver: keyserver.ubuntu.com
+        url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
         state: present
-
+        
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
       tags: patch_update
@@ -73,7 +74,14 @@
         - pkg-config
         - wget
         - zip
-        - zulu-9
+      tags: build_tools
+
+    - name: Install zulu-9-amd64
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - zulu-9-amd64
+      when:
+        - ansible_architecture == "x86_64"
       tags: build_tools
       
     - name: Install libpng-dev on aarch64
@@ -158,6 +166,12 @@
        - ansible_architecture == "x86_64"
       tags: default_java
 
+    - name: Set default java version - armv7l
+      shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-armhf/jre/bin/java
+      when:
+       - ansible_architecture == "armv7l"
+      tags: default_java
+
     - name: Set default java version - PPC64LE
       shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-ppc64el/jre/bin/java
       when:
@@ -203,7 +217,7 @@
 
     - name: Install Text::CSV
       shell: |
-        cpanm --with-recommends Text::CSV   
+        cpanm --with-recommends Text::CSV  
       tags: text_csv
 
     #########
@@ -216,6 +230,8 @@
         mode: 0440
         force: no
         validate_certs: no
+      when:
+        - ansible_architecture != "armv7l"
       tags: cmake 
       
     - name: Extract cmake
@@ -223,10 +239,14 @@
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
         copy: False 
+      when:
+        - ansible_architecture != "armv7l"
       tags: cmake  
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+      when:
+        - ansible_architecture != "armv7l"
       tags: cmake
 
     - name: Cleanup cmake
@@ -236,7 +256,15 @@
       with_items:
         - /tmp/cmake-3.7.2.tar.gz
         - /tmp/cmake-3.7.2
+      when:
+        - ansible_architecture != "armv7l"
       tags: cmake 
+
+    - name: Install cmake on armv7l
+      apt: pkg=cmake state=latest update_cache=yes
+      when:
+        - ansible_architecture == "armv7l"
+      tags: cmake
 
     ##########
     # Docker #
