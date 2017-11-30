@@ -74,7 +74,13 @@
         path: C:\temp
         state: directory
       tags: basic_config
-        
+
+    - name: Create C:\openjdk directory
+      win_file:
+        path: C:\openjdk
+        state: directory
+      tags: basic_config
+
     - name: Create cmd.exe shortcut
       win_shortcut:
         src: C:\Windows\System32\cmd.exe
@@ -193,24 +199,57 @@
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
       tags: text_cvs
 
+    # freemarker v2.3.8
+    - name: Test if freemarker is already installed
+      win_stat:
+        path: 'C:\openjdk\freemarker.jar'
+      register: freemarker_installed
+      tags: freemarker
+
     - name: Download freemarker
       win_get_url: 
         url: http://central.maven.org/maven2/freemarker/freemarker/2.3.8/freemarker-2.3.8.jar
-        dest: 'C:\temp\freemarker.jar'
-        force: no
+        dest: 'C:\openjdk\freemarker.jar'
+      when: (freemarker_installed.stat.exists == false)
       tags: freemarker
 
-    - name: Install freetype
+    # freetype v2.5.3
+    - name: Test if freetype is already installed
+      win_stat:
+        path: 'C:\openjdk\freetype-2.5.3'
+      register: freetype_installed
+      tags: freetype
+
+    - name: Test if freetype is already downloaded
+      win_stat:
+        path: 'C:\temp\ft253.zip'
+      when: (freetype_installed.stat.exists == false)
+      register: freetype_download
+      tags: freetype
+
+    - name: Download freetype 2.5.3
       win_get_url:
         url: https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
         dest: C:\temp\ft253.zip
-        force: no
+      when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
       tags: freetype
 
     - name: Unpack freetype
       win_unzip:
         src: C:\temp\ft253.zip
-        dest: C:\temp
+        dest: C:\openjdk
+        delete_archive: yes
+      when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
+      tags: freetype
+
+    - name: Add modify, write permissions for jenkins user
+      win_acl:
+        path: C:\openjdk\freetype-2.5.3
+        user: "{{ Jenkins_Username }}"
+        rights: Read,Write,Modify,FullControl,Delete
+        type: allow
+        state: present
+      when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
       tags: freetype
 
     #########
@@ -267,28 +306,31 @@
     # Java 7
     - name: Test if Java 7 is already installed
       win_stat:
-          path: 'C:\Program Files\Java\jre7'
+          path: 'C:\Program Files\Java\java-se-7u75-ri'
       register: java7_installed
       tags: java7
 
     - name: Check if Java 7 is already downloaded
       win_stat:
-          path: 'C:\TEMP\java7.exe'
+          path: 'C:\temp\jdk7u75-b13.zip'
       register: java7_download
       tags: java7
 
     - name: Download Java 7
       win_get_url:
-        url: http://javadl.sun.com/webapps/download/AutoDL?BundleId=81821
-        dest: 'C:\TEMP\java7.exe'
+        url: http://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip
+        dest: 'C:\temp\jdk7u75-b13.zip'
       when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
       tags: java7
 
     - name: Install Java 7
-      raw: 'C:\TEMP\java7.exe /s SPONSORS=0 /l*v C:\TEMP\java7_install_log.txt'
+      win_unzip:
+        src: C:\temp\jdk7u75-b13.zip
+        dest: C:\Program Files\Java
+        delete_archive: yes
       when: (java7_installed.stat.exists == false)
       tags: java7
-
+    
     # Java 8
     - name: Test if Java 8 is already installed
       win_stat:
@@ -309,7 +351,7 @@
       when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
       tags: java8
 
-    - name: Install Java 8 into C:\temp\sdk
+    - name: Install Java 8
       win_unzip:
         src: C:\temp\jdk8u144-b01.zip
         dest: C:\Program Files\Java
@@ -324,6 +366,15 @@
         scope: machine
         state: present
       when: (java8_installed.stat.exists == false)
+      tags: java8
+
+    - name: Add JAVA_HOME/bin to Path
+      win_path:
+        name: Path
+        elements: 
+          - 'C:\Program Files\Java\jdk8u144-b01\bin'
+        scope: machine
+        state: present
       tags: java8
 
     ###########################
