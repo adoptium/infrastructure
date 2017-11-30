@@ -83,7 +83,7 @@
         - zulu-9-amd64
       when:
         - ansible_architecture == "x86_64"
-      tags: build_tools
+      tags: [build_tools, install_zulu]
       
     - name: Install libpng-dev on aarch64
       apt: pkg={{ item }} state=latest
@@ -149,7 +149,7 @@
         user: "{{ Jenkins_Username }}"
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
-      tags: jenkins_user
+      tags: [jenkins_user, jenkins_authorized_key]
 
     - name: Add Jenkins user to the audio group
       user: name={{ Jenkins_Username }}
@@ -397,6 +397,7 @@
     - name: Include Nagios Playbook
       include_tasks: nagios/nagios_ubuntu.yml
       when: Nagios_Plugins == "Enabled"
+      tags: nagios_plugins
 
     #####################
     # superuser account #
@@ -423,7 +424,7 @@
         state: present
         key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
       when: Superuser_Account == "Enabled"
-      tags: supperuser
+      tags: [supperuser, add_zeus_user_key]
 
     - name: Grant zeus sudo powers
       lineinfile:
