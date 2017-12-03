@@ -80,7 +80,7 @@
     - name: Install zulu-9-amd64
       apt: pkg={{ item }} state=latest
       with_items:
-        - zulu-9-amd64
+        - zulu-9
       when:
         - ansible_architecture == "x86_64"
       tags: build_tools
