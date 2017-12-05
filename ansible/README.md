@@ -92,6 +92,18 @@ ansible-playbook -s playbooks/ubuntu.yml --skip-tags "jenkins_user"
 ansible-playbook -s playbooks/ubuntu.yml --skip-tags "install_zulu, jenkins_authorized_key, nagios_add_key, add_zeus_user_key"
 ```
 
+## Skipping tasks via CLI when running Ansible playbooks (conditional and skipping tasks)
+
+The below example is appropriate to run playbook by skipping tasks by using a combination of conditionals and tags (linked and dependent tasks will not be executed):
+
+```
+ansible-playbook -i [/path/to/]hosts -s ubuntu.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/]/id_rsa.pub Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
+```
+
+Ensure that,
+ - the `hosts` file is created and placed in the right place, where the above command will work
+ - the `id_rsa.pub` file is created and correctly referred to, where the above command will work (use the `createSSHKeyPair.sh` script provided, to be run inside the vagrant box, creates the public key `id_rsa.pub` in the `/home/vagrant/.ssh/` folder)     
+
 Useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
 
 ## Verbose mode, debugging Ansible playbooks
