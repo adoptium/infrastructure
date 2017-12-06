@@ -271,6 +271,7 @@
       file:
         path: C:\temp\cmake.msi
         state: absent
+      ignore_errors: yes
       tags: cmake
 
     #######
