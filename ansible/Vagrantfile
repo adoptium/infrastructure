@@ -11,6 +11,20 @@ sudo mkdir /ansible
 sudo cp /etc/ansible/ansible.cfg /ansible
 sudo touch /ansible/hosts
 sudo sed -i 's?#inventory      = /etc/ansible/hosts?inventory = /ansible/hosts?g' /ansible/ansible.cfg
+echo "---------------------------------------------------------------------------------------"
+echo "*** Creating public-private keypair for ansible-playbook... for user '$USER' *** "
+yes y | ssh-keygen -t rsa -b 4096 -C "adoptopenjdk@gmail.com" -q -P "" -f $HOME/.ssh/id_rsa
+echo "---------------------------------------------------------------------------------------"
+echo "*** Public-private keypair for ansible-playbook... for user '$USER' has been created in *** "
+ls -lash $HOME/.ssh
+echo "---------------------------------------------------------------------------------------"
+export VAGRANT_MOUNT=/vagrant
+echo "*** Creating 'hosts' file for ansible-playbook... ***"
+echo "localhost ansible_connection=local" > $VAGRANT_MOUNT/playbooks/hosts
+echo "---------------------------------------------------------------------------------------"
+echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains ***"
+cat $VAGRANT_MOUNT/playbooks/hosts
+echo "---------------------------------------------------------------------------------------"
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -19,6 +33,6 @@ Vagrant.configure("2") do |config|
     adoptopenjdk.vm.box = "ubuntu/trusty64"
     adoptopenjdk.vm.hostname = "adoptopenjdk"
     adoptopenjdk.vm.network :private_network, type: "dhcp"
-    adoptopenjdk.vm.provision "shell", inline: $script
+    adoptopenjdk.vm.provision "shell", inline: $script, privileged: false
   end
 end

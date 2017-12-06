@@ -37,6 +37,7 @@
   - name: Setup Nagios user
     shell: adduser nagios --shell /bin/bash --disabled-password --gecos ""
     ignore_errors: yes
+    tags: nagios
 
   - name: Create SSH Key folder for Nagios
     file: 
@@ -45,6 +46,7 @@
       group: nagios
       mode: 0700
       state: directory
+    tags: nagios
 
   - name: Setup authorized_keys
     file:
@@ -53,12 +55,14 @@
       group: nagios    
       mode: 0600
       state: touch
+    tags: nagios
 
   - name: Add key
     authorized_key:
       user: nagios
       state: present
       key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
+    tags: [nagios, nagios_add_key]
   
   ##############################
   # Install additional plugins #
