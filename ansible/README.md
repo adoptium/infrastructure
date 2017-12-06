@@ -17,21 +17,22 @@ e.g. `/home/karianna/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
    cd /vagrant/playbooks   
 ```
 
-1) Ensure that you have edited `hosts` file in `/etc/ansible/` or in the project root directory.
-For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
+Note: 
+ - A `hosts` file containing `localhost ansible_connection=local` will already be present in the directory with the playbook scripts (`/vagrant/playbooks`).
+ - A public key file `id_rsa.pub` will already be present in the `/home/vagrant/.ssh/` folder 
 
-2) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
+1) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
 
 `ansible-playbook -s ubuntu.yml`
 
 or 
 
-`ansible-playbook -i /path/to/hosts -s ubuntu.yml`
+`ansible-playbook -i hosts -s ubuntu.yml`
 
 In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](#Skipping one or more tags via CLI when running Ansible playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```
-ansible-playbook -i ../../hosts -s ubuntu.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+ansible-playbook -i hosts -s ubuntu.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
 ```
 
 # Running Manually
@@ -97,12 +98,12 @@ ansible-playbook -s playbooks/ubuntu.yml --skip-tags "install_zulu, jenkins_auth
 The below example is appropriate to run playbook by skipping tasks by using a combination of conditionals and tags (linked and dependent tasks will not be executed):
 
 ```
-ansible-playbook -i [/path/to/]hosts -s ubuntu.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/]/id_rsa.pub Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
+ansible-playbook -i [/path/to/hosts] -s ubuntu.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
 ```
 
-Ensure that,
- - the `hosts` file is created and placed in the right place, where the above command will work
- - the `id_rsa.pub` file is created and correctly referred to, where the above command will work (use the `createSSHKeyPair.sh` script provided, to be run inside the vagrant box, creates the public key `id_rsa.pub` in the `/home/vagrant/.ssh/` folder)     
+Note that when running from inside the `vagrant` instance:
+ - the `[/path/to/hosts]` can be replace with `/vagrant/playbooks/hosts`
+ - the `[/path/to/id_rsa.pub]` can be replaced with `/home/vagrant/.ssh/id_rsa.pub`
 
 Useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
 
@@ -124,7 +125,7 @@ A snippet from the man pages of Ansible:
 
 ## Expected output of a successful Ansible build
 
-When the above `ansible-playbook` commands success, we should get something of this output (snippet)
+When the above `ansible-playbook` commands succeed, we should get something of this output (snippet):
 
 >
 > .
