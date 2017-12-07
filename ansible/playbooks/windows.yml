@@ -268,7 +268,7 @@
       tags: cmake
 
     - name: Cleanup cmake
-      file:
+      win_file:
         path: C:\temp\cmake.msi
         state: absent
       ignore_errors: yes
