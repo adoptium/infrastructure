@@ -31,3 +31,7 @@
 |  Scaleway |  build-scaleway-armv7-ubuntu16.04-1  |  212.47.233.28 | arm  |  Ubuntu16.04 | root ||
 |  Scaleway |  build-scaleway-armv7-ubuntu16.04-2  |  212.47.246.7 | arm  |  Ubuntu16.04 | root ||
 |  Scaleway | test-scaleway-x64-ubuntu-16.04-1 | 51.15.76.107 | x86_64 | Ubuntu16.04 | root ||
+| SoftLayer | build-win2012-1 | 37.58.193.195 | x64 | Win Server 2012 R2 | Administrator ||
+| SoftLayer | build-win2012-2 | 37.58.103.196 | x64 | Win Server 2012 R2 | Administrator ||
+| SoftLayer | jck-softlayer-x64-ubuntu-16.04-1 | 159.122.210.205 | x64 | Ubuntu16.04 | root | Only for JCK use |
+| SoftLayer | jck-softlayer-x64-ubuntu-16.04-2 | 159.122.210.194 | x64 | Ubuntu16.04 | root | Only for JCK use |
