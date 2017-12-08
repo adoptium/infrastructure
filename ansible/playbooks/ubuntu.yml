@@ -50,7 +50,6 @@
       with_items:
         - autoconf
         - bison
-        - ccache
         - cpanminus
         - cpio
         - flex
