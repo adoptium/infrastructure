@@ -244,6 +244,12 @@
     #########
     # cmake #
     #########
+    - name: Check if cmake is installed
+      stat:
+        path: /usr/bin/cmake
+      register: cmake_installed
+      tags: cmake
+
     - name: Download cmake
       get_url:
         url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
@@ -252,21 +258,27 @@
         force: no
         validate_certs: no
       when: 
+        - cmake_installed.stat.exists == "false"
         - ansible_architecture != "ppc64"
       tags: cmake
+
+    - stat: path=/tmp/cmake-3.7.2.tar.gz
+      register: cmake_download
       
     - name: Extract cmake
       unarchive:
         src: /tmp/cmake-3.7.2.tar.gz
         dest: /tmp
         copy: False
-      when: 
+      when:
+        - cmake_download.stat.exists == "true"
         - ansible_architecture != "ppc64"
       tags: cmake
 
     - name: Running ./configure & make for cmake
       shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
       when: 
+        - cmake_download.stat.exists == "true"
         - ansible_architecture != "ppc64"
         - ansible_architecture != "s390x"
       tags: cmake
