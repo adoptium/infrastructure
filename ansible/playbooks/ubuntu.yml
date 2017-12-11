@@ -52,9 +52,12 @@
         - bison
         - cpanminus
         - cpio
+        - curl
         - flex
         - g++
         - gcc
+        - g++-4.8
+        - gcc-4.8
         - git
         - libasound2-dev
         - libcups2-dev
@@ -62,6 +65,7 @@
         - libelf-dev
         - libexpat1-dev
         - libffi-dev
+        - libfreetype6-dev
         - libx11-dev
         - libxext-dev
         - libxrender-dev
@@ -76,6 +80,14 @@
         - zip
       tags: build_tools
 
+    - name: Install Numa
+      apt: pkg={{ item }} state=latest
+      with_items:
+        - libnuma-dev
+      when:
+        - ansible_architecture != "armv7l"
+      tags: build_tools
+      
     - name: Install zulu-9-amd64
       apt: pkg={{ item }} state=latest
       with_items:
