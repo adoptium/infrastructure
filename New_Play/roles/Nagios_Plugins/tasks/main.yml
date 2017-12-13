@@ -1,0 +1,9 @@
+---
+##################
+# Nagios_Plugins #
+##################
+- name: Include Nagios Playbook
+  include_tasks: nagios_{{ ansible_distribution }}.yml
+  when:
+    - Nagios_Plugins == "Enabled"
+  tags: nagios_plugins

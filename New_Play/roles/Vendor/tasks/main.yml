@@ -1,0 +1,15 @@
+---
+####################################
+# Include optional Vendor Playbook #
+####################################
+- name: Test if Vendor Playbook exists
+  local_action: stat path="../Vendor/Vendor_File.yml"
+  register: optional_vendor_file
+  tags: Vendor
+
+- name: Include optional Vendor Playbook
+  include_tasks: ../Vendor/Vendor_File.yml
+  when:
+    - optional_vendor_file.stat.exists
+    - Vendor_File == "Enabled"
+  tags: Vendor

@@ -1,0 +1,28 @@
+---
+########
+# Main #
+########
+
+#########################
+# Override for Raspbian #
+#########################
+- name: If Raspbian on armv7l override ansible_distribution
+  set_fact:
+    ansible_distribution: "Ubuntu"
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_architecture == "armv7l"
+
+########################
+# Include OS variables #
+########################
+- name: Include OS variables
+  include_vars: "../vars/{{ ansible_distribution }}.yml"
+  tags: main
+
+##############################
+# OS setup and configuration #
+##############################
+- name: Perform OS setup and configuration
+  include_tasks: "{{ ansible_distribution }}.yml"
+  tags: main

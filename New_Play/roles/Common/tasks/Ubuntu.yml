@@ -1,0 +1,92 @@
+---
+##########
+# Ubuntu #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Add the openjdk repository to apt
+  apt_repository: repo='ppa:openjdk-r/ppa'
+  when:
+    - ansible_architecture != "armv7l"
+  tags: patch_update
+
+- name: Add Azul Zulu repository for x86_64
+  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+  when:
+    - ansible_architecture == "x86_64"
+  tags: patch_update
+
+- name: Add Azul Zulu GPG Package Signing Key for x86_64
+  apt_key:
+    url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    state: present
+  when:
+    - ansible_architecture == "x86_64"
+  tags: patch_update
+
+- name: Run apt-get upgrade
+  apt: upgrade=safe update_cache=yes
+  tags: patch_update
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools for x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install additional build tools for aarch64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_aarch64 }}"
+  when:
+    - ansible_architecture == "aarch64"
+  tags: build_tools
+
+#################
+# xorg Packages #
+#################
+- name: Install xserver-xorg-legacy on Ubuntu 16
+  apt: name=xserver-xorg-legacy state=installed
+  when:
+    - ansible_distribution_major_version == "16"
+  tags: test_tools
+
+- name: Install libfreetype6-dev on Ubuntu 16 s390x
+  apt: name=libfreetype6-dev state=installed
+  when:
+   - ansible_architecture == "s390x"
+  tags: test_tools
+
+####################
+# Set default Java #
+####################
+- name: Set default java version for x86_64
+  shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+  when:
+   - ansible_distribution_major_version == "14"
+   - ansible_architecture == "x86_64"
+  tags: default_java
+
+- name: Set default java version for armv7l
+  shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-armhf/jre/bin/java
+  when:
+   - ansible_architecture == "armv7l"
+  tags: default_java
+
+- name: Set default java version for ppc64le
+  shell: update-alternatives --set java /usr/lib/jvm/java-8-openjdk-ppc64el/jre/bin/java
+  when:
+   - ansible_distribution_major_version == "14"
+   - ansible_architecture == "ppc64le"
+  tags: default_java

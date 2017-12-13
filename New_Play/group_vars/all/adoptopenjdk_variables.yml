@@ -1,0 +1,8 @@
+---
+##########################
+# adoptopenjdk_variables #
+##########################
+Jenkins_Username: j9build
+Jenkins_User_SSHKey: /root/.ssh/id_rsa.pub
+Nagios_Plugins: Disabled
+Superuser_Account: Disabled
