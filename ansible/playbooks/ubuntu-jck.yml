@@ -1,9 +1,9 @@
-################################################
-#   AdoptOpenJDK - Ansible JCK Playbook for:   #
-# ---- Ubuntu 16 on x86 (only one tested) ---- #
-################################################
+###############################################
+#  AdoptOpenJDK - Ansible JCK Playbook for:   #
+# Ubuntu 16 on x86 (depends on openjdk-8-jre) #
+###############################################
 
-- hosts: ubuntu
+- hosts: ubuntu-jck
   remote_user: root
   become: yes
   tasks:
@@ -17,13 +17,10 @@
       apt: pkg={{ item }} state=latest
       with_items:
       - ant
-      - ftpd
+      - acl
       - gcc
-      - krb5-kdc
-      - krb5-admin-server
-      - pwgen
-      - tomcat8
       - unzip
+      - openjdk-8-jre
       - xvfb
     - name: Create Jenkins user
       action: user name="{{ Jenkins_Username }}" state=present
@@ -34,46 +31,6 @@
         user: "{{ Jenkins_Username }}"
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
-    - name: Create FTP user with password
-      action: user name="{{ jckftp_Username }}" shell=/bin/false password={{ lookup('file', jckftp_Passwd) }} state=present
-      ignore_errors: yes
-      tags: ftp_user
-    - name: Create file for FTP access
-      copy:
-        content: ""
-        dest: "/home/{{ jckftp_Username }}/filename.txt"
-        force: no
-        owner: "{{ jckftp_Username }}"
-        mode: 0755
-    - name: Copy krb5.conf
-      copy:
-        src: conf/krb5.conf
-        dest: /etc/krb5.conf
-        owner: root
-        group: root
-        mode: 0644
-        backup: yes
-    - name: Configure kerberos server
-      shell: kdb5_util create -r ADOPTOPENJDK_NET -W -s -P `pwgen -1`
-      args:
-        creates: /etc/krb5kdc/principal.kadm5
-    - shell: "{{ item }}"
-      with_items:
-      - kadmin.local -q "addprinc -pw `pwgen -1` admin/admin@ADOPTOPENJDK_NET"
-      - kadmin.local -q "addprinc -pw user1 user1/127.0.0.1@ADOPTOPENJDK_NET"
-      - kadmin.local -q "addprinc -pw user2 user2/127.0.0.1@ADOPTOPENJDK_NET"
-      - kadmin.local -q getprincs | egrep '^admin/admin@|^user1/|^user2/' > krb5.jckusers.txt; if test $(wc -l < krb5.jckusers.txt) -ne 3; then echo Wrong number of users - expected 3:; cat krb5.jckusers.txt; rm krb5.jckusers.txt; exit 1; fi
-      args:
-        creates: krb5.jckusers.txt
-    - service:
-        name: krb5-kdc
-        state: started
-    - service:
-        name: krb5-admin-server
-        state: started
-    - service:
-        name: tomcat8
-        state: started
     - name: Start virtual X display on :1
       shell: Xvfb :1 &
       args:
