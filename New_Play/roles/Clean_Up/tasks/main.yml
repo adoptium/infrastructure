@@ -48,5 +48,9 @@
     - /tmp/expat-2.2.5.tar.bz2 # expat
     - /tmp/zlib-1.2.11 # zlib_sles11_ppc64
     - /tmp/zlib-1.2.11.tar.gz # zlib_sles11_ppc64
+    - /tmp/gcc-4.8.5.tar.gz # gcc-4.8
+    - /tmp/mpc-0.8.1.tar.gz # gcc-4.8
+    - /tmp/gcc-4.8.5 # gcc-4.8
+    - /tmp/mpc-0.8.1 # gcc-4.8
   ignore_errors: yes
   tags: clean_up

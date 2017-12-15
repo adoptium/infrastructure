@@ -26,5 +26,6 @@
     - x11
     - NTP_TIME
     - Nagios_Plugins
+    - gcc_48
     - Clean_Up
     - Vendor

@@ -1,6 +1,6 @@
 # AdoptOpenJDK - Ansible Playbook README.MD
 
-## Platform Support:
+## Platform Supported:
 
 ```
 CentOS 7
@@ -35,6 +35,9 @@ UB 16
 
 Raspbian 8
 - armv7l
+
+Oracle Linux 7
+- aarch64
 ```
 
 ## Playbook Layout: (tree view)
@@ -44,6 +47,7 @@ Raspbian 8
 ├── group_vars
 │   └── all
 │       └── adoptopenjdk_variables.yml
+├── main.retry
 ├── main.yml
 └── roles
     ├── Ant-Contrib
@@ -58,6 +62,7 @@ Raspbian 8
     ├── Common
     │   ├── tasks
     │   │   ├── CentOS.yml
+    │   │   ├── OracleLinux.yml
     │   │   ├── RedHat.yml
     │   │   ├── SLES.yml
     │   │   ├── Ubuntu.yml
@@ -65,6 +70,7 @@ Raspbian 8
     │   │   └── main.yml
     │   └── vars
     │       ├── CentOS.yml
+    │       ├── OracleLinux.yml
     │       ├── RedHat.yml
     │       ├── SLES.yml
     │       └── Ubuntu.yml
@@ -111,9 +117,12 @@ Raspbian 8
     ├── cmake
     │   └── tasks
     │       └── main.yml
+    ├── gcc_48
+    │   └── tasks
+    │       └── main.yml
     └── x11
         └── tasks
             └── main.yml
 
-40 directories, 34 files
+42 directories, 38 files
 ```

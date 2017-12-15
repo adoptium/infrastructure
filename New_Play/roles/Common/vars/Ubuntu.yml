@@ -7,6 +7,7 @@
 Build_Tool_Packages:
   - autoconf
   - bison
+  - build-essential
   - cpanminus
   - cpio
   - curl
@@ -23,6 +24,11 @@ Build_Tool_Packages:
   - libexpat1-dev
   - libffi-dev
   - libfreetype6-dev
+  - libgmp3-dev
+  - libmpfr4
+  - libmpfr4-dbg
+  - libmpfr-dev
+  - libmpfr-doc
   - libwww-perl
   - libx11-dev
   - libxext-dev

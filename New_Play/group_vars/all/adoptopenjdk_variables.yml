@@ -1,5 +1,7 @@
 ---
-# AdoptOpenJDK variables file
+##########################
+# adoptopenjdk_variables #
+##########################
 Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub
 Zeus_User_SSHKey: /Vendor_Files/keys/zeus.key
 Nagios_User_SSHKey: /Vendor_Files/keys/nagios.key

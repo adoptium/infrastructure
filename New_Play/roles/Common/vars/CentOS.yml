@@ -20,6 +20,8 @@ Build_Tool_Packages:
   - git
   - glibc
   - glibc-common
+  - glibc-devel
+  - gmp-devel
   - java-1.8.0-openjdk-devel
   - libdwarf-devel
   - libXext-devel
@@ -28,6 +30,7 @@ Build_Tool_Packages:
   - libXtst-devel
   - make
   - mesa-libGL-devel
+  - mpfr-devel
   - ntp
   - openssl-devel
   - perl-CPAN

@@ -1,23 +1,32 @@
 ---
-##########
-# RedHat #
-##########
+###############
+# OracleLinux #
+###############
 
 # Command Build Tool Packages
 Build_Tool_Packages:
   - alsa-lib-devel
   - bind-utils
+  - bison
+  - bzip2
+  - crontabs
+  - cpanminus
   - cpio
   - cups-devel
-  - expat-devel
+  - elfutils-libelf-devel
+  - flex
   - freetype-devel
   - gcc
   - gcc-c++
   - gettext
+  - git
   - glibc
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - ibutils
+  - java-1.8.0-openjdk-devel
+  - libdwarf
   - libXext-devel
   - libXrender-devel
   - libXt-devel
@@ -25,37 +34,22 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
-  - numactl-devel
   - ntp
   - openssl-devel
   - perl-CPAN
+  - perl-DBI
   - perl-devel
+  - perl-GD
+  - perl-libwww-perl
+  - sudo
+  - unzip
   - wget
-  - xz
   - zip
-
-Additional_Build_Tools_RHEL7:
-  - bison
-  - elfutils-libelf-devel
-  - flex
-  - libdwarf-devel
-
-Additional_Build_Tools_RHEL7_PPC64LE:
-  - libcurl-devel
-  - libstdc++-static
-  - ant-contrib
-
-Java_NOT_RHEL6_PPC64:
-  - java-1.7.0-openjdk-devel
-  - java-1.8.0-openjdk-devel
-
-Java_RHEL6_PPC64:
-  - java-1.7.0-ibm-devel
-  - java-1.8.0-ibm-devel
 
 Test_Tool_Packages:
   - ant
   - perl
   - xorg-x11-xauth
+  - xorg-x11-server-Xorg
 
 crontab_Patching: "/usr/bin/yum -y update"

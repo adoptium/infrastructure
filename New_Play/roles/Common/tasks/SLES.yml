@@ -33,14 +33,14 @@
     - ansible_distribution_major_version == "11"
   tags: build_tools
 
-#############################
-# zlib for SLES 11 on PPC64 #
-#############################
+########
+# zlib #
+########
 - name: Check if zlib is already installed
   stat:
     path: /usr/local/lib/libz.so
   register: zlib_status
-  tags: zlib_sles11_ppc64
+  tags: zlib
 
 - name: Download Zlib - SLES 11 PPC64
   get_url:
@@ -49,9 +49,7 @@
     mode: 0440
   when:
     - zlib_status.stat.islnk is not defined
-    - ansible_distribution_major_version == "11"
-    - ansible_architecture == "ppc64"
-  tags: zlib_sles11_ppc64
+  tags: zlib
 
 - name: Extract Zlib - SLES 11 PPC64
   unarchive:
@@ -60,18 +58,14 @@
     copy: False
   when:
     - zlib_status.stat.islnk is not defined
-    - ansible_distribution_major_version == "11"
-    - ansible_architecture == "ppc64"
-  tags: zlib_sles11_ppc64
+  tags: zlib
 
 - name: Running ./configure & make for Zlib - SLES 11 PPC64
   shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
     - zlib_status.stat.islnk is not defined
-    - ansible_distribution_major_version == "11"
-    - ansible_architecture == "ppc64"
-  tags: zlib_sles11_ppc64
+  tags: zlib
 
 #################
 # xorg Packages #
