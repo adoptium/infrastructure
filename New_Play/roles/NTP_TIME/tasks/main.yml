@@ -16,6 +16,7 @@
   service:
     name: ntp
     state: restarted
+    enabled: yes
   when:
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
   tags: ntp_time
@@ -24,6 +25,7 @@
   service:
     name: ntpd
     state: restarted
+    enabled: yes
   when:
     - (ansible_distribution == "RedHat") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
   tags: ntp_time
