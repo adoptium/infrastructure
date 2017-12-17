@@ -3,7 +3,7 @@
 # -------- Ubuntu 16 (tested on x64) -------- #
 ###############################################
 
-- hosts: ubuntu-jckservices
+- hosts: all
   remote_user: root
   become: yes
   tasks:
