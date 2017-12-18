@@ -1,0 +1,47 @@
+---
+########
+# SLES #
+########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - bind-utils
+  - bison
+  - cpio
+  - curl
+  - flex
+  - gcc
+  - gcc-c++
+  - glibc
+  - glibc-devel
+  - libdw1
+  - libelf0
+  - libelf1
+  - make
+  - ntp
+  - unzip
+  - wget
+  - zip
+
+Additional_Build_Tools_SLES12:
+  - java-1_8_0-openjdk
+  - libfreetype6
+  - libXext6
+  - libXrender1
+  - libXt6
+  - libXtst6
+  - Mesa-libGL1
+  - perl-CPAN-Meta
+
+Additional_Build_Tools_SLES11:
+  - perl-Error
+  - libwww-perl
+
+Test_Tool_Packages:
+  - ant
+  - perl
+  - pulseaudio
+  - xorg-x11-server
+  - xorg-x11
+
+crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"

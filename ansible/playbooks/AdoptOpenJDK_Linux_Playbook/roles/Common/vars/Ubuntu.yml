@@ -1,0 +1,61 @@
+---
+##########
+# Ubuntu #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - autoconf
+  - bison
+  - build-essential
+  - cpanminus
+  - cpio
+  - curl
+  - flex
+  - g++
+  - gcc
+  - g++-4.8
+  - gcc-4.8
+  - gettext
+  - libasound2-dev
+  - libcups2-dev
+  - libdwarf-dev
+  - libelf-dev
+  - libexpat1-dev
+  - libffi-dev
+  - libfreetype6-dev
+  - libgmp3-dev
+  - libmpfr4
+  - libmpfr4-dbg
+  - libmpfr-dev
+  - libmpfr-doc
+  - libwww-perl
+  - libx11-dev
+  - libxext-dev
+  - libxrender-dev
+  - libxt-dev
+  - libxtst-dev
+  - make
+  - ntp
+  - openjdk-7-jdk
+  - openjdk-8-jdk
+  - pkg-config
+  - wget
+  - zip
+
+Additional_Build_Tools_x86_64:
+  - zulu-9
+  - libnuma-dev
+
+Additional_Build_Tools_aarch64:
+  - libpng-dev
+
+Test_Tool_Packages:
+  - ant
+  - ant-contrib
+  - perl
+  - pulseaudio
+  - xauth
+  - xorg
+
+crontab_Patching: "/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"

@@ -1,0 +1,157 @@
+---
+########
+# SLES #
+########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: zypper upgrade all packages
+  zypper: name='*' state=latest update_cache=yes
+  tags: patch_update
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools for SLES 12
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES12 }}"
+  when:
+    - ansible_distribution_major_version == "12"
+  tags: build_tools
+
+- name: Install additional build tools for SLES 11
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES11 }}"
+  when:
+    - ansible_distribution_major_version == "11"
+  tags: build_tools
+
+########
+# zlib #
+########
+- name: Check if zlib is already installed
+  stat:
+    path: /usr/local/lib/libz.so
+  register: zlib_status
+  tags: zlib
+
+- name: Download Zlib - SLES 11 PPC64
+  get_url:
+    url: http://www.zlib.net/zlib-1.2.11.tar.gz
+    dest: /tmp/zlib-1.2.11.tar.gz
+    mode: 0440
+  when:
+    - zlib_status.stat.islnk is not defined
+  tags: zlib
+
+- name: Extract Zlib - SLES 11 PPC64
+  unarchive:
+    src: /tmp/zlib-1.2.11.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - zlib_status.stat.islnk is not defined
+  tags: zlib
+
+- name: Running ./configure & make for Zlib - SLES 11 PPC64
+  shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+  become: yes
+  when:
+    - zlib_status.stat.islnk is not defined
+  tags: zlib
+
+#################
+# xorg Packages #
+#################
+- name: Install xorg-x11-xauth on SLES 11
+  zypper: name=xorg-x11-xauth state=installed
+  when:
+    - ansible_distribution_major_version == "11"
+  tags: test_tools
+
+- name: Install xauth on SLES 12
+  zypper: name=xauth state=installed
+  when:
+    - ansible_distribution_major_version == "12"
+  tags: test_tools
+
+############################
+# Install Java 8 - SLES 11 #
+############################
+- name: Test if IBM Java 8 is already installed - SLES 11
+  stat:
+    path: /opt/ibm/java/bin
+  register: java8_installed
+  when:
+    - ansible_distribution_major_version == "11"
+  tags: java8_SLES11
+
+- name: Download IBM Java 8
+  get_url:
+    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.3.0/linux/x64/ibm-java-sdk-8.0-3.0-x86_64-archive.bin
+    dest: /tmp/ibm-java.bin
+    validate_certs: no
+  when:
+    - ansible_distribution_major_version == "11"
+    - java8_installed.stat.exists == false
+  tags: java8_SLES11
+
+- name: Create IBM Java 8 response file
+  shell: |
+    echo "INSTALLER_UI=silent" > /tmp/ibm-java.response.properties
+    echo "USER_INSTALL_DIR=/opt/ibm/java" >> /tmp/ibm-java.response.properties
+    echo "LICENSE_ACCEPTED=TRUE" >> /tmp/ibm-java.response.properties
+  when:
+    - ansible_distribution_major_version == "11"
+    - java8_installed.stat.exists == false
+  tags: java8_SLES11
+
+- name: Install Java 8
+  shell: |
+    mkdir -p /opt/ibm
+    chmod +x /tmp/ibm-java.bin
+    /tmp/ibm-java.bin -i silent -f /tmp/ibm-java.response.properties
+  when:
+    - ansible_distribution_major_version == "11"
+    - java8_installed.stat.exists == false
+  tags: java8_SLES11
+
+##############################
+# expat on SLES 11 on x86_64 #
+##############################
+- name: Install expat on SLES 11
+  get_url:
+    url: https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when:
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Extract expat on SLES 11
+  unarchive:
+    src: /tmp/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    copy: False
+  when:
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Running ./configure & make for expat on SLES 11
+  shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
+  become: yes
+  when:
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
+    - ansible_architecture == "x86_64"
+  tags: expat

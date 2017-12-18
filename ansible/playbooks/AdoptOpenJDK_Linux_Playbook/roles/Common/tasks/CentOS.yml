@@ -1,0 +1,57 @@
+---
+##########
+# CentOS #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Enable EPEL release
+  yum:
+    name: epel-release
+    state: installed
+    update_cache: yes
+    validate_certs: no
+  tags: patch_update
+
+- name: YUM upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags: patch_update
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##############################
+# expat on CentOS on x86_64 #
+##############################
+- name: Install expat
+  get_url:
+    url: https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Extract expat
+  unarchive:
+    src: /tmp/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    copy: False
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Running ./configure & make for expat
+  shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
+  become: yes
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat

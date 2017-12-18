@@ -1,0 +1,90 @@
+---
+#######################
+# NVidia_Cuda_Toolkit #
+#######################
+- name: Check if NVidia CUDA toolkit is aready installed
+  stat:
+      path: /usr/local/cuda-9.0
+  register: cuda_installed
+  tags: nvidia_cuda_toolkit
+
+# RedHat 7 and Ubuntu 16 on x86_64
+- name: Download NVidia CUDA toolkit
+  get_url:
+    url="https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
+    dest="/tmp/cuda9_linux-run"
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+    - ansible_architecture == "x86_64"
+  tags: nvidia_cuda_toolkit
+
+- name: Install NVidia CUDA toolkit
+  shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+    - ansible_architecture == "x86_64"
+  tags: nvidia_cuda_toolkit
+
+# RHEL 7 PPC64LE
+- name: Download NVidia CUDA Repo RPM for RHEL7 on ppc64le
+  get_url:
+    url: http://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
+    dest: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Apply NVidia CUDA repo RPM for RHEL7 on ppc64le
+  yum: name=/tmp/cuda-repo-rhel7-9.ppc64le.rpm state=installed
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Install NVidia CUDA toolkit for RHEL7 on ppc64le
+  yum: name=cuda state=installed
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+# SLES
+- name: Download NVidia CUDA toolkit Repo RPM for SLES12 on x86_64
+  get_url:
+    url="http://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm"
+    dest="/tmp/sles12_cuda9_repo.rpm"
+  when:
+    - cuda_installed.stat.islnk is not defined
+    - ansible_architecture == "x86_64"
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+  tags: nvidia_cuda_toolkit
+
+- name: Enable NVidia CUDA toolkit Repo for SLES12 on x86_64
+  shell: |
+    rpm -i /tmp/sles12_cuda9_repo.rpm
+    sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
+  when:
+    - cuda_installed.stat.islnk is not defined
+    - ansible_architecture == "x86_64"
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+  tags: nvidia_cuda_toolkit
+
+- name: Install NVidia CUDA toolkit for SLES12 on x86_64
+  zypper: pkg=cuda state=latest update_cache=yes
+  when:
+    - cuda_installed.stat.islnk is not defined
+    - ansible_architecture == "x86_64"
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+  tags: nvidia_cuda_toolkit

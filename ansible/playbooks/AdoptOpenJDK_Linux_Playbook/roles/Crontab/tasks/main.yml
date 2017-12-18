@@ -1,0 +1,13 @@
+---
+###########
+# Crontab #
+###########
+- name: Add cron job to check for updates
+  cron: name="Check for Updates every Sunday at 5am"
+        weekday="6"
+        minute="0"
+        hour="5"
+        user=root
+        job="{{ crontab_Patching }}"
+        state=present
+  tags: crontab

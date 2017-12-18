@@ -1,0 +1,61 @@
+---
+##########
+# RedHat #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib-devel
+  - bind-utils
+  - cpio
+  - cups-devel
+  - expat-devel
+  - freetype-devel
+  - gcc
+  - gcc-c++
+  - gettext
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gmp-devel
+  - libXext-devel
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+  - make
+  - mesa-libGL-devel
+  - mpfr-devel
+  - numactl-devel
+  - ntp
+  - openssl-devel
+  - perl-CPAN
+  - perl-devel
+  - wget
+  - xz
+  - zip
+
+Additional_Build_Tools_RHEL7:
+  - bison
+  - elfutils-libelf-devel
+  - flex
+  - libdwarf-devel
+
+Additional_Build_Tools_RHEL7_PPC64LE:
+  - libcurl-devel
+  - libstdc++-static
+  - ant-contrib
+
+Java_NOT_RHEL6_PPC64:
+  - java-1.7.0-openjdk-devel
+  - java-1.8.0-openjdk-devel
+
+Java_RHEL6_PPC64:
+  - java-1.7.0-ibm-devel
+  - java-1.8.0-ibm-devel
+
+Test_Tool_Packages:
+  - ant
+  - perl
+  - xorg-x11-xauth
+
+crontab_Patching: "/usr/bin/yum -y update"

@@ -1,0 +1,31 @@
+###################################
+# AdoptOpenJDK - Ansible Playbook #
+###################################
+- hosts: all
+  remote_user: root
+  become: yes
+  tasks:
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - Common
+    - Jenkins_User
+    - Ant-Contrib
+    - ccache
+    - GIT_Source
+    - CPAN
+    - cmake
+    - Docker
+    - NVidia_Cuda_Toolkit
+    - Superuser
+    - Swap_File
+    - Crontab
+    - x11
+    - NTP_TIME
+    - Nagios_Plugins
+    - gcc_48
+    - Clean_Up
+    - Vendor

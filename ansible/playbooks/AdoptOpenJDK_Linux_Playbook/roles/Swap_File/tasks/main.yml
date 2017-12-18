@@ -1,0 +1,52 @@
+---
+#############
+# Swap_File #
+#############
+- name: Check of /swapfile already exists
+  stat:
+    path: /swapfile
+  register: swap_test
+  tags: swap_file
+
+- name: Create swap file
+  command: fallocate -l 2G /swapfile
+  when:
+    - swap_test.stat.exists == false
+    - ansible_distribution_major_version != "11"
+  tags: swap_file
+
+- name: Create swap file - via DD on SLES 11 and CentOS 7
+  command: dd if=/dev/zero of=/swapfile bs=250M count=8
+  when:
+    - swap_test.stat.exists == false
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+  tags: swap_file
+
+- name: Set swap file permissions
+  file: path=/swapfile
+        owner=root
+        group=root
+        mode=0600
+  when: swap_test.stat.exists == false
+  tags: swap_file
+
+- name: Create swap area device
+  command: mkswap /swapfile
+  when: swap_test.stat.exists == false
+  tags: swap_file
+
+- name: Mount swap file
+  command: swapon /swapfile
+  when: swap_test.stat.exists == false
+  tags: swap_file
+
+- name: Add swap to fstab
+  mount: src=/swapfile
+    name=none
+    fstype=swap
+    opts=sw
+    passno=0
+    dump=0
+    state=present
+  when: swap_test.stat.exists == false
+  tags: swap_file

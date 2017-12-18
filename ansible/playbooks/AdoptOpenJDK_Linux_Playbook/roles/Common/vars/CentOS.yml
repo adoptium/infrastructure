@@ -1,0 +1,51 @@
+---
+##########
+# CentOS #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib-devel
+  - bind-utils
+  - bison
+  - bzip2
+  - cpanminus
+  - cpio
+  - cups-devel
+  - elfutils-libelf-devel
+  - flex
+  - freetype-devel
+  - gcc
+  - gcc-c++
+  - git
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gmp-devel
+  - java-1.8.0-openjdk-devel
+  - libdwarf-devel
+  - libXext-devel
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+  - make
+  - mesa-libGL-devel
+  - mpfr-devel
+  - ntp
+  - openssl-devel
+  - perl-CPAN
+  - perl-DBI
+  - perl-devel
+  - perl-GD
+  - perl-libwww-perl
+  - unzip
+  - wget
+  - zip
+
+Test_Tool_Packages:
+  - ant
+  - perl
+  - xorg-x11-xauth
+  - xorg-x11-server-Xorg
+
+crontab_Patching: "/usr/bin/yum -y update"

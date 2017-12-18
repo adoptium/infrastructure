@@ -1,0 +1,176 @@
+---
+##########
+# Docker #
+##########
+- name: Test if docker is already installed
+  shell: docker >/dev/null 2>&1
+  ignore_errors: yes
+  register: docker_installed
+  tags: docker
+
+# Ubuntu
+- name: Add Docker Repo for Ubuntu
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Install Docker prerequisites for Ubuntu
+  apt: pkg={{ item }} state=latest update_cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Install additional Docker prerequisites for Ubuntu 14
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - linux-image-extra-{{ ansible_kernel }}
+    - linux-image-extra-virtual
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == "14"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Import Docker Repo key for Ubuntu
+  shell: "wget -qO- https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+# RedHat
+- name: Install EPEL repo for RedHat 7
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+  ignore_errors: yes
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Docker Repo for RedHat 7
+  get_url:
+    url: https://download.docker.com/linux/CentOS/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Import Docker Repo key for RedHat
+  rpm_key:
+    key: https://download.docker.com/linux/CentOS/gpg
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+# SLES
+- name: Install Docker on SLES12
+  zypper: pkg={{ item }} state=latest update_cache=yes
+  with_items:
+    - apparmor-parser
+    - bridge-utils
+    - ca-certificates
+    - docker
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+# CentOS
+- name: Install EPEL repo for CentOS 7
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  ignore_errors: yes
+  tags: docker
+
+- name: Import Docker Repo key for CentOS 7
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Docker Repo for CentOS 7
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+# All OS' - Common
+- name: Install Docker for ALL
+  package: "name=docker-ce state=latest"
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Jenkins user to the docker group for ALL
+  user: name= " {{ Jenkins_Username }} "
+        groups=docker
+        append=yes
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12" ) or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Enable and Start Docker Service for ALL
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12" ) or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - ansible_architecture == "x86_64"
+  tags: docker

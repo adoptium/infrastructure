@@ -1,0 +1,43 @@
+---
+########
+# CPAN #
+########
+
+# Additional steps for RedHat and SLES
+- name: Install cpanminus RedHat 6 and SLES
+  shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
+  ignore_errors: yes
+  when:
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
+  tags: test_tools
+
+- name: Install cpanminus RedHat 7
+  yum:
+    name: cpanminus
+    state: installed
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+  tags: test_tools
+
+# All
+- name: Install JSON
+  shell: |
+    cpanm --with-recommends JSON
+  tags:
+    - cpan
+    - json
+
+- name: Install Text::CSV
+  shell: |
+    cpanm --with-recommends Text::CSV
+  tags:
+    - cpan
+    - text_csv
+
+- name: Install XML::Parser
+  shell: |
+    cpanm --with-recommends XML::Parser
+  tags:
+    - cpan
+    - xml_parser
