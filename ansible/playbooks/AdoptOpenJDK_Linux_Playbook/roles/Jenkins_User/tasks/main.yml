@@ -31,4 +31,5 @@
     append=yes
   when:
     - (ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture != "armv7l"
   tags: jenkins_user
