@@ -4,6 +4,7 @@
 ####################################
 - name: Test if Vendor Playbook exists
   local_action: stat path="/Vendor_Files/Vendor_Playbook/Vendor.yml"
+  become: no
   register: optional_vendor_file
   tags: Vendor
 

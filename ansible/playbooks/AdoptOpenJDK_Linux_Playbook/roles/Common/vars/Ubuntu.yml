@@ -43,6 +43,10 @@ Build_Tool_Packages:
   - wget
   - zip
 
+gcc_compiler:
+  - g++-4.8
+  - gcc-4.8
+
 Additional_Build_Tools_x86_64:
   - zulu-9
   - libnuma-dev

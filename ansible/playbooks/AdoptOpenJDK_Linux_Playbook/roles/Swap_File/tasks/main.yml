@@ -5,13 +5,41 @@
 - name: Check of /swapfile already exists
   stat:
     path: /swapfile
-  register: swap_test
+  when:
+    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  register: swap_root
   tags: swap_file
 
-- name: Create swap file
-  command: fallocate -l 2G /swapfile
+- name: Check of /tmp/swapfile already exists on BeagleBone
+  stat:
+    path: /tmp/swapfile
   when:
-    - swap_test.stat.exists == false
+    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
+  register: swap_tmp
+  tags: swap_file
+
+
+- name: Display Debug Information
+  debug:
+    msg:
+      - "swap_test: {{ swap_test | default('***Undefined***') }} "
+      - "swap_tmp: {{ swap_tmp | default('***Undefined***') }} "
+      - "swap_root: {{ swap_root | default('***Undefined***') }} "  
+
+- set_fact:
+    swap_path: /swapfile
+  when:
+    - swap_root.stat.exists
+
+- set_fact:
+    swap_path: /tmp/swapfile
+  when:
+    - swap_tmp.stat.exists == true
+
+- name: Create swap file
+  command: "fallocate -l 2G {{ swap_path }}"
+  when:
+    - (swap_root.stat.exists == false or swap_tmp.stat.exists == false)
     - ansible_distribution_major_version != "11"
   tags: swap_file
 
@@ -23,30 +51,34 @@
   tags: swap_file
 
 - name: Set swap file permissions
-  file: path=/swapfile
+  file: path="{{ swap_path }}"
         owner=root
         group=root
         mode=0600
-  when: swap_test.stat.exists == false
+  when: 
+    - swap_test.stat.exists == false
   tags: swap_file
 
 - name: Create swap area device
-  command: mkswap /swapfile
-  when: swap_test.stat.exists == false
+  command: "mkswap {{ swap_path }}"
+  when: 
+    - swap_test.stat.exists == false
   tags: swap_file
 
 - name: Mount swap file
-  command: swapon /swapfile
-  when: swap_test.stat.exists == false
+  command: "swapon {{ swap_path }}"
+  when: 
+    - swap_test.stat.exists == false
   tags: swap_file
 
 - name: Add swap to fstab
-  mount: src=/swapfile
+  mount: src="{{ swap_path }}"
     name=none
     fstype=swap
     opts=sw
     passno=0
     dump=0
     state=present
-  when: swap_test.stat.exists == false
+  when: 
+    - swap_test.stat.exists == false
   tags: swap_file

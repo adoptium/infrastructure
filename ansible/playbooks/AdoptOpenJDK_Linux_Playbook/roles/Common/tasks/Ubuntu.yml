@@ -26,6 +26,21 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
+- name: Add additional repositories for BeagleBone
+  apt_repository: repo={{ item }}
+  with_items:
+    - deb http://deb.debian.org/debian/ stable main contrib non-free
+    - deb-src http://deb.debian.org/debian/ stable main contrib non-free
+    - deb http://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb-src http://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb http://deb.debian.org/debian-security stable/updates main
+    - deb-src http://deb.debian.org/debian-security stable/updates main
+    - deb http://ftp.debian.org/debian stretch-backports main
+    - deb-src http://ftp.debian.org/debian stretch-backports main
+  when:
+    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
+  tags: patch_update
+
 - name: Run apt-get upgrade
   apt: upgrade=safe update_cache=yes
   tags: patch_update
@@ -39,6 +54,13 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Install GCC G++ on supported platforms
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc_compiler }}"
+  when:
+    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  tags: build_tools
+
 - name: Install additional build tools for x86_64
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_x86_64 }}"
