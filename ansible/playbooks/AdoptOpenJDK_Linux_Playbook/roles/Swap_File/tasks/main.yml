@@ -2,51 +2,40 @@
 #############
 # Swap_File #
 #############
-- name: Check of /swapfile already exists
-  stat:
-    path: /swapfile
-  when:
-    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
-  register: swap_root
-  tags: swap_file
-
-- name: Check of /tmp/swapfile already exists on BeagleBone
-  stat:
-    path: /tmp/swapfile
-  when:
-    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
-  register: swap_tmp
-  tags: swap_file
-
-
-- name: Display Debug Information
-  debug:
-    msg:
-      - "swap_test: {{ swap_test | default('***Undefined***') }} "
-      - "swap_tmp: {{ swap_tmp | default('***Undefined***') }} "
-      - "swap_root: {{ swap_root | default('***Undefined***') }} "  
-
-- set_fact:
+- name: Set Swapfile path /swapfile
+  set_fact:
     swap_path: /swapfile
   when:
-    - swap_root.stat.exists
+    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  tags: swap_file
 
-- set_fact:
+- name: Set Swapfile path /tmp/swapfile on BeagleBone
+  set_fact:
     swap_path: /tmp/swapfile
   when:
-    - swap_tmp.stat.exists == true
+    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
+  tags: swap_file
+
+- name: Check if Swapfile already exists
+  stat:
+    path: "{{ swap_path }}"
+  register: swap_exists
+  tags: swap_file
+
+- debug: var=swap_path
+  tags: swap_file
 
 - name: Create swap file
   command: "fallocate -l 2G {{ swap_path }}"
   when:
-    - (swap_root.stat.exists == false or swap_tmp.stat.exists == false)
-    - ansible_distribution_major_version != "11"
+    - swap_exists.stat.exists == false
+    - (ansible_distribution != "SLES" and ansible_distribution_major_version != "11") or (ansible_distribution != "CentOS" and ansible_distribution_major_version != "7" )
   tags: swap_file
 
 - name: Create swap file - via DD on SLES 11 and CentOS 7
   command: dd if=/dev/zero of=/swapfile bs=250M count=8
   when:
-    - swap_test.stat.exists == false
+    - swap_exists.stat.exists == false
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
   tags: swap_file
 
@@ -55,20 +44,20 @@
         owner=root
         group=root
         mode=0600
-  when: 
-    - swap_test.stat.exists == false
+  when:
+    - swap_exists.stat.exists == false
   tags: swap_file
 
 - name: Create swap area device
   command: "mkswap {{ swap_path }}"
-  when: 
-    - swap_test.stat.exists == false
+  when:
+    - swap_exists.stat.exists == false
   tags: swap_file
 
 - name: Mount swap file
   command: "swapon {{ swap_path }}"
-  when: 
-    - swap_test.stat.exists == false
+  when:
+    - swap_exists.stat.exists == false
   tags: swap_file
 
 - name: Add swap to fstab
@@ -79,6 +68,6 @@
     passno=0
     dump=0
     state=present
-  when: 
-    - swap_test.stat.exists == false
+  when:
+    - swap_exists.stat.exists == false
   tags: swap_file
