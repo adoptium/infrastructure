@@ -14,8 +14,6 @@ Build_Tool_Packages:
   - flex
   - g++
   - gcc
-  - g++-4.8
-  - gcc-4.8
   - gettext
   - libasound2-dev
   - libcups2-dev
