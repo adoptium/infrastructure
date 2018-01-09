@@ -19,6 +19,8 @@
       - ant
       - acl
       - gcc
+      - git
+      - make
       - unzip
       - openjdk-8-jre
       - xvfb
