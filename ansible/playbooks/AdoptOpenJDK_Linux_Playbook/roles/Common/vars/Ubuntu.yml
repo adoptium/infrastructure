@@ -17,6 +17,7 @@ Build_Tool_Packages:
   - gettext
   - libasound2-dev
   - libcups2-dev
+  - libcurl4-openssl-dev
   - libdwarf-dev
   - libelf-dev
   - libexpat1-dev
