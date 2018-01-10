@@ -113,6 +113,14 @@
         jump: ACCEPT
     - iptables:
         chain: INPUT
+        source: 140.211.168.225
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 140.211.168.217
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
         jump: REJECT
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
