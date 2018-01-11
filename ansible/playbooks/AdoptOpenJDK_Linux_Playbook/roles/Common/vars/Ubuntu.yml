@@ -22,6 +22,7 @@ Build_Tool_Packages:
   - libexpat1-dev
   - libffi-dev
   - libfreetype6-dev
+  - libfontconfig1-dev
   - libgmp3-dev
   - libmpfr4
   - libmpfr4-dbg
