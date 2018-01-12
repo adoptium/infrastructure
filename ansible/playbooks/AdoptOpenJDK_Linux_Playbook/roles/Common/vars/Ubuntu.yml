@@ -17,11 +17,13 @@ Build_Tool_Packages:
   - gettext
   - libasound2-dev
   - libcups2-dev
+  - libcurl4-openssl-dev
   - libdwarf-dev
   - libelf-dev
   - libexpat1-dev
   - libffi-dev
   - libfreetype6-dev
+  - libfontconfig1-dev
   - libgmp3-dev
   - libmpfr4
   - libmpfr4-dbg

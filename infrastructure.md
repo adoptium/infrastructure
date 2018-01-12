@@ -5,8 +5,8 @@
 |  Linaro |  build-linaro-armv8-centos7-2 |  192.168.1.14 |  arch64 |  Centos7 |  centos |  (ssh via build-linaro-armv8-centos7-1) |
 | MacStadium  |  build-macstadium-macos1010-1 |  207.254.50.138 | x64  |  MacOS10.10 | administrator  ||
 | MacStadium  |  build-macstadium-macos1010-2 |  208.83.1.242 | x64  |  MacOS10.10 | administrator  ||
-| MacStadium  |  jck-macstadium-macos1010-1 |  207.254.71.30 | x64  |  MacOS10.10 | administrator  ||
-| MacStadium  |  jck-macstadium-macos1010-2 |  207.254.71.31 | x64  |  MacOS10.10 | administrator  ||
+| MacStadium  |  jck-macstadium-macos1010-1 |  207.254.71.30 | x64  |  MacOS10.10 | administrator  | Only for JCK use |
+| MacStadium  |  jck-macstadium-macos1010-2 |  207.254.71.31 | x64  |  MacOS10.10 | administrator  | Only for JCK use |
 |  Marist |  build-marist-s390x-sles-12 |  148.100.110.56 | s390x  | Sles12  |  linux1 ||
 |  Marist |  build-marist-s390x-ubuntu-16.04-1 |  148.100.33.147 | s390x  | Ubuntu16.04  |  linux1 ||
 |  Marist |  build-marist-s390x-ubuntu-16.04-2 |  148.100.33.178 | s390x  | Ubuntu16.04  |  linux1 ||
@@ -16,13 +16,15 @@
 |  osuosl |  build-osuosl-ppc64le-centos-7.2 |  140.211.168.138 | ppc64le  | Centos72  |  centos ||
 |  osuosl |  build-osuosl-ppc64le-fedora-24-1 |  140.211.168.134 | ppc64le  | Fedora 24  |  fedora ||
 |  osuosl |  build-osuosl-ppc64le-fedora-24-2 |  140.211.168.139 | ppc64le  | Fedora 24  |  fedora ||
-|  osuosl |  build-osuosl-ppc64le-ubuntu-16.10 |  140.211.168.135 | ppc64le  | Ubuntu16.10  |  ubuntu ||
+|  osuosl |  build-osuosl-ppc64le-ubuntu-16.10 |  140.211.168.225 | ppc64le  | Ubuntu16.10  |  ubuntu ||
+|  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-1 |  140.211.168.135 | ppc64le  | Ubuntu16.10  |  ubuntu | Only for JCK use |
+|  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-2 |  140.211.168.217 | ppc64le  | Ubuntu16.10  |  ubuntu | Only for JCK use |
 |  osuosl |  build-osuosl-ppc64-aix-71-1|  140.211.9.10 | ppc64  | aix71  |  root ||
 |  osuosl |  build-osuosl-ppc64-aix-71-2|  140.211.9.12 | ppc64  | aix71  |  root ||
 |  Packet |  build-packet-armv8-ubuntu-16.04  |  147.75.196.30 | aarch64  |  Ubuntu16.04 | root ||
 |  Packet |  test-packet-armv8-ubuntu-16.04  |  147.75.74.50 | aarch64  |  Ubuntu16.04 | root ||
 |  Packet |  jck-packet-armv8-ubuntu-16.04  |  147.75.193.234 | aarch64  |  Ubuntu16.04 | root ||
-|  Packet |  test-packet-x64-ubuntu-16.04-1  |  147.75.204.239 | x64  |  Ubuntu16.04 | root ||
+|  Packet |  test-packet-x64-ubuntu-16.04-1  |  147.75.204.239 | x64  |  Ubuntu16.04 | root | Only for JCK use |
 |  Packet |  test-packet-x64-windows-2012r2-1 | 147.75.101.30 | x64 | Win Server 2012r2  |  Admin ||
 | MacInCloud  |  test-macincloud-macos1010-1 |  74.80.250.151 | x64  |  MacOS10.10 | admin  ||
 | MacInCloud  |  test-macincloud-macos1010-2 |  74.80.250.173 | x64  |  MacOS10.10 | admin  ||
