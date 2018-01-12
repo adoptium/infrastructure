@@ -13,6 +13,17 @@
     - ansible_distribution == "Debian"
     - ansible_architecture == "armv7l"
 
+###########################
+# Set Root account policy #
+###########################
+- name: Root account policy - expire date
+  command: chage -E -1 root
+  tags: root_account
+
+- name: Root account policy - max days
+  command: chage -M -1 root
+  tags: root_account
+
 ########################
 # Include OS variables #
 ########################
