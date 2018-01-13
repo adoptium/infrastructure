@@ -10,6 +10,7 @@ Build_Tool_Packages:
   - cpio
   - cups-devel
   - expat-devel
+  - fontconfig-devel
   - freetype-devel
   - gcc
   - gcc-c++
