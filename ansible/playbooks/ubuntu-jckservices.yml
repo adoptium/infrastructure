@@ -122,6 +122,8 @@
     - iptables:
         chain: INPUT
         jump: REJECT
+    - name: iptables_permanent
+      command: iptables-save
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
