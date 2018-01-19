@@ -88,11 +88,18 @@
         icon: C:\Windows\System32\cmd.exe,0
       tags: basic_config
 
+    - name: Test if Cygwin is already installed
+      win_stat:
+        path: 'C:\cygwin64'
+      register: cygwin_installed
+      tags: cygwin
+
     - name: Download Cygwin installer
       win_get_url:
         url: https://cygwin.com/setup-x86_64.exe
         dest: 'C:\temp\cygwin.exe'
         force: no
+      when: (cygwin_installed.stat.exists == false)
       tags: cygwin
 
     - name: Install Cygwin and its packages
@@ -101,6 +108,7 @@
                     --local-package-dir {{ Cygwin_PACKAGE_DIR }} 
                     --root {{ Cygwin_ROOT_INST_DIR }} 
                     --categories {{ Cygwin_CATEGORIES }}
+      when: (cygwin_installed.stat.exists == false)
       tags: cygwin
 
     - name: Install Cygwin build extra packages
@@ -109,6 +117,7 @@
         - unzip
         - zip
         - cpio
+      when: (cygwin_installed.stat.exists == false)
       tags: cygwin
 
     - name: Install Cygwin test extra packages
@@ -123,6 +132,7 @@
         - xinit
         - xorg-server
         - xterm
+      when: (cygwin_installed.stat.exists == false)
       tags: cygwin
 
     - name: Remove c:\cygwin64\bin from the path if it exists
@@ -133,31 +143,31 @@
       tags: cygwin
 
     - name: Add c:\cygwin64\bin to the start of the %PATH%
-      raw: setx PATH "C:\cygwin64\bin;$env:Path" -m
+      raw: setx PATH "C:\cygwin64\bin;$env:Path" /M
       tags: cygwin
 
     # Firefox
     - name: Test if Firefox is already installed
       win_stat:
-          path: 'C:\Program Files\Mozilla Firefox\firefox.exe'
+        path: 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
       register: firefox_installed
       tags: firefox
 
     - name: Check if Firefox is already downloaded
       win_stat:
-          path: 'c:\Temp\firefox.exe'
+        path: 'C:\temp\firefox.exe'
       register: firefox_download
       tags: firefox
 
     - name: Download Firefox
       win_get_url:
         url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
-        dest: c:\Temp\firefox.exe
+        dest: 'C:\temp\firefox.exe'
       when: (firefox_download.stat.exists == false) and (firefox_installed.stat.exists == false)
       tags: firefox
 
     - name: Install Firefox
-      raw: c:\Temp\firefox.exe -ms
+      raw: C:\temp\firefox.exe -ms
       when: (firefox_installed.stat.exists == false)
       tags: firefox
 
@@ -170,20 +180,20 @@
 
     - name: Check if Strawberry Perl is already downloaded
       win_stat:
-          path: 'c:\Temp\strawberry-perl.zip'
+          path: 'C:\temp\strawberry-perl.zip'
       register: strawberry_perl_download
       tags: strawberry_perl
 
     - name: Download Strawberry Perl
       win_get_url:
         url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
-        dest: c:\Temp\strawberry-perl.zip
+        dest: C:\temp\strawberry-perl.zip
       when: (strawberry_perl_download.stat.exists == false) and (strawberry_perl_installed.stat.exists == false)
       tags: strawberry_perl
 
     - name: Unzip Strawberry Perl
       win_unzip:
-        src: c:\Temp\strawberry-perl.zip
+        src: C:\temp\strawberry-perl.zip
         dest: C:\Strawberry
       when: (strawberry_perl_installed.stat.exists == false)
       tags: strawberry_perl
@@ -198,6 +208,7 @@
 
     - name: Install Text::CSV_XS
       win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
+      when: (strawberry_perl_installed.stat.exists == false)
       tags: text_cvs
 
     # freemarker v2.3.8
@@ -224,7 +235,6 @@
     - name: Test if freetype is already downloaded
       win_stat:
         path: 'C:\temp\ft253.zip'
-      when: (freetype_installed.stat.exists == false)
       register: freetype_download
       tags: freetype
 
@@ -250,22 +260,30 @@
         rights: Read,Write,Modify,FullControl,Delete
         type: allow
         state: present
-      when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
+      when: (freetype_installed.stat.exists == false)
       tags: freetype
 
     #########
     # cmake #
     #########
+    - name: Test if cmake is already installed
+      win_stat:
+        path: 'C:\cygwin64\bin\cmake.exe'
+      register: cmake_installed
+      tags: cmake
+
     - name: Download cmake installer
       win_get_url:
         url: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.msi
         dest: 'C:\temp\cmake.msi'
         force: no
+      when: (cmake_installed.stat.exists == false)
       tags: cmake
 
     - name: Install cmake
       raw: C:\temp\cmake.msi /quite
       ignore_errors: yes
+      when: (cmake_installed.stat.exists == false)
       tags: cmake
 
     - name: Cleanup cmake
@@ -382,11 +400,25 @@
     ###########################
     # Apache ANT Installation #
     ###########################
+    - name: Test if Ant is already installed
+      win_stat:
+          path: 'C:\apache-ant\apache-ant-1.10.1'
+      register: ant_installed
+      tags: ant
+
+    - name: Test if Ant is already downloaded
+      win_stat:
+          path: 'c:\temp\ant.zip'
+      register: ant_download
+      tags: ant
+
     - name: Download Apache ANT
       win_get_url:
         url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.1-bin.zip
         dest: c:\temp\ant.zip
         force: no
+      when: (ant_installed.stat.exists == false) and (ant_download.stat.exists == false)
+      register: ant_download
       tags: ant
 
     - name: Deploy Apache ANT
@@ -394,10 +426,12 @@
         src: c:\temp\ant.zip
         dest: c:\apache-ant\
         creates: c:\apache-ant
+      when: (ant_installed.stat.exists == false)
       tags: ant
 
     - name: Set ANT_HOME
       raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.1" /M
+      when: (ant_installed.stat.exists == false)
       tags: ant
 
     - name: Add %ANT_HOME%\bin to %PATH%
@@ -405,6 +439,13 @@
           elements:
           - '%ANT_HOME%\bin'
           state: present
+      when: (ant_installed.stat.exists == false)
+      tags: ant
+
+    - name: Test if ant-contrib is already installed
+      win_stat:
+          path: 'C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar'
+      register: ant_contrib_installed
       tags: ant
 
     - name: Download ant-contrib
@@ -412,6 +453,7 @@
         url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
         dest: c:\temp\ant-contrib.zip
         force: no
+      when: (ant_contrib_installed.stat.exists == false)
       tags: ant
 
     - name: unzip ant-contrib
@@ -419,6 +461,7 @@
         src: c:\temp\ant-contrib.zip
         dest: c:\temp\ant-contrib
         creates: c:\temp\ant-contrib
+      when: (ant_contrib_installed.stat.exists == false)
       tags: ant
 
     - name: Copy the ant-contrib.jar to ANT's lib folder
@@ -426,6 +469,7 @@
         src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
         dest: C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar
         remote_src: True
+      when: (ant_contrib_installed.stat.exists == false)
       tags: ant
 
     ###################################
@@ -463,7 +507,7 @@
       win_stat:
         path: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0'
       register: vs2013_installed
-      tag: visual_studio_2013
+      tags: visual_studio_2013
 
     - name: Download Visual Studio Community 2013
       win_get_url:
@@ -494,7 +538,7 @@
           path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0'
       register: cuda_installed
       tags: Cuda_Toolkit
-    
+
     - name: Download NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
       win_get_url:
         url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_windows_network-exe'
@@ -532,7 +576,7 @@
         state: absent
       when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
       tags: Cuda_Toolkit
-  
+
     ###################
     # NTP Time Server #
     ###################
