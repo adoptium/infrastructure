@@ -40,7 +40,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*)127.0.0.1(.*)$"
-    line: "127.0.0.1   localhost"
+    line: "127.0.0.1   localhost  localhost.localdomain"
     state: present
     backup: yes
   tags: hosts_file
