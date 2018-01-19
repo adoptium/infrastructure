@@ -1,0 +1,47 @@
+---
+#######################
+# NVidia Cuda Toolkit #
+#######################
+- name: Check if NVidia CUDA toolkit is aready installed
+  win_stat:
+      path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0'
+  register: cuda_installed
+  tags: NVidia_Cuda_Toolkit
+
+- name: Download NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
+  win_get_url:
+    url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_windows_network-exe'
+    dest: 'C:\temp\cuda_9.0.176_windows_network-exe.exe'
+  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  tags: NVidia_Cuda_Toolkit
+
+- name: Install NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
+  win_shell: C:\temp\cuda_9.0.176_windows_network-exe.exe -s CUDAToolkit_9.0
+  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  tags: NVidia_Cuda_Toolkit
+
+- name: Cleanup NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
+  file:
+    path: C:\temp\cuda_9.0.176_windows_network-exe.exe
+    state: absent
+  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  tags: NVidia_Cuda_Toolkit
+
+- name: Download NVidia CUDA toolkit - Windows 10 and Server 2016
+  win_get_url:
+    url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_win10_network-exe'
+    dest: 'C:\temp\cuda_9.0.176_win10_network-exe.exe'
+  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  tags: NVidia_Cuda_Toolkit
+
+- name: Install NVidia CUDA toolkit - Windows 10 and Server 2016
+  win_shell: C:\temp\cuda_9.0.176_win10_network-exe.exe -s CUDAToolkit_9.0
+  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  tags: NVidia_Cuda_Toolkit
+
+- name: Cleanup NVidia CUDA toolkit - Windows 10 and Server 2016
+  win_file:
+    path: C:\temp\cuda_9.0.176_win10_network-exe.exe
+    state: absent
+  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  tags: NVidia_Cuda_Toolkit

@@ -1,0 +1,41 @@
+---
+###################
+# freetype v2.5.3 #
+###################
+
+- name: Test if freetype is already installed
+  win_stat:
+    path: 'C:\openjdk\freetype-2.5.3'
+  register: freetype_installed
+  tags: Freetype
+
+- name: Test if freetype is already downloaded
+  win_stat:
+    path: 'C:\temp\ft253.zip'
+  register: freetype_download
+  tags: Freetype
+
+- name: Download freetype 2.5.3
+  win_get_url:
+    url: https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
+    dest: C:\temp\ft253.zip
+  when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
+  tags: Freetype
+
+- name: Unpack freetype
+  win_unzip:
+    src: C:\temp\ft253.zip
+    dest: C:\openjdk
+    delete_archive: yes
+  when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
+  tags: Freetype
+
+- name: Add modify, write permissions for jenkins user
+  win_acl:
+    path: C:\openjdk\freetype-2.5.3
+    user: "{{ Jenkins_Username }}"
+    rights: Read,Write,Modify,FullControl,Delete
+    type: allow
+    state: present
+  when: (freetype_installed.stat.exists == false)
+  tags: Freetype

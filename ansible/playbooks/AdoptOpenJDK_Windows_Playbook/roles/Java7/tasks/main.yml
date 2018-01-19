@@ -1,0 +1,31 @@
+---
+##########
+# Java 7 #
+##########
+
+- name: Test if Java 7 is already installed
+  win_stat:
+      path: 'C:\Program Files\Java\java-se-7u75-ri'
+  register: java7_installed
+  tags: Java7
+
+- name: Check if Java 7 is already downloaded
+  win_stat:
+      path: 'C:\temp\jdk7u75-b13.zip'
+  register: java7_download
+  tags: Java7
+
+- name: Download Java 7
+  win_get_url:
+    url: http://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip
+    dest: 'C:\temp\jdk7u75-b13.zip'
+  when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
+  tags: Java7
+
+- name: Install Java 7
+  win_unzip:
+    src: C:\temp\jdk7u75-b13.zip
+    dest: C:\Program Files\Java
+    delete_archive: yes
+  when: (java7_installed.stat.exists == false)
+  tags: Java7

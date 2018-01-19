@@ -1,0 +1,68 @@
+---
+########################
+# Include OS variables #
+########################
+- name: Include OS variables
+  include_vars: "../vars/main.yml"
+  tags: main
+
+##########
+# cygwin #
+##########
+- name: Test if Cygwin is already installed
+  win_stat:
+    path: 'C:\cygwin64'
+  register: cygwin_installed
+  tags: cygwin
+
+- name: Download Cygwin installer
+  win_get_url:
+    url: https://cygwin.com/setup-x86_64.exe
+    dest: 'C:\temp\cygwin.exe'
+    force: no
+  when: (cygwin_installed.stat.exists == false)
+  tags: cygwin
+
+- name: Install Cygwin and its packages
+  win_command: c:\temp\cygwin.exe --quiet-mode --download --local-install
+                --delete-orphans --site {{ Cygwin_SITE_URL }}
+                --local-package-dir {{ Cygwin_PACKAGE_DIR }}
+                --root {{ Cygwin_ROOT_INST_DIR }}
+                --categories {{ Cygwin_CATEGORIES }}
+  when: (cygwin_installed.stat.exists == false)
+  tags: cygwin
+
+- name: Install Cygwin build extra packages
+  win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
+  with_items:
+    - unzip
+    - zip
+    - cpio
+  when: (cygwin_installed.stat.exists == false)
+  tags: cygwin
+
+- name: Install Cygwin test extra packages
+  win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
+  with_items:
+    - curl
+    - curl-debuginfo
+    - libcurl-devel
+    - libpng15
+    - libpng-devel
+    - perl-Text-CSV
+    - xinit
+    - xorg-server
+    - xterm
+  when: (cygwin_installed.stat.exists == false)
+  tags: cygwin
+
+- name: Remove c:\cygwin64\bin from the path if it exists
+  win_path:
+    elements:
+      - 'C:\cygwin64\bin'
+    state: absent
+  tags: cygwin
+
+- name: Add c:\cygwin64\bin to the start of the %PATH%
+  raw: setx PATH "C:\cygwin64\bin;$env:Path" /M
+  tags: cygwin

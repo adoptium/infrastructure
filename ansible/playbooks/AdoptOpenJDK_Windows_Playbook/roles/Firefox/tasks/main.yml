@@ -1,0 +1,28 @@
+---
+###########
+# Firefox #
+###########
+
+- name: Test if Firefox is already installed
+  win_stat:
+    path: 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
+  register: firefox_installed
+  tags: Firefox
+
+- name: Check if Firefox is already downloaded
+  win_stat:
+    path: 'C:\temp\firefox.exe'
+  register: firefox_download
+  tags: Firefox
+
+- name: Download Firefox
+  win_get_url:
+    url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
+    dest: 'C:\temp\firefox.exe'
+  when: (firefox_download.stat.exists == false) and (firefox_installed.stat.exists == false)
+  tags: Firefox
+
+- name: Install Firefox
+  raw: C:\temp\firefox.exe -ms
+  when: (firefox_installed.stat.exists == false)
+  tags: Firefox

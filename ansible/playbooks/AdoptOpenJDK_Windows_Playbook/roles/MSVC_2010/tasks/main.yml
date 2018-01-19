@@ -1,0 +1,28 @@
+---
+###################################
+# Visual Studio 2010 Professional #
+###################################
+- name: Test if VS 2010 is already installed
+  win_stat:
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio 10.0'
+  register: vs2010_installed
+  tags: MSVS_2010
+
+- name: Download Visual Studio 2010 Professional
+  win_get_url:
+    url: 'http://download.microsoft.com/download/D/B/C/DBC11267-9597-46FF-8377-E194A73970D6/vs_proweb.exe'
+    dest: 'C:\temp\vs2010_professional.exe'
+  when: (vs2010_installed.stat.exists == false)
+  tags: MSVS_2010
+
+- name: Install Visual Studio 2010 Professional
+  raw: 'C:\temp\vs2010_professional.exe /q /norestart'
+  when: (vs2010_installed.stat.exists == false)
+  tags: MSVS_2010
+
+- name: Reboot machine after Visual Studio 2010 installation
+  win_reboot:
+    reboot_timeout: 1800
+    shutdown_timeout: 1800
+  when: (vs2010_installed.stat.exists == false)
+  tags: MSVS_2010
