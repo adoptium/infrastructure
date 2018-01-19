@@ -4,7 +4,7 @@
 ###############################################
 
 - hosts: all
-  remote_user: root
+  user: root
   become: yes
   tasks:
   - block:
@@ -121,7 +121,21 @@
         jump: ACCEPT
     - iptables:
         chain: INPUT
+        source: 148.100.33.183
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 148.100.33.184
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 165.225.150.83
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
         jump: REJECT
+    - name: iptables_permanent
+      command: iptables-save
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
