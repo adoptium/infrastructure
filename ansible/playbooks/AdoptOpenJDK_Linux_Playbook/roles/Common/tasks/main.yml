@@ -24,6 +24,27 @@
   command: chage -M -1 root
   tags: root_account
 
+#####################
+# Update /etc/hosts #
+#####################
+- name: Update /etc/hosts file - IP FQDN hostname
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+    backup: yes
+  tags: hosts_file
+
+- name: Update /etc/hosts file - 127.0.0.1
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*)127.0.0.1(.*)$"
+    line: "127.0.0.1   localhost"
+    state: present
+    backup: yes
+  tags: hosts_file
+
 ########################
 # Include OS variables #
 ########################
