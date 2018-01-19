@@ -4,7 +4,7 @@
 ###############################################
 
 - hosts: all
-  remote_user: root
+  user: root
   become: yes
   tasks:
   - block:
@@ -118,6 +118,18 @@
     - iptables:
         chain: INPUT
         source: 140.211.168.217
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 148.100.33.183
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 148.100.33.184
+        jump: ACCEPT
+    - iptables:
+        chain: INPUT
+        source: 165.225.150.83
         jump: ACCEPT
     - iptables:
         chain: INPUT
