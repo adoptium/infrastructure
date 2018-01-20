@@ -79,8 +79,8 @@
 # VCS tool: Mercurial    #
 ##########################
 - name: Install Mercurial
-  pip: name=mercurial version="3.7.3"
-       state=present
+  apt: name=mercurial state=present
+  tags: vcs_tool
 
 #################
 # xorg Packages #
