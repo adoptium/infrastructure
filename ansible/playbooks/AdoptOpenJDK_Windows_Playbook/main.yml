@@ -1,0 +1,43 @@
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# -------- Windows 7, 8, 10 ---------  #
+# - Windows Server 2008, 2012, 2016  - #
+########################################
+
+################
+# Please Note: #
+################
+# *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it (WINRM)***
+# Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
+# Run powershell as the Administrator
+# wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
+# .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+# .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+# .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+
+- hosts: all
+  tasks:
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - Common
+    - Windows_Updates
+    - Jenkins_User
+    - cygwin
+    - Firefox
+    - Strawberry_Perl
+    - Freemarker
+    - Freetype
+    - cmake
+    - GIT
+    - Java7
+    - Java8
+    - ANT
+    - MSVS_2010
+    - MSVS_2013
+    - NVidia_Cuda_Toolkit
+    - NTP_TIME

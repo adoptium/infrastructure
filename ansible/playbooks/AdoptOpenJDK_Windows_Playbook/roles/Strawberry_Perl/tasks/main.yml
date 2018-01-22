@@ -1,0 +1,43 @@
+---
+###################
+# Strawberry Perl #
+###################
+
+- name: Test if Strawberry Perl is already installed
+  win_stat:
+      path: 'C:\Strawberry\perl'
+  register: strawberry_perl_installed
+  tags: Strawberry_Perl
+
+- name: Check if Strawberry Perl is already downloaded
+  win_stat:
+      path: 'C:\temp\strawberry-perl.zip'
+  register: strawberry_perl_download
+  tags: Strawberry_Perl
+
+- name: Download Strawberry Perl
+  win_get_url:
+    url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
+    dest: C:\temp\strawberry-perl.zip
+  when: (strawberry_perl_download.stat.exists == false) and (strawberry_perl_installed.stat.exists == false)
+  tags: Strawberry_Perl
+
+- name: Unzip Strawberry Perl
+  win_unzip:
+    src: C:\temp\strawberry-perl.zip
+    dest: C:\Strawberry
+  when: (strawberry_perl_installed.stat.exists == false)
+  tags: Strawberry_Perl
+
+- name: Add Strawberry Perl to %PATH%
+  win_path:
+    elements:
+    - 'C:\Strawberry\bin'
+    state: present
+  when: (strawberry_perl_installed.stat.exists == false)
+  tags: Strawberry_Perl
+
+- name: Install Text::CSV_XS
+  win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
+  when: (strawberry_perl_installed.stat.exists == false)
+  tags: Strawberry_Perl

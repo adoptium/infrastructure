@@ -1,0 +1,31 @@
+---
+#########
+# cmake #
+#########
+
+- name: Test if cmake is already installed
+  win_stat:
+    path: 'C:\cygwin64\bin\cmake.exe'
+  register: cmake_installed
+  tags: cmake
+
+- name: Download cmake installer
+  win_get_url:
+    url: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.msi
+    dest: 'C:\temp\cmake.msi'
+    force: no
+  when: (cmake_installed.stat.exists == false)
+  tags: cmake
+
+- name: Install cmake
+  raw: C:\temp\cmake.msi /quite
+  ignore_errors: yes
+  when: (cmake_installed.stat.exists == false)
+  tags: cmake
+
+- name: Cleanup cmake
+  win_file:
+    path: C:\temp\cmake.msi
+    state: absent
+  ignore_errors: yes
+  tags: cmake

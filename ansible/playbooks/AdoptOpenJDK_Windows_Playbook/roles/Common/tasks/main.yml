@@ -1,0 +1,16 @@
+---
+################
+# Basic Config #
+################
+- name: Create C:\temp directory
+  win_file:
+    path: C:\temp
+    state: directory
+  tags: basic_config
+
+- name: Create cmd.exe shortcut
+  win_shortcut:
+    src: C:\Windows\System32\cmd.exe
+    dest: C:\Users\Public\Desktop\cmd.lnk
+    icon: C:\Windows\System32\cmd.exe,0
+  tags: basic_config

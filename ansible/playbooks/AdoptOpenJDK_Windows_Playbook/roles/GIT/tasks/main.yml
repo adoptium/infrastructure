@@ -1,0 +1,28 @@
+---
+#######
+# GIT #
+#######
+
+- name: Test if GIT is already installed
+  win_stat:
+      path: 'C:\Program Files\Git'
+  register: git_installed
+  tags: git
+
+- name: Check if GIT installer is already downloaded
+  win_stat:
+      path: 'C:\temp\git.exe'
+  register: git_download
+  tags: git
+
+- name: Download GIT installer
+  win_get_url:
+    url: 'https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe'
+    dest: 'C:\temp\git.exe'
+  when: (git_download.stat.exists == false) and (git_installed.stat.exists == false)
+  tags: git
+
+- name: Install GIT
+  win_command: 'C:\temp\git.exe /SILENT /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
+  when: (git_installed.stat.exists == false)
+  tags: git

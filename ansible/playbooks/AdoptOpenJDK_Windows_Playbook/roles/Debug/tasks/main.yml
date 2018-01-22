@@ -1,0 +1,19 @@
+---
+#####################
+# Debug Information #
+#####################
+- name: Display Debug Information
+  debug:
+    msg:
+      - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
+      - "ansible_os_family: {{ ansible_os_family | default('***Undefined***') }} "
+      - "ansible_distribution: {{ ansible_distribution | default('***Undefined***') }} "
+      - "ansible_distribution_major_version: {{ ansible_distribution_major_version | default('***Undefined***') }} "
+      - "ansible_architecture: {{ ansible_architecture | default('***Undefined***') }} "
+      - "ansible_processor_vcpus: {{ ansible_processor_vcpus | default('***Undefined***') }} "
+      - "ansible_processor_cores: {{ ansible_processor_cores | default('***Undefined***') }} "
+      - "Jenkins_Username: {{ Jenkins_Username | default('***Undefined***') }} "
+      - "Nagios_Plugins: {{ Nagios_Plugins | default('***Undefined***') }} "
+      - "Superuser_Account: {{ Superuser_Account | default('***Undefined***') }}"
+      - "Vendor_File: {{ Vendor_File | default('***Undefined***') }}"
+  tags: Debug

@@ -1,0 +1,31 @@
+---
+################################
+# Visual Studio Community 2013 #
+################################
+
+- name: Test if VS 2013 is installed
+  win_stat:
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0'
+  register: vs2013_installed
+  tags: MSVS_2013
+
+- name: Download Visual Studio Community 2013
+  win_get_url:
+    url: 'https://go.microsoft.com/fwlink/?LinkId=532495'
+    dest: 'C:\TEMP\vs2013_community.exe'
+    force: no
+  when: (vs2013_installed.stat.exists == false)
+  tags: MSVS_2013
+
+- name: Install Visual Studio Community 2013
+  raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
+        /Log C:\TEMP\vs2013_install_log.txt'
+  when: (vs2013_installed.stat.exists == false)
+  tags: MSVS_2013
+
+- name: Reboot machine after Visual Studio installation
+  win_reboot:
+    reboot_timeout: 1800
+    shutdown_timeout: 1800
+  when: (vs2013_installed.stat.exists == false)
+  tags: MSVS_2013
