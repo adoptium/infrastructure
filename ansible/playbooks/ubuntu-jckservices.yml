@@ -16,6 +16,7 @@
     - name: Install JCK prerequisistes
       apt: pkg={{ item }} state=latest
       with_items:
+      - iptables-persistent
       - ant
       - ftpd
       - gcc
@@ -135,7 +136,7 @@
         chain: INPUT
         jump: REJECT
     - name: iptables_permanent
-      command: iptables-save
+      command: /sbin/iptables-save > /etc/iptables/rules
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
