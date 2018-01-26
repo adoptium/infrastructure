@@ -21,48 +21,76 @@
       - nagios-plugins-common
       - perl
       - qstat
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
 
   ##########
   # Layout #
   ##########
   - name: Creates Nagios folder
     file: path=/usr/local/nagios/ state=directory
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
 
   - name: Create symlink to plugins
     file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
 
   ###############
   # Nagios user #
   ###############
-  - name: Setup Nagios user
-    shell: adduser nagios --shell /bin/bash --disabled-password --gecos ""
+  - name: Create Nagios user
+    action: user name=nagios state=present
     ignore_errors: yes
-    tags: nagios
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
 
-  - name: Create SSH Key folder for Nagios
-    file:
-      path: /home/nagios/.ssh
-      owner: nagios
-      group: nagios
-      mode: 0700
-      state: directory
-    tags: nagios
-
-  - name: Setup authorized_keys
-    file:
-      path: /home/nagios/.ssh/authorized_keys
-      owner: nagios
-      group: nagios
-      mode: 0600
-      state: touch
-    tags: nagios
-
-  - name: Add key
+  - name: Set authorized key for Nagios user
     authorized_key:
       user: nagios
       state: present
       key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
-    tags: [nagios, nagios_add_key]
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
+
+  - name: Nagios user account policy - expire date
+    command: chage -E -1 nagios
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
+
+  - name: Nagios user account policy - max days
+    command: chage -M -1 nagios
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
 
   ##############################
   # Install additional plugins #
@@ -72,3 +100,9 @@
       url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
       dest: /usr/local/nagios/libexec/check_mem
       mode: 0755
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+      - ansible_distribution == "Ubuntu" 
+      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
+    tags: nagios_plugins
