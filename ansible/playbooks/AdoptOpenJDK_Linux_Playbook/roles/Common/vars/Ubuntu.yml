@@ -61,5 +61,6 @@ Test_Tool_Packages:
   - pulseaudio
   - xauth
   - xorg
+  - mercurial
 
 crontab_Patching: "/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"

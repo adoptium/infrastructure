@@ -75,13 +75,6 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
-##########################
-# VCS tool: Mercurial    #
-##########################
-- name: Install Mercurial
-  apt: name=mercurial state=present
-  tags: vcs_tool
-
 #################
 # xorg Packages #
 #################
