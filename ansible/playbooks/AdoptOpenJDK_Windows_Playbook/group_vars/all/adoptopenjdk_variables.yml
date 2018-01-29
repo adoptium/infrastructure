@@ -2,6 +2,6 @@
 ansible_port: 5986
 ansible_connection: winrm
 ansible_winrm_server_cert_validation: ignore
-Jenkins_Win_Passwd: /Vendor_Files/j9build/jenkins_win_passwd
+Jenkins_Win_Passwd: /Vendor_Files/jenkins/jenkins_win_passwd
 Jenkins_Username: jenkins
 Nagios_Plugins: Disabled
