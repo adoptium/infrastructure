@@ -23,7 +23,7 @@ The following items are stored in GitHub.
 |---|---|---|
 | Jenkins - Configuration and Settings | localhost `/mnt/backup-server/jenkins_backup` | Daily |
 | Nagios - Configuration and Settings | localhost `/root/backups` | Weekly |
-| Semaphore - Configuration and Settings | not currently backed up | N/A |
+| AWX - Configuration and Settings | not currently backed up | N/A |
 
 ##### Questions:
 Backup schedule:
