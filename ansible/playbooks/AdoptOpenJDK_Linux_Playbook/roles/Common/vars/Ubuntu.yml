@@ -57,6 +57,7 @@ Additional_Build_Tools_aarch64:
 Test_Tool_Packages:
   - ant
   - ant-contrib
+  - mercurial
   - perl
   - pulseaudio
   - xauth
