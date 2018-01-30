@@ -1,3 +1,18 @@
+# Members
+
+#### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
+
+- [@bblondin](https://github.com/bblondin) - Brad Blondin
+- [@gdams](https://github.com/gdams) - George Adams
+
+#### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
+
+- [@bblondin](https://github.com/bblondin) - Brad Blondin
+- [@bletherhead](https://github.com/bleatherhead) - Peter Stanton
+- [@gdams](https://github.com/gdams) - George Adams
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison
+- [@tellison](https://github.com/tellison) - Tim Ellison
+
 # Maintenance Information:
 
 #### Quarterly Maintenance Window Schedule:
