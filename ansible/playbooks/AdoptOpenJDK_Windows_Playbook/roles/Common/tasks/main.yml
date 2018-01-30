@@ -8,6 +8,12 @@
     state: directory
   tags: basic_config
 
+- name: Create C:\openjdk directory
+  win_file:
+    path: C:\openjdk
+    state: directory
+  tags: basic_config
+  
 - name: Create cmd.exe shortcut
   win_shortcut:
     src: C:\Windows\System32\cmd.exe
