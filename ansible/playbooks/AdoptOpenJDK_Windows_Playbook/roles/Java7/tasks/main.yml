@@ -29,3 +29,7 @@
     delete_archive: yes
   when: (java7_installed.stat.exists == false)
   tags: Java7
+
+- name: Create symlink to Java 7
+  raw: mklink /D "C:\openjdk\jdk7\" "C:\Program Files\Java\jdk7u75-b13"
+  tags: Java7
