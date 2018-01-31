@@ -95,7 +95,7 @@
 
 - name: Download IBM Java 8
   get_url:
-    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.3.0/linux/x64/ibm-java-sdk-8.0-3.0-x86_64-archive.bin
+    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.5.7/linux/x86_64/ibm-java-sdk-8.0-5.7-x86_64-archive.bin
     dest: /tmp/ibm-java.bin
     validate_certs: no
   when:
