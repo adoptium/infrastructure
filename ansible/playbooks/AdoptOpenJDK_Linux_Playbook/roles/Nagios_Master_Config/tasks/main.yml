@@ -1,0 +1,24 @@
+---
+########################
+# Nagios_Master_Config #
+########################
+#
+# Note:
+# This script will enable monitoring of a Nagios client system for the following standard services:
+# Current Load, Current Users, Disk Space Root Partition, PING, RAM, SSH, Total Processes, Zombie Process
+# Anything beyond the standard defaults would require manual configuration. Such has adding monitoring for web sites.
+# If the client system is already being monitored by Nagios it will be skipped.
+#
+# Requirements:
+# The 'Nagios_Plugins' role must have completed successfully
+# The AWX (Ansible Tower) host but have the root ssh key to access the Nagios Master
+# Nagios_Monitoring: Enabled - must be set in the group_vars
+# Nagios_Master_IP: x.x.x.x - must be set in the group_vars
+# Script must exist on Nagios Master 
+#
+- name: SSH into the Nagios Master and excute the Nagios_Ansible_Config_tool.sh script 
+  local_action: command ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ ansible_fqdn }} {{ ansible_default_ipv4.address }} "
+  when:
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_master_config

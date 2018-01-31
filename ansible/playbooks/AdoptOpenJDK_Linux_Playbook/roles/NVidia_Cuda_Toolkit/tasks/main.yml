@@ -41,6 +41,7 @@
 
 - name: Apply NVidia CUDA repo RPM for RHEL7 on ppc64le
   yum: name=/tmp/cuda-repo-rhel7-9.ppc64le.rpm state=installed
+  ignore_errors: True
   when:
     - cuda_installed.stat.isdir is not defined
     - ansible_distribution == "RedHat"
