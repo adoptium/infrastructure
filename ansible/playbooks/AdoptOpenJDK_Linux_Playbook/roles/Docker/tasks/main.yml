@@ -146,6 +146,13 @@
   tags: docker
 
 # All OS' - Common
+- name: Run apt-get update
+  apt:
+    update_cache: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+  tags: docker
+  
 - name: Install Docker for ALL
   package: "name=docker-ce state=latest"
   when:
@@ -167,7 +174,7 @@
 - name: Enable and Start Docker Service for ALL
   service:
     name: docker
-    state: started
+    state: restarted
     enabled: yes
   when:
     - docker_installed.rc != 0
