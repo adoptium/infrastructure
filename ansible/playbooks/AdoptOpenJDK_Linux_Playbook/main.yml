@@ -25,7 +25,8 @@
     - Crontab
     - x11
     - NTP_TIME
-    - Nagios_Plugins
     - gcc_48
+    - Nagios_Plugins
+    - Nagios_Master_Config
     - Clean_Up
     - Vendor
