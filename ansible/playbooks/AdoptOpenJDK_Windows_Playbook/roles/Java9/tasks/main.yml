@@ -1,0 +1,33 @@
+---
+##########
+# Java 9 #
+##########
+- name: Test if Java 9 is already installed
+  win_stat:
+      path: 'C:\Program Files\Java\jdk-9+181'
+  register: java9_installed
+  tags: Java9
+
+- name: Check if Java 9 is already downloaded
+  win_stat:
+      path: 'C:\temp\jdk-9+181.zip'
+  register: java9_download
+  tags: Java9
+
+- name: Download Java 9
+  win_get_url:
+    url: https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-9%2B181/OpenJDK9_x64_Win_jdk-9.181.zip
+    dest: 'C:\temp\jdk-9+181.zip'
+  when: (java9_download.stat.exists == false) and (java9_installed.stat.exists == false)
+  tags: Java9
+
+- name: Install Java 9
+  win_unzip:
+    src: C:\temp\jdk-9+181.zip
+    dest: C:\Program Files\Java
+  when: (java9_installed.stat.exists == false)
+  tags: Java9
+
+- name: Create symlink to Java 9
+  raw: mklink /D "C:\openjdk\jdk9\" "C:\Program Files\Java\jdk-9+181"
+  tags: Java9
