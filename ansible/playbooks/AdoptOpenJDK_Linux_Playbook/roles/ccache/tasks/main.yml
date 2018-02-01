@@ -26,16 +26,14 @@
   tags: ccache
 
 - name: Running ./configure & make for CCACHE
-  shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
-  become: yes
+  shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture != "s390x"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for s390x
-  shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_cores }} && sudo make install
-  become: yes
+  shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make -j {{ ansible_processor_cores }} && make install 
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture == "s390x"
