@@ -100,6 +100,9 @@
       - ansible_distribution_major_version == "7"
     tags: nagios_plugins
 
+  ##############################
+  # Install additional plugins #
+  ##############################
   - name: Download add-on check_mem plugin
     get_url:
       url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
@@ -114,7 +117,7 @@
 
   - name: Download add-on check_yum plugin
     get_url:
-      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-tests/master/Build/ansible/playbooks/nagios/additional_plugins/check_yum
+      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Linux_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
       dest: /usr/local/nagios/libexec/check_yum
       mode: 0755
     when:
@@ -124,6 +127,9 @@
       - ansible_distribution_major_version == "7"
     tags: nagios_plugins
 
+  ############
+  # Clean up #
+  ############
   - name: Remove nagios-plugins tmp folder files
     file:
       state: absent
