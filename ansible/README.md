@@ -29,7 +29,7 @@ or
 
 `ansible-playbook -i hosts -s ubuntu.yml`
 
-In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](#Skipping one or more tags via CLI when running Ansible playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
+In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```
 ansible-playbook -i hosts -s ubuntu.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
