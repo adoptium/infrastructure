@@ -75,9 +75,16 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
-#################
-# xorg Packages #
-#################
+#########################
+# Additional Test Tools #
+#########################
+- name: Install additional Test Tool Packages for x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Test_Tool_Packages_x86_64 }}"
+  when:
+   - ansible_architecture == "x86_64"
+  tags: test_tools
+  
 - name: Install xserver-xorg-legacy on Ubuntu 16
   apt: name=xserver-xorg-legacy state=installed
   when:

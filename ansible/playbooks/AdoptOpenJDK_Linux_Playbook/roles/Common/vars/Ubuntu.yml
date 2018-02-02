@@ -59,8 +59,10 @@ Test_Tool_Packages:
   - ant-contrib
   - mercurial
   - perl
-  - pulseaudio
   - xauth
   - xorg
+
+Test_Tool_Packages_x86_64:
+  - pulseaudio
 
 crontab_Patching: "/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
