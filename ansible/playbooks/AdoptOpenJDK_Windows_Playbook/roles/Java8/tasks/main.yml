@@ -29,7 +29,7 @@
   tags: Java8
 
 - name: Create symlink to Java 8
-  raw: mklink /D "C:\openjdk\jdk8\" "C:\Program Files\Java\jdk8u144-b01"
+  raw: mklink /D \"C:\openjdk\jdk8\\" \"C:\Program Files\Java\jdk8u144-b01\"
   tags: Java8
 
 - name: Set JAVA_HOME to version 8
