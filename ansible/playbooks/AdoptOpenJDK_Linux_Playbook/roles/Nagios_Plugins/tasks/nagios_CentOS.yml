@@ -1,0 +1,129 @@
+#########################################################################################
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on CentOS 7 on x86 hardware #
+#########################################################################################
+
+###########################################################################
+# License Information:                                                    #
+# Nagios core and its plugins are lincesed under GPL                      #
+# For more information please see: https://www.nagios.com/legal/licenses/ #
+###########################################################################
+
+  - debug: msg='Installing Nagios plugins'
+  ###############
+  # Nagios user #
+  ###############
+  - name: Create Nagios user
+    action: user name=nagios state=present
+    ignore_errors: yes
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Set authorized key for Nagios user
+    authorized_key:
+      user: nagios
+      state: present
+      key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Nagios user account policy - expire date
+    command: chage -E -1 nagios
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Nagios user account policy - max days
+    command: chage -M -1 nagios
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Allow Nagios to use yum while restricting it to check-update only
+    shell: |
+      echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  ###################
+  # Install plugins #
+  ###################
+  - name: Download nagios-plugins
+    get_url:
+      url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Extract nagios-plugins
+    unarchive:
+      src: /tmp/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      copy: False
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Configure, make and make install nagios-plugins
+    shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+    become: yes
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  ##############################
+  # Install additional plugins #
+  ##############################
+  - name: Download add-on check_mem plugin
+    get_url:
+      url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
+      dest: /usr/local/nagios/libexec/check_mem
+      mode: 0755
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Download add-on check_yum plugin
+    get_url:
+      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Linux_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
+      dest: /usr/local/nagios/libexec/check_yum
+      mode: 0755
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  ############
+  # Clean up #
+  ############
+  - name: Remove nagios-plugins tmp folder files
+    file:
+      state: absent
+      path: "/tmp/nagios-plugins-2.2.1/"
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
+
+  - name: Remove nagios-plugins tar file
+    file:
+      state: absent
+      path: "/tmp/nagios-plugins-2.2.1.tar.gz"
+    when:
+      - Nagios_Plugins == "Enabled"
+      - ansible_architecture == "x86_64"
+    tags: nagios_plugins
