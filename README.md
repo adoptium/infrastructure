@@ -8,7 +8,7 @@
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
 - [@bblondin](https://github.com/bblondin) - Brad Blondin
-- [@bletherhead](https://github.com/bleatherhead) - Peter Stanton
+- [@bletherhead](https://github.com/bletherhead) - Peter Stanton
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones
 - [@gdams](https://github.com/gdams) - George Adams
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
