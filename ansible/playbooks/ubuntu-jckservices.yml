@@ -74,6 +74,9 @@
     - service:
         name: tomcat8
         state: started
+    - service: 
+        name: iptables-persistent
+        state: started
     - iptables:
         chain: INPUT
         ctstate: ESTABLISHED,RELATED
@@ -136,7 +139,7 @@
         chain: INPUT
         jump: REJECT
     - name: iptables_permanent
-      command: '/sbin/iptables-save > /etc/iptables/rules'
+      shell: iptables-save > /etc/iptables/rules.v4
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
