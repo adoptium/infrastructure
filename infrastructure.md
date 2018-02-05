@@ -19,6 +19,8 @@
 |  osuosl |  build-osuosl-ppc64le-ubuntu-16.10 |  140.211.168.135 | ppc64le  | Ubuntu17.04  |  ubuntu ||
 |  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-1 |  140.211.168.225 | ppc64le  | Ubuntu16.04  |  ubuntu | Only for JCK use |
 |  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-2 |  140.211.168.217 | ppc64le  | Ubuntu16.04  |  ubuntu | Only for JCK use |
+|  osuosl |  test-osuosl-ppc64le-ubuntu-16-04-1 |  140.211.168.227 | ppc64le  | Ubuntu16.04  |  ubuntu ||
+|  osuosl |  test-osuosl-ppc64le-ubuntu-16-04-2 |  140.211.168.190 | ppc64le  | Ubuntu16.04  |  ubuntu ||
 |  osuosl |  build-osuosl-ppc64-aix-71-1|  140.211.9.10 | ppc64  | aix71  |  root ||
 |  osuosl |  build-osuosl-ppc64-aix-71-2|  140.211.9.12 | ppc64  | aix71  |  root ||
 |  Packet |  build-packet-armv8-ubuntu-16.04  |  147.75.196.30 | aarch64  |  Ubuntu16.04 | root ||
