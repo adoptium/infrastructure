@@ -136,7 +136,7 @@
         chain: INPUT
         jump: REJECT
     - name: iptables_permanent
-      command: /sbin/iptables-save > /etc/iptables/rules
+      command: '/sbin/iptables-save > /etc/iptables/rules'
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
