@@ -74,9 +74,6 @@
     - service:
         name: tomcat8
         state: started
-    - service: 
-        name: iptables-persistent
-        state: started
     - iptables:
         chain: INPUT
         ctstate: ESTABLISHED,RELATED
