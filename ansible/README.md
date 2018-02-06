@@ -23,16 +23,16 @@ Note:
 
 1) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
 
-`ansible-playbook -s ubuntu.yml`
+`ansible-playbook -s AdoptOpenJDK_Linux_Playbook/main.yml`
 
 or 
 
-`ansible-playbook -i hosts -s ubuntu.yml`
+`ansible-playbook -i hosts -s AdoptOpenJDK_Linux_Playbook/main.yml`
 
 In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```
-ansible-playbook -i hosts -s ubuntu.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+ansible-playbook -i hosts -s AdoptOpenJDK_Linux_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
 ```
 
 # Running Manually
@@ -60,11 +60,11 @@ For Ubuntu 14.x
 
 3) Run a playbook to install dependencies, e.g. for Ubuntu 14.x on x86:
 
-`ansible-playbook -s playbooks/ubuntu.yml`
+`ansible-playbook -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml`
 
 or 
 
-`ansible-playbook -i /path/to/hosts -s ubuntu.yml`
+`ansible-playbook -i /path/to/hosts -s AdoptOpenJDK_Linux_Playbook/main.yml`
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
@@ -88,9 +88,9 @@ Running `ansible --version` will display your Ansible configuration folder that 
 One of the two examples below is appropriate to run playbook and skip tags, leading to linked and dependent tasks to be not executed:
 
 ```
-ansible-playbook -s playbooks/ubuntu.yml --skip-tags "jenkins_user"
+ansible-playbook -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml --skip-tags "jenkins_user"
 
-ansible-playbook -s playbooks/ubuntu.yml --skip-tags "install_zulu, jenkins_authorized_key, nagios_add_key, add_zeus_user_key"
+ansible-playbook -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml --skip-tags "install_zulu, jenkins_authorized_key, nagios_add_key, add_zeus_user_key"
 ```
 
 ## Skipping tasks via CLI when running Ansible playbooks (conditional and skipping tasks)
@@ -98,7 +98,7 @@ ansible-playbook -s playbooks/ubuntu.yml --skip-tags "install_zulu, jenkins_auth
 The below example is appropriate to run playbook by skipping tasks by using a combination of conditionals and tags (linked and dependent tasks will not be executed):
 
 ```
-ansible-playbook -i [/path/to/hosts] -s ubuntu.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
+ansible-playbook -i [/path/to/hosts] -s AdoptOpenJDK_Linux_Playbook/main.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
 ```
 
 Note that when running from inside the `vagrant` instance:
@@ -112,10 +112,10 @@ Useful if one or more tasks are failing to execute successfully or if they need 
 Below are the levels of verbosity available with using ansible scripts:
 
 ```
-ansible-playbook -v -s playbooks/ubuntu.yml
-ansible-playbook -vv -s playbooks/ubuntu.yml
-ansible-playbook -vvv -s playbooks/ubuntu.yml
-ansible-playbook -vvvv -s playbooks/ubuntu.yml
+ansible-playbook -v -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml
+ansible-playbook -vv -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml
+ansible-playbook -vvv -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml
+ansible-playbook -vvvv -s playbooks/AdoptOpenJDK_Linux_Playbook/main.yml
 ```
 
 A snippet from the man pages of Ansible:
