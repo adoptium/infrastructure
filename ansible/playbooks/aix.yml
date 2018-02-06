@@ -6,125 +6,279 @@
 - hosts: all
   remote_user: root
   become: yes
+  environment:
+    PATH: "/opt/freeware/bin:{{ ansible_env.PATH }}"
+  vars:
+    swap_size: 4096
 
   tasks:
   - block:
-
-    ##########
-    # Layout #
-    ##########
-    - name: Create tmp folder /tmp/playbook_tmp
-      file: path=/tmp/playbook_tmp state=directory mode=0755
-      tags: layout
-
-    - name: Create rpm tmp folder /tmp/playbook_tmp/rpms
-      file: path=/tmp/playbook_tmp/rpms state=directory mode=0755
-      tags: layout
-
-    - name: Create java tmp folder /tmp/playbook_tmp/java
-      file: path=/tmp/playbook_tmp/java state=directory mode=0755
-      tags: layout
-
-    - name: Create xlc tmp folder /tmp/playbook_tmp/xlc
-      file: path=/tmp/playbook_tmp/xlc state=directory mode=0755
-      tags: layout
-
-    ################################
-    # AIX filesystem configuration #
-    ################################
+  ################################
+  # AIX filesystem configuration #
+  ################################
     - name: Download AIX filesystem configuration script
       get_url:
         url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
-        dest: /tmp/playbook_tmp/AIX_filesystem_config.sh
+        dest: /tmp/AIX_filesystem_config.sh
         mode: 0775
         validate_certs: no
       tags: filesystem
         
     - name: Execute AIX filesystem configuration script
-      command: /tmp/playbook_tmp/AIX_filesystem_config.sh
+      command: /tmp/AIX_filesystem_config.sh
       tags: filesystem
 
-    ######################################
-    # Install and configure RPM Packages #
-    ######################################
-    - name: Transfer RPM Packages to remote host
-      copy:
-        src: "{{ item }}"
-        dest: /tmp/playbook_tmp/rpms/
-        mode: 0755
-      with_fileglob:
-        - /home/ubuntu/aix/rpms/*
-      tags: additional_rpms
+    - file:
+        state: absent
+        path: /tmp/AIX_filesystem_config.sh
+      tags: filesystem
 
-    - name: Download script to install RPM packages
+  ##########################################################################
+  # Install openssl from IBM installp                                      #
+  # openssl installp download requiring an IBMid                           #
+  # https://www-01.ibm.com/support/docviepw.wss?uid=isg1fileset-1190419011 #
+  ##########################################################################
+    - name: Transfer Openssl to remote host
+      copy:
+        src: /Vendor_Files/aix/openssl-1.0.2.1300.tar.gz
+        dest: /tmp/openssl-1.0.2.1300.tar.gz
+      tags: openssl
+
+    - name: Extract Openssl 
+      shell: gzip -cd /tmp/openssl-1.0.2.1300.tar.gz | tar xf - -C /tmp/
+      tags: openssl
+    
+    - name: Install IBM Openssl - installp
+      shell: installp -aXYgd /tmp/openssl-1.0.2.1300 openssl.base
+      register: result.openssl
+      ignore_errors: yes
+      tags: openssl
+
+    - name: Clean openssl tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/openssl-1.0.2.1300
+        - /tmp/openssl-1.0.2.1300.tar.gz
+      tags: openssl
+
+  ####################################################
+  # Uninstall conflicting packages from base image   #
+  # if they were installed via rpm unless yum exists #
+  ####################################################
+    - stat:
+        path: /usr/bin/yum
+      register: yum
+
+    - debug:
+        msg: "Yum installed, skipping download and installation"
+      when: yum.stat.islnk is defined
+
+    - name: Uninstall conflicting packages
+      shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
+      when: yum.stat.islnk is not defined
+      tags: rpm_remove
+
+  ####################################
+  # Install yum and update to latest #    
+  ####################################
+    - name: Download yum.sh
       get_url:
-        url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_RPM_PKGs_Install.sh 
-        dest: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
+        url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+        validate_certs: False
+        dest: /tmp/
         mode: 0775
-        validate_certs: no
-      tags: additional_rpms
+        timeout: 25
+      when: yum.stat.islnk is not defined
+      tags: yum
 
-    - name: Execute script to install RPM packages
-      command: /tmp/playbook_tmp/AIX_RPM_PKGs_Install.sh
-      tags: additional_rpms
+    - name: Install yum and dependencies
+      shell: /tmp/yum.sh
+      register: result.yum
+      ignore_errors: yes
+      when: yum.stat.islnk is not defined
+      tags: yum
 
-    ##############
-    # IBM Java 8 #
-    ##############
-    - name: Transfer Java to remote host
-      copy:
-        src: /home/ubuntu/aix/java/Java8_64.jre.tar.gz
-        dest: /tmp/playbook_tmp/java/Java8_64.jre.tar.gz
+    - name: Yum update
+      yum:
+        update_cache: yes
+        name: '*'
+        state: latest
+      tags: yum
+
+    - name: Install yum package support
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - bison
+        - cups-devel
+        - cups-libs
+        - flex
+        - freetype2-devel
+        - gawk
+        - git
+        - grep
+        - make
+        - m4
+        - pkg-config
+        - sed
+        - tar
+        - unzip
+        - xz-libs
+        - zip
+      tags: yum
+
+  ###########################################
+  # Additional Tools not available thru yum #
+  ###########################################
+    - name: Install yum package support
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - http://www.oss4aix.org/download/RPMS/mktemp/mktemp-1.7-1.aix5.1.ppc.rpm
+        - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
+        - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
+      when: yum.stat.islnk is not defined
+      tags: rpm_install
+
+  ##############
+  # IBM Java 8 #
+  ##############
+    - stat:
+        path: /usr/java8_64
+      register: java8
       tags: java8
 
-    - name: Extract Java 
-      shell: gzip -d /tmp/playbook_tmp/java/Java8_64.jre.tar.gz 
+    - debug:
+        msg: "Java8 found, skipping download and installation"
+      when: java8.stat.isdir is defined
       tags: java8
 
-    - shell: tar -xvf /tmp/playbook_tmp/java/Java8_64.jre.tar -C /tmp/playbook_tmp/java/
+    - name: Transfer and Extract Java8
+      unarchive:
+        src: /Vendor_Files/aix/OpenJDK8_ppc64_AIX_jdk8u144-b01.tar.gz
+        dest: /tmp
+        remote_src: no
+      when: java8.stat.isdir is not defined
       tags: java8
 
-    - name: Install Java 8 - installp
-      shell: installp -agXYd /tmp/playbook_tmp/java/ Java8_64.jre
+    - name: Move extracted Java8 to /usr/java8_64 
+      shell: mv /tmp/jdk8u144-b01/ /usr/java8_64
+      when: java8.stat.isdir is not defined
       tags: java8
 
     - name: Create symlink for Java
-      file: src=/usr/java8_64/jre/bin/java dest=/usr/bin/java state=link
+      file: src=/usr/java8_64/bin/java dest=/usr/bin/java state=link
+      when: java8.stat.isdir is not defined
+      tags: java8
+
+    - name: Create symlink for Javac
+      file: src=/usr/java8_64/bin/javac dest=/usr/bin/javac state=link
+      when: java8.stat.isdir is not defined
       tags: java8
 
     - name: Test Java
       command: /usr/bin/java -version
-      register: java_version
+      register: java8_version
       tags: java8
 
     - name: Display Java version information
       debug:
-        msg: "{{ java_version.stderr }}"
+        msg: "{{ java8_version.stderr }}"
       tags: java8
 
-    ############
-    # IBM XL C #
-    ############
-    - name: Transfer IBM XL C to remote host
+    - replace:
+        path: /etc/environment
+        regexp: 'java5'
+        replace: 'java8'
+      tags: java8
+
+  ##############
+  # IBM Java 7 #
+  ##############
+    - stat:
+        path: /usr/java7
+      register: java7
+      tags: java7
+
+    - debug:
+        msg: "Java7 found, skipping download and installation"
+      when: java7.stat.isdir is defined
+      tags: java7
+
+    - name: Transfer and Extract Java7
+      unarchive:
+        src: /Vendor_Files/aix/openjdk-7u-aix.tar
+        dest: /tmp
+        remote_src: no
+      when: java7.stat.isdir is not defined
+      tags: java7
+
+    - name: Move extracted Java7 to /usr/java7 
+      shell: mv /tmp/j2sdk-image /usr/java7
+      when: java7.stat.isdir is not defined
+      tags: java7
+
+    - name: Test Java7
+      command: /usr/java7/bin/java -version
+      register: java7_version
+      tags: java7
+
+    - name: Display Java7 version information
+      debug:
+        msg: "{{ java7_version.stderr }}"
+      tags: java7
+
+  ########################################################################
+  # Install X11 extensions                                               #
+  # x11.adt.ext installp download requiring an IBMid                     #
+  # http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+  ########################################################################
+    - name: Transfer X11 installp to remote host
       copy:
-        src: /home/ubuntu/aix/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
-        dest: /tmp/playbook_tmp/xlc/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+        src: /Vendor_Files/aix/X11.adt
+        dest: /tmp/X11.adt
+      tags: x11
+
+    - name: Install IBM X11 Extensions - installp
+      shell: installp -aXYgd /tmp/X11.adt X11.adt.ext
+      register: result.x11
+      ignore_errors: yes
+      tags: x11
+
+    - file:
+        state: absent
+        path: /tmp/X11.adt
+
+  ############
+  # IBM XL C #
+  ############
+    - stat:
+        path: /usr/bin/xlc
+      register: xlc
       tags: xlc
 
-    - name: Extract IBM XL C
-      shell: cd /tmp/playbook_tmp/xlc/ && uncompress IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.Z
+    - debug:
+        msg: "xlc installed, skipping download and installation"
+      when: xlc.stat.islnk is defined
       tags: xlc
 
-    - shell: cd /tmp/playbook_tmp/xlc/ && tar -xvf IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar
+    - name: Transfer and Extract XLC
+      unarchive:
+        src: /Vendor_Files/aix/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+        dest: /tmp
+        remote_src: no
+      when: xlc.stat.islnk is not defined
       tags: xlc
 
     - name: Install IBM XL C - installp
-      shell: installp -aXYgd /tmp/playbook_tmp/xlc/usr/sys/inst.images all
-      register: result
+      shell: installp -aXYgd /tmp/usr/sys/inst.images all
+      register: result.xlc
       ignore_errors: yes
+      when: xlc.stat.islnk is not defined
       tags: xlc
 
     - debug: msg='Erorrs from the previous installp command normal'
+      when: xlc.stat.islnk is not defined
       tags: xlc
 
     - name: TestIBM XL C
@@ -139,26 +293,106 @@
 
     - name: Symlink - /usr/bin/xlc
       file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
-      tags: xlc
-    - name: Symlink - /usr/bin/xlc++
-      file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
-      tags: xlc
-    - name: Symkink - /usr/bin/xlC 
-      file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
-      tags: xlc
-    - name: Symkink - /usr/bin/xlc_r
-      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
-      tags: xlc
-    - name: Symkink - /usr/bin/xlC_r 
-      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
-      tags: xlc
-    - name: Symkink - /usr/bin/gxlC
-      file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+      when: xlc.stat.islnk is not defined
       tags: xlc
 
-    #########################
-    # Configure system logs #
-    #########################
+    - name: Symlink - /usr/bin/xlc++
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
+      when: xlc.stat.islnk is not defined
+      tags: xlc
+
+    - name: Symlink - /usr/bin/xlC 
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
+      when: xlc.stat.islnk is not defined
+      tags: xlc
+
+    - name: Symlink - /usr/bin/xlc_r
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
+      when: xlc.stat.islnk is not defined
+      tags: xlc
+
+    - name: Symlink - /usr/bin/xlC_r 
+      file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
+      when: xlc.stat.islnk is not defined
+      tags: xlc
+
+    - name: Symlink - /usr/bin/gxlC
+      file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+      when: xlc.stat.islnk is not defined
+      tags: xlc
+
+  ###############
+  #     ant     #
+  ###############
+    - stat:
+        path: /usr/bin/ant
+      register: ant
+      tags: ant
+
+    - debug:
+        msg: "Ant installed, skipping download and installation"
+      when: ant.stat.islnk is defined
+      tags: ant
+
+    - name: Download and extract ant
+      unarchive:
+        src: http://apache.mirrors.hoobly.com/ant/binaries/apache-ant-1.9.9-bin.zip
+        dest: /opt
+        remote_src: yes
+      when: ant.stat.islnk is not defined
+      tags: ant
+
+    - name: Create symlink for ant
+      file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
+      when: ant.stat.islnk is not defined
+      tags: ant
+
+  ###############
+  # ant-contrib #
+  ###############
+    - stat:
+        path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
+      register: antcontrib
+      tags: ant-contrib
+
+    - debug:
+        msg: ant-contrib.jar installed, skipping download"
+      when: antcontrib.stat.exists == True
+      tags: ant-contrib
+
+    - name: Download and extract ant-contrib
+      unarchive:
+        src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+        dest: /tmp/
+        remote_src: yes
+      when: antcontrib.stat.exists == False
+      tags: ant-contrib
+
+    - name: Move ant-contrib.jar to lib folder
+      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
+      when: antcontrib.stat.exists == False
+      tags: ant-contrib
+
+    - name: Clean ant-contrib tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/ant-contrib
+        - /tmp/ant-contrib-1.0b2-bin.tar.gz
+      tags: ant-contrib
+
+  ########
+  # cpan #
+  ########
+    - name: Install Text::CSV
+      shell: |
+        CC=xlc_r cpan -i Text::CSV
+      tags: cpan
+
+  #########################
+  # Configure system logs #
+  #########################
     - name: Ensure /etc/syslog.conf entries are present
       blockinfile:
         backup: yes
@@ -191,35 +425,124 @@
       changed_when: False
       tags: syslog
 
-    ################
-    # Jenkins user #
-    ################
+  ######################################
+  # Add bash to available login shells #
+  ######################################
+    - replace:
+        path: /etc/security/login.cfg
+        regexp: 'shells = '
+        replace: 'shells = /bin/bash,'
+      tags: login_shell
+
+    - blockinfile:
+        dest: /etc/shells
+        block: |
+          /bin/bash
+      tags: login_shell
+
+    - blockinfile:
+        dest: /etc/environment
+        block: |
+          AIXTHREAD_HRT=true
+          PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
+      tags: login_shell
+
+    - replace:
+        path: /etc/environment
+        regexp: 'PATH=/usr/bin'
+        replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
+      tags: login_shell
+
+  ################
+  # Jenkins user #
+  ################
+    - stat:
+        path: /home/{{ Jenkins_Username }}
+      register: jenkins
+      tags: jenkins_user
+
+    - debug:
+        msg: "i{{ Jenkins_Username }} home directory found, skipping user creation tasks"
+      when: jenkins.stat.isdir is defined
+      tags: jenkins_user
+
     - name: Create jenkins user
-      action: user name=jenkins state=present
+      shell: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }} 
       ignore_errors: yes
+      when: jenkins.stat.isdir is not defined
       tags: jenkins_user
 
-    - name: Set authorized key for jenkins
+    - name: Create SSH Key folder for {{ Jenkins_Username }}
+      file:
+        path: /home/{{ Jenkins_Username }}/.ssh
+        owner: "{{ Jenkins_Username }}"
+        group: staff
+        mode: 0700
+        state: directory
+      when: jenkins.stat.isdir is not defined
+      tags: jenkins_user
+
+    - name: Set authorized key for jenkins user
       authorized_key:
-        user: jenkins
+        user: "{{ Jenkins_Username }}"
         state: present
-        key: "{{ lookup('file', '/home/ubuntu/keys/id_rsa.pub') }}"
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+      when: jenkins.stat.isdir is not defined
       tags: jenkins_user
 
-    ##################
-    # Nagios plugins #
-    ##################
+  ##############
+  # freemarker #
+  ##############
+    - stat:
+        path: /home/{{ Jenkins_Username }}/freemarker.jar
+      register: freemarker
+      tags: freemarker
+
+    - debug:
+        msg: freemarker.jar found, skipping download"
+      when: freemarker.stat.exists == True
+      tags: freemarker
+
+    - name: Download and extract freemarker.jar
+      unarchive:
+        src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+        dest: /tmp/
+        remote_src: yes
+        owner: "{{ Jenkins_Username }}"
+        group: staff
+        mode: 0755
+      when: freemarker.stat.exists == False
+      tags: freemarker
+
+    - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+      command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+      when: freemarker.stat.exists == False
+      tags: freemarker
+
+    - name: Clean freemarker tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/freemarker-2.3.8
+        - /tmp/freemarker-2.3.8.tar.gz
+      tags: freemarker
+
+  ##################
+  # Nagios plugins #
+  ##################
     - name: Include Nagios Playbook
       include_tasks: nagios/nagios_ubuntu.yml
       when: Nagios_Plugins == "Enabled"
 
-    #####################
-    # superuser account #
-    #####################
+  #####################
+  # superuser account #
+  #####################
     - name: Setup zeus user
       shell: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
       ignore_errors: yes
-      tags: supperuser
+      when: Superuser_Account == "Enabled"
+      tags: superuser
 
     - name: Create SSH Key folder for zeus
       file:
@@ -228,14 +551,16 @@
         group: staff
         mode: 0700
         state: directory
-      tags: supperuser
+      when: Superuser_Account == "Enabled"
+      tags: superuser
 
     - name: Add key
       authorized_key:
         user: zeus
         state: present
         key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
-      tags: supperuser
+      when: Superuser_Account == "Enabled"
+      tags: superuser
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -243,12 +568,20 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-      tags: supperuser
+      when: Superuser_Account == "Enabled"
+      tags: superuser
 
-    ###################
-    # NTP Time Server #
-    ###################
-    - name: Rewrite ntp.conf
+  ###################
+  # NTP Time Server #
+  ###################
+    - name: ensure NTP daemon is enabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
+        replace: '\1'
+      tags: ntp
+
+    - name: ensure NTP daemon is configured
       copy:
         content: |
           server 1.pool.ntp.org
@@ -260,31 +593,62 @@
         owner: root
         group: system
         mode: 0664
-      tags: x11
+      tags: ntp
 
-    - name: Start NTP
-      service:
-        name: xntpd
-        state: restarted
-      tags: x11
+    - name: Stop NTP daemon
+      service: name=xntpd state=stopped
+      changed_when: False
+      tags: ntp
 
-    ############
-    # Clean up #
-    ############
-    - name: Clean up - Remove /tmp/playbook_tmp/
-      file: path=/tmp/playbook_tmp/ state=absent
-      tags: cleanup
+    - name: Start NTP daemon
+      service: name=xntpd state=started
+      changed_when: False
+      tags: ntp
 
-    ################
-    # Pass or Fail #
-    ################
-    - name: Send Slack notification, successful
-      include_tasks: slack_notification/successful_slack.yml
-      when: Slack_Notification == "Enabled"
-      tags: slack
+  ####################
+  # Disable sendmail #
+  ####################
+    - name: ensure sendmail is stopped
+      service: name=sendmail state=stopped
+      tags: sendmail
 
-    rescue:
-    - name: Send Slack notification, failure
-      include_tasks: slack_notification/failure_slack.yml
-      when: Slack_Notification == "Enabled"
-      tags: slack
+    - name: ensure sendmail is disabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+        replace: '#\1'
+      tags: sendmail
+
+  ############################
+  # Enable full core support #
+  ############################
+    - name: ensure full AIX core files are enabled
+      command: chdev -l sys0 -a fullcore=true
+      changed_when: False
+      tags: fullcore
+
+  #####################
+  # Enable swap space #
+  #####################
+    - name: ensure swap space is of adequate size
+      shell: |
+        swap_line=$(lsps -a | tail -n 1)
+        curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
+        swap_lv=$(echo $swap_line | awk '{print $1}')
+        if [[ $curr_swap_size -lt {{swap_size}} ]]
+        then
+          echo "Extending swap LV..."
+          extendlv $swap_lv $(expr {{swap_size}} - $curr_swap_size)MB
+        fi
+      register: extendlv_result
+      changed_when: "'Extending' in extendlv_result.stdout"
+      notify:
+        - restart machine
+      tags: swap
+
+  handlers:
+    - name: restart machine
+      shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
+      async: 1
+      poll: 0
+      failed_when: False
