@@ -8,7 +8,6 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  - debug: msg='Installing Nagios plugins'
   ########################################
   # Install Nagios dependencies packages #
   ########################################
@@ -22,9 +21,7 @@
       - perl
       - qstat
     when:
-      - Nagios_Plugins == "Enabled"
       - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
       - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
 
@@ -34,75 +31,13 @@
   - name: Creates Nagios folder
     file: path=/usr/local/nagios/ state=directory
     when:
-      - Nagios_Plugins == "Enabled"
       - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
       - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
 
   - name: Create symlink to plugins
     file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
     when:
-      - Nagios_Plugins == "Enabled"
       - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
-    tags: nagios_plugins
-
-  ###############
-  # Nagios user #
-  ###############
-  - name: Create Nagios user
-    action: user name=nagios state=present
-    ignore_errors: yes
-    when:
-      - Nagios_Plugins == "Enabled"
-      - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
-    tags: nagios_plugins
-
-  - name: Set authorized key for Nagios user
-    authorized_key:
-      user: nagios
-      state: present
-      key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
-    when:
-      - Nagios_Plugins == "Enabled"
-      - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
-    tags: nagios_plugins
-
-  - name: Nagios user account policy - expire date
-    command: chage -E -1 nagios
-    when:
-      - Nagios_Plugins == "Enabled"
-      - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
-    tags: nagios_plugins
-
-  - name: Nagios user account policy - max days
-    command: chage -M -1 nagios
-    when:
-      - Nagios_Plugins == "Enabled"
-      - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
-    tags: nagios_plugins
-
-  ##############################
-  # Install additional plugins #
-  ##############################
-  - name: Download add-on check_mem plugin
-    get_url:
-      url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
-      dest: /usr/local/nagios/libexec/check_mem
-      mode: 0755
-    when:
-      - Nagios_Plugins == "Enabled"
-      - ansible_architecture == "x86_64"
-      - ansible_distribution == "Ubuntu" 
       - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
