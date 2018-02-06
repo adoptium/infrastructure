@@ -15,7 +15,6 @@
 |  Marist |  build-marist-s390x-zOS-2 |  148.100.36.137 | s390x  | zOS 2.1  |  OPEN1 ||
 |  osuosl |  build-osuosl-ppc64le-centos-7.2 |  140.211.168.138 | ppc64le  | Centos72  |  centos ||
 |  osuosl |  build-osuosl-ppc64le-fedora-24-1 |  140.211.168.134 | ppc64le  | Fedora 24  |  fedora ||
-|  osuosl |  build-osuosl-ppc64le-fedora-24-2 |  140.211.168.139 | ppc64le  | Fedora 24  |  fedora ||
 |  osuosl |  build-osuosl-ppc64le-ubuntu-16.10 |  140.211.168.135 | ppc64le  | Ubuntu17.04  |  ubuntu ||
 |  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-1 |  140.211.168.225 | ppc64le  | Ubuntu16.04  |  ubuntu | Only for JCK use |
 |  osuosl |  jck-osuosl-ppc64le-ubuntu-16.04-2 |  140.211.168.217 | ppc64le  | Ubuntu16.04  |  ubuntu | Only for JCK use |
