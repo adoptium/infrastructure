@@ -44,6 +44,7 @@
 
 - name: Account policy - expire date
   command: chage -E -1 " {{ item }} "
+  ignore_errors: yes
   with_items:
     - root
     - jenkins
@@ -55,6 +56,7 @@
 
 - name: Account policy - max days
   command: chage -M -1 " {{ item }} "
+  ignore_errors: yes
   with_items:
     - root
     - jenkins
