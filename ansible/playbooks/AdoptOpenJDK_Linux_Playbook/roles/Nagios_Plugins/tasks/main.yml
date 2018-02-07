@@ -19,7 +19,7 @@
   authorized_key:
     user: nagios
     state: present
-    key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
+    key: "{{ lookup('file', '{{ Nagios_Key }}') }}"
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_architecture == "x86_64"
