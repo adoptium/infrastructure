@@ -11,7 +11,6 @@
   #########
   roles:
     - Debug
-    - Security
     - Common
     - Jenkins_User
     - Ant-Contrib
@@ -30,4 +29,5 @@
     - Nagios_Plugins
     - Nagios_Master_Config
     - Clean_Up
+    - Security
     - Vendor
