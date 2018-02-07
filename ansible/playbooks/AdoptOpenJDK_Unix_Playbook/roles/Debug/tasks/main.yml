@@ -7,6 +7,7 @@
     msg:
       - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
       - "ansible_hostname: {{ ansible_hostname | default('***Undefined***') }}"
+      - "ansible_ssh_private_key_file: {{ ansible_ssh_private_key_file }}"
       - "ansible_fqdn: {{ ansible_fqdn | default('***Undefined***') }}"
       - "ansible_default_ipv4.address: {{ ansible_default_ipv4.address | default('***Undefined***') }}"
       - "ansible_os_family: {{ ansible_os_family | default('***Undefined***') }} "

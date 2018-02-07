@@ -1,9 +1,10 @@
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-- hosts: all
-  remote_user: root
-  become: yes
+- hosts:
+    - build
+    - test
+  gather_facts: yes
   tasks:
 
   #########
