@@ -11,6 +11,7 @@
   #########
   roles:
     - Debug
+    - Security
     - Common
     - Jenkins_User
     - Ant-Contrib
