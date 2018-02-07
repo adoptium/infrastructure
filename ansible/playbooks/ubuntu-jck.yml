@@ -34,7 +34,7 @@
         state: present
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
     - name: Start virtual X display on :1
-      shell: Xvfb :1 &
+      shell: Xvfb :1 -screen 0 1280x1024x24 &
       args:
         creates: /tmp/.X1-lock
       become: yes
