@@ -12,6 +12,16 @@
   shell: git --version >/dev/null 2>&1
   ignore_errors: yes
   register: git_installed
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: git_source
+
+- name: Test if git is installed on path FreeBSD
+  shell: git --version >/dev/null
+  ignore_errors: yes
+  register: git_installed
+  when:
+    - ansible_distribution == "FreeBSD"
   tags: git_source
 
 - name: Test if git is installed at the correct version
@@ -27,6 +37,7 @@
     mode: 0440
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
+    - ansible_distribution != "FreeBSD"
   tags: git_source
 
 - name: Extract git source
@@ -36,6 +47,7 @@
     copy: False
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
+    - ansible_distribution != "FreeBSD"
   tags: git_source
 
 - name: Compile and install git from source
@@ -44,6 +56,7 @@
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
     - ansible_architecture != "s390x"
+    - ansible_distribution != "FreeBSD"
   tags: git_source
 
 - name: Compile and install git from source on s390x
@@ -52,4 +65,5 @@
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
     - ansible_architecture == "s390x"
+    - ansible_distribution != "FreeBSD"
   tags: git_source

@@ -26,6 +26,12 @@
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "centos")
   tags: clean_up
 
+- name: Remove pkg dependencies that are no longer required - FreeBSD
+  command: pkg autoremove -y
+  when:
+    - ansible_distribution == "FreeBSD"
+  tags: clean_up
+
 # Remove unneeded packages
 - name: Remove unneeded downloaded packages
   file:

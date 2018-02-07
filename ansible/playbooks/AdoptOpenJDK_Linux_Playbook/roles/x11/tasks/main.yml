@@ -11,6 +11,21 @@
     group: root
     owner: root
     mode: 0644
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: x11
+
+- name: Create X11 Wrapper config file FreeBSD
+  copy:
+    content: |
+      allowed_users=anybody
+      needs_root_rights=yes
+    dest: /etc/X11/Xwrapper.config
+    group: wheel
+    owner: root
+    mode: 0644
+  when:
+    - ansible_distribution == "FreeBSD"
   tags: x11
 
 - name: Start X11

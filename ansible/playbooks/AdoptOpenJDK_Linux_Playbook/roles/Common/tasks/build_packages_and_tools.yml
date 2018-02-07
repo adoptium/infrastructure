@@ -5,6 +5,15 @@
 - name: Install Build Tool Packages
   package: "name={{ item }} state=latest"
   with_items: "{{ Build_Tool_Packages }}"
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: build_tools
+
+- name: Install Build Tool Packages FreeBSD
+  package: "name={{ item }} state=present"
+  with_items: "{{ Build_Tool_Packages }}"
+  when:
+    - ansible_distribution == "FreeBSD"
   tags: build_tools
 
 - name: Create symlink for gmake to make
@@ -14,9 +23,20 @@
     owner: root
     group: root
     state: link
+  when:
+    - ansible_distribution != "FreeBSD"
   tags: build_tools
 
 - name: Install Test Tool Packages
   package: "name={{ item }} state=latest"
   with_items: "{{ Test_Tool_Packages }}"
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: test_tools
+
+- name: Install Test Tool Packages FreeBSD
+  package: "name={{ item }} state=present"
+  with_items: "{{ Test_Tool_Packages }}"
+  when:
+    - ansible_distribution == "FreeBSD"
   tags: test_tools

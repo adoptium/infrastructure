@@ -38,6 +38,9 @@ Raspbian 8
 
 Oracle Linux 7
 - aarch64
+
+FreeBSD 11
+- x86_64
 ```
 
 ## Playbook Layout: (tree view)

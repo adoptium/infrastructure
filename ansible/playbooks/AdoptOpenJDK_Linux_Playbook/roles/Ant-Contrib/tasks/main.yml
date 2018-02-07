@@ -26,6 +26,12 @@
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 
+- name: Create /usr/share/ant/lib/ FreeBSD
+  file: path=/usr/share/ant/lib/ state=directory
+  when:
+    - ansible_distribution == "FreeBSD"
+  tags: ant-contrib
+
 - name: Move ant-contrib.jar to lib folder
   command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
   when: antcontrib_status.stat.exists == False

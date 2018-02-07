@@ -1,0 +1,30 @@
+---
+##########
+# FreeBSD #
+##########
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install GCC G++ on supported platforms
+  package: "name={{ item }} state=present"
+  with_items: "{{ gcc_compiler }}"
+  tags: build_tools
+
+#######################
+# Symlink gtar to tar #
+#######################
+- name: Create symlink for gtar to tar
+  file:
+    src: /usr/local/bin/gtar
+    dest: /usr/bin/tar
+    owner: root
+    group: wheel
+    state: link
+  tags: build_tools
