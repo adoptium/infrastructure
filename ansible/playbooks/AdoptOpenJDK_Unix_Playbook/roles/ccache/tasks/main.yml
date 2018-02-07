@@ -30,7 +30,6 @@
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture != "s390x"
-    - ansible_distribution != "FreeBSD"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for s390x
@@ -38,11 +37,4 @@
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture == "s390x"
-  tags: ccache
-
-- name: Running ./configure & make for CCACHE for FreeBSD
-  shell: cd /home/{{ Jenkins_Username }}/ccache-3.1.9 && ./configure && make && make install
-  when:
-    - ccache_status.stat.isdir is not defined
-    - ansible_distribution == "FreeBSD"
   tags: ccache

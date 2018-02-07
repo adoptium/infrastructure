@@ -3,6 +3,24 @@
 # FreeBSD #
 ##########
 
+##############################################
+# Workaround for Ansible not detecting cores #
+##############################################
+- name: Get number of cores on FreeBSD
+  shell: sysctl hw.ncpu | awk '{print $2}'
+  register: freebsd_cores
+
+- name: Set ansible_processor_vcpus
+  set_fact:
+    ansible_processor_vcpus: "{{ freebsd_cores.stdout }}"
+
+######################
+# Overide root group #
+######################
+- name: Set default root group to wheel
+  set_fact:
+    root_group: "wheel"
+
 ############################
 # Build Packages and tools #
 ############################

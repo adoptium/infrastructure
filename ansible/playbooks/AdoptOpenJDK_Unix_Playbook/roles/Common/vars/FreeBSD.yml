@@ -61,4 +61,4 @@ Test_Tool_Packages:
   - pulseaudio
   - p5-App-cpanminus
 
-crontab_Patching: "/usr/sbin/pkg upgrade"
+crontab_Patching: "/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"

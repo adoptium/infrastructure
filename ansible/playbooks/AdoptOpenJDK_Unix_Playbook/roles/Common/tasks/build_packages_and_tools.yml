@@ -2,18 +2,19 @@
 ############################
 # Build_Packages_and_tools #
 ############################
-- name: Install Build Tool Packages
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Build_Tool_Packages }}"
-  when:
-    - ansible_distribution != "FreeBSD"
-  tags: build_tools
+- name: Set package manager var
+  set_fact:
+    package_var: "latest"
 
-- name: Install Build Tool Packages FreeBSD
-  package: "name={{ item }} state=present"
-  with_items: "{{ Build_Tool_Packages }}"
+- name: Set package manager var for FreeBSD
+  set_fact:
+    package_var: "present"
   when:
     - ansible_distribution == "FreeBSD"
+
+- name: Install Build Tool Packages
+  package: "name={{ item }} state={{ package_var }}"
+  with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
 - name: Create symlink for gmake to make
@@ -28,15 +29,6 @@
   tags: build_tools
 
 - name: Install Test Tool Packages
-  package: "name={{ item }} state=latest"
+  package: "name={{ item }} state={{ package_var }}"
   with_items: "{{ Test_Tool_Packages }}"
-  when:
-    - ansible_distribution != "FreeBSD"
-  tags: test_tools
-
-- name: Install Test Tool Packages FreeBSD
-  package: "name={{ item }} state=present"
-  with_items: "{{ Test_Tool_Packages }}"
-  when:
-    - ansible_distribution == "FreeBSD"
   tags: test_tools

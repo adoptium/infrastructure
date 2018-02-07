@@ -51,8 +51,7 @@
   command: "fallocate -l 2G {{ swap_path }}"
   when:
     - (swap_root.rc != 0 and swap_tmp.rc != 0)
-    - ansible_distribution != "FreeBSD"
-    - (ansible_distribution != "SLES" and ansible_distribution_major_version != "11") or (ansible_distribution != "CentOS" and ansible_distribution_major_version != "7" )
+    - ansible_distribution != "FreeBSD" or (ansible_distribution != "SLES" and ansible_distribution_major_version != "11") or (ansible_distribution != "CentOS" and ansible_distribution_major_version != "7" )
   tags: swap_file
 
 - name: Create swap file - via DD on SLES 11 and CentOS 7 and FreeBSD
@@ -65,21 +64,10 @@
 - name: Set swap file permissions
   file: path="{{ swap_path }}"
         owner=root
-        group=root
+        group="{{ root_group }}"
         mode=0600
   when:
     - (swap_root.rc != 0 and swap_tmp.rc != 0)
-    - ansible_distribution != "FreeBSD"
-  tags: swap_file
-
-- name: Set swap file permissions FreeBSD
-  file: path="{{ swap_path }}"
-        owner=root
-        group=wheel
-        mode=0600
-  when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
-    - ansible_distribution == "FreeBSD"
   tags: swap_file
 
 - name: Create swap area device

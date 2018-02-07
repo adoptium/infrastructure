@@ -12,7 +12,7 @@
   ignore_errors: yes
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
   tags: nagios_plugins
 
 - name: Set authorized key for Nagios user
@@ -22,14 +22,14 @@
     key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
   tags: nagios_plugins
 
 - name: Nagios user account policy - expire date
   command: chage -E -1 nagios
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "FreeBSD"
   tags: nagios_plugins
 
@@ -37,7 +37,7 @@
   command: chage -M -1 nagios
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "FreeBSD"
   tags: nagios_plugins
 
@@ -52,7 +52,7 @@
     timeout: 25
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
@@ -63,7 +63,7 @@
     copy: False
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
@@ -72,18 +72,8 @@
   become: yes
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
-    - ansible_distribution != "FreeBSD"
-  tags: nagios_plugins
-
-- name: Configure, make and make install nagios-plugins FreeBSD
-  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make && make install
-  become: yes
-  when:
-    - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
-    - ansible_distribution == "FreeBSD"
   tags: nagios_plugins
 
   ##############################
@@ -96,7 +86,7 @@
     mode: 0755
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
   tags: nagios_plugins
 
   ################################
@@ -117,7 +107,7 @@
     path: "/tmp/nagios-plugins-2.2.1/"
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
@@ -127,6 +117,6 @@
     path: "/tmp/nagios-plugins-2.2.1.tar.gz"
   when:
     - Nagios_Plugins == "Enabled"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "amd64")
+    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
