@@ -4,6 +4,10 @@
 - hosts:
     - build
     - test
+    - "!*zos*"
+    - "!*win*"
+    - "!*macos*"
+    - "!*aix*"
   gather_facts: yes
   tasks:
 
