@@ -22,7 +22,6 @@
       - qstat
     when:
       - ansible_architecture == "x86_64"
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
 
   ##########
@@ -32,12 +31,10 @@
     file: path=/usr/local/nagios/ state=directory
     when:
       - ansible_architecture == "x86_64"
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
 
   - name: Create symlink to plugins
     file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
     when:
       - ansible_architecture == "x86_64"
-      - (ansible_distribution_major_version == "14" or ansible_distribution_major_version == "16")
     tags: nagios_plugins
