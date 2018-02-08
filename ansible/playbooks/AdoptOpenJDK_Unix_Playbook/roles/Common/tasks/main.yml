@@ -29,6 +29,14 @@
     - ansible_distribution == "Debian"
     - ansible_architecture == "armv7l"
 
+################
+# Set Hostname #
+################
+- name: Set hostname to inventory_hostname
+  hostname:
+    name: "{{ inventory_hostname }}.{{ Domain }}"
+  tags: hostname
+
 #####################
 # Update /etc/hosts #
 #####################
@@ -36,7 +44,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
-    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
     state: present
     backup: yes
   tags: hosts_file

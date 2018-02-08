@@ -36,6 +36,7 @@ hosts:
 
     - packet:
         ubuntu1604-armv8-1: {ip: 147.75.196.30}
+        freebsd11-x64-1: {ip: 147.75.101.29}
 
     - joyent:
         ubuntu1604-x64-2: {ip: 37.153.109.201}
