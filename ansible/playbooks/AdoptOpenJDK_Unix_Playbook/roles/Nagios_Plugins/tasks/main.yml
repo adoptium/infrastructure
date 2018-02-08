@@ -8,7 +8,7 @@
   # Nagios user #
   ###############
 - name: Create Nagios user
-  action: user name=nagios state=present
+  action: user name=nagios state=present shell=/bin/bash
   ignore_errors: yes
   when:
     - Nagios_Plugins == "Enabled"
