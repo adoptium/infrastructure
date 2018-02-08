@@ -25,22 +25,6 @@
     - ansible_architecture == "x86_64"
   tags: nagios_plugins
 
-- name: Nagios user account policy - expire date
-  command: chage -E -1 nagios
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
-    - ansible_distribution != "FreeBSD"
-  tags: nagios_plugins
-
-- name: Nagios user account policy - max days
-  command: chage -M -1 nagios
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
-    - ansible_distribution != "FreeBSD"
-  tags: nagios_plugins
-
   ###################
   # Install plugins #
   ###################
