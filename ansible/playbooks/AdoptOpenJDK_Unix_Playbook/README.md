@@ -46,37 +46,44 @@ FreeBSD 11
 ## Playbook Layout: (tree view)
 ```
 .
-├── README.md
 ├── group_vars
 │   └── all
 │       └── adoptopenjdk_variables.yml
-├── main.retry
 ├── main.yml
+├── README.md
 └── roles
     ├── Ant-Contrib
     │   └── tasks
     │       └── main.yml
-    ├── CPAN
+    ├── ccache
     │   └── tasks
     │       └── main.yml
     ├── Clean_Up
     │   └── tasks
     │       └── main.yml
+    ├── cmake
+    │   └── tasks
+    │       └── main.yml
     ├── Common
     │   ├── tasks
+    │   │   ├── build_packages_and_tools.yml
     │   │   ├── CentOS.yml
+    │   │   ├── FreeBSD.yml
+    │   │   ├── main.yml
     │   │   ├── OracleLinux.yml
     │   │   ├── RedHat.yml
     │   │   ├── SLES.yml
-    │   │   ├── Ubuntu.yml
-    │   │   ├── build_packages_and_tools.yml
-    │   │   └── main.yml
+    │   │   └── Ubuntu.yml
     │   └── vars
     │       ├── CentOS.yml
+    │       ├── FreeBSD.yml
     │       ├── OracleLinux.yml
     │       ├── RedHat.yml
     │       ├── SLES.yml
     │       └── Ubuntu.yml
+    ├── CPAN
+    │   └── tasks
+    │       └── main.yml
     ├── Crontab
     │   └── tasks
     │       └── main.yml
@@ -86,25 +93,40 @@ FreeBSD 11
     ├── Docker
     │   └── tasks
     │       └── main.yml
+    ├── gcc_48
+    │   └── tasks
+    │       └── main.yml
     ├── GIT_Source
     │   └── tasks
     │       └── main.yml
     ├── Jenkins_User
     │   └── tasks
     │       └── main.yml
+    ├── Nagios_Master_Config
+    │   └── tasks
+    │       └── main.yml
+    ├── Nagios_Plugins
+    │   └── tasks
+    │       ├── additional_plugins
+    │       │   ├── check_pkg
+    │       │   ├── check_sw_up
+    │       │   ├── check_yum
+    │       │   └── check_zypper
+    │       ├── main.yml
+    │       ├── nagios_CentOS.yml
+    │       ├── nagios_FreeBSD.yml
+    │       ├── nagios_RedHat.yml
+    │       ├── nagios_SLES.yml
+    │       └── nagios_Ubuntu.yml
     ├── NTP_TIME
     │   └── tasks
     │       └── main.yml
     ├── NVidia_Cuda_Toolkit
     │   └── tasks
     │       └── main.yml
-    ├── Nagios_Plugins
+    ├── Security
     │   └── tasks
-    │       ├── main.yml
-    │       ├── nagios_CentOS.yml
-    │       ├── nagios_RedHat.yml
-    │       ├── nagios_SLES.yml
-    │       └── nagios_Ubuntu.yml
+    │       └── main.yml
     ├── Superuser
     │   └── tasks
     │       └── main.yml
@@ -114,18 +136,9 @@ FreeBSD 11
     ├── Vendor
     │   └── tasks
     │       └── main.yml
-    ├── ccache
-    │   └── tasks
-    │       └── main.yml
-    ├── cmake
-    │   └── tasks
-    │       └── main.yml
-    ├── gcc_48
-    │   └── tasks
-    │       └── main.yml
     └── x11
         └── tasks
             └── main.yml
 
-42 directories, 38 files
+47 directories, 46 files
 ```
