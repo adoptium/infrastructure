@@ -45,7 +45,9 @@
   tags: docker
 
 - name: Import Docker Repo key for Ubuntu
-  shell: "wget -qO- https://download.docker.com/linux/ubuntu/gpg | apt-key add -"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
