@@ -1,0 +1,64 @@
+---
+##########
+# FreeBSD #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib
+  - autoconf
+  - automake
+  - bash
+  - binutils
+  - bison
+  - cups
+  - curl
+  - fontconfig
+  - freetype2
+  - gcc
+  - gcc-ecj
+  - git
+  - gmake
+  - libICE
+  - libSM
+  - libX11
+  - libXau
+  - libXdmcp
+  - libXext
+  - libXfixes
+  - libXi
+  - libXrender
+  - libXt
+  - libXtst
+  - libdaemon
+  - libffi
+  - libfontenc
+  - libgnomecups
+  - libiconv
+  - libxcb
+  - m4
+  - mercurial
+  - mkfontdir
+  - nano
+  - openjdk
+  - openjdk8
+  - ntp
+  - gtar
+  - xextproto
+  - xproto
+  - wget
+  - zip
+
+gcc_compiler:
+  - gcc48
+
+Test_Tool_Packages:
+  - apache-ant
+  - mercurial
+  - perl5
+  - xauth
+  - xorg
+  - pulseaudio
+  - p5-App-cpanminus
+
+crontab_Patching: "/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"

@@ -1,0 +1,47 @@
+---
+################
+# Jenkins_User #
+################
+- name: Create Jenkins user
+  action: user name={{ Jenkins_Username }} state=present
+  ignore_errors: yes
+  tags: jenkins_user
+
+- name: Create Jenkins user's home folder
+  file:
+    path: /home/{{ Jenkins_Username }}
+    state: directory
+    owner: "{{ Jenkins_Username }}"
+    group: "{{ Jenkins_Username }}"
+    mode: 0700
+  when:
+   - ansible_architecture == "s390x"
+  tags: jenkins_user
+
+- name: Set authorized key for Jenkins user
+  authorized_key:
+    user: "{{ Jenkins_Username }}"
+    state: present
+    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+  tags: [jenkins_user, jenkins_authorized_key]
+
+- name: Jenkins user account policy - expire date
+  command: chage -E -1 "{{ Jenkins_Username }}"
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: jenkins_user
+
+- name: Jenkins user account policy - max days
+  command: chage -M -1 "{{ Jenkins_Username }}"
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: jenkins_user
+
+- name: Add Jenkins user to the audio group
+  user: name={{ Jenkins_Username }}
+    groups=audio
+    append=yes
+  when:
+    - (ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture != "armv7l"
+  tags: jenkins_user

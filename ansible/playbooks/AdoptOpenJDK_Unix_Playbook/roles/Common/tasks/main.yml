@@ -1,0 +1,80 @@
+---
+########
+# Main #
+########
+
+###########################
+# Overide amd64 to x86_64 #
+###########################
+- name: If ansible_distribution is amd64 set it to x86_64
+  set_fact:
+    ansible_distribution: "x86_64"
+  when:
+    - ansible_distribution == "amd64"
+
+##################
+# Set root group #
+##################
+- name: Set default root group to root
+  set_fact:
+    root_group: "root"
+
+#########################
+# Override for Raspbian #
+#########################
+- name: If Raspbian on armv7l override ansible_distribution
+  set_fact:
+    ansible_distribution: "Ubuntu"
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_architecture == "armv7l"
+
+###########################
+# Set Root account policy #
+###########################
+- name: Root account policy - expire date
+  command: chage -E -1 root
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: root_account
+
+- name: Root account policy - max days
+  command: chage -M -1 root
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: root_account
+
+#####################
+# Update /etc/hosts #
+#####################
+- name: Update /etc/hosts file - IP FQDN hostname
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+    backup: yes
+  tags: hosts_file
+
+- name: Update /etc/hosts file - 127.0.0.1
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*)127.0.0.1(.*)$"
+    line: "127.0.0.1   localhost  localhost.localdomain"
+    state: present
+    backup: yes
+  tags: hosts_file
+
+########################
+# Include OS variables #
+########################
+- name: Include OS variables
+  include_vars: "../vars/{{ ansible_distribution }}.yml"
+  tags: main
+
+##############################
+# OS setup and configuration #
+##############################
+- name: Perform OS setup and configuration
+  include_tasks: "{{ ansible_distribution }}.yml"
+  tags: main

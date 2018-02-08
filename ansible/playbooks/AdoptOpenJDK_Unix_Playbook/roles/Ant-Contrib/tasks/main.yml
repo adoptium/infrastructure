@@ -1,0 +1,38 @@
+---
+###############
+# Ant-Contrib #
+###############
+- name: Check if ant-contrib is already installed
+  stat:
+    path: /usr/share/ant/lib/ant-contrib.jar
+  register: antcontrib_status
+  tags: ant-contrib
+
+- name: Download ant-contrib
+  get_url:
+    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when: antcontrib_status.stat.exists == False
+  tags: ant-contrib
+
+- name: Extract ant-contrib
+  unarchive:
+    src: /tmp/ant-contrib-1.0b2-bin.tar.gz
+    dest: /tmp/
+    copy: False
+  when: antcontrib_status.stat.exists == False
+  tags: ant-contrib
+
+- name: Create /usr/share/ant/lib/ FreeBSD
+  file: path=/usr/share/ant/lib/ state=directory
+  when:
+    - ansible_distribution == "FreeBSD"
+  tags: ant-contrib
+
+- name: Move ant-contrib.jar to lib folder
+  command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
+  when: antcontrib_status.stat.exists == False
+  tags: ant-contrib

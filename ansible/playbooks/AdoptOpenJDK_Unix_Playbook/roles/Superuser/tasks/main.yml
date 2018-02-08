@@ -1,0 +1,52 @@
+---
+#############
+# Superuser #
+#############
+- name: Create Superuser account - zeus
+  action: user name=zeus state=present
+  when: Superuser_Account == "Enabled"
+  tags: superuser
+
+- name: Create Superuser account home folder for s390x
+  file:
+    path: /home/zeus/
+    owner: zeus
+    group: zeus
+    mode: 0700
+    state: directory
+  when:
+    - ansible_architecture == "s390x"
+    - Superuser_Account == "Enabled"
+  tags: superuser
+
+- name: Set authorized key for Superuser account
+  authorized_key:
+    user: zeus
+    state: present
+    key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+  when: Superuser_Account == "Enabled"
+  tags: superuser
+
+- name: Grant Superuser sudo powers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^zeus'
+    line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+  when: Superuser_Account == "Enabled"
+  tags: superuser
+
+- name: Superuser account policy - expire date
+  command: chage -E -1 zeus
+  when:
+    - Superuser_Account == "Enabled"
+    - ansible_distribution != "FreeBSD"
+
+  tags: superuser
+
+- name: Superuser account policy - max days
+  command: chage -M -1 zeus
+  when:
+    - Superuser_Account == "Enabled"
+    - ansible_distribution != "FreeBSD"
+  tags: superuser
