@@ -32,7 +32,6 @@
 | MacInCloud  |  test-macincloud-macos1010-2 |  74.80.250.173 | x64  |  MacOS10.10 | admin  ||
 |  Joyent |  build-joyent-x64-smartOS-14-1  | 165.225.138.202 | x64 | SmartOS14.4.0  |  root ||
 |  Joyent |  build-joyent-x64-freebsd-11-1  | 165.225.138.105 | x64 | FreeBSD11-1  |  root ||
-|  Joyent |  build-joyent-x64-ubuntu-16.04-1  | 37.153.108.134 | x64 | Ubuntu16.04  |  root ||
 |  Joyent |  build-joyent-x64-ubuntu-16-04-2  | 37.153.109.201 | x64 | Ubuntu16.04  |  root ||
 |  Scaleway |  build-scaleway-x64-ubuntu-16-04-2  |  51.15.46.107 | x64 |  Ubuntu16.04 | root ||
 |  Scaleway |  build-scaleway-armv7-ubuntu16-04-1  |  212.47.233.28 | arm  |  Ubuntu16.04 | root ||
