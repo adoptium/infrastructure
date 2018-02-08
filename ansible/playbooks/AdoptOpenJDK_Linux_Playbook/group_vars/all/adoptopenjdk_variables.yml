@@ -17,6 +17,14 @@ Nagios_User_SSHKey: /Vendor_Files/keys/nagios.key
 Nagios_Monitoring: Enabled
 Nagios_Master_IP: 78.47.239.96
 
+# Security Variables:
+Security: Enabled
+Keybox_SSHKey: /Vendor_Files/keys/keybox.key
+
 # JCK Variables:
 jckftp_Username: jckftp
 jckftp_Passwd: /Vendor_Files/passwords/ftp
+
+# Vendor Variables:
+Vendor_File: Disabled
+Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml

@@ -19,21 +19,7 @@
   authorized_key:
     user: nagios
     state: present
-    key: "{{ lookup('file', '/Vendor_Files/keys/nagios.key') }}"
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
-  tags: nagios_plugins
-
-- name: Nagios user account policy - expire date
-  command: chage -E -1 nagios
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
-  tags: nagios_plugins
-
-- name: Nagios user account policy - max days
-  command: chage -M -1 nagios
+    key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_architecture == "x86_64"
@@ -74,6 +60,15 @@
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
+  ################################
+  # Require OS specific playbook #
+  ################################
+- name: Include Nagios Playbook
+  include_tasks: nagios_{{ ansible_distribution }}.yml
+  when:
+    - Nagios_Plugins == "Enabled"
+  tags: nagios_plugins
+  
   ##############################
   # Install additional plugins #
   ##############################
@@ -85,15 +80,6 @@
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_architecture == "x86_64"
-  tags: nagios_plugins
-
-  ################################
-  # Require OS specific playbook #
-  ################################
-- name: Include Nagios Playbook
-  include_tasks: nagios_{{ ansible_distribution }}.yml
-  when:
-    - Nagios_Plugins == "Enabled"
   tags: nagios_plugins
 
   ############

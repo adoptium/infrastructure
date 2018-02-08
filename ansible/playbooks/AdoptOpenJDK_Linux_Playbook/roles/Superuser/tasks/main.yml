@@ -35,13 +35,3 @@
     line: 'zeus ALL=(ALL) NOPASSWD: ALL'
   when: Superuser_Account == "Enabled"
   tags: supperuser
-
-- name: Superuser account policy - expire date
-  command: chage -E -1 zeus
-  when: Superuser_Account == "Enabled"
-  tags: supperuser
-
-- name: Superuser account policy - max days
-  command: chage -M -1 zeus
-  when: Superuser_Account == "Enabled"
-  tags: supperuser
