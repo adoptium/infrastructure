@@ -19,16 +19,30 @@
   when:
     - Security == "Enabled"
   tags: security
-  
-- name: Ensure security settings are applied to sshd_config
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    state: present
-    line: " {{ item }} "
-  with_items:
-    - PermitRootLogin without-password
-    - PasswordAuthentication no
-    - ChallengeResponseAuthentication no
+
+- name: Security - Disable Password Authentication for all users
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PasswordAuthentication"
+              line="PasswordAuthentication no"
+              state=present
+  when:
+    - Security == "Enabled"
+  tags: security
+
+- name: Security - Disable Password Authentication for root user
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PermitRootLogin"
+              line="PermitRootLogin without-password"
+              state=present
+  when:
+    - Security == "Enabled"
+  tags: security
+
+- name: Security - Disable ChallengeResponseAuthentication for all users
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^ChallengeResponseAuthentication"
+              line="ChallengeResponseAuthentication no"
+              state=present
   when:
     - Security == "Enabled"
   tags: security
