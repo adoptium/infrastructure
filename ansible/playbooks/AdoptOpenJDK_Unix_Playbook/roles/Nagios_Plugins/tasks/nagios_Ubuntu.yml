@@ -29,6 +29,7 @@
   ##########
   - name: Creates Nagios folder
     file: path=/usr/local/nagios/ state=directory
+    mode: 0755
     when:
       - ansible_architecture == "x86_64"
     tags: nagios_plugins
