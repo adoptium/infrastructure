@@ -3,7 +3,7 @@
 # Jenkins_User #
 ################
 - name: Create Jenkins user
-  action: user name={{ Jenkins_Username }} state=present
+  action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
   ignore_errors: yes
   tags: jenkins_user
 
