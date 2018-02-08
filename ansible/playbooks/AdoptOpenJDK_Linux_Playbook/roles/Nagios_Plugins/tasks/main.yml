@@ -60,6 +60,15 @@
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
+  ################################
+  # Require OS specific playbook #
+  ################################
+- name: Include Nagios Playbook
+  include_tasks: nagios_{{ ansible_distribution }}.yml
+  when:
+    - Nagios_Plugins == "Enabled"
+  tags: nagios_plugins
+  
   ##############################
   # Install additional plugins #
   ##############################
@@ -71,15 +80,6 @@
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_architecture == "x86_64"
-  tags: nagios_plugins
-
-  ################################
-  # Require OS specific playbook #
-  ################################
-- name: Include Nagios Playbook
-  include_tasks: nagios_{{ ansible_distribution }}.yml
-  when:
-    - Nagios_Plugins == "Enabled"
   tags: nagios_plugins
 
   ############
