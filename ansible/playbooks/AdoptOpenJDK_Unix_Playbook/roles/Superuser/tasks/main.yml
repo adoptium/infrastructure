@@ -3,7 +3,7 @@
 # Superuser #
 #############
 - name: Create Superuser account - zeus
-  action: user name=zeus state=present
+  action: user name=zeus state=present shell=/bin/bash
   when: Superuser_Account == "Enabled"
   tags: superuser
 
