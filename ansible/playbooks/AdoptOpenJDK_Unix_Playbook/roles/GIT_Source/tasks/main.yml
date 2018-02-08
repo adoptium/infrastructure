@@ -9,19 +9,9 @@
 # Process with downloing and installing git
 
 - name: Test if git is installed on path
-  shell: git --version >/dev/null 2>&1
-  ignore_errors: yes
-  register: git_installed
-  when:
-    - ansible_distribution != "FreeBSD"
-  tags: git_source
-
-- name: Test if git is installed on path FreeBSD
   shell: git --version >/dev/null
   ignore_errors: yes
   register: git_installed
-  when:
-    - ansible_distribution == "FreeBSD"
   tags: git_source
 
 - name: Test if git is installed at the correct version
