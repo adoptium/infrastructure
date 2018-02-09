@@ -15,7 +15,7 @@
   tags: git_source
 
 - name: Test if git is installed at the correct version
-  shell: git --version 2>/dev/null | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+  shell: git --version >/dev/null | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
   when: git_installed.rc == 0
   register: git_version
   tags: git_source
