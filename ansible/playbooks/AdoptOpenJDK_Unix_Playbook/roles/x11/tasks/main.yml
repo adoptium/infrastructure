@@ -8,8 +8,8 @@
       allowed_users=anybody
       needs_root_rights=yes
     dest: /etc/X11/Xwrapper.config
-    group: root
-    owner: "{{ root_group }}"
+    group: "{{ root_group }}"
+    owner: root
     mode: 0644
   tags: x11
 
