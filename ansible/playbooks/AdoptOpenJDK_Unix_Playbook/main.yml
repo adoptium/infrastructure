@@ -18,6 +18,7 @@
     - Debug
     - Common
     - Jenkins_User
+    - Jenkins_Master
     - Ant-Contrib
     - ccache
     - GIT_Source

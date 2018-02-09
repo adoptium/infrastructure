@@ -1,0 +1,18 @@
+---
+##################
+# Jenkins_Master #
+##################
+- name: Check if machine exists in jenkins
+  uri:
+    url: "https://{{ Jenkins_Domain }}/computer/{{ ansible_hostname }}/api/json"
+  register: jenkins
+  ignore_errors: true
+  tags: jenkins_master
+
+- name: SSH into the Jenkins and excute the jenkins-create-node.sh script
+  become: false
+  # TODO fetch a var instead of hard coding linux
+  local_action: command ssh -o StrictHostKeyChecking=no {{ Jenkins_Username }}@{{ Jenkins_Domain }} "/home/{{ Jenkins_Username }}/.jenkins/jenkins-create-node.sh {{ inventory_hostname }} {{ ansible_host }} /home/jenkins linux,{{os}},{{arch}},{{provider}},{{ansible_architecture}},{{type}},{{ansible_distribution|lower}},{{ansible_distribution|lower}}{{ansible_distribution_major_version}}"
+  when:
+    - jenkins.status != 200
+  tags: jenkins_master
