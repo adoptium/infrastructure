@@ -17,7 +17,7 @@
 # Script must exist on Nagios Master
 #
 - name: SSH into the Nagios Master and excute the Nagios_Ansible_Config_tool.sh script
-  local_action: command ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname }} {{ ansible_default_ipv4.address }} "
+  local_action: command ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname  }} {{ ansible_host }} {{ provider }}  "
   when:
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
