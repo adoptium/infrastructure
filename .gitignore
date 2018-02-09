@@ -2,4 +2,5 @@
 .idea/*
 ansible/playbooks/*.retry
 *.pyc
-ansible/host_vars/*
+ansible/host_vars
+hosts
