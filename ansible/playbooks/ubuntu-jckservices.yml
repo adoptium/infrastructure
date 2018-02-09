@@ -137,6 +137,14 @@
         jump: REJECT
     - name: iptables_permanent
       shell: iptables-save > /etc/iptables/rules.v4
+    - name: Add cron job to check for updates
+      cron: name="Check for Updates every Sunday at 5am"
+        weekday="6"
+        minute="0"
+        hour="5"
+        user=root
+        job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
+        state=present
 # If your users are set to lock out after some retries you'll need this:
 #    - pamd:
 #        name: common-auth
