@@ -1,0 +1,9 @@
+---
+####################################
+# Include optional Vendor Playbook #
+####################################
+- name: Include optional Vendor Playbook
+  include_tasks: "{{ Vendor_Playbook }}.yml"
+  when:
+    - Vendor_File == "Enabled"
+  tags: Vendor

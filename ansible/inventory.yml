@@ -1,0 +1,86 @@
+---
+
+#
+# AdoptOpenJDK hosts! check the readme on how to add more
+# (if its not obvious enough).
+#
+
+hosts:
+
+  - build:
+
+    - cloudcone:
+        ubuntu1604-x64-1: {ip: 173.82.219.221}
+
+    - 1and1:
+        win2008r2-x64-1: {ip: 109.228.48.187}
+
+    - macstadium:
+        macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
+        macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
+
+    - marist:
+        sles12-s390x-1: {ip: 148.100.110.56, user: linux1}
+        ubuntu1604-s390x-1: {ip: 148.100.33.147, user: linux1}
+        ubuntu1604-s390x-2: {ip: 148.100.33.178, user: linux1}
+        ubuntu1604-s390x-3: {ip: 148.100.33.179, user: linux1}
+        zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
+        zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
+
+    - osuosl:
+        centos72-ppc64le-1: {ip: 140.211.168.138, user: centos}
+        fedora24-ppc64le-1: {ip: 140.211.168.134, user: fedora}
+        ubuntu1710-ppc64le-1: {ip: 140.211.168.135, user: ubuntu}
+        aix71-ppc64-1: {ip: 140.211.9.10}
+        aix71-ppc64-2: {ip: 140.211.9.12}
+
+    - packet:
+        ubuntu1604-armv8-1: {ip: 147.75.196.30}
+        freebsd11-x64-1: {ip: 147.75.101.29}
+
+    - joyent:
+        ubuntu1604-x64-2: {ip: 37.153.109.201}
+
+    - scaleway:
+        ubuntu1604-x64-2: {ip: 51.15.46.107}
+        ubuntu1604-armv7-1: {ip: 212.47.233.28}
+        ubuntu1604-armv7-2: {ip: 212.47.246.7}
+
+    - softlayer:
+        win2012r2-x64-1: {ip: 37.58.193.195}
+        win2012r2-x64-2: {ip: 37.58.103.196}
+
+  - test:
+
+    - osuosl:
+        ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
+        ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
+
+    - packet:
+        ubuntu1604-armv8-1: {ip: 147.75.74.50}
+        ubuntu1604-x64-1: {ip: 147.75.204.239}
+        win2012r2-x64-1: {ip: 147.75.101.30}
+
+    - macincloud:
+        macos1010-x64-1: {ip: 74.80.250.151, user: admin}
+        macos1010-x64-2: {ip: 74.80.250.173, user: admin}
+
+    - scaleway:
+        ubuntu1604-x64-1: {ip: 51.15.76.107}
+
+  - jck:
+
+    - macstadium:
+        macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
+        macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
+
+    - osuosl:
+        ubuntu1604-ppc64le-1: {ip: 140.211.168.225, user: ubuntu}
+        ubuntu1604-ppc64le-2: {ip: 140.211.168.217, user: ubuntu}
+
+    - packet:
+        ubuntu1604-armv8-1: {ip: 147.75.193.234}
+
+    - softlayer:
+        ubuntu1604-x64-1: {ip: 159.122.210.205}
+        ubuntu1604-x64-2: {ip: 159.122.210.194}

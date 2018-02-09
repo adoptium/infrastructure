@@ -1,0 +1,48 @@
+---
+##########
+# FreeBSD #
+##########
+
+##############################################
+# Workaround for Ansible not detecting cores #
+##############################################
+- name: Get number of cores on FreeBSD
+  shell: sysctl hw.ncpu | awk '{print $2}'
+  register: freebsd_cores
+
+- name: Set ansible_processor_vcpus
+  set_fact:
+    ansible_processor_vcpus: "{{ freebsd_cores.stdout }}"
+
+######################
+# Overide root group #
+######################
+- name: Set default root group to wheel
+  set_fact:
+    root_group: "wheel"
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install GCC G++ on supported platforms
+  package: "name={{ item }} state=present"
+  with_items: "{{ gcc_compiler }}"
+  tags: build_tools
+
+#######################
+# Symlink gtar to tar #
+#######################
+- name: Create symlink for gtar to tar
+  file:
+    src: /usr/local/bin/gtar
+    dest: /usr/bin/tar
+    owner: root
+    group: wheel
+    state: link
+  tags: build_tools

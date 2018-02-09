@@ -1,0 +1,34 @@
+---
+############################
+# Build_Packages_and_tools #
+############################
+- name: Set package manager var
+  set_fact:
+    package_var: "latest"
+
+- name: Set package manager var for FreeBSD
+  set_fact:
+    package_var: "present"
+  when:
+    - ansible_distribution == "FreeBSD"
+
+- name: Install Build Tool Packages
+  package: "name={{ item }} state={{ package_var }}"
+  with_items: "{{ Build_Tool_Packages }}"
+  tags: build_tools
+
+- name: Create symlink for gmake to make
+  file:
+    src: /usr/bin/make
+    dest: /usr/bin/gmake
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution != "FreeBSD"
+  tags: build_tools
+
+- name: Install Test Tool Packages
+  package: "name={{ item }} state={{ package_var }}"
+  with_items: "{{ Test_Tool_Packages }}"
+  tags: test_tools
