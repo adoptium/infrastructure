@@ -1,0 +1,7 @@
+---
+##########################
+# adoptopenjdk_variables #
+##########################
+
+# jenkins domain
+Jenkins_Domain: ci.adoptopenjdk.net
