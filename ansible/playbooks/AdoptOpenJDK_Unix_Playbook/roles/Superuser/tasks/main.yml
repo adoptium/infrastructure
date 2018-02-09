@@ -29,7 +29,7 @@
 
 - name: Grant Superuser sudo powers
   lineinfile:
-    dest: {{ Sudoers_File }}
+    dest: "{{ Sudoers_File }}"
     state: present
     regexp: '^zeus'
     line: 'zeus ALL=(ALL) NOPASSWD: ALL'
