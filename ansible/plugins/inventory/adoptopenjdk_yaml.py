@@ -46,7 +46,7 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'packet')
+        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro')
 }
 
 # customisation options per host:
