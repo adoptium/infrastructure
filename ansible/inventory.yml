@@ -20,10 +20,10 @@ hosts:
         macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
 
     - marist:
-        sles12-s390x-1: {ip: 148.100.110.56, user: linux1}
-        ubuntu1604-s390x-1: {ip: 148.100.33.147, user: linux1}
-        ubuntu1604-s390x-2: {ip: 148.100.33.178, user: linux1}
-        ubuntu1604-s390x-3: {ip: 148.100.33.179, user: linux1}
+        sles12-s390x-1: {ip: 148.100.110.56}
+        ubuntu1604-s390x-1: {ip: 148.100.33.147}
+        ubuntu1604-s390x-2: {ip: 148.100.33.178}
+        ubuntu1604-s390x-3: {ip: 148.100.33.179}
         zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
         zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
