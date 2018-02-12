@@ -189,7 +189,7 @@
     - replace:
         path: /etc/environment
         regexp: 'java5'
-        replace: 'java8'
+        replace: 'java8_64'
       tags: java8
 
   ##############
@@ -489,6 +489,11 @@
         key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
       when: jenkins.stat.isdir is not defined
       tags: jenkins_user
+
+    # Use the system defaults as defined in /etc/environment
+    - file:
+        state: absent
+        path: /home/{{ Jenkins_Username }}/.profile
 
   ##############
   # freemarker #
