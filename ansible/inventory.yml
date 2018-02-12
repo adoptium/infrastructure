@@ -15,7 +15,7 @@ hosts:
     - 1and1:
         win2008r2-x64-1: {ip: 109.228.48.187}
       
-    - linaro
+    - linaro:
         centos74-armv8-1: {ip: 64.28.99.122}
         centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
 
