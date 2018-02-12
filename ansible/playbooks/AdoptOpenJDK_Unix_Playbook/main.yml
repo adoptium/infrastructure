@@ -33,6 +33,7 @@
     - gcc_48
     - Nagios_Plugins
     - Nagios_Master_Config
+    - Nagios_Tunnel
     - Clean_Up
     - Security
     - Vendor
