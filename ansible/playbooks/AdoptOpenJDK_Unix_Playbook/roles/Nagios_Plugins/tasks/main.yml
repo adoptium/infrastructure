@@ -12,7 +12,7 @@
   ignore_errors: yes
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
   tags: nagios_plugins
 
 - name: Set authorized key for Nagios user
@@ -22,7 +22,7 @@
     key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
   tags: nagios_plugins
 
   ###################
@@ -68,7 +68,7 @@
   when:
     - Nagios_Plugins == "Enabled"
   tags: nagios_plugins
-  
+
   ##############################
   # Install additional plugins #
   ##############################

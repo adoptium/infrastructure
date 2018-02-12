@@ -16,7 +16,10 @@
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
 # .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
-- hosts: all
+- hosts:
+    - "build*win*"
+    - "test*win*"
+  gather_facts: yes
   tasks:
 
   #########
