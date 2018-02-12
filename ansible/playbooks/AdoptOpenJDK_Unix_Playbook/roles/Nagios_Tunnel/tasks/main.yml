@@ -51,11 +51,11 @@
 
 - name: Add cron job to keep reverse tunnel alive for nagios user
   cron: name="Keep Nagios reverse tunnel alive"
-        weekday="6"
-        minute="0"
-        hour="5"
+        weekday="*"
+        minute="*"
+        hour="*"
         user=nagios
-        job="* * * * * ~/Nagios_RemoteTunnel.sh"
+        job="~/Nagios_RemoteTunnel.sh"
         state=present
   when:
     - {{ ansible_port }} != "22"
