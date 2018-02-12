@@ -9,10 +9,44 @@
   ignore_errors: true
   tags: jenkins_master
 
+  ############################
+  # Set default OS variables #
+  ############################
+- name: Set JDK7_DIR
+  set_fact:
+    JDK7_DIR: "CHANGEME"
+  when:
+    - jenkins.status != 200
+  tags: jenkins_master
+
+- name: Set JDK8_DIR
+  set_fact:
+    JDK8_DIR: "CHANGEME"
+  when:
+    - jenkins.status != 200
+  tags: jenkins_master
+
+- name: Set JDK9_DIR
+  set_fact:
+    JDK9_DIR: "CHANGEME"
+  when:
+    - jenkins.status != 200
+  tags: jenkins_master
+
+  ######################
+  # Fetch OS variables #
+  ######################
+- name: Fetch Java Path variables
+  include_tasks: "{{ ansible_distribution }}.yml"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - jenkins.status != 200
+  tags: jenkins_master
+
 - name: SSH into the Jenkins and excute the jenkins-create-node.sh script
   become: false
   # TODO fetch a var instead of hard coding linux
-  local_action: command ssh -o StrictHostKeyChecking=no {{ Jenkins_Username }}@{{ Jenkins_Domain }} "/home/{{ Jenkins_Username }}/.jenkins/jenkins-create-node.sh {{ inventory_hostname }} {{ ansible_host }} /home/jenkins linux,{{os}},{{arch}},{{provider}},{{ansible_architecture}},{{type}},{{ansible_distribution|lower}},{{ansible_distribution|lower}}{{ansible_distribution_major_version}}"
+  local_action: command ssh -o StrictHostKeyChecking=no {{ Jenkins_Username }}@{{ Jenkins_Domain }} "/home/{{ Jenkins_Username }}/.jenkins/jenkins-create-node.sh {{ inventory_hostname }} {{ ansible_host }} /home/jenkins linux,{{os}},{{arch}},{{provider}},{{ansible_architecture}},{{type}},{{ansible_distribution|lower}},{{ansible_distribution|lower}}{{ansible_distribution_major_version}} {{JDK7_DIR}} {{JDK8_DIR}} {{JDK9_DIR}}"
   when:
     - jenkins.status != 200
   tags: jenkins_master

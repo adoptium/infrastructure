@@ -1,0 +1,47 @@
+---
+##########
+# Ubuntu #
+##########
+
+###############################
+# Prepare Java Path Variables #
+###############################
+- name: Set jdk_architecture
+  set_fact:
+    jdk_architecture: "{{ ansible_architecture }}"
+
+- name: Overide x86_64 to amd64
+  set_fact:
+    jdk_architecture: "amd64"
+  when: ansible_architecture == "x86_64"
+
+- name: Overide ppc64le to ppc64el
+  set_fact:
+    jdk_architecture: "ppc64el"
+  when: ansible_architecture == "ppc64le"
+
+- name: Overide aarch64 to arm64
+  set_fact:
+    jdk_architecture: "arm64"
+  when: ansible_architecture == "aarch64"
+
+- name: Overide armv7l to armhf
+  set_fact:
+    jdk_architecture: "armhf"
+  when: ansible_architecture == "armv7l"
+
+###############################
+# Set Java Path Variables #
+###############################
+- name: Set JDK7_DIR
+  set_fact:
+    JDK7_DIR: "/usr/lib/jvm/java-7-openjdk-{{ jdk_architecture }}/"
+
+- name: Set JDK8_DIR
+  set_fact:
+    JDK8_DIR: "/usr/lib/jvm/java-8-openjdk-{{ jdk_architecture }}/"
+
+- name: Set JDK9_DIR
+  set_fact:
+    JDK9_DIR: "/usr/lib/jvm/java-9-openjdk-{{ jdk_architecture }}/"
+  when: ansible_architecture == "x86_64"
