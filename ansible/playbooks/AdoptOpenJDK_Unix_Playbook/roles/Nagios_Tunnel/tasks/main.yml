@@ -1,0 +1,67 @@
+---
+#################
+# Nagios Tunnel #
+#################
+
+- name: Place Adopt_Tunnel_User.key in nagios users ssh folder
+  copy:
+    src: /Vendor_Files/keys/Adopt_Tunnel_User.key
+    dest: /home/nagios/.ssh/Adopt_Tunnel_User.key
+    owner: nagios
+    group: nagios
+    mode: 0600
+  when:
+    - {{ ansible_port }} != "22"
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_tunnel
+
+- name: Download Nagios_RemoteTunnel.sh script
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/Supporting_Scripts/Nagios_Ansible_Config_tool/Nagios_RemoteTunnel.sh
+    dest: /home/nagios/Nagios_RemoteTunnel.sh
+    mode: 0755
+  when:
+    - {{ ansible_port }} != "22"
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_tunnel
+
+- name: Update Nagios_RemoteTunnel.sh - ReplaceNAGIOSMASTERADDRESS with {{ Nagios_Master_IP }}
+  replace:
+    path: /home/nagios/Nagios_RemoteTunnel.sh
+    regexp: 'ReplaceNAGIOSMASTERADDRESS'
+    replace: " {{ Nagios_Master_IP }} "
+  when:
+    - {{ ansible_port }} != "22"
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_tunnel
+
+- name: Update Nagios_RemoteTunnel.sh - ReplacePortNumber with {{ ansible_port }}
+  replace:
+    path: /home/nagios/Nagios_RemoteTunnel.sh
+    regexp: 'ReplacePortNumber'
+    replace: " {{ ansible_port }} "
+  when:
+    - {{ ansible_port }} != "22"
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_tunnel
+
+- name: Add cron job to keep reverse tunnel alive for nagios user
+  cron: name="Keep Nagios reverse tunnel alive"
+        weekday="6"
+        minute="0"
+        hour="5"
+        user=nagios
+        job="* * * * * ~/Nagios_RemoteTunnel.sh"
+        state=present
+  when:
+    - {{ ansible_port }} != "22"
+    - Nagios_Monitoring == "Enabled"
+    - Nagios_Master_IP is defined
+  tags: nagios_tunnel
+  
+
+

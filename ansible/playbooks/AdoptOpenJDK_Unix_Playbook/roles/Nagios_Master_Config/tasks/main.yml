@@ -16,8 +16,14 @@
 # Nagios_Master_IP: x.x.x.x - must be set in the group_vars
 # Script must exist on Nagios Master
 #
+- name: Set SSH port number to 22 if undefined in inventory.yml
+  set_fact: ansible_port="22"
+  when:
+    - {{ ansible_port }} is not defined
+  tags: nagios_master_config
+
 - name: SSH into the Nagios Master and excute the Nagios_Ansible_Config_tool.sh script
-  local_action: command ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname  }} {{ ansible_host }} {{ provider }}  "
+  local_action: command ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname  }} {{ ansible_host }} {{ provider }} {{ ansible_port }} "
   when:
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
