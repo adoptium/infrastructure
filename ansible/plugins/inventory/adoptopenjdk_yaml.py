@@ -46,7 +46,7 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro')
+        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro', '1and1')
 }
 
 # customisation options per host:
@@ -103,11 +103,7 @@ def main():
                         hostname = '{}-{}{}{}'.format(host_type, provider_name,
                                                       delimiter, host)
 
-                        # no point in adding windows servers for now
-                        if 'win' in hostname:
-                            continue
-                        else:
-                            export[host_type]['hosts'].append(hostname)
+                        export[host_type]['hosts'].append(hostname)
 
                         c = {}
 
@@ -125,7 +121,8 @@ def main():
 
                         if 'user' in metadata:
                             c.update({'ansible_user': metadata['user']})
-                            c.update({'ansible_become': True})
+                            if 'win' not in hostname:
+                                c.update({'ansible_become': True})
 
                         if 'labels' in metadata:
                             c.update({'labels': metadata['labels']})

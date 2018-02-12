@@ -13,7 +13,7 @@ hosts:
         ubuntu1604-x64-1: {ip: 173.82.219.221}
 
     - 1and1:
-        win2008r2-x64-1: {ip: 109.228.48.187}
+        win2008r2-x64-1: {ip: 109.228.48.187, user: Administrator}
 
     - macstadium:
         macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
@@ -48,8 +48,8 @@ hosts:
         ubuntu1604-armv7-2: {ip: 212.47.246.7}
 
     - softlayer:
-        win2012r2-x64-1: {ip: 37.58.193.195}
-        win2012r2-x64-2: {ip: 37.58.103.196}
+        win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
+        win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
   - test:
 
@@ -60,7 +60,7 @@ hosts:
     - packet:
         ubuntu1604-armv8-1: {ip: 147.75.74.50}
         ubuntu1604-x64-1: {ip: 147.75.204.239}
-        win2012r2-x64-1: {ip: 147.75.101.30}
+        win2012r2-x64-1: {ip: 147.75.101.30, user: Admin}
 
     - macincloud:
         macos1010-x64-1: {ip: 74.80.250.151, user: admin}
