@@ -55,8 +55,10 @@ Java_RHEL6_PPC64:
   - java-1.8.0-ibm-devel
 
 Test_Tool_Packages:
+  - acl
   - ant
   - perl
   - xorg-x11-xauth
+  - xorg-x11-server-Xvfb
 
 crontab_Patching: "/usr/bin/yum -y update"
