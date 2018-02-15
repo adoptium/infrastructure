@@ -1,0 +1,104 @@
+---
+#########
+# MacOS #
+#########
+
+##############################################
+# Workaround for Ansible not detecting cores #
+##############################################
+- name: Get number of cores on MacOS
+  shell: sysctl -n hw.ncpu
+  register: macos_cores
+
+- name: Set ansible_processor_vcpus
+  set_fact:
+    ansible_processor_vcpus: "{{ macos_cores.stdout }}"
+
+######################
+# Overide root group #
+######################
+- name: Set default root group to wheel
+  set_fact:
+    root_group: "wheel"
+
+#############################
+# Install Xcode build tools #
+#############################
+- name: Check for xcode-tools
+  raw: xcode-select --print-path &> /dev/null
+  register: xcode
+  ignore_errors: yes
+
+- name: Install xcode-tools
+  script: scripts/install-xcode.sh
+  when: xcode.rc > 1
+
+####################
+# Install HomeBrew #
+####################
+- name: Check if Homebrew is already installed
+  stat:
+    path: /usr/local/bin/brew
+  register: brew
+
+- name: Install Homebrew
+  become_user: administrator
+  script: scripts/install-homebrew.sh
+  when: not brew.stat.exists
+
+- name: Upgrade installed packages
+  become_user: administrator
+  homebrew:
+    upgrade_all: yes
+
+- name: Install brew cu
+  become_user: administrator
+  homebrew_tap:
+    name: buo/cask-upgrade
+
+- name: Update Casks
+  become_user: administrator
+  command: /usr/local/bin/brew cu
+
+################
+# Install Java #
+################
+- name: Add caskroom/versions to homebrew
+  become_user: administrator
+  homebrew_tap:
+    name: caskroom/versions
+
+#TODO add java7
+
+- name: Install java8
+  become_user: administrator
+  homebrew_cask:
+    name: java8
+    state: present
+
+- name: Install java9
+  become_user: administrator
+  homebrew_cask:
+    name: java
+    state: present
+
+############################
+# Build Packages and tools #
+############################
+- name: Install Build Tool Packages
+  become_user: administrator
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Build_Tool_Packages }}"
+  tags: build_tools
+
+#######################
+# Symlink gtar to tar #
+#######################
+- name: Create symlink for gtar to tar
+  file:
+    src: /usr/local/bin/gtar
+    dest: /usr/bin/tar
+    owner: root
+    group: wheel
+    state: link
+  tags: build_tools

@@ -1,0 +1,15 @@
+---
+##########
+# MacOS #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - wget
+  - ntp
+  - freetype
+  - gnu-tar
+
+Test_Tool_Packages:
+
+crontab_Patching: ""

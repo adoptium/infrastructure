@@ -15,7 +15,16 @@
     mode: 0440
     timeout: 25
     validate_certs: no
-  when: antcontrib_status.stat.exists == False
+  when:
+    - antcontrib_status.stat.exists == False
+    - ansible_os_family != "Darwin"
+  tags: ant-contrib
+
+- name: Download ant-contrib macOS
+  command: "/usr/local/bin/wget --no-check-certificate -o /tmp/ant-contrib-1.0b2-bin.tar.gz https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz"
+  when:
+    - antcontrib_status.stat.exists == False
+    - ansible_os_family == "Darwin"
   tags: ant-contrib
 
 - name: Extract ant-contrib

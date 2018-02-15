@@ -35,7 +35,19 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: Domain == "adoptopenjdk.net"
+  when:
+    - (Domain == "adoptopenjdk.net" and ansible_os_family != "Darwin")
+  tags: hostname
+
+- name: Set hostname to inventory_hostname macOS
+  command: "{{ item }}"
+  with_items:
+    - "sudo scutil --set HostName {{ inventory_hostname }}.{{ Domain }}"
+    - "sudo scutil --set LocalHostName {{ inventory_hostname }}"
+    - "sudo scutil --set ComputerName {{ inventory_hostname }}.{{ Domain }}"
+    - "dscacheutil -flushcache"
+  when:
+    - (Domain == "adoptopenjdk.net" and ansible_os_family == "Darwin")
   tags: hostname
 
 #####################
@@ -49,7 +61,7 @@
     state: present
   when: Domain == "adoptopenjdk.net"
   tags: hosts_file
-  
+
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
   lineinfile:
     dest: /etc/hosts
