@@ -55,12 +55,14 @@ Additional_Build_Tools_aarch64:
   - libpng-dev
 
 Test_Tool_Packages:
+  - acl
   - ant
   - ant-contrib
   - mercurial
   - perl
   - xauth
   - xorg
+  - xvfb
 
 Test_Tool_Packages_x86_64:
   - pulseaudio
