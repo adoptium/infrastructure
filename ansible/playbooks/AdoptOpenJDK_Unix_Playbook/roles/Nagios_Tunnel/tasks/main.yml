@@ -17,7 +17,7 @@
     group: nagios
     mode: 0600
   when:
-    - {{ ansible_port }} != "22"
+    - ansible_port != "22"
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
@@ -29,7 +29,7 @@
     dest: /home/nagios/Nagios_RemoteTunnel.sh
     mode: 0755
   when:
-    - {{ ansible_port }} != "22"
+    - ansible_port != "22"
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
@@ -41,7 +41,7 @@
     regexp: 'ReplaceNAGIOSMASTERADDRESS'
     replace: " {{ Nagios_Master_IP }} "
   when:
-    - {{ ansible_port }} != "22"
+    - ansible_port != "22"
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
@@ -53,7 +53,7 @@
     regexp: 'ReplacePortNumber'
     replace: " {{ ansible_port }} "
   when:
-    - {{ ansible_port }} != "22"
+    - ansible_port != "22"
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
@@ -68,7 +68,7 @@
         job="~/Nagios_RemoteTunnel.sh"
         state=present
   when:
-    - {{ ansible_port }} != "22"
+    - ansible_port != "22"
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
