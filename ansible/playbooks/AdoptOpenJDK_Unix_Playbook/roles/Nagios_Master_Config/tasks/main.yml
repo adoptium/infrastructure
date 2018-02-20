@@ -19,7 +19,7 @@
 - name: Set SSH port number to 22 if undefined in inventory.yml
   set_fact: ansible_port="22"
   when:
-    - {{ ansible_port }} is not defined
+    - ansible_port is not defined
   tags: nagios_master_config
 
 - name: SSH into the Nagios Master and excute the Nagios_Ansible_Config_tool.sh script
