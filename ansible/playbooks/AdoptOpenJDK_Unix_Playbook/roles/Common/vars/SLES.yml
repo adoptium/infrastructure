@@ -41,7 +41,8 @@ Test_Tool_Packages:
   - ant
   - perl
   - pulseaudio
-  - xorg-x11-server
   - xorg-x11
+  - xorg-x11-server
+  - xorg-x11-server-extra
 
 crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"
