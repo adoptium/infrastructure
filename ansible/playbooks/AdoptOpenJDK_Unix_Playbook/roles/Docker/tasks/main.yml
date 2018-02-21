@@ -69,7 +69,7 @@
 
 - name: Add Docker Repo for RedHat 7
   get_url:
-    url: https://download.docker.com/linux/CentOS/docker-ce.repo
+    url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
     force: yes
     owner: root
@@ -84,7 +84,7 @@
 
 - name: Import Docker Repo key for RedHat
   rpm_key:
-    key: https://download.docker.com/linux/CentOS/gpg
+    key: https://download.docker.com/linux/centos/gpg
     state: present
   when:
     - docker_installed.rc != 0
