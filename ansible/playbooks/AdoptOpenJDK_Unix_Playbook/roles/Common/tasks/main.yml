@@ -35,6 +35,7 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
+  when: Domain == "adoptopenjdk.net"
   tags: hostname
 
 #####################
@@ -46,7 +47,16 @@
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
     line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
     state: present
-    backup: yes
+  when: Domain == "adoptopenjdk.net"
+  tags: hosts_file
+  
+- name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+  when: Domain != "adoptopenjdk.net"
   tags: hosts_file
 
 - name: Update /etc/hosts file - 127.0.0.1
