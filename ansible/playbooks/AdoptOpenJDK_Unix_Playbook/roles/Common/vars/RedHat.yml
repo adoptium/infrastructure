@@ -39,10 +39,10 @@ Additional_Build_Tools_RHEL7:
   - elfutils-libelf-devel
   - flex
   - libdwarf-devel
+  - libstdc++-static
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libcurl-devel
-  - libstdc++-static
   - ant-contrib
 
 Java_NOT_RHEL6_PPC64:
