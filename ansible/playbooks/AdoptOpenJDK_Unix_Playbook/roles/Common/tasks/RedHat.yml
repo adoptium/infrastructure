@@ -10,6 +10,7 @@
   shell: |
     subscription-manager repos --enable=rhel-7-server-extras-rpms
     subscription-manager repos --enable rhel-7-server-optional-rpms
+  ignore_errors: yes
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
