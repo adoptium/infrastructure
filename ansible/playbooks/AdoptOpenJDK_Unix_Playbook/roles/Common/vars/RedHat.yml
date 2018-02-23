@@ -26,7 +26,6 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
-  - numactl-devel
   - ntp
   - openssl-devel
   - perl-CPAN
