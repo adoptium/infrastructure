@@ -137,6 +137,7 @@
         - http://www.oss4aix.org/download/RPMS/mktemp/mktemp-1.7-1.aix5.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
+        - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
       when: yum.stat.islnk is not defined
       tags: rpm_install
 
