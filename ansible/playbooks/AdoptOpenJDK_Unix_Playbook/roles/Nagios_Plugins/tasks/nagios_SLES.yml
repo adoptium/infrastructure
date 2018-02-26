@@ -18,8 +18,6 @@
       - gcc
       - make
       - xinetd
-    when:
-      - ansible_architecture == "x86_64"
     tags: nagios_plugins
 
   ###############
@@ -29,8 +27,6 @@
     shell: |
       echo "nagios ALL = NOPASSWD: /usr/bin/zypper ref" >> /etc/sudoers
       echo "nagios ALL = NOPASSWD: /usr/bin/zypper list-patches" >> /etc/sudoers
-    when:
-      - ansible_architecture == "x86_64"
     tags: nagios_plugins
 
   ##############################
@@ -41,6 +37,4 @@
       url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
       dest: /usr/local/nagios/libexec/check_zypper
       mode: 0755
-    when:
-      - ansible_architecture == "x86_64"
     tags: nagios_plugins
