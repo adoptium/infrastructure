@@ -14,9 +14,6 @@
   - name: Allow Nagios to use yum while restricting it to check-update only
     shell: |
       echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
-    when:
-      - ansible_architecture == "x86_64"
-      - ansible_distribution_major_version == "7"
     tags: nagios_plugins
 
   ##############################
@@ -27,7 +24,4 @@
       url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
       dest: /usr/local/nagios/libexec/check_yum
       mode: 0755
-    when:
-      - ansible_architecture == "x86_64"
-      - ansible_distribution_major_version == "7"
     tags: nagios_plugins
