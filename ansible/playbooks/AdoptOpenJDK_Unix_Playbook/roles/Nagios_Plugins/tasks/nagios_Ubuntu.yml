@@ -20,8 +20,6 @@
       - nagios-plugins-common
       - perl
       - qstat
-    when:
-      - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
     tags: nagios_plugins
 
   ##########
@@ -29,12 +27,8 @@
   ##########
   - name: Creates Nagios folder
     file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-    when:
-      - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
     tags: nagios_plugins
 
   - name: Create symlink to plugins
     file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
-    when:
-      - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
     tags: nagios_plugins
