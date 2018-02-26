@@ -67,6 +67,13 @@
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
+ 
+- name: Install additional build tools for PPC64LE
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_ppc64le }}"
+  when:
+    - ansible_architecture == "ppc64le"
+  tags: build_tools
 
 - name: Install additional build tools for aarch64
   package: "name={{ item }} state=latest"
