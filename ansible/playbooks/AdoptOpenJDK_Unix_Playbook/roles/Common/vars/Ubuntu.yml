@@ -51,6 +51,9 @@ Additional_Build_Tools_x86_64:
   - zulu-9
   - libnuma-dev
 
+Additional_Build_Tools_ppc64le:
+  - libnuma-dev
+
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
