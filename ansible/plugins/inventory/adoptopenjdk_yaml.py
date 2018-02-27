@@ -42,11 +42,12 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
 
   # valid roles - add as necessary
-  'type': ('build', 'test', 'jck'),
+  'type': ('build', 'test', 'jck', 'infrastructure'),
 
   # providers - validated for consistency
   'provider': ('cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro', '1and1')
+        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro', '1and1',
+        'digitalocean')
 }
 
 # customisation options per host:

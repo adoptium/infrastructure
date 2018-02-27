@@ -1,0 +1,111 @@
+##########################################
+# AdoptOpenJDK Ansible API Playbook for: #
+# ------ Ubuntu 16 (tested on x64) ----- #
+##########################################
+
+- hosts: infrastructure-digitalocean-ubuntu1604-x64-1
+  user: root
+  become: yes
+
+  tasks:
+  - block:
+    - name: Load AdoptOpenJDKs variable file
+      include_vars: variables/adoptopenjdk_variables.yml
+
+    - name: Set hostname to api.adoptopenjdk.net
+      hostname:
+        name: api.adoptopenjdk.net
+      tags: hostname
+
+    - name: OS update -- apt-get upgrade
+      apt: upgrade=safe update_cache=yes
+      tags: patch_update
+
+    - name: Add Node.js v6.x
+      raw: "curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -"
+      tags: dependencies
+
+    - name: Install API prerequisistes
+      apt: pkg={{ item }} state=latest
+      with_items:
+      - iptables-persistent
+      - nodejs
+      tags: dependencies
+
+    - name: Create Jenkins user
+      action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
+      ignore_errors: yes
+      tags: jenkins_user
+
+    - name: Set ssh key for jenkins user
+      authorized_key:
+        user: "{{ Jenkins_Username }}"
+        state: present
+        key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+      tags: jenkins_user
+
+    - name: Install "forever" node.js package globally
+      npm:
+        name: forever
+        global: yes
+        state: present
+      tags: forever
+
+    - name: Allow port 443
+      command: iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+      tags: iptables
+
+    - name: Forward 1234 to 443
+      command: iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 1234
+      tags: iptables
+
+    - name: iptables_permanent
+      shell: iptables-save > /etc/iptables/rules.v4
+      tags: iptables
+
+    - name: Copy server.key
+      copy:
+        src: "{{ lookup('file', '{{ api_server_key }}') }}"
+        dest: "/home/{{ Jenkins_Username }}/sslcert/server.key"
+        owner: jenkins
+        group: jenkins
+        mode: 0644
+      tags: sslcert
+
+    - name: Copy server.crt
+      copy:
+        src: "{{ lookup('file', '{{ api_server_crt }}') }}"
+        dest: "/home/{{ Jenkins_Username }}/sslcert/server.crt"
+        owner: jenkins
+        group: jenkins
+        mode: 0644
+      tags: sslcert
+
+    - name: Git Clone openjdk-api.git
+      become_user: "{{ Jenkins_Username }}"
+      git:
+        repo: 'https://github.com/AdoptOpenJDK/openjdk-api.git'
+        dest: "/home/{{ Jenkins_Username }}/openjdk-api"
+        update: yes
+
+    - name: NPM install api package.json
+      become_user: "{{ Jenkins_Username }}"
+      npm:
+        path: "/home/{{ Jenkins_Username }}/openjdk-api"
+
+    - name: Kill any existing processes
+      command: "pkill -f /home/{{ Jenkins_Username }}/openjdk-api/server.js"
+      ignore_errors: true
+
+    - name: Start api app
+      become_user: "{{ Jenkins_Username }}"
+      raw: "export PRODUCTION=true && /usr/local/bin/forever start /home/{{ Jenkins_Username }}/openjdk-api/server.js"
+
+    - name: Add cron job to check for updates
+      cron: name="Check for Updates every Sunday at 5am"
+        weekday="6"
+        minute="0"
+        hour="5"
+        user=root
+        job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
+        state=present

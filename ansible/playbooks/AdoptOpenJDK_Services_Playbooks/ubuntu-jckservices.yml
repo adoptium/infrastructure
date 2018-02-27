@@ -9,7 +9,7 @@
   tasks:
   - block:
     - name: Load AdoptOpenJDKs variable file
-      include_vars: adoptopenjdk_variables.yml
+      include_vars: variables/adoptopenjdk_variables.yml
     - name: OS update -- apt-get upgrade
       apt: upgrade=safe update_cache=yes
       tags: patch_update
@@ -155,4 +155,4 @@
 #        new_control: "[success=1 default=ignore]"
 #        new_module_path: pam_succeed_if.so
 #        module_arguments: "user in jckftp"
-#        state: before      
+#        state: before

@@ -7,6 +7,11 @@
 
 hosts:
 
+  - infrastructure:
+
+    - digitalocean:
+        ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
+
   - build:
 
     - cloudcone:
