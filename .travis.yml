@@ -19,5 +19,11 @@ install:
   - ansible --version
 
 script:
-  # Check AdoptOpenJDK_Unix_Playbook syntax.
+  # Check that the inventory is valid
+- cd ansible && ansible-inventory --host=build-cloudcone-ubuntu1604-x64-1
+  # Check Playbook syntax.
 - cd ansible && ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
+- cd ansible && ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
+- cd ansible && ansible-playbook playbooks/aix.yml --syntax-check
+- cd ansible && ansible-playbook playbooks/ubuntu-jck.yml --syntax-check
+- cd ansible && ansible-playbook playbooks/ubuntu-jckservices.yml --syntax-check
