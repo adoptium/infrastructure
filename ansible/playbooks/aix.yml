@@ -115,6 +115,7 @@
         - cups-libs
         - flex
         - freetype2-devel
+        - fontconfig-devel
         - gawk
         - git
         - grep
