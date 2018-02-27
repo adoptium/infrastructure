@@ -15,14 +15,8 @@ install:
   # Install ansible
   - pip install ansible
 
-  # Install Linter
-  - ./travis-ci-linter/install_lint.sh
-
   # Check ansible version
   - ansible --version
-
-  # Create ansible.cfg with correct roles_path
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
 
 script:
   # Check AdoptOpenJDK_Unix_Playbook syntax.
