@@ -4,6 +4,13 @@
 ##################
 - debug: msg='Installing Nagios plugins'
 
+- name: If Raspbian on armv7l override ansible_distribution
+  set_fact:
+    ansible_distribution: "Ubuntu"
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_architecture == "armv7l"
+    
   ###############
   # Nagios user #
   ###############
@@ -34,7 +41,6 @@
     timeout: 25
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
@@ -45,7 +51,6 @@
     copy: False
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
   tags: nagios_plugins
 
@@ -54,8 +59,16 @@
   become: yes
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
     - ansible_distribution != "Ubuntu"
+    - (ansible_distribution != "RedHat" and ansible_distribution_major_version != "7" and ansible_architecture != "ppc64le")
+  tags: nagios_plugins
+
+- name: Configure, make and make install nagios-plugins - RHEL 7 PPC64LE
+  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --build=ppc64le-pc-linux --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+  become: yes
+  when:
+    - Nagios_Plugins == "Enabled"
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and ansible_architecture == "ppc64le")
   tags: nagios_plugins
 
   ################################
@@ -77,5 +90,4 @@
     mode: 0755
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_architecture == "x86_64"
   tags: nagios_plugins
