@@ -65,7 +65,7 @@
 
     - name: Copy server.key
       copy:
-        src: "{{ lookup('file', '{{ api_server_key }}') }}"
+        src: "{{ api_server_key }}"
         dest: "/home/{{ Jenkins_Username }}/sslcert/server.key"
         owner: jenkins
         group: jenkins
@@ -74,7 +74,7 @@
 
     - name: Copy server.crt
       copy:
-        src: "{{ lookup('file', '{{ api_server_crt }}') }}"
+        src: "{{ api_server_crt }}"
         dest: "/home/{{ Jenkins_Username }}/sslcert/server.crt"
         owner: jenkins
         group: jenkins
