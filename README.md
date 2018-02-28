@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure.svg?branch=master)](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure)
 # Members
 
 #### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
