@@ -80,6 +80,10 @@ hosts:
 
     - scaleway:
         ubuntu1604-x64-1: {ip: 51.15.76.107}
+    
+    - softlayer:
+        ubuntu1604-x64-1: {ip: 169.55.150.155}
+        rhel7-x64-1: {ip: 169.55.170.70}
 
   - jck:
 
