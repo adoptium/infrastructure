@@ -539,7 +539,7 @@
   # Nagios plugins #
   ##################
     - name: Include Nagios Playbook
-      include_tasks: nagios/nagios_ubuntu.yml
+      include_tasks: nagios/nagios_aix.yml
       when: Nagios_Plugins == "Enabled"
 
   #####################
