@@ -5,6 +5,7 @@
 
 # Command Build Tool Packages
 Build_Tool_Packages:
+  - apt-transport-https
   - autoconf
   - bison
   - build-essential
@@ -35,7 +36,7 @@ Build_Tool_Packages:
   - libxrender-dev
   - libxt-dev
   - libxtst-dev
-  - make
+  - make 
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
