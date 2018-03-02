@@ -72,6 +72,8 @@ hosts:
     - packet:
         ubuntu1604-armv8-1: {ip: 147.75.74.50}
         ubuntu1604-x64-1: {ip: 147.75.204.239}
+        ubuntu1604-x64-2: {ip: 147.75.100.127}
+        ubuntu1604-x64-3: {ip: 147.75.83.133}
         win2012r2-x64-1: {ip: 147.75.101.30, user: Admin}
 
     - macincloud:
