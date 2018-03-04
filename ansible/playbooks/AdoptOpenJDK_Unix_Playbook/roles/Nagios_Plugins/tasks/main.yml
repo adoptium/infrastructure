@@ -30,47 +30,6 @@
     - Nagios_Plugins == "Enabled"
   tags: nagios_plugins
 
-  ###################
-  # Install plugins #
-  ###################
-- name: Download nagios-plugins
-  get_url:
-    url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
-    dest: /tmp/
-    mode: 0440
-    timeout: 25
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution != "Ubuntu"
-  tags: nagios_plugins
-
-- name: Extract nagios-plugins
-  unarchive:
-    src: /tmp/nagios-plugins-2.2.1.tar.gz
-    dest: /tmp/
-    copy: False
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution != "Ubuntu"
-  tags: nagios_plugins
-
-- name: Configure, make and make install nagios-plugins
-  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-  become: yes
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution != "Ubuntu"
-    - (ansible_distribution != "RedHat" and ansible_distribution_major_version != "7" and ansible_architecture != "ppc64le")
-  tags: nagios_plugins
-
-- name: Configure, make and make install nagios-plugins - RHEL 7 PPC64LE
-  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --build=ppc64le-pc-linux --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-  become: yes
-  when:
-    - Nagios_Plugins == "Enabled"
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and ansible_architecture == "ppc64le")
-  tags: nagios_plugins
-
   ################################
   # Require OS specific playbook #
   ################################
