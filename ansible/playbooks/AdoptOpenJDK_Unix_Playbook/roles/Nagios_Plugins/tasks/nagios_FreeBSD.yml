@@ -21,6 +21,29 @@
       echo "nagios ALL = NOPASSWD: /usr/sbin/pkg upgrade --dry-run" >> /etc/sudoers
     tags: nagios_plugins
 
+  ###################
+  # Install plugins #
+  ###################
+  - name: Download nagios-plugins
+    get_url:
+      url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
+    tags: nagios_plugins
+
+  - name: Extract nagios-plugins
+    unarchive:
+      src: /tmp/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      copy: False
+    tags: nagios_plugins
+
+  - name: Configure, make and make install nagios-plugins
+    shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+    become: yes
+    tags: nagios_plugins
+    
   ##############################
   # Install additional plugins #
   ##############################
