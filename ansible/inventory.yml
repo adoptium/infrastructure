@@ -53,6 +53,7 @@ hosts:
 
     - joyent:
         ubuntu1604-x64-2: {ip: 37.153.109.201}
+        centos69-x64-1: {ip: 165.225.149.157}
 
     - scaleway:
         ubuntu1604-x64-2: {ip: 51.15.46.107}
