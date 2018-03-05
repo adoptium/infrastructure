@@ -16,6 +16,7 @@ Build_Tool_Packages:
   - freetype-devel
   - gcc
   - gcc-c++
+  - gettext
   - git
   - glibc
   - glibc-common
