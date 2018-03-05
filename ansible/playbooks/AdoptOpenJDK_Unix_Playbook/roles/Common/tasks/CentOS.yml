@@ -26,6 +26,51 @@
 - name: Call Build Packages and Tools Task
   include_tasks: build_packages_and_tools.yml
 
+- name: Download devtools (gcc4.8)
+  get_url:
+    url: http://people.centos.org/tru/devtools-2/devtools-2.repo
+    dest: /etc/yum.repos.d/devtools-2.repo
+    timeout: 25
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Install gcc4.8
+  yum:
+    name: devtoolset-2
+    state: latest
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/gcc to gcc
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/gcc
+    dest: /usr/bin/gcc
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/g++ to g++
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/g++
+    dest: /usr/bin/g++
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
 ##############################
 # expat on CentOS on x86_64 #
 ##############################
