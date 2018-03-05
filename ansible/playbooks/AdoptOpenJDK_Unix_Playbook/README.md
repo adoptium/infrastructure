@@ -3,6 +3,9 @@
 ## Platform Supported:
 
 ```
+CentOS 6
+- x86_64
+
 CentOS 7
 - x86_64
 
