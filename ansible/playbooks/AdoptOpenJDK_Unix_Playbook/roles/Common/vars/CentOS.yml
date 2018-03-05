@@ -49,6 +49,9 @@ gcc_compiler:
   - devtoolset-2-binutils
   - devtoolset-2-gcc-c++
 
+Additional_Build_Tools_x86_64:
+  - zulu-9
+
 Test_Tool_Packages:
   - ant
   - perl
