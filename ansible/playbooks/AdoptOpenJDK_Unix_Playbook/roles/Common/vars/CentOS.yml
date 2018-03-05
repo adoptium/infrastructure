@@ -44,6 +44,11 @@ Build_Tool_Packages:
   - wget
   - zip
 
+gcc_compiler:
+  - devtoolset-2-gcc
+  - devtoolset-2-binutils
+  - devtoolset-2-gcc-c++
+
 Test_Tool_Packages:
   - ant
   - perl

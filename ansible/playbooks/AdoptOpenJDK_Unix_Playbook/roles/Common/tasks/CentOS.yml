@@ -37,9 +37,8 @@
   tags: build_tools
 
 - name: Install gcc4.8
-  yum:
-    name: devtoolset-2
-    state: latest
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc_compiler }}"
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
