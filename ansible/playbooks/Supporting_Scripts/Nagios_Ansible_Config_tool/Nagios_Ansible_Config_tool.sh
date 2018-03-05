@@ -265,7 +265,7 @@ fi
 ##############
 #
 Provider_Exists=`cat $Hostgroups_File | grep "hostgroup_name" | grep $Provider_Name`										# Test if Hostgroup already exists for the Provider_Name 
-if [[ $Provider_Exist = "" ]] ; then
+if [[ $Provider_Exists = "" ]] ; then
 	# The Provider_Name doesn't exists, Create new hostgroup from template for Provider
         Hostgroup_Template_TMP_File=$Template_Dir/hostgroup_template.cfg.file.$RANDOM                                                                           # Name tmp file with random number
         cp $Template_Dir/hostgroup_template.cfg $Hostgroup_Template_TMP_File                                    	                	                # Create a temp file to work with
