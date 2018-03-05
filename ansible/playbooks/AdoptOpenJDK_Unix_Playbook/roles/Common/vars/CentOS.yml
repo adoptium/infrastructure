@@ -9,7 +9,6 @@ Build_Tool_Packages:
   - bind-utils
   - bison
   - bzip2
-  - cpanminus
   - cpio
   - cups-devel
   - elfutils-libelf-devel
@@ -22,6 +21,7 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libdwarf-devel
   - libXext-devel
