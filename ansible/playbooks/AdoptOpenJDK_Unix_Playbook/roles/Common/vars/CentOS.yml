@@ -13,6 +13,7 @@ Build_Tool_Packages:
   - cups-devel
   - elfutils-libelf-devel
   - flex
+  - fontconfig-devel
   - freetype-devel
   - gcc
   - gcc-c++
