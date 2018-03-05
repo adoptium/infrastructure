@@ -18,7 +18,7 @@ hosts:
         ubuntu1604-x64-1: {ip: 173.82.219.221}
        
     - digitalocean:
-        ubuntu1604-x64-1: {ip: 159.65.80.192}
+        centos69-x64-1: {ip: 159.65.95.239}
 
     - 1and1:
         win2008r2-x64-1: {ip: 109.228.48.187, user: Administrator}
