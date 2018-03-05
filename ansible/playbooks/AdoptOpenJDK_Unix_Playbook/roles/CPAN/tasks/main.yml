@@ -8,7 +8,7 @@
   shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
   ignore_errors: yes
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
   tags: test_tools
 
 - name: Install cpanminus RedHat 7
