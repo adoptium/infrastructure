@@ -47,7 +47,7 @@ hosts:
         aix71-ppc64-2: {ip: 140.211.9.12}
 
     - packet:
-        ubuntu1604-armv8-1: {ip: 147.75.196.30}
+        centos74-armv8-1: {ip: 147.75.196.30}
         ubuntu1604-armv8-2: {ip: 147.75.77.146}
         freebsd11-x64-1: {ip: 147.75.101.29}
 
