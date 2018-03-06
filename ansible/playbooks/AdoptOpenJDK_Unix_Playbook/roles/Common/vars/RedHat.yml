@@ -36,6 +36,7 @@ Build_Tool_Packages:
 
 Additional_Build_Tools_RHEL7:
   - bison
+  - curl-devel
   - elfutils-libelf-devel
   - flex
   - libdwarf-devel
