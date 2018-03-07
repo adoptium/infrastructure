@@ -40,7 +40,7 @@ hosts:
         zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
     - osuosl:
-        centos72-ppc64le-1: {ip: 140.211.168.138, user: centos}
+        centos74-ppc64le-1: {ip: 140.211.168.138, user: centos}
         fedora24-ppc64le-1: {ip: 140.211.168.134, user: fedora}
         ubuntu1604-ppc64le-1: {ip: 140.211.168.243, user: ubuntu}
         aix71-ppc64-1: {ip: 140.211.9.10}
