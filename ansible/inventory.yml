@@ -3,6 +3,7 @@
 #
 # AdoptOpenJDK hosts! check the readme on how to add more
 # (if its not obvious enough).
+# Initial host names are "os-arch-index" within each stanza
 #
 
 hosts:
@@ -11,6 +12,9 @@ hosts:
 
     - digitalocean:
         ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
+
+    - softlayer:
+        ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
 
   - build:
 
