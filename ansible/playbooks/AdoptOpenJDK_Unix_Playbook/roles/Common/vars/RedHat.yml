@@ -23,7 +23,6 @@ Build_Tool_Packages:
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
-  - lbzip2
   - make
   - mesa-libGL-devel
   - mpfr-devel
