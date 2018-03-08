@@ -25,6 +25,18 @@
     yum:
       name: nagios-plugins-all
       state: latest
+    tags: nagios_plugins
+
+  ##########
+  # Layout #
+  ##########
+  - name: Creates Nagios folder
+    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+    tags: nagios_plugins
+
+  - name: Create symlink to plugins
+    file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+    tags: nagios_plugins
 
   ##############################
   # Install additional plugins #
@@ -34,6 +46,4 @@
       url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
       dest: /usr/local/nagios/libexec/check_yum
       mode: 0755
-    when:
-      - ansible_architecture == "x86_64"
     tags: nagios_plugins
