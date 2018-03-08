@@ -3,7 +3,7 @@
 # Ubuntu 16 on x86 (depends on openjdk-8-jre) #
 ###############################################
 
-- hosts: all
+- hosts: "{{ groups['Vendor_groups'] | default('jck:*ubuntu*') }}"
   remote_user: root
   become: yes
   tasks:
