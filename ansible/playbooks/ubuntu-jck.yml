@@ -23,6 +23,7 @@
       - make
       - unzip
       - openjdk-8-jre
+      - vnc4server
       - xvfb
     - name: Create Jenkins user
       action: user name="{{ Jenkins_Username }}" state=present
@@ -39,3 +40,11 @@
         creates: /tmp/.X1-lock
       become: yes
       become_user: jenkins
+    - name: Add cron job to check for updates
+      cron: name="Check for Updates every Sunday at 5am"
+        weekday="6"
+        minute="0"
+        hour="5"
+        user=root
+        job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
+        state=present

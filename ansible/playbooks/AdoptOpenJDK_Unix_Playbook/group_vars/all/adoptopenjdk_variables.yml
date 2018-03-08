@@ -6,6 +6,9 @@
 # Domain for setting hostname
 Domain: adoptopenjdk.net
 
+# Sudoers file
+Sudoers_File: /etc/sudoers
+
 # Jenkins User Variables:
 Jenkins_Username: jenkins
 Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub

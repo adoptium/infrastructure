@@ -11,7 +11,7 @@
 # MPC - gcc prerequisites
 - name: Download mpc sources
   get_url:
-    url: http://www.multiprecision.org/mpc/download/mpc-0.8.1.tar.gz
+    url: http://www.multiprecision.org/downloads/mpc-0.8.1.tar.gz
     dest: '/tmp/mpc-0.8.1.tar.gz'
     force: no
     mode: 0755

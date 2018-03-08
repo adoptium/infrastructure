@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure.svg?branch=master)](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure)
 # Members
 
 #### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
@@ -8,9 +9,10 @@
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
 - [@bblondin](https://github.com/bblondin) - Brad Blondin
-- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones
 - [@gdams](https://github.com/gdams) - George Adams
+- [@mwornast](https://github.com/mwornast) - Marcus Wornast
+- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
 

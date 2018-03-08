@@ -21,6 +21,13 @@
   set_fact:
     root_group: "wheel"
 
+########################
+# Overide sudoers file #
+########################
+- name: Set sudoers file to /usr/local/etc/sudoers
+  set_fact:
+    Sudoers_File: "/usr/local/etc/sudoers"
+
 ############################
 # Build Packages and tools #
 ############################

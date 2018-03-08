@@ -115,6 +115,7 @@
         - cups-libs
         - flex
         - freetype2-devel
+        - fontconfig-devel
         - gawk
         - git
         - grep
@@ -137,6 +138,7 @@
         - http://www.oss4aix.org/download/RPMS/mktemp/mktemp-1.7-1.aix5.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
+        - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
       when: yum.stat.islnk is not defined
       tags: rpm_install
 
@@ -189,7 +191,7 @@
     - replace:
         path: /etc/environment
         regexp: 'java5'
-        replace: 'java8'
+        replace: 'java8_64'
       tags: java8
 
   ##############
@@ -490,6 +492,11 @@
       when: jenkins.stat.isdir is not defined
       tags: jenkins_user
 
+    # Use the system defaults as defined in /etc/environment
+    - file:
+        state: absent
+        path: /home/{{ Jenkins_Username }}/.profile
+
   ##############
   # freemarker #
   ##############
@@ -532,7 +539,7 @@
   # Nagios plugins #
   ##################
     - name: Include Nagios Playbook
-      include_tasks: nagios/nagios_ubuntu.yml
+      include_tasks: nagios/nagios_aix.yml
       when: Nagios_Plugins == "Enabled"
 
   #####################

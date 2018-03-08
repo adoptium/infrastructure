@@ -15,6 +15,7 @@
       - "ansible_architecture: {{ ansible_architecture | default('***Undefined***') }} "
       - "ansible_processor_vcpus: {{ ansible_processor_vcpus | default('***Undefined***') }} "
       - "ansible_processor_cores: {{ ansible_processor_cores | default('***Undefined***') }} "
+      - "Domain: {{ Domain | default('***Undefined***') }} "
       - "Jenkins_Username: {{ Jenkins_Username | default('***Undefined***') }} "
       - "Superuser_Account: {{ Superuser_Account | default('***Undefined***') }}"
       - "Vendor_File: {{ Vendor_File | default('***Undefined***') }}"

@@ -9,28 +9,32 @@ Build_Tool_Packages:
   - bind-utils
   - bison
   - bzip2
-  - cpanminus
   - cpio
   - cups-devel
   - elfutils-libelf-devel
   - flex
+  - fontconfig-devel
   - freetype-devel
   - gcc
   - gcc-c++
+  - gettext
   - git
   - glibc
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libdwarf-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
+  - lbzip2
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - numactl-devel
   - ntp
   - openssl-devel
   - perl-CPAN
@@ -42,10 +46,19 @@ Build_Tool_Packages:
   - wget
   - zip
 
+gcc_compiler:
+  - devtoolset-2-gcc
+  - devtoolset-2-binutils
+  - devtoolset-2-gcc-c++
+
+Additional_Build_Tools_x86_64:
+  - zulu-9
+
 Test_Tool_Packages:
   - ant
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xorg
+  - xorg-x11-server-Xvfb
 
 crontab_Patching: "/usr/bin/yum -y update"

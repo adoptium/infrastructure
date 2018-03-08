@@ -4,20 +4,19 @@
 ########
 
 # Additional steps for RedHat and SLES
-- name: Install cpanminus RedHat 6 and SLES
+- name: Install cpanminus RedHat 6, CentOS 6 and SLES
   shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
   ignore_errors: yes
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
   tags: test_tools
 
-- name: Install cpanminus RedHat 7
+- name: Install cpanminus RedHat 7 and Centos 7
   yum:
     name: cpanminus
     state: installed
   when:
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version == "7"
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
   tags: test_tools
 
 # All

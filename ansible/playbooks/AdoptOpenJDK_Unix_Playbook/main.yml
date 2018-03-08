@@ -1,13 +1,7 @@
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-- hosts:
-    - build
-    - test
-    - "!*zos*"
-    - "!*win*"
-    - "!*macos*"
-    - "!*aix*"
+- hosts: "{{ groups['Vendor_groups'] | default('build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
   gather_facts: yes
   tasks:
 
@@ -33,6 +27,7 @@
     - gcc_48
     - Nagios_Plugins
     - Nagios_Master_Config
+    - Nagios_Tunnel
     - Clean_Up
     - Security
     - Vendor

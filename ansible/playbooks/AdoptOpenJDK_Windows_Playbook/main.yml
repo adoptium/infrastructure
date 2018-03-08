@@ -16,7 +16,8 @@
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
 # .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
-- hosts: all
+- hosts: "{{ groups['Vendor_groups'] | default('build*win*:test*win*') }}"
+  gather_facts: yes
   tasks:
 
   #########

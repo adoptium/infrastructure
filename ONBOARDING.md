@@ -8,7 +8,7 @@
 
 ### GitHub
 
-- Full list of machines is [here](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/infrastructure.md). Please remember to always update this when adding new machines or removing existing ones.
+- Full list of machines is [here](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml). Please remember to always update this when adding new machines or removing existing ones.
 - Ansible Playbooks are all stored [here](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible).
 
 #### [Secrets](https://github.com/AdoptOpenJDK/secrets)

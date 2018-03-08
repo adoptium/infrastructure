@@ -23,10 +23,10 @@ Build_Tool_Packages:
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
+  - lbzip2
   - make
   - mesa-libGL-devel
   - mpfr-devel
-  - numactl-devel
   - ntp
   - openssl-devel
   - perl-CPAN
@@ -37,13 +37,14 @@ Build_Tool_Packages:
 
 Additional_Build_Tools_RHEL7:
   - bison
+  - curl-devel
   - elfutils-libelf-devel
   - flex
   - libdwarf-devel
+  - libstdc++-static
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libcurl-devel
-  - libstdc++-static
   - ant-contrib
 
 Java_NOT_RHEL6_PPC64:
@@ -55,8 +56,10 @@ Java_RHEL6_PPC64:
   - java-1.8.0-ibm-devel
 
 Test_Tool_Packages:
+  - acl
   - ant
   - perl
   - xorg-x11-xauth
+  - xorg-x11-server-Xvfb
 
 crontab_Patching: "/usr/bin/yum -y update"

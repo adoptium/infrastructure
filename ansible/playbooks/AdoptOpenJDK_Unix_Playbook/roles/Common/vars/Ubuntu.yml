@@ -5,6 +5,7 @@
 
 # Command Build Tool Packages
 Build_Tool_Packages:
+  - apt-transport-https
   - autoconf
   - bison
   - build-essential
@@ -35,7 +36,7 @@ Build_Tool_Packages:
   - libxrender-dev
   - libxt-dev
   - libxtst-dev
-  - make
+  - make 
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
@@ -51,16 +52,21 @@ Additional_Build_Tools_x86_64:
   - zulu-9
   - libnuma-dev
 
+Additional_Build_Tools_ppc64le:
+  - libnuma-dev
+
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
 Test_Tool_Packages:
+  - acl
   - ant
   - ant-contrib
   - mercurial
   - perl
   - xauth
   - xorg
+  - xvfb
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

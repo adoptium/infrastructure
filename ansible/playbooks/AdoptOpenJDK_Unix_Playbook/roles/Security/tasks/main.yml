@@ -59,6 +59,17 @@
     name: ssh
     state: restarted
     enabled: yes
+  ignore_errors: yes
+  when:
+    - Security == "Enabled"
+  tags: security
+  
+- name: Restart sshd service
+  service:
+    name: sshd
+    state: restarted
+    enabled: yes
+  ignore_errors: yes
   when:
     - Security == "Enabled"
   tags: security

@@ -58,6 +58,7 @@ Test_Tool_Packages:
   - perl5
   - xauth
   - xorg
+  - xorg-vfbserver
   - pulseaudio
   - p5-App-cpanminus
 
