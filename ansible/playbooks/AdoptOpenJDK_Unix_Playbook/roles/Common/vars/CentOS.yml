@@ -6,6 +6,7 @@
 # Command Build Tool Packages
 Build_Tool_Packages:
   - alsa-lib-devel
+  - autoconf
   - bind-utils
   - bison
   - bzip2
