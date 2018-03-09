@@ -82,7 +82,7 @@
   ignore_errors: yes
   with_items:
     - root
-    - jenkins
+    - "{{ Jenkins_Username }}"
     - nagios
     - zeus
   when:
@@ -95,7 +95,7 @@
   ignore_errors: yes
   with_items:
     - root
-    - jenkins
+    - "{{ Jenkins_Username }}"
     - nagios
     - zeus
   when:
