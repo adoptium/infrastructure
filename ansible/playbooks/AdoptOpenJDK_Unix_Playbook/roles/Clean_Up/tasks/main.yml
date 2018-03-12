@@ -43,6 +43,7 @@
     - /home/{{ Jenkins_Username }}/ccache.tar # ccache
     - /tmp/ant-contrib # ant-contrib
     - /tmp/ant-contrib-1.0b2-bin.tar.gz # ant-contrib
+    - /tmp/ant-contrib-1.0b3-3.4.1.noarch.rpm # ant-contrib
     - /tmp/cmake-3.7.2 # cmake
     - /tmp/cmake-3.7.2.tar.gz # cmake
     - /tmp/cuda9_linux-run # NVidia_Cuda_Toolkit
@@ -55,6 +56,7 @@
     - /tmp/git-2.15.0.tar.xz # git-src
     - /tmp/ibm-java.bin # java8_SLES11
     - /tmp/ibm-java.response.properties # java8_SLES11
+    - /tmp/junit-3.8.2-8.1.noarch.rpm # junit
     - /tmp/mpc-0.8.1 # gcc-4.8
     - /tmp/mpc-0.8.1.tar.gz # gcc-4.8
     - /tmp/nagios-plugins-2.2.1/ # nagios_plugins
