@@ -28,8 +28,15 @@
   when: (java8_installed.stat.exists == false)
   tags: Java8
 
+- name: Test if Java 8 symlink is already created
+  win_stat:
+      path: 'C:\openjdk\jdk8'
+  register: java8_symlink
+  tags: Java8
+
 - name: Create symlink to Java 8
   raw: cmd /c mklink /D "C:\openjdk\jdk8\" "C:\Program Files\Java\jdk8u144-b01\"
+  when: (java8_symlink.stat.exists == false)
   tags: Java8
 
 - name: Set JAVA_HOME to version 8
