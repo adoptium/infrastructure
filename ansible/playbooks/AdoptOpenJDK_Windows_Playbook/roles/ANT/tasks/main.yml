@@ -70,7 +70,7 @@
 - name: Copy the ant-contrib.jar to ANT's lib folder
   win_copy:
     src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
-    dest: C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar
+    dest: C:\apache-ant\apache-ant-1.10.2\lib\ant-contrib.jar
     remote_src: True
   when: (ant_contrib_installed.stat.exists == false)
   tags: ANT
