@@ -5,7 +5,7 @@
 
 - name: Test if Ant is already installed
   win_stat:
-      path: 'C:\apache-ant\apache-ant-1.10.1'
+      path: 'C:\apache-ant\apache-ant-1.10.2'
   register: ant_installed
   tags: ANT
 
@@ -17,7 +17,7 @@
 
 - name: Download Apache ANT
   win_get_url:
-    url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.1-bin.zip
+    url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.2-bin.zip
     dest: c:\temp\ant.zip
     force: no
   when: (ant_installed.stat.exists == false) and (ant_download.stat.exists == false)
@@ -33,7 +33,7 @@
   tags: ANT
 
 - name: Set ANT_HOME
-  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.1" /M
+  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.2" /M
   when: (ant_installed.stat.exists == false)
   tags: ANT
 
@@ -47,7 +47,7 @@
 
 - name: Test if ant-contrib is already installed
   win_stat:
-      path: 'C:\apache-ant\apache-ant-1.10.1\lib\ant-contrib.jar'
+      path: 'C:\apache-ant\apache-ant-1.10.2\lib\ant-contrib.jar'
   register: ant_contrib_installed
   tags: ANT
 
