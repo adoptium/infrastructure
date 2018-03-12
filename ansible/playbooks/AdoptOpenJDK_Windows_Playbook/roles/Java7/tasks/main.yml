@@ -31,5 +31,5 @@
   tags: Java7
 
 - name: Create symlink to Java 7
-  raw: cmd /c mklink /D "C:\openjdk\jdk7\" "C:\Program Files\Java\java-se-7u75-ri"
+  raw: cmd /c mklink /D "C:\openjdk\jdk7\" "C:\Program Files\Java\java-se-7u75-ri\"
   tags: Java7
