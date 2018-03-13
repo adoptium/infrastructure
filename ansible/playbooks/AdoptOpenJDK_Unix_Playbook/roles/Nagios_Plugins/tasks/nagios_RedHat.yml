@@ -1,3 +1,9 @@
+when: 
+      - ansible_distribution_major_version != "6"
+
+
+
+
 #######################################################################################
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on RHEL 7 on x86 hardware #
 #######################################################################################
@@ -19,11 +25,43 @@
   ###################
   # Install plugins #
   ###################
-  - name: Install nagios-plugins-all
+  - name: Install nagios-plugins-all 
     yum:
       name: nagios-plugins-all
       state: latest
+    when: 
+      - ansible_distribution_major_version != "6"
     tags: nagios_plugins
+
+  #############################
+  # Install plugins On RHEL 6 #
+  #############################
+  - name: Download nagios-plugins
+    get_url:
+      url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
+    when: 
+      - ansible_distribution_major_version == "6"
+    tags: nagios_plugins
+
+  - name: Extract nagios-plugins
+    unarchive:
+      src: /tmp/nagios-plugins-2.2.1.tar.gz
+      dest: /tmp/
+      copy: False
+    when: 
+      - ansible_distribution_major_version == "6"
+    tags: nagios_plugins
+
+  - name: Configure, make and make install nagios-plugins
+    shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+    become: yes
+    when:
+      - ansible_distribution_major_version == "6"
+    tags: nagios_plugins
+
 
   ##########
   # Layout #
