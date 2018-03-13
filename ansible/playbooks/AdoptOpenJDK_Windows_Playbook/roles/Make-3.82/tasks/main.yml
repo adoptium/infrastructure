@@ -10,12 +10,12 @@
 
 - name: Download make-3.82
   win_get_url:
-    url: http://ftp.gnu.org/gnu/make/make-3.82.tar.gz
-    dest: 'C:\temp\make-3.82.tar.gz'
+    url: https://ci.adoptopenjdk.net/userContent/make-3.82.zip
+    dest: 'C:\temp\make-3.82.zip'
   tags: Make-3.82
 
 - name: Extract make-3.82 to C:\openjdk\
   win_unzip:
-    src: 'C:\temp\make-3.82.tar.gz'
+    src: 'C:\temp\make-3.82.zip'
     dest: 'C:\openjdk\'
   tags: Make-3.82
