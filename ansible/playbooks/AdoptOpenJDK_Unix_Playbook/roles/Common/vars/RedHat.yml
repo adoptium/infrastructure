@@ -19,7 +19,7 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
-  - libffi
+  - libffi-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
