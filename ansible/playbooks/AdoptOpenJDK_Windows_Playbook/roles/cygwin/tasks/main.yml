@@ -55,13 +55,8 @@
     - xterm
   tags: cygwin
 
-- name: Remove c:\cygwin64\bin from the path if it exists
+- name: Add c:\cygwin64\bin to the path
   win_path:
     elements:
       - 'C:\cygwin64\bin'
-    state: absent
-  tags: cygwin
-
-- name: Add c:\cygwin64\bin to the start of the %PATH%
-  raw: setx PATH "C:\cygwin64\bin;$env:Path" /M
   tags: cygwin
