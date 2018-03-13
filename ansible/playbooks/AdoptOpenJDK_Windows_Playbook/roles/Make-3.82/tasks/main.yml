@@ -14,7 +14,7 @@
     dest: 'C:\temp\make-3.82.tar.gz'
   tags: Make-3.82
 
-- name:  Extract make-3.82 to C:\openjdk\
+- name: Extract make-3.82 to C:\openjdk\
   win_unzip:
     src: 'C:\temp\make-3.82.tar.gz'
     dest: 'C:\openjdk\'
