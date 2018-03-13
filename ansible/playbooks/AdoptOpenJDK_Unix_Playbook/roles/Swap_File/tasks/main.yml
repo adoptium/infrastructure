@@ -47,19 +47,10 @@
     - ansible_architecture == "armv7l"
   tags: swap_file
 
-- name: Create swap file - via fallocate
-  command: "fallocate -l 2G {{ swap_path }}"
+- name: Create swap file - via DD
+  command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
     - (swap_root.rc != 0 and swap_tmp.rc != 0)
-    - ansible_distribution != "FreeBSD"
-    - (ansible_distribution != "SLES" and ansible_distribution_major_version != "11") or (ansible_distribution != "CentOS" and ansible_distribution_major_version != "7" ) or (ansible_distribution != "RedHat" and ansible_distribution_major_version != "7" )
-  tags: swap_file
-
-- name: Create swap file - via DD on SLES 11 and CentOS 7 and FreeBSD
-  command: dd if=/dev/zero of=/swapfile bs=250M count=8
-  when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
-    - ansible_distribution == "FreeBSD" or (ansible_distribution == "SLES" and ansible_distribution_major_version == "11") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" )
   tags: swap_file
 
 - name: Set swap file permissions

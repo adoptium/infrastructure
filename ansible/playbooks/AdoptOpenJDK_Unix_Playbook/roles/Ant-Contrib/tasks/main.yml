@@ -36,3 +36,41 @@
   command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
+  
+- name: Download junit - SLES
+  get_url:
+    url: https://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/oss/suse/noarch/junit-3.8.2-8.1.noarch.rpm
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when: 
+    - ansible_distribution == "SLES"
+  tags: ant-contrib
+
+- name: Install junit from rpm - SLES
+  yum:
+    name: /tmp/junit-3.8.2-8.1.noarch.rpm
+    state: present
+  when: 
+    - ansible_distribution == "SLES"
+  tags: ant-contrib
+
+- name: Download ant-contrib - SLES
+  get_url:
+    url: https://ftp5.gwdg.de/pub/opensuse/discontinued/update/13.2/noarch/ant-contrib-1.0b3-3.4.1.noarch.rpm
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when: 
+    - ansible_distribution == "SLES"
+  tags: ant-contrib
+
+- name: Install ant-contrib from rpm - SLES
+  yum:
+    name: /tmp/ant-contrib-1.0b3-3.4.1.noarch.rpm
+    state: present
+  when: 
+    - ansible_distribution == "SLES"
+  tags: ant-contrib
