@@ -22,6 +22,6 @@
   tags: basic_config
 
 - name: Set Hostname
-  raw: echo y | netdom renamecomputer "$env:COMPUTERNAME" /Newname "{{ inventory_hostname }}"
+  raw: netdom renamecomputer "$env:COMPUTERNAME" /Newname "{{ inventory_hostname }}" -force
   when: Domain == "adoptopenjdk.net"
   tags: basic_config
