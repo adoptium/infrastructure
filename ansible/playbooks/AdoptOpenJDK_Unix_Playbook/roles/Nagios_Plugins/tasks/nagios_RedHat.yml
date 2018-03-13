@@ -66,6 +66,8 @@
 
   - name: Create symlink to plugins
     file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+    when: 
+      - ansible_distribution_major_version != "6"
     tags: nagios_plugins
 
   ##############################
