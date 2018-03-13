@@ -1,0 +1,19 @@
+---
+####################
+# Custom Make-3.82 #
+####################
+- name: Test if Make-3.82 is already installed
+  win_stat:
+    path: 'C:\openjdk\make-3.82'
+  register: make-3.82_installed
+  tags: Make-3.82
+
+- name: Download make-3.82
+  win_get_url:
+    url: http://ftp.gnu.org/gnu/make/make-3.82.tar.gz
+    dest: 'C:\temp\make-3.82.tar.gz'
+  tags: Make-3.82
+
+- name: Extract make-3.82 to C:\openjdk\
+  raw: cmd /c tar -xf C:\temp\make-3.82.tar.gz -C C:\openjdk\
+  tags: Make-3.82

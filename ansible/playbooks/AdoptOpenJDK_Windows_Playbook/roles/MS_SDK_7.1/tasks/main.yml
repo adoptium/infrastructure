@@ -1,0 +1,31 @@
+---
+#######################################
+# Microsoft Windows SDK for Windows 7 #
+#######################################
+
+- name: Test if MS SDK is installed
+  win_stat:
+    path: 'C:\Program Files\Microsoft SDKs\v7.1'
+  register: ms_sdk_installed
+  tags: MS_SDK_7.1
+
+- name: Test if MS SDK is already downloaded
+  win_stat:
+    path: 'C:\temp\MS_SDK.zip'
+  register: ms_sdk_download
+  tags: MS_SDK_7.1
+
+- name: Download pre compiled freetype.zip
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/MicrosoftSDKs.zip
+    dest: C:\temp\MS_SDK.zip
+  when: (ms_sdk_installed.stat.exists == false) and (ms_sdk_download.stat.exists == false)
+  tags: MS_SDK_7.1
+
+- name: Unpack freetype
+  win_unzip:
+    src: C:\temp\MS_SDK.zip
+    dest: C:\Program Files\
+    delete_archive: yes
+  when: (ms_sdk_installed.stat.exists == false) and (ms_sdk_download.stat.exists == false)
+  tags: MS_SDK_7.1

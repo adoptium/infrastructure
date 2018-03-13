@@ -13,10 +13,15 @@
     path: C:\openjdk
     state: directory
   tags: basic_config
-  
+
 - name: Create cmd.exe shortcut
   win_shortcut:
     src: C:\Windows\System32\cmd.exe
     dest: C:\Users\Public\Desktop\cmd.lnk
     icon: C:\Windows\System32\cmd.exe,0
+  tags: basic_config
+
+- name: Set Hostname
+  raw: echo y | netdom renamecomputer "$env:COMPUTERNAME" /Newname "{{ inventory_hostname }}"
+  when: Domain == "adoptopenjdk.net"
   tags: basic_config

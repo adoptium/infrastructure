@@ -39,3 +39,44 @@
     state: present
   when: (freetype_installed.stat.exists == false)
   tags: Freetype
+
+####################################
+# Pre compiled version of freetype #
+####################################
+
+- name: Test if freetype is already installed
+  win_stat:
+    path: 'C:\openjdk\freetype'
+  register: freetype_compiled_installed
+  tags: Freetype
+
+- name: Test if freetype is already downloaded
+  win_stat:
+    path: 'C:\temp\freetype.zip'
+  register: freetype_compiled_download
+  tags: Freetype
+
+- name: Download pre compiled freetype.zip
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/freetype.zip
+    dest: C:\temp\freetype.zip
+  when: (freetype_compiled_installed.stat.exists == false) and (freetype_compiled_download.stat.exists == false)
+  tags: Freetype
+
+- name: Unpack freetype
+  win_unzip:
+    src: C:\temp\freetype.zip
+    dest: C:\openjdk
+    delete_archive: yes
+  when: (freetype_compiled_installed.stat.exists == false) and (freetype_compiled_download.stat.exists == false)
+  tags: Freetype
+
+- name: Add modify, write permissions for jenkins user
+  win_acl:
+    path: C:\openjdk\freetype
+    user: "{{ Jenkins_Username }}"
+    rights: Read,Write,Modify,FullControl,Delete
+    type: allow
+    state: present
+  when: (freetype_compiled_installed.stat.exists == false)
+  tags: Freetype

@@ -1,0 +1,9 @@
+---
+##########################
+# Windows Code Sign Cert #
+##########################
+- name: Download Windows.p12
+  win_get_url:
+    url: https://github.com/AdoptOpenJDK/openjdk-installer/raw/master/windows.p12
+    dest: 'C:\Users\jenkins\windows.p12'
+  tags: Signtool
