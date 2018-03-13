@@ -19,12 +19,15 @@
       - ant
       - acl
       - gcc
+      - gedit
+      - gnome-terminal
       - git
       - make
       - unzip
       - openjdk-8-jre
       - vnc4server
       - xvfb
+      - xterm
     - name: Create Jenkins user
       action: user name="{{ Jenkins_Username }}" state=present
       ignore_errors: yes
