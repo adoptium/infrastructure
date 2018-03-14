@@ -48,6 +48,7 @@
     - /tmp/cmake-3.7.2.tar.gz # cmake
     - /tmp/cuda9_linux-run # NVidia_Cuda_Toolkit
     - /tmp/cuda-repo-rhel7-9.ppc64le.rpm # NVidia_Cuda_Toolkit
+    - /tmp/dkms.noarch.rpm # NVidia_Cuda_Toolkit
     - /tmp/expat-2.2.5 # expat
     - /tmp/expat-2.2.5.tar.bz2 # expat
     - /tmp/gcc-4.8.5 # gcc-4.8
