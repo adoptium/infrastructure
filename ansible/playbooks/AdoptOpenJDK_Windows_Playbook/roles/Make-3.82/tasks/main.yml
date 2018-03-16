@@ -10,7 +10,7 @@
 
 - name: Download make-3.82
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/make-3.82.zip
+    url: 'https://ci.adoptopenjdk.net/userContent/make-3.82.zip'
     dest: 'C:\temp\make-3.82.zip'
   when: (make-3.82_installed.stat.exists == false)
   tags: Make-3.82
