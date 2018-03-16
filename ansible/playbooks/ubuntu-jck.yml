@@ -22,9 +22,11 @@
       - gedit
       - gnome-terminal
       - git
+      - gv
       - make
       - unzip
       - openjdk-8-jre
+      - printer-driver-cups-pdf
       - vnc4server
       - xvfb
       - xterm
