@@ -35,6 +35,7 @@
   win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
   with_items:
     - autoconf
+    - gcc-core
     - make
     - unzip
     - zip
