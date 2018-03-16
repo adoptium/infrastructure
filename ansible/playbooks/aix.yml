@@ -67,16 +67,14 @@
   # Uninstall conflicting packages from base image   #
   # if they were installed via rpm unless yum exists #
   ####################################################
-    - stat:
+    - name: Confirm yum is installed - /usr/bin/yum
+      stat:
         path: /usr/bin/yum
       register: yum
 
-    - debug:
-        msg: "Yum installed, skipping download and installation"
-      when: yum.stat.islnk is defined
-
     - name: Uninstall conflicting packages
       shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
+      ignore_errors: True
       when: yum.stat.islnk is not defined
       tags: rpm_remove
 
@@ -136,12 +134,16 @@
       yum: name={{ item }} state=present update_cache=yes
       with_items:
         - http://www.oss4aix.org/download/RPMS/mktemp/mktemp-1.7-1.aix5.1.ppc.rpm
+        - http://www.bullfreeware.com/download/bin/2328/libiconv-1.14-22.aix6.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
         - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
         - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
-      when: yum.stat.islnk is not defined
       tags: rpm_install
 
+    - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+      shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+      ignore_errors: True
+      
   ##############
   # IBM Java 8 #
   ##############
@@ -338,7 +340,7 @@
 
     - name: Download and extract ant
       unarchive:
-        src: http://apache.mirrors.hoobly.com/ant/binaries/apache-ant-1.9.9-bin.zip
+        src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
         dest: /opt
         remote_src: yes
       when: ant.stat.islnk is not defined
@@ -387,6 +389,10 @@
   ########
   # cpan #
   ########
+    - name: Ensure memory limits for root are unlimited
+      shell: ulimit -m unlimited && ulimit -d unlimited
+      tags: cpan
+      
     - name: Install Text::CSV
       shell: |
         CC=xlc_r cpan -i Text::CSV
