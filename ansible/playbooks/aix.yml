@@ -502,7 +502,31 @@
     - file:
         state: absent
         path: /home/{{ Jenkins_Username }}/.profile
+    
+    - name: Set user capabilites
+      shell: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
+      tags: jenkins_user
+      
 
+    - name: Set group capabilites
+      shell: chgroup adms=root staff
+      tags: jenkins_user
+      
+    - name: ensure adequate limits are set in /etc/security/limits
+      command: chsec -f /etc/security/limits -s {{ Jenkins_Username }} -a {{ item }}
+      with_items:
+        - "fsize=-1"
+        - "core=-1"
+        - "cpu=-1"
+        - "data=262144"
+        - "rss=65536"
+        - "stack=65536"
+        - "core_hard=-1"  
+        - "nofiles=-1"
+        - "nofiles_hard=-1"
+      changed_when: False
+      tags: jenkins_user
+ 
   ##############
   # freemarker #
   ##############
