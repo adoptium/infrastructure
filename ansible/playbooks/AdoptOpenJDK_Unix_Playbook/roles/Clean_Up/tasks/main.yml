@@ -51,6 +51,8 @@
     - /tmp/dkms.noarch.rpm # NVidia_Cuda_Toolkit
     - /tmp/expat-2.2.5 # expat
     - /tmp/expat-2.2.5.tar.bz2 # expat
+    - /tmp/freemarker-2.3.8 # freemarker
+    - /tmp/freemarker-2.3.8.tar.gz # freemarker
     - /tmp/gcc-4.8.5 # gcc-4.8
     - /tmp/gcc-4.8.5.tar.gz # gcc-4.8
     - /tmp/git-2.15.0 # git-src
