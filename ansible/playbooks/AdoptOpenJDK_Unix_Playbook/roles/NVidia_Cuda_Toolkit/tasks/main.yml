@@ -28,7 +28,37 @@
   tags: nvidia_cuda_toolkit
 
 # RHEL 7 PPC64LE
-- name: Download NVidia CUDA Repo RPM for RHEL7 on ppc64le
+- name: Ensure kernel-debug-devel is installed - RHEL 7 PPC64LE
+  yum: name=kernel-debug-devel state=installed
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Download DKMS - RHEL 7 PPC64LE
+  get_url:
+    url: https://dl.fedoraproject.org/pub/epel/7/ppc64le/Packages/d/dkms-2.4.0-1.20170926git959bd74.el7.noarch.rpm
+    dest: /tmp/dkms.noarch.rpm
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Install DKMS RPM - RHEL 7 PPC64LE
+  yum: name=/tmp/dkms.noarch.rpm state=installed
+  ignore_errors: True
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Download NVidia CUDA Repo RPM - RHEL 7 on PPC64LE
   get_url:
     url: http://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
     dest: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
@@ -39,7 +69,7 @@
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-- name: Apply NVidia CUDA repo RPM for RHEL7 on ppc64le
+- name: Apply NVidia CUDA repo RPM - RHEL 7 on PPC64LE
   yum: name=/tmp/cuda-repo-rhel7-9.ppc64le.rpm state=installed
   ignore_errors: True
   when:
@@ -49,7 +79,7 @@
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-- name: Install NVidia CUDA toolkit for RHEL7 on ppc64le
+- name: Install NVidia CUDA toolkit - RHEL 7 on PPC64LE
   yum: name=cuda state=installed
   when:
     - cuda_installed.stat.isdir is not defined

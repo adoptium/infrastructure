@@ -12,6 +12,7 @@
     - Debug
     - Common
     - Jenkins_User
+    - freemarker
     - Ant-Contrib
     - ccache
     - GIT_Source

@@ -20,7 +20,6 @@
     url: https://cygwin.com/setup-x86_64.exe
     dest: 'C:\temp\cygwin.exe'
     force: no
-  when: (cygwin_installed.stat.exists == false)
   tags: cygwin
 
 - name: Install Cygwin and its packages
@@ -35,10 +34,11 @@
 - name: Install Cygwin build extra packages
   win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
   with_items:
+    - autoconf
+    - make
     - unzip
     - zip
     - cpio
-  when: (cygwin_installed.stat.exists == false)
   tags: cygwin
 
 - name: Install Cygwin test extra packages
@@ -53,7 +53,6 @@
     - xinit
     - xorg-server
     - xterm
-  when: (cygwin_installed.stat.exists == false)
   tags: cygwin
 
 - name: Remove c:\cygwin64\bin from the path if it exists

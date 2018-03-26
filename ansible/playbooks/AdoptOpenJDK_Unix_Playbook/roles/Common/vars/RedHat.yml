@@ -19,11 +19,11 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - libffi-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
-  - lbzip2
   - make
   - mesa-libGL-devel
   - mpfr-devel
@@ -31,6 +31,7 @@ Build_Tool_Packages:
   - openssl-devel
   - perl-CPAN
   - perl-devel
+  - unzip
   - wget
   - xz
   - zip
@@ -58,6 +59,7 @@ Java_RHEL6_PPC64:
 Test_Tool_Packages:
   - acl
   - ant
+  - ant-contrib
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb

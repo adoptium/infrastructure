@@ -81,7 +81,7 @@
 # Set default Java #
 ####################
 - name: Set default java version - RHEL 6 x86_64
-  shell: update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-ibm.x86_64/bin/java
   when:
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
