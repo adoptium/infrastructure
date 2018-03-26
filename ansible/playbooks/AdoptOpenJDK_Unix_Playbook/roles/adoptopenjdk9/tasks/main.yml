@@ -2,22 +2,27 @@
 ##################
 # AdoptOpenJDK 9 #
 ##################
-- name: Check if gcc-4.8 is installed on x86_64 RedHat 6
+- name: Check if jdk9 is already installed in the target location
   shell: ls -ld /usr/lib/jvm/jdk-9+* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk9_installed
   tags: adoptopenjdk9
 
 - name: Install latest release if one not already installed
-  get_url:
-    shell: cd /usr/lib/jvm && wget -O - https://api.adoptopenjdk.net/openjdk9/releases/x64_linux/latest/binary | gzip -d | tar xpf -
+  unarchive:
+    src: https://api.adoptopenjdk.net/openjdk9/releases/x64_linux/latest/binary
+    dest: /usr/lib/jvm
+    remote_src: yes
   when:
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk9
 
 - name: Install latest release if one not already installed
-  get_url:
-    shell: cd /usr/lib/jvm && wget -O - https://api.adoptopenjdk.net/openjdk9/releases/{{ ansible_architecture }}_linux/latest/binary | gzip -d | tar xpf -
+  unarchive:
+    src: https://api.adoptopenjdk.net/openjdk9/releases/{{ ansible_architecture }}_linux/latest/binary
+    dest: /usr/lib/jvm
+    remote_src: yes
   when:
     - ansible_architecture != "x86_64"
+    - ansible_architecture != "armv7l"
   tags: adoptopenjdk9
