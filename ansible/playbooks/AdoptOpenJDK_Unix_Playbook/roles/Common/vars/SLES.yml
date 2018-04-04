@@ -19,6 +19,7 @@ Build_Tool_Packages:
   - libelf1
   - make
   - ntp
+  - pkg-config
   - unzip
   - wget
   - zip
