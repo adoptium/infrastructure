@@ -112,3 +112,4 @@ hosts:
     - softlayer:
         ubuntu1604-x64-1: {ip: 159.122.210.205}
         ubuntu1604-x64-2: {ip: 159.122.210.194}
+        win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
