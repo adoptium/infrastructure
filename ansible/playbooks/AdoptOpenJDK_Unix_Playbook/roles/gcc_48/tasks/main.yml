@@ -70,7 +70,7 @@
   tags: gcc-4.8
 
 - name: Running configure, compile and install for gcc-4.8.5
-  shell: cd /tmp/gcc-4.8.5 && ./configure --prefix=/opt/gcc-4.8.5 && make -j {{ ansible_processor_vcpus }} && make -j {{ ansible_processor_vcpus }} install
+  shell: cd /tmp/gcc-4.8.5 && ./configure --prefix=/opt/gcc-4.8.5 && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - gcc_installed.rc != 0
     - ansible_distribution == "RedHat"

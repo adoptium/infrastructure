@@ -37,7 +37,7 @@ hosts:
 
     - marist:
         sles12-s390x-1: {ip: 148.100.110.56}
-        ubuntu1604-s390x-1: {ip: 148.100.33.147}
+        rhel74-s390x-1: {ip: 148.100.110.37}
         ubuntu1604-s390x-2: {ip: 148.100.33.178}
         ubuntu1604-s390x-3: {ip: 148.100.33.179}
         zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
@@ -84,6 +84,9 @@ hosts:
     - macincloud:
         macos1010-x64-1: {ip: 74.80.250.151, user: admin}
         macos1010-x64-2: {ip: 74.80.250.173, user: admin}
+        
+    - marist:
+        ubuntu1604-s390x-1: {ip: 148.100.33.147}
 
     - scaleway:
         ubuntu1604-x64-1: {ip: 51.15.76.107}
@@ -91,6 +94,7 @@ hosts:
     - softlayer:
         ubuntu1604-x64-1: {ip: 169.55.150.155}
         rhel74-x64-1: {ip: 169.55.170.70}
+        rhel69-x64-1: {ip: 169.55.150.147}
         win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
 
   - jck:
@@ -98,6 +102,10 @@ hosts:
     - macstadium:
         macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
         macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
+
+    - marist:
+        ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}
+        ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
 
     - osuosl:
         ubuntu1604-ppc64le-1: {ip: 140.211.168.225, user: ubuntu}
@@ -110,3 +118,4 @@ hosts:
         ubuntu1604-x64-1: {ip: 159.122.210.205}
         ubuntu1604-x64-2: {ip: 159.122.210.194}
         win2012r2-x64-1: {ip: 169.55.170.68, user: admin}
+        win2012r2-x64-2: {ip: 165.225.150.83, user: Administrator}
