@@ -114,7 +114,7 @@ hosts:
     - packet:
         ubuntu1604-armv8-1: {ip: 147.75.193.234}
 
-- joyent:
+    - joyent:
         win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
 
     - softlayer:
