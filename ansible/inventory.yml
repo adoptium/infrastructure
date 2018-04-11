@@ -114,8 +114,10 @@ hosts:
     - packet:
         ubuntu1604-armv8-1: {ip: 147.75.193.234}
 
+- joyent:
+        win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
+
     - softlayer:
         ubuntu1604-x64-1: {ip: 159.122.210.205}
         ubuntu1604-x64-2: {ip: 159.122.210.194}
         win2012r2-x64-1: {ip: 169.55.170.68, user: admin}
-        win2012r2-x64-2: {ip: 165.225.150.83, user: Administrator}
