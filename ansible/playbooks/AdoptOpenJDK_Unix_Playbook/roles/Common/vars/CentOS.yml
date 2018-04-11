@@ -45,6 +45,7 @@ Build_Tool_Packages:
   - perl-libwww-perl
   - unzip
   - wget
+  - xz
   - zip
 
 gcc_compiler:
