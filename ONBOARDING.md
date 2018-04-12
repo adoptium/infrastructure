@@ -26,7 +26,7 @@ All infrastructure members have full admin access to the jenkins slave section a
 
 Used for machine monitoring (ensure that the user knows where to find the password).
 
-#### [Ansible AWX](ansible.adoptopenjdk.net)
+#### [Ansible AWX](https://ansible.adoptopenjdk.net)
 
 Used to run all playbooks on new machines (ensure that the an account has been created for the user)
 
