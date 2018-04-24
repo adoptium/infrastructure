@@ -2,7 +2,7 @@
 
 ### Tasks before onboarding
 
-- Add user to https://github.com/orgs/AdoptOpenJDK/teams/infrastructure (if they are not in the org you may need an onwer to add them).
+- Add user to https://github.com/orgs/AdoptOpenJDK/teams/infrastructure (if they are not in the org you may need an owner to add them).
 - Create Pull Request to add user to https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/README.md#infrastructure.
 - Ideally request users public GPG key as well as their public SSH key.
 
