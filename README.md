@@ -17,7 +17,6 @@
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
-- [@bblondin](https://github.com/bblondin) - Brad Blondin
 - [@gdams](https://github.com/gdams) - George Adams
 - [@karianna](https://github.com/karianna) - Martijn Verburg
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar
