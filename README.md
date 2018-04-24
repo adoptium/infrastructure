@@ -25,6 +25,8 @@
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
+# Machine Information
+Most information about our machines can be found at https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml
 
 # Maintenance Information:
 
