@@ -3,8 +3,8 @@
 
 #### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
 
-- [@bblondin](https://github.com/bblondin) - Brad Blondin
 - [@gdams](https://github.com/gdams) - George Adams
+- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
