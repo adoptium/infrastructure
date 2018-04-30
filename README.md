@@ -3,8 +3,8 @@
 
 #### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
 
-- [@bblondin](https://github.com/bblondin) - Brad Blondin
 - [@gdams](https://github.com/gdams) - George Adams
+- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
@@ -17,7 +17,6 @@
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
-- [@bblondin](https://github.com/bblondin) - Brad Blondin
 - [@gdams](https://github.com/gdams) - George Adams
 - [@karianna](https://github.com/karianna) - Martijn Verburg
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar
@@ -25,6 +24,8 @@
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
+# Machine Information
+Most information about our machines can be found at https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml
 
 # Maintenance Information:
 
