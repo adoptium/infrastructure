@@ -100,6 +100,19 @@
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/c++ to c++
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/c++
+    dest: /usr/bin/c++
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
 ##############################
 # expat on CentOS on x86_64 #
 ##############################
