@@ -8,41 +8,6 @@
   register: gcc_installed
   tags: gcc-4.8
 
-# MPC - gcc prerequisites
-- name: Download mpc sources
-  get_url:
-    url: http://www.multiprecision.org/downloads/mpc-0.8.1.tar.gz
-    dest: '/tmp/mpc-0.8.1.tar.gz'
-    force: no
-    mode: 0755
-  when:
-    - gcc_installed.rc != 0
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version == "6"
-    - ansible_architecture == "x86_64"
-  tags: gcc-4.8
-
-- name: Extract mpc
-  unarchive:
-    src: /tmp/mpc-0.8.1.tar.gz
-    dest: /tmp/
-    copy: False
-  when:
-    - gcc_installed.rc != 0
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version == "6"
-    - ansible_architecture == "x86_64"
-  tags: gcc-4.8
-
-- name: Running configure, compile and install for mpc
-  shell: cd /tmp/mpc-0.8.1 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
-  when:
-    - gcc_installed.rc != 0
-    - ansible_distribution == "RedHat"
-    - ansible_distribution_major_version == "6"
-    - ansible_architecture == "x86_64"
-  tags: gcc-4.8
-
 # gcc
 - name: Download gcc-4.8.5 source
   get_url:
@@ -100,6 +65,49 @@
     owner: root
     group: root
     state: link
+  when:
+    - gcc_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: gcc-4.8
+
+- name: Create symlink for c++-4.8
+  file:
+    src: /opt/gcc-4.8.5/bin/c++
+    dest: /usr/bin/c++-4.8
+    owner: root
+    group: root
+    state: link
+  when:
+    - gcc_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: gcc-4.8
+
+- name: Create symlink for libstdc++.so.6.0.19
+  file:
+    src: /opt/gcc-4.8.5/lib64/libstdc++.so.6.0.19 
+    dest: /usr/lib64/libstdc++.so.6.0.19
+    owner: root
+    group: root
+    state: link
+  when:
+    - gcc_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: gcc-4.8
+
+- name: Create symlink for libstdc++.so.6
+  file:
+    src: /usr/lib64/libstdc++.so.6.0.19
+    dest: /usr/lib64/libstdc++.so.6
+    owner: root
+    group: root
+    state: link
+    force: true
   when:
     - gcc_installed.rc != 0
     - ansible_distribution == "RedHat"
