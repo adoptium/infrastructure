@@ -15,14 +15,14 @@
   register: ms_sdk_download
   tags: MS_SDK_7.1
 
-- name: Download pre compiled freetype.zip
+- name: Download MicrosoftSDKs.zip
   win_get_url:
     url: https://ci.adoptopenjdk.net/userContent/MicrosoftSDKs.zip
     dest: C:\temp\MS_SDK.zip
   when: (ms_sdk_installed.stat.exists == false) and (ms_sdk_download.stat.exists == false)
   tags: MS_SDK_7.1
 
-- name: Unpack freetype
+- name: Unpack MicrosoftSDKs
   win_unzip:
     src: C:\temp\MS_SDK.zip
     dest: C:\Program Files\
