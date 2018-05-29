@@ -16,29 +16,30 @@
       echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
     tags: nagios_plugins
 
-  ###################
-  # Install plugins #
-  ###################
-  - name: Install nagios-plugins-all 
-    yum:
-      name: nagios-plugins-all
-      state: latest
-    when: 
-      - ansible_distribution_major_version != "6"
-    tags: nagios_plugins
-
-  ##########
-  # Layout #
-  ##########
-  - name: Creates Nagios folder
-    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-    tags: nagios_plugins
-
-  - name: Create symlink to plugins
-    file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
-    when: 
-      - ansible_distribution_major_version != "6"
-    tags: nagios_plugins
+# Can't find nagios-plugins-all on RHEL74/s390x so removing this
+#  ###################
+#  # Install plugins #
+#  ###################
+#  - name: Install nagios-plugins-all 
+#    yum:
+#      name: nagios-plugins-all
+#      state: latest
+#    when: 
+#      - ansible_distribution_major_version != "6"
+#    tags: nagios_plugins
+#
+#  ##########
+#  # Layout #
+#  ##########
+#  - name: Creates Nagios folder
+#    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+#    tags: nagios_plugins
+#
+#  - name: Create symlink to plugins
+#    file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+#    when: 
+#      - ansible_distribution_major_version != "6"
+#    tags: nagios_plugins
 
   #############################
   # Install plugins On RHEL 6 #
@@ -55,7 +56,7 @@
       mode: 0440
       timeout: 25
     when: 
-      - ansible_distribution_major_version == "6"
+#      - ansible_distribution_major_version == "6"
       - not folder_nagios.stat.exists
     tags: nagios_plugins
 
@@ -65,7 +66,7 @@
       dest: /tmp/
       copy: False
     when: 
-      - ansible_distribution_major_version == "6"
+#      - ansible_distribution_major_version == "6"
       - not folder_nagios.stat.exists
     tags: nagios_plugins
 
@@ -73,7 +74,7 @@
     shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
     become: yes
     when:
-      - ansible_distribution_major_version == "6"
+#      - ansible_distribution_major_version == "6"
       - not folder_nagios.stat.exists
     tags: nagios_plugins
 
