@@ -36,7 +36,7 @@ Build_Tool_Packages:
   - libxrender-dev
   - libxt-dev
   - libxtst-dev
-  - make 
+  - make
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
@@ -67,6 +67,8 @@ Test_Tool_Packages:
   - xauth
   - xorg
   - xvfb
+  - binfmt-support
+  - qemu-user-static
 
 Test_Tool_Packages_x86_64:
   - pulseaudio
