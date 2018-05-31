@@ -43,6 +43,7 @@ Build_Tool_Packages:
   - perl-devel
   - perl-GD
   - perl-libwww-perl
+  - perl-Time-HiRes
   - unzip
   - wget
   - xz
