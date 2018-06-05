@@ -1,16 +1,7 @@
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-<<<<<<< HEAD
-- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
-=======
-- hosts:
-    - build
-    - test
-    - "!*zos*"
-    - "!*win*"
-    - "!*aix*"
->>>>>>> initial macos ansible
+- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
 
