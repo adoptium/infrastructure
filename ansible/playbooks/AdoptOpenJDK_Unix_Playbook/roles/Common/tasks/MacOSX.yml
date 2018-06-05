@@ -63,24 +63,12 @@
 ################
 # Install Java #
 ################
+#TODO Add Java 7
+
 - name: Add caskroom/versions to homebrew
   become_user: administrator
   homebrew_tap:
-    name: caskroom/versions
-
-#TODO add java7
-
-- name: Install java8
-  become_user: administrator
-  homebrew_cask:
-    name: java8
-    state: present
-
-- name: Install java9
-  become_user: administrator
-  homebrew_cask:
-    name: java
-    state: present
+    name: AdoptOpenJDK/openjdk
 
 ############################
 # Build Packages and tools #
