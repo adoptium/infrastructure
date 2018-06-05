@@ -65,7 +65,7 @@
 ################
 #TODO Add Java 7
 
-- name: Add caskroom/versions to homebrew
+- name: Add the AdoptOpenJDK brew repo
   become_user: administrator
   homebrew_tap:
     name: AdoptOpenJDK/openjdk
