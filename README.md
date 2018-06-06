@@ -11,11 +11,11 @@
 - [@bblondin](https://github.com/bblondin) - Brad Blondin
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones
 - [@gdams](https://github.com/gdams) - George Adams
+- [@jdekonin](https://github.com/jdekonin) - Joe deKoning
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
-- [@jdekonin](https://github.com/jdekonin) - Joe deKoning
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@gdams](https://github.com/gdams) - George Adams
