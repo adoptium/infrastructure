@@ -4,26 +4,26 @@
 ##########
 - name: Test if Java 8 is already installed
   win_stat:
-      path: 'C:\Program Files\Java\jdk8u144-b01'
+      path: 'C:\Program Files\Java\jdk8u172-b11'
   register: java8_installed
   tags: Java8
 
 - name: Check if Java 8 is already downloaded
   win_stat:
-      path: 'C:\temp\jdk8u144-b01.zip'
+      path: 'C:\temp\jdk8u172-b11.zip'
   register: java8_download
   tags: Java8
 
 - name: Download Java 8
   win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u144-b01/OpenJDK8_x64_Win_jdk8u144-b01.zip
-    dest: 'C:\temp\jdk8u144-b01.zip'
+    url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u172-b11/OpenJDK8_x64_Win_jdk8u172-b11.zip
+    dest: 'C:\temp\jdk8u172-b11.zip'
   when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
   tags: Java8
 
 - name: Install Java 8
   win_unzip:
-    src: C:\temp\jdk8u144-b01.zip
+    src: C:\temp\jdk8u172-b11.zip
     dest: C:\Program Files\Java
   when: (java8_installed.stat.exists == false)
   tags: Java8
@@ -35,7 +35,7 @@
   tags: Java8
 
 - name: Create symlink to Java 8
-  raw: cmd /c mklink /D "C:\openjdk\jdk8\" "C:\Program Files\Java\jdk8u144-b01\"
+  raw: cmd /c mklink /D "C:\openjdk\jdk8\" "C:\Program Files\Java\jdk8u172-b11\"
   when: (java8_symlink.stat.exists == false)
   tags: Java8
 
@@ -43,7 +43,7 @@
   win_path:
     name: JAVA_HOME
     elements:
-      - 'C:\Program Files\Java\jdk8u144-b01'
+      - 'C:\Program Files\Java\jdk8u172-b11'
     scope: machine
     state: present
   when: (java8_installed.stat.exists == false)
@@ -53,7 +53,7 @@
   win_path:
     name: Path
     elements:
-      - 'C:\Program Files\Java\jdk8u144-b01\bin'
+      - 'C:\Program Files\Java\jdk8u172-b11\bin'
     scope: machine
     state: present
   tags: Java8
