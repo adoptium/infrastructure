@@ -18,9 +18,12 @@ hosts:
 
   - build:
 
+    - azure:
+        win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
+
     - cloudcone:
         ubuntu1604-x64-1: {ip: 173.82.219.221}
-       
+
     - digitalocean:
         centos69-x64-1: {ip: 159.65.95.239}
 
@@ -84,13 +87,13 @@ hosts:
     - macincloud:
         macos1010-x64-1: {ip: 74.80.250.151, user: admin}
         macos1010-x64-2: {ip: 74.80.250.173, user: admin}
-        
+
     - marist:
         ubuntu1604-s390x-1: {ip: 148.100.33.147}
 
     - scaleway:
         ubuntu1604-x64-1: {ip: 51.15.76.107}
-    
+
     - softlayer:
         ubuntu1604-x64-1: {ip: 169.55.150.155}
         rhel74-x64-1: {ip: 169.55.170.70}
