@@ -16,7 +16,7 @@
 
 - name: Download Java 9
   win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-9%2B181/OpenJDK9_x64_Win_jdk-9.181.zip
+    url: https://github.com/AdoptOpenJDK/openjdk9-nightly/releases/download/jdk-9%2B181-20180611/OpenJDK9_x64_Win_20180611.zip
     dest: 'C:\temp\jdk-9+181.zip'
   when: (java9_download.stat.exists == false) and (java9_installed.stat.exists == false)
   tags: Java9
