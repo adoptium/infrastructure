@@ -21,7 +21,7 @@
   tags: MSVS_2010
 
 - name: Register Visual Studio 2010 DIA SDK shared libraries
-  raw: 'for /r "C:\Program Files (x86)\Microsoft Visual Studio 10.0\DIA SDK" %F in ( msdia*.dll ) do regsvr32 /s "%~F"'
+  win_command: 'for /r "C:\Program Files (x86)\Microsoft Visual Studio 10.0\DIA SDK" %F in ( msdia*.dll ) do regsvr32 /s "%~F"'
   tags: MSVS_2010
 
 - name: Reboot machine after Visual Studio 2010 installation
