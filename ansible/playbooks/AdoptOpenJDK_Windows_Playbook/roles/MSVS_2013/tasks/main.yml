@@ -28,7 +28,6 @@
   with_items:
     - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\msdia120.dll
     - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\amd64\msdia120.dll
-    - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\arm\msdia120.dll
   tags: MSVS_2013
 
 - name: Reboot machine after Visual Studio installation
