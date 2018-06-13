@@ -5,6 +5,7 @@
 
 - [@gdams](https://github.com/gdams) - George Adams
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton
+- [@johnoliver](https://github.com/johnoliver) - John Oliver
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
