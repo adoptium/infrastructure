@@ -4,8 +4,8 @@
 #### [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
 
 - [@gdams](https://github.com/gdams) - George Adams
-- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 - [@johnoliver](https://github.com/johnoliver) - John Oliver
+- [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
@@ -13,6 +13,7 @@
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones
 - [@gdams](https://github.com/gdams) - George Adams
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning
+- [@johnoliver](https://github.com/johnoliver) - John Oliver
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
