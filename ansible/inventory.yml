@@ -67,7 +67,10 @@ hosts:
         win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
         win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
-  - test:
+  - test: 
+  
+    - azure:
+        win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
 
     - osuosl:
         ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
