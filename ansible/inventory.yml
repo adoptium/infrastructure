@@ -79,7 +79,6 @@ hosts:
         ubuntu1604-x64-2: {ip: 147.75.100.127}
         ubuntu1604-x64-3: {ip: 147.75.83.133}
         win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
-        ubuntu1604-x64-4: {ip: 147.75.77.86, description: optane}
 
     - macincloud:
         macos1010-x64-1: {ip: 74.80.250.151, user: admin}
