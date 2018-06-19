@@ -27,9 +27,6 @@ hosts:
     - digitalocean:
         centos69-x64-1: {ip: 159.65.95.239}
 
-    - 1and1:
-        win2008r2-x64-1: {ip: 109.228.48.187, user: Administrator}
-
     - linaro:
         centos74-armv8-1: {ip: 64.28.99.122}
         centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
@@ -70,7 +67,10 @@ hosts:
         win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
         win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
-  - test:
+  - test: 
+  
+    - azure:
+        win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
 
     - osuosl:
         ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
@@ -82,7 +82,6 @@ hosts:
         ubuntu1604-x64-2: {ip: 147.75.100.127}
         ubuntu1604-x64-3: {ip: 147.75.83.133}
         win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
-        ubuntu1604-x64-4: {ip: 147.75.77.86, description: optane}
 
     - macincloud:
         macos1010-x64-1: {ip: 74.80.250.151, user: admin}
