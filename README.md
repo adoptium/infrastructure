@@ -21,6 +21,7 @@
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@gdams](https://github.com/gdams) - George Adams
+- [@johnoliver](https://github.com/johnoliver) - John Oliver
 - [@karianna](https://github.com/karianna) - Martijn Verburg
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert
