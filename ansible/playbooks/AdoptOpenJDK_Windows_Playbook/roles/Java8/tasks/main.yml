@@ -4,13 +4,13 @@
 ##########
 - name: Test if Java 8 is already installed
   win_stat:
-      path: 'C:\Program Files\Java\jdk8u172-b11'
+    path: 'C:\Program Files\Java\jdk8u172-b11'
   register: java8_installed
   tags: Java8
 
 - name: Check if Java 8 is already downloaded
   win_stat:
-      path: 'C:\temp\jdk8u172-b11.zip'
+    path: 'C:\temp\jdk8u172-b11.zip'
   register: java8_download
   tags: Java8
 
@@ -30,7 +30,7 @@
 
 - name: Test if Java 8 symlink is already created
   win_stat:
-      path: 'C:\openjdk\jdk8'
+    path: 'C:\openjdk\jdk8'
   register: java8_symlink
   tags: Java8
 

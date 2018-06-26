@@ -49,7 +49,7 @@
     state: present
   when: Domain == "adoptopenjdk.net"
   tags: hosts_file
-  
+
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
   lineinfile:
     dest: /etc/hosts

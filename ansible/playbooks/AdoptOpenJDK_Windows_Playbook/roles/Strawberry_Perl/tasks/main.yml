@@ -5,13 +5,13 @@
 
 - name: Test if Strawberry Perl is already installed
   win_stat:
-      path: 'C:\Strawberry\perl'
+    path: 'C:\Strawberry\perl'
   register: strawberry_perl_installed
   tags: Strawberry_Perl
 
 - name: Check if Strawberry Perl is already downloaded
   win_stat:
-      path: 'C:\temp\strawberry-perl.zip'
+    path: 'C:\temp\strawberry-perl.zip'
   register: strawberry_perl_download
   tags: Strawberry_Perl
 
@@ -32,7 +32,7 @@
 - name: Add Strawberry Perl to %PATH%
   win_path:
     elements:
-    - 'C:\Strawberry\bin'
+      - 'C:\Strawberry\bin'
     state: present
   when: (strawberry_perl_installed.stat.exists == false)
   tags: Strawberry_Perl

@@ -10,116 +10,116 @@ hosts:
 
   - infrastructure:
 
-    - digitalocean:
-        ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
+      - digitalocean:
+          ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
 
-    - softlayer:
-        ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
+      - softlayer:
+          ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
 
   - build:
 
-    - azure:
-        win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
+      - azure:
+          win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
 
-    - cloudcone:
-        ubuntu1604-x64-1: {ip: 173.82.219.221}
+      - cloudcone:
+          ubuntu1604-x64-1: {ip: 173.82.219.221}
 
-    - digitalocean:
-        centos69-x64-1: {ip: 159.65.95.239}
+      - digitalocean:
+          centos69-x64-1: {ip: 159.65.95.239}
 
-    - linaro:
-        centos74-armv8-1: {ip: 64.28.99.122}
-        centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
+      - linaro:
+          centos74-armv8-1: {ip: 64.28.99.122}
+          centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
 
-    - macstadium:
-        macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
-        macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
+      - macstadium:
+          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
+          macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
 
-    - marist:
-        sles12-s390x-1: {ip: 148.100.110.56}
-        rhel74-s390x-1: {ip: 148.100.110.129}
-        ubuntu1604-s390x-2: {ip: 148.100.33.178}
-        ubuntu1604-s390x-3: {ip: 148.100.33.179}
-        zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
-        zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
+      - marist:
+          sles12-s390x-1: {ip: 148.100.110.56}
+          rhel74-s390x-1: {ip: 148.100.110.129}
+          ubuntu1604-s390x-2: {ip: 148.100.33.178}
+          ubuntu1604-s390x-3: {ip: 148.100.33.179}
+          zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
+          zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
-    - osuosl:
-        centos74-ppc64le-1: {ip: 140.211.168.138}
-        centos74-ppc64le-2: {ip: 140.211.168.117}
-        ubuntu1604-ppc64le-1: {ip: 140.211.168.243}
-        aix71-ppc64-1: {ip: 140.211.9.10}
-        aix71-ppc64-2: {ip: 140.211.9.12}
+      - osuosl:
+          centos74-ppc64le-1: {ip: 140.211.168.138}
+          centos74-ppc64le-2: {ip: 140.211.168.117}
+          ubuntu1604-ppc64le-1: {ip: 140.211.168.243}
+          aix71-ppc64-1: {ip: 140.211.9.10}
+          aix71-ppc64-2: {ip: 140.211.9.12}
 
-    - packet:
-        centos74-armv8-1: {ip: 147.75.196.30}
-        ubuntu1604-armv8-2: {ip: 147.75.77.146}
-        freebsd11-x64-1: {ip: 147.75.101.29}
+      - packet:
+          centos74-armv8-1: {ip: 147.75.196.30}
+          ubuntu1604-armv8-2: {ip: 147.75.77.146}
+          freebsd11-x64-1: {ip: 147.75.101.29}
 
-    - joyent:
-        centos69-x64-1: {ip: 165.225.149.157}
+      - joyent:
+          centos69-x64-1: {ip: 165.225.149.157}
 
-    - scaleway:
-        ubuntu1604-x64-2: {ip: 51.15.46.107}
-        ubuntu1604-armv7-1: {ip: 212.47.233.28}
-        ubuntu1604-armv7-2: {ip: 212.47.246.7}
+      - scaleway:
+          ubuntu1604-x64-2: {ip: 51.15.46.107}
+          ubuntu1604-armv7-1: {ip: 212.47.233.28}
+          ubuntu1604-armv7-2: {ip: 212.47.246.7}
 
-    - softlayer:
-        win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
-        win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
+      - softlayer:
+          win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
+          win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
-  - test: 
-  
-    - azure:
-        win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
+  - test:
 
-    - osuosl:
-        ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
-        ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
+      - azure:
+          win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
 
-    - packet:
-        ubuntu1604-armv8-1: {ip: 147.75.74.50}
-        ubuntu1604-x64-1: {ip: 147.75.204.239}
-        ubuntu1604-x64-2: {ip: 147.75.100.127}
-        ubuntu1604-x64-3: {ip: 147.75.83.133}
-        win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
+      - osuosl:
+          ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
+          ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
 
-    - macincloud:
-        macos1010-x64-1: {ip: 74.80.250.151, user: admin}
-        macos1010-x64-2: {ip: 74.80.250.173, user: admin}
+      - packet:
+          ubuntu1604-armv8-1: {ip: 147.75.74.50}
+          ubuntu1604-x64-1: {ip: 147.75.204.239}
+          ubuntu1604-x64-2: {ip: 147.75.100.127}
+          ubuntu1604-x64-3: {ip: 147.75.83.133}
+          win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
-    - marist:
-        ubuntu1604-s390x-1: {ip: 148.100.33.147}
+      - macincloud:
+          macos1010-x64-1: {ip: 74.80.250.151, user: admin}
+          macos1010-x64-2: {ip: 74.80.250.173, user: admin}
 
-    - scaleway:
-        ubuntu1604-x64-1: {ip: 51.15.76.107}
+      - marist:
+          ubuntu1604-s390x-1: {ip: 148.100.33.147}
 
-    - softlayer:
-        ubuntu1604-x64-1: {ip: 169.55.150.155}
-        rhel74-x64-1: {ip: 169.55.170.70}
-        rhel69-x64-1: {ip: 169.55.150.147}
-        win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
+      - scaleway:
+          ubuntu1604-x64-1: {ip: 51.15.76.107}
+
+      - softlayer:
+          ubuntu1604-x64-1: {ip: 169.55.150.155}
+          rhel74-x64-1: {ip: 169.55.170.70}
+          rhel69-x64-1: {ip: 169.55.150.147}
+          win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
 
   - jck:
 
-    - macstadium:
-        macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
-        macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
+      - macstadium:
+          macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
+          macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
 
-    - marist:
-        ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}
-        ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
+      - marist:
+          ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}
+          ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
 
-    - osuosl:
-        ubuntu1604-ppc64le-1: {ip: 140.211.168.225, user: ubuntu}
-        ubuntu1604-ppc64le-2: {ip: 140.211.168.217, user: ubuntu}
+      - osuosl:
+          ubuntu1604-ppc64le-1: {ip: 140.211.168.225, user: ubuntu}
+          ubuntu1604-ppc64le-2: {ip: 140.211.168.217, user: ubuntu}
 
-    - packet:
-        ubuntu1604-armv8-1: {ip: 147.75.193.234}
+      - packet:
+          ubuntu1604-armv8-1: {ip: 147.75.193.234}
 
-    - joyent:
-        win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
+      - joyent:
+          win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
 
-    - softlayer:
-        ubuntu1604-x64-1: {ip: 159.122.210.205}
-        ubuntu1604-x64-2: {ip: 159.122.210.194}
-        win2012r2-x64-1: {ip: 169.55.170.68, user: Administrator}
+      - softlayer:
+          ubuntu1604-x64-1: {ip: 159.122.210.205}
+          ubuntu1604-x64-2: {ip: 159.122.210.194}
+          win2012r2-x64-1: {ip: 169.55.170.68, user: Administrator}

@@ -15,7 +15,7 @@
     group: "{{ Jenkins_Username }}"
     mode: 0700
   when:
-   - ansible_architecture == "s390x"
+    - ansible_architecture == "s390x"
   tags: jenkins_user
 
 - name: Set authorized key for Jenkins user

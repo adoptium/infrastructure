@@ -8,42 +8,42 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  ###############
-  # Nagios user #
-  ###############
-  - name: Allow Nagios to use yum while restricting it to check-update only
-    shell: |
-      echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
-    when:
-      - ansible_architecture == "x86_64"
-    tags: nagios_plugins
+###############
+# Nagios user #
+###############
+- name: Allow Nagios to use yum while restricting it to check-update only
+  shell: |
+    echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
+  when:
+    - ansible_architecture == "x86_64"
+  tags: nagios_plugins
 
-  ###################
-  # Install plugins #
-  ###################
-  - name: Install nagios-plugins-all
-    yum:
-      name: nagios-plugins-all
-      state: latest
-    tags: nagios_plugins
+###################
+# Install plugins #
+###################
+- name: Install nagios-plugins-all
+  yum:
+    name: nagios-plugins-all
+    state: latest
+  tags: nagios_plugins
 
-  ##########
-  # Layout #
-  ##########
-  - name: Creates Nagios folder
-    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-    tags: nagios_plugins
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+  tags: nagios_plugins
 
-  - name: Create symlink to plugins
-    file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
-    tags: nagios_plugins
+- name: Create symlink to plugins
+  file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+  tags: nagios_plugins
 
-  ##############################
-  # Install additional plugins #
-  ##############################
-  - name: Download add-on check_yum plugin
-    get_url:
-      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
-      dest: /usr/local/nagios/libexec/check_yum
-      mode: 0755
-    tags: nagios_plugins
+##############################
+# Install additional plugins #
+##############################
+- name: Download add-on check_yum plugin
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
+    dest: /usr/local/nagios/libexec/check_yum
+    mode: 0755
+  tags: nagios_plugins

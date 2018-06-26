@@ -5,13 +5,13 @@
 
 - name: Test if GIT is already installed
   win_stat:
-      path: 'C:\Program Files\Git'
+    path: 'C:\Program Files\Git'
   register: git_installed
   tags: git
 
 - name: Check if GIT installer is already downloaded
   win_stat:
-      path: 'C:\temp\git.exe'
+    path: 'C:\temp\git.exe'
   register: git_download
   tags: git
 
