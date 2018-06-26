@@ -50,7 +50,7 @@
           tags: openssl
 
         - name: Install IBM Openssl - installp
-          shell: installp -aXYgd /tmp/openssl-1.0.2.1300 openssl.base
+          command: installp -aXYgd /tmp/openssl-1.0.2.1300 openssl.base
           register: result.openssl
           ignore_errors: yes
           tags: openssl
@@ -93,7 +93,7 @@
           tags: yum
 
         - name: Install yum and dependencies
-          shell: /tmp/yum.sh
+          command: /tmp/yum.sh
           register: result.yum
           ignore_errors: yes
           when: yum.stat.islnk is not defined
@@ -168,7 +168,7 @@
           tags: java8
 
         - name: Move extracted Java8 to /usr/java8_64
-          shell: mv /tmp/jdk8u144-b01/ /usr/java8_64
+          command: mv /tmp/jdk8u144-b01/ /usr/java8_64
           when: java8.stat.isdir is not defined
           tags: java8
 
@@ -220,7 +220,7 @@
           tags: java7
 
         - name: Move extracted Java7 to /usr/java7
-          shell: mv /tmp/j2sdk-image /usr/java7
+          command: mv /tmp/j2sdk-image /usr/java7
           when: java7.stat.isdir is not defined
           tags: java7
 
@@ -246,7 +246,7 @@
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
-          shell: installp -aXYgd /tmp/X11.adt X11.adt.ext
+          command: installp -aXYgd /tmp/X11.adt X11.adt.ext
           register: result.x11
           ignore_errors: yes
           tags: x11
@@ -277,7 +277,7 @@
           tags: xlc
 
         - name: Install IBM XL C - installp
-          shell: installp -aXYgd /tmp/usr/sys/inst.images all
+          command: installp -aXYgd /tmp/usr/sys/inst.images all
           register: result.xlc
           ignore_errors: yes
           when: xlc.stat.islnk is not defined
@@ -396,8 +396,7 @@
           tags: cpan
 
         - name: Install Text::CSV
-          shell: |
-            CC=xlc_r cpan -i Text::CSV
+          command: CC=xlc_r cpan -i Text::CSV
           tags: cpan
 
       #########################
@@ -477,7 +476,7 @@
           tags: jenkins_user
 
         - name: Create jenkins user
-          shell: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }}
+          command: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }}
           ignore_errors: yes
           when: jenkins.stat.isdir is not defined
           tags: jenkins_user
@@ -506,12 +505,12 @@
             path: /home/{{ Jenkins_Username }}/.profile
 
         - name: Set user capabilites
-          shell: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
+          command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
           tags: jenkins_user
 
 
         - name: Set group capabilites
-          shell: chgroup adms=root staff
+          command: chgroup adms=root staff
           tags: jenkins_user
 
         - name: ensure adequate limits are set in /etc/security/limits
@@ -578,7 +577,7 @@
       # superuser account #
       #####################
         - name: Setup zeus user
-          shell: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
+          command: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
           ignore_errors: yes
           when: Superuser_Account == "Enabled"
           tags: superuser

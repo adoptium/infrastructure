@@ -21,22 +21,19 @@
 
 # All
 - name: Install JSON
-  shell: |
-    cpanm --with-recommends JSON
+  command: cpanm --with-recommends JSON
   tags:
     - cpan
     - json
 
 - name: Install Text::CSV
-  shell: |
-    cpanm --with-recommends Text::CSV
+  command: cpanm --with-recommends Text::CSV
   tags:
     - cpan
     - text_csv
 
 - name: Install XML::Parser
-  shell: |
-    cpanm --with-recommends XML::Parser
+  command: cpanm --with-recommends XML::Parser
   tags:
     - cpan
     - xml_parser

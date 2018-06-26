@@ -32,7 +32,7 @@
 # Nagios user #
 ###############
 - name: Setup Nagios user
-  shell: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
+  command: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
   ignore_errors: yes
 
 - name: Create SSH Key folder for Nagios
