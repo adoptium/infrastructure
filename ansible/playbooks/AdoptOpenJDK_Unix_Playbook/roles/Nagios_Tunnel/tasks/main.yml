@@ -73,4 +73,3 @@
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
   tags: nagios_tunnel
- 

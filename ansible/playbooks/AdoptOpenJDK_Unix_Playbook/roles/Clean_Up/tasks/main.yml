@@ -21,7 +21,7 @@
 - name: Remove yum dependencies that are no longer required - RedHat and CentOS
   command: yum -y autoremove
   args:
-     warn: no
+    warn: no
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "centos")
   tags: clean_up

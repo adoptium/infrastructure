@@ -5,13 +5,13 @@
 
 - name: Test if Ant is already installed
   win_stat:
-      path: 'C:\apache-ant\apache-ant-1.10.3'
+    path: 'C:\apache-ant\apache-ant-1.10.3'
   register: ant_installed
   tags: ANT
 
 - name: Test if Ant is already downloaded
   win_stat:
-      path: 'c:\temp\ant.zip'
+    path: 'c:\temp\ant.zip'
   register: ant_download
   tags: ANT
 
@@ -39,15 +39,15 @@
 
 - name: Add %ANT_HOME%\bin to %PATH%
   win_path:
-      elements:
+    elements:
       - '%ANT_HOME%\bin'
-      state: present
+    state: present
   when: (ant_installed.stat.exists == false)
   tags: ANT
 
 - name: Test if ant-contrib is already installed
   win_stat:
-      path: 'C:\apache-ant\apache-ant-1.10.3\lib\ant-contrib.jar'
+    path: 'C:\apache-ant\apache-ant-1.10.3\lib\ant-contrib.jar'
   register: ant_contrib_installed
   tags: ANT
 

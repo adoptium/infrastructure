@@ -4,15 +4,15 @@
 #######################
 - name: Check if NVidia CUDA toolkit is aready installed
   stat:
-      path: /usr/local/cuda-9.0
+    path: /usr/local/cuda-9.0
   register: cuda_installed
   tags: nvidia_cuda_toolkit
 
 # RedHat 7 and Ubuntu 16 on x86_64
 - name: Download NVidia CUDA toolkit
   get_url:
-    url="https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
-    dest="/tmp/cuda9_linux-run"
+    url: "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
+    dest: "/tmp/cuda9_linux-run"
   when:
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )

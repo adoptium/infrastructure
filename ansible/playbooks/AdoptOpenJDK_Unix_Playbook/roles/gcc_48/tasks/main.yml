@@ -88,7 +88,7 @@
 
 - name: Create symlink for libstdc++.so.6.0.19
   file:
-    src: /opt/gcc-4.8.5/lib64/libstdc++.so.6.0.19 
+    src: /opt/gcc-4.8.5/lib64/libstdc++.so.6.0.19
     dest: /usr/lib64/libstdc++.so.6.0.19
     owner: root
     group: root

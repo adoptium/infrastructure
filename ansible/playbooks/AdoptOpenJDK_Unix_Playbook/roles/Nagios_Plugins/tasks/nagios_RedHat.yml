@@ -1,3 +1,4 @@
+---
 #######################################################################################
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on RHEL 7 on x86 hardware #
 #######################################################################################
@@ -8,82 +9,82 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  ###############
-  # Nagios user #
-  ###############
-  - name: Allow Nagios to use yum while restricting it to check-update only
-    shell: |
-      echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
-    tags: nagios_plugins
+###############
+# Nagios user #
+###############
+- name: Allow Nagios to use yum while restricting it to check-update only
+  shell: |
+    echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
+  tags: nagios_plugins
 
 # Can't find nagios-plugins-all on RHEL74/s390x so removing this
-#  ###################
-#  # Install plugins #
-#  ###################
-#  - name: Install nagios-plugins-all 
-#    yum:
-#      name: nagios-plugins-all
-#      state: latest
-#    when: 
-#      - ansible_distribution_major_version != "6"
-#    tags: nagios_plugins
+# ###################
+# # Install plugins #
+# ###################
+# - name: Install nagios-plugins-all
+#   yum:
+#     name: nagios-plugins-all
+#     state: latest
+#   when:
+#     - ansible_distribution_major_version != "6"
+#   tags: nagios_plugins
 #
-#  ##########
-#  # Layout #
-#  ##########
-#  - name: Creates Nagios folder
-#    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-#    tags: nagios_plugins
+# ##########
+# # Layout #
+# ##########
+# - name: Creates Nagios folder
+#   file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+#   tags: nagios_plugins
 #
-#  - name: Create symlink to plugins
-#    file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
-#    when: 
-#      - ansible_distribution_major_version != "6"
-#    tags: nagios_plugins
+# - name: Create symlink to plugins
+#   file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+#   when:
+#     - ansible_distribution_major_version != "6"
+#   tags: nagios_plugins
 
-  #############################
-  # Install plugins On RHEL 6 #
-  #############################
-  - name: Test if nagios-plugins are already installed
-    stat:
-      path: /usr/local/nagios
-    register: folder_nagios
-    
-  - name: Download nagios-plugins
-    get_url:
-      url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
-      dest: /tmp/
-      mode: 0440
-      timeout: 25
-    when: 
+#############################
+# Install plugins On RHEL 6 #
+#############################
+- name: Test if nagios-plugins are already installed
+  stat:
+    path: /usr/local/nagios
+  register: folder_nagios
+
+- name: Download nagios-plugins
+  get_url:
+    url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+  when:
 #      - ansible_distribution_major_version == "6"
-      - not folder_nagios.stat.exists
-    tags: nagios_plugins
+    - not folder_nagios.stat.exists
+  tags: nagios_plugins
 
-  - name: Extract nagios-plugins
-    unarchive:
-      src: /tmp/nagios-plugins-2.2.1.tar.gz
-      dest: /tmp/
-      copy: False
-    when: 
+- name: Extract nagios-plugins
+  unarchive:
+    src: /tmp/nagios-plugins-2.2.1.tar.gz
+    dest: /tmp/
+    copy: False
+  when:
 #      - ansible_distribution_major_version == "6"
-      - not folder_nagios.stat.exists
-    tags: nagios_plugins
+    - not folder_nagios.stat.exists
+  tags: nagios_plugins
 
-  - name: Configure, make and make install nagios-plugins
-    shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-    become: yes
-    when:
+- name: Configure, make and make install nagios-plugins
+  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+  become: yes
+  when:
 #      - ansible_distribution_major_version == "6"
-      - not folder_nagios.stat.exists
-    tags: nagios_plugins
+    - not folder_nagios.stat.exists
+  tags: nagios_plugins
 
-  ##############################
-  # Install additional plugins #
-  ##############################
-  - name: Download add-on check_yum plugin
-    get_url:
-      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
-      dest: /usr/local/nagios/libexec/check_yum
-      mode: 0755
-    tags: nagios_plugins
+##############################
+# Install additional plugins #
+##############################
+- name: Download add-on check_yum plugin
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
+    dest: /usr/local/nagios/libexec/check_yum
+    mode: 0755
+  tags: nagios_plugins

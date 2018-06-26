@@ -4,13 +4,13 @@
 ##########
 - name: Test if Java 9 is already installed
   win_stat:
-      path: 'C:\Program Files\Java\jdk-9+181'
+    path: 'C:\Program Files\Java\jdk-9+181'
   register: java9_installed
   tags: Java9
 
 - name: Check if Java 9 is already downloaded
   win_stat:
-      path: 'C:\temp\jdk-9+181.zip'
+    path: 'C:\temp\jdk-9+181.zip'
   register: java9_download
   tags: Java9
 
@@ -30,7 +30,7 @@
 
 - name: Test if Java 9 symlink is already created
   win_stat:
-      path: 'C:\openjdk\jdk9'
+    path: 'C:\openjdk\jdk9'
   register: java9_symlink
   tags: Java9
 
