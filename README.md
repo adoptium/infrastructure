@@ -25,6 +25,7 @@
 - [@karianna](https://github.com/karianna) - Martijn Verburg
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert
+- [@sophia-guo](https://github.com/sophia-guo) - Sophia Guo
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
