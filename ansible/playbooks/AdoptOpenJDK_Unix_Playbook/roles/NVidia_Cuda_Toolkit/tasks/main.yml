@@ -20,7 +20,7 @@
   tags: nvidia_cuda_toolkit
 
 - name: Install NVidia CUDA toolkit
-  shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
+  command: sh /tmp/cuda9_linux-run --silent --toolkit --override
   when:
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
@@ -101,7 +101,7 @@
   tags: nvidia_cuda_toolkit
 
 - name: Enable NVidia CUDA toolkit Repo for SLES12 on x86_64
-  shell: |
+  command: |
     rpm -i /tmp/sles12_cuda9_repo.rpm
     sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
   when:
