@@ -6,7 +6,9 @@
   shell: ls -ld /usr/lib/jvm/jdk-9+* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk9_installed
-  tags: adoptopenjdk9
+  tags:
+    - adoptopenjdk9
+    - skip_ansible_lint
 
 - name: Install latest release if one not already installed
   unarchive:

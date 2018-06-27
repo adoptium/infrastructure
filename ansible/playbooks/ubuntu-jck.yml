@@ -31,6 +31,9 @@
             - vnc4server
             - xvfb
             - xterm
+          tags:
+            # TODO: Package installs should not use latest
+            - skip_ansible_lint
         - name: Create Jenkins user
           action: user name="{{ Jenkins_Username }}" state=present
           ignore_errors: yes

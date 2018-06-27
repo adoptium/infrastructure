@@ -9,7 +9,10 @@
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
-  tags: test_tools
+  tags:
+    - test_tools
+    - skip_ansible_lint
+    #TODO: curl used in place of get_url or uri module
 
 - name: Install cpanminus RedHat 7 and Centos 7
   yum:
@@ -21,22 +24,25 @@
 
 # All
 - name: Install JSON
-  shell: |
-    cpanm --with-recommends JSON
+  command: cpanm --with-recommends JSON
   tags:
     - cpan
     - json
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 - name: Install Text::CSV
-  shell: |
-    cpanm --with-recommends Text::CSV
+  command: cpanm --with-recommends Text::CSV
   tags:
     - cpan
     - text_csv
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 - name: Install XML::Parser
-  shell: |
-    cpanm --with-recommends XML::Parser
+  command: cpanm --with-recommends XML::Parser
   tags:
     - cpan
     - xml_parser
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint

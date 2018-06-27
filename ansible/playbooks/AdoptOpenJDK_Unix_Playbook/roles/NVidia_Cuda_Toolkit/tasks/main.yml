@@ -20,7 +20,7 @@
   tags: nvidia_cuda_toolkit
 
 - name: Install NVidia CUDA toolkit
-  shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
+  command: sh /tmp/cuda9_linux-run --silent --toolkit --override
   when:
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7") )
@@ -101,7 +101,7 @@
   tags: nvidia_cuda_toolkit
 
 - name: Enable NVidia CUDA toolkit Repo for SLES12 on x86_64
-  shell: |
+  command: |
     rpm -i /tmp/sles12_cuda9_repo.rpm
     sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
   when:
@@ -109,7 +109,10 @@
     - ansible_architecture == "x86_64"
     - ansible_distribution == "SLES"
     - ansible_distribution_major_version == "12"
-  tags: nvidia_cuda_toolkit
+  tags:
+    - nvidia_cuda_toolkit
+    #TODO: rpm used in place of yum or rpm_key module
+    - skip_ansible_lint
 
 - name: Install NVidia CUDA toolkit for SLES12 on x86_64
   zypper: pkg=cuda state=latest update_cache=yes
@@ -118,4 +121,7 @@
     - ansible_architecture == "x86_64"
     - ansible_distribution == "SLES"
     - ansible_distribution_major_version == "12"
-  tags: nvidia_cuda_toolkit
+  tags:
+    - nvidia_cuda_toolkit
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
