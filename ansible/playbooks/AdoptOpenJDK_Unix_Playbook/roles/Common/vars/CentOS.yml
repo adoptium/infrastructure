@@ -43,6 +43,7 @@ Build_Tool_Packages:
   - perl-devel
   - perl-GD
   - perl-libwww-perl
+  - perl-Time-HiRes
   - unzip
   - wget
   - xz
@@ -58,6 +59,7 @@ Additional_Build_Tools_x86_64:
 
 Test_Tool_Packages:
   - ant
+  - mercurial
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xorg

@@ -10,7 +10,7 @@
 
 - name: Install latest release if one not already installed
   unarchive:
-    src: https://api.adoptopenjdk.net/openjdk9/releases/x64_linux/latest/binary
+    src: https://api.adoptopenjdk.net/openjdk9/nightly/x64_linux/latest/binary
     dest: /usr/lib/jvm
     remote_src: yes
   when:
@@ -19,7 +19,7 @@
 
 - name: Install latest release if one not already installed
   unarchive:
-    src: https://api.adoptopenjdk.net/openjdk9/releases/{{ ansible_architecture }}_linux/latest/binary
+    src: https://api.adoptopenjdk.net/openjdk9/nightly/{{ ansible_architecture }}_linux/latest/binary
     dest: /usr/lib/jvm
     remote_src: yes
   when:

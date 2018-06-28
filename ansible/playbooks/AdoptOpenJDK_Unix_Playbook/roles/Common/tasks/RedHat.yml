@@ -47,7 +47,7 @@
 
 - name: Install numactl-devel excluding RHEL 7 on s390x
   package: "name=numactl-devel state=latest"
-  when: 
+  when:
     - (ansible_distribution_major_version != "7" and ansible_architecture != "s390x")
   tags: build_tools
 

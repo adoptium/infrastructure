@@ -1,3 +1,4 @@
+---
 #################################################################################################
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on Ubuntu 14 and 16 on x86 hardware #
 #################################################################################################
@@ -8,27 +9,27 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  ########################################
-  # Install Nagios dependencies packages #
-  ########################################
-  - name: Install Nagios plugins
-    apt: pkg={{ item }} state=latest update_cache=yes
-    with_items:
-      - fping
-      - gcc
-      - nagios-plugins
-      - nagios-plugins-common
-      - perl
-      - qstat
-    tags: nagios_plugins
+########################################
+# Install Nagios dependencies packages #
+########################################
+- name: Install Nagios plugins
+  apt: pkg={{ item }} state=latest update_cache=yes
+  with_items:
+    - fping
+    - gcc
+    - nagios-plugins
+    - nagios-plugins-common
+    - perl
+    - qstat
+  tags: nagios_plugins
 
-  ##########
-  # Layout #
-  ##########
-  - name: Creates Nagios folder
-    file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-    tags: nagios_plugins
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+  tags: nagios_plugins
 
-  - name: Create symlink to plugins
-    file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
-    tags: nagios_plugins
+- name: Create symlink to plugins
+  file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
+  tags: nagios_plugins

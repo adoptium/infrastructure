@@ -154,7 +154,7 @@
   when:
     - ansible_distribution == "Ubuntu"
   tags: docker
-  
+
 - name: Install Docker for ALL
   package: "name=docker-ce state=latest"
   when:

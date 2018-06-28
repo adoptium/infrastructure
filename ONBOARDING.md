@@ -32,4 +32,4 @@ Used to run all playbooks on new machines (ensure that the an account has been c
 
 #### [KeyBox](https://keybox.adoptopenjdk.net)
 
-Used to disribute SSH keys. Ensure that both the users SSH key is on the system but also ensure that they know where to find the password.
+Used to distribute SSH keys. Ensure that both the users SSH key is on the system but also ensure that they know where to find the password.
