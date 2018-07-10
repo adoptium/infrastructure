@@ -33,3 +33,11 @@
     - (ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture != "armv7l"
   tags: jenkins_user
+
+- name: Unset expiry on user account for Redhat for Jenkins user
+  shell: chage -M -1 -E -1 {{ Jenkins_Username }}
+  tags: jenkins_user
+
+- name: Unset expiry on user account for Redhat for root
+  shell: chage -M -1 -E -1 root
+  tags: jenkins_user
