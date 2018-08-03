@@ -89,6 +89,14 @@
             dest: "/home/{{ Jenkins_Username }}/openjdk-api"
             update: yes
 
+        - name: Copy github api tokens
+          copy:
+            content: "{{ lookup('env','githubApiToken') }}"
+            dest: "/home/{{ Jenkins_Username }}/github.auth"
+            owner: jenkins
+            group: jenkins
+            mode: 0600
+
         - name: NPM install api package.json
           become_user: "{{ Jenkins_Username }}"
           npm:
