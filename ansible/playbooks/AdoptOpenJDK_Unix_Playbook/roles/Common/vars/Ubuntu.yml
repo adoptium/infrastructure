@@ -16,7 +16,10 @@ Build_Tool_Packages:
   - g++
   - gcc
   - gettext
+  - gperf
   - libasound2-dev
+  - libavcodec-dev
+  - libavformat-dev
   - libcups2-dev
   - libcurl4-openssl-dev
   - libdwarf-dev
@@ -25,17 +28,28 @@ Build_Tool_Packages:
   - libffi-dev
   - libfreetype6-dev
   - libfontconfig1-dev
+  - libgl1-mesa-dev
+  - libgstreamer0.10-dev
+  - libgstreamer-plugins-base0.10-dev
   - libgmp3-dev
+  - libgtk2.0-dev
+  - libgtk-3-dev
+  - libjpeg-dev
   - libmpfr4
   - libmpfr4-dbg
   - libmpfr-dev
   - libmpfr-doc
+  - libpng-dev
+  - libudev-dev
   - libwww-perl
   - libx11-dev
   - libxext-dev
+  - libxml2-dev
   - libxrender-dev
+  - libxslt1-dev
   - libxt-dev
   - libxtst-dev
+  - libxxf86vm-dev
   - make
   - ntp
   - openjdk-7-jdk
