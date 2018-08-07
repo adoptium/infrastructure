@@ -42,5 +42,6 @@
     - ANT
     - MSVS_2010
     - MSVS_2013
+    - MSVS_2017
     - NVidia_Cuda_Toolkit
     - NTP_TIME

@@ -1,0 +1,38 @@
+---
+################################
+# Visual Studio Community 2017 #
+################################
+
+- name: Test if VS 2017 is installed
+  win_stat:
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017'
+  register: vs2017_installed
+  tags: MSVS_2017
+
+- name: Download Visual Studio Community 2017
+  win_get_url:
+    url: 'https://aka.ms/vs/15/release/vs_community.exe'
+    dest: 'C:\TEMP\vs_community.exe'
+    force: no
+  when: (vs2017_installed.stat.exists == false)
+  tags: MSVS_2017
+
+- name: Install Visual Studio Community 2017
+  raw: 'C:\TEMP\vs_community.exe /Silent /NoRestart
+        /Log C:\TEMP\vs2017_install_log.txt'
+  when: (vs2017_installed.stat.exists == false)
+  tags: MSVS_2017
+
+- name: Register Visual Studio Community 2017 DIA SDK shared libraries
+  win_command: 'regsvr32 /s "{{ item }}"'
+  with_items:
+    - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\msdia140.dll
+    - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\amd64\msdia140.dll
+  tags: MSVS_2017
+
+- name: Reboot machine after Visual Studio installation
+  win_reboot:
+    reboot_timeout: 1800
+    shutdown_timeout: 1800
+  when: (vs2017_installed.stat.exists == false)
+  tags: MSVS_2017
