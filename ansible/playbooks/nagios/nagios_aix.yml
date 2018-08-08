@@ -1,3 +1,4 @@
+---
 ####################################################################
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on AIX #
 ####################################################################
@@ -8,50 +9,50 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  - debug: msg='Installing Nagios plugins'
-  ##########
-  # Layout #
-  ##########
-  - name: Creates Nagios folder
-    file: path=/usr/local/nagios/ state=directory mode=0755
-  - file: path=/usr/local/nagios/libexec/ state=directory mode=0755
+- debug: msg='Installing Nagios plugins'
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755
+- file: path=/usr/local/nagios/libexec/ state=directory mode=0755
 
-  ##################
-  # Install Nagios #
-  ##################  
-  - name: Transfer over Nagios Plugins
-    copy:
-      src: "{{ item }}"
-      dest: /usr/local/nagios/libexec/
-      mode: 0755
-    with_fileglob:
-      - /home/ubuntu/aix/nagios/*
+##################
+# Install Nagios #
+##################
+- name: Transfer over Nagios Plugins
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/nagios/libexec/
+    mode: 0755
+  with_fileglob:
+    - /home/ubuntu/aix/nagios/*
 
-  ###############
-  # Nagios user #
-  ###############
-  - name: Setup Nagios user
-    shell: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
-    ignore_errors: yes
+###############
+# Nagios user #
+###############
+- name: Setup Nagios user
+  shell: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
+  ignore_errors: yes
 
-  - name: Create SSH Key folder for Nagios
-    file:
-      path: /home/nagios/.ssh
-      owner: nagios
-      group: staff
-      mode: 0700
-      state: directory
+- name: Create SSH Key folder for Nagios
+  file:
+    path: /home/nagios/.ssh
+    owner: nagios
+    group: staff
+    mode: 0700
+    state: directory
 
-  - name: Setup authorized_keys
-    file:
-      path: /home/nagios/.ssh/authorized_keys
-      owner: nagios
-      group: staff
-      mode: 0600
-      state: touch
+- name: Setup authorized_keys
+  file:
+    path: /home/nagios/.ssh/authorized_keys
+    owner: nagios
+    group: staff
+    mode: 0600
+    state: touch
 
-  - name: Add key
-    authorized_key:
-      user: nagios
-      state: present
-      key: "{{ lookup('file', '/home/nagios/key/id_rsa.pub') }}"
+- name: Add key
+  authorized_key:
+    user: nagios
+    state: present
+    key: "{{ lookup('file', '/home/nagios/key/id_rsa.pub') }}"

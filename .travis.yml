@@ -9,23 +9,26 @@ dist: trusty
 addons:
   apt:
     packages:
-    - python-pip
+      - python-pip
 
 install:
   # Install ansible
   - pip install ansible
+  - pip install yamllint
 
   # Check ansible version
   - ansible --version
 
 script:
-- cd ansible
-  # Check that the inventory is valid
-- ansible-inventory --host=build-cloudcone-ubuntu1604-x64-1
-  # Check Playbook syntax.
-- ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
-- ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
-- ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-api.yml --syntax-check
-- ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml --syntax-check
-- ansible-playbook playbooks/aix.yml --syntax-check
-- ansible-playbook playbooks/ubuntu-jck.yml --syntax-check
+  - cd ansible
+    # Check that the inventory is valid
+  - ansible-inventory --host=build-cloudcone-ubuntu1604-x64-1
+    # Check YAML validity
+  - yamllint -c yamllint.yml .
+    # Check Playbook syntax.
+  - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
+  - ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
+  - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-api.yml --syntax-check
+  - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml --syntax-check
+  - ansible-playbook playbooks/aix.yml --syntax-check
+  - ansible-playbook playbooks/ubuntu-jck.yml --syntax-check

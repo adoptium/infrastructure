@@ -1,3 +1,4 @@
+---
 #########################################################################################
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on CentOS 7 on x86 hardware #
 #########################################################################################
@@ -8,48 +9,48 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-  ###############
-  # Nagios user #
-  ###############
-  - name: Allow Nagios to use pkg while restricting it to audit only
-    shell: |
-      echo "nagios ALL = NOPASSWD: /usr/sbin/pkg audit -F" >> /etc/sudoers
-    tags: nagios_plugins
+###############
+# Nagios user #
+###############
+- name: Allow Nagios to use pkg while restricting it to audit only
+  shell: |
+    echo "nagios ALL = NOPASSWD: /usr/sbin/pkg audit -F" >> /etc/sudoers
+  tags: nagios_plugins
 
-  - name: Allow Nagios to use pkg while restricting it to upgrade --dry-run only
-    shell: |
-      echo "nagios ALL = NOPASSWD: /usr/sbin/pkg upgrade --dry-run" >> /etc/sudoers
-    tags: nagios_plugins
+- name: Allow Nagios to use pkg while restricting it to upgrade --dry-run only
+  shell: |
+    echo "nagios ALL = NOPASSWD: /usr/sbin/pkg upgrade --dry-run" >> /etc/sudoers
+  tags: nagios_plugins
 
-  ###################
-  # Install plugins #
-  ###################
-  - name: Download nagios-plugins
-    get_url:
-      url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
-      dest: /tmp/
-      mode: 0440
-      timeout: 25
-    tags: nagios_plugins
+###################
+# Install plugins #
+###################
+- name: Download nagios-plugins
+  get_url:
+    url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+  tags: nagios_plugins
 
-  - name: Extract nagios-plugins
-    unarchive:
-      src: /tmp/nagios-plugins-2.2.1.tar.gz
-      dest: /tmp/
-      copy: False
-    tags: nagios_plugins
+- name: Extract nagios-plugins
+  unarchive:
+    src: /tmp/nagios-plugins-2.2.1.tar.gz
+    dest: /tmp/
+    copy: False
+  tags: nagios_plugins
 
-  - name: Configure, make and make install nagios-plugins
-    shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-    become: yes
-    tags: nagios_plugins
-    
-  ##############################
-  # Install additional plugins #
-  ##############################
-  - name: Download add-on check_pkg plugin
-    get_url:
-      url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_pkg
-      dest: /usr/local/nagios/libexec/check_pkg
-      mode: 0755
-    tags: nagios_plugins
+- name: Configure, make and make install nagios-plugins
+  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+  become: yes
+  tags: nagios_plugins
+
+##############################
+# Install additional plugins #
+##############################
+- name: Download add-on check_pkg plugin
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_pkg
+    dest: /usr/local/nagios/libexec/check_pkg
+    mode: 0755
+  tags: nagios_plugins
