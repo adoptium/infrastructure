@@ -24,7 +24,7 @@
     state: present
   when:
     - ansible_architecture == "x86_64"
-  tags: patch_update
+  tags: [patch_update, azul-key]
 
 - name: Add additional repositories for BeagleBone
   apt_repository: repo={{ item }}
