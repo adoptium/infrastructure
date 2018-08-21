@@ -50,6 +50,16 @@
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
+- name: Install repos for devtoolset-7 on CentOS6 x86_64
+  yum:
+    name: centos-release-scl
+  state: installed
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
 ############################
 # Build Packages and tools #
 ############################
@@ -66,6 +76,15 @@
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Install gcc v7.3 on CentOS 6 x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc_73_compiler_x86_64 }}"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
   tags: build_tools
 
 - name: Install additional build tools for x86_64
