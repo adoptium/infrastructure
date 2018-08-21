@@ -398,6 +398,9 @@
         - name: Install Text::CSV
           shell: |
             CC=xlc_r cpan -i Text::CSV
+          environment:
+            PERL_MB_OPT: "--install_base \"/home/{{ Jenkins_Username }}\""
+            PERL_MM_OPT: "INSTALL_BASE=/home/{{ Jenkins_Username }}"
           tags: cpan
 
       #########################
@@ -455,6 +458,7 @@
             block: |
               AIXTHREAD_HRT=true
               PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
+              PERL5LIB=/home/{{ Jenkins_Username }}/lib/perl5
           tags: login_shell
 
         - replace:
@@ -472,7 +476,7 @@
           tags: jenkins_user
 
         - debug:
-            msg: "i{{ Jenkins_Username }} home directory found, skipping user creation tasks"
+            msg: "{{ Jenkins_Username }} home directory found, skipping user creation tasks"
           when: jenkins.stat.isdir is defined
           tags: jenkins_user
 
