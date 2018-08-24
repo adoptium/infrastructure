@@ -12,6 +12,7 @@
   roles:
     - Debug
     - Common
+    - autoconf
     - Jenkins_User
     - freemarker
     - Ant-Contrib

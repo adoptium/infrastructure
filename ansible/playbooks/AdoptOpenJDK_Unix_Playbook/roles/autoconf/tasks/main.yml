@@ -1,0 +1,73 @@
+---
+###############
+# Autoconf 2.69
+###############
+
+- name: Test if Autoconf v2.69 is installed
+  shell: autoconf --version | grep autoconf | awk '{print $4}'
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  register: autoconf_version
+  tags: autoconf-2.69
+
+- name: Download Autoconf v2.69
+  get_url:
+    url: https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+    dest: /tmp/autoconf-2.69.tar.gz
+    force: no
+    mode: 0755
+  when:
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: autoconf-2.69
+
+- name: Extract Autoconf v2.69
+  unarchive:
+    src: /tmp/autoconf-2.69.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: autoconf-2.69
+
+- name: Build and install Autoconf v2.69
+  shell: cd /tmp/autoconf-2.69 && ./configure && make && make install
+  when:
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: autoconf-2.69
+
+- name: Remove the older Autoconf package
+  yum:
+    name: autoconf
+    state: absent
+  when:
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: autoconf-2.69
+
+- name: Remove downloaded packages for Autoconf v2.69
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/autoconf-2.69.tar.gz
+    - /tmp/autoconf-2.69
+  ignore_errors: yes
+  when:
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: autoconf-2.69
