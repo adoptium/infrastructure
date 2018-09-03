@@ -1,0 +1,78 @@
+---
+##########
+# gcc_73 #
+##########
+
+
+- name: Check if gcc-7 is installed on RHEL/CentOS
+  shell: /opt/rh/devtoolset-7/root/usr/bin/gcc --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.3 --version 2>&1 > /dev/null || /usr/bin/gcc-7.3 --version 2>&1 > /dev/null
+  ignore_errors: yes
+  register: gcc7_installed
+  tags: gcc-7
+  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+
+# Installation on CentOS x86_64 will be handled via the scl repo in the Common CentOS playbook
+
+- name: Download AdoptOpenJDK gcc-7.3.0 binary
+  get_url:
+    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc730+ccache.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
+    force: no
+    mode: 0644
+  when:
+    - gcc7_installed.rc != 0
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+  tags: gcc-7
+
+- name: Extract AdoptOpenJDK gcc-7.3.0 binary to /usr/local/gcc
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-7.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - gcc7_installed.rc != 0
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+  tags: gcc-7
+
+- name: Remove downloaded gcc 7 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
+    state: absent
+  when:
+    - gcc7_installed.rc != 0
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+  tags: gcc-7
+
+# Not keen on this from gcc 4.8 so skipping - sxa
+# Leaving it commented out so it's clear what could be done
+#- name: Create symlink for libstdc++.so.6.0.19
+#  file:
+#    src: /opt/gcc-4.8.5/lib64/libstdc++.so.6.0.19
+#    dest: /usr/lib64/libstdc++.so.6.0.19
+#    owner: root
+#    group: root
+#    state: link
+#  when:
+#    - gcc_installed.rc != 0
+#    - ansible_distribution == "RedHat"
+#    - ansible_distribution_major_version == "6"
+#    - ansible_architecture == "x86_64"
+#  tags: gcc-4.8
+#
+#- name: Create symlink for libstdc++.so.6
+#  file:
+#    src: /usr/lib64/libstdc++.so.6.0.19
+#    dest: /usr/lib64/libstdc++.so.6
+#    owner: root
+#    group: root
+#    state: link
+#    force: true
+#  when:
+#    - gcc_installed.rc != 0
+#    - ansible_distribution == "RedHat"
+#    - ansible_distribution_major_version == "6"
+#    - ansible_architecture == "x86_64"
+#  tags: gcc-4.8
