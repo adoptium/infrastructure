@@ -54,6 +54,13 @@ gcc_compiler:
   - devtoolset-2-binutils
   - devtoolset-2-gcc-c++
 
+gcc_73_compiler_x86_64:
+  - devtoolset-7-binutils
+  - devtoolset-7-gcc
+  - devtoolset-7-libstdc++-devel
+  - devtoolset-7-runtime
+  - devtoolset-7-gcc-c++
+
 Additional_Build_Tools_x86_64:
   - zulu-9
 
