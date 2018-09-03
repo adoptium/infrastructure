@@ -3,6 +3,7 @@
 # gcc_73 #
 ##########
 
+
 - name: Check if gcc-7 is installed on RHEL/CentOS
   shell: /opt/rh/devtoolset-7/root/usr/bin/gcc --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.3 --version 2>&1 > /dev/null || /usr/bin/gcc-7.3 --version 2>&1 > /dev/null
   ignore_errors: yes
@@ -10,26 +11,7 @@
   tags: gcc-7
   when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
 
-- name: Install SCL (devtoolset) repository on CentOS x86_64
-  package: "name={{ item }} state=latest"
-  with_items: centos-release-scl
-  when:
-    - gcc7_installed.rc != 0
-    - ansible_distribution == "CentOS"
-    - ansible_architecture == "x86_64"
-  tags: gcc-7
-
-- name: Install gcc v7.3 on CentOS x86_64
-  package: "name={{ item }} state=latest"
-  with_items:
-    - devtoolset-7-gcc
-    - devtoolset-7-binutils
-    - devtoolset-7-gcc-c++
-  when:
-    - gcc7_installed.rc != 0
-    - ansible_distribution == "CentOS"
-    - ansible_architecture == "x86_64"
-  tags: gcc-7
+# Installation on CentOS x86_64 will be handled via the scl repo in the Common CentOS playbook
 
 - name: Download AdoptOpenJDK gcc-7.3.0 binary
   get_url:
@@ -53,7 +35,7 @@
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
   tags: gcc-7
-  
+
 - name: Remove downloaded gcc 7 binary tarball
   file:
     path: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
