@@ -19,7 +19,6 @@ Build_Tool_Packages:
   - glibc
   - glibc-common
   - glibc-devel
-  - glibc-devel.i686
   - gmp-devel
   - libdwarf-devel
   - libffi-devel
@@ -50,6 +49,9 @@ Additional_Build_Tools_RHEL7:
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libcurl-devel
   - ant-contrib
+
+Additional_Build_Tools_RHEL_x86_64:
+  - glibc-devel.i686
 
 Java_NOT_RHEL6_PPC64:
   - java-1.7.0-openjdk-devel
