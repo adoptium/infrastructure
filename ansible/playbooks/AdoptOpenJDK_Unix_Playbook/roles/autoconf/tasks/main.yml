@@ -19,10 +19,10 @@
     force: no
     mode: 0755
   when:
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - ((autoconf_version.stdout == '') or ((autoconf_version.stdout != '') and (autoconf_version.stdout is version('2.69', operator='lt', strict=True))))
   tags: autoconf-2.69
 
 - name: Extract Autoconf v2.69
@@ -31,19 +31,19 @@
     dest: /tmp
     copy: False
   when:
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - ((autoconf_version.stdout == '') or ((autoconf_version.stdout != '') and (autoconf_version.stdout is version('2.69', operator='lt', strict=True))))
   tags: autoconf-2.69
 
 - name: Build and install Autoconf v2.69
   shell: cd /tmp/autoconf-2.69 && ./configure && make && make install
   when:
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - ((autoconf_version.stdout == '') or ((autoconf_version.stdout != '') and (autoconf_version.stdout is version('2.69', operator='lt', strict=True))))
   tags: autoconf-2.69
 
 - name: Remove the older Autoconf package
@@ -51,10 +51,10 @@
     name: autoconf
     state: absent
   when:
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - ((autoconf_version.stdout != '') and (autoconf_version.stdout is version('2.69', operator='lt', strict=True)))
   tags: autoconf-2.69
 
 - name: Remove downloaded packages for Autoconf v2.69
@@ -66,8 +66,8 @@
     - /tmp/autoconf-2.69
   ignore_errors: yes
   when:
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - ((autoconf_version.stdout == '') or ((autoconf_version.stdout != '') and (autoconf_version.stdout is version('2.69', operator='lt', strict=True))))
   tags: autoconf-2.69

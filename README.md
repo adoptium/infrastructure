@@ -8,7 +8,7 @@
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM)
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
-
+- [@ali-ince](ihttps://github.com/ali-ince) - Ali Ince (LJC)
 - [@bblondin](https://github.com/bblondin) - Brad Blondin (IBM)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
@@ -19,7 +19,6 @@
 - [@sej-jackson](https://github.com/sej-jackson - Sarah (Sej) Jackson (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
-- [@ali-ince](ihttps://github.com/ali-ince) - Ali Ince (LJC)
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)

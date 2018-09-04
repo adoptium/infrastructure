@@ -62,10 +62,18 @@
 ##########################
 - name: Install gcc4.8
   package: "name={{ item }} state=latest"
-  with_items: "{{ gcc_compiler }}"
+  with_items: "{{ gcc48_devtoolset_compiler }}"
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Install gcc7.3
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc73_devtoolset_compiler }}"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_architecture == "x86_64"
   tags: build_tools
 
 - name: Install additional build tools for x86_64

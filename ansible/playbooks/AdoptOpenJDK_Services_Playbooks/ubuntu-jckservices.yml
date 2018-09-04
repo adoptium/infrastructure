@@ -135,6 +135,10 @@
             jump: ACCEPT
         - iptables:
             chain: INPUT
+            source: 169.55.170.68
+            jump: ACCEPT
+        - iptables:
+            chain: INPUT
             jump: REJECT
         - name: iptables_permanent
           shell: iptables-save > /etc/iptables/rules.v4
