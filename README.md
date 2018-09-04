@@ -14,6 +14,7 @@
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton
+- [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison
 - [@tellison](https://github.com/tellison) - Tim Ellison
 
