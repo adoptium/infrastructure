@@ -20,9 +20,9 @@
     force: no
     mode: 0644
   when:
-    - gcc7_installed.rc != 0
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+    - gcc7_installed.rc != 0
   tags: gcc-7
 
 - name: Extract AdoptOpenJDK gcc-7.3.0 binary to /usr/local/gcc
@@ -31,9 +31,9 @@
     dest: /usr/local/
     copy: False
   when:
-    - gcc7_installed.rc != 0
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+    - gcc7_installed.rc != 0
   tags: gcc-7
 
 - name: Remove downloaded gcc 7 binary tarball
@@ -41,9 +41,9 @@
     path: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
     state: absent
   when:
-    - gcc7_installed.rc != 0
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+    - gcc7_installed.rc != 0
   tags: gcc-7
 
 # Not keen on this from gcc 4.8 so skipping - sxa
