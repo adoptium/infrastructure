@@ -53,7 +53,6 @@ hosts:
       - packet:
           centos74-armv8-1: {ip: 147.75.196.30}
           ubuntu1604-armv8-2: {ip: 147.75.77.146}
-          freebsd11-x64-1: {ip: 147.75.101.29}
 
       - joyent:
           centos69-x64-1: {ip: 165.225.149.157}
