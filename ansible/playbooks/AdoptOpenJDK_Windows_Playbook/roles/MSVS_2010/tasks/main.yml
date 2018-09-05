@@ -20,6 +20,13 @@
   when: (vs2010_installed.stat.exists == false)
   tags: MSVS_2010
 
+- name: Register Visual Studio 2010 DIA SDK shared libraries
+  win_command: 'regsvr32 /s "{{ item }}"'
+  with_items:
+    - c:\Program Files (x86)\Microsoft Visual Studio 10.0\DIA SDK\bin\msdia100.dll
+    - c:\Program Files (x86)\Microsoft Visual Studio 10.0\DIA SDK\bin\amd64\msdia100.dll
+  tags: MSVS_2010
+
 - name: Reboot machine after Visual Studio 2010 installation
   win_reboot:
     reboot_timeout: 1800

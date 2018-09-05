@@ -14,7 +14,7 @@
   when:
     - Security == "Enabled"
   tags: security
-  
+
 - name: Ensure keybox's ssh key is applied to root's authorized_key file
   authorized_key:
     user: root
@@ -63,7 +63,7 @@
   when:
     - Security == "Enabled"
   tags: security
-  
+
 - name: Restart sshd service
   service:
     name: sshd

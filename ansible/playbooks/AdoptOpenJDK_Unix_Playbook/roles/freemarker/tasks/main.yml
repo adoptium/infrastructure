@@ -2,24 +2,24 @@
 ###################################
 # freemarker to Jenkins User home #
 ###################################
-  - name: Check that the freemarker.jar exists
-    stat:
-      path: /home/{{ Jenkins_Username }}/freemarker.jar
-    register: freemarker
-    tags: freemarker
+- name: Check that the freemarker.jar exists
+  stat:
+    path: /home/{{ Jenkins_Username }}/freemarker.jar
+  register: freemarker
+  tags: freemarker
 
-  # Originally downloaded from 
-  # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
-  - name: Download and extract freemarker.jar
-    unarchive:
-      src: https://ci.adoptopenjdk.net/userContent/freemarker-2.3.8.tar.gz
-      dest: /tmp/
-      remote_src: yes
-      mode: 0755
-    when: freemarker.stat.exists == False
-    tags: freemarker
+# Originally downloaded from
+# https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+- name: Download and extract freemarker.jar
+  unarchive:
+    src: https://ci.adoptopenjdk.net/userContent/freemarker-2.3.8.tar.gz
+    dest: /tmp/
+    remote_src: yes
+    mode: 0755
+  when: freemarker.stat.exists == False
+  tags: freemarker
 
-  - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-    command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-    when: freemarker.stat.exists == False
-    tags: freemarker
+- name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+  command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+  when: freemarker.stat.exists == False
+  tags: freemarker

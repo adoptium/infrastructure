@@ -45,9 +45,9 @@ valid = {
   'type': ('build', 'test', 'jck', 'infrastructure'),
 
   # providers - validated for consistency
-  'provider': ('cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
+  'provider': ('azure', 'cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro', '1and1',
-        'digitalocean')
+        'digitalocean', 'ibm')
 }
 
 # customisation options per host:

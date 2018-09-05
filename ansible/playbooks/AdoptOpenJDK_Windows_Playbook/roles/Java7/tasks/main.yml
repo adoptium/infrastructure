@@ -5,13 +5,13 @@
 
 - name: Test if Java 7 is already installed
   win_stat:
-      path: 'C:\Program Files\Java\java-se-7u75-ri'
+    path: 'C:\Program Files\Java\java-se-7u75-ri'
   register: java7_installed
   tags: Java7
 
 - name: Check if Java 7 is already downloaded
   win_stat:
-      path: 'C:\temp\jdk7u75-b13.zip'
+    path: 'C:\temp\jdk7u75-b13.zip'
   register: java7_download
   tags: Java7
 
@@ -32,7 +32,7 @@
 
 - name: Test if Java 7 symlink is already created
   win_stat:
-      path: 'C:\openjdk\jdk7'
+    path: 'C:\openjdk\jdk7'
   register: java7_symlink
   tags: Java7
 

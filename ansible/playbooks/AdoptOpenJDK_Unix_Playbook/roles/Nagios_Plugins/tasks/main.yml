@@ -10,7 +10,7 @@
   when:
     - ansible_distribution == "Debian"
     - ansible_architecture == "armv7l"
-    
+
   ###############
   # Nagios user #
   ###############

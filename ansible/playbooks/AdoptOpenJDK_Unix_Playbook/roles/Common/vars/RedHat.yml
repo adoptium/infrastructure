@@ -9,6 +9,7 @@ Build_Tool_Packages:
   - bind-utils
   - cpio
   - cups-devel
+  - elfutils-libelf-devel
   - expat-devel
   - fontconfig-devel
   - freetype-devel
@@ -19,7 +20,9 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - libdwarf-devel
   - libffi-devel
+  - libmpc-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
@@ -31,6 +34,7 @@ Build_Tool_Packages:
   - openssl-devel
   - perl-CPAN
   - perl-devel
+  - pkgconfig
   - unzip
   - wget
   - xz
@@ -39,14 +43,15 @@ Build_Tool_Packages:
 Additional_Build_Tools_RHEL7:
   - bison
   - curl-devel
-  - elfutils-libelf-devel
   - flex
-  - libdwarf-devel
   - libstdc++-static
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libcurl-devel
   - ant-contrib
+
+Additional_Build_Tools_RHEL_x86_64:
+  - glibc-devel.i686
 
 Java_NOT_RHEL6_PPC64:
   - java-1.7.0-openjdk-devel
@@ -60,6 +65,7 @@ Test_Tool_Packages:
   - acl
   - ant
   - ant-contrib
+  - ant-apache-regexp
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb

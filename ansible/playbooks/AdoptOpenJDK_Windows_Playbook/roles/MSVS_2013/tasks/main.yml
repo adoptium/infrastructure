@@ -23,6 +23,13 @@
   when: (vs2013_installed.stat.exists == false)
   tags: MSVS_2013
 
+- name: Register Visual Studio Community 2013 DIA SDK shared libraries
+  win_command: 'regsvr32 /s "{{ item }}"'
+  with_items:
+    - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\msdia120.dll
+    - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\amd64\msdia120.dll
+  tags: MSVS_2013
+
 - name: Reboot machine after Visual Studio installation
   win_reboot:
     reboot_timeout: 1800

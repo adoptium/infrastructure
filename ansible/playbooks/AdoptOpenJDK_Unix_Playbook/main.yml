@@ -1,7 +1,8 @@
+---
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-- hosts: "{{ groups['Vendor_groups'] | default('build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
+- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
   gather_facts: yes
   tasks:
 
@@ -11,6 +12,7 @@
   roles:
     - Debug
     - Common
+    - autoconf
     - Jenkins_User
     - freemarker
     - Ant-Contrib
@@ -26,6 +28,8 @@
     - x11
     - NTP_TIME
     - gcc_48
+    - gcc_7
+    - adoptopenjdk9
     - Nagios_Plugins
     - Nagios_Master_Config
     - Nagios_Tunnel
