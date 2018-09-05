@@ -40,7 +40,16 @@
     - ansible_architecture == "x86_64"
   tags: build_tools
 
-- name: Add devtools to yum repo
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
     url: http://people.centos.org/tru/devtools-2/devtools-2.repo
     dest: /etc/yum.repos.d/devtools-2.repo
@@ -50,22 +59,20 @@
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
-############################
-# Build Packages and tools #
-############################
-- name: Call Build Packages and Tools Task
-  include_tasks: build_packages_and_tools.yml
-
-
-##########################
-# Additional build tools #
-##########################
 - name: Install gcc4.8
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc48_devtoolset_compiler }}"
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+
+- name: Install CentOS SCL x86_64 repo for gcc7.3
+  package: "name=centos-release-scl state=latest"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_architecture == "x86_64"
   tags: build_tools
 
 - name: Install gcc7.3
