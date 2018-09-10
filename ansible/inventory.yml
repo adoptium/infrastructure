@@ -13,6 +13,9 @@ hosts:
       - digitalocean:
           ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
 
+      - packet:
+          ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
+
       - softlayer:
           ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
 
