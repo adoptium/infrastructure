@@ -15,7 +15,7 @@
     dest: "/tmp/cuda9_linux-run"
   when:
     - cuda_installed.stat.isdir is not defined
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7") )
     - ansible_architecture == "x86_64"
   tags: nvidia_cuda_toolkit
 
@@ -23,7 +23,7 @@
   shell: sh /tmp/cuda9_linux-run --silent --toolkit --override
   when:
     - cuda_installed.stat.isdir is not defined
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") and (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7") )
     - ansible_architecture == "x86_64"
   tags: nvidia_cuda_toolkit
 
@@ -60,7 +60,7 @@
 
 - name: Download NVidia CUDA Repo RPM - RHEL 7 on PPC64LE
   get_url:
-    url: http://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
+    url: https://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
     dest: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
   when:
     - cuda_installed.stat.isdir is not defined
@@ -91,8 +91,8 @@
 # SLES
 - name: Download NVidia CUDA toolkit Repo RPM for SLES12 on x86_64
   get_url:
-    url="http://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm"
-    dest="/tmp/sles12_cuda9_repo.rpm"
+    url: https://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm
+    dest: /tmp/sles12_cuda9_repo.rpm
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
