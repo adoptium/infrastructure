@@ -1,0 +1,82 @@
+---
+#############################
+# nasm                      #
+# OpenJ9 requirement on x86 #
+# See eclipse/openj9#2418   #
+#############################
+
+# Conditions:
+# Check for gcc v7 as this is a nasm compile requirement
+# If gcc v7 if found check if nasm is installed when ansible_architecture is x86_64
+# If so, nasm_installed.rc will equal 0, then check if its the version required
+# If not, download, compile and install
+
+# checking the common location for ubuntu package installs
+- name: Checking for /usr/bin/gcc-7
+  stat: path=/usr/bin/gcc-7
+  register: gcc7
+  tags: nasm
+- name: Setting CC to /usr/bin/gcc-7 if found
+  set_fact:
+    CC: "/usr/bin/gcc-7"
+  when: gcc7.stat.exists == True and CC is not defined
+  tags: nasm
+
+- name: Checking for devtools-7 installation
+  stat: path=/opt/rh/devtoolset-7/root/usr/bin/gcc
+  register: gcc7
+  tags: nasm
+- name: Setting CC to devtools-7 if found
+  set_fact:
+    CC: "/opt/rh/devtoolset-7/root/usr/bin/gcc"
+  when: gcc7.stat.exists == True and CC is not defined
+  tags: nasm
+
+- name: Checking for gcc-7.3 binary installation
+  stat: path=/usr/local/gcc/bin/gcc-7.3
+  register: gcc7
+  tags: nasm
+- name: Setting CC to gcc-7.3 binary found
+  set_fact:
+    CC: "/usr/local/gcc/bin/gcc-7.3"
+  when: gcc7.stat.exists == True and CC is not defined
+  tags: nasm
+
+- debug:
+    msg: "VARIABLE CC SET TO {{ CC }}"
+  when: CC is defined
+  tags: nasm
+
+- name: Test if nasm is installed on path
+  shell: nasm >/dev/null 2>&1
+  ignore_errors: yes
+  register: nasm_installed
+  when: CC is defined
+  tags: nasm
+
+- name: Capture nasm is installed version
+  shell: nasm --version 2>/dev/null | grep version | awk '{print $3}'
+  when: nasm_installed.rc == 0
+  register: nasm
+  tags: nasm
+
+- name: Download nasm sources
+  shell: cd /tmp && wget https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz
+  when:
+    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+  tags: nasm
+
+- name: Extract nasm sources
+  unarchive:
+    src: /tmp/nasm-2.13.03.tar.gz
+    dest: /tmp/
+    copy: False
+  when:
+    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+  tags: nasm
+
+- name: Running ./configure & make for nasm
+  shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} ./configure -prefix=/usr/local && make install
+  when:
+    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+  tags: nasm
