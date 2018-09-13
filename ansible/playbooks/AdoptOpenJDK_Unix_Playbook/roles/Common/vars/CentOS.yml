@@ -27,6 +27,7 @@ Build_Tool_Packages:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libdwarf-devel
+  - libstdc++-static
   - libXext-devel
   - libXrender-devel
   - libXt-devel
