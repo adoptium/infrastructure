@@ -1,0 +1,64 @@
+---
+###################
+# OpenSSL v1.1.0g #
+###################
+# Required by OpenJ9 for out-of-process JIT compilation (aka JITaaS)
+# Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
+
+- name: Test if OpenSSL v1.1.0g is installed
+  shell: openssl version | awk '{print $2}' | cut -c 1-5
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+  register: openssl_version
+  tags: openssl
+
+- name: Download OpenSSL v1.1.0g
+  get_url:
+    url: https://www.openssl.org/source/old/1.1.0/openssl-1.1.0g.tar.gz
+    dest: /tmp/openssl-1.1.0g.tar.gz
+    force: no
+    mode: 0755
+    validate_certs: no
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+  tags: openssl
+
+- name: Extract OpenSSL v1.1.0g
+  unarchive:
+    src: /tmp/openssl-1.1.0g.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+  tags: openssl
+
+# when running OpenJ9 for JITaaS
+# /usr/local/openssl-1.1.0 to be added to The PATH
+# /usr/local/openssl-1.1.0/lib64 (on CentOS, RHEL) or
+# /usr/local/openssl-1.1.0/lib (on Ubuntu) to be added to LD_LIBRARY_PATH
+- name: Build and install OpenSSL v1.1.0g
+  shell: cd /tmp/openssl-1.1.0g && ./config --prefix=/usr/local/openssl-1.1.0 && make && make install
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+  tags: openssl
+
+- name: Remove downloaded packages for OpenSSL v1.1.0g
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/openssl-1.1.0g.tar.gz
+    - /tmp/openssl-1.1.0g
+  ignore_errors: yes
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+  tags: openssl
