@@ -5,7 +5,7 @@
 
 - name: Test if Firefox is already installed
   win_stat:
-    path: 'C:\Program Files (x86)\Mozilla Firefox\firefox.exe'
+    path: 'C:\Program Files\Mozilla Firefox\firefox.exe'
   register: firefox_installed
   tags: Firefox
 
