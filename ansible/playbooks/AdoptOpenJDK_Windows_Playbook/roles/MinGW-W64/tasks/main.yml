@@ -1,0 +1,25 @@
+---
+#############
+# MinGW-W64 #
+#############
+# MinGW-W64 is an OpenJ9 prerequisite.
+# It requires 7-Zip to unpack the downloaded MinGW binary.
+
+- name: Test if MinGW-W64 is already installed (required by OpenJ9)
+  win_stat:
+    path: 'C:\mingw-w64'
+  register: mingw_installed
+  tags: mingw
+
+- name: Download MinGW-W64
+  win_get_url:
+    url: https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z
+    dest: 'C:\temp\'
+    force: no
+  when: mingw_installed.stat.exists == false
+  tags: mingw
+
+- name: Install MinGW-W64
+  raw: C:\7-Zip\7z.exe x C:\temp\x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z -oC:\mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0\
+  when: mingw_installed.stat.exists == false
+  tags: mingw

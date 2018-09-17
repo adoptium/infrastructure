@@ -45,3 +45,5 @@
     - MSVS_2017
     - NVidia_Cuda_Toolkit
     - NTP_TIME
+    - 7-Zip
+    - MinGW-W64
