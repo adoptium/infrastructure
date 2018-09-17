@@ -1,0 +1,28 @@
+---
+########################################
+# AdoptOpenJDK 10 for bootstrapping 11 #
+########################################
+- name: Check if jdk10 is already installed in the target location
+  shell: ls -ld /usr/lib/jvm/jdk-10+* >/dev/null 2>&1
+  ignore_errors: yes
+  register: adoptopenjdk10_installed
+  tags: adoptopenjdk10
+
+- name: Install latest release if one not already installed (Linux/x64)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - ansible_architecture == "x86_64"
+  tags: adoptopenjdk10
+
+- name: Install latest release if one not already installed (not Linux/x64 or Linux/armv7l)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=hotspot&os=linux&arch={{ ansible_architecture }}&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - ansible_architecture != "x86_64"
+    - ansible_architecture != "armv7l"
+  tags: adoptopenjdk10
