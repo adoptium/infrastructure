@@ -55,6 +55,25 @@
     - xterm
   tags: cygwin
 
+###############################################################################
+# Cygwin by default installs latest versions of packages, which is 3.0-2 for
+# grep. This version of grep is unable to match EOL (with $) when the file use
+# windows style CRLF sequence at end of lines and it is required for openjdk8
+# builds to complete. The following two steps downloads the latest known
+# version of grep to satisfy this requirement and overwrites the installed
+# grep version.
+###############################################################################
+- name: Download grep-2.27-2
+  win_get_url:
+    url: "{{ Cygwin_SITE_URL + '/x86_64/release/grep/grep-2.27-2.tar.xz' }}"
+    dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\grep.tar.xz' }}"
+    force: no
+  tags: cygwin
+
+- name: Extract grep-2.27-2
+  win_command: "{{ Cygwin_ROOT_INST_DIR + '\\bin\\bash.exe -l -c \"tar -C / -xvf /tmp/grep.tar.xz\"' }}"
+  tags: cygwin
+
 - name: Remove c:\cygwin64\bin from the path if it exists
   win_path:
     elements:
