@@ -19,7 +19,7 @@
 - [@sej-jackson](https://github.com/sej-jackson - Sarah (Sej) Jackson (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
-- [@vsebe](https://github.com/vsebe) - (IBM)
+- [@vsebe](https://github.com/vsebe) - Voileta Sebe (IBM)
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
