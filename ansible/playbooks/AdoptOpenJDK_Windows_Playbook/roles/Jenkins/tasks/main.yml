@@ -1,0 +1,38 @@
+---
+################
+# Jenkins user #
+################
+- name: Create Jenkins user
+  win_user:
+    name: "{{ Jenkins_Username }}"
+    fullname: AdoptOpenJDK Jenkins User
+    password: "{{ lookup('file', '{{ Jenkins_Win_Passwd }}') }}"
+    state: present
+    password_never_expires: true
+    groups:
+      - Users, Remote Desktop Users
+  tags: jenkins_user
+
+
+#######################################################################
+# This is a workaround for removing left over workspace folders which
+# Jenkins fails to remove by itself
+#######################################################################
+- name: Create a scheduled task to delete zombie jenkins workspaces
+  win_scheduled_task:
+    name: DeleteJenkinsWorkspaces
+    description: This schedule task recursively deletes all jenkins workspace
+                 folders that are already marked for deletion but failed
+                 (with name ws-cleanup)
+    actions:
+      - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+        arguments: -command "Remove-Item -Force -Recurse
+                    -ErrorAction SilentlyContinue
+                    \\?\C:\Users\{{ Jenkins_Username }}\workspace\*ws-cleanup*"
+    triggers:
+      - type: daily
+        start_boundary: '2018-01-01T21:00:00'
+    username: SYSTEM
+    state: present
+    enabled: true
+  tags: jenkins_workspace

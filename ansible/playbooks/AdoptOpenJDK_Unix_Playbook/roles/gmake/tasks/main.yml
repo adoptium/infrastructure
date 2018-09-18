@@ -1,0 +1,61 @@
+---
+#####################
+# gmake from source #
+#####################
+
+# Conditions:
+# Check if make is installed in /usr/local/bin/make on CentOS/RHEL on ppc64le
+# Proceed with downloading and installing make
+# Addresses https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/499
+
+- name: Test if self-built make 4.1 is available
+  shell: /usr/local/bin/make --version >/dev/null
+  ignore_errors: yes
+  register: goodmake_installed
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "ppc64le"
+  tags: goodmake_source
+
+- name: Download make 4.1 source
+  get_url:
+    url: https://ftp.gnu.org/gnu/make/make-4.1.tar.gz
+    dest: /tmp/make-4.1.tar.gz
+    mode: 0440
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "ppc64le"
+    - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: Extract make 4.1 source
+  unarchive:
+    src: /tmp/make-4.1.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "ppc64le"
+    - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: Compile and install make 4.1 from source
+  shell: cd /tmp/make-4.1 && ./configure --prefix=/usr/local && make clean && make -j {{ ansible_processor_vcpus }} && make install
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "ppc64le"
+    - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: Create symlink for /usr/bin/gmake to our built 4.1 in /usr/local/bin/make
+  file:
+    src: /usr/local/bin/make
+    dest: /usr/bin/gmake
+    owner: root
+    group: root
+    state: link
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "ppc64le"
+    - goodmake_installed.rc != 0
+  tags: goodmake_source

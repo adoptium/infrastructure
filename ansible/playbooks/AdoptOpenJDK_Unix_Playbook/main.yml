@@ -20,6 +20,7 @@
     - GIT_Source
     - CPAN
     - cmake
+    - gmake
     - Docker
     - NVidia_Cuda_Toolkit
     - Superuser
