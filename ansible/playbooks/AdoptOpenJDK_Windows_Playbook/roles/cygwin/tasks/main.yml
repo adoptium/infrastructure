@@ -82,5 +82,5 @@
   tags: cygwin
 
 - name: Add c:\cygwin64\bin to the start of the %PATH%
-  raw: setx PATH "C:\cygwin64\bin;$env:Path" /M
+  raw: setx PATH "C:\cygwin64\bin;$env:Path"
   tags: cygwin
