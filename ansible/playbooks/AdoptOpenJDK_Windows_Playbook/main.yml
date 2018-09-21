@@ -47,3 +47,5 @@
     - NTP_TIME
     - 7-Zip
     - MinGW-W64
+    - Clang_64bit
+    - Clang_32bit
