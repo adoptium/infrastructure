@@ -18,9 +18,7 @@
 
 - name: Enable EPEL Release
   shell: |
-    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    yum update
-  state: present
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && yum update
   tags: patch_update
 
 - name: YUM upgrade all packages
