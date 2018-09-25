@@ -16,6 +16,11 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
+- name: Enable EPEL Release
+  shell: |
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  tags: patch_update
+
 - name: YUM upgrade all packages
   yum:
     name: '*'
