@@ -130,9 +130,9 @@
             - zip
           tags: yum
 
-      ###########################################
-      # Additional Tools not available thru yum #
-      ###########################################
+      ##############################################
+      # Additional Tools not available through yum #
+      ##############################################
         - name: Install yum package support
           yum: name={{ item }} state=present update_cache=yes
           with_items:
@@ -234,11 +234,11 @@
             msg: "{{ java7_version.stderr }}"
           tags: java7
 
-      ########################################################################
-      # Install X11 extensions                                               #
-      # x11.adt.ext installp download requiring an IBMid                     #
-      # http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
-      ########################################################################
+      #########################################################################
+      # Install X11 extensions                                                #
+      # x11.adt.ext installp download requiring an IBMid                      #
+      # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+      #########################################################################
         - name: Transfer X11 installp to remote host
           copy:
             src: /Vendor_Files/aix/X11.adt

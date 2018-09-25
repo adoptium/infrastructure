@@ -26,14 +26,14 @@
 - name: Import AZUL public key
   rpm_key:
     state: present
-    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    key: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
   when:
     - ansible_architecture == "x86_64"
   tags: azul-key
 
 - name: Add AZUL to yum repo
   get_url:
-    url: http://repos.azulsystems.com/rhel/zulu.repo
+    url: https://repos.azulsystems.com/rhel/zulu.repo
     dest: /etc/yum.repos.d/zulu.repo
     timeout: 25
   when:
@@ -51,7 +51,7 @@
 ##########################
 - name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
-    url: http://people.centos.org/tru/devtools-2/devtools-2.repo
+    url: https://people.centos.org/tru/devtools-2/devtools-2.repo
     dest: /etc/yum.repos.d/devtools-2.repo
     timeout: 25
   when:
