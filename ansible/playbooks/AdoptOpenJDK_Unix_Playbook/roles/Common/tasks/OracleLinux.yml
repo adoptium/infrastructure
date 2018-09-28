@@ -20,7 +20,7 @@
   yum_repository:
     name: ol7_el7
     description: Oracle Linux 7 (aarch64) Latest
-    baseurl: http://yum.oracle.com/repo/OracleLinux/OL7/latest/aarch64/
+    baseurl: https://yum.oracle.com/repo/OracleLinux/OL7/latest/aarch64/
     gpgcheck: no
     enabled: yes
 

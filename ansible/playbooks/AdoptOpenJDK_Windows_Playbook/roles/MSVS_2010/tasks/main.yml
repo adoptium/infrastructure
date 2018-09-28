@@ -10,7 +10,7 @@
 
 - name: Download Visual Studio 2010 Professional
   win_get_url:
-    url: 'http://download.microsoft.com/download/D/B/C/DBC11267-9597-46FF-8377-E194A73970D6/vs_proweb.exe'
+    url: 'https://download.microsoft.com/download/D/B/C/DBC11267-9597-46FF-8377-E194A73970D6/vs_proweb.exe'
     dest: 'C:\temp\vs2010_professional.exe'
   when: (vs2010_installed.stat.exists == false)
   tags: MSVS_2010

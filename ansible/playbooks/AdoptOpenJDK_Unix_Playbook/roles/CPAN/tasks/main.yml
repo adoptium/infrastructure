@@ -5,7 +5,7 @@
 
 # Additional steps for RedHat and SLES
 - name: Install cpanminus RedHat 6, CentOS 6 and SLES
-  shell: "curl -L http://cpanmin.us | perl - App::cpanminus"
+  shell: "curl -L https://cpanmin.us | perl - App::cpanminus"
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
