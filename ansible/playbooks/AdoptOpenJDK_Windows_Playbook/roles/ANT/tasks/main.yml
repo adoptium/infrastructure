@@ -17,7 +17,8 @@
 
 - name: Download Apache ANT
   win_get_url:
-    url: http://apache.forsale.plus/ant/binaries/apache-ant-1.10.3-bin.zip
+    # Ant 1.10.3 has been archived
+    url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.3-bin.zip
     dest: c:\temp\ant.zip
     force: no
   when: (ant_installed.stat.exists == false) and (ant_download.stat.exists == false)

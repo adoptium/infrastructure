@@ -51,7 +51,7 @@
 ##########################
 - name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
-    url: http://people.centos.org/tru/devtools-2/devtools-2.repo
+    url: https://people.centos.org/tru/devtools-2/devtools-2.repo
     dest: /etc/yum.repos.d/devtools-2.repo
     timeout: 25
   when:

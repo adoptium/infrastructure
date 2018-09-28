@@ -43,7 +43,7 @@ ansible-playbook -i inventory install.yml
 docker logs -f awx_task
 
 # At this point you can open the website and test
-http://ansible.adoptopenjdk.net
+https://ansible.adoptopenjdk.net
 
 # Viewing the website will show
 AWX is Upgrading
@@ -52,7 +52,7 @@ AWX is currently upgrading or installing, this page will refresh when done.
 # The default administrator username is admin, and the password is password.
 # Testing Ansible Tower
 # Complete the Hello World test
-http://docs.ansible.com/ansible-tower/2.3.0/html/quickstart/create_project.html
+https://docs.ansible.com/ansible-tower/2.3.0/html/quickstart/create_project.html
 
 # Now we need to secure the server???
 login to website
@@ -96,7 +96,7 @@ MMMNNNNNNNNNNNNNNNN+    /NNNNNNNNNNNNNNNNNNd+`     -NNNNNNNNNNNNNNNMMM
 MMMMNNNNNNNNNNNNNNs    -mNNNNNNNNNNNNNNNNNNNNmy:   +NNNNNNNNNNNNNNMMMM
 MMMMMNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNmdmNNNNNNNNNNNNNNMMMMM
                    Welcome to AWX aka Ansible Tower
-                http://ansible.adoptopenjdk.net
+                https://ansible.adoptopenjdk.net
 AWX is run from docker containers, you can watch the start up activity for the containers by running: docker logs -f awx_task
 
 # auto update 
