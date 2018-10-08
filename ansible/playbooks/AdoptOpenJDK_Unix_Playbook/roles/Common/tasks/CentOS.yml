@@ -33,7 +33,7 @@
 
 - name: Add AZUL to yum repo
   get_url:
-    url: https://repos.azulsystems.com/rhel/zulu.repo
+    url: http://repos.azulsystems.com/rhel/zulu.repo
     dest: /etc/yum.repos.d/zulu.repo
     timeout: 25
   when:
