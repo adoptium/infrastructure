@@ -26,7 +26,7 @@
 - name: Import AZUL public key
   rpm_key:
     state: present
-    key: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
   when:
     - ansible_architecture == "x86_64"
   tags: azul-key
