@@ -75,6 +75,8 @@
           args:
             creates: krb5.jckusers.txt
           tags:
+            #false positive for 'use shell only when shell is required'
+            #this whole piece should be rewritten to avoid 'bashsible' code style
             - skip_ansible_lint
 
         - name: Start krb5-kdc service
@@ -166,7 +168,8 @@
             chain: INPUT
             source: 169.55.170.68
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             jump: REJECT
         - name: iptables_permanent
