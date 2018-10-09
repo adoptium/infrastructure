@@ -15,7 +15,9 @@
 ##########
 - name: Creates Nagios folder
   file: path=/usr/local/nagios/ state=directory mode=0755
-- file: path=/usr/local/nagios/libexec/ state=directory mode=0755
+
+- name: Creates Nagios libexec folder
+  file: path=/usr/local/nagios/libexec/ state=directory mode=0755
 
 ##################
 # Install Nagios #
@@ -32,8 +34,11 @@
 # Nagios user #
 ###############
 - name: Setup Nagios user
-  shell: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
+  command: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
   ignore_errors: yes
+  tags:
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 - name: Create SSH Key folder for Nagios
   file:

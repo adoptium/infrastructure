@@ -6,7 +6,10 @@
   shell: docker >/dev/null 2>&1
   ignore_errors: yes
   register: docker_installed
-  tags: docker
+  tags:
+    - docker
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 # Ubuntu
 - name: Add Docker Repo for Ubuntu
@@ -30,7 +33,10 @@
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
     - ansible_architecture == "x86_64"
-  tags: docker
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
 
 - name: Install additional Docker prerequisites for Ubuntu 14
   apt: pkg={{ item }} state=latest
@@ -42,7 +48,10 @@
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version == "14"
     - ansible_architecture == "x86_64"
-  tags: docker
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
 
 - name: Import Docker Repo key for Ubuntu
   apt_key:
@@ -106,7 +115,10 @@
     - ansible_distribution == "SLES"
     - ansible_distribution_major_version == "12"
     - ansible_architecture == "x86_64"
-  tags: docker
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
 
 # CentOS
 - name: Install EPEL repo for CentOS 7
@@ -161,7 +173,10 @@
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
     - ansible_architecture == "x86_64"
-  tags: docker
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
 
 - name: Add Jenkins user to the docker group for ALL
   user: name={{ Jenkins_Username }}

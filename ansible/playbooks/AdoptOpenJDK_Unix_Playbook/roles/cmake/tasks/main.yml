@@ -13,7 +13,9 @@
   shell: cmake >/dev/null 2>&1
   ignore_errors: yes
   register: cmake_installed
-  tags: cmake
+  tags:
+    - cmake
+    - skip_ansible_lint
 
 - name: Test if cmake is installed at the correct version
   shell: cmake --version 2>/dev/null | grep version | awk '{print $3}'
@@ -55,4 +57,7 @@
   apt: pkg=cmake state=latest update_cache=yes
   when:
     - ansible_architecture == "armv7l"
-  tags: cmake
+  tags:
+    - cmake
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint

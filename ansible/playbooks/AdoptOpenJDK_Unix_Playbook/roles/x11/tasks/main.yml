@@ -19,4 +19,7 @@
   shell: startx -- :1 &
   ignore_errors: yes
   no_log: True
-  tags: x11
+  tags:
+    - x11
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint

@@ -31,7 +31,10 @@
           with_items:
             - iptables-persistent
             - nodejs
-          tags: dependencies
+          tags:
+            - dependencies
+            # TODO: Package installs should not use latest
+            - skip_ansible_lint
 
         - name: Create Jenkins user
           action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
@@ -84,13 +87,18 @@
 
         - name: Git Clone openjdk-api.git
           become_user: "{{ Jenkins_Username }}"
+          become: True
           git:
             repo: 'https://github.com/AdoptOpenJDK/openjdk-api.git'
             dest: "/home/{{ Jenkins_Username }}/openjdk-api"
             update: yes
+          tags:
+            # TODO: Git checkouts must contain explicit version
+            - skip_ansible_lint
 
         - name: NPM install api package.json
           become_user: "{{ Jenkins_Username }}"
+          become: True
           npm:
             path: "/home/{{ Jenkins_Username }}/openjdk-api"
 
@@ -100,6 +108,7 @@
 
         - name: Start api app
           become_user: "{{ Jenkins_Username }}"
+          become: True
           raw: "export PRODUCTION=true && /usr/local/bin/forever start /home/{{ Jenkins_Username }}/openjdk-api/server.js"
 
         - name: Add cron job to check for updates
