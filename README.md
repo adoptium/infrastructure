@@ -27,7 +27,7 @@
 - [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkari (LJC)
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert (IBM)
-- [@sxa555](https://github.com/sxa555) - Stewart X Addisoni (IBM)
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
 
 # Machine Information
