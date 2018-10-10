@@ -9,7 +9,6 @@
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-- [@bblondin](https://github.com/bblondin) - Brad Blondin (IBM)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning
