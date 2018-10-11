@@ -32,6 +32,8 @@
     - gcc_7
     - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
+    - OpenSSL
+    - Protobuf
     - Nagios_Plugins
     - Nagios_Master_Config
     - Nagios_Tunnel

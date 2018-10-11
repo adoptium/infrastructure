@@ -1,0 +1,61 @@
+---
+###########################
+# Protocol Buffers v3.5.1 #
+###########################
+# Required by OpenJ9 for out-of-process JIT compilation aka JITaaS
+# Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
+
+- name: Check if Protocol Buffers v3.5.1 is installed
+  stat:
+    path: /usr/local/bin/protoc
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+  register: protobuf_status
+  tags: protobuf
+
+- name: Download Protocol Buffers v3.5.1
+  get_url:
+    url: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
+    dest: /tmp/protobuf-cpp-3.5.1.tar.gz
+    force: no
+    mode: 0755
+    validate_certs: no
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+  tags: protobuf
+
+- name: Extract Protocol Buffers v3.5.1
+  unarchive:
+    src: /tmp/protobuf-cpp-3.5.1.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+  tags: protobuf
+
+- name: Build and install Protocol Buffers v3.5.1
+  shell: cd /tmp/protobuf-3.5.1 && ./configure && make && make install && ldconfig
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+  tags: protobuf
+
+- name: Remove downloaded packages for Protocol Buffers v3.5.1
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/protobuf-cpp-3.5.1.tar.gz
+    - /tmp/protobuf-3.5.1
+  ignore_errors: yes
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+  tags: protobuf
