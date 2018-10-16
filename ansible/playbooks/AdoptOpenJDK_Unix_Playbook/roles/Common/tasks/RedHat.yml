@@ -18,7 +18,8 @@
 
 - name: Enable EPEL Release
   shell: |
-    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  ignore_errors: yes
   tags: patch_update
 
 - name: YUM upgrade all packages
