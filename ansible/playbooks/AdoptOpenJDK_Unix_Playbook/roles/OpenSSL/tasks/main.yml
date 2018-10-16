@@ -6,7 +6,7 @@
 # Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
 
 - name: Test if OpenSSL v1.1.0g is installed
-  shell: openssl version | awk '{print $2}' | cut -c 1-5
+  shell: export LD_LIBRARY_PATH=/usr/local/openssl-1.1.0/lib &&  /usr/local/openssl-1.1.0/bin/openssl version | awk '{print $2}' | cut -c 1-5
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
