@@ -48,22 +48,28 @@
   tags: nasm
 
 - name: Test if nasm is installed on path
-  shell: nasm >/dev/null 2>&1
+  shell: nasm --version >/dev/null 2>&1
   ignore_errors: yes
   register: nasm_installed
   when: CC is defined
   tags: nasm
 
+- debug:
+    msg: "VARIABLE nasm_installed SET TO {{ nasm_installed.rc }}"
+  when: nasm_installed.rc is defined
+  tags: nasm
+
 - name: Capture nasm is installed version
   shell: nasm --version 2>/dev/null | grep version | awk '{print $3}'
-  when: nasm_installed.rc == 0
+  when:
+    - (nasm_installed.rc is defined) and (nasm_installed.rc == 0 )
   register: nasm
   tags: nasm
 
 - name: Download nasm sources
   shell: cd /tmp && wget https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz
   when:
-    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
   tags: nasm
 
 - name: Extract nasm sources
@@ -72,11 +78,11 @@
     dest: /tmp/
     copy: False
   when:
-    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
   tags: nasm
 
 - name: Running ./configure & make for nasm
   shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} ./configure -prefix=/usr/local && make install
   when:
-    - (nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='eq') )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
   tags: nasm
