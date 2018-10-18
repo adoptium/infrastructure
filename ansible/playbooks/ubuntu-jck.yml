@@ -11,6 +11,14 @@
     - block:
         - name: Load AdoptOpenJDKs variable file
           include_vars: adoptopenjdk_variables.yml
+        - name: If we ARE running on Power set var accordingly
+          set_fact:
+            isPower: "Y"
+          when: ansible_architecture.find("ppc") != -1
+        - name: If we're NOT running on Power set var accordingly
+          set_fact:
+            isPower: "N"
+          when: ansible_architecture.find("ppc") == -1
         - name: OS update -- apt-get upgrade
           apt: upgrade=safe update_cache=yes
           tags: patch_update
@@ -28,11 +36,24 @@
             - unzip
             - openjdk-8-jre
             - printer-driver-cups-pdf
-            - vnc4server
             - xvfb
             - xterm
           tags:
             # TODO: Package installs should not use latest
+            - skip_ansible_lint
+        - name: Install VNC on Power systems
+          apt: pkg={{ item }} state=latest
+          with_items:
+            - tightvncserver
+          when: isPower =="Y"
+          tags:
+            - skip_ansible_lint
+        - name: Install VNC on Non-Power systems
+          apt: pkg={{ item }} state=latest
+          with_items:
+            - vnc4server
+          when: isPower =="N"
+          tags:
             - skip_ansible_lint
         - name: Create Jenkins user
           action: user name="{{ Jenkins_Username }}" state=present
@@ -43,6 +64,15 @@
             user: "{{ Jenkins_Username }}"
             state: present
             key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+        - name: Create Jcktestr user
+          action: user name="{{ Jcktestr_Username }}" state=present
+          ignore_errors: yes
+          tags: jcktestr_user
+        - name: Set ssh key for jcktestr user
+          authorized_key:
+            user: "{{ Jcktestr_Username }}"
+            state: present
+            key: "{{ lookup('file', '{{ Jcktestr_User_SSHKey }}') }}"
         - name: Start virtual X display on :1
           shell: Xvfb :1 -screen 0 1280x1024x24 &
           args:
