@@ -2,8 +2,23 @@
 ##################
 # AdoptOpenJDK 9 #
 ##################
+- name: Checking for /usr/lib/jvm
+  stat: path=/usr/lib/jvm
+  register: usr_lib_jvm_exists
+  tags: adoptopenjdk9
+
+- name: Creating /usr/lib/jvm if not found
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: usr_lib_jvm_exists.stat.exists != True
+  tags: adoptopenjdk9
+
 - name: Check if jdk9 is already installed in the target location
-  shell: ls -ld /usr/lib/jvm/jdk-9+* >/dev/null 2>&1
+  shell: ls -ld /usr/lib/jvm/jdk-9.* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk9_installed
   tags:
@@ -16,6 +31,7 @@
     dest: /usr/lib/jvm
     remote_src: yes
   when:
+    - adoptopenjdk9_installed.rc != 0
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk9
 
@@ -25,6 +41,23 @@
     dest: /usr/lib/jvm
     remote_src: yes
   when:
+    - adoptopenjdk9_installed.rc != 0
     - ansible_architecture != "x86_64"
     - ansible_architecture != "armv7l"
+  tags: adoptopenjdk9
+
+- name: Get /usr/lib/jvm/jdk9.* full path name
+  shell: ls -ld /usr/lib/jvm/jdk-9.* 2>/dev/null | awk '{print $9}'
+  register: adoptopenjdk9_dir
+  when: adoptopenjdk9_installed.rc != 0
+  tags: adoptopenjdk9
+
+- name: Chown /usr/lib/jvm/jdk9.*
+  file:
+    path: '{{ adoptopenjdk9_dir.stdout }}'
+    state: directory
+    owner: root
+    group: root
+    recurse: yes
+  when: adoptopenjdk9_installed.rc != 0
   tags: adoptopenjdk9
