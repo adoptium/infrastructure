@@ -15,6 +15,7 @@
     - autoconf
     - Jenkins_User
     - freemarker
+    - ant
     - Ant-Contrib
     - ccache
     - GIT_Source

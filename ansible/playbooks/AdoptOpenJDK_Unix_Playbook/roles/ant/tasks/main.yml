@@ -1,0 +1,64 @@
+---
+##############
+# Apache Ant #
+##############
+
+# Install Apache Ant from binaries on RHEL and Centos
+
+- name: Check if Apache Ant is already installed in custom location /usr/local
+  shell: ls /usr/local/apache-ant-1.10.5 >/dev/null 2>&1
+  ignore_errors: yes
+  register: ant_installed
+  tags:
+    - ant
+    - skip_ansible_lint
+
+- name: Download Apache Ant binaries
+  get_url:
+    url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when:
+    - ant_installed.rc != 0
+  tags: ant
+
+- name: Extract ant
+  unarchive:
+    src: /tmp/apache-ant-1.10.5-bin.zip
+    dest: /usr/local
+    copy: False
+  when:
+    - ant_installed.rc != 0
+  tags: ant
+
+- name: Create /usr/local/bin/ant symlink
+  file:
+    src: /usr/local/apache-ant-1.10.5/bin/ant
+    dest: /usr/local/bin/ant
+    owner: root
+    group: root
+    state: link
+  when:
+    - ant_installed.rc != 0
+  tags: ant
+
+- name: Clean up downloaded packages
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/apache-ant-1.10.5-bin.zip
+  when:
+    - ant_installed.rc != 0
+  ignore_errors: yes
+  tags: ant
+
+- name: Remove the older Ant package
+  yum:
+    name: ant
+    state: absent
+  when:
+    - ant_installed.rc != 0
+  tags: ant
