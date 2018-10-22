@@ -84,11 +84,37 @@
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
   when: (ansible_distribution_major_version != "6" and ansible_architecture != "ppc64")
+  tags: java
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL6_PPC64 }}"
   when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+  tags: java
+
+- name: Check if java8 directory exists
+  shell: ls -d /usr/lib/jvm/java-1.8.0-openjdk.* >/dev/null 2>&1
+  ignore_errors: yes
+  register: java8
+  tags: java
+
+- name: Create /usr/lib/jvm/java-1.8.0-openjdk symlink
+  shell: ln -s /usr/lib/jvm/java-1.8.0-openjdk.* /usr/lib/jvm/java-1.8.0-openjdk
+  when:
+    - java8.rc == 0
+  tags: java
+
+- name: Check if java7 directory exists
+  shell: ls -d /usr/lib/jvm/java-1.7.0-openjdk.* >/dev/null 2>&1
+  ignore_errors: yes
+  register: java7
+  tags: java
+
+- name: Create /usr/lib/jvm/java-1.7.0-openjdk symlink
+  shell: ln -s /usr/lib/jvm/java-1.7.0-openjdk.* /usr/lib/jvm/java-1.7.0-openjdk
+  when:
+    - java7.rc == 0
+  tags: java
 
 ####################
 # Set default Java #
