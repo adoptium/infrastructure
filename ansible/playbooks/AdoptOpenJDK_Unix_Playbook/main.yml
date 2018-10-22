@@ -13,6 +13,7 @@
     - Debug
     - Common
     - autoconf
+    - curl
     - Jenkins_User
     - freemarker
     - ant
