@@ -47,7 +47,6 @@ Build_Tool_Packages:
   - zip
 
 Test_Tool_Packages:
-  - ant
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xorg

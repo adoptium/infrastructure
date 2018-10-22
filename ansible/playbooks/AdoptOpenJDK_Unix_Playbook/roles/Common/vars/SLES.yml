@@ -39,7 +39,6 @@ Additional_Build_Tools_SLES11:
   - libwww-perl
 
 Test_Tool_Packages:
-  - ant
   - perl
   - pulseaudio
   - xorg-x11

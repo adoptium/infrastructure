@@ -68,8 +68,6 @@ Additional_Build_Tools_aarch64:
 
 Test_Tool_Packages:
   - acl
-  - ant
-  - ant-contrib
   - mercurial
   - perl
   - xauth

@@ -64,7 +64,6 @@ Additional_Build_Tools_x86_64:
   - zulu-9
 
 Test_Tool_Packages:
-  - ant
   - mercurial
   - perl
   - xorg-x11-xauth

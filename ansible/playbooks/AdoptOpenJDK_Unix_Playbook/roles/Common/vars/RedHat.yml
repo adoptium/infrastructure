@@ -49,7 +49,6 @@ Additional_Build_Tools_RHEL7:
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libcurl-devel
-  - ant-contrib
   - libstdc++.so.5
 Additional_Build_Tools_RHEL_x86_64:
   - glibc-devel.i686
@@ -64,9 +63,6 @@ Java_RHEL6_PPC64:
 
 Test_Tool_Packages:
   - acl
-  - ant
-  - ant-contrib
-  - ant-apache-regexp
   - perl
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb

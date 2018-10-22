@@ -2,9 +2,21 @@
 ###############
 # Ant-Contrib #
 ###############
+
+# ANT_HOME/lib is: /usr/local/apache-ant-*/lib
+
+- name: Set ant_lib_dir variable for on {{ ansible_distribution }} {{ ansible_architecture }}
+  set_fact:
+    ant_lib_dir: /usr/local/apache-ant-1.10.5/lib
+  when:
+  tags: ant-contrib
+
+- debug: var=ant_lib_dir
+  tags: ant-contrib
+
 - name: Check if ant-contrib is already installed
   stat:
-    path: /usr/share/ant/lib/ant-contrib.jar
+    path: "{{ ant_lib_dir }}/ant-contrib.jar"
   register: antcontrib_status
   tags: ant-contrib
 
@@ -26,15 +38,10 @@
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 
-- name: Create /usr/share/ant/lib/ FreeBSD
-  file: path=/usr/share/ant/lib/ state=directory
+- name: Move ant-contrib.jar to ant lib folder
+  command: mv /tmp/ant-contrib/lib/ant-contrib.jar {{ ant_lib_dir }}
   when:
-    - ansible_distribution == "FreeBSD"
-  tags: ant-contrib
-
-- name: Move ant-contrib.jar to lib folder
-  command: mv /tmp/ant-contrib/lib/ant-contrib.jar /usr/share/ant/lib/
-  when: antcontrib_status.stat.exists == False
+    - antcontrib_status.stat.exists == False
   tags: ant-contrib
 
 - name: Download junit - SLES
@@ -51,25 +58,6 @@
 - name: Install junit from rpm - SLES
   yum:
     name: /tmp/junit-3.8.2-8.1.noarch.rpm
-    state: present
-  when:
-    - ansible_distribution == "SLES"
-  tags: ant-contrib
-
-- name: Download ant-contrib - SLES
-  get_url:
-    url: https://ftp5.gwdg.de/pub/opensuse/discontinued/update/13.2/noarch/ant-contrib-1.0b3-3.4.1.noarch.rpm
-    dest: /tmp/
-    mode: 0440
-    timeout: 25
-    validate_certs: no
-  when:
-    - ansible_distribution == "SLES"
-  tags: ant-contrib
-
-- name: Install ant-contrib from rpm - SLES
-  yum:
-    name: /tmp/ant-contrib-1.0b3-3.4.1.noarch.rpm
     state: present
   when:
     - ansible_distribution == "SLES"
