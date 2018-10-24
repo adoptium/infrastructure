@@ -49,6 +49,15 @@
 ##########################
 # Additional build tools #
 ##########################
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools for CentOS 7
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_CentOS7 }}"
+  when: ansible_distribution_major_version == "7"
+  tags: build_tools
+
 - name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
     url: https://people.centos.org/tru/devtools-2/devtools-2.repo
