@@ -27,7 +27,6 @@ Build_Tool_Packages:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libdwarf-devel
-  - libstdc++-static
   - libXext-devel
   - libXrender-devel
   - libXt-devel
@@ -59,6 +58,9 @@ gcc73_devtoolset_compiler:
   - devtoolset-7-gcc
   - devtoolset-7-binutils
   - devtoolset-7-gcc-c++
+
+Additional_Build_Tools_CentOS7:
+  - libstdc++-static
 
 Additional_Build_Tools_x86_64:
   - zulu-9
