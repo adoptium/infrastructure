@@ -40,6 +40,7 @@ Build_Tool_Packages:
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
+  - pigz
   - pkg-config
   - wget
   - zip
