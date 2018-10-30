@@ -6,6 +6,25 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+- zypper_repository:
+    name: devel-tools
+    repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/SLE_12_SP3/'
+    auto_import_keys: yes
+    state: present
+  when:
+    - ansible_distribution_major_version == "12"
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
+  tags: patch_update
+
+- zypper_repository:
+    name: devel-tools
+    repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Factory_zSystems/'
+    auto_import_keys: yes
+    state: present
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_architecture == "s390x")
+  tags: patch_update
+
 - name: zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
