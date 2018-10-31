@@ -19,7 +19,7 @@
   tags: clang_32bit
 
 - name: Install Clang 32bit
-  win_command: 'c:\temp\LLVM-7.0.0-win32.exe'
+  win_command: 'c:\temp\LLVM-7.0.0-win32.exe /S'
   when: clang_32bit_installed.stat.exists == false
   tags: clang_32bit
 
