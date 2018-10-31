@@ -19,7 +19,7 @@
   tags: clang_64bit
 
 - name: Install Clang 64bit
-  win_command: 'c:\temp\LLVM-7.0.0-win64.exe'
+  win_command: 'c:\temp\LLVM-7.0.0-win64.exe /S'
   when: clang_64bit_installed.stat.exists == false
   tags: clang_64bit
 
