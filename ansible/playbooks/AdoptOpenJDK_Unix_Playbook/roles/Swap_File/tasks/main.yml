@@ -13,13 +13,19 @@
   command: ls /swapfile
   ignore_errors: yes
   register: swap_root
-  tags: swap_file
+  tags:
+    - swap_file
+    # TODO: use stat to check file existence
+    - skip_ansible_lint
 
 - name: Test swapfile path - /tmp/swapfile
   command: ls /tmp/swapfile
   ignore_errors: yes
   register: swap_tmp
-  tags: swap_file
+  tags:
+    - swap_file
+    # TODO: use stat to check file existence
+    - skip_ansible_lint
 
 - name: Set Swapfile path - /swapfile
   set_fact:

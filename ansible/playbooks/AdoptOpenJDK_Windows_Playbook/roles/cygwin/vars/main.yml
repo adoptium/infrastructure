@@ -3,7 +3,7 @@
 # cygwin #
 ##########
 
-Cygwin_SITE_URL: http://mirrors.kernel.org/sourceware/cygwin/
+Cygwin_SITE_URL: https://mirrors.kernel.org/sourceware/cygwin/
 Cygwin_PACKAGE_DIR: c:\cygwin_packages
 Cygwin_ROOT_INST_DIR: C:\cygwin64
 Cygwin_CATEGORIES: Devel

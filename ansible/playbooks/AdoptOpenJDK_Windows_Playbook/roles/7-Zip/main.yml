@@ -1,0 +1,19 @@
+---
+########
+# 7zip #
+########
+# Added for extracting MinGW-W64
+
+- name: Download 7-Zip (required to unpack MinGW-W64)
+  win_get_url:
+    url: https://www.7-zip.org/a/7z1805-x64.exe
+    dest: 'C:\temp\7z.exe'
+    force: no
+  tags: 7zip
+
+- name: Install 7-Zip
+  win_package:
+    path: 'C:\temp\7z.exe'
+    creates_path: 'C:\7-Zip\7z.exe'
+    state: present
+  tags: 7zip

@@ -12,13 +12,17 @@
   roles:
     - Debug
     - Common
+    - autoconf
+    - curl
     - Jenkins_User
     - freemarker
+    - ant
     - Ant-Contrib
     - ccache
     - GIT_Source
     - CPAN
     - cmake
+    - gmake
     - Docker
     - NVidia_Cuda_Toolkit
     - Superuser
@@ -27,8 +31,12 @@
     - x11
     - NTP_TIME
     - gcc_48
+    - gcc_7
+    - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
     - adoptopenjdk10
+    - OpenSSL
+    - Protobuf
     - Nagios_Plugins
     - Nagios_Master_Config
     - Nagios_Tunnel

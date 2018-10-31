@@ -54,6 +54,7 @@ Build_Tool_Packages:
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
+  - pigz
   - pkg-config
   - wget
   - zip
@@ -65,17 +66,23 @@ gcc_compiler:
 Additional_Build_Tools_x86_64:
   - zulu-9
   - libnuma-dev
+  - gcc-7
+  - g++-7
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev
+  - gcc-7
+  - g++-7
+
+Additional_Build_Tools_s390:
+  - gcc-7
+  - g++-7
 
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
 Test_Tool_Packages:
   - acl
-  - ant
-  - ant-contrib
   - mercurial
   - perl
   - xauth

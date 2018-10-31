@@ -3,14 +3,17 @@
 # NTP_TIME #
 ############
 - name: Set timedatectl set-ntp no
-  shell: timedatectl set-ntp no
+  command: timedatectl set-ntp no
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
   tags: ntp_time
 
 - name: Configure NTP server pools
   shell: "cat /etc/ntp.conf | grep '1.pool.ntp.org' && echo NTP || echo -e 'pool 1.pool.ntp.org\npool 2.pool.ntp.org\npool 3.pool.ntp.org' >> /etc/ntp.conf"
-  tags: ntp_time
+  tags:
+    - ntp_time
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 - name: Start NTP for Ubuntu and SLES 11
   service:

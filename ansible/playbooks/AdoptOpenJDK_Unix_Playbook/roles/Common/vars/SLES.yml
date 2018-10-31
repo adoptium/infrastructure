@@ -26,6 +26,7 @@ Build_Tool_Packages:
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
+  - git
   - libfreetype6
   - libXext6
   - libXrender1
@@ -39,7 +40,6 @@ Additional_Build_Tools_SLES11:
   - libwww-perl
 
 Test_Tool_Packages:
-  - ant
   - perl
   - pulseaudio
   - xorg-x11

@@ -15,16 +15,28 @@ install:
   # Install ansible
   - pip install ansible
   - pip install yamllint
+  - pip install ansible-lint
 
   # Check ansible version
   - ansible --version
 
 script:
   - cd ansible
+
     # Check that the inventory is valid
   - ansible-inventory --host=build-cloudcone-ubuntu1604-x64-1
+
     # Check YAML validity
   - yamllint -c yamllint.yml .
+
+    # Ansible code static analysis
+  - ansible-lint playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+  - ansible-lint playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+  - ansible-lint playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-api.yml
+  - ansible-lint playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
+  - ansible-lint playbooks/aix.yml
+  - ansible-lint playbooks/ubuntu-jck.yml
+
     # Check Playbook syntax.
   - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
   - ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check

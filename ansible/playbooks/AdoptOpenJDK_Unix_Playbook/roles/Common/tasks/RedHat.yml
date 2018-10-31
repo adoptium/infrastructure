@@ -16,6 +16,12 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
+- name: Enable EPEL Release
+  shell: |
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  ignore_errors: yes
+  tags: patch_update
+
 - name: YUM upgrade all packages
   yum:
     name: '*'
@@ -49,6 +55,13 @@
   package: "name=numactl-devel state=latest"
   when:
     - (ansible_distribution_major_version != "7" and ansible_architecture != "s390x")
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
   tags: build_tools
 
 #################

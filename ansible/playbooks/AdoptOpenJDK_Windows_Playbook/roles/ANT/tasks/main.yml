@@ -33,7 +33,7 @@
   tags: ANT
 
 - name: Set ANT_HOME
-  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.3" /M
+  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.3"
   when: (ant_installed.stat.exists == false)
   tags: ANT
 

@@ -17,7 +17,7 @@
 
 - name: Download Java 7
   win_get_url:
-    url: http://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip
+    url: https://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip
     dest: 'C:\temp\jdk7u75-b13.zip'
   when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
   tags: Java7

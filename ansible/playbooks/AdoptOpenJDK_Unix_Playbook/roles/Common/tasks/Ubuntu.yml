@@ -12,6 +12,12 @@
     - ansible_architecture != "armv7l"
   tags: patch_update
 
+- name: Add the ubuntu toolchain repository to apt
+  apt_repository: repo='ppa:ubuntu-toolchain-r/test'
+  when:
+    - ansible_architecture != "armv7l"
+  tags: patch_update
+
 - name: Add Azul Zulu repository for x86_64
   apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
   when:
@@ -24,17 +30,17 @@
     state: present
   when:
     - ansible_architecture == "x86_64"
-  tags: patch_update
+  tags: [patch_update, azul-key]
 
 - name: Add additional repositories for BeagleBone
   apt_repository: repo={{ item }}
   with_items:
-    - deb http://deb.debian.org/debian/ stable main contrib non-free
-    - deb-src http://deb.debian.org/debian/ stable main contrib non-free
-    - deb http://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb-src http://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb http://deb.debian.org/debian-security stable/updates main
-    - deb-src http://deb.debian.org/debian-security stable/updates main
+    - deb https://deb.debian.org/debian/ stable main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable main contrib non-free
+    - deb https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb https://deb.debian.org/debian-security stable/updates main
+    - deb-src https://deb.debian.org/debian-security stable/updates main
     - deb http://ftp.debian.org/debian stretch-backports main
     - deb-src http://ftp.debian.org/debian stretch-backports main
   when:
@@ -73,6 +79,13 @@
   with_items: "{{ Additional_Build_Tools_ppc64le }}"
   when:
     - ansible_architecture == "ppc64le"
+  tags: build_tools
+
+- name: Install additional build tools for S390
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_s390 }}"
+  when:
+    - ansible_architecture == "s390x"
   tags: build_tools
 
 - name: Install additional build tools for aarch64
