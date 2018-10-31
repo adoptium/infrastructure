@@ -27,7 +27,6 @@
     - x11
     - NTP_TIME
     - gcc_48
-    - gcc_64
     - adoptopenjdk9
     - adoptopenjdk10
     - Nagios_Plugins
