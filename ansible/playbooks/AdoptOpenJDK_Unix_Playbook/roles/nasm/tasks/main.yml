@@ -86,3 +86,13 @@
   when:
     - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
   tags: nasm
+
+- name: Remove downloaded packages for nasm
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/nasm-2.13.03
+    - /tmp/nasm-2.13.03.tar.gz
+  ignore_errors: yes
+  tags: nasm

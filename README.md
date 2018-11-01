@@ -24,7 +24,7 @@
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
-- [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkari (LJC)
+- [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM)

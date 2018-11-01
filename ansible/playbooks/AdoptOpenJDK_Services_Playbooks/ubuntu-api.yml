@@ -22,8 +22,8 @@
           apt: upgrade=safe update_cache=yes
           tags: patch_update
 
-        - name: Add Node.js v6.x
-          raw: "curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -"
+        - name: Add Node.js v10.x
+          raw: "curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -"
           tags: dependencies
 
         - name: Install API prerequisistes
