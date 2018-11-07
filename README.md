@@ -5,7 +5,7 @@
 
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM)
+- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
