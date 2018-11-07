@@ -9,11 +9,12 @@
 
 #### [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-- [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
-- [@jdekonin](https://github.com/jdekonin) - Joe deKoning
+- [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
+- [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@mwornast](https://github.com/mwornast) - Marcus Wornast
+- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
+- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM)
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
@@ -21,13 +22,18 @@
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
 
 #### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
+- [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
+-	[@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
+- [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
+- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
+- [@VermaSh](https://github.com/VermaSh) Shubham Verma (IBM)
 
 # Machine Information
 Most information about our machines can be found at https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml
