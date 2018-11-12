@@ -21,7 +21,9 @@
   shell: ls -ld /usr/lib/jvm/jdk-10* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk10_installed
-  tags: adoptopenjdk10
+  tags:
+    - adoptopenjdk10
+    - skip_ansible_lint
 
 - name: Install latest release if one not already installed (Linux/x64)
   unarchive:
