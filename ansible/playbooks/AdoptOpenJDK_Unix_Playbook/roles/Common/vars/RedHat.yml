@@ -67,4 +67,4 @@ Test_Tool_Packages:
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb
 
-crontab_Patching: "/usr/bin/yum -y update"
+crontab_Patching: "/usr/bin/yum -y update && yum clean packages"
