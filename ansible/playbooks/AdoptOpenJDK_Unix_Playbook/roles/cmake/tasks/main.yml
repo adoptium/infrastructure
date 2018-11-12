@@ -6,7 +6,7 @@
 # Conditions:
 # Check if cmake is installed when ansible_architecture is x86_64 or ppc64le.
 # If so cmake_installed.rc will equal 0, then test if cmake is at the correct version level.
-# If cmake_installed.rc does NOT equal 0 (not installed) or if cmake_installed.rc equals 0 (installed) and its at a lower version than 3.7.2 then...
+# If cmake_installed.rc does NOT equal 0 (not installed) or if cmake_installed.rc equals 0 (installed) and its at a lower version than 3.11.4 then...
 # Process with downloing and installing cmake
 
 - name: Test if cmake is installed on path
@@ -25,30 +25,30 @@
 
 - name: Download cmake
   get_url:
-    url: https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-    dest: /tmp/cmake-3.7.2.tar.gz
+    url: https://cmake.org/files/v3.11/cmake-3.11.4.tar.gz
+    dest: /tmp/cmake-3.11.4.tar.gz
     mode: 0440
     force: no
     validate_certs: no
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 
 - name: Extract cmake
   unarchive:
-    src: /tmp/cmake-3.7.2.tar.gz
+    src: /tmp/cmake-3.11.4.tar.gz
     dest: /tmp
     copy: False
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 
 - name: Running ./configure & make for cmake
-  shell: cd /tmp/cmake-3.7.2 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/cmake-3.11.4 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 

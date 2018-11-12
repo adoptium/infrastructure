@@ -60,6 +60,10 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Call Build Packages and Tools Task for OpenJFX
+  package: "name={{ item }} state=latest"
+  with_items: "{{ OpenJFX_Build_Tool_Packages }}"
+
 - name: Install GCC G++ on supported platforms
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_compiler }}"
