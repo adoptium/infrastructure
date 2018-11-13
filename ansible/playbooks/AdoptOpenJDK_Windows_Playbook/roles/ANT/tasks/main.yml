@@ -5,7 +5,7 @@
 
 - name: Test if Ant is already installed
   win_stat:
-    path: 'C:\apache-ant\apache-ant-1.10.3'
+    path: 'C:\apache-ant\apache-ant-1.10.5'
   register: ant_installed
   tags: ANT
 
@@ -33,7 +33,7 @@
   tags: ANT
 
 - name: Set ANT_HOME
-  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.5"
+  raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.5" /m
   when: (ant_installed.stat.exists == false)
   tags: ANT
 
