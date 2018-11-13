@@ -1,0 +1,56 @@
+---
+###########
+# OpenSSL #
+###########
+- name: Check if OpenSSL 32bit installed
+  win_shell: Test-Path -Path C:\openjdk\OpenSSL-1.1.1-x86_32
+  register: openssl32_installed
+  tags: openssl
+
+- name: Check if OpenSSL 64bit installed
+  win_shell: Test-Path -Path C:\openjdk\OpenSSL-1.1.1-x86_64
+  register: openssl64_installed
+  tags: openssl
+
+- name: Download OpenSSL-1.1.1
+  win_get_url:
+    url: https://www.openssl.org/source/openssl-1.1.1.tar.gz
+    dest: C:\temp\openssl-1.1.1.tar.gz
+  when: (openssl32_installed == False) or (openssl64_installed == False)
+  tags: openssl
+
+- name: Unpack OpenSSL-1.1.1
+  win_unzip:
+    src: C:\temp\openssl-1.1.1.tar.gz
+    dest: C:\temp
+    delete_archive: yes
+  when: (openssl32_installed == False) or (openssl64_installed == False)
+  tags: openssl
+
+- name: Install OpenSSL-1.1.1 32bit
+  win_shell: |
+    set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH%
+    "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\vsvars32"
+    perl C:\temp\openssl-1.1.1\Configure VC-WIN32 --prefix=C:\openjdk\OpenSSL-1.1.1-x86_32
+    nmake install
+  args:
+    executable: cmd
+  when: (openssl32_installed == False)
+  tags: openssl
+
+- name: Install OpenSSL-1.1.1 64bit
+  win_shell: |
+    set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH%
+    "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall" AMD64
+    perl C:\temp\openssl-1.1.1\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1-x86_64
+    nmake install
+  args:
+    executable: cmd
+  when: (openssl64_installed == False)
+  tags: openssl
+
+- name: Cleanup OpenSSL
+  win_file:
+    path: C:\temp\openssl-1.1.1
+    state: absent
+  tags: openssl
