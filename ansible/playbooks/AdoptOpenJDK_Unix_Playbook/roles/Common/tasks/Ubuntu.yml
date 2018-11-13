@@ -35,12 +35,12 @@
 - name: Add additional repositories for BeagleBone
   apt_repository: repo={{ item }}
   with_items:
-    - deb http://deb.debian.org/debian/ stable main contrib non-free
-    - deb-src http://deb.debian.org/debian/ stable main contrib non-free
-    - deb http://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb-src http://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb http://deb.debian.org/debian-security stable/updates main
-    - deb-src http://deb.debian.org/debian-security stable/updates main
+    - deb https://deb.debian.org/debian/ stable main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable main contrib non-free
+    - deb https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb https://deb.debian.org/debian-security stable/updates main
+    - deb-src https://deb.debian.org/debian-security stable/updates main
     - deb http://ftp.debian.org/debian stretch-backports main
     - deb-src http://ftp.debian.org/debian stretch-backports main
   when:
@@ -60,6 +60,10 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Call Build Packages and Tools Task for OpenJFX
+  package: "name={{ item }} state=latest"
+  with_items: "{{ OpenJFX_Build_Tool_Packages }}"
+
 - name: Install GCC G++ on supported platforms
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_compiler }}"

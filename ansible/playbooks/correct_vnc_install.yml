@@ -1,0 +1,50 @@
+---
+###############################################
+#  AdoptOpenJDK - Ansible JCK Playbook for:   #
+# Ubuntu 16 on x86 (depends on openjdk-8-jre) #
+###############################################
+
+- hosts: "{{ groups['Vendor_groups'] | default('jck-*-ubuntu*') }}"
+  remote_user: root
+  become: yes
+  tasks:
+    - block:
+        - name: If we're running on Power set var accordingly
+          set_fact:
+            isPower: "Y"
+          when: ansible_architecture.find("ppc") != -1
+        - name: If we're running on zLinux set var accordingly
+          set_fact:
+            isZlinux: "Y"
+          when: ansible_architecture.find("s390") != -1
+        - name: OS update -- apt-get upgrade
+          apt: upgrade=safe update_cache=yes
+          tags: patch_update
+        - name: Remove wrong VNC from Power systems
+          apt: pkg={{ item }} state=absent
+          with_items:
+            - vnc4server
+          when: isPower is defined and isPower =="Y"
+          tags:
+            - remove_wrong_power_vnc
+        - name: Install correct VNC on Power systems
+          apt: pkg={{ item }} state=latest
+          with_items:
+            - tightvncserver
+          when: isPower is defined and isPower =="Y"
+          tags:
+            - install_correct_power_VNC
+        - name: Remove wrong VNC from zLinux systems
+          apt: pkg={{ item }} state=absent
+          with_items:
+            - tightvncserver
+          when: isZlinux is defined and isZlinux =="Y"
+          tags:
+            - remove_wrong_zlinux_vnc
+        - name: Install correct VNC on zLinux systems
+          apt: pkg={{ item }} state=latest
+          with_items:
+            - vnc4server
+          when: isZlinux is defined and isZlinux =="Y"
+          tags:
+            - install_correct_zlinux_VNC

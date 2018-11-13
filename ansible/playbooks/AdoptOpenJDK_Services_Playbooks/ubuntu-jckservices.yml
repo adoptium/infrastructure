@@ -26,6 +26,11 @@
             - pwgen
             - tomcat8
             - unzip
+          tags:
+            # TODO: replace 'latest' with specified versions
+            - skip_ansible_lint
+
+
         - name: Create Jenkins user
           action: user name="{{ Jenkins_Username }}" state=present
           ignore_errors: yes
@@ -54,11 +59,14 @@
             group: root
             mode: 0644
             backup: yes
+
         - name: Configure kerberos server
-          shell: kdb5_util create -r ADOPTOPENJDK_NET -W -s -P `pwgen -1`
+          command: kdb5_util create -r ADOPTOPENJDK_NET -W -s -P `pwgen -1`
           args:
             creates: /etc/krb5kdc/principal.kadm5
-        - shell: "{{ item }}"
+
+        - name: Run shell scripts
+          shell: "{{ item }}"
           with_items:
             - kadmin.local -q "addprinc -pw `pwgen -1` admin/admin@ADOPTOPENJDK_NET"
             - kadmin.local -q "addprinc -pw user1 user1/jckservices.adoptopenjdk.net@ADOPTOPENJDK_NET"
@@ -66,78 +74,102 @@
             - kadmin.local -q getprincs | egrep '^admin/admin@|^user1/|^user2/' > krb5.jckusers.txt; if test $(wc -l < krb5.jckusers.txt) -ne 3; then echo Wrong number of users - expected 3:; cat krb5.jckusers.txt; rm krb5.jckusers.txt; exit 1; fi
           args:
             creates: krb5.jckusers.txt
-        - service:
+          tags:
+            #false positive for 'use shell only when shell is required'
+            #this whole piece should be rewritten to avoid 'bashsible' code style
+            - skip_ansible_lint
+
+        - name: Start krb5-kdc service
+          service:
             name: krb5-kdc
             state: started
-        - service:
+        - name: Start krb5-admin-server service
+          service:
             name: krb5-admin-server
             state: started
-        - service:
+        - name: Start tomcat8 service
+          service:
             name: tomcat8
             state: started
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             ctstate: ESTABLISHED,RELATED
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             protocol: icmp
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             protocol: tcp
             destination_port: 22
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             protocol: tcp
             destination_port: 80
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 159.122.210.194
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 159.122.210.205
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 207.254.71.30
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 207.254.71.31
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 147.75.193.234
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 140.211.168.225
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 140.211.168.217
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 148.100.33.183
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 148.100.33.184
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 165.225.150.83
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             source: 169.55.170.68
             jump: ACCEPT
-        - iptables:
+        - name: Setup iptables
+          iptables:
             chain: INPUT
             jump: REJECT
         - name: iptables_permanent

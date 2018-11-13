@@ -12,13 +12,19 @@
   shell: git --version >/dev/null
   ignore_errors: yes
   register: git_installed
-  tags: git_source
+  tags:
+    - git_source
+    # Emits 'git used in place of git module'
+    - skip_ansible_lint
 
 - name: Test if git is installed at the correct version
   shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
   when: git_installed.rc == 0
   register: git_version
-  tags: git_source
+  tags:
+    - git_source
+    # Emits 'git used in place of git module'
+    - skip_ansible_lint
 
 - name: Download git source
   get_url:
@@ -44,6 +50,9 @@
   package: "name=curl-devel state=latest"
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+  tags:
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
 
 - name: Compile and install git from source
   shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install

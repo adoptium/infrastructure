@@ -1,0 +1,70 @@
+---
+########
+# CURL #
+########
+
+# curl 7.20 and newer is required
+
+- name: Check curl version
+  shell: curl --version | head -n1 | awk '{print $2}'
+  register: curl_version
+  tags:
+    - curl
+    - skip_ansible_lint
+
+- debug: var=curl_version.stdout
+  tags: curl
+
+- name: Set curl latest variable
+  set_fact:
+    curl_latest: 7.61.1
+  tags: curl
+
+- name: Download curl {{ curl_latest }}
+  get_url:
+    url: https://github.com/curl/curl/releases/download/curl-7_61_1/curl-7.61.1.tar.gz
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when:
+    - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout | version_compare('7.20.0', operator='lt', strict=True))))
+  tags: curl
+
+- name: Extract curl
+  unarchive:
+    src: /tmp/curl-{{ curl_latest }}.tar.gz
+    dest: /tmp/
+    copy: False
+  when:
+    - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout | version_compare('7.20.0', operator='lt', strict=True))))
+  tags: curl
+
+- name: Build and install curl {{ curl_latest }} in /usr/local
+  shell: cd /tmp/curl-{{ curl_latest }} && ./configure --prefix=/usr/local/curl-{{ curl_latest }} && make && make install
+  when:
+    - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout | version_compare('7.20.0', operator='lt', strict=True))))
+  tags: curl
+
+- name: Create /usr/local/bin/curl symlink
+  file:
+    src: /usr/local/curl-{{ curl_latest }}/bin/curl
+    dest: /usr/local/bin/curl
+    owner: root
+    group: root
+    state: link
+  when:
+    - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout | version_compare('7.20.0', operator='lt', strict=True))))
+  tags: curl
+
+- name: Remove downloaded packages for curl {{ curl_latest }}
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/curl-{{ curl_latest }}.tar.gz
+    - /tmp/curl-{{ curl_latest }}
+  ignore_errors: yes
+  when:
+    - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout | version_compare('7.20.0', operator='lt', strict=True))))
+  tags: curl

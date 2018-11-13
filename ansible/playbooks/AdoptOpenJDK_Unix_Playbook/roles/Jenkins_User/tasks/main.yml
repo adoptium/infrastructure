@@ -35,9 +35,15 @@
   tags: jenkins_user
 
 - name: Unset expiry on user account for Redhat for Jenkins user
-  shell: chage -M -1 -E -1 {{ Jenkins_Username }}
-  tags: jenkins_user
+  command: chage -M -1 -E -1 {{ Jenkins_Username }}
+  tags:
+    - jenkins_user
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
 
 - name: Unset expiry on user account for Redhat for root
-  shell: chage -M -1 -E -1 root
-  tags: jenkins_user
+  command: chage -M -1 -E -1 root
+  tags:
+    - jenkins_user
+    # TODO: write a condition when NOT to run this step
+    - skip_ansible_lint
