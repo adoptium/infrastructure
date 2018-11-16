@@ -47,3 +47,4 @@
     - NTP_TIME
     - 7-Zip
     - MinGW-W64
+    - OpenSSL
