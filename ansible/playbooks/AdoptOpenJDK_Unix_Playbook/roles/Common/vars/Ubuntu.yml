@@ -37,6 +37,7 @@ Build_Tool_Packages:
   - libxt-dev
   - libxtst-dev
   - make
+  - numactl
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
