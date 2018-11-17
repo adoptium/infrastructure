@@ -11,6 +11,7 @@
   #########
   roles:
     - Debug
+    - Version
     - Common
     - autoconf
     - curl
