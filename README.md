@@ -73,7 +73,7 @@ Core infrastructure team - granted access to hosts on a case by case basis
 Issues can be assigned to these folks
 
 - [@AdamBrousseau](https://github.com/AdamBrousseau) - Adam Brousseau (IBM)
-- [@CJKwork](https://github.com/CJKwork) - Clive ? (IBM)
+- [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
 - [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
