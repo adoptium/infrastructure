@@ -26,6 +26,8 @@
     state: link
   when:
     - ansible_distribution != "FreeBSD"
+    - ansible_distribution != "RedHat"
+    - ansible_distribution != "CentOS"
   tags: build_tools
 
 - name: Install Test Tool Packages
