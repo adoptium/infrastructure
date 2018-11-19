@@ -55,10 +55,23 @@
   ignore_errors: yes
   tags: ant
 
-- name: Remove the older Ant package
+- name: Remove the older Ant package via yum
   yum:
     name: ant
     state: absent
   when:
-    - ant_installed.rc != 0
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+  tags: ant
+
+- name: Remove the older Ant package via apt
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+      - ant
+      - ant-contrib
+      - ant-optional
+  when:
+    - ansible_distribution == "Ubuntu"
   tags: ant
