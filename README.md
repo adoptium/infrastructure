@@ -22,10 +22,15 @@ on how we implement these goals.
 
 See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
-# Child / Related Repos / Important Documentation
+# Related Repos
 
-* [Secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets
-* [Hosts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualised](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/adoptopenjdk.pdf).
+* [email](https://www.github.com/adoptopenjdk/email/) - A repo containing configuration for our email aliases etc.
+* [secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets.
+* [openjdk-jenkins-helper](https://www.github.com/adoptopenjdk/openjdk-jenkins-helper/) - A repo containing helper scripts for out Jenkins CI.
+
+## Important Documentation
+
+* [hosts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualised](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/adoptopenjdk.pdf).
 * [Ansible at AdoptOpenJDK](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks. 
 
 # Contributing
@@ -37,38 +42,45 @@ submitting Pull Requests.
 # Members
 
 We list members and their organisation affiliation for maximum transparency. Want to add 
-a new member? Please follow our [Onboarding Process](ONBOARDING.md).
+a new member? Please follow our [Onboarding Process](ONBOARDING.md). 
 
 ## [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
 
-**TODO** Swap Stewart for Marcus?  Find more non IBM and LJC folks
-
 Team that holds super user access to Infrastructure
 
-- [@gdams](https://github.com/gdams) - George Adams (IBM)
-- [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
+- [@gdams](https://github.com/gdams) - George Adams (IBM) - *
+- [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC) - *
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
 Core infrastructure team - granted access to hosts on a case by case basis
 
-**TODO** Check who really has access in the secrets repo
-
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
-- [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
+- [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
-- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
-- [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM)
+- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC) - *
+- [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM) - *
+- [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
-- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
-- [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
+- [@tellison](https://github.com/tellison) - Tim Ellison (IBM) - * 
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
 
-#### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
+## [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure)
+
+Issues can be assigned to these folks
+
+- [@AdamBrousseau](https://github.com/AdamBrousseau) - Adam Brousseau (IBM)
+- [@CJKwork](https://github.com/CJKwork) - Clive ? (IBM)
+- [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
+- [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
+- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
+- [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
+- [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
+
+## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
 -	[@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
 - [@gdams](https://github.com/gdams) - George Adams (IBM)
