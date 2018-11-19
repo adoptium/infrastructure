@@ -13,14 +13,15 @@ Assuming the PR is approved
 
 Add the user to the correct Infrastructure team:
 
-**TODO** Finish this properly
-
-- [infrastructure team](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
-- [infrastructure team](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
-- [infrastructure team](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
-
+* [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - Super Users
+* [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - Core Infra Team
+* [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure) - Can be assigned Infra Issues
+* [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins) - Super users on Jenkins
 
 ### [Secrets](https://github.com/AdoptOpenJDK/secrets)
+
+For [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) and
+[@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) teams only.
 
 - Show user how to access the secrets repo and also how to use dotGPG to read files.
 - Adding a new user to dotGPG can be done following the instructions [here](https://github.com/AdoptOpenJDK/secrets#adding-users.)
@@ -29,7 +30,7 @@ Add the user to the correct Infrastructure team:
 
 ### [ci.adoptopenjdk.net](https://ci.adoptopenjdk.net)
 
-All infrastructure members have full admin access to the jenkins slave section allowing them to create, delete and update slaves.
+All infrastructure members have full admin access to the jenkins follower section allowing them to create, delete and update followers.
 
 ### [Nagios](https://nagios.adoptopenjdk.net)
 
