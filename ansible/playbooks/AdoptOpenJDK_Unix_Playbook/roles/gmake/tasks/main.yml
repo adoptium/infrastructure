@@ -46,16 +46,3 @@
     - ansible_architecture == "ppc64le"
     - goodmake_installed.rc != 0
   tags: goodmake_source
-
-- name: Create symlink for /usr/bin/gmake to our built 4.1 in /usr/local/bin/make
-  file:
-    src: /usr/local/bin/make
-    dest: /usr/bin/gmake
-    owner: root
-    group: root
-    state: link
-  when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_architecture == "ppc64le"
-    - goodmake_installed.rc != 0
-  tags: goodmake_source
