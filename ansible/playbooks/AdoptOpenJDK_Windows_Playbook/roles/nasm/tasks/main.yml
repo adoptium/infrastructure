@@ -1,0 +1,24 @@
+---
+########
+# nasm #
+########
+- name: Check if nasm is installed
+  win_stat:
+    path: C:\openjdk\nasm-2.13.03
+  register: nasm_installed
+  tags: nasm
+
+- name: Download nasm
+  win_get_url:
+    url: https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/win64/nasm-2.13.03-win64.zip
+    dest: C:\temp\nasm-2.13.03.zip
+  when: (nasm_installed.stat.exists == false)
+  tags: nasm
+
+- name: Unzip nasm
+  win_unzip:
+    src: C:\temp\nasm-2.13.03.zip
+    dest: C:\openjdk
+    delete_archive: yes
+  when: (nasm_installed.stat.exists == false)
+  tags: nasm
