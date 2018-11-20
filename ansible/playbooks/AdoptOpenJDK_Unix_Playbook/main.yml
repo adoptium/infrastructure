@@ -32,13 +32,20 @@
     - NTP_TIME
     - gcc_48
     - gcc_7
-    - ccache # ccache needs to be compiled/installed after compilers
+    - role: local_srcinstall
+      src_tarball: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
+      installed_target: /usr/local/bin/cmake
     - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
     - adoptopenjdk10
     - adoptopenjdk11
     - OpenSSL
-    - Protobuf
+    - role: local_srcinstall
+      src_tarball: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
+      installed_target: /usr/local/bin/protoc
+      when:
+        - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" oransible_distribution == "SLES")
+        - ansible_architecture == "x86_64"
     - Nagios_Plugins
     - Nagios_Master_Config
     - Nagios_Tunnel

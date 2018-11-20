@@ -1,0 +1,58 @@
+---
+#######################################################
+# ansible install into /usr/local from source tarball #
+#######################################################
+
+# Conditions:
+# Check if target is installed
+# Proceed with downloading to /tmp/src_tarball_extracted installing
+
+- name: Test if already installed into "{{ installed_target }}"
+  stat: path="{{ installed_target }}"
+  register: local_installed
+  tags: local_srcinstall
+
+- name: Download source tarball from "{{ src_tarball }}"
+  get_url:
+    url: "{{ src_tarball }}"
+    dest: /tmp/src_tarball.tgz
+    mode: 0440
+  when: local_installed.stat.exists == False
+  tags: local_srcinstall
+
+- name: Create temp directory to build in
+  file: path=/tmp/src_tarball_extracted state=directory
+  when: local_installed.stat.exists == False
+  tags: local_srcinstall
+
+- name: Extract /tmp/src_tarball.tgz to /tmp/src_tarball_extracted
+  unarchive:
+    src: /tmp/src_tarball.tgz
+    dest: /tmp/src_tarball_extracted
+    copy: False
+  when: local_installed.stat.exists == False
+  tags: local_srcinstall
+
+- name: Compile and install to "{{ installed_targetprefix | default('/usr/local') }}"
+  shell: cd /tmp/src_tarball_extracted/* && ./configure "{{ srcinstall_configure_params | default('--prefix=/usr/local') }}" && make clean && make -j {{ ansible_processor_vcpus }} && make install
+  when: local_installed.stat.exists == False
+  tags: local_srcinstall
+
+- name: Remove /tmp/src_tarball.tgz and /tmp/src_tarball_extracted
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/src_tarball.tgz
+    - /tmp/src_tarball_extracted
+  when: local_installed.stat.exists == False
+  tags: local_srcinstall
+
+- name: Create optional symlink from "{{ srcinstall_symlink_source }}" to "{{ srcinstall_symlink_target }}"
+  file:
+    src: "{{ srcinstall_symlink_source }}"
+    dest: "{{ srcinstall_symlink_target }}"
+    state: link
+  when:
+    - local_installed.stat.exists == False
+    - ( srcinstall_symlink_source is defined and srcinstall_symlink_target is defined )
