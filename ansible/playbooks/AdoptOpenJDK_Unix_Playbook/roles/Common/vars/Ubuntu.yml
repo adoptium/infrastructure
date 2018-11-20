@@ -61,6 +61,7 @@ OpenJFX_Build_Tool_Packages:
   - libxml2-dev
   - libxslt1-dev
   - libxxf86vm-dev
+  - ruby
 
 gcc_compiler:
   - g++-4.8
