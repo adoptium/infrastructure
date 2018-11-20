@@ -44,6 +44,8 @@ submitting Pull Requests.
 We list members and their organisation affiliation for maximum transparency. Want to add 
 a new member? Please follow our [Onboarding Process](ONBOARDING.md). 
 
+* - Indicates access to the secrets repo
+
 ## [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
 
 Team that holds super user access to Infrastructure
@@ -138,7 +140,7 @@ Backup retention:
 - How many copies?
 
 ## OS Patch Management
-**WARN:** Several of our hosts are internet facing and we need to stay vigilant 
+**WARNING:** Several of our hosts are internet facing and we need to stay vigilant 
 of the potential security risks this presents.
 
 ### Patch Management / Minimum Time Frame
