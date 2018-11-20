@@ -14,7 +14,7 @@
   register: goodmake_installed
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_architecture == "ppc64le"
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags: goodmake_source
 
 - name: Download make 4.1 source
@@ -24,7 +24,7 @@
     mode: 0440
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_architecture == "ppc64le"
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -35,7 +35,7 @@
     copy: False
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_architecture == "ppc64le"
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -43,6 +43,19 @@
   shell: cd /tmp/make-4.1 && ./configure --prefix=/usr/local && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_architecture == "ppc64le"
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
+    - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: Create symlink for /usr/bin/gmake to our built 4.1 in /usr/local/bin/make
+  file:
+    src: /usr/local/bin/make
+    dest: /usr/bin/gmake
+    owner: root
+    group: root
+    state: link
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
     - goodmake_installed.rc != 0
   tags: goodmake_source
