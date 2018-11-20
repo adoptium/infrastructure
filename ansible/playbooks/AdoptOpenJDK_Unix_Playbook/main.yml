@@ -11,10 +11,13 @@
   #########
   roles:
     - Debug
+    - Version
     - Common
     - autoconf
+    - curl
     - Jenkins_User
     - freemarker
+    - ant
     - Ant-Contrib
     - ccache
     - GIT_Source
@@ -32,6 +35,7 @@
     - gcc_7
     - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
+    - adoptopenjdk10
     - OpenSSL
     - Protobuf
     - Nagios_Plugins

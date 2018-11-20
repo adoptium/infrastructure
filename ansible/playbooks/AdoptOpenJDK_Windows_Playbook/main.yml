@@ -26,6 +26,7 @@
   #########
   roles:
     - Debug
+    - Version
     - Common
     - Windows_Updates
     - Jenkins
@@ -49,3 +50,4 @@
     - MinGW-W64
     - Clang_64bit
     - Clang_32bit
+    - OpenSSL

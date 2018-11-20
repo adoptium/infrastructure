@@ -39,3 +39,31 @@
     state: present
   when: (freetype_installed.stat.exists == false)
   tags: Freetype
+
+- name: Check if freetype 32bit has been built
+  win_shell: Test-Path -Path C:\openjdk\freetype-2.5.3\lib32
+  register: freetype32_built
+  tags: Freetype
+
+- name: Check if freetype 64bit has been built
+  win_shell: Test-Path -Path C:\openjdk\freetype-2.5.3\lib64
+  register: freetype64_built
+  tags: Freetype
+
+- name: Build freetype-2.5.3 32bit
+  win_shell: |
+    msbuild.exe C:/openjdk/freetype-2.5.3/builds/windows/vc2010/freetype.vcxproj /p:PlatformToolset=v100 /p:Configuration="Release Multithreaded" /p:PlatformTarget=x86 /p:ConfigurationType=DynamicLibrary /p:TargetName=freetype /p:OutDir="C:/openjdk/freetype-2.5.3/lib32/" /p:IntDir="C:/openjdk/freetype-2.5.3/obj32/" > C:/temp/freetype32.log
+    msbuild.exe C:/openjdk/freetype-2.5.3/builds/windows/vc2010/freetype.vcxproj /p:PlatformToolset=v100 /p:Configuration="Release Multithreaded" /p:PlatformTarget=x86 /p:ConfigurationType=StaticLibrary /p:TargetName=freetype /p:OutDir="C:/openjdk/freetype-2.5.3/lib32/" /p:IntDir="C:/openjdk/freetype-2.5.3/obj32/" >> C:/temp/freetype32.log
+  args:
+    executable: C:\Windows\system32\cmd.exe /k ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" x86
+  when: (freetype32_built == False)
+  tags: Freetype
+
+- name: Build freetype-2.5.3 64bit
+  win_shell: |
+    msbuild.exe C:/openjdk/freetype-2.5.3/builds/windows/vc2010/freetype.vcxproj /p:PlatformToolset=v100 /p:Configuration="Release Multithreaded" /p:Platform=x64 /p:ConfigurationType=DynamicLibrary /p:TargetName=freetype /p:OutDir="C:/openjdk/freetype-2.5.3/lib64/" /p:IntDir="C:/openjdk/freetype-2.5.3/obj64/" > C:/temp/freetype64.log
+    msbuild.exe C:/openjdk/freetype-2.5.3/builds/windows/vc2010/freetype.vcxproj /p:PlatformToolset=v100 /p:Configuration="Release Multithreaded" /p:Platform=x64 /p:ConfigurationType=StaticLibrary /p:TargetName=freetype /p:OutDir="C:/openjdk/freetype-2.5.3/lib64/" /p:IntDir="C:/openjdk/freetype-2.5.3/obj64/" >> C:/temp/freetype64.log
+  args:
+    executable: C:\Windows\system32\cmd.exe /k ""C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"" x86
+  when: (freetype64_built == False)
+  tags: Freetype

@@ -4,14 +4,14 @@
 ##########
 - name: Check if ccache is already installed
   stat:
-    path: /home/{{ Jenkins_Username }}/ccache-3.4.2
+    path: /usr/local/bin/ccache
   register: ccache_status
   tags: ccache
 
 - name: Download ccache.tar.gz
   get_url:
     url: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
-    dest: /home/{{ Jenkins_Username }}/ccache.tar.gz
+    dest: /tmp/ccache.tar.gz
     mode: 0440
     validate_certs: False
   when: ccache_status.stat.isdir is not defined
@@ -19,22 +19,32 @@
 
 - name: Extract ccache
   unarchive:
-    src: /home/{{ Jenkins_Username }}/ccache.tar.gz
-    dest: /home/{{ Jenkins_Username }}
+    src: /tmp/ccache.tar.gz
+    dest: /tmp
     copy: False
   when: ccache_status.stat.isdir is not defined
   tags: ccache
 
 - name: Running ./configure & make for CCACHE
-  shell: cd /home/{{ Jenkins_Username }}/ccache-3.4.2 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/ccache-3.4.2 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture != "s390x"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for s390x
-  shell: cd /home/{{ Jenkins_Username }}/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_cores }} && make install
+  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_cores }} && make install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture == "s390x"
+  tags: ccache
+
+- name: Remove downloaded packages for ccache
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/ccache.tar.gz
+    - /tmp/ccache-3.4.2
+  ignore_errors: yes
   tags: ccache
