@@ -30,7 +30,8 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdk do |adoptopenjdk|
-    adoptopenjdk.vm.box = "ubuntu/trusty64"
+    adoptopenjdk.vm.box = "generic/ubuntu1604"
+    adoptopenjdk.vm.synced_folder ".", "/vagrant"
     adoptopenjdk.vm.hostname = "adoptopenjdk"
     adoptopenjdk.vm.network :private_network, type: "dhcp"
     adoptopenjdk.vm.provision "shell", inline: $script, privileged: false
