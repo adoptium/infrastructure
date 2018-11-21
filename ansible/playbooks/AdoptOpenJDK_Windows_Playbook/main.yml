@@ -49,3 +49,4 @@
     - 7-Zip
     - MinGW-W64
     - OpenSSL
+    - nasm
