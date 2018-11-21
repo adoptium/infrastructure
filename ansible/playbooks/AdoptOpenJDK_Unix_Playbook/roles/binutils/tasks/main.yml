@@ -1,0 +1,79 @@
+---
+############
+# binutils #
+############
+
+# gcc-7.3 requires binutils v2.24 or newer
+# Note the installation on CentOS x86_64 is done via Developer Toolset 7 from
+# Software Collections (see the Common role for CentOS).
+
+# Note:
+# In order to use the binutils 2.31 tools (ld, as, ar) add:
+# /usr/local/binutils/bin to PATH
+# /usr/local/binutils/lib to LD_LIBRARY_PATH
+
+- name: Get the binutils version on RHEL/CentOS
+  shell: (/usr/local/binutils/bin/ld -v 2>/dev/null || ld -v 2>/dev/null ) | sed -n 's/^.*\( [0-9]\.[0-9][0-9]\).*/\1/p'| awk '{print $1}'
+  ignore_errors: yes
+  register: binutils_version
+  tags: binutils
+  when: ansible_distribution == "RedHat"
+
+- debug: var=binutils_version.stdout
+  tags: binutils
+
+# should install the same version used to build gcc-7.3
+- name: Download binutils-2.31
+  get_url:
+    url: https://ftp.gnu.org/gnu/binutils/binutils-2.31.1.tar.xz
+    dest: /tmp/binutils-2.31.1.tar.xz
+    force: no
+    mode: 0644
+  when:
+    - ansible_distribution == "RedHat"
+    - (binutils_version.stdout == '') or (binutils_version.stdout | version_compare('2.24', operator='lt'))
+  tags: binutils
+
+- name: Extract binutils-2.31
+  unarchive:
+    src: /tmp/binutils-2.31.1.tar.xz
+    dest: /tmp/
+    copy: False
+  when:
+    - ansible_distribution == "RedHat"
+    - (binutils_version.stdout == '') or (binutils_version.stdout | version_compare('2.24', operator='lt'))
+  tags: binutils
+
+# Note: Do not use --suffix option!
+# No suffix tools - ld, as, ar - are required by OpenJ9.
+- name: Build and install binutils-2.31 in /usr/local
+  shell: cd /tmp/binutils-2.31.1 && ./configure --prefix=/usr/local/binutils-2.31.1 && make -j {{ ansible_processor_vcpus }} && make install
+  when:
+    - ansible_distribution == "RedHat"
+    - (binutils_version.stdout == '') or (binutils_version.stdout | version_compare('2.24', operator='lt'))
+  tags: binutils
+
+- name: Remove binutils-2.31 tarball and build directory
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/binutils-2.31.1.tar.xz
+    - /tmp/binutils-2.31.1
+  when:
+    - ansible_distribution == "RedHat"
+    - (binutils_version.stdout == '') or (binutils_version.stdout | version_compare('2.24', operator='lt'))
+  tags: binutils
+
+# binutils symlink should point to the latest required version
+- name: Create /usr/local/binutils symlink
+  file:
+    src: /usr/local/binutils-2.31.1
+    dest: /usr/local/binutils
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "RedHat"
+    - (binutils_version.stdout == '') or (binutils_version.stdout | version_compare('2.24', operator='lt'))
+  tags: binutils
