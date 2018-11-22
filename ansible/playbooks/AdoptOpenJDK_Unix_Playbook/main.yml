@@ -19,7 +19,6 @@
     - freemarker
     - ant
     - Ant-Contrib
-    - ccache
     - GIT_Source
     - CPAN
     - cmake
@@ -33,6 +32,7 @@
     - NTP_TIME
     - gcc_48
     - gcc_7
+    - ccache # ccache needs to be compiled/installed after compilers
     - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
     - adoptopenjdk10
