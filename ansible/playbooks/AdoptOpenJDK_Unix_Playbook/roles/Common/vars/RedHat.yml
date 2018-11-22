@@ -28,6 +28,7 @@ Build_Tool_Packages:
   - libdwarf-devel
   - libffi-devel
   - libmpc-devel
+  - libpng-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
