@@ -37,7 +37,7 @@
 
 - name: Install latest OpenJ9 release if one not already installed (Linux/s390x)
   unarchive:
-    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=s390x&release=latest&type=jdk
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=openj9&os=linux&arch=s390x&release=latest&type=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   when:
