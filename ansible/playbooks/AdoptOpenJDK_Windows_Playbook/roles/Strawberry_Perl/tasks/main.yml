@@ -32,7 +32,7 @@
 - name: Add Strawberry Perl to %PATH%
   win_path:
     elements:
-      - 'C:\Strawberry\bin'
+      - 'C:\Strawberry\perl\bin'
     state: present
   when: (strawberry_perl_installed.stat.exists == false)
   tags: Strawberry_Perl
