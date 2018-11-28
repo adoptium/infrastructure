@@ -36,6 +36,7 @@
     - {role: nasm, when: ansible_architecture == 'x86_64'}
     - adoptopenjdk9
     - adoptopenjdk10
+    - adoptopenjdk11
     - OpenSSL
     - Protobuf
     - Nagios_Plugins
