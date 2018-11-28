@@ -12,7 +12,7 @@
     - skip_ansible_lint
 
 # Ubuntu
-- name: Add Docker Repo for Ubuntu
+- name: Add Docker Repo for Ubuntu x86_64
   apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
@@ -20,6 +20,26 @@
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
     - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Docker Repo for Ubuntu s390x
+  apt_repository:
+    repo: "deb [arch=s390x] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "s390x"
+  tags: docker
+
+- name: Add Docker Repo for Ubuntu ppc64le
+  apt_repository:
+    repo: "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "ppc64le"
   tags: docker
 
 - name: Install Docker prerequisites for Ubuntu
@@ -32,7 +52,7 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -47,7 +67,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version == "14"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -60,7 +80,7 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 # RedHat
@@ -73,7 +93,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 - name: Add Docker Repo for RedHat 7
@@ -88,7 +108,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 - name: Import Docker Repo key for RedHat
@@ -99,7 +119,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 # SLES
@@ -129,7 +149,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   ignore_errors: yes
   tags: docker
 
@@ -141,7 +161,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 - name: Add Docker Repo for CentOS 7
@@ -156,7 +176,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 # All OS' - Common
@@ -172,23 +192,33 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Add Jenkins user to the docker group for ALL
+- name: Add Jenkins user to the docker group for RHEL7, cent7, and ubuntu
   user: name={{ Jenkins_Username }}
     groups=docker
     append=yes
   when:
     - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12" ) or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
+  tags: docker
+
+- name: Add Jenkins user to the docker group for SLES 12
+  user: name={{ Jenkins_Username }}
+    groups=docker
+    append=yes
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12")
     - ansible_architecture == "x86_64"
   tags: docker
 
-- name: Enable and Start Docker Service for ALL
+- name: Enable and Start Docker Service for RHEL7, cent7, and ubuntu
   service:
     name: docker
     state: restarted
@@ -196,5 +226,16 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" ) or (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12" ) or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
+  tags: docker
+
+- name: Enable and Start Docker Service for SLES 12
+  service:
+    name: docker
+    state: restarted
+    enabled: yes
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12")
     - ansible_architecture == "x86_64"
   tags: docker
