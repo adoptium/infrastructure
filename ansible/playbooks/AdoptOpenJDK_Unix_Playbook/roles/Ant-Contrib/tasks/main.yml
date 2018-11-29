@@ -56,7 +56,7 @@
   tags: ant-contrib
 
 - name: Install junit from rpm - SLES
-  yum:
+  zypper:
     name: /tmp/junit-3.8.2-8.1.noarch.rpm
     state: present
   when:
