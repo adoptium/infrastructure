@@ -1,0 +1,563 @@
+---
+#########
+# MacOS #
+#########
+
+- name: MacOS Playbook
+  hosts: all
+  environment:
+    TOOLS_941: /tmp/Command_Line_Tools_macOS_10.13_for_Xcode_9.4.1.dmg
+    TMPMOUNT_941: /tmp/xcode941
+    DMG_FILE_7: /tmp/Xcode_7.2.1.dmg
+    DMG_FILE_4: /tmp/Xcode_4.6.3.dmg
+    TMPMOUNT_7: /tmp/xcode721
+    TMPMOUNT_4: /tmp/xcode463
+  tasks:
+  
+##############
+# Brew Tasks #
+##############
+
+  - name: Check if Homebrew is already installed
+    stat:
+      path: /usr/local/bin/brew
+    register: brew
+
+  - name: Install and Setup Brew
+    shell: |
+      yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    #become: yes
+    become_user: administrator
+    when: not brew.stat.exists
+    tags: install_brew
+  
+  #- name: Install Brew packages (hacky way)
+  #  shell: | 
+  #    brew install git autoconf freetype gnu-sed wget gnu-tar bash perl pkg-config
+  #  tags: brew_packages
+
+#  - name: Installing required packages with brew
+#    homebrew:
+#      name: 
+#        - 'git' 
+#        - 'autoconf'
+#        - 'freetype'
+#        - 'gnu-sed'
+#        - 'wget'
+#        - 'gnu-tar'
+#        - 'bash'
+#        - 'perl'
+#        - 'pkg-config'
+#      state: present
+#    tags: brew_packages
+  
+
+  # Change this to file module with the "linked" paramater
+#  - name: Link Brew installed packages to proper targets
+#    shell: | 
+#      ln -s /usr/local/bin/gsed /usr/local/bin/sed &&
+#      ln -s /usr/local/bin/gtar /usr/local/bin/tar &&
+#      ln -s /usr/local/bin/nasm-2.13.03/nasm /usr/local/bin/nasm
+#    become: yes
+#    tags: brew_links
+
+  - name: Linking gnu-sed to sed
+    file:
+      src: /usr/local/bin/gsed
+      dest: /usr/local/bin/sed
+      state: link
+
+  - name: Linking gnu-tar to tar
+    file:
+      src: /usr/local/bin/gtar
+      dest: /usr/local/bin/tar
+      state: link
+
+  - name: Linking gnu-tar to /usr/bin/gtar for unarchive ansible module
+    file:
+      src: /usr/local/bin/gtar
+      dest: /usr/bin/gtar
+      state: link
+    become: yes
+
+  
+  #########################
+  # Jenkins User Creation #
+  #########################
+  
+  - name: Create jenkins user 
+    user:
+      comment: "Jenkins user for slave agents, jenkins user must NOT exist on target system or this will break" 
+      name: jenkins
+      group: staff
+      state: present
+      shell: /usr/local/bin/bash
+      createhome: yes
+      home: /Users/jenkins
+    #when: ansible_distribution = 'MacOSX'
+    become: yes
+  
+  ###############
+  # NASM Config #
+  ###############
+  
+  #- name: Download and install NASM
+  #  get_url: 
+  #    url: https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/macosx/nasm-2.13.03-macosx.zip
+  #    dest: /Users/jenkins/
+  #    mode: 0440
+  #    validate_certs: no
+  
+  - name: Download and Install NASM
+    unarchive: 
+      src: https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/macosx/nasm-2.13.03-macosx.zip
+      dest: /Users/jenkins/
+      remote_src: yes
+    become: yes
+    tags: nasm
+  
+  - name: Move NASM to correct target directory
+    shell: |
+      mv /Users/jenkins/nasm-2.13.03 /usr/local/bin
+    become: yes
+    ignore_errors: yes
+    tags: nasm
+  
+  - name: Remove zipped NASM file 
+    file:
+      state: absent
+      path: /Users/jenkins/nasm-2.13.03-macosx.zip  
+    become: yes
+    tags: nasm
+  
+  - name: Linking nasm to-2.13.03/nasm to nasm
+    file:
+      src: /usr/local/bin/nasm-2.13.03/nasm
+      dest: /usr/local/bin/nasm
+      state: link
+    become: yes
+
+  #################
+  # Kernel Tuning #
+  #################
+  
+  - name: Creating /etc/sysctl.conf for kernel tuning
+    file: 
+      path: /etc/sysctl.conf
+      state: touch
+      mode: 0777
+      owner: j9admin
+      group: staff
+    become: yes
+
+  - name: Setting writable permissions for non-root user to /etc/sysctl.conf 
+    file: 
+      path: /etc/sysctl.conf
+      mode: 0777
+      owner: j9admin
+      group: staff
+    become: yes
+
+  - name: Writing kernel tuning parameters to /etc/sysctl.conf
+    blockinfile:
+      path: /etc/sysctl.conf
+      block: |
+        kern.sysv.shmmax=314572800
+        kern.sysv.shmall=76800
+    become: yes
+  
+ # - name: Setting kern.sysv.shmmax=314572800
+ #   lineinfile:
+ #     path: /etc/sysctl.conf
+ #     #state: present
+ #     line: 'kern.sysv.shmmax=314572800'
+ #     #owner: root
+ #     #group: wheel
+ #     become: yes 
+ # 
+ # - name: Setting kern.sysv.shmall=76800
+ #   lineinfile:
+ #     path: /etc/sysctl.conf
+ #     #state: present
+ #     line: 'kern.sysv.shmall=76800'
+ #     #owner: root
+ #     #group: wheel
+ #     become: yes 
+
+  - name: Changing permissions on /etc/sysctl.conf back to original
+    file: 
+      path: /etc/sysctl.conf
+      mode: 0644
+      owner: root
+      group: wheel
+    become: yes
+  
+  ########
+  # CPAN #
+  ########
+  
+  # NEED TO FIGURE THIS OUT 
+
+  #- name: CPAN initialization
+  #  shell: | 
+  #    yes | cpan install
+
+  # NEED TO FIGURE THIS OUT 
+
+  - name: Install JSON
+    cpanm: 
+      executable: /usr/local/bin/cpan
+      name: JSON
+    tags:
+      - cpan
+      - json
+      - skip_ansible_lint
+    #become: yes
+  
+  - name: Install Text::CSV
+    cpanm: 
+      executable: /usr/local/bin/cpan
+      name: Text::CSV
+    tags:
+      - cpan
+      - text_csv
+      - skip_ansible_lint
+    #become: yes
+   
+  - name: Install XML::Parser
+    cpanm: 
+      executable: /usr/local/bin/cpan
+      name: XML::Parser
+    tags:
+      - cpan
+      - xml_parser
+      - skip_ansible_lint
+    #become: yes
+  
+  ###################################
+  # freemarker to Jenkins User home #
+  ###################################
+  - name: Check that the freemarker.jar exists
+    stat:
+      path: /Users/jenkins/freemarker.jar
+    register: freemarker
+    tags: freemarker
+  
+  # Originally downloaded from
+  # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+  - name: Download and extract freemarker.jar
+    unarchive:
+      src: https://ci.adoptopenjdk.net/userContent/freemarker-2.3.8.tar.gz
+      dest: /tmp/
+      remote_src: yes
+      #mode: 0755
+    when: freemarker.stat.exists == False
+    become: yes
+    tags: freemarker
+  
+  - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+    command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /Users/jenkins
+    when: freemarker.stat.exists == False
+    become: yes
+    tags: freemarker
+  
+  #####################
+  # Bootjdk Directory #
+  #####################
+  
+  - name: Download for openjdk8
+    unarchive:
+      src: https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u192-b12/OpenJDK8U-jdk_x64_mac_hotspot_8u192b12.tar.gz
+      dest: /Users/jenkins
+      validate_certs: no
+      remote_src: yes
+    tags: jdk8
+  
+  - name: Create bootjdk directory
+    file: 
+      path: /Users/jenkins/bootjdks 
+      state: present
+  
+  - name: Move to proper directory
+    shell: |
+      mv /Users/jenkins/jdk8u192-b12/Contents/Home /Users/jenkins/bootjdks/adoptojdk-java-8
+    tags: jdk8
+  
+  # May need become: root for this one
+  - name: Cleanup jdk8 directories
+    shell: |
+      rm -rf /Users/jenkins/OpenJDK8U-jdk_x64_mac_hotspot_8u192b12.tar.gz jdk8u192-b12
+    become: yes
+    tags: jdk8
+  
+  ############################
+  # Additional Brew Packages #
+  ############################
+  
+  #- name: Install ant and ant-contrib
+  - homebrew: 
+      name: ant
+    #  - ant
+    #  - ant-contrib
+      state: present
+    tags: brew_packages
+  
+  ##############
+  # JDK11 Only #
+  ##############
+  - name: Download and extract JDK11 
+    unarchive:
+      src: https://github.com/AdoptOpenJDK/openjdk10-releases/releases/download/jdk-10.0.2%2B13/OpenJDK10_x64_Mac_jdk-10.0.2.13.tar.gz
+      dest: /tmp/
+      remote_src: yes
+      mode: 0755
+    tags: jdk11
+  
+  ### Clean below up by using jinja2 {{ }} for shell commands 
+  - name: Move binary to proper directory
+    shell: |
+      mv /tmp/jdk-10.0.2+13 ./bootjdks/adoptojdk-java-10
+    become: yes
+    tags: jdk11
+  
+  - name: Cleanup file
+    file: 
+      path: /tmp/jdk-10.0.2+13
+      state: absent
+    tags: jdk11
+  
+  - name: Create folder for working with xcode 9.4.1
+    file:
+      path: /tmp/xcode941 
+      state: present
+    tags: jdk11
+  
+  # remove machine dependency for this, files should be centrally hosted
+  - name: Download Command line tools (Xcode 9.4.1)
+    shell: |
+      scp osxrt1:/Users/j9admin/Downloads/Command_Line_Tools_macOS_10.13_for_Xcode_9.4.1.dmg /tmp
+    tags: jdk11
+  
+  - name: Setting environment variables for hdiutil
+    shell: "echo $TOOLS_941"
+    environment:
+      TOOLS_941: /tmp/Command_Line_Tools_macOS_10.13_for_Xcode_9.4.1.dmg
+    tags: jdk11
+  
+  - name: More environment variables for hdiutil
+    shell: "echo $TMPMOUNT_941"
+    environment:
+      TMPMOUNT_941: /tmp/xcode941
+    tags: jdk11
+  
+  - name: Hdiutil mounting
+    shell: |
+      sudo hdiutil attach "$TOOLS_941" -mountpoint "$TMPMOUNT_941" -nobrowse
+    become: yes
+    tags: jdk11
+  
+  - name: Installing xcode from hdiutils
+    shell: |
+      sudo installer -allowUntrusted -pkg "$(fund $TMPMOUNT_941 -name '*.pkg')" -target /
+    become: yes
+    tags: jdk11
+  
+  - name: Detaching from the mountpoint
+    shell: |
+      sudo hdiutil detach "$TMPMOUNT_941"
+    become: yes
+    tags: jdk11
+  
+  - name: Cleaning up
+    shell: | 
+      sudo rm -rf "$TMPMOUNT_941"
+    become: yes
+    tags: jdk11
+  
+  
+  #############
+  # JDK8 Only #
+  #############
+  
+  - name: Create temp directory for Xcode7
+    file:
+      path: /tmp/xcode721
+      state: directory
+    tags: jdk8
+  
+  - name: Create temp directory for Xcode4
+    file:
+      path: /tmp/xcode463
+      state: directory
+    tags: jdk8
+  
+  - name: Create directory for Xcode7
+    file: 
+      path: /Users/jenkins/Xcode7/
+      state: directory
+    tags: jdk8
+  
+  - name: Create directory for Xcode4
+    file:
+      path: /Users/jenkins/Xcode4/
+      state: directory
+    tags: jdk8
+  
+  # remove machine dependency from this, these files should be centrally hosted
+  - name: Copy Xcode7 from machine
+    shell: | 
+      scp j9admin@osxvm3:/Users/j9admin/Downloads/Xcode_7.2.1.dmg /tmp
+    tags: jdk8
+  
+  - name: Copy Xcode4 from machine
+    shell: | 
+      scp j9admin@osxvm3:/Users/j9admin/Downloads/Xcode_4.6.3.dmg /tmp
+    tags: jdk8
+  
+#  - name: Setting environment variables for mount points
+#    shell: echo "$DMG_FILE_7"
+#    environment:
+#      DMG_FILE_7: /tmp/Xcode_7.2.1.dmg
+#    tags: jdk8
+#  
+#  - name: More environment variables
+#    shell: echo "$DMG_FILE_4"
+#    environment:
+#      DMG_FILE_4: /tmp/Xcode_4.6.3.dmg
+#    tags: jdk8
+#  
+#  # could also jinja2 these to reduce complexity and increase maintainability 
+#  - name: More environment variables for mount points
+#    environment:
+#      TMPMOUNT_7: /tmp/xcode721
+#    tags: jdk8
+#  
+#  - name: More environment variables for mount points
+#    environment:
+#      TMPMOUNT_4: /tmp/xcode463
+#    tags: jdk8
+  
+  - name: Using hdiutil to mount the .dmg file
+    shell: |
+      hdiutil attach "$DMG_FILE_7" -mountpoint "$TMPMOUNT_7" -nobrowse
+    become: yes
+    tags: jdk8
+  
+  - name: copy Xcode.app to the proper directory
+    shell: |
+       sudo cp -a $TMPMOUNT_7/Xcode.app /Users/jenkins/Xcode7/
+    become: yes
+    tags: jdk8
+  
+  - name: detach from mountpoint
+    shell: | 
+      sudo hdiutil detach "$TMPMOUNT_7"
+    become: yes
+    tags: jdk8
+  
+#  - name: cleanup files
+#    file: 
+#      path: /tmp/xcode721
+#    become: yes
+#    state: absent
+  
+  - name: hdiutil mount for xcode4
+    shell: | 
+      hdiutil attach "$DMG_FILE_4" -mountpoint "$TMPMOUNT_4" -nobrowse
+    become: yes
+    tags: jdk8
+  
+  - name: copy to proper directory
+    shell: |
+      sudo cp -a $TMPMOUNT_4/Xcode.app /Users/jenkins/Xcode4/
+    become: yes
+    tags: jdk8
+  
+  - name: detach from mount point for xcode4
+    shell: |
+       sudo hdiutil detach "$TMPMOUNT_4"
+    become: yes
+    tags: jdk8
+  
+#  - name: cleanup more files
+#    file:
+#      path: /tmp/xcode463
+#    become: yes
+#    state: absent
+
+#  - name: cleanup files for xcode4 
+#    shell: | 
+#       sudo rm -rf "$TMPMOUNT_4"
+#    become: yes
+#    tags: jdk8
+  
+  
+  ###  Accepting Xcode license, this might be a hacky workaround (if not, we may require manual user intervention)
+  
+  - name: accept license for xcode7
+    expect: 
+      command: /Users/jenkins/Xcode7/Xcode.app/Contents//Developer/usr/bin/xcodebuild -license
+      responses:
+        acceptance: agree
+    become: yes
+    tags: jdk8
+  
+  - name: accept license for xcode4
+    expect: 
+      command: /Users/jenkins/Xcode4/Xcode.app/Contents//Developer/usr/bin/xcodebuild -license
+      responses:
+        acceptance: agree
+    become: yes
+    tags: jdk8
+  
+  - name: make openjdk_cache directory
+    file:
+      path: /Users/jenkins/openjdk_cache
+      state: present
+    become: yes
+  
+  ##### GIT STUFF #####
+  - name: Initialize openjdk_cache directory
+    shell: | 
+      git init --bare /Users/jenkins/openjdk_cache
+    become: yes
+  
+  # this command would be useful with jinja2 {{}} syntax integration
+  - name: Add git remotes for jdk8
+    git:
+      remote: https://github.com/ibmruntimes/openj9-openjdk-jdk8.git
+      name: jdk8
+    become: yes
+  
+  - name: Add git remotes for jdk11
+    git:
+      remote: https://github.com/ibmruntimes/openj9-openjdk-jdk11.git
+      name: jdk11
+    become: yes
+  
+  - name: Add git remotes for jdk
+    git:
+      remote: https://github.com/ibmruntimes/openj9-openjdk-jdk.git
+      name: jdk
+    become: yes
+  
+  - name: Add git remotes for OpenJ9
+    git: 
+      remote: https://github.com/eclipse/openj9.git
+      name: openj9
+    become: yes
+  
+  - name: Add git remotes for OMR
+    git: 
+      remote: https://github.com/eclipse/openj9-omr.git
+      name: omr
+    become: yes
+  
+  - name: Git fetch all repos
+    shell: |
+      git fetch --all /Users/jenkins/openjdk_cache
+    become: yes
+  
+  - name: Setting proper file permissions
+    file: dest=/Users/jenkins owner=jenkins group=staff recurse=yes
+  
