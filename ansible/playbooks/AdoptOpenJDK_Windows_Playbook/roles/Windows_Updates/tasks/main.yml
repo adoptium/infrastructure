@@ -4,13 +4,12 @@
 ###################
 - name: Download and Install Windows Updates
   win_updates:
-    register: update_result
+  register: update_result
   ignore_errors: yes
   tags: Windows_Updates
 
 - name: Reboot machine if necessary
   win_reboot:
-    shutdown_timeout: 3600
     reboot_timeout: 3600
-    when: update_result.reboot_required
+  when: update_result.reboot_required
   tags: Windows_Updates
