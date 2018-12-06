@@ -167,3 +167,32 @@
   when:
     - ansible_architecture == "x86_64"
   tags: expat
+
+###########
+# Locales #
+###########
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags: locales
+
+- name: Create Japanese locale
+  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales
