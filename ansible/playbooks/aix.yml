@@ -246,6 +246,48 @@
             msg: "{{ java7_version.stderr }}"
           tags: java7
 
+      ###############
+      # Boot JDK 11 #
+      ###############
+        - name: Check for Java11 install
+          stat:
+            path: /usr/java11_64
+          register: java11
+          tags: java11
+
+        - debug:
+            msg: "Java11 found, skipping download and installation"
+          when: java11.stat.isdir is defined
+          tags: java11
+
+        - name: Create Java11 directory
+          file:
+            path: /usr/java11_64
+            state: directory
+          when: java11.stat.isdir is not defined
+          tags: java11
+
+        - name: Download and Extract Java11
+          unarchive:
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk&heap_size=normal
+            dest: /usr/java11_64
+            remote_src: yes
+            extra_opts:
+              - --strip=1
+          when: java11.stat.isdir is not defined
+          tags: java11
+
+        - name: Test Java11
+          command: /usr/java11_64/bin/java -version
+          register: java11_version
+          tags: java11
+
+        - name: Display Java11 version information
+          debug:
+            msg: "{{ java11_version }}"
+          tags: java11
+
+
       #########################################################################
       # Install X11 extensions                                                #
       # x11.adt.ext installp download requiring an IBMid                      #
