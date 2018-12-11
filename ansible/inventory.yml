@@ -35,24 +35,24 @@ hosts:
           centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
 
       - macstadium:
-          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
-          macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
+          macos1010-1: {ip: 207.254.50.138, user: Administrator}
+          macos1010-2: {ip: 208.83.1.242, user: Administrator}
 
       - marist:
           rhel74-s390x-1: {ip: 148.100.110.129}
           rhel74-s390x-2: {ip: 148.100.110.131}
-          sles12-s390x-1: {ip: 148.100.110.56}
+          s390x-sles-12: {ip: 148.100.110.56}
           ubuntu1604-s390x-2: {ip: 148.100.33.178}
           ubuntu1604-s390x-3: {ip: 148.100.33.179}
-          zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
-          zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
+          s390x-zOS-1: {ip: 148.100.36.136, user: OPEN1}
+          s390x-zOS-2: {ip: 148.100.36.137, user: OPEN1}
 
       - osuosl:
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.243}
-          aix71-ppc64-1: {ip: 140.211.9.10}
-          aix71-ppc64-2: {ip: 140.211.9.12}
+          ppc64-aix-71-1: {ip: 140.211.9.10}
+          ppc64-aix-71-2: {ip: 140.211.9.12}
 
       - packet:
           centos74-armv8-1: {ip: 147.75.196.30}
@@ -62,9 +62,9 @@ hosts:
           centos69-x64-1: {ip: 165.225.149.157}
 
       - scaleway:
-          ubuntu1604-x64-2: {ip: 51.15.46.107}
-          ubuntu1604-armv7-1: {ip: 212.47.233.28}
-          ubuntu1604-armv7-2: {ip: 212.47.246.7}
+          x64-ubuntu-16-04-2: {ip: 51.15.46.107}
+          armv7-ubuntu16-04-1: {ip: 212.47.233.28}
+          armv7-ubuntu16-04-2: {ip: 212.47.246.7}
 
       - softlayer:
           win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
@@ -76,19 +76,19 @@ hosts:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
 
       - osuosl:
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
-          ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
+          ppc64le-ubuntu-16-04-1: {ip: 140.211.168.227, user: ubuntu}
+          ppc64le-ubuntu-16-04-2: {ip: 140.211.168.190, user: ubuntu}
 
       - packet:
-          ubuntu1604-armv8-1: {ip: 147.75.74.50}
+          armv8-ubuntu-16-04: {ip: 147.75.74.50}
           ubuntu1604-x64-1: {ip: 147.75.204.239}
           ubuntu1604-x64-2: {ip: 147.75.100.127}
           ubuntu1604-x64-3: {ip: 147.75.83.133}
-          win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
+          x64-windows-2012r2-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
-          macos1010-x64-1: {ip: 74.80.250.151, user: admin}
-          macos1010-x64-2: {ip: 74.80.250.173, user: admin}
+          macos1010-1: {ip: 74.80.250.151, user: admin}
+          macos1010-2: {ip: 74.80.250.173, user: admin}
 
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.33.147}
