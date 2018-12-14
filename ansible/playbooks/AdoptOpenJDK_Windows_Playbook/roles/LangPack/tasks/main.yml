@@ -1,0 +1,13 @@
+---
+# Switch language
+- include: en.yml
+  when: lang == 'en'
+  tags: langpack
+
+- include: ja.yml
+  when: lang == 'ja'
+  tags: langpack
+
+- include: ko.yml
+  when: lang == 'ko'
+  tags: langpack

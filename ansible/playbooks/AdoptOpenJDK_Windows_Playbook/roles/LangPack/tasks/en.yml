@@ -1,0 +1,34 @@
+---
+##############################
+# Switch language to English #
+##############################
+
+- name: Test if language pack en is installed
+  win_shell: |
+      DISM.exe /Online /Get-Intl /English |
+      Select-String -SimpleMatch 'Installed language(s)'|
+      ForEach-Object { if($_ -match 'en-US'){ $Matches[0] }}
+  register: lang_installed
+  failed_when: lang_installed.stdout | length == 0
+  tags: langpack
+
+- name: Set Languagelist
+  win_shell: Set-WinUserLanguageList -LanguageList en-US -Force
+  tags: langpack
+
+- name: Overwrite UI language
+  win_shell: Set-WinUILanguageOverride -Language en-US
+  tags: langpack
+
+- name: Region Setting
+  win_region:
+    copy_settings: "true"
+    format: en-US
+    unicode_language: en-US
+  register: result
+  tags: langpack
+
+- name: Change Region - Reboot
+  win_reboot:
+  when: result.restart_required
+  tags: langpack
