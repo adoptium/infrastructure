@@ -29,6 +29,8 @@ Additional_Build_Tools_SLES12:
   - git
   - libfreetype6
   - libXext6
+  - libXi6 # JDK12+ compilation
+  - libXrandr2 # JDK12+ compilation
   - libXrender1
   - libXt6
   - libXtst6

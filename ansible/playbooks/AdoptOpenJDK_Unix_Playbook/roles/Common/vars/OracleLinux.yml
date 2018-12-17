@@ -28,6 +28,8 @@ Build_Tool_Packages:
   - java-1.8.0-openjdk-devel
   - libdwarf
   - libXext-devel
+  - libXi-devel # JDK12+ compilation
+  - libXrandr-devel # JDK12+ compilation
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
