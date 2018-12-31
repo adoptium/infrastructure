@@ -1,0 +1,9 @@
+---
+####################################
+# Verify Ansible Version           #
+####################################
+- name: Verify if Ansible version is 2.4 or above
+  assert:
+    that:
+      - "{{ ansible_version.string | version_compare('2.4', '>=') }}"
+    msg: "Ansible 2.4 or above is required"

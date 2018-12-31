@@ -1,0 +1,47 @@
+---
+####################
+# LLVM/Clang 32bit #
+####################
+# Clang 32bit is an OpenJ9 prerequisite.
+# Silent installer for 32-bit will remove the 64-bit version so
+# we install from a zip file
+
+- name: Test if Clang 32bit is already installed (required by OpenJ9)
+  win_stat:
+    path: 'C:\Program Files (x86)\LLVM\bin\clang.exe'
+  register: clang_32bit_installed
+  tags: clang_32bit
+
+- name: Download Clang 32bit
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/llvm700/llvm-7.0.0-win32.zip
+    dest: 'C:\temp\'
+    force: no
+  when: clang_32bit_installed.stat.exists == false
+  tags: clang_32bit
+
+- name: Install (unzip) Clang 32bit
+  win_unzip:
+  src: C:\temp\llvm-7.0.0-win32.zip
+  dest: C:\
+  creates: 'C:\Program Files (x86)\LLVM\bin\clang.exe'
+  when: clang_32bit_installed.stat.exists == false
+  tags: clang_32bit
+
+- name: Test if LLVM32 symlink is already created
+  win_stat:
+    path: 'C:\openjdk\LLVM32'
+  register: llvm32_symlink
+  tags: clang_32bit
+
+- name: Create symlink to C:\openjdk\LLVM32
+  raw: cmd /c mklink /D "C:\openjdk\LLVM32\" "C:\Program Files (x86)\LLVM"
+  when: (llvm32_symlink.stat.exists == false)
+  tags: clang_32bit
+
+- name: Cleanup Clang 32bit zip
+  win_file:
+    path: 'c:\temp\LLVM-7.0.0-win32.zip'
+    state: absent
+  ignore_errors: yes
+  tags: clang_32bit

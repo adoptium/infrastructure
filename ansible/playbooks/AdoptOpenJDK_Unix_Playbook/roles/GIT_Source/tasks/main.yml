@@ -71,3 +71,28 @@
     - ansible_architecture == "s390x"
     - ansible_distribution != "FreeBSD"
   tags: git_source
+
+- name: Remove system git if needed (yum)
+  yum:
+    name:
+      - git
+      - perl-Git
+    state: absent
+  when:
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
+    - ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+  tags:
+    - git_source
+    - dont_remove_system
+  
+- name: Remove system git if needed (zypper)
+  zypper:
+    name: git
+    state: absent
+  when:
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
+    - ansible_distribution == "SLES"
+  tags:
+    - git_source
+    - dont_remove_system
+

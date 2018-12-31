@@ -19,7 +19,6 @@ Build_Tool_Packages:
   - gcc
   - gcc-c++
   - gettext
-  - git
   - glibc
   - glibc-common
   - glibc-devel
@@ -28,6 +27,7 @@ Build_Tool_Packages:
   - java-1.8.0-openjdk-devel
   - libcurl-devel
   - libdwarf-devel
+  - libpng-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel

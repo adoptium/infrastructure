@@ -8,10 +8,12 @@ Build_Tool_Packages:
   - alsa-lib-devel
   - autoconf
   - bind-utils
+  - bison
+  - bzip2
   - cpio
   - cups-devel
   - elfutils-libelf-devel
-  - expat-devel
+  - flex
   - fontconfig-devel
   - freetype-devel
   - gcc
@@ -21,9 +23,11 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - libcurl-devel
   - libdwarf-devel
   - libffi-devel
   - libmpc-devel
+  - libpng-devel
   - libXext-devel
   - libXrender-devel
   - libXt-devel
@@ -42,14 +46,11 @@ Build_Tool_Packages:
   - zip
 
 Additional_Build_Tools_RHEL7:
-  - bison
-  - curl-devel
-  - flex
   - libstdc++-static
 
 Additional_Build_Tools_RHEL7_PPC64LE:
-  - libcurl-devel
   - libstdc++.so.5
+
 Additional_Build_Tools_RHEL_x86_64:
   - glibc-devel.i686
 

@@ -1,0 +1,40 @@
+---
+###########
+# Java 11 #
+###########
+- name: Test if Java11 is already installed
+  win_stat:
+    path: 'C:\Program Files\Java\jdk-11.0.1+13'
+  register: java11_installed
+  tags: Java11
+
+- name: Check if Java11 is already downloaded
+  win_stat:
+    path: 'C:\temp\jdk-11.0.1+13.zip'
+  register: java11_download
+  tags: Java11
+
+- name: Download Java11
+  win_get_url:
+    url: https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_windows_hotspot_11.0.1_13.zip
+    dest: 'C:\temp\jdk-11.0.1+13.zip'
+  when: (java11_download.stat.exists == false) and (java11_installed.stat.exists == false)
+  tags: Java11
+
+- name: Install Java11
+  win_unzip:
+    src: C:\temp\jdk-11.0.1+13.zip
+    dest: C:\Program Files\Java
+  when: (java11_installed.stat.exists == false)
+  tags: Java11
+
+- name: Test if Java11 symlink is already created
+  win_stat:
+    path: 'C:\openjdk\jdk11'
+  register: java11_symlink
+  tags: Java11
+
+- name: Create symlink to Java11
+  raw: cmd /c mklink /D "C:\openjdk\jdk11\" "C:\Program Files\Java\jdk-11.0.1+13\"
+  when: (java11_symlink.stat.exists == false)
+  tags: Java11
