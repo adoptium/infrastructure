@@ -22,9 +22,9 @@
 
 - name: Install (unzip) Clang 32bit
   win_unzip:
-  src: C:\temp\llvm-7.0.0-win32.zip
-  dest: C:\
-  creates: 'C:\Program Files (x86)\LLVM\bin\clang.exe'
+    src: C:\temp\llvm-7.0.0-win32.zip
+    dest: C:\
+    creates: 'C:\Program Files (x86)\LLVM\bin\clang.exe'
   when: clang_32bit_installed.stat.exists == false
   tags: clang_32bit
 
@@ -35,7 +35,7 @@
   tags: clang_32bit
 
 - name: Create symlink to C:\openjdk\LLVM32
-  raw: cmd /c mklink /D "C:\openjdk\LLVM32\" "C:\Program Files (x86)\LLVM"
+  raw: cmd /c mklink /D "C:\openjdk\LLVM32" "C:\Program Files (x86)\LLVM"
   when: (llvm32_symlink.stat.exists == false)
   tags: clang_32bit
 

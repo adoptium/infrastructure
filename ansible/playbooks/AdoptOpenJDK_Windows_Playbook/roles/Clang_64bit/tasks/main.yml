@@ -30,7 +30,7 @@
   tags: clang_64bit
 
 - name: Create symlink to C:\openjdk\LLVM64
-  raw: cmd /c mklink /D "C:\openjdk\LLVM64\" "C:\Program Files\LLVM"
+  raw: cmd /c mklink /D "C:\openjdk\LLVM64" "C:\Program Files\LLVM"
   when: (llvm64_symlink.stat.exists == false)
   tags: clang_64bit
 
