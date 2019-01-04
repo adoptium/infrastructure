@@ -18,7 +18,7 @@
   tags: cmake
 
 - name: Install cmake
-  raw: C:\temp\cmake.msi /quite
+  raw: C:\temp\cmake.msi /quiet
   ignore_errors: yes
   when: (cmake_installed.stat.exists == false)
   tags: cmake

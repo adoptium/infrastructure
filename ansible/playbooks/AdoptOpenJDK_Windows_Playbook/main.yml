@@ -30,6 +30,7 @@
     - Common
     - Windows_Updates
     - Jenkins
+    - MSVS_2010
     - cygwin
     - Firefox
     - Strawberry_Perl
@@ -42,12 +43,13 @@
     - Java9
     - Java11
     - ANT
-    - MSVS_2010
     - MSVS_2013
     - MSVS_2017
     - NVidia_Cuda_Toolkit
     - NTP_TIME
     - 7-Zip
     - MinGW-W64
+    - Clang_64bit
+    - Clang_32bit
     - OpenSSL
     - nasm
