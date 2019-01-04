@@ -84,7 +84,7 @@
   tags:
     - git_source
     - dont_remove_system
-  
+
 - name: Remove system git if needed (zypper)
   zypper:
     name: git
@@ -95,4 +95,3 @@
   tags:
     - git_source
     - dont_remove_system
-
