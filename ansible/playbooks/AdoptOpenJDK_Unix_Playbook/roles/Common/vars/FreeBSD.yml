@@ -27,6 +27,7 @@ Build_Tool_Packages:
   - libXext
   - libXfixes
   - libXi
+  - libXrandr # JDK12+ compilation
   - libXrender
   - libXt
   - libXtst

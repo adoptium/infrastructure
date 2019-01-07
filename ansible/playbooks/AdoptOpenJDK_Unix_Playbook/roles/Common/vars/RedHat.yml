@@ -29,6 +29,8 @@ Build_Tool_Packages:
   - libmpc-devel
   - libpng-devel
   - libXext-devel
+  - libXi-devel # JDK12+ compilation
+  - libXrandr-devel # JDK12+ compilation
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
