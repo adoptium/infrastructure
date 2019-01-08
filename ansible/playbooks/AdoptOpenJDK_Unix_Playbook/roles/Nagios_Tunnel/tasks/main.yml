@@ -21,7 +21,7 @@
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
-  tags: nagios_tunnel
+  tags: [nagios_tunnel, adoptopenjdk]
 
 - name: Download Nagios_RemoteTunnel.sh script
   get_url:
@@ -33,7 +33,7 @@
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
-  tags: nagios_tunnel
+  tags: [nagios_tunnel, adoptopenjdk]
 
 - name: Update Nagios_RemoteTunnel.sh - ReplaceNAGIOSMASTERADDRESS with {{ Nagios_Master_IP }}
   replace:
@@ -45,7 +45,7 @@
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
-  tags: nagios_tunnel
+  tags: [nagios_tunnel, adoptopenjdk]
 
 - name: Update Nagios_RemoteTunnel.sh - ReplacePortNumber with {{ ansible_port }}
   replace:
@@ -57,7 +57,7 @@
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
-  tags: nagios_tunnel
+  tags: [nagios_tunnel, adoptopenjdk]
 
 - name: Add cron job to keep reverse tunnel alive for nagios user
   cron: name="Keep Nagios reverse tunnel alive"
@@ -72,4 +72,4 @@
     - Nagios_Monitoring == "Enabled"
     - Nagios_Master_IP is defined
     - tunnel_script_result.stat.exists == False
-  tags: nagios_tunnel
+  tags: [nagios_tunnel, adoptopenjdk]

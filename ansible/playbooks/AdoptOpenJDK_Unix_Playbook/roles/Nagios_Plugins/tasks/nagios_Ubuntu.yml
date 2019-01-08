@@ -21,15 +21,15 @@
     - nagios-plugins-common
     - perl
     - qstat
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]
 
 ##########
 # Layout #
 ##########
 - name: Creates Nagios folder
   file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]
 
 - name: Create symlink to plugins
   file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]

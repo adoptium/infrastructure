@@ -13,7 +13,7 @@
     regexp: '^no-agent-forwarding'
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Ensure keybox's ssh key is applied to root's authorized_key file
   authorized_key:
@@ -22,7 +22,7 @@
     key: "{{ lookup('file', '{{ Keybox_SSHKey }}') }}"
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 ###############
 # sshd_config #
@@ -34,7 +34,7 @@
               state=present
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Security - Disable Password Authentication for root user
   lineinfile: dest=/etc/ssh/sshd_config
@@ -43,7 +43,7 @@
               state=present
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Security - Disable ChallengeResponseAuthentication for all users
   lineinfile: dest=/etc/ssh/sshd_config
@@ -52,7 +52,7 @@
               state=present
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Restart ssh service
   service:
@@ -62,7 +62,7 @@
   ignore_errors: yes
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Restart sshd service
   service:
@@ -72,7 +72,7 @@
   ignore_errors: yes
   when:
     - Security == "Enabled"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 ##################
 # Account Policy #
@@ -88,7 +88,7 @@
   when:
     - Security == "Enabled"
     - ansible_distribution != "FreeBSD"
-  tags: security
+  tags: [security, adoptopenjdk]
 
 - name: Account policy - max days
   command: chage -M -1 "{{ item }}"
@@ -101,4 +101,4 @@
   when:
     - Security == "Enabled"
     - ansible_distribution != "FreeBSD"
-  tags: security
+  tags: [security, adoptopenjdk]
