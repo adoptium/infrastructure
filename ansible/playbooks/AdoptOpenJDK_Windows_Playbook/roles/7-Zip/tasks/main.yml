@@ -16,5 +16,5 @@
     path: 'C:\temp\7z.exe'
     creates_path: 'C:\7-Zip\7z.exe'
     state: present
-    arguments: /S
+    arguments: /S /D="C:\7-Zip"
   tags: 7zip
