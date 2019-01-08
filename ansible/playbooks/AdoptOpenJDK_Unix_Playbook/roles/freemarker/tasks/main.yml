@@ -6,7 +6,7 @@
   stat:
     path: /home/{{ Jenkins_Username }}/freemarker.jar
   register: freemarker
-  tags: freemarker
+  tags: [freemarker, adoptopenjdk]
 
 # Originally downloaded from
 # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
@@ -17,9 +17,9 @@
     remote_src: yes
     mode: 0755
   when: freemarker.stat.exists == False
-  tags: freemarker
+  tags: [freemarker, adoptopenjdk]
 
 - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
   command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
   when: freemarker.stat.exists == False
-  tags: freemarker
+  tags: [freemarker, adoptopenjdk]

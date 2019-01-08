@@ -19,7 +19,7 @@
   ignore_errors: yes
   when:
     - Nagios_Plugins == "Enabled"
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]
 
 - name: Set authorized key for Nagios user
   authorized_key:
@@ -28,7 +28,7 @@
     key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
   when:
     - Nagios_Plugins == "Enabled"
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]
 
   ################################
   # Require OS specific playbook #
@@ -37,7 +37,7 @@
   include_tasks: nagios_{{ ansible_distribution }}.yml
   when:
     - Nagios_Plugins == "Enabled"
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]
 
   ##############################
   # Install additional plugins #
@@ -49,4 +49,4 @@
     mode: 0755
   when:
     - Nagios_Plugins == "Enabled"
-  tags: nagios_plugins
+  tags: [nagios_plugins, adoptopenjdk]

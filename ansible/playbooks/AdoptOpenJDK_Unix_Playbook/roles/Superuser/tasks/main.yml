@@ -5,7 +5,7 @@
 - name: Create Superuser account - zeus
   action: user name=zeus state=present shell=/bin/bash
   when: Superuser_Account == "Enabled"
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
 
 - name: Create Superuser account home folder for s390x
   file:
@@ -17,7 +17,7 @@
   when:
     - ansible_architecture == "s390x"
     - Superuser_Account == "Enabled"
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
 
 - name: Set authorized key for Superuser account
   authorized_key:
@@ -25,7 +25,7 @@
     state: present
     key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
   when: Superuser_Account == "Enabled"
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
 
 - name: Grant Superuser sudo powers
   lineinfile:
@@ -34,7 +34,7 @@
     regexp: '^zeus'
     line: 'zeus ALL=(ALL) NOPASSWD: ALL'
   when: Superuser_Account == "Enabled"
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
 
 - name: Superuser account policy - expire date
   command: chage -E -1 zeus
@@ -42,11 +42,11 @@
     - Superuser_Account == "Enabled"
     - ansible_distribution != "FreeBSD"
 
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
 
 - name: Superuser account policy - max days
   command: chage -M -1 zeus
   when:
     - Superuser_Account == "Enabled"
     - ansible_distribution != "FreeBSD"
-  tags: superuser
+  tags: [superuser, adoptopenjdk]
