@@ -28,7 +28,6 @@
     - Superuser
     - Swap_File
     - Crontab
-    - x11
     - NTP_TIME
     - gcc_48
     - gcc_7
