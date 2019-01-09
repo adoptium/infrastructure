@@ -1,0 +1,53 @@
+##############
+# IBM Java 8 #
+##############
+- name: Get java8 path information
+  stat:
+    path: /usr/java8_64
+  register: java8
+  tags: java8
+
+- debug:
+    msg: "Java8 found, skipping download and installation"
+  when: java8.stat.isdir is defined
+  tags: java8
+
+- name: Transfer and Extract Java8
+  unarchive:
+    src: /Vendor_Files/aix/OpenJDK8_ppc64_AIX_jdk8u144-b01.tar.gz
+    dest: /tmp
+    remote_src: no
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Move extracted Java8 to /usr/java8_64
+  command: mv /tmp/jdk8u144-b01/ /usr/java8_64
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Create symlink for Java
+  file: src=/usr/java8_64/bin/java dest=/usr/bin/java state=link
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Create symlink for Javac
+  file: src=/usr/java8_64/bin/javac dest=/usr/bin/javac state=link
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Test Java
+  command: /usr/bin/java -version
+  register: java8_version
+  tags: java8
+
+- name: Display Java version information
+  debug:
+    msg: "{{ java8_version.stderr }}"
+  tags: java8
+
+- name: Modify Java version in /etc/environment
+  replace:
+    path: /etc/environment
+    regexp: 'java5'
+    replace: 'java8_64'
+  tags: java8

@@ -1,0 +1,45 @@
+---
+###########################################
+# AdoptOpenJDK - Ansible Playbook for AIX #
+###########################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+  environment:
+    PATH: "/opt/freeware/bin:{{ ansible_env.PATH }}"
+  vars:
+    swap_size: 4096
+
+  tasks:
+
+  roles:
+    - FileSystemConfig
+    - openssl
+    - yum
+    - yum_packages
+    - other_rpm_installs
+    - ibmjava7
+    - ibmjava8
+    - adoptopenjdk11
+    - x11_extenions
+    - xlc
+    - ant
+    - cpan
+    - syslog
+    - bashshell
+    - jenkinsuser
+    - freemarker
+    - nagios
+    - superuser
+    - ntp
+    - disable_sendmail
+    - core
+    - swapspace
+
+  handlers:
+    - name: restart machine
+      shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
+      async: 1
+      poll: 0
+      failed_when: False

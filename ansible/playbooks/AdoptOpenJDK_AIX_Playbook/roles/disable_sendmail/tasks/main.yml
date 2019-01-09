@@ -1,0 +1,13 @@
+####################
+# Disable sendmail #
+####################
+- name: ensure sendmail is stopped
+  service: name=sendmail state=stopped
+  tags: sendmail
+
+- name: ensure sendmail is disabled
+  replace:
+    dest: /etc/rc.tcpip
+    regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+    replace: '#\1'
+  tags: sendmail

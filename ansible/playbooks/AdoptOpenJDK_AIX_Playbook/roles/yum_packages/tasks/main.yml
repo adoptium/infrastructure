@@ -1,0 +1,27 @@
+#############################################
+# Install yum packages from the AIX toolbox #
+#############################################
+
+- name: Install yum package support
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - autoconf
+    - bison
+    - coreutils
+    - cups-devel
+    - cups-libs
+    - flex
+    - freetype2-devel
+    - fontconfig-devel
+    - gawk
+    - git
+    - grep
+    - make
+    - m4
+    - pkg-config
+    - sed
+    - tar
+    - unzip
+    - xz-libs
+    - zip
+  tags: yum

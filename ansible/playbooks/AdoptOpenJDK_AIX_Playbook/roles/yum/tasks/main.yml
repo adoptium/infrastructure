@@ -1,0 +1,51 @@
+####################################################
+# Uninstall conflicting packages from base image   #
+# if they were installed via rpm unless yum exists #
+####################################################
+- name: Confirm yum is installed - /usr/bin/yum
+  stat:
+    path: /usr/bin/yum
+  register: yum
+
+- name: Uninstall conflicting packages
+  shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>
+  ignore_errors: True
+  when: yum.stat.islnk is not defined
+  tags:
+    - rpm_remove
+    # TODO: rpm used in place of yum or rpm_key module
+    - skip_ansible_lint
+
+####################################
+# Install yum and update to latest #
+####################################
+- name: Download yum.sh
+  get_url:
+    url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/pp
+    validate_certs: False
+    dest: /tmp/
+    mode: 0775
+    timeout: 25
+  when: yum.stat.islnk is not defined
+  tags: yum
+
+- name: Install yum and dependencies
+  command: /tmp/yum.sh
+  register: result.yum
+  ignore_errors: yes
+  when: yum.stat.islnk is not defined
+  tags:
+    - yum
+    #TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Yum update
+  yum:
+    update_cache: yes
+    name: '*'
+    state: latest
+  tags:
+    - yum
+    #TODO: Package installs should not use latest
+    - skip_ansible_lint
+

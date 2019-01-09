@@ -1,0 +1,21 @@
+#########################################################################
+# Install X11 extensions                                                #
+# x11.adt.ext installp download requiring an IBMid                      #
+# https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+#########################################################################
+- name: Transfer X11 installp to remote host
+  copy:
+    src: /Vendor_Files/aix/X11.adt
+    dest: /tmp/X11.adt
+  tags: x11
+
+- name: Install IBM X11 Extensions - installp
+  command: installp -aXYgd /tmp/X11.adt X11.adt.ext
+  register: result.x11
+  ignore_errors: yes
+  tags: x11
+
+- name: Remove X11 installp
+  file:
+    state: absent
+    path: /tmp/X11.adt

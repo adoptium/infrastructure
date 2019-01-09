@@ -1,0 +1,29 @@
+##########################################################################
+# Install openssl from IBM installp                                      #
+# openssl installp download requiring an IBMid                           #
+# https://www-01.ibm.com/support/docviepw.wss?uid=isg1fileset-1190419011 #
+##########################################################################
+- name: Transfer Openssl to remote host
+  copy:
+    src: /Vendor_Files/aix/openssl-1.0.2.1300.tar.gz
+    dest: /tmp/openssl-1.0.2.1300.tar.gz
+  tags: [openssl, adoptopenjdk]
+
+- name: Extract Openssl
+  shell: gzip -cd /tmp/openssl-1.0.2.1300.tar.gz | tar xf - -C /tmp/
+  tags: [openssl, adoptopenjdk]
+
+- name: Install IBM Openssl - installp
+  command: installp -aXYgd /tmp/openssl-1.0.2.1300 openssl.base
+  register: result.openssl
+  ignore_errors: yes
+  tags: [openssl, adoptopenjdk]
+
+- name: Clean openssl tmp files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/openssl-1.0.2.1300
+    - /tmp/openssl-1.0.2.1300.tar.gz
+  tags: [openssl, adoptopenjdk]

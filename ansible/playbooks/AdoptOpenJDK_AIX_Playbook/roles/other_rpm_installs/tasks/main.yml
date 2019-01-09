@@ -1,0 +1,15 @@
+########################################################
+# Additional rpms from third parties (Not AIX toolbox) #
+########################################################
+- name: Install yum package support
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - http://www.bullfreeware.com/download/bin/2328/libiconv-1.14-22.aix6.
+    - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.a
+    - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.p
+    - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.
+  tags: rpm_install
+
+- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/per
+  ignore_errors: True

@@ -1,0 +1,16 @@
+########
+# cpan #
+########
+- name: Ensure memory limits for root are unlimited
+  shell: ulimit -m unlimited && ulimit -d unlimited
+  tags: cpan
+
+- name: Install Text::CSV
+  command: CC=xlc_r cpan -i Text::CSV
+  environment:
+    PERL_MB_OPT: "--install_base \"/home/{{ Jenkins_Username }}\""
+    PERL_MM_OPT: "INSTALL_BASE=/home/{{ Jenkins_Username }}"
+  tags:
+    - cpan
+    # Environment variables don't work as part of command
+    - skip_ansible_lint
