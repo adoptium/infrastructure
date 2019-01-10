@@ -29,27 +29,27 @@
     - Version
     - Common
     - Windows_Updates
-    - Jenkins
+    - Jenkins                     # AdoptOpenJDK infrastructure
     - MSVS_2010
     - cygwin
     - Firefox
-    - Strawberry_Perl
-    - Freemarker
+    - Strawberry_Perl             # Testing
+    - Freemarker                  # OpenJ9
     - Freetype
-    - cmake
+    - cmake                       # OpenJ9
     - GIT
-    - Java7
-    - Java8
-    - Java9
-    - Java11
-    - ANT
+    - Java7                       # JDK8 build bootstrap
+    - Java8                       # JDK9 build bootstrap
+    - Java9                       # JDK10 build bootstrap
+    - Java11                      # JDK11 buid bootstrap
+    - ANT                         # Testing
     - MSVS_2013
-    - MSVS_2017
-    - NVidia_Cuda_Toolkit
+    - MSVS_2017                   # OpenJ9
+    - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
-    - 7-Zip
-    - MinGW-W64
-    - Clang_64bit
-    - Clang_32bit
-    - OpenSSL
-    - nasm
+    - 7-Zip                       # Mostly extracting other prereqs :-)
+    - MinGW-W64                   # OpenJ9 (Obsoleted)
+    - Clang_64bit                 # OpenJ9
+    - Clang_32bit                 # OpenJ9
+    - OpenSSL                     # OpenJ9
+    - nasm                        # OpenJ9

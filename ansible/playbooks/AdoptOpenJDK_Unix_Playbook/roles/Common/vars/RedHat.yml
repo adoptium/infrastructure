@@ -8,12 +8,12 @@ Build_Tool_Packages:
   - alsa-lib-devel
   - autoconf
   - bind-utils
-  - bison
+  - bison                         # OpenJ9
   - bzip2
   - cpio
   - cups-devel
   - elfutils-libelf-devel
-  - flex
+  - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
   - gcc
@@ -24,13 +24,13 @@ Build_Tool_Packages:
   - glibc-devel
   - gmp-devel
   - libcurl-devel
-  - libdwarf-devel
+  - libdwarf-devel                # OpenJ9
   - libffi-devel
   - libmpc-devel
   - libpng-devel
   - libXext-devel
-  - libXi-devel # JDK12+ compilation
-  - libXrandr-devel # JDK12+ compilation
+  - libXi-devel                   # JDK12+ compilation
+  - libXrandr-devel               # JDK12+ compilation
   - libXrender-devel
   - libXt-devel
   - libXtst-devel

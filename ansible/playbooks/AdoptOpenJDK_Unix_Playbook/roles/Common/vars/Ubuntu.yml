@@ -7,19 +7,19 @@
 Build_Tool_Packages:
   - apt-transport-https
   - autoconf
-  - bison
+  - bison                         # OpenJ9
   - build-essential
   - cpanminus
   - cpio
   - curl
-  - flex
+  - flex                          # Openj9
   - g++
   - gcc
   - gettext
   - libasound2-dev
   - libcups2-dev
   - libcurl4-openssl-dev
-  - libdwarf-dev
+  - libdwarf-dev                  # OpenJ9
   - libelf-dev
   - libexpat1-dev
   - libffi-dev
@@ -33,8 +33,8 @@ Build_Tool_Packages:
   - libwww-perl
   - libx11-dev
   - libxext-dev
-  - libxi-dev # JDK12+ compilation
-  - libxrandr-dev # JDK12+ compilation
+  - libxi-dev                     # JDK12+ compilation
+  - libxrandr-dev                 # JDK12+ compilation
   - libxrender-dev
   - libxt-dev
   - libxtst-dev
@@ -77,12 +77,12 @@ Additional_Build_Tools_x86_64:
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev
-  - gcc-7
-  - g++-7
+  - gcc-7                         # OpenJ9
+  - g++-7                         # OpenJ9
 
 Additional_Build_Tools_s390:
-  - gcc-7
-  - g++-7
+  - gcc-7                         # OpenJ9
+  - g++-7                         # OpenJ9
 
 Additional_Build_Tools_aarch64:
   - libpng-dev

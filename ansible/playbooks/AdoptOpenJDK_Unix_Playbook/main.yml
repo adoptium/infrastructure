@@ -15,32 +15,32 @@
     - Common
     - autoconf
     - curl
-    - Jenkins_User
-    - freemarker
-    - ant
-    - Ant-Contrib
+    - Jenkins_User                # AdoptOpenJDK Infrastructure
+    - freemarker                  # OpenJ9
+    - ant                         # Testing
+    - Ant-Contrib                 # Testing
     - GIT_Source
     - CPAN
-    - cmake
+    - cmake                       # OpenJ9
     - gmake
-    - Docker
-    - NVidia_Cuda_Toolkit
-    - Superuser
+    - Docker                      # Testing
+    - NVidia_Cuda_Toolkit         # OpenJ9
+    - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
     - NTP_TIME
     - gcc_48
-    - gcc_7
+    - gcc_7                       # OpenJ9
     - ccache # ccache needs to be compiled/installed after compilers
-    - {role: nasm, when: ansible_architecture == 'x86_64'}
-    - adoptopenjdk9
-    - adoptopenjdk10
-    - adoptopenjdk11
-    - OpenSSL
-    - Protobuf
-    - Nagios_Plugins
-    - Nagios_Master_Config
-    - Nagios_Tunnel
+    - {role: nasm, when: ansible_architecture == 'x86_64'} # OpenJ9
+    - adoptopenjdk9               # JDK10 build bootstrap
+    - adoptopenjdk10              # JDK11 build bootstrap
+    - adoptopenjdk11              # JDK12 build bootstrap
+    - OpenSSL                     # OpenJ9
+    - Protobuf                    # OpenJ9
+    - Nagios_Plugins              # AdoptOpenJDK Infrastructure
+    - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
+    - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
     - Clean_Up
     - Security
     - Vendor
