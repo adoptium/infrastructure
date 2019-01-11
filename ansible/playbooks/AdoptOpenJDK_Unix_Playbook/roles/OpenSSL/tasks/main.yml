@@ -23,7 +23,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
 - name: Extract OpenSSL v1.1.0g
@@ -34,7 +34,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
 # when running OpenJ9 for JITaaS
@@ -46,7 +46,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
 - name: Remove downloaded packages for OpenSSL v1.1.0g
@@ -60,5 +60,5 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl

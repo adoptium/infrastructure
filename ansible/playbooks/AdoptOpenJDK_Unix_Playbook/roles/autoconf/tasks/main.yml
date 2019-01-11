@@ -22,7 +22,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
   tags: autoconf-2.69
 
 - name: Extract Autoconf v2.69
@@ -34,7 +34,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
   tags: autoconf-2.69
 
 - name: Build and install Autoconf v2.69
@@ -43,7 +43,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
   tags: autoconf-2.69
 
 - name: Remove the older Autoconf package
@@ -54,7 +54,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
   tags: autoconf-2.69
 
 - name: Remove downloaded packages for Autoconf v2.69
@@ -69,5 +69,5 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
-    - ((autoconf_version.rc == 0) and (autoconf_version.stdout | version_compare('2.69', operator='lt')))
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
   tags: autoconf-2.69
