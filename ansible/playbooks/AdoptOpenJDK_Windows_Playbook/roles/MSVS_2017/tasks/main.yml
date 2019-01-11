@@ -18,9 +18,10 @@
   tags: MSVS_2017
 
 - name: Install Visual Studio Community 2017
-  raw: 'C:\TEMP\vs_community.exe /Silent /NoRestart
-        /Log C:\TEMP\vs2017_install_log.txt'
+  win_command: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop;includeRecommended;includeOptional --quiet --norestart'
   when: (vs2017_installed.stat.exists == false)
+  register: vs2017_error
+  failed_when: vs2017_error.rc != 1 and vs2017_error.rc != 0
   tags: MSVS_2017
 
 - name: Register Visual Studio Community 2017 DIA SDK shared libraries
