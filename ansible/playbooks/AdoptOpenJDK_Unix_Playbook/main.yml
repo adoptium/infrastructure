@@ -5,6 +5,8 @@
 - hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
   gather_facts: yes
   tasks:
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
 
   #########
   # Roles #
