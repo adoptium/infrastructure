@@ -9,7 +9,7 @@
   shell: export LD_LIBRARY_PATH=/usr/local/openssl-1.1.0/lib &&  /usr/local/openssl-1.1.0/bin/openssl version | awk '{print $2}' | cut -c 1-5
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   register: openssl_version
   tags: openssl
 
@@ -22,7 +22,7 @@
     validate_certs: no
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
     - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
@@ -33,7 +33,7 @@
     copy: False
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
     - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
@@ -45,7 +45,7 @@
   shell: cd /tmp/openssl-1.1.0g && ./config --prefix=/usr/local/openssl-1.1.0 && make && make install
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
     - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
 
@@ -59,6 +59,6 @@
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
     - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.1.0', operator='lt', strict=True))))
   tags: openssl
