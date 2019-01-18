@@ -90,18 +90,18 @@
 
         - name: Transfer Openssl to remote host
           copy:
-            src: /Vendor_Files/aix/openssl/openssl-1.0.2.1600.tar.Z
-            dest: /tmp/openssl-1.0.2.1600.tar.Z
+            src: /Vendor_Files/aix/openssl/openssl-1.0.2.1601.tar.Z
+            dest: /tmp/openssl-1.0.2.1601.tar.Z
           when: does_openssl_exist.rc != 0
           tags: openssl
 
         - name: Extract Openssl
-          shell: uncompress /tmp/openssl-1.0.2.1600.tar.Z | tar xf - -C /tmp/
+          shell: uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
           when: does_openssl_exist.rc != 0
           tags: openssl
 
         - name: Install IBM Openssl - installp
-          command: installp -aXYgd /tmp/openssl-1.0.2.1600 openssl.base
+          command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
           register: result.openssl
           ignore_errors: yes
           when: does_openssl_exist.rc != 0
@@ -112,8 +112,8 @@
             path: "{{ item }}"
             state: absent
           with_items:
-            - /tmp/openssl-1.0.2.1300
-            - /tmp/openssl-1.0.2.1300.tar.gz
+            - /tmp/openssl-1.0.2.1601
+            - /tmp/openssl-1.0.2.1601.tar.Z
           when: does_openssl_exist.rc != 0
           tags: openssl
 
