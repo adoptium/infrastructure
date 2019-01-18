@@ -680,7 +680,7 @@
       ########
 
         - name: Check if Text::CSV is already installed
-          shell: perldoc -l Text::CSV
+          command: perldoc -l Text::CSV
           register: TextCSV_is_installed
           ignore_errors: yes
           tags: cpan
