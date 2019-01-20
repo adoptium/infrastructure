@@ -54,13 +54,23 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Compile and install git from source
+- name: Compile and install git from source on RHEL/CentOS6
+  shell: cd /tmp/git-2.15.0 && ./configure --with-curl=/usr/local/curl-7.61.1 --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
+  become: yes
+  when:
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
+    - ansible_architecture != "s390x"
+    - (( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
+  tags: git_source
+
+- name: Compile and install git from source on everything else
   shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
   become: yes
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout | version_compare('2.15', operator='lt') )
     - ansible_architecture != "s390x"
     - ansible_distribution != "FreeBSD"
+    - ! (( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
   tags: git_source
 
 - name: Compile and install git from source on s390x
