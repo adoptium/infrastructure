@@ -9,6 +9,7 @@ Slack_Notification: Disabled
 Superuser_Account: Enabled
 jckftp_Username: jckftp
 jckftp_Passwd: /Vendor_Files/passwords/ftp
+Asian_Locales: Disabled
 # Jcktestr User Variables:
 Jcktestr_Username: jcktestr
 Jcktestr_User_SSHKey: /Vendor_Files/keys/keybox.key
