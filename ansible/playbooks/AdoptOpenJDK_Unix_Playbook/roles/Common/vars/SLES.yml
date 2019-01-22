@@ -47,5 +47,6 @@ Test_Tool_Packages:
   - xorg-x11
   - xorg-x11-server
   - xorg-x11-server-extra
+  - glibc-locale                  # Internationalization tests
 
 crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"
