@@ -27,6 +27,7 @@ cat $VAGRANT_MOUNT/playbooks/hosts
 echo "---------------------------------------------------------------------------------------"
 SCRIPT
 
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdkU18 do |adoptopenjdkU18|
