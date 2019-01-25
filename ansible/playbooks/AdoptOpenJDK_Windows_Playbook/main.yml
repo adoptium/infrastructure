@@ -48,7 +48,6 @@
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - 7-Zip                       # Mostly extracting other prereqs :-)
-    - MinGW-W64                   # OpenJ9 (Obsoleted)
     - Clang_64bit                 # OpenJ9
     - Clang_32bit                 # OpenJ9
     - OpenSSL                     # OpenJ9
