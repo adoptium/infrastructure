@@ -5,7 +5,7 @@
 
 
 - name: Check if gcc-7 is installed on RHEL/CentOS
-  shell: /opt/rh/devtoolset-7/root/usr/bin/gcc --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.3 --version 2>&1 > /dev/null || /usr/bin/gcc-7.3 --version 2>&1 > /dev/null
+  shell: /opt/rh/devtoolset-7/root/usr/bin/gcc --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.3 --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.4 --version 2>&1 > /dev/null || /usr/bin/gcc-7.3 --version 2>&1 > /dev/null
   ignore_errors: yes
   register: gcc7_installed
   tags: gcc-7
@@ -22,10 +22,24 @@
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+    - ansible_architecture != "s390x"
     - gcc7_installed.rc != 0
   tags: gcc-7
 
-- name: Extract AdoptOpenJDK gcc-7.3.0 binary to /usr/local/gcc
+- name: Download AdoptOpenJDK gcc-7.4.0 binary for s390x
+  get_url:
+    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc740+ccache.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
+    force: no
+    mode: 0644
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
+    - ansible_architecture == "s390x"
+    - gcc7_installed.rc != 0
+  tags: gcc-7
+
+- name: Extract AdoptOpenJDK gcc-7 binary to /usr/local/gcc
   unarchive:
     src: /tmp/ansible-adoptopenjdk-gcc-7.tar.xz
     dest: /usr/local/
