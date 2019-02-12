@@ -23,7 +23,7 @@
     - Ant-Contrib                 # Testing
     - GIT_Source
     - CPAN
-    - cmake                       # OpenJ9
+    - cmake                       # OpenJ9 / OpenJFX
     - gmake
     - Docker                      # Testing
     - NVidia_Cuda_Toolkit         # OpenJ9
