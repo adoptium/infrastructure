@@ -21,7 +21,7 @@
   tags: NVidia_Cuda_Toolkit
 
 - name: Cleanup NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
-  file:
+  win_file:
     path: C:\temp\cuda_9.0.176_windows_network-exe.exe
     state: absent
   when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")

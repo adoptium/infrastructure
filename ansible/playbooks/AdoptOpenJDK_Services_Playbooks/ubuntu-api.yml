@@ -92,6 +92,7 @@
             repo: 'https://github.com/AdoptOpenJDK/openjdk-api.git'
             dest: "/home/{{ Jenkins_Username }}/openjdk-api"
             update: yes
+            force: yes
           tags:
             # TODO: Git checkouts must contain explicit version
             - skip_ansible_lint

@@ -28,7 +28,8 @@
     dest: /usr/local/nagios/libexec/
     mode: 0755
   with_fileglob:
-    - /home/ubuntu/aix/nagios/*
+    - /Vendor_Files/aix/nagios/*
+    # above path was /home/ubuntu/aix/nagios/*
 
 ###############
 # Nagios user #
@@ -60,4 +61,4 @@
   authorized_key:
     user: nagios
     state: present
-    key: "{{ lookup('file', '/home/nagios/key/id_rsa.pub') }}"
+    key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"

@@ -5,7 +5,7 @@
 - name: Create Jenkins user
   action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
   ignore_errors: yes
-  tags: jenkins_user
+  tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user's home folder
   file:
@@ -16,14 +16,14 @@
     mode: 0700
   when:
     - ansible_architecture == "s390x"
-  tags: jenkins_user
+  tags: [jenkins_user, adoptopenjdk]
 
 - name: Set authorized key for Jenkins user
   authorized_key:
     user: "{{ Jenkins_Username }}"
     state: present
     key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
-  tags: [jenkins_user, jenkins_authorized_key]
+  tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
 
 - name: Add Jenkins user to the audio group
   user: name={{ Jenkins_Username }}
@@ -32,12 +32,13 @@
   when:
     - (ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture != "armv7l"
-  tags: jenkins_user
+  tags: [jenkins_user, adoptopenjdk]
 
 - name: Unset expiry on user account for Redhat for Jenkins user
   command: chage -M -1 -E -1 {{ Jenkins_Username }}
   tags:
     - jenkins_user
+    - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
 
@@ -45,5 +46,6 @@
   command: chage -M -1 -E -1 root
   tags:
     - jenkins_user
+    - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint

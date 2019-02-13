@@ -76,14 +76,23 @@
 
 - name: Remove c:\cygwin64\bin from the path if it exists
   win_path:
+    name: PATH
     elements:
       - 'C:\cygwin64\bin'
+    scope: machine
     state: absent
   tags: cygwin
 
-- name: Add c:\cygwin64\bin to the start of the %PATH%
-  raw: setx PATH "C:\cygwin64\bin;$env:Path" /m
+- name: Add c:\cygwin64\bin to front of %PATH%
+  win_shell: 'setx /M PATH "C:\cygwin64\bin;%PATH%"'
+  args:
+    executable: cmd
   tags:
     - cygwin
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
+
+- name: Reboot machine for PATH changes to take effect
+  win_reboot:
+    reboot_timeout: 1800
+  tags: cygwin

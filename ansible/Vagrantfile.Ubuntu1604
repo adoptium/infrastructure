@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo apt-get install tree -y
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible -y
+sudo mkdir /ansible
+sudo cp /etc/ansible/ansible.cfg /ansible
+sudo touch /ansible/hosts
+sudo sed -i 's?#inventory      = /etc/ansible/hosts?inventory = /ansible/hosts?g' /ansible/ansible.cfg
+echo "---------------------------------------------------------------------------------------"
+echo "*** Creating public-private keypair for ansible-playbook... for user '$USER' *** "
+yes y | ssh-keygen -t rsa -b 4096 -C "adoptopenjdk@gmail.com" -q -P "" -f $HOME/.ssh/id_rsa
+echo "---------------------------------------------------------------------------------------"
+echo "*** Public-private keypair for ansible-playbook... for user '$USER' has been created in *** "
+ls -lash $HOME/.ssh
+echo "---------------------------------------------------------------------------------------"
+export VAGRANT_MOUNT=/vagrant
+echo "*** Creating 'hosts' file for ansible-playbook... ***"
+echo "localhost ansible_connection=local" > $VAGRANT_MOUNT/playbooks/hosts
+echo "---------------------------------------------------------------------------------------"
+echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains ***"
+cat $VAGRANT_MOUNT/playbooks/hosts
+echo "---------------------------------------------------------------------------------------"
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkU16 do |adoptopenjdkU16|
+    adoptopenjdkU16.vm.box = "generic/ubuntu1604"
+    adoptopenjdkU16.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkU16.vm.hostname = "adoptopenjdkU16"
+    adoptopenjdkU16.vm.network :private_network, type: "dhcp"
+    adoptopenjdkU16.vm.provision "shell", inline: $script, privileged: false
+  end
+end

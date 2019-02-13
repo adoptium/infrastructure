@@ -14,8 +14,8 @@ addons:
 install:
   # Install ansible
   - pip install ansible
-  - pip install yamllint
-  - pip install ansible-lint
+  - pip install yamllint==1.13.0
+  - pip install ansible-lint==3.5.1
 
   # Check ansible version
   - ansible --version

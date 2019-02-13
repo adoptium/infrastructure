@@ -6,7 +6,7 @@
 # Command Build Tool Packages
 Build_Tool_Packages:
   - bind-utils
-  - bison
+  - bison                         # OpenJ9
   - cpio
   - curl
   - flex
@@ -29,6 +29,8 @@ Additional_Build_Tools_SLES12:
   - git
   - libfreetype6
   - libXext6
+  - libXi6                        # JDK12+ compilation
+  - libXrandr2                    # JDK12+ compilation
   - libXrender1
   - libXt6
   - libXtst6
@@ -45,5 +47,6 @@ Test_Tool_Packages:
   - xorg-x11
   - xorg-x11-server
   - xorg-x11-server-extra
+  - glibc-locale                  # Internationalization tests
 
 crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"

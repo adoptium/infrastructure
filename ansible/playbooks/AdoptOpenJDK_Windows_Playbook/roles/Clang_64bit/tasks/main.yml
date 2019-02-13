@@ -24,15 +24,15 @@
   tags: clang_64bit
 
 - name: Test if LLVM64 symlink is already created
-   win_stat:
-     path: 'C:\openjdk\LLVM64'
-   register: llvm64_symlink
-   tags: clang_64bit
+  win_stat:
+    path: 'C:\openjdk\LLVM64'
+  register: llvm64_symlink
+  tags: clang_64bit
 
 - name: Create symlink to C:\openjdk\LLVM64
-   raw: cmd /c mklink /D "C:\openjdk\LLVM64\" "C:\Program Files\LLVM"
-   when: (llvm64_symlink.stat.exists == false)
-   tags: clang_64bit
+  raw: cmd /c mklink /D "C:\openjdk\LLVM64" "C:\Program Files\LLVM"
+  when: (llvm64_symlink.stat.exists == false)
+  tags: clang_64bit
 
 - name: Cleanup Clang 64bit installer
   win_file:
