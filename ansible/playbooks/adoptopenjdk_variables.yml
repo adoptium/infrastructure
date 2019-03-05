@@ -13,3 +13,5 @@ Asian_Locales: Disabled
 # Jcktestr User Variables:
 Jcktestr_Username: jcktestr
 Jcktestr_User_SSHKey: /Vendor_Files/keys/keybox.key
+# AIX variable
+bootjdk: openj9

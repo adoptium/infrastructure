@@ -261,7 +261,7 @@
 
         - name: Transfer and Extract Java8
           unarchive:
-            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
             dest: /usr/java8_64
             remote_src: yes
           when: java8.stat.isdir is not defined
@@ -284,7 +284,7 @@
 
         - name: Transfer and Extract Java9
           unarchive:
-            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk9?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk9?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
             dest: /usr/java9_64
             remote_src: yes
           when: java9.stat.isdir is not defined
