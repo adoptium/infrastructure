@@ -52,3 +52,4 @@
     - Clang_32bit                 # OpenJ9
     - OpenSSL                     # OpenJ9
     - nasm                        # OpenJ9
+    - Rust                        # IcedTea-Web
