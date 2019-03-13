@@ -50,9 +50,6 @@
     - libpng15
     - libpng-devel
     - perl-Text-CSV
-    - xinit
-    - xorg-server
-    - xterm
   tags: cygwin
 
 ###############################################################################
