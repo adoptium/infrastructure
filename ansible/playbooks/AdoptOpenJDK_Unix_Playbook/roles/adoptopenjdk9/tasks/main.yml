@@ -18,7 +18,7 @@
   tags: adoptopenjdk9
 
 - name: Check if jdk9 is already installed in the target location
-  shell: ls -ld /usr/lib/jvm/jdk-9.* >/dev/null 2>&1
+  shell: ls -ld /usr/lib/jvm/jdk-9* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk9_installed
   tags:
@@ -47,7 +47,7 @@
   tags: adoptopenjdk9
 
 - name: Get /usr/lib/jvm/jdk9.* full path name
-  shell: ls -ld /usr/lib/jvm/jdk-9.* 2>/dev/null | awk '{print $9}'
+  shell: ls -ld /usr/lib/jvm/jdk-9* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk9_dir
   when: adoptopenjdk9_installed.rc != 0
   tags: adoptopenjdk9
