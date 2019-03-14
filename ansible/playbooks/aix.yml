@@ -9,8 +9,8 @@
   become: yes
   environment:
     PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
-    PERL_MB_OPT: "--install_base /home/{{ Jenkins_Username }}"
-    PERL_MM_OPT: "INSTALL_BASE=/home/{{ Jenkins_Username }}"
+    PERL_MB_OPT: "--install_base /opt/freemarker"
+    PERL_MM_OPT: "INSTALL_BASE=/opt/freemarker"
   vars:
     swap_size: 4096
 
@@ -563,16 +563,16 @@
               /bin/bash
           tags: login_shell
 
-        - name: Add bash to available login shells
+        - name: Set variables for global environment
           blockinfile:
             dest: /etc/environment
             block: |
               AIXTHREAD_HRT=true
               PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
-              PERL5LIB=/home/{{ Jenkins_Username }}/lib/perl5
+              PERL5LIB=/opt/freemarker/lib/perl5
           tags: login_shell
 
-        - name: Add bash to available login shells
+        - name: Add freeware and xlc to PATH for global environment 
           replace:
             path: /etc/environment
             regexp: 'PATH=/usr/bin'
