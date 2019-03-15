@@ -572,7 +572,7 @@
               PERL5LIB=/opt/freemarker/lib/perl5
           tags: login_shell
 
-        - name: Add freeware and xlc to PATH for global environment 
+        - name: Add freeware and xlc to PATH for global environment
           replace:
             path: /etc/environment
             regexp: 'PATH=/usr/bin'
