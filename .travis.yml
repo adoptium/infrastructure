@@ -32,7 +32,6 @@ script:
     # Ansible code static analysis
   - ansible-lint playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
   - ansible-lint playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
-  - ansible-lint playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-api.yml
   - ansible-lint playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
   - ansible-lint playbooks/aix.yml
   - ansible-lint playbooks/ubuntu-jck.yml
@@ -40,7 +39,6 @@ script:
     # Check Playbook syntax.
   - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
   - ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
-  - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-api.yml --syntax-check
   - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml --syntax-check
   - ansible-playbook playbooks/aix.yml --syntax-check
   - ansible-playbook playbooks/ubuntu-jck.yml --syntax-check
