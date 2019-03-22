@@ -297,9 +297,9 @@
           tags: java9
 
 
-      #################
-      # OpenJ9 JDK 10 #
-      #################
+        #################
+        # OpenJ9 JDK 10 #
+        #################
         - name: Check for Java10 availability
           stat:
             path: /usr/java10_64
@@ -344,6 +344,30 @@
             remote_src: yes
           when: java11.stat.isdir is not defined
           tags: java11
+
+        #################
+        # OpenJ9 JDK 12 #
+        #################
+        - name: Check for Java12 availability
+          stat:
+            path: /usr/java12_64
+          register: java12
+          tags: java12
+
+        - name: Create /usr/java12_64 if it doesn't exist
+          file:
+            path: /usr/java12_64
+            state: directory
+          when: java12.stat.isdir is not defined
+          tags: java12
+
+        - name: Transfer and Extract Java12
+          unarchive:
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
+            dest: /usr/java12_64
+            remote_src: yes
+          when: java12.stat.isdir is not defined
+          tags: java12
 
       #########################################################################
       # Install X11 extensions                                                #
