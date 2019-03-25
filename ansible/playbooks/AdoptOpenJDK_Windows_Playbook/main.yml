@@ -20,6 +20,10 @@
 - hosts: "{{ groups['Vendor_groups'] | default('build*win*:test*win*') }}"
   gather_facts: yes
   tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
 
   #########
   # Roles #

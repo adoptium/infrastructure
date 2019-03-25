@@ -4,37 +4,44 @@
 ###########
 - name: Test if Java11 is already installed
   win_stat:
-    path: 'C:\Program Files\Java\jdk-11.0.1+13'
+    path: 'C:\openjdk\jdk-11\bin'
   register: java11_installed
   tags: Java11
 
 - name: Check if Java11 is already downloaded
   win_stat:
-    path: 'C:\temp\jdk-11.0.1+13.zip'
+    path: 'C:\temp\jdk-11.zip'
   register: java11_download
   tags: Java11
 
 - name: Download Java11
   win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.1%2B13/OpenJDK11U-jdk_x64_windows_hotspot_11.0.1_13.zip
-    dest: 'C:\temp\jdk-11.0.1+13.zip'
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    dest: 'C:\temp\jdk-11.zip'
   when: (java11_download.stat.exists == false) and (java11_installed.stat.exists == false)
   tags: Java11
 
 - name: Install Java11
   win_unzip:
-    src: C:\temp\jdk-11.0.1+13.zip
+    src: C:\temp\jdk-11.zip
     dest: C:\Program Files\Java
   when: (java11_installed.stat.exists == false)
   tags: Java11
 
 - name: Test if Java11 symlink is already created
   win_stat:
-    path: 'C:\openjdk\jdk11'
+    path: 'C:\openjdk\jdk-11'
   register: java11_symlink
   tags: Java11
 
-- name: Create symlink to Java11
-  raw: cmd /c mklink /D "C:\openjdk\jdk11" "C:\Program Files\Java\jdk-11.0.1+13"
+- name: Get Java 11 Folder name to create symlink
+  win_shell: powershell ([Environment]::SetEnvironmentVariable("Java11_Folder", (Get-ChildItem -Path 'C:\Program Files\Java\jdk-11*' | Select-String -Pattern 'C*'), "Machine"))
+  when: (java11_symlink.stat.exists == false)
+  tags: Java11
+
+- name: Create symlink to Java 11
+  win_shell: New-Item -Path 'C:\openjdk\jdk-11' -ItemType SymbolicLink -Value ([Environment]::GetEnvironmentVariable("Java11_Folder", "Machine"))
+  args:
+    executable: powershell
   when: (java11_symlink.stat.exists == false)
   tags: Java11
