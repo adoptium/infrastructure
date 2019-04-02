@@ -39,7 +39,6 @@ Build_Tool_Packages:
   - libxt-dev
   - libxtst-dev
   - make
-  - numactl
   - ntp
   - openjdk-7-jdk
   - openjdk-8-jdk
@@ -72,17 +71,20 @@ gcc_compiler:
 Additional_Build_Tools_x86_64:
   - zulu-9
   - libnuma-dev
+  - numactl
   - gcc-7
   - g++-7
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev
+  - numactl
   - gcc-7                         # OpenJ9
   - g++-7                         # OpenJ9
 
 Additional_Build_Tools_s390:
   - gcc-7                         # OpenJ9
   - g++-7                         # OpenJ9
+  - numactl
 
 Additional_Build_Tools_aarch64:
   - libpng-dev
