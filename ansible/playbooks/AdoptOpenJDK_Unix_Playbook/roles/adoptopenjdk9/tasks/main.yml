@@ -49,7 +49,9 @@
 - name: Get /usr/lib/jvm/jdk9.* full path name
   shell: ls -ld /usr/lib/jvm/jdk-9* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk9_dir
-  when: adoptopenjdk9_installed.rc != 0
+  when:
+    - adoptopenjdk9_installed.rc != 0
+    - ansible_architecture != "armv7l"
   tags: adoptopenjdk9
 
 - name: Chown /usr/lib/jvm/jdk9.*
@@ -59,5 +61,7 @@
     owner: root
     group: root
     recurse: yes
-  when: adoptopenjdk9_installed.rc != 0
+  when:
+    - adoptopenjdk9_installed.rc != 0
+    - ansible_architecture != "armv7l"
   tags: adoptopenjdk9
