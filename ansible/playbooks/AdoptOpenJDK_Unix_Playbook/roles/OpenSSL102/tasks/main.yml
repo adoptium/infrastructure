@@ -1,0 +1,58 @@
+---
+###################################################
+# OpenSSL v1.0.2r for building OpenJ9 on CentOS 6 #
+###################################################
+
+- name: Test if OpenSSL v1.0.2r is installed
+  shell: export LD_LIBRARY_PATH=/usr/local/openssl-1.0.2/lib &&  /usr/local/openssl-1.0.2/bin/openssl version | awk '{print $2}' | cut -c 1-5
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+  register: openssl_version
+  tags: openssl
+
+- name: Download OpenSSL v1.0.2r
+  get_url:
+    url: https://www.openssl.org/source/openssl-1.0.2r.tar.gz
+    dest: /tmp/openssl-1.0.2r.tar.gz
+    force: no
+    mode: 0755
+    validate_certs: no
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+  tags: openssl
+
+- name: Extract OpenSSL v1.0.2r
+  unarchive:
+    src: /tmp/openssl-1.0.2r.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+  tags: openssl
+
+- name: Build and install OpenSSL v1.0.2r
+  shell: cd /tmp/openssl-1.0.2r && ./config --prefix=/usr/local/openssl-1.0.2 shared && make && make install
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+  tags: openssl
+
+- name: Remove downloaded packages for OpenSSL v1.0.2r
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/openssl-1.0.2r.tar.gz
+    - /tmp/openssl-1.0.2r
+  ignore_errors: yes
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+  tags: openssl
