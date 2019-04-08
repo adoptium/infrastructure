@@ -51,6 +51,7 @@
       when:
         - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
         - ansible_architecture == "x86_64"
+    - OpenSSL102                  # OpenJ9
     - Nagios_Plugins              # AdoptOpenJDK Infrastructure
     - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
     - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
