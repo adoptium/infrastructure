@@ -4,6 +4,9 @@
 ###########################
 # Required by OpenJ9 for out-of-process JIT compilation aka JITaaS
 # Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
+#
+# Note: this role is optional
+# to apply the role, add "Protobuf" to the playbook roles (see ../../../main.yml)
 
 - name: Check if Protocol Buffers v3.5.1 is installed
   stat:
@@ -36,6 +39,28 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
+  tags: protobuf
+
+- name: Check if the linker search paths contains /usr/local/lib
+  command: ldconfig -p | grep /usr/local/lib
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+  register: linker_search_path
+  ignore_errors: True
+  tags: protobuf
+
+- name: Create/update /etc/ld.so.conf.d/usr-local.conf
+  lineinfile:
+    path: /etc/ld.so.conf.d/usr-local.conf
+    line: /usr/local/lib
+    create: yes
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - protobuf_status.stat.exists == False
+    - linker_search_path.stdout == ''
   tags: protobuf
 
 - name: Build and install Protocol Buffers v3.5.1
