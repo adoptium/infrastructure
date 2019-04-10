@@ -74,6 +74,8 @@ hosts:
 
       - azure:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
+          win2012r2-x64-2: {ip: 40.121.164.56, user: adoptopenjdk}
+          win2012r2-x64-3: {ip: 13.68.219.237, user: adoptopenjdk}
 
       - osuosl:
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}

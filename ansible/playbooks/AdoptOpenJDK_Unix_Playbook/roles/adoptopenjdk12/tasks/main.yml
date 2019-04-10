@@ -1,0 +1,82 @@
+---
+########################################
+# AdoptOpenJDK 12 for bootstrapping 13 #
+########################################
+- name: Checking for /usr/lib/jvm
+  stat: path=/usr/lib/jvm
+  register: usr_lib_jvm_exists
+  tags: adoptopenjdk12
+
+- name: Creating /usr/lib/jvm if not found
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: usr_lib_jvm_exists.stat.exists != True
+  tags: adoptopenjdk12
+
+- name: Check if jdk-12 is already installed in the target location
+  shell: ls -ld /usr/lib/jvm/jdk-12* >/dev/null 2>&1
+  ignore_errors: yes
+  register: adoptopenjdk12_installed
+  tags:
+    - adoptopenjdk12
+    - skip_ansible_lint
+
+- name: Install latest release if one not already installed (Linux/x64)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=linux&arch=x64&heap_size=normal&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - adoptopenjdk12_installed.rc != 0
+    - ansible_architecture == "x86_64"
+  tags: adoptopenjdk12
+
+- name: Install latest release if one not already installed (Linux/s390x)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=linux&arch=s390x&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - adoptopenjdk12_installed.rc != 0
+    - ansible_architecture == "s390x"
+  tags: adoptopenjdk12
+
+- name: Install latest release if one not already installed (Linux/ppc64le)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=linux&arch=ppc64le&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - adoptopenjdk12_installed.rc != 0
+    - ansible_architecture == "ppc64le"
+  tags: adoptopenjdk12
+
+- name: Install latest Hotspot release if one not already installed (Linux/aarch64)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl=hotspot&os=linux&arch=aarch64&release=latest&type=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - adoptopenjdk12_installed.rc != 0
+    - ansible_architecture == "aarch64"
+  tags: adoptopenjdk12
+
+- name: Get /usr/lib/jvm/jdk-12* full path name
+  shell: ls -ld /usr/lib/jvm/jdk-12* 2>/dev/null | awk '{print $9}'
+  register: adoptopenjdk12_dir
+  when: adoptopenjdk12_installed.rc != 0
+  tags: adoptopenjdk12
+
+- name: Chown /usr/lib/jvm/jdk-12*
+  file:
+    path: '{{ adoptopenjdk12_dir.stdout }}'
+    state: directory
+    owner: root
+    group: root
+    recurse: yes
+  when: adoptopenjdk12_installed.rc != 0
+  tags: adoptopenjdk12
