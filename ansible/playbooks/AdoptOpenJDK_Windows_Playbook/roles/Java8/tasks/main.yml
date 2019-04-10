@@ -4,46 +4,52 @@
 ##########
 - name: Test if Java 8 is already installed
   win_stat:
-    path: 'C:\Program Files\Java\jdk8u172-b11'
+    path: 'C:\openjdk\jdk-8\bin'
   register: java8_installed
   tags: Java8
 
 - name: Check if Java 8 is already downloaded
   win_stat:
-    path: 'C:\temp\jdk8u172-b11.zip'
+    path: 'C:\temp\jdk-8.zip'
   register: java8_download
   tags: Java8
 
 - name: Download Java 8
   win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk8-releases/releases/download/jdk8u172-b11/OpenJDK8_x64_Win_jdk8u172-b11.zip
-    dest: 'C:\temp\jdk8u172-b11.zip'
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    dest: 'C:\temp\jdk-8.zip'
   when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
   tags: Java8
 
 - name: Install Java 8
   win_unzip:
-    src: C:\temp\jdk8u172-b11.zip
+    src: C:\temp\jdk-8.zip
     dest: C:\Program Files\Java
   when: (java8_installed.stat.exists == false)
   tags: Java8
 
 - name: Test if Java 8 symlink is already created
   win_stat:
-    path: 'C:\openjdk\jdk8'
+    path: 'C:\openjdk\jdk-8'
   register: java8_symlink
   tags: Java8
 
+- name: Get Java 8 Folder name to create symlink
+  win_shell: powershell ([Environment]::SetEnvironmentVariable("Java8_Folder", (Get-ChildItem -Path 'C:\Program Files\Java\jdk8*' | Select-String -Pattern 'C*'), "Machine"))
+  when: (java8_symlink.stat.exists == false)
+  tags: Java8
+
 - name: Create symlink to Java 8
-  raw: cmd /c mklink /D "C:\openjdk\jdk8" "C:\Program Files\Java\jdk8u172-b11"
+  win_shell: New-Item -Path 'C:\openjdk\jdk-8' -ItemType SymbolicLink -Value ([Environment]::GetEnvironmentVariable("Java8_Folder", "Machine"))
+  args:
+    executable: powershell
   when: (java8_symlink.stat.exists == false)
   tags: Java8
 
 - name: Set JAVA_HOME to version 8
   win_path:
     name: JAVA_HOME
-    elements:
-      - 'C:\Program Files\Java\jdk8u172-b11'
+    elements: C:\openjdk\jdk-8
     scope: machine
     state: present
   when: (java8_installed.stat.exists == false)
@@ -52,8 +58,8 @@
 - name: Add JAVA_HOME/bin to Path
   win_path:
     name: Path
-    elements:
-      - 'C:\Program Files\Java\jdk8u172-b11\bin'
+    elements: C:\openjdk\jdk-8\bin
     scope: machine
     state: present
+  when: (java8_installed.stat.exists == false)
   tags: Java8

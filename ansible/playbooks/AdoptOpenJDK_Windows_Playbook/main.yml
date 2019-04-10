@@ -20,6 +20,10 @@
 - hosts: "{{ groups['Vendor_groups'] | default('build*win*:test*win*') }}"
   gather_facts: yes
   tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
 
   #########
   # Roles #
@@ -41,15 +45,16 @@
     - Java7                       # JDK8 build bootstrap
     - Java8                       # JDK9 build bootstrap
     - Java9                       # JDK10 build bootstrap
-    - Java11                      # JDK11 buid bootstrap
+    - Java11                      # JDK11 build bootstrap
+    - Java12                      # JDK12 build bootstrap
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - 7-Zip                       # Mostly extracting other prereqs :-)
-    - MinGW-W64                   # OpenJ9 (Obsoleted)
     - Clang_64bit                 # OpenJ9
     - Clang_32bit                 # OpenJ9
     - OpenSSL                     # OpenJ9
     - nasm                        # OpenJ9
+    - Rust                        # IcedTea-Web

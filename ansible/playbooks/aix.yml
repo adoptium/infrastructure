@@ -8,15 +8,31 @@
   remote_user: root
   become: yes
   environment:
-    PATH: "/opt/freeware/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
+    PERL_MB_OPT: "--install_base /opt/freemarker"
+    PERL_MM_OPT: "INSTALL_BASE=/opt/freemarker"
   vars:
     swap_size: 4096
 
   tasks:
     - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: adoptopenjdk_variables.yml
+      # Install bash if it's not already there
+        - name: Check if bash is installed
+          shell: bash --version >/dev/null 2>&1
+          register: does_bash_exist
+          ignore_errors: yes
+        - name: install bash
+          yum: name=bash state=present update_cache=yes
+          when: does_bash_exist.rc != 0
+
+
       ################################
       # AIX filesystem configuration #
       ################################
+
         - name: Download AIX filesystem configuration script
           get_url:
             url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
@@ -35,25 +51,64 @@
             path: /tmp/AIX_filesystem_config.sh
           tags: filesystem
 
-      ##########################################################################
-      # Install openssl from IBM installp                                      #
-      # openssl installp download requiring an IBMid                           #
-      # https://www-01.ibm.com/support/docviepw.wss?uid=isg1fileset-1190419011 #
-      ##########################################################################
+      ################################
+      # AIX RAMDISK configuration    #
+      ################################
+        - name: Create /usr/local/bin if it doesn't exist
+          file:
+            path: /usr/local/bin
+            state: directory
+          tags: ramdisk
+
+        - name: Update inittab
+          lineinfile:
+            line: "ramdisk:2:once:/usr/local/bin/AIX_ramdisk.ksh >/dev/null 2>&1"
+            path: /etc/inittab
+          tags: ramdisk
+
+        - name: Check if AIX_ramdisk.ksh exists
+          stat:
+            path: /usr/local/bin/AIX_ramdisk.ksh
+          register: ramdisk_script_exists
+          tags: ramdisk
+
+        - name: Download AIX ramdisk script
+          get_url:
+            url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_ramdisk.ksh
+            dest: /usr/local/bin/AIX_ramdisk.ksh
+            mode: 0775
+            validate_certs: no
+          when: not ramdisk_script_exists.stat.exists
+          tags: ramdisk
+
+      ##################################################################
+      # Install openssl from IBM installp                              #
+      # openssl installp download requiring an IBMid                   #
+      # https://www-01.ibm.com/support/docview.wss?uid=isg3T1027135    #
+      ##################################################################
+        - name: Check if openssl is installed
+          shell: openssl version >/dev/null 2>&1
+          register: does_openssl_exist
+          ignore_errors: yes
+          tags: openssl
+
         - name: Transfer Openssl to remote host
           copy:
-            src: /Vendor_Files/aix/openssl-1.0.2.1300.tar.gz
-            dest: /tmp/openssl-1.0.2.1300.tar.gz
+            src: /Vendor_Files/aix/openssl/openssl-1.0.2.1601.tar.Z
+            dest: /tmp/openssl-1.0.2.1601.tar.Z
+          when: does_openssl_exist.rc != 0
           tags: openssl
 
         - name: Extract Openssl
-          shell: gzip -cd /tmp/openssl-1.0.2.1300.tar.gz | tar xf - -C /tmp/
+          shell: uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
+          when: does_openssl_exist.rc != 0
           tags: openssl
 
         - name: Install IBM Openssl - installp
-          command: installp -aXYgd /tmp/openssl-1.0.2.1300 openssl.base
+          command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
           register: result.openssl
           ignore_errors: yes
+          when: does_openssl_exist.rc != 0
           tags: openssl
 
         - name: Clean openssl tmp files
@@ -61,8 +116,9 @@
             path: "{{ item }}"
             state: absent
           with_items:
-            - /tmp/openssl-1.0.2.1300
-            - /tmp/openssl-1.0.2.1300.tar.gz
+            - /tmp/openssl-1.0.2.1601
+            - /tmp/openssl-1.0.2.1601.tar.Z
+          when: does_openssl_exist.rc != 0
           tags: openssl
 
       ####################################################
@@ -82,6 +138,7 @@
             - rpm_remove
             # TODO: rpm used in place of yum or rpm_key module
             - skip_ansible_lint
+
       ####################################
       # Install yum and update to latest #
       ####################################
@@ -110,6 +167,7 @@
             update_cache: yes
             name: '*'
             state: latest
+            exclude: curl*
           tags:
             - yum
             #TODO: Package installs should not use latest
@@ -119,24 +177,35 @@
           yum: name={{ item }} state=present update_cache=yes
           with_items:
             - autoconf
+            - bc
             - bison
             - coreutils
+            - cpio
             - cups-devel
             - cups-libs
+            - expect
             - flex
             - freetype2-devel
             - fontconfig-devel
             - gawk
             - git
             - grep
+            - libXrender-devel
+            - libffi-devel
             - make
             - m4
+            - pcre
             - pkg-config
+            - popt
             - sed
             - tar
+            - tcl
+            - tk
             - unzip
+            - wget
             - xz-libs
             - zip
+            - zsh
           tags: yum
 
       ##############################################
@@ -154,9 +223,33 @@
         - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
           shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
           ignore_errors: True
+          tags: rpm_install
 
       ##############
-      # IBM Java 8 #
+      # Boot JDK 7 #
+      ##############
+        - name: Check for Java7 availability
+          stat:
+            path: /usr/java7_64
+          register: java7
+          tags: java7
+
+        - name: Create /usr/java7_64 if it doesn't exist
+          file:
+            path: /usr/java7_64
+            state: directory
+          when: java7.stat.isdir is not defined
+
+        - name: Transfer and Extract Java7
+          unarchive:
+            src: /Vendor_Files/aix/openjdk-7u-aix.tar
+            dest: /usr/java7_64
+            remote_src: no
+          when: java7.stat.isdir is not defined
+          tags: java7
+
+      ##############
+      # Boot JDK 8 #
       ##############
         - name: Get java8 path information
           stat:
@@ -164,151 +257,147 @@
           register: java8
           tags: java8
 
-        - debug:
-            msg: "Java8 found, skipping download and installation"
-          when: java8.stat.isdir is defined
+        - name: Create /usr/java8_64 if it doesn't exist
+          file:
+            path: /usr/java8_64
+            state: directory
+          when: java8.stat.isdir is not defined
           tags: java8
 
         - name: Transfer and Extract Java8
           unarchive:
-            src: /Vendor_Files/aix/OpenJDK8_ppc64_AIX_jdk8u144-b01.tar.gz
-            dest: /tmp
-            remote_src: no
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
+            dest: /usr/java8_64
+            remote_src: yes
           when: java8.stat.isdir is not defined
-          tags: java8
-
-        - name: Move extracted Java8 to /usr/java8_64
-          command: mv /tmp/jdk8u144-b01/ /usr/java8_64
-          when: java8.stat.isdir is not defined
-          tags: java8
-
-        - name: Create symlink for Java
-          file: src=/usr/java8_64/bin/java dest=/usr/bin/java state=link
-          when: java8.stat.isdir is not defined
-          tags: java8
-
-        - name: Create symlink for Javac
-          file: src=/usr/java8_64/bin/javac dest=/usr/bin/javac state=link
-          when: java8.stat.isdir is not defined
-          tags: java8
-
-        - name: Test Java
-          command: /usr/bin/java -version
-          register: java8_version
-          tags: java8
-
-        - name: Display Java version information
-          debug:
-            msg: "{{ java8_version.stderr }}"
-          tags: java8
-
-        - name: Modify Java version in /etc/environment
-          replace:
-            path: /etc/environment
-            regexp: 'java5'
-            replace: 'java8_64'
           tags: java8
 
       ##############
-      # IBM Java 7 #
+      # Boot JDK 9 #
       ##############
-        - name: Check for Java7 availability
+        - name: Check for Java9 availability
           stat:
-            path: /usr/java7
-          register: java7
-          tags: java7
+            path: /usr/java9_64
+          register: java9
+          tags: java9
 
-        - debug:
-            msg: "Java7 found, skipping download and installation"
-          when: java7.stat.isdir is defined
-          tags: java7
+        - name: Create /usr/java9_64 if it doesn't exist
+          file:
+            path: /usr/java9_64
+            state: directory
+          when: java9.stat.isdir is not defined
+          tags: java9
 
-        - name: Transfer and Extract Java7
+        - name: Transfer and Extract Java9
           unarchive:
-            src: /Vendor_Files/aix/openjdk-7u-aix.tar
-            dest: /tmp
-            remote_src: no
-          when: java7.stat.isdir is not defined
-          tags: java7
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk9?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
+            dest: /usr/java9_64
+            remote_src: yes
+          when: java9.stat.isdir is not defined
+          tags: java9
 
-        - name: Move extracted Java7 to /usr/java7
-          command: mv /tmp/j2sdk-image /usr/java7
-          when: java7.stat.isdir is not defined
-          tags: java7
 
-        - name: Test Java7
-          command: /usr/java7/bin/java -version
-          register: java7_version
-          tags: java7
+        #################
+        # OpenJ9 JDK 10 #
+        #################
+        - name: Check for Java10 availability
+          stat:
+            path: /usr/java10_64
+          register: java10
+          tags: java10
 
-        - name: Display Java7 version information
-          debug:
-            msg: "{{ java7_version.stderr }}"
-          tags: java7
+        - name: Create /usr/java10_64 if it doesn't exist
+          file:
+            path: /usr/java10_64
+            state: directory
+          when: java10.stat.isdir is not defined
+          tags: java10
 
-      ###############
-      # Boot JDK 11 #
-      ###############
-        - name: Check for Java11 install
+        - name: Transfer and Extract Java9
+          unarchive:
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
+            dest: /usr/java10_64
+            remote_src: yes
+          when: java10.stat.isdir is not defined
+          tags: java10
+
+        #################
+        # OpenJ9 JDK 11 #
+        #################
+        - name: Check for Java11 availability
           stat:
             path: /usr/java11_64
           register: java11
           tags: java11
 
-        - debug:
-            msg: "Java11 found, skipping download and installation"
-          when: java11.stat.isdir is defined
-          tags: java11
-
-        - name: Create Java11 directory
+        - name: Create /usr/java11_64 if it doesn't exist
           file:
             path: /usr/java11_64
             state: directory
           when: java11.stat.isdir is not defined
           tags: java11
 
-        - name: Download and Extract Java11
+        - name: Transfer and Extract Java11
           unarchive:
-            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk&heap_size=normal
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
             dest: /usr/java11_64
             remote_src: yes
-            extra_opts:
-              - --strip=1
           when: java11.stat.isdir is not defined
           tags: java11
 
-        - name: Test Java11
-          command: /usr/java11_64/bin/java -version
-          register: java11_version
-          tags: java11
+        #################
+        # OpenJ9 JDK 12 #
+        #################
+        - name: Check for Java12 availability
+          stat:
+            path: /usr/java12_64
+          register: java12
+          tags: java12
 
-        - name: Display Java11 version information
-          debug:
-            msg: "{{ java11_version }}"
-          tags: java11
+        - name: Create /usr/java12_64 if it doesn't exist
+          file:
+            path: /usr/java12_64
+            state: directory
+          when: java12.stat.isdir is not defined
+          tags: java12
 
+        - name: Transfer and Extract Java12
+          unarchive:
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
+            dest: /usr/java12_64
+            remote_src: yes
+          when: java12.stat.isdir is not defined
+          tags: java12
 
       #########################################################################
       # Install X11 extensions                                                #
       # x11.adt.ext installp download requiring an IBMid                      #
       # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
       #########################################################################
+        - name: Check if X11.adt.ext is installed
+          shell: lslpp -l X11.adt.ext >/dev/null 2>&1
+          register: does_X11_adt_ext_exist
+          ignore_errors: yes
         - name: Transfer X11 installp to remote host
           copy:
-            src: /Vendor_Files/aix/X11.adt
+            src: /Vendor_Files/aix/adt/X11.adt
             dest: /tmp/X11.adt
+          when: does_X11_adt_ext_exist.rc != 0
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
           command: installp -aXYgd /tmp/X11.adt X11.adt.ext
           register: result.x11
           ignore_errors: yes
+          when: does_X11_adt_ext_exist.rc != 0
           tags: x11
 
         - name: Remove X11 installp
           file:
             state: absent
             path: /tmp/X11.adt
+          when: does_X11_adt_ext_exist.rc != 0
+          tags: x11
 
       ############
       # IBM XL C #
@@ -326,7 +415,7 @@
 
         - name: Transfer and Extract XLC
           unarchive:
-            src: /Vendor_Files/aix/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+            src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
             dest: /tmp
             remote_src: no
           when: xlc.stat.islnk is not defined
@@ -446,23 +535,6 @@
             - /tmp/ant-contrib-1.0b2-bin.tar.gz
           tags: ant-contrib
 
-      ########
-      # cpan #
-      ########
-        - name: Ensure memory limits for root are unlimited
-          shell: ulimit -m unlimited && ulimit -d unlimited
-          tags: cpan
-
-        - name: Install Text::CSV
-          command: CC=xlc_r cpan -i Text::CSV
-          environment:
-            PERL_MB_OPT: "--install_base \"/home/{{ Jenkins_Username }}\""
-            PERL_MM_OPT: "INSTALL_BASE=/home/{{ Jenkins_Username }}"
-          tags:
-            - cpan
-            # Environment variables don't work as part of command
-            - skip_ansible_lint
-
       #########################
       # Configure system logs #
       #########################
@@ -515,16 +587,16 @@
               /bin/bash
           tags: login_shell
 
-        - name: Add bash to available login shells
+        - name: Set variables for global environment
           blockinfile:
             dest: /etc/environment
             block: |
               AIXTHREAD_HRT=true
               PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
-              PERL5LIB=/home/{{ Jenkins_Username }}/lib/perl5
+              PERL5LIB=/opt/freemarker/lib/perl5
           tags: login_shell
 
-        - name: Add bash to available login shells
+        - name: Add freeware and xlc to PATH for global environment
           replace:
             path: /etc/environment
             regexp: 'PATH=/usr/bin'
@@ -574,6 +646,7 @@
           file:
             state: absent
             path: /home/{{ Jenkins_Username }}/.profile
+          tags: jenkins_user
 
         - name: Set user capabilites
           command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
@@ -638,12 +711,58 @@
             - /tmp/freemarker-2.3.8.tar.gz
           tags: freemarker
 
+      ########
+      # cpan #
+      ########
+
+        - name: Check if Text::CSV is already installed
+          command: perldoc -l Text::CSV
+          register: TextCSV_is_installed
+          ignore_errors: yes
+          tags: cpan
+
+        - name: Check if XML::Parser is already installed
+          command: perldoc -l XML::Parser
+          register: XMLParser_is_installed
+          ignore_errors: yes
+          tags: cpan
+
+        - name: Ensure memory limits for root are unlimited
+          shell: ulimit -m unlimited && ulimit -d unlimited
+          when: TextCSV_is_installed.rc != 0
+          tags: cpan
+
+        - name: Link to compiler location
+          file: src=/opt/IBM/xlC/13.1.3/bin dest=/usr/vac/bin state=link
+          when: TextCSV_is_installed.rc != 0
+          tags: cpan
+
+      ##########################################################
+      # The 1st time cpan starts it asks to be configured, so  #
+      # we echo a blank to it as the default answer is yes     #
+      ##########################################################
+        - name: Get CPAN to auto-configure
+          shell: echo | cpan
+          when: TextCSV_is_installed.rc != 0
+          tags: cpan
+
+        - name: Install Text::CSV
+          command: cpan -i Text::CSV
+          when: TextCSV_is_installed.rc != 0
+          tags: cpan
+
+        - name: Install XML::Parser
+          command: cpan -i XML::Parser
+          when: XMLParser_is_installed.rc != 0
+          tags: cpan
+
       ##################
       # Nagios plugins #
       ##################
         - name: Include Nagios Playbook
           include_tasks: nagios/nagios_aix.yml
           when: Nagios_Plugins == "Enabled"
+          tags: nagios
 
       #####################
       # superuser account #
@@ -668,7 +787,7 @@
           authorized_key:
             user: zeus
             state: present
-            key: "{{ lookup('file', '/home/ubuntu/keys/zeus.key') }}"
+            key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
           when: Superuser_Account == "Enabled"
           tags: superuser
 
@@ -748,7 +867,7 @@
             if [[ $curr_swap_size -lt {{swap_size}} ]]
             then
               echo "Extending swap LV..."
-              extendlv $swap_lv $(expr {{swap_size}} - $curr_swap_size)MB
+              extendlv $swap_lv $(expr {{swap_size}} - $curr_swap_size)M
             fi
           register: extendlv_result
           changed_when: "'Extending' in extendlv_result.stdout"

@@ -4,37 +4,44 @@
 ##########
 - name: Test if Java 9 is already installed
   win_stat:
-    path: 'C:\Program Files\Java\jdk-9.0.4+11'
+    path: 'C:\openjdk\jdk-9\bin'
   register: java9_installed
   tags: Java9
 
 - name: Check if Java 9 is already downloaded
   win_stat:
-    path: 'C:\temp\jdk-9.0.4+11.zip'
+    path: 'C:\temp\jdk-9.zip'
   register: java9_download
   tags: Java9
 
 - name: Download Java 9
   win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk9-nightly/releases/download/jdk-9%2B181-20180611/OpenJDK9_x64_Win_20180611.zip
-    dest: 'C:\temp\jdk-9.0.4+11.zip'
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk9?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    dest: 'C:\temp\jdk-9.zip'
   when: (java9_download.stat.exists == false) and (java9_installed.stat.exists == false)
   tags: Java9
 
 - name: Install Java 9
   win_unzip:
-    src: C:\temp\jdk-9.0.4+11.zip
+    src: C:\temp\jdk-9.zip
     dest: C:\Program Files\Java
   when: (java9_installed.stat.exists == false)
   tags: Java9
 
 - name: Test if Java 9 symlink is already created
   win_stat:
-    path: 'C:\openjdk\jdk9'
+    path: 'C:\openjdk\jdk-9'
   register: java9_symlink
   tags: Java9
 
+- name: Get Java 9 Folder name to create symlink
+  win_shell: powershell ([Environment]::SetEnvironmentVariable("Java9_Folder", (Get-ChildItem -Path 'C:\Program Files\Java\jdk-9*' | Select-String -Pattern 'C*'), "Machine"))
+  when: (java9_symlink.stat.exists == false)
+  tags: Java9
+
 - name: Create symlink to Java 9
-  raw: cmd /c mklink /D "C:\openjdk\jdk9" "C:\Program Files\Java\jdk-9.0.4+11"
+  win_shell: New-Item -Path 'C:\openjdk\jdk-9' -ItemType SymbolicLink -Value ([Environment]::GetEnvironmentVariable("Java9_Folder", "Machine"))
+  args:
+    executable: powershell
   when: (java9_symlink.stat.exists == false)
   tags: Java9

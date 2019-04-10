@@ -1,0 +1,47 @@
+---
+###########
+# Java 12 #
+###########
+- name: Test if Java12 is already installed
+  win_stat:
+    path: 'C:\openjdk\jdk-12\bin'
+  register: java12_installed
+  tags: Java12
+
+- name: Check if Java12 is already downloaded
+  win_stat:
+    path: 'C:\temp\jdk-12.zip'
+  register: java12_download
+  tags: Java12
+
+- name: Download Java12
+  win_get_url:
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    dest: 'C:\temp\jdk-12.zip'
+  when: (java12_download.stat.exists == false) and (java12_installed.stat.exists == false)
+  tags: Java12
+
+- name: Install Java12
+  win_unzip:
+    src: C:\temp\jdk-12.zip
+    dest: C:\Program Files\Java
+  when: (java12_installed.stat.exists == false)
+  tags: Java12
+
+- name: Test if Java12 symlink is already created
+  win_stat:
+    path: 'C:\openjdk\jdk-12'
+  register: java12_symlink
+  tags: Java12
+
+- name: Get Java 12 Folder name to create symlink
+  win_shell: powershell ([Environment]::SetEnvironmentVariable("Java12_Folder", (Get-ChildItem -Path 'C:\Program Files\Java\jdk-12*' | Select-String -Pattern 'C*'), "Machine"))
+  when: (java12_symlink.stat.exists == false)
+  tags: Java12
+
+- name: Create symlink to Java 12
+  win_shell: New-Item -Path 'C:\openjdk\jdk-12' -ItemType SymbolicLink -Value ([Environment]::GetEnvironmentVariable("Java12_Folder", "Machine"))
+  args:
+    executable: powershell
+  when: (java12_symlink.stat.exists == false)
+  tags: Java12

@@ -45,17 +45,17 @@
     - ansible_architecture == "aarch64"
   tags: adoptopenjdk10
 
-- name: Install latest OpenJ9 release if one not already installed (Linux/s390x)
+- name: Install latest OpenJ9 release if one not already installed (Linux/s390x or Linux/ppc64le)
   unarchive:
     src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=openj9&os=linux&arch=s390x&release=latest&type=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   when:
     - adoptopenjdk10_installed.rc != 0
-    - ansible_architecture == "s390x"
+    - (ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags: adoptopenjdk10
 
-- name: Install latest release if one not already installed (not Linux/x64 or Linux/armv7l)
+- name: Install latest release if one not already installed (not installed above)
   unarchive:
     src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=hotspot&os=linux&arch={{ ansible_architecture }}&release=latest&type=jdk
     dest: /usr/lib/jvm
@@ -64,6 +64,7 @@
     - adoptopenjdk10_installed.rc != 0
     - ansible_architecture != "x86_64"
     - ansible_architecture != "s390x"
+    - ansible_architecture != "ppc64le"
     - ansible_architecture != "armv7l"
     - ansible_architecture != "aarch64"
   tags: adoptopenjdk10
