@@ -31,7 +31,7 @@
     force: no
     validate_certs: no
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 
@@ -41,14 +41,14 @@
     dest: /tmp
     copy: False
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 
 - name: Running ./configure & make for cmake
   shell: cd /tmp/cmake-3.11.4 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout | version_compare('3.7.2', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: cmake
 
