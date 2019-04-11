@@ -39,7 +39,6 @@
     - Firefox
     - Strawberry_Perl             # Testing
     - Freemarker                  # OpenJ9
-    - Freetype
     - cmake                       # OpenJ9
     - GIT
     - Java7                       # JDK8 build bootstrap
