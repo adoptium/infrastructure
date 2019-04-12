@@ -110,17 +110,17 @@
     - ansible_architecture == "x86_64"
   tags: test_tools
 
-- name: Install xserver-xorg-legacy on Ubuntu 16
-  apt: name=xserver-xorg-legacy state=installed
+- name: Install additional Packages specific to Ubuntu 16
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Packages_Ubuntu16 }}"
   when:
     - ansible_distribution_major_version == "16"
-  tags: test_tools
 
-- name: Install libfreetype6-dev on Ubuntu 16 s390x
-  apt: name=libfreetype6-dev state=installed
+- name: Install additional Packages specific to Ubuntu 18
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Packages_Ubuntu18 }}"
   when:
-    - ansible_architecture == "s390x"
-  tags: test_tools
+    - ansible_distribution_major_version == "18"
 
 ####################
 # Set default Java #
