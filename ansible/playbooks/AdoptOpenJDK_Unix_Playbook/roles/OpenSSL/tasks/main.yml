@@ -1,64 +1,252 @@
 ---
 ###################
-# OpenSSL v1.1.0g #
+# OpenSSL v1.1.1 #
 ###################
 # Required by OpenJ9 for out-of-process JIT compilation (aka JITaaS)
 # Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
 
-- name: Test if OpenSSL v1.1.0g is installed
-  shell: export LD_LIBRARY_PATH=/usr/local/openssl-1.1.0/lib &&  /usr/local/openssl-1.1.0/bin/openssl version | awk '{print $2}' | cut -c 1-5
+# Note: some systems have already OpenSSL 1.1.1 instaled (as system)
+# do not install 1.1.1b on them
+
+- name: Set OpenSSL facts
+  set_fact:
+    openssl_latest: 1.1.1
+    openssl_latest_release: 1.1.1b
+  tags: openssl-1.1.1
+
+# check if it is installed in custom location or as system
+
+- name: Test if OpenSSL {{ openssl_latest }} or {{ openssl_latest_release }} is installed
+  shell: test -f /usr/local/openssl-{{ openssl_latest_release }}/bin/openssl ; /usr/local/openssl-{{ openssl_latest_release }}/bin/openssl version || /usr/bin/openssl version | grep {{ openssl_latest }}
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
   register: openssl_version
-  tags: openssl
+  ignore_errors: True
+  tags: openssl-1.1.1
 
-- name: Download OpenSSL v1.1.0g
+- debug: var=openssl_version.stdout
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+  tags: openssl-1.1.1
+
+# install latest release
+
+- name: Convert openssl_latest_release variable
+  shell: echo {{ openssl_latest_release }} | sed 's/\./_/g'
+  register: converted_openssl_latest_release
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- debug: var=converted_openssl_latest_release.stdout
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Download OpenSSL {{ openssl_latest_release }}
   get_url:
-    url: https://www.openssl.org/source/old/1.1.0/openssl-1.1.0g.tar.gz
-    dest: /tmp/openssl-1.1.0g.tar.gz
+    url: https://github.com/openssl/openssl/archive/OpenSSL_{{ converted_openssl_latest_release.stdout }}.tar.gz
+    dest: /tmp/openssl-{{ openssl_latest }}.tar.gz
     force: no
     mode: 0755
     validate_certs: no
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
-  tags: openssl
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
 
-- name: Extract OpenSSL v1.1.0g
+- name: Extract OpenSSL {{ openssl_latest_release }}
   unarchive:
-    src: /tmp/openssl-1.1.0g.tar.gz
+    src: /tmp/openssl-{{ openssl_latest }}.tar.gz
     dest: /tmp
     copy: False
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
-  tags: openssl
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
 
-# when running OpenJ9 for JITaaS
-# /usr/local/openssl-1.1.0 to be added to The PATH
-# /usr/local/openssl-1.1.0/lib64 (on CentOS, RHEL) or
-# /usr/local/openssl-1.1.0/lib (on Ubuntu) to be added to LD_LIBRARY_PATH
-- name: Build and install OpenSSL v1.1.0g
-  shell: cd /tmp/openssl-1.1.0g && ./config --prefix=/usr/local/openssl-1.1.0 && make && make install
+- name: Build and install OpenSSL {{ openssl_latest_release }}
+  shell: cd /tmp/openssl-OpenSSL_{{ converted_openssl_latest_release.stdout }} && ./config --prefix=/usr/local/openssl-{{ openssl_latest_release }} --openssldir=/usr/local/openssl-{{ openssl_latest_release }} && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
-  tags: openssl
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
 
-- name: Remove downloaded packages for OpenSSL v1.1.0g
+# clean up
+
+- name: Remove downloaded packages for OpenSSL {{ openssl_latest_release }}
   file:
     path: "{{ item }}"
     state: absent
   with_items:
-    - /tmp/openssl-1.1.0g.tar.gz
-    - /tmp/openssl-1.1.0g
-  ignore_errors: yes
+    - /tmp/openssl-{{ openssl_latest }}.tar.gz
+    - /tmp/openssl-OpenSSL_{{ converted_openssl_latest_release.stdout }}
+  ignore_errors: True
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.1.0', operator='lt', strict=True))))
-  tags: openssl
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Remove old OpenSSL versions
+  shell: find /usr/local/ -type d -name openssl-\* | grep -v {{ openssl_latest_release }} | xargs rm -fr
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+# add to PATH
+
+- name: Set OpenSSL path command on CentOS or RHEL
+  set_fact:
+    path_commad: pathmunge /usr/local/openssl-{{ openssl_latest_release }}/bin
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Set OpenSSL path command on SLES or Ubuntu
+  set_fact:
+    path_commad: export PATH=/usr/local/openssl-{{ openssl_latest_release }}/bin:$PATH
+  when:
+    - (ansible_distribution == "SLES" or ansible_distribution == "Ubuntu")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- debug: var=path_commad
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Remove /etc/profile.d/openssl*.sh
+  shell: find /etc/profile.d/ -type f -name openssl\*.sh | grep -v {{ openssl_latest_release }} | xargs rm -f
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  ignore_errors: True
+  tags: openssl-1.1.1
+
+- name: Create /etc/profile.d/openssl-{{ openssl_latest_release }}.sh
+  copy:
+    dest: /etc/profile.d/openssl-{{ openssl_latest_release }}.sh
+    content: "{{ path_commad }}"
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+# configure link libraries
+
+- name: Remove /etc/ld.so.conf.d/openssl*.conf
+  shell: find /etc/ld.so.conf.d/ -type f -name openssl\*.conf | grep -v {{ openssl_latest_release }} | xargs rm -f
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  ignore_errors: True
+  tags: openssl-1.1.1
+
+- name: Create /etc/ld.so.conf.d/openssl-{{ openssl_latest_release }}.conf
+  copy:
+    dest: /etc/ld.so.conf.d/openssl-{{ openssl_latest_release }}.conf
+    content: /usr/local/openssl-{{ openssl_latest_release }}/lib
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Rebuild linker cache
+  command: ldconfig
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+# settings for the Jenkins agent
+# add OpenSSL-1.1.1b to PATH using ssh client environment
+
+- name: Create SSH environement for Jenkins user
+  file:
+    path: /home/{{ Jenkins_Username }}/.ssh/environment
+    state: touch
+    owner: "{{ Jenkins_Username }}"
+    mode: 0644
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Add OpenSSL-1.1.1b to Jenkins user's environement
+  shell: echo PATH=/usr/local/openssl-1.1.1b/bin:$PATH > /home/{{ Jenkins_Username }}/.ssh/environment
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags:
+    - openssl
+    - skip_ansible_lint
+
+- name: Enable user environment in the OpenSSH daemon configuration file
+  replace:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitUserEnvironment no'
+    replace: 'PermitUserEnvironment yes'
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Set OpenSSL daemon reload command on CentOS and RHEL
+  set_fact:
+    reload_openssl_cmd: service sshd reload
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Set OpenSSL daemon reload command on Ubuntu
+  set_fact:
+    reload_openssl_cmd: /etc/init.d/ssh reload
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Set OpenSSL daemon reload command on SLES
+  set_fact:
+    reload_openssl_cmd: rcsshd reload
+  when:
+    - ansible_distribution == "SLES"
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1
+
+- name: Reload the OpenSSH daemon configuration
+  command: "{{ reload_openssl_cmd }}"
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - ansible_architecture == "x86_64"
+    - openssl_version.stdout == ''
+  tags: openssl-1.1.1

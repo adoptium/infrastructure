@@ -45,7 +45,6 @@
     - adoptopenjdk10              # JDK11 build bootstrap
     - adoptopenjdk11              # JDK12 build bootstrap
     - adoptopenjdk12              # JDK13 build bootstrap
-    - OpenSSL                     # OpenJ9
     - role: local_srcinstall
       src_tarball: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
       installed_target: /usr/local/bin/protoc
