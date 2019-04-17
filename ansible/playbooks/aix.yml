@@ -465,78 +465,132 @@
           when: does_X11_adt_ext_exist.rc != 0
           tags: x11
 
-      ############
-      # IBM XL C #
-      ############
-        - name: Checking for XLC availability
+      ###################
+      # IBM XL C 13.1.3 #
+      ###################
+        - name: Checking for XLC13 availability
           stat:
-            path: /usr/bin/xlc
-          register: xlc
-          tags: xlc
+            path: /opt/IBM/xlC/13.1.3/bin/xlc
+          register: xlc13
+          tags: xlc13
 
         - debug:
-            msg: "xlc installed, skipping download and installation"
-          when: xlc.stat.islnk is defined
-          tags: xlc
+            msg: "xlc13 installed, skipping download and installation"
+          when: xlc13.stat.islnk is defined
+          tags: xlc13
 
-        - name: Transfer and Extract XLC
+        - name: Transfer and Extract XLC13
           unarchive:
             src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
             dest: /tmp
             remote_src: no
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
-        - name: Install IBM XL C - installp
-          command: installp -aXYgd /tmp/usr/sys/inst.images all
+        - name: Install IBM XLC13 - installp
+          command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
           register: result.xlc
           ignore_errors: yes
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
 
         - debug: msg='Erorrs from the previous installp command normal'
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
-        - name: TestIBM XL C
+        - name: TestIBM XLC13
           command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
-          register: xlc_qversion
-          tags: xlc
+          register: xlc13_qversion
+          tags: xlc13
 
-        - name: Display XL C qversion information
+        - name: Display XLC13 qversion information
           debug:
-            msg: "{{ xlc_qversion.stdout }}"
-          tags: xlc
+            msg: "{{ xlc13_qversion.stdout }}"
+          tags: xlc13
 
         - name: Symlink - /usr/bin/xlc
           file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - name: Symlink - /usr/bin/xlc++
           file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - name: Symlink - /usr/bin/xlC
           file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - name: Symlink - /usr/bin/xlc_r
           file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - name: Symlink - /usr/bin/xlC_r
           file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - name: Symlink - /usr/bin/gxlC
           file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
-          when: xlc.stat.islnk is not defined
-          tags: xlc
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Clean XLC13 tmp files
+          file:
+            path: /tmp/usr
+            state: absent
+          tags: xlc13
+
+      ###################
+      # IBM XL C 16.1.0 #
+      ###################
+        - name: Checking for XLC16 availability
+          stat:
+            path: /opt/IBM/xlc/16.1.0/bin/xlc
+          register: xlc16
+          tags: xlc16
+
+        - debug:
+            msg: "xlc16 installed, skipping download and installation"
+          when: xlc16.stat.islnk is defined
+          tags: xlc16
+
+        - name: Transfer and Extract XLC16
+          unarchive:
+            src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+            dest: /tmp
+            remote_src: no
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - name: Install IBM XLC16 - installp
+          command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+          register: result.xlc
+          ignore_errors: yes
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - debug: msg='Erorrs from the previous installp command normal'
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - name: TestIBM XLC16
+          command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
+          register: xlc16_qversion
+          tags: xlc16
+
+        - name: Display XLC16 qversion information
+          debug:
+            msg: "{{ xlc16_qversion.stdout }}"
+          tags: xlc16
+
+        - name: Clean XLC16 tmp files
+          file:
+            path: /tmp/usr
+            state: absent
+          tags: xlc16
 
       ###############
       #     ant     #
