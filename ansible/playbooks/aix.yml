@@ -9,8 +9,8 @@
   become: yes
   environment:
     PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
-    PERL_MB_OPT: "--install_base /opt/freemarker"
-    PERL_MM_OPT: "INSTALL_BASE=/opt/freemarker"
+    PERL_MB_OPT: "--install_base /opt/freeware"
+    PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
   vars:
     swap_size: 4096
 
