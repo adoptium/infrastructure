@@ -15,7 +15,7 @@ install:
   # Install ansible
   - pip install ansible
   - pip install yamllint==1.13.0
-  - pip install ansible-lint==3.5.1
+  - pip install ansible-lint==4.1.0
 
   # Check ansible version
   - ansible --version
