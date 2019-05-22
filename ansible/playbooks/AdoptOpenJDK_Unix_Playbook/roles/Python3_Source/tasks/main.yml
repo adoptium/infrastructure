@@ -1,0 +1,83 @@
+---
+##############
+# Python3_Source #
+##############
+- name: Test if python3 is installed on path
+  shell: python3 --version >/dev/null
+  ignore_errors: yes
+  register: python3_installed
+  tags:
+    - python3_source
+
+- name: Ensure zlib1g and libffi-dev is installed on Ubuntu before compiling python3
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - zlib1g
+      - zlib1g-dev
+      - libffi-dev
+  when:
+    - (ansible_distribution == "Ubuntu")
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Ensure zlib-devel and libffi-devel-gcc5 is installed on SLES before compiling python3
+  zypper:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - zlib-devel
+      - libffi-devel-gcc5
+  when:
+    - (ansible_distribution == "SLES")
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Ensure zlib-devel and libffi-devel is installed on CentOS or RedHat before compiling python3
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - zlib-devel
+      - libffi-devel
+  when:
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Download Python3 source
+  get_url:
+    url: https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz
+    dest: /tmp/Python-3.7.3.tar.xz
+    mode: 0440
+  when:
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Extract Python3 source
+  unarchive:
+    src: /tmp/Python-3.7.3.tar.xz
+    dest: /tmp/
+    copy: False
+  when:
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Compile and install python3 from source
+  shell: cd /tmp/Python-3.7.3 && ./configure --prefix=/usr/local && make && make install
+  become: yes
+  when:
+    - (python3_installed.rc != 0 )
+  tags: python3_source
+
+- name: Clean Python Source Install Files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/Python-3.7.3.tar.xz
+    - /tmp/Python-3.7.3
+  when:
+    - (python3_installed.rc != 0 )
+  tags: python3_source
