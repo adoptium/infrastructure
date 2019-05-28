@@ -30,7 +30,6 @@
     - cmake                       # OpenJ9 / OpenJFX
     - gmake
     - Docker                      # Testing
-    - NVidia_Cuda_Toolkit         # OpenJ9
     - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
