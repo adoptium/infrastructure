@@ -28,22 +28,11 @@
   when: (java8_installed.stat.exists == false)
   tags: Java8
 
-- name: Test if Java 8 symlink is already created
-  win_stat:
-    path: 'C:\openjdk\jdk-8'
-  register: java8_symlink
-  tags: Java8
-
-- name: Get Java 8 Folder name to create symlink
-  win_shell: powershell ([Environment]::SetEnvironmentVariable("Java8_Folder", (Get-ChildItem -Path 'C:\Program Files\Java\jdk8*' | Select-String -Pattern 'C*'), "Machine"))
-  when: (java8_symlink.stat.exists == false)
-  tags: Java8
-
-- name: Create symlink to Java 8
-  win_shell: New-Item -Path 'C:\openjdk\jdk-8' -ItemType SymbolicLink -Value ([Environment]::GetEnvironmentVariable("Java8_Folder", "Machine"))
+- name: Create symlink to directory without spaces if not already there
+  win_shell: for /D %a in ("C:\Program Files\Java\jdk8*") do IF NOT EXIST "C:\openjdk\jdk-8" MKLINK /D "C:\openjdk\jdk-8" "%a"
   args:
-    executable: powershell
-  when: (java8_symlink.stat.exists == false)
+    executable: cmd.exe
+    creates: 'C:\openjdk\jdk-8'
   tags: Java8
 
 - name: Set JAVA_HOME to version 8
