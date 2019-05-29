@@ -80,8 +80,10 @@
     state: absent
   tags: cygwin
 
+# NOTE: This construct is because an SQL Server entry is being added to
+# the path which has an erroneous quote in it which causes problems for SETX
 - name: Add c:\cygwin64\bin to front of %PATH%
-  win_shell: 'setx /M PATH "C:\cygwin64\bin;%PATH%"'
+  win_shell: 'setx /M PATH "C:\cygwin64\bin;%PATH:\"=%"'
   args:
     executable: cmd
   tags:
