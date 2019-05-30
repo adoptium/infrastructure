@@ -27,7 +27,6 @@
     - Ant-Contrib                 # Testing
     - GIT_Source
     - CPAN
-    - cmake                       # OpenJ9 / OpenJFX
     - gmake
     - Docker                      # Testing
     - Superuser                   # AdoptOpenJDK Infrastructure
@@ -36,6 +35,7 @@
     - NTP_TIME
     - gcc_48
     - gcc_7                       # OpenJ9
+    - cmake                       # OpenJ9 / OpenJFX
     - role: local_srcinstall
       src_tarball: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
       installed_target: /usr/local/bin/ccache
