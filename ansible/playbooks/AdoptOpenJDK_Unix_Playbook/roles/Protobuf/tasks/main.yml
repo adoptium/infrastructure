@@ -64,7 +64,7 @@
   tags: protobuf
 
 - name: Build and install Protocol Buffers v3.5.1
-  shell: cd /tmp/protobuf-3.5.1 && ./configure && make && make install && ldconfig
+  shell: cd /tmp/protobuf-3.5.1 && ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC && make && make install && ldconfig
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
