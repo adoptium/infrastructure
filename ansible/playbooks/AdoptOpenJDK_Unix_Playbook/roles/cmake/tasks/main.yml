@@ -1,13 +1,7 @@
 ---
-#########
-# cmake #
-#########
-
-# Conditions:
-# Check if cmake is installed when ansible_architecture is x86_64 or ppc64le.
-# If so cmake_installed.rc will equal 0, then test if cmake is at the correct version level.
-# If cmake_installed.rc does NOT equal 0 (not installed) or if cmake_installed.rc equals 0 (installed) and its at a lower version than 3.11.4 then...
-# Process with downloing and installing cmake
+############################################################################
+# cmake  - required by OpenJ9 and OpenJFX builds - requires C++11 compiler #
+############################################################################
 
 - name: Test if cmake is installed on path
   shell: cmake >/dev/null 2>&1
@@ -45,8 +39,9 @@
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
   tags: cmake
 
+# NOTE: PATH setting is for RHEL6/CentOS6 since gcc 4.4.7 is not C++11 compliant
 - name: Running ./configure & make for cmake
-  shell: cd /tmp/cmake-3.11.4 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/cmake-3.11.4 && ./configure && PATH=/opt/gcc-4.8.5/bin:$PATH make -j {{ ansible_processor_vcpus }} && make install
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
