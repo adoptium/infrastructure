@@ -1,0 +1,44 @@
+---
+###################################
+# AdoptOpenJDK - Ansible Playbook #
+###################################
+- hosts: "{{ groups['Vendor_groups'] | default('localhost:infra') }}"
+  gather_facts: yes
+  tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - Version
+    - name: Install packages for java and git
+      action: apt pkg={{item}} state=installed
+      with_items:
+        - openjdk-8-jre-headless
+        - hg
+        - git
+    - name: Create /usr/local/bin
+      file: path=/usr/local/bin state=directory
+    - name: Download git-remote-hg
+      get_url:
+        url: https://raw.github.com/felipec/git-remote-hg/master/git-remote-hg
+        dest: /usr/local/bin/git-remote-hg
+        mode: 0555
+    - Jenkins_User                # AdoptOpenJDK Infrastructure
+    - Superuser                   # AdoptOpenJDK Infrastructure
+    - Swap_File
+    - Crontab
+    - NTP_TIME
+    - Nagios_Plugins              # AdoptOpenJDK Infrastructure
+    - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
+    - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
+    - Clean_Up
+    - Security
+    - Vendor
