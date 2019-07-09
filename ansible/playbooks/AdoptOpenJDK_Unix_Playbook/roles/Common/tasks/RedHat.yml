@@ -84,7 +84,7 @@
 - name: Install Java (Not RedHat 6 on ppc64)
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
-  when: (ansible_distribution_major_version != "6" and ansible_architecture != "ppc64")
+  when: not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
@@ -95,7 +95,7 @@
 # Set default Java #
 ####################
 - name: Set default java version - RHEL 6 x86_64
-  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-ibm.x86_64/bin/java
+  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
   when:
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
