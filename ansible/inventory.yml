@@ -19,6 +19,9 @@ hosts:
       - softlayer:
           ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
 
+      - godaddy:
+          ubuntu1604-x64-1: {ip: 160.153.247.225, description: git-hg/load relief for jenkins master}
+
   - build:
 
       - azure:
