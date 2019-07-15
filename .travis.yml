@@ -24,7 +24,7 @@ script:
   - cd ansible
 
     # Check that the inventory is valid
-  - ansible-inventory --host=build-cloudcone-ubuntu1604-x64-1
+  - ansible-inventory --host=build-marist-rhel74-s390x-1
 
     # Check YAML validity
   - yamllint -c yamllint.yml .
