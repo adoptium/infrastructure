@@ -76,6 +76,12 @@ hosts:
           win2012r2-x64-2: {ip: 40.121.164.56, user: adoptopenjdk}
           win2012r2-x64-3: {ip: 13.68.219.237, user: adoptopenjdk}
 
+      - godaddy:
+          win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
+          win2016-x64-2: {ip: 160.153.234.5,  user: adoptopenjdk}
+          win2016-x64-3: {ip: 160.153.234.8,  user: adoptopenjdk}
+          win2016-x64-4: {ip: 160.153.234.22, user: adoptopenjdk}
+
       - osuosl:
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
