@@ -27,9 +27,6 @@ hosts:
       - azure:
           win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
 
-      - cloudcone:
-          ubuntu1604-x64-1: {ip: 173.82.219.221}
-
       - digitalocean:
           centos69-x64-1: {ip: 159.65.95.239}
 
