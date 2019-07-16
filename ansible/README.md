@@ -2,6 +2,8 @@
 
 # Quickstart Guide
 
+To test the ansible scripts, you'll need to install the following programs.
+
 For macOS:
 
 1) Install Homebrew 2.1.7 or later
