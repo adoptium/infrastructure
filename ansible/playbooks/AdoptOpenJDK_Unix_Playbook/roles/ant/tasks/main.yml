@@ -41,7 +41,18 @@
     group: root
     state: link
   when:
-    - ant_installed.rc != 0
+    - ant_installed.rc != 0 and not os|startswith("macos")
+  tags: ant
+
+- name: Create /usr/local/bin/ant symlink macOS
+  file:
+    src: /usr/local/apache-ant-1.10.5/bin/ant
+    dest: /usr/local/bin/ant
+    owner: admin
+    group: wheel
+    state: link
+  when:
+    - ant_installed.rc != 0 and os|startswith("macos")
   tags: ant
 
 - name: Clean up downloaded packages

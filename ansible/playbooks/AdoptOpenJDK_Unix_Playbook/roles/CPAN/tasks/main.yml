@@ -8,8 +8,9 @@
   shell: "curl -L https://cpanmin.us | perl - App::cpanminus"
   ignore_errors: yes
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or (ansible_distribution == "SLES") or os|startswith("macos")
   tags:
+    - cpan
     - test_tools
     - skip_ansible_lint
     #TODO: curl used in place of get_url or uri module
@@ -20,11 +21,13 @@
     state: installed
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-  tags: test_tools
+  tags:
+    - cpan
+    - test_tools
 
 # All
 - name: Install JSON
-  command: cpanm --with-recommends JSON
+  command: cpanm --with-recommends --sudo JSON
   tags:
     - cpan
     - json
@@ -32,7 +35,7 @@
     - skip_ansible_lint
 
 - name: Install Text::CSV
-  command: cpanm --with-recommends Text::CSV
+  command: cpanm --with-recommends --sudo Text::CSV
   tags:
     - cpan
     - text_csv
@@ -40,7 +43,7 @@
     - skip_ansible_lint
 
 - name: Install XML::Parser
-  command: cpanm --with-recommends XML::Parser
+  command: cpanm --with-recommends --sudo XML::Parser
   tags:
     - cpan
     - xml_parser
