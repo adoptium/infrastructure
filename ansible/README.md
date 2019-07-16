@@ -1,5 +1,24 @@
 # Ansible playbooks to download and install dependencies for OpenJDK on various platforms
 
+# Quickstart Guide
+
+To test the ansible scripts, you'll need to install the following programs.
+
+For macOS:
+
+1) Install Homebrew 2.1.7 or later
+  ```bash
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  ```
+2) Install Vagrant 2.2.5 or later
+  ```bash
+  brew cask install vagrant
+  ```
+3) Install Virtualbox 6.0.8 or later:
+  ```bash
+  brew cask install virtualbox
+  ```
+ 
 # Running via Vagrant and VirtualBox
 
 To test the ansible scripts you can set up a Virtual Machine isolated from your own local system.
