@@ -10,8 +10,8 @@ PROD=$(softwareupdate -l |
   grep "\*.*Command Line" |
   head -n 1 | awk -F"*" '{print $2}' |
   sed -e 's/^ *//' |
-tr -d '\n')
-softwareupdate -i "$PROD";
+  tr -d '\n')
+  softwareupdate -i "$PROD";
 fi
 
 # Installing the latest Xcode command line tools on 10.7.x and 10.8.x
