@@ -102,7 +102,7 @@ Yes, in order to access the package repositories (we will perform either `yum in
 As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
 You can do this by following these steps:
 
-  1. Copy and paste the existing directory you have.
+  1. Make a copy of the existing directory you have.
   2. The "vagrantfile" is an alias to the vagrantfile that is labelled with the desired OS. Replace this so it is an alias of the OS you want. (default OS is CentOS)
   3. Continue the vagrant functions as normal.
 
