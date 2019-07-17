@@ -2,7 +2,7 @@
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
+- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
     - block:

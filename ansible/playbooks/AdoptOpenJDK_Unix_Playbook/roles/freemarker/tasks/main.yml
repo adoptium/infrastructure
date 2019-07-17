@@ -21,5 +21,10 @@
 
 - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
   command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-  when: freemarker.stat.exists == False
+  when: freemarker.stat.exists == False and not os|startswith("macos")
+  tags: [freemarker, adoptopenjdk]
+
+- name: Move freemarker.jar to /Users/{{ Jenkins_Username }} folder (macOS)
+  command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /Users/{{ Jenkins_Username }}
+  when: freemarker.stat.exists == False and os|startswith("macos")
   tags: [freemarker, adoptopenjdk]

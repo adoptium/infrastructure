@@ -39,14 +39,14 @@
 - name: Superuser account policy - expire date
   command: chage -E -1 zeus
   when:
-    - Superuser_Account == "Enabled"
-    - ansible_distribution != "FreeBSD"
+    - Superuser_Account == "Enabled" and not os|startswith("macos")
+    - ansible_distribution != "FreeBSD" and not os|startswith("macos")
 
   tags: [superuser, adoptopenjdk]
 
 - name: Superuser account policy - max days
   command: chage -M -1 zeus
   when:
-    - Superuser_Account == "Enabled"
-    - ansible_distribution != "FreeBSD"
+    - Superuser_Account == "Enabled" and not os|startswith("macos")
+    - ansible_distribution != "FreeBSD" and not os|startswith("macos")
   tags: [superuser, adoptopenjdk]
