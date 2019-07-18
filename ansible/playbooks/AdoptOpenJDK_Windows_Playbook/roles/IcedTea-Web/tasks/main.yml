@@ -1,0 +1,32 @@
+---
+###############
+# IcedTea-Web #
+###############
+
+- name: Check if IcedTea-Web 1.8.2 is already downloaded
+  win_stat:
+    path: 'C:\temp\icedteaWEB182.msi'
+  register: icedteaweb_download
+  tags: IcedTea-Web
+
+- name: Check if IcedTea-Web 1.8.2 is already installed
+  win_stat:
+    path: 'C:\Program Files\IcedTeaWEB'
+  register: icedteaweb_install
+  tags: IcedTea-Web
+
+- name: Download IcedTea-Web 1.8.2
+  win_get_url:
+    url: https://github.com/AdoptOpenJDK/IcedTea-Web/releases/download/icedtea-web-1.8.2/icedtea-web-1.8.2.msi
+    dest: 'C:\temp\icedteaWEB182.msi'
+  when: (icedteaweb_download.stat.exists == false) and (icedteaweb_install.stat.exists == false)
+  tags: IcedTea-Web
+
+- name: Install IcedTea-Web 1.8.2
+  win_package:
+    path: 'C:\temp\icedteaWEB182.msi'
+    creates_path: 'C:\Program Files\IcedTeaWeb\WebStart\bin\javaws.exe'
+    state: present
+    arguments: /l* C:\temp\icedteaweb.log /quiet INSTALLDIR="C:\Program Files\IcedTeaWEB"
+  when: (icedteaweb_install.stat.exists == false)
+  tags: IcedTea-Web
