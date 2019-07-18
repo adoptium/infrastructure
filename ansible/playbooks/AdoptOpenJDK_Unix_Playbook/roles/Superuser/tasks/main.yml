@@ -25,7 +25,7 @@
     state: present
     key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
   when: Superuser_Account == "Enabled"
-  tags: [superuser, adoptopenjdk]
+  tags: [superuser, superuser_authorized_key, adoptopenjdk]
 
 - name: Grant Superuser sudo powers
   lineinfile:
@@ -39,14 +39,14 @@
 - name: Superuser account policy - expire date
   command: chage -E -1 zeus
   when:
-    - Superuser_Account == "Enabled" and not os|startswith("macos")
-    - ansible_distribution != "FreeBSD" and not os|startswith("macos")
+    - Superuser_Account == "Enabled" and (ansible_distribution != "MacOSX")
+    - ansible_distribution != "FreeBSD" and (ansible_distribution != "MacOSX")
 
   tags: [superuser, adoptopenjdk]
 
 - name: Superuser account policy - max days
   command: chage -M -1 zeus
   when:
-    - Superuser_Account == "Enabled" and not os|startswith("macos")
-    - ansible_distribution != "FreeBSD" and not os|startswith("macos")
+    - Superuser_Account == "Enabled" and (ansible_distribution != "MacOSX")
+    - ansible_distribution != "FreeBSD" and (ansible_distribution != "MacOSX")
   tags: [superuser, adoptopenjdk]
