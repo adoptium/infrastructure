@@ -78,8 +78,8 @@ hosts:
 
       - godaddy:
           win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
-          win2016-x64-2: {ip: 160.153.234.5,  user: adoptopenjdk}
-          win2016-x64-3: {ip: 160.153.234.8,  user: adoptopenjdk}
+          win2016-x64-2: {ip: 160.153.234.5, user: adoptopenjdk}
+          win2016-x64-3: {ip: 160.153.234.8, user: adoptopenjdk}
           win2016-x64-4: {ip: 160.153.234.22, user: adoptopenjdk}
 
       - osuosl:
