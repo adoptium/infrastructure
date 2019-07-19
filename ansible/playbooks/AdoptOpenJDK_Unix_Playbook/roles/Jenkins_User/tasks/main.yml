@@ -41,7 +41,7 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: not os|startswith("macos")
+  when: (ansible_distribution != "MacOSX")
 
 - name: Unset expiry on user account for Redhat for root
   command: chage -M -1 -E -1 root
@@ -50,4 +50,4 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: not os|startswith("macos")
+  when: (ansible_distribution != "MacOSX")

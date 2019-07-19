@@ -35,7 +35,7 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: Domain == "adoptopenjdk.net" and not os|startswith("macos")
+  when: Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
   tags: hostname
 
 - name: Set hostname to inventory_hostname (macOS)
@@ -44,7 +44,7 @@
     - "sudo scutil --set HostName {{ inventory_hostname }}.adoptopenjdk.net"
     - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
     - "dscacheutil -flushcache"
-  when: Domain == "adoptopenjdk.net" and os|startswith("macos")
+  when: Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
 
 #####################
 # Update /etc/hosts #
