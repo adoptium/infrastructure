@@ -57,3 +57,4 @@
     - OpenSSL                     # OpenJ9
     - nasm                        # OpenJ9
     - Rust                        # IcedTea-Web
+    - IcedTea-Web                 # For Jenkins webstart
