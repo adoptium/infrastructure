@@ -6,15 +6,15 @@ To test the ansible scripts, you'll need to install the following programs.
 
 For macOS:
 
-1) Install Homebrew 2.1.7 or later
+1. Install Homebrew 2.1.7 or later
   ```bash
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   ```
-2) Install Vagrant 2.2.5 or later
+2. Install Vagrant 2.2.5 or later
   ```bash
   brew cask install vagrant
   ```
-3) Install Virtualbox 6.0.8 or later:
+3. Install Virtualbox 6.0.8 or later:
   ```bash
   brew cask install virtualbox
   ```
@@ -96,6 +96,17 @@ Yes, in order to access the package repositories (we will perform either `yum in
     ```
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
+
+## Can I have multiple VMs on different OSs?
+
+As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
+You can do this by following these steps:
+
+  1. Make a copy of the existing directory you have.
+  2. The "vagrantfile" is an alias to the vagrantfile that is labelled with the desired OS. Replace this so it is an alias of the OS you want. (default OS is CentOS)
+  3. Continue the vagrant functions as normal.
+
+To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into. 
 
 ## Which playbook do I run?
 
