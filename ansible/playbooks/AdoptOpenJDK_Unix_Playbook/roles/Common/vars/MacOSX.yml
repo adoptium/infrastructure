@@ -1,0 +1,21 @@
+---
+##########
+# macOS #
+##########
+
+# Command Build Tool Packages
+
+Build_Tool_Packages:
+  - gnu-tar
+  - wget
+
+Build_Tool_Casks:
+  - adoptopenjdk8
+
+Test_Tool_Packages:
+  - mercurial
+  - pulseaudio
+  - cpanminus
+
+Test_Tool_Casks:
+  - xquartz
