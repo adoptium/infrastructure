@@ -86,6 +86,7 @@
 ##############################
 # OS setup and configuration #
 ##############################
+# If this errors, upgrade ansible to >=2.4
 - name: Perform OS setup and configuration
   include_tasks: "{{ ansible_distribution }}.yml"
   tags: main
