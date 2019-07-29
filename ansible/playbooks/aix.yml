@@ -167,7 +167,7 @@
             update_cache: yes
             name: '*'
             state: latest
-            exclude: curl*
+            exclude: curl*, python-pycurl*
           tags:
             - yum
             #TODO: Package installs should not use latest
