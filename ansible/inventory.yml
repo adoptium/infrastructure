@@ -25,7 +25,8 @@ hosts:
   - build:
 
       - azure:
-          win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
+          win2008r2-x64-1: {ip: 13.90.22.129, user: adoptopenjdk}
+          win2008r2-x64-2: {ip: 13.82.55.70, user: adoptopenjdk}
 
       - digitalocean:
           centos69-x64-1: {ip: 159.65.95.239}
