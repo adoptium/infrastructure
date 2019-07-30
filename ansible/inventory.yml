@@ -39,6 +39,8 @@ hosts:
       - macstadium:
           macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
+          macos1012-x64-1: {ip: 207.254.28.22, user: Administrator}
+          macos1012-x64-2: {ip: 207.254.71.42, user: Administrator}
 
       - marist:
           rhel74-s390x-1: {ip: 148.100.110.129}
@@ -128,10 +130,6 @@ hosts:
           win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
 
   - jck:
-
-      - macstadium:
-          macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
-          macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
 
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}

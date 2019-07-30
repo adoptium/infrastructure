@@ -6,11 +6,14 @@
 # Command Build Tool Packages
 
 Build_Tool_Packages:
+  - autoconf
+  - coreutils
   - gnu-tar
   - wget
 
 Build_Tool_Casks:
   - adoptopenjdk8
+  - adoptopenjdk11
 
 Test_Tool_Packages:
   - mercurial
