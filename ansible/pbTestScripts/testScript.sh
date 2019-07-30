@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
-#takes all arguments from the script
+
+# Takes all arguments from the script
 processArgs() 
 {
 	if [ $# -lt 2 ]; then
@@ -18,8 +19,8 @@ setupFiles()
 	mkdir -p logFiles || true
 }
 
-#Takes in git URL as arg 1, foldername as arg 2
-setupGit()	
+# Takes in git URL as arg 1, foldername as arg 2
+setupGit()
 {
 	cd ~/adoptopenjdkPBTests
 	if [ ! -d "$2" ]; then		#if folder doesn't exist
@@ -36,8 +37,8 @@ testBuild()
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
 
-#Takes the OS as arg 1, foldername as arg 2
-startVMPlaybook()	
+# Takes the OS as arg 1, foldername as arg 2
+startVMPlaybook()
 {
 	cd ~/adoptopenjdkPBTests/$2/ansible
 	ln -sf Vagrantfile.$1 Vagrantfile	#Alias the correct vagrant file
@@ -55,8 +56,8 @@ destroyVM()
 	vagrant destroy -f
 }
 
-#Takes in OS as arg 1
-searchLogFiles() 
+# Takes in OS as arg 1
+searchLogFiles()
 {
 	cd ~/adoptopenjdkPBTests/logFiles
 	if grep -q 'failed=[1-9]' *$1.log 
@@ -76,7 +77,7 @@ processArgs $*
 setupFiles 
 setupGit $1 $folderName
 
-#For all tested OSs / Playbooks
+# For all tested OSs / Playbooks
 for OS in Ubuntu1804 Ubuntu1604 CentOS6		
 do 	
 	startVMPlaybook $OS $folderName
@@ -89,6 +90,4 @@ for OS in Ubuntu1804 Ubuntu1604 CentOS6
 do
 	searchLogFiles $OS
 done
-
-	
 
