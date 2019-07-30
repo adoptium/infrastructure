@@ -70,7 +70,7 @@
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
     - ansible_architecture != "s390x"
     - ansible_distribution != "FreeBSD"
-    - ! (( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
+    - not(( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
   tags: git_source
 
 - name: Compile and install git from source on s390x
