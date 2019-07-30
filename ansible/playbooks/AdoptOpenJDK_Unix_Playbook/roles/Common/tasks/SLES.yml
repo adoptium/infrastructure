@@ -61,16 +61,16 @@
   register: zlib_status
   tags: zlib
 
-- name: Download Zlib - SLES 11 PPC64
+- name: Download Zlib
   get_url:
-    url: https://www.zlib.net/zlib-1.2.11.tar.gz
+    url: http://www.zlib.net/zlib-1.2.11.tar.gz
     dest: /tmp/zlib-1.2.11.tar.gz
     mode: 0440
   when:
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
-- name: Extract Zlib - SLES 11 PPC64
+- name: Extract Zlib
   unarchive:
     src: /tmp/zlib-1.2.11.tar.gz
     dest: /tmp
@@ -79,10 +79,19 @@
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
-- name: Running ./configure & make for Zlib - SLES 11 PPC64
+- name: Running ./configure & make for Zlib on Linux x86-64 or PPC64LE
   shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
+    - ansible_architecture != "s390x"
+    - zlib_status.stat.islnk is not defined
+  tags: zlib
+
+- name: Running ./configure & make for Zlib on Linux s390x
+  shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_cores }} && make install
+  become: yes
+  when:
+    - ansible_architecture == "s390x"
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
