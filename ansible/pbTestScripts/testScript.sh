@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
-processArgs() #takes all arguments from the script
+#takes all arguments from the script
+processArgs() 
 {
 	if [ $# -lt 2 ]; then
 		printf "\nScript takes 2 input arguments\n"
@@ -8,6 +9,7 @@ processArgs() #takes all arguments from the script
 		exit 1
 	fi
 }
+
 setupFiles()
 {
 	cd ~					
@@ -15,7 +17,9 @@ setupFiles()
 	cd adoptopenjdkPBTests
 	mkdir -p logFiles || true
 }
-setupGit()	#Takes in git URL as arg 1, foldername as arg 2
+
+#Takes in git URL as arg 1, foldername as arg 2
+setupGit()	
 {
 	cd ~/adoptopenjdkPBTests
 	if [ ! -d "$2" ]; then		#if folder doesn't exist
@@ -25,27 +29,34 @@ setupGit()	#Takes in git URL as arg 1, foldername as arg 2
     		git pull $1
 	fi
 }
+
 testBuild()
 {
 	vagrant ssh -c "git clone https://github.com/AdoptOpenJDK/openjdk-build"
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
-startVMPlaybook()	#Takes the OS as arg 1, foldername as arg 2
+
+#Takes the OS as arg 1, foldername as arg 2
+startVMPlaybook()	
 {
 	cd ~/adoptopenjdkPBTests/$2/ansible
 	ln -sf Vagrantfile.$1 Vagrantfile	#Alias the correct vagrant file
 	vagrant  up
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$2.$1.log
+
 		# ^ Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
 	testBuild
 	vagrant halt
 }
+
 destroyVM()
 {
 	printf "Destroying Machine . . .\n"
 	vagrant destroy -f
 }
-searchLogFiles() #Takes in OS as arg 1
+
+#Takes in OS as arg 1
+searchLogFiles() 
 {
 	cd ~/adoptopenjdkPBTests/logFiles
 	if grep -q 'failed=[1-9]' *$1.log 
@@ -58,12 +69,15 @@ searchLogFiles() #Takes in OS as arg 1
 		printf "\n$1 playbook succeeded\n"
 	fi
 }
+
 # var1 = GitURL, var2 = y/n for VM retention
 folderName=${1##*/}
 processArgs $*
 setupFiles 
 setupGit $1 $folderName
-for OS in Ubuntu1804 Ubuntu1604 CentOS6		#For all tested OSs / Playbooks
+
+#For all tested OSs / Playbooks
+for OS in Ubuntu1804 Ubuntu1604 CentOS6		
 do 	
 	startVMPlaybook $OS $folderName
 	if [[ $2 = "n" ]]
