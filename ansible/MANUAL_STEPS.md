@@ -9,7 +9,10 @@ this requires `NOPASSWD` to be added to the sudoers file to enable elevation
 and change:
 `%admin          ALL = (ALL) ALL`
 to
-`%admin          ALL = (ALL) NOPASSWD:ALL`
+```
+%admin ALL=(ALL) NOPASSWD:ALL
+jenkins ALL=(ALL) NOPASSWD: /usr/bin/xcode-select
+```
 
 2. Allow ssh access
 
