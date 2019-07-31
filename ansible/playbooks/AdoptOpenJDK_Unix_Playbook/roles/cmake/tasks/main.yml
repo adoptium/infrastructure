@@ -3,6 +3,13 @@
 # cmake  - required by OpenJ9 and OpenJFX builds - requires C++11 compiler #
 ############################################################################
 
+- name: Set ansible_processor_vcpus
+  set_fact:
+    ansible_processor_vcpus: "{{ ansible_processor_cores }}"
+  when:
+    - ansible_architecture == "s390x"
+  tags: cmake
+
 - name: Test if cmake is installed on path
   shell: cmake >/dev/null 2>&1
   ignore_errors: yes
