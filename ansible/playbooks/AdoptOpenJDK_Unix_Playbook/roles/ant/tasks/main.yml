@@ -41,7 +41,7 @@
     group: root
     state: link
   when:
-    - ant_installed.rc != 0 and (ansible_distribution == "MacOSX")
+    - ant_installed.rc != 0 and (ansible_distribution != "MacOSX")
   tags: ant
 
 - name: Create /usr/local/bin/ant symlink macOS
