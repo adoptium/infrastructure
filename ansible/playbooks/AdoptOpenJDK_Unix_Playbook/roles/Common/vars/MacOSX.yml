@@ -19,6 +19,7 @@ Test_Tool_Packages:
   - mercurial
   - pulseaudio
   - cpanminus
+  - p7zip
 
 Test_Tool_Casks:
   - xquartz
