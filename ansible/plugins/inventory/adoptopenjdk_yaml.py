@@ -47,7 +47,7 @@ valid = {
   # providers - validated for consistency
   'provider': ('azure', 'joyent', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro',
-        'digitalocean', 'ibm', 'godaddy')
+        'digitalocean', 'ibm', 'godaddy', 'openlab')
 }
 
 # customisation options per host:
