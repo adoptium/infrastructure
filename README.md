@@ -52,7 +52,7 @@ a new member? Please follow our [Onboarding Process](ONBOARDING.md).
 
 Team that holds super user access to Infrastructure
 
-- [@gdams](https://github.com/gdams) - George Adams (IBM) - *
+- [@gdams](https://github.com/gdams) - George Adams (jClarity) - *
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC) - *
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
 
@@ -61,7 +61,7 @@ Team that holds super user access to Infrastructure
 Core infrastructure team - granted access to hosts on a case by case basis
 
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-- [@gdams](https://github.com/gdams) - George Adams (IBM)
+- [@gdams](https://github.com/gdams) - George Adams (jClarity)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
@@ -87,7 +87,7 @@ Issues can be assigned to these folks
 ## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
 -	[@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
-- [@gdams](https://github.com/gdams) - George Adams (IBM)
+- [@gdams](https://github.com/gdams) - George Adams (jClarity)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
