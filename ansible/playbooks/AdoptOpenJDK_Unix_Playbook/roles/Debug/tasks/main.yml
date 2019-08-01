@@ -2,6 +2,10 @@
 #####################
 # Debug Information #
 #####################
+- name: Fetch Debug Information
+  setup:
+  tags: debug
+
 - name: Display Debug Information
   debug:
     msg:

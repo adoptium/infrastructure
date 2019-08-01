@@ -3,7 +3,6 @@
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
 - hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
-  gather_facts: yes
   tasks:
     - block:
       # Set standard variables
@@ -16,6 +15,7 @@
   # Roles #
   #########
   roles:
+    - bootstrap
     - Debug
     - Version
     - Common
