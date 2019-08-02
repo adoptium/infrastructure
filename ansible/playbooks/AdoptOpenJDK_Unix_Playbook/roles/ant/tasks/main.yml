@@ -48,7 +48,7 @@
   file:
     src: /usr/local/apache-ant-1.10.5/bin/ant
     dest: /usr/local/bin/ant
-    owner: admin
+    owner: "{{ ansible_user }}"
     group: wheel
     state: link
   when:
