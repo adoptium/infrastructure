@@ -9,6 +9,7 @@ Build_Tool_Packages:
   - autoconf
   - coreutils
   - gnu-tar
+  - nasm
   - wget
 
 Build_Tool_Casks:
