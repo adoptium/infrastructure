@@ -7,7 +7,7 @@
 
 Build_Tool_Packages:
   - autoconf
-  - bash
+  - bash # OpenJ9 needs bash v4 or later
   - coreutils
   - gnu-tar
   - wget
