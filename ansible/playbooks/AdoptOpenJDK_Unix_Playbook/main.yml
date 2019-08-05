@@ -3,11 +3,23 @@
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
 - hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
+  pre_tasks:
+    - name: Check current directoty
+      local_action: stat path="{{ lookup('env', 'PWD') }}/ansible.cfg"
+      register: dir_check
+      tags: debug
+
+    - name: Exit if running from wrong directorys
+      fail: msg="It looks like you're running ansible from the wrong directory, make sure you're in the ansible directory!"
+      when: dir_check.stat.exists == false
+      tags: debug
+
   tasks:
     - block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
+
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
 
