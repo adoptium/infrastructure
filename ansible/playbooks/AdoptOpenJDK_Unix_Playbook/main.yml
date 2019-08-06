@@ -4,7 +4,7 @@
 ###################################
 - hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
   pre_tasks:
-    - name: Check current directoty
+    - name: Check current directory
       local_action: stat path="{{ lookup('env', 'PWD') }}/ansible.cfg"
       register: dir_check
       tags: debug
