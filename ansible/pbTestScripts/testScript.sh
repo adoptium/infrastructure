@@ -43,7 +43,7 @@ startVMPlaybook()
 	cd ~/adoptopenjdkPBTests/$2/ansible
 	#Alias the correct vagrant file
 	ln -sf Vagrantfile.$1 Vagrantfile
-	vagrant  up
+	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$2.$1.log
 	testBuild
