@@ -65,3 +65,19 @@
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Test_Tool_Casks }}"
   tags: test_tools
+
+# As per https://github.com/eclipse/openj9/issues/3790
+- name: Creating /etc/sysctl.conf for kernel tunings
+  file:
+    path: /etc/sysctl.conf
+    state: touch
+    mode: 0777
+    owner: root
+    group: wheel
+
+- name: Writing kernel tuning parameters to /etc/sysctl.conf
+  blockinfile:
+    path: /etc/sysctl.conf
+    block: |
+      kern.sysv.shmmax=314572800
+      kern.sysv.shmall=76800

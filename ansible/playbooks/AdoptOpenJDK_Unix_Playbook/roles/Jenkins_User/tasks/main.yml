@@ -25,6 +25,17 @@
     key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
   tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
 
+# As per https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/840
+- name: Set umask to 0002 (macOS)
+  lineinfile:
+    path: "/Users/{{ Jenkins_Username }}/.bashrc"
+    line: umask 0002
+    owner: "{{ Jenkins_Username }}"
+    group: wheel
+    create: yes
+  when: (ansible_distribution == "MacOSX")
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Add Jenkins user to the audio group
   user: name={{ Jenkins_Username }}
     groups=audio
