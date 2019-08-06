@@ -25,7 +25,7 @@
     key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
   tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
 
-# As per https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/840
+# As per https://github.com/eclipse/openj9/issues/4375
 - name: Set umask to 0002 (macOS)
   lineinfile:
     path: "/Users/{{ Jenkins_Username }}/.bashrc"
