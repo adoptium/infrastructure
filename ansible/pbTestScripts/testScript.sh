@@ -13,7 +13,7 @@ processArgs()
 
 setupFiles()
 {
-	cd ~					
+	cd ~
 	mkdir -p adoptopenjdkPBTests || true
 	cd adoptopenjdkPBTests
 	mkdir -p logFiles || true
@@ -31,19 +31,22 @@ setupGit()
 	fi
 }
 
+testBuild()
+{
+	vagrant ssh -c "git clone https://github.com/AdoptOpenJDK/openjdk-build"
+	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
+}
+
 # Takes the OS as arg 1, foldername as arg 2
 startVMPlaybook()
 {
 	cd ~/adoptopenjdkPBTests/$2/ansible
-
-	# Alias the correct vagrant file
+	#Alias the correct vagrant file
 	ln -sf Vagrantfile.$1 Vagrantfile
-	
 	vagrant up
-
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$2.$1.log
-
+	testBuild
 	vagrant halt
 }
 
@@ -57,10 +60,10 @@ destroyVM()
 searchLogFiles()
 {
 	cd ~/adoptopenjdkPBTests/logFiles
-	if grep -q 'failed=[1-9]' *$1.log 
-	then 
+	if grep -q 'failed=[1-9]' *$1.log
+	then
 		printf "\n$1 Failed\n"
-	elif grep -q '\[ERROR\]' *$1.log 
+	elif grep -q '\[ERROR\]' *$1.log
 	then
 		printf "\n$1 playbook was stopped\n"
 	else
@@ -71,20 +74,18 @@ searchLogFiles()
 # var1 = GitURL, var2 = y/n for VM retention
 folderName=${1##*/}
 processArgs $*
-setupFiles 
+setupFiles
 setupGit $1 $folderName
-
 # For all tested OSs / Playbooks
 for OS in Ubuntu1804 Ubuntu1604 CentOS6
-do 	
+do
 	startVMPlaybook $OS $folderName
 	if [[ $2 = "n" ]]
 	then
 		destroyVM
 	fi
 done
-
-for OS in Ubuntu1804 Ubuntu1604 CentOS6 
+for OS in Ubuntu1804 Ubuntu1604 CentOS6
 do
 	searchLogFiles $OS
 done
