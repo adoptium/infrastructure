@@ -79,5 +79,11 @@
   blockinfile:
     path: /etc/sysctl.conf
     block: |
-      kern.sysv.shmmax=314572800
-      kern.sysv.shmall=76800
+      kern.sysv.shmmax=125839605760
+      kern.sysv.shmall=30722560
+  register: kernel
+
+- name: Reboot macOS after tweaking kernel tuning parameters
+  reboot:
+    reboot_timeout: 3600
+  when: kernel.changed
