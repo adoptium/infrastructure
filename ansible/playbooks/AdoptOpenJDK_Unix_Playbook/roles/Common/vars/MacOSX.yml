@@ -8,6 +8,7 @@
 Build_Tool_Packages:
   - autoconf
   - bash # OpenJ9 needs bash v4 or later
+  - ccache
   - coreutils
   - gnu-tar
   - nasm # openj9 jdk13+
