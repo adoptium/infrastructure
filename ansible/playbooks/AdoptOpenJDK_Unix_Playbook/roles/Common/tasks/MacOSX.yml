@@ -71,7 +71,7 @@
   file:
     path: /etc/sysctl.conf
     state: touch
-    mode: 0774
+    mode: 0644
     owner: root
     group: wheel
 
