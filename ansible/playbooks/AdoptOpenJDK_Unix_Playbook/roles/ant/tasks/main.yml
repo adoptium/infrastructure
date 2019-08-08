@@ -33,6 +33,15 @@
     - ant_installed.rc != 0
   tags: ant
 
+- name: Check usr/local/bin exists
+  stat:
+    path: /usr/local/bin
+  register: ant_folder_directory
+
+- name: Create /usr/local/bin
+  shell: cd /usr/local && mkdir bin
+  when: ant_folder_directory.stat.exists == False
+
 - name: Create /usr/local/bin/ant symlink
   file:
     src: /usr/local/apache-ant-1.10.5/bin/ant
