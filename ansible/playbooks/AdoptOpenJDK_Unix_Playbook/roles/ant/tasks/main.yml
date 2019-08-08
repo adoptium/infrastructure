@@ -33,14 +33,11 @@
     - ant_installed.rc != 0
   tags: ant
 
-- name: Check usr/local/bin exists
-  stat:
+- name: Create /usr/local/bin if it doesn't exist
+  file:
     path: /usr/local/bin
-  register: ant_folder_directory
-
-- name: Create /usr/local/bin
-  shell: cd /usr/local && mkdir bin
-  when: ant_folder_directory.stat.exists == False
+    state: directory
+    mode: '0755'
 
 - name: Create /usr/local/bin/ant symlink
   file:
