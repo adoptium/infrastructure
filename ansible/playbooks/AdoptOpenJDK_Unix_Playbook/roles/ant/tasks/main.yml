@@ -38,6 +38,7 @@
     path: /usr/local/bin
     state: directory
     mode: '0755'
+  when: ansible_distribution != "MacOSX"
 
 - name: Create /usr/local/bin/ant symlink
   file:
