@@ -19,49 +19,49 @@
   register: brew
 
 - name: Install Homebrew
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   script: scripts/install-homebrew.sh
   when: not brew.stat.exists
 
 - name: Upgrade installed packages
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
 
 - name: Install brew cu
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: buo/cask-upgrade
 
 - name: Add AdoptOpenJDK Java Repo
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: AdoptOpenJDK/openjdk
 
 - name: Update Casks
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   command: /usr/local/bin/brew cu
 
 - name: Install Build Tool Packages
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
 - name: Install Build Tool Casks
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Casks }}"
   tags: build_tools
 
 - name: Install Test Tool Packages
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew: "name={{ item }} state=present"
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
 - name: Install Test Tool Casks
-  become_user: administrator
+  become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Test_Tool_Casks }}"
   tags: test_tools

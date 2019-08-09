@@ -8,6 +8,7 @@
       - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
       - "ansible_hostname: {{ ansible_hostname | default('***Undefined***') }}"
       - "ansible_fqdn: {{ ansible_fqdn | default('***Undefined***') }}"
+      - "ansible_user: {{ ansible_user | default('***Undefined***') }}"
       - "ansible_default_ipv4.address: {{ ansible_default_ipv4.address | default('***Undefined***') }}"
       - "ansible_os_family: {{ ansible_os_family | default('***Undefined***') }} "
       - "ansible_distribution: {{ ansible_distribution | default('***Undefined***') }} "
