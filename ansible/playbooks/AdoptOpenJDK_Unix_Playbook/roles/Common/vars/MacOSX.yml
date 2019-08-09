@@ -7,8 +7,11 @@
 
 Build_Tool_Packages:
   - autoconf
+  - bash # OpenJ9 needs bash v4 or later
+  - ccache
   - coreutils
   - gnu-tar
+  - nasm # openj9 jdk13+
   - wget
 
 Build_Tool_Casks:
@@ -19,6 +22,7 @@ Test_Tool_Packages:
   - mercurial
   - pulseaudio
   - cpanminus
+  - p7zip # required for the codesign job to extract jmods and because unzip can't handle pkzip file-created files
 
 Test_Tool_Casks:
   - xquartz
