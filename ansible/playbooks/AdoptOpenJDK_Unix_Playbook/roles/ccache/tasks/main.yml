@@ -9,11 +9,8 @@
   tags: ccache
 
 - name: Download ccache.tar.gz
-  get_url:
-    url: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
-    dest: /tmp/ccache.tar.gz
-    mode: 0440
-    validate_certs: False
+  command: wget -O /tmp/ccache.tar.gz https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
+    warn=False
   when: ccache_status.stat.isdir is not defined
   tags: ccache
 
