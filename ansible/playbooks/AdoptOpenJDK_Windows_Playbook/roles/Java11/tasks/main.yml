@@ -16,7 +16,7 @@
 
 - name: Download Java11
   win_get_url:
-    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk&heap_size={{ heapsize }}
     dest: 'C:\temp\jdk-11.zip'
   when: (java11_download.stat.exists == false) and (java11_installed.stat.exists == false)
   tags: Java11
