@@ -37,9 +37,7 @@
     - gcc_48
     - gcc_7                       # OpenJ9
     - cmake                       # OpenJ9 / OpenJFX
-    - role: local_srcinstall
-      src_tarball: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
-      installed_target: /usr/local/bin/ccache
+    - ccache
     - {role: nasm, when: ansible_architecture == 'x86_64'} # OpenJ9
     - adoptopenjdk9               # JDK10 build bootstrap
     - adoptopenjdk10              # JDK11 build bootstrap
