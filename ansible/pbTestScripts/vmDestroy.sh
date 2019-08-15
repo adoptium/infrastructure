@@ -11,10 +11,10 @@ processArgs()
 	fi
 }
 
-# akes project name as arg 1, and OS as arg 2
+# Takes project name as arg 1, and OS as arg 2
 destroyVM()
 {
-	cd ~/adoptopenjdkPBTests/$1/ansible
+	cd $HOME/adoptopenjdkPBTests/$1/ansible
 	ln -sf Vagrantfile.$2 Vagrantfile	# Correct Vagrantfile alias
 	vagrant destroy -f			# Force destroy without question
 	printf "\nDestroyed $2 Machine\n"	
@@ -23,7 +23,7 @@ destroyVM()
 # Takes the project name as arg1
 checkFolder()
 {
-	cd ~/adoptopenjdkPBTests
+	cd $HOME/adoptopenjdkPBTests
 	if [ -d "$1" ]; then
 		printf "\n$1 found!\n"
 		return 0
@@ -37,7 +37,7 @@ checkFolder()
 processArgs $*
 if checkFolder $1; then	
  	# For all currently supported OSs
-	for OS in Ubuntu1804 Ubuntu1604 CentOS6
+	for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7
 	do
 		destroyVM $1 $OS
 	done

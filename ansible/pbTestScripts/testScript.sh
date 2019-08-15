@@ -2,8 +2,8 @@
 set -u
 
 branchName='NULL'
-folderName=' '
-gitURL=' '
+folderName=''
+gitURL=''
 
 # Takes all arguments from the script
 processArgs()
@@ -27,23 +27,23 @@ setupFiles()
 setupGit()
 {
 	cd $HOME/adoptopenjdkPBTests
-	if [ "$3" = "NULL" ]; then
-		echo "Not a branch"
-		if [ ! -d "$2-master" ]; then
-   			git clone $1
-			mv $2 $2-master
+	if [ "$branchName" == "NULL" ]; then
+		echo "Detected as the master branch"
+		if [ ! -d "$folderName-master" ]; then
+   			git clone $gitURL
+			mv $folderName $folderName-master
 		else
-			cd "$2-master"
-    			git pull $1
+			cd "$folderName-master"
+    			git pull $gitURL
 		fi
 	else
 		echo "Branch detected"
-		if [ ! -d "$2-$3" ]; then
-   			git clone -b $3 --single-branch $1
-			mv $2 "$2-$3"
+		if [ ! -d "$folderName-$branchName" ]; then
+  			git clone -b $branchName --single-branch $gitURL
+			mv $folderName "$folderName-$branchName"
 		else
-			cd "$2-$3"
-			git pull origin $3
+			cd "$folderName-$branchName"
+			git pull origin $branchName
 		fi
 	fi
 }
@@ -54,19 +54,20 @@ testBuild()
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
 
-# Takes the OS as arg 1, foldername as arg 2, branchName as arg 3
+# Takes the OS as arg 1
 startVMPlaybook()
 {
-	if [ "$3" = "NULL" ]; then	
-		cd $HOME/adoptopenjdkPBTests/$2-master/ansible
-		$3="master"
+	local OS=$1
+	if [ "$branchName" == "NULL" ]; then
+		cd $HOME/adoptopenjdkPBTests/$folderName-master/ansible
+		$branchName="master"  #Incorrect!
 	else
-		cd $HOME/adoptopenjdkPBTests/$2-$3/ansible
+		cd $HOME/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	fi
-	ln -sf Vagrantfile.$1 Vagrantfile
+	ln -sf Vagrantfile.$OS Vagrantfile
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
-	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$2.$3.$1.log
+	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	testBuild
 	vagrant halt
 }
@@ -92,20 +93,20 @@ searchLogFiles()
 	fi
 }
 
-# Takes in the URL passed to the script
+# Takes in the URL passed to the script, and extracts the foldername, branch name and builds the gitURL to be used later on.
 splitURL()
 {
-	# breaks down url to array, and extracts info
-	IFS='/' read -r -a array <<< "$1"
+	local urlSplit
+	urlSplit='/' read -r -a array <<< "$1"
 	if [ ${array[@]: -2:1} == 'tree' ]
 	then
 		branchName=${array[@]: -1:1}
 		folderName=${array[@]: -3:1}
 		unset 'array[${#array[@]}-1]'
 		unset 'array[${#array[@]}-1]'
-		for I in "${array[@]}"
+		for i in "${array[@]}"
 		do
-			gitURL="$gitURL$I/"
+			gitURL="$gitURL$i/"
 		done
 	else
 		folderName=${array[@]: -1:1}
@@ -116,11 +117,11 @@ splitURL()
 processArgs $*
 splitURL $1
 setupFiles
-setupGit $gitURL $folderName $branchName
+setupGit
 # For all tested OSs / Playbooks
 for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7
 do
-	startVMPlaybook $OS $folderName $branchName
+	startVMPlaybook $OS
 	if [[ $2 = "n" ]]
 	then
 		destroyVM
