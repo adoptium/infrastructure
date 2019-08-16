@@ -4,7 +4,7 @@
 $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
-.\\ConfigureRemotingForAnsible.ps1
+.\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 ipConfig
 SCRIPT
 
