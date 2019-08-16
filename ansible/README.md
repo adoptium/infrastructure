@@ -97,6 +97,17 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
+## How do I run the playbook on a Windows Machine?
+
+As Ansible can't run on Windows, it has to run remotely. To test the playbook, a Vagrant VM can be used.
+You can do this by following these steps:
+
+1) `ln -sf Vagrantfile.WindowsS12 Vagrantfile && vagrant up` in the `../ansible` directory
+2) Note the IP address that is output from running `vagrant up` and place it into a text file. e.g. `hosts.win`. Place this text file in `../anisble/playbooks/AdoptopenJDK_Windows_Playbook`
+3) Edit `../AdoptOpenJDK_Windows_Playbook/main.yml` so the `- hosts :{{ groups['Vendor_groups'] ... etc` becomes `- hosts: all`
+4) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME`.
+5) From the `../ansible` directory, running `sudo ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
+
 ## Can I have multiple VMs on different OSs?
 
 As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.

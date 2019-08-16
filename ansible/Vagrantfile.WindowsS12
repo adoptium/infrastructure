@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+Start-Process powershell -Verb runAs
+wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+.\\ConfigureRemotingForAnsible.ps1
+ipConfig
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.define :adoptopenjdkW10 do |adoptopenjdkW10|
+    adoptopenjdkW10.vm.box = "mwrock/Windows2012R2"
+    adoptopenjdkW10.vm.hostname = "adoptopenjdkW10"
+    adoptopenjdkW10.vm.communicator = "winrm"
+    adoptopenjdkW10.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW10.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW10.vm.provision "shell", inline: $script, privileged: false
+  end
+end
