@@ -16,7 +16,7 @@
 
 - name: Download Java12
   win_get_url:
-    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk
+    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk&heap_size={{ heapsize }}
     dest: 'C:\temp\jdk-12.zip'
   when: (java12_download.stat.exists == false) and (java12_installed.stat.exists == false)
   tags: Java12

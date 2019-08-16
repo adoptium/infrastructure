@@ -11,3 +11,4 @@ Nagios_Plugins: Disabled
 
 ### Default JDK ###
 bootjdk: hotspot
+heapsize: normal
