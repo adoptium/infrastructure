@@ -60,7 +60,7 @@ startVMPlaybook()
 	local OS=$1
 	if [ "$branchName" == "NULL" ]; then
 		cd $HOME/adoptopenjdkPBTests/$folderName-master/ansible
-		$branchName="master"  #Incorrect!
+		branchName="master"
 	else
 		cd $HOME/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	fi
@@ -96,8 +96,8 @@ searchLogFiles()
 # Takes in the URL passed to the script, and extracts the foldername, branch name and builds the gitURL to be used later on.
 splitURL()
 {
-	local urlSplit
-	urlSplit='/' read -r -a array <<< "$1"
+	#IFS stands for Internal Field Seperator and determines the delimiter for splitting.
+	IFS='/' read -r -a array <<< "$1"
 	if [ ${array[@]: -2:1} == 'tree' ]
 	then
 		branchName=${array[@]: -1:1}
