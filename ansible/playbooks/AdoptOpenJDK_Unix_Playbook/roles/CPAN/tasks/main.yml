@@ -8,10 +8,10 @@
   shell: "curl -L https://cpanmin.us | perl - App::cpanminus"
   ignore_errors: yes
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
-    - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
-    - ansible_distribution == "SLES"
-    - ansible_distribution == "MacOSX"
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6") or
+      (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or
+      ansible_distribution == "SLES" or
+      ansible_distribution == "MacOSX"
   tags:
     - cpan
     - test_tools
