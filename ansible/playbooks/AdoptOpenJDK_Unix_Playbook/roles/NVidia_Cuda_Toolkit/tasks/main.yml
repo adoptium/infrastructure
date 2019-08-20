@@ -8,7 +8,6 @@
   register: cuda_installed
   tags: nvidia_cuda_toolkit
 
-# RedHat 7 and Ubuntu 16 on x86_64
 - name: Download NVidia CUDA toolkit
   get_url:
     url: "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
@@ -16,7 +15,7 @@
   when:
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7") )
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le")
   tags: nvidia_cuda_toolkit
 
 - name: Install NVidia CUDA toolkit
@@ -27,42 +26,41 @@
     - ansible_architecture == "x86_64"
   tags: nvidia_cuda_toolkit
 
-# RHEL 7 PPC64LE
-- name: Ensure kernel-debug-devel is installed - RHEL 7 PPC64LE
+- name: Ensure kernel-debug-devel is installed - RHEL/CentOS 7 PPC64LE
   yum: name=kernel-debug-devel state=installed
   when:
     - cuda_installed.stat.isdir is not defined
-    - ansible_distribution == "RedHat"
+    - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-- name: Download NVidia CUDA Repo RPM - RHEL 7 on PPC64LE
+- name: Download NVidia CUDA Repo RPM - RHEL/CentOS 7 on PPC64LE
   get_url:
     url: https://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
     dest: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
   when:
     - cuda_installed.stat.isdir is not defined
-    - ansible_distribution == "RedHat"
+    - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-- name: Apply NVidia CUDA repo RPM - RHEL 7 on PPC64LE
+- name: Apply NVidia CUDA repo RPM - RHEL/CentOS 7 on PPC64LE
   yum: name=/tmp/cuda-repo-rhel7-9.ppc64le.rpm state=installed
   ignore_errors: True
   when:
     - cuda_installed.stat.isdir is not defined
-    - ansible_distribution == "RedHat"
+    - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-- name: Install NVidia CUDA toolkit - RHEL 7 on PPC64LE
+- name: Install NVidia CUDA toolkit - RHEL/CentOS 7 on PPC64LE
   yum: name=cuda-toolkit-9-0 state=installed
   when:
     - cuda_installed.stat.isdir is not defined
-    - ansible_distribution == "RedHat"
+    - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
