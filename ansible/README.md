@@ -99,7 +99,7 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 ## How do I run the playbook on a Windows Machine?
 
-As Ansible can't run on Windows, it has to be ran on a seperate system and then pointed at a Windows machine (such as a VM). To test the playbook, a vagrant VM can be used.
+As Ansible can't run on Windows, it has to be run on a seperate system and then pointed at a Windows machine (such as a VM). To test the playbook, a vagrant VM can be used.
 You can do this by following these steps:
 
 1) `git clone "https://github.com/AdoptOpenJdk/openjdk-infrastructure/"`
