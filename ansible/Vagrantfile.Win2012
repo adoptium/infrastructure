@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Runs powershell as an administator and gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it.
+$script = <<SCRIPT
+Start-Process powershell -Verb runAs
+wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+.\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+ipConfig
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkW2012 do |adoptopenjdkW2012|
+    adoptopenjdkW2012.vm.box = "mwrock/Windows2012R2"
+    adoptopenjdkW2012.vm.hostname = "adoptopenjdkW2012"
+    adoptopenjdkW2012.vm.communicator = "winrm"
+    adoptopenjdkW2012.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW2012.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW2012.vm.provision "shell", inline: $script, privileged: false
+  end
+end
