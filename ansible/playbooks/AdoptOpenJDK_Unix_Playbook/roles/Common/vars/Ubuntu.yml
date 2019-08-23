@@ -28,6 +28,7 @@ Build_Tool_Packages:
   - libgmp3-dev
   - libmpfr-dev
   - libmpfr-doc
+  - libssl-dev
   - libwww-perl
   - libx11-dev
   - libxext-dev
