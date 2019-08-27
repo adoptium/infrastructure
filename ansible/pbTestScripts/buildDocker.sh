@@ -84,7 +84,7 @@ removeBuild()
 
 buildDocker()
 {
-	local commandString="./makejdk-any-platform.sh --clean-docker-build"
+	local commandString="./makejdk-any-platform.sh --docker --clean-docker-build"
 	if [ -n "$bootDir" ]; then
 		commandString="$commandString -J $bootDir"
 	fi
