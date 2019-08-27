@@ -79,7 +79,7 @@ jdkVersionList()
 removeBuild()
 {
 	echo "Removing ../openjdk_build/workspace/build"
-	cd $WORKSPACE/DockerBuildFolder/openjdk-build/workspace && sudo rm -r build
+	cd $WORKSPACE/DockerBuildFolder/openjdk-build/workspace && rm -r build
 }
 
 buildDocker()
