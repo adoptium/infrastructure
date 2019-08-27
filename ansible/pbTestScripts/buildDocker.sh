@@ -79,7 +79,7 @@ jdkVersionList()
 removeBuild()
 {
 	echo "Removing ../openjdk_build/workspace/build"
-	cd $HOME/DockerBuildFolder/openjdk-build/workspace && sudo rm -r build
+	cd $WORKSPACE/DockerBuildFolder/openjdk-build/workspace && rm -r build
 }
 
 buildDocker()
@@ -96,19 +96,19 @@ buildDocker()
 		for jdk in jdk8u jdk9u jdk10u jdk11u jdk12u jdk13u
 		do
 			echo "$commandString $jdk being executed"
-			cd $HOME/DockerBuildFolder/openjdk-build && $commandString $jdk
+			cd $WORKSPACE/DockerBuildFolder/openjdk-build && $commandString $jdk
 		done
 	else
 		echo "$commandString $jdkVersion being executed"
-		cd $HOME/DockerBuildFolder/openjdk-build && $commandString $jdkVersion
+		cd $WORKSPACE/DockerBuildFolder/openjdk-build && $commandString $jdkVersion
 	fi
 	removeBuild
 }
 
 setupGit()
 {
-	mkdir -p $HOME/DockerBuildFolder
-	cd $HOME/DockerBuildFolder/
+	mkdir -p $WORKSPACE/DockerBuildFolder
+	cd $WORKSPACE/DockerBuildFolder/
 	if [ ! -d "openjdk-build" ]; then
 		git clone https://github.com/adoptopenjdk/openjdk-build $HOME/DockerBuildFolder/openjdk-build
 	else
