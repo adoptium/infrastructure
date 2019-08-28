@@ -4,15 +4,70 @@ set -u
 branchName='NULL'
 folderName=''
 gitURL=''
+vagrantOS=''
+retainVM=false
+testNativeBuild=false
 
-# Takes all arguments from the script
+# Takes all arguments from the script, and determines options
 processArgs()
 {
-	if [ $# -lt 2 ]; then
-		printf "\nScript takes 2 input arguments\n"
-		printf "Github URL, then y/n to retain VMs\n\n"
-		exit 1
-	fi
+	while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]] ; do
+		local opt="$1";
+		shift;
+		case "$opt" in
+			"--Vagrantfile" | "-v" )
+				vagrantOS="$1"; shift;;
+			"--all" | "-a" )
+				vagrantOS="all";;
+			"--build" | "-b" )
+				testNativeBuild=true;;
+			"--VM" | "-vm" )
+				retainVM=true;;
+			"--URL" | "-u" )
+				gitURL="$1"; shift;;
+			"--help" | "-h" )
+				usage; exit 0;;
+			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
+		esac
+	done
+}
+
+usage()
+{
+	echo
+	echo "Usage: ./testScript.sh 	--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
+					--all | -a 				Builds and tests playbook through every OS
+					--VM | -vm				Option to retain the VM once building them
+					--build | -b				Option to enable testing a native build on the VM
+					--URL | -u <GitURL>			The URL of the git repository
+					--help | -h				Displays this help message"
+}
+
+checkVagrantOS()
+{
+	case "$vagrantOS" in
+		"Ubuntu1604" | "U16" | "u16" )
+			vagrantOS="Ubuntu1604";;
+		"Ubuntu1804" | "U18" | "u18" )
+			vagrantOS="Ubuntu1804";;
+		"CentOS6" | "centos6" | "C6" | "c6" )
+			vagrantOS="CentOS6" ;;
+		"CentOS7" | "centos7" | "C7" | "c7" )
+			vagrantOS="CentOS7" ;;
+		"all" ) ;;
+		*) echo "Not a currently supported OS" ; vagrantOSList; exit 1;
+	esac
+}
+
+vagrantOSList()
+{
+	echo
+	echo "Currently supported Vagrant OSs :
+		- Ubuntu1604
+		- Ubuntu1804
+		- CentOS6
+		- CentOS7"
+	echo
 }
 
 setupFiles()
@@ -23,7 +78,6 @@ setupFiles()
 	mkdir -p logFiles || true
 }
 
-# Takes in git URL as arg 1, foldername as arg 2, branchName as arg 3
 setupGit()
 {
 	cd $HOME/adoptopenjdkPBTests
@@ -68,7 +122,9 @@ startVMPlaybook()
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
-	testBuild
+	if [[ "$testNativeBuild" = true ]]; then
+		testBuild
+	fi
 	vagrant halt
 }
 
@@ -93,13 +149,14 @@ searchLogFiles()
 	fi
 }
 
-# Takes in the URL passed to the script, and extracts the foldername, branch name and builds the gitURL to be used later on.
+# Takes in the URL passed to the script, and extracts the folder name, branch name and builds the gitURL to be used later on.
 splitURL()
 {
 	#IFS stands for Internal Field Seperator and determines the delimiter for splitting.
-	IFS='/' read -r -a array <<< "$1"
+	IFS='/' read -r -a array <<< "$gitURL"
 	if [ ${array[@]: -2:1} == 'tree' ]
 	then
+		gitURL=""
 		branchName=${array[@]: -1:1}
 		folderName=${array[@]: -3:1}
 		unset 'array[${#array[@]}-1]'
@@ -110,24 +167,33 @@ splitURL()
 		done
 	else
 		folderName=${array[@]: -1:1}
-		gitURL=$1
 	fi
 }
 # var1 = GitURL, var2 = y/n for VM retention
 processArgs $*
-splitURL $1
+splitURL
+checkVagrantOS
 setupFiles
 setupGit
-# For all tested OSs / Playbooks
-for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7
-do
-	startVMPlaybook $OS
-	if [[ $2 = "n" ]]
-	then
-		destroyVM
-	fi
-done
-for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7
-do
-	searchLogFiles $OS $branchName
-done
+# Testing all of the OSs
+if [ "$vagrantOS" == "all" ]; then
+	for OS in Ubuntu1604 Ubuntu1804 CentOS6 CentOS7
+	do
+		startVMPlaybook $OS
+		if [[ "$retainVM" = false ]]
+		then
+			destroyVM
+		fi
+	done
+	for OS in Ubuntu1604 Ubuntu1804 CentOS6 CentOS7
+	do
+		searchLogFiles $OS $branchName
+	done
+else
+	startVMPlaybook $vagrantOS
+		if [[ "$retainVM" = false ]]
+		then
+			destroyVM
+		fi
+	searchLogFiles $vagrantOS $branchName
+fi
