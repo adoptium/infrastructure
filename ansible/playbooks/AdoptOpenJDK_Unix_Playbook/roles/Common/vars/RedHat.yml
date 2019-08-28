@@ -43,6 +43,7 @@ Build_Tool_Packages:
   - perl-CPAN
   - perl-devel
   - pkgconfig
+  - systemtap-sdt-devel
   - unzip
   - wget
   - xz

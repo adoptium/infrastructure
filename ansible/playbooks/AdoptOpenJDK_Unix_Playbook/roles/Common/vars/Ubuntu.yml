@@ -42,6 +42,7 @@ Build_Tool_Packages:
   - openjdk-8-jdk
   - pigz
   - pkg-config
+  - systemtap-sdt-dev
   - wget
   - zip
 

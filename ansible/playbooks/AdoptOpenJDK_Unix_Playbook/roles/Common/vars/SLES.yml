@@ -20,6 +20,7 @@ Build_Tool_Packages:
   - make
   - ntp
   - pkg-config
+  - systemtap-sdt-devel
   - unzip
   - wget
   - zip
