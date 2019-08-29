@@ -1,7 +1,7 @@
 #!/bin/bash
 set -u
 
-branchName='NULL'
+branchName=''
 folderName=''
 gitURL=''
 vagrantOS=''
@@ -102,7 +102,7 @@ setupFiles()
 setupGit()
 {
 	cd $WORKSPACE/adoptopenjdkPBTests
-	if [ "$branchName" == "NULL" ]; then
+	if [ "$branchName" == "" ]; then
 		echo "Detected as the master branch"
 		if [ ! -d "$folderName-master" ]; then
    			git clone $gitURL
@@ -133,7 +133,7 @@ testBuild()
 startVMPlaybook()
 {
 	local OS=$1
-	if [ "$branchName" == "NULL" ]; then
+	if [ "$branchName" == "" ]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
 		branchName="master"
 	else
