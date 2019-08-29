@@ -246,14 +246,19 @@
             file_type: directory
             paths: /usr
             patterns: 'jdk7u*'
+          when: java7.stat.isdir is not defined
           register: java7_files_matched
           tags: java7
 
-        - name: Rename to java7_64
-          command: mv "{{ item.path }}" /usr/java7_64
+        - name: Symlink to java7_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java7_64
+            state: link
           with_items:
             - "{{ java7_files_matched.files }}"
-          tags: java7	  
+          when: java7.stat.isdir is not defined
+          tags: java7
 
       ##############
       # Boot JDK 8 #
@@ -277,17 +282,25 @@
             file_type: directory
             paths: /usr
             patterns: 'jdk8u*'
+          when: java8.stat.isdir is not defined
           register: java8_files_matched
           tags: java8
 
-        - name: Rename to java8_64
-          command: mv "{{ item.path }}" /usr/java8_64
+        - name: Symlink to java8_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java8_64
+            state: link
           with_items:
             - "{{ java8_files_matched.files }}"
+          when: java8.stat.isdir is not defined
           tags: java8
 
         - name: Setting Java 8 as default
-          command: ln -s /usr/java8_64/jre/bin/java usr/bin/java
+          file:
+            src: /usr/java8_64
+            dest: /usr/bin/java
+            state: link
           tags: java8
 
       ##############
@@ -311,14 +324,19 @@
           find:
             file_type: directory
             paths: /usr
-            patterns: 'jdk9*'
+            patterns: 'jdk-9*'
+          when: java9.stat.isdir is not defined
           register: java9_files_matched
           tags: java9
 
-        - name: Rename to java9_64
-          command: mv "{{ item.path }}" /usr/java9_64
+        - name: Symlink to java9_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java9_64
+            state: link
           with_items:
             - "{{ java9_files_matched.files }}"
+          when: java9.stat.isdir is not defined
           tags: java9
 
 
@@ -343,14 +361,19 @@
           find:
             file_type: directory
             paths: /usr
-            patterns: 'jdk10*'
+            patterns: 'jdk-10*'
+          when: java10.stat.isdir is not defined
           register: java10_files_matched
           tags: java10
 
-        - name: Rename to java10_64
-          command: mv "{{ item.path }}" /usr/java10_64
+        - name: Symlink to java10_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java10_64
+            state: link
           with_items:
             - "{{ java10_files_matched.files }}"
+          when: java10.stat.isdir is not defined
           tags: java10
 
 
@@ -375,13 +398,16 @@
           find:
             file_type: directory
             paths: /usr
-            patterns: 'jdk11*'
+            patterns: 'jdk-11*'
           when: java11.stat.isdir is not defined
           register: java11_files_matched
           tags: java11
 
-        - name: Rename to java11_64
-          command: mv "{{ item.path }}" /usr/java11_64
+        - name: Symlink to java11_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java11_64
+            state: link
           with_items:
             - "{{ java11_files_matched.files }}"
           when: java11.stat.isdir is not defined
@@ -408,13 +434,16 @@
           find:
             file_type: directory
             paths: /usr
-            patterns: 'jdk12*'
+            patterns: 'jdk-12*'
           when: java12.stat.isdir is not defined
           register: java12_files_matched
           tags: java12
 
-        - name: Rename to java12_64
-          command: mv "{{ item.path }}" /usr/java12_64
+        - name: Symlink to java12_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java12_64
+            state: link
           with_items:
             - "{{ java12_files_matched.files }}"
           when: java12.stat.isdir is not defined
