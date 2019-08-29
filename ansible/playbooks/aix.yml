@@ -233,17 +233,16 @@
           register: java7
           tags: java7
 
-        - name: Create /usr/java7_64 if it does not exist
-          file:
-            path: /usr/java7_64
-            state: directory
-          when: java7.stat.isdir is not defined
-
         - name: Transfer and Extract Java7
           unarchive:
             src: /Vendor_Files/aix/openjdk-7u-aix.tar
-            dest: /usr/java7_64
+            dest: /usr
             remote_src: no
+          when: java7.stat.isdir is not defined
+          tags: java7
+
+        - name: Rename j2sdk_image to java7_64
+          command: mv /usr/j2sdk_image /usr/java7_64
           when: java7.stat.isdir is not defined
           tags: java7
 
@@ -256,19 +255,38 @@
           register: java8
           tags: java8
 
-        - name: Create /usr/java8_64 if it does not exist
-          file:
-            path: /usr/java8_64
-            state: directory
-          when: java8.stat.isdir is not defined
-          tags: java8
-
         - name: Transfer and Extract AdoptOpenJDK 8
           unarchive:
             src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
-            dest: /usr/java8_64
+            dest: /usr
             remote_src: yes
           when: java8.stat.isdir is not defined
+          tags: java8
+
+        - name: Find java8 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk8u*'
+          when: java8.stat.isdir is not defined
+          register: java8_files_matched
+          tags: java8
+
+        - name: Symlink to java8_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java8_64
+            state: link
+          with_items:
+            - "{{ java8_files_matched.files }}"
+          when: java8.stat.isdir is not defined
+          tags: java8
+
+        - name: Setting Java 8 as default
+          file:
+            src: /usr/java8_64
+            dest: /usr/bin/java
+            state: link
           tags: java8
 
       ##############
@@ -280,18 +298,30 @@
           register: java9
           tags: java9
 
-        - name: Create /usr/java9_64 if it does not exist
-          file:
-            path: /usr/java9_64
-            state: directory
-          when: java9.stat.isdir is not defined
-          tags: java9
-
         - name: Transfer and Extract AdoptOpenJDK 9
           unarchive:
             src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk9?openjdk_impl={{ bootjdk }}&os=aix&arch=ppc64&release=latest&type=jdk
-            dest: /usr/java9_64
+            dest: /usr
             remote_src: yes
+          when: java9.stat.isdir is not defined
+          tags: java9
+
+        - name: Find java9 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-9*'
+          when: java9.stat.isdir is not defined
+          register: java9_files_matched
+          tags: java9
+
+        - name: Symlink to java9_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java9_64
+            state: link
+          with_items:
+            - "{{ java9_files_matched.files }}"
           when: java9.stat.isdir is not defined
           tags: java9
 
@@ -305,20 +335,33 @@
           register: java10
           tags: java10
 
-        - name: Create /usr/java10_64 if it does not exist
-          file:
-            path: /usr/java10_64
-            state: directory
-          when: java10.stat.isdir is not defined
-          tags: java10
-
         - name: Transfer and Extract AdoptOpenJDK 10
           unarchive:
             src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk10?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
-            dest: /usr/java10_64
+            dest: /usr
             remote_src: yes
           when: java10.stat.isdir is not defined
           tags: java10
+
+        - name: Find java10 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-10*'
+          when: java10.stat.isdir is not defined
+          register: java10_files_matched
+          tags: java10
+
+        - name: Symlink to java10_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java10_64
+            state: link
+          with_items:
+            - "{{ java10_files_matched.files }}"
+          when: java10.stat.isdir is not defined
+          tags: java10
+
 
         #################
         # OpenJ9 JDK 11 #
@@ -329,18 +372,30 @@
           register: java11
           tags: java11
 
-        - name: Create /usr/java11_64 if it does not exist
-          file:
-            path: /usr/java11_64
-            state: directory
-          when: java11.stat.isdir is not defined
-          tags: java11
-
         - name: Transfer and Extract AdoptOpenJDK 11
           unarchive:
             src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
-            dest: /usr/java11_64
+            dest: /usr
             remote_src: yes
+          when: java11.stat.isdir is not defined
+          tags: java11
+
+        - name: Find java11 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-11*'
+          when: java11.stat.isdir is not defined
+          register: java11_files_matched
+          tags: java11
+
+        - name: Symlink to java11_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java11_64
+            state: link
+          with_items:
+            - "{{ java11_files_matched.files }}"
           when: java11.stat.isdir is not defined
           tags: java11
 
@@ -353,18 +408,30 @@
           register: java12
           tags: java12
 
-        - name: Create /usr/java12_64 if it does not exist
-          file:
-            path: /usr/java12_64
-            state: directory
-          when: java12.stat.isdir is not defined
-          tags: java12
-
         - name: Transfer and Extract AdoptOpenJDK 12
           unarchive:
             src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk12?openjdk_impl=openj9&os=aix&arch=ppc64&release=latest&type=jdk
-            dest: /usr/java12_64
+            dest: /usr
             remote_src: yes
+          when: java12.stat.isdir is not defined
+          tags: java12
+
+        - name: Find java12 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-12*'
+          when: java12.stat.isdir is not defined
+          register: java12_files_matched
+          tags: java12
+
+        - name: Symlink to java12_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java12_64
+            state: link
+          with_items:
+            - "{{ java12_files_matched.files }}"
           when: java12.stat.isdir is not defined
           tags: java12
 
