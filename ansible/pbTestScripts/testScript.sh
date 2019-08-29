@@ -21,7 +21,7 @@ processArgs()
 				vagrantOS="all";;
 			"--build" | "-b" )
 				testNativeBuild=true;;
-			"--VM" | "-vm" )
+			"--retainVM" | "-r" )
 				retainVM=true;;
 			"--URL" | "-u" )
 				gitURL="$1"; shift;;
@@ -37,7 +37,7 @@ usage()
 	echo
 	echo "Usage: ./testScript.sh 	--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
 					--all | -a 				Builds and tests playbook through every OS
-					--VM | -vm				Option to retain the VM once building them
+					--retainVM | -r				Option to retain the VM once building them
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
 					--help | -h				Displays this help message"
@@ -54,7 +54,8 @@ checkVagrantOS()
 			vagrantOS="CentOS6" ;;
 		"CentOS7" | "centos7" | "C7" | "c7" )
 			vagrantOS="CentOS7" ;;
-		"all" ) ;;
+		"all" )
+			vagrantOS="Ubuntu1604 Ubuntu1804 CentOS6 CentOS7" ;;
 		*) echo "Not a currently supported OS" ; vagrantOSList; exit 1;
 	esac
 }
@@ -171,29 +172,24 @@ splitURL()
 }
 # var1 = GitURL, var2 = y/n for VM retention
 processArgs $*
+if [ "$gitURL" == "" ]; then
+	echo "No GitURL specified; Defaulting to adoptopenjdk/openjdk-infrastructure"
+	gitURL=https://github.com/adoptopenjdk/openjdk-infrastructure
+fi
 splitURL
 checkVagrantOS
 setupFiles
 setupGit
-# Testing all of the OSs
-if [ "$vagrantOS" == "all" ]; then
-	for OS in Ubuntu1604 Ubuntu1804 CentOS6 CentOS7
-	do
-		startVMPlaybook $OS
-		if [[ "$retainVM" = false ]]
-		then
-			destroyVM
-		fi
-	done
-	for OS in Ubuntu1604 Ubuntu1804 CentOS6 CentOS7
-	do
-		searchLogFiles $OS $branchName
-	done
-else
-	startVMPlaybook $vagrantOS
-		if [[ "$retainVM" = false ]]
-		then
-			destroyVM
-		fi
-	searchLogFiles $vagrantOS $branchName
-fi
+echo "Testing on the following OSs: $vagrantOS"
+for OS in $vagrantOS
+do
+	startVMPlaybook $OS
+	if [[ "$retainVM" = false ]]
+	then
+		destroyVM
+	fi
+done
+for OS in $vagrantOS
+do
+	searchLogFiles $OS $branchName
+done
