@@ -241,22 +241,8 @@
           when: java7.stat.isdir is not defined
           tags: java7
 
-        - name: Find java7 directory
-          find:
-            file_type: directory
-            paths: /usr
-            patterns: 'jdk7u*'
-          when: java7.stat.isdir is not defined
-          register: java7_files_matched
-          tags: java7
-
-        - name: Symlink to java7_64
-          file:
-            src: "{{ item.path }}"
-            dest: /usr/java7_64
-            state: link
-          with_items:
-            - "{{ java7_files_matched.files }}"
+        - name: Rename j2sdk_image to java7_64
+          command: mv /usr/j2sdk_image /usr/java7_64
           when: java7.stat.isdir is not defined
           tags: java7
 
