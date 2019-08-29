@@ -35,12 +35,29 @@ processArgs()
 usage()
 {
 	echo
-	echo "Usage: ./testScript.sh 	--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
+	echo "Usage: ./testScript.sh			--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
 					--all | -a 				Builds and tests playbook through every OS
 					--retainVM | -r				Option to retain the VM once building them
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
 					--help | -h				Displays this help message"
+}
+
+defaultVars()
+{
+	#Sets WORKSPACE to home if WORKSPACE is empty or undefined. 
+	if [ ! -n "${WORKSPACE:-}" ]; then
+		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
+		WORKSPACE=$HOME
+	fi
+	if [ "$gitURL" == "" ]; then
+		echo "No GitURL specified; Defaulting to adoptopenjdk/openjdk-infrastructure"
+		gitURL=https://github.com/adoptopenjdk/openjdk-infrastructure
+	fi
+	if [ "$vagrantOS" == "" ]; then
+		echo "No Vagrant OS specified; Defaulting to testing all of them"
+		vagrantOS="all"
+	fi
 }
 
 checkVagrantOS()
@@ -73,15 +90,18 @@ vagrantOSList()
 
 setupFiles()
 {
-	cd $HOME
-	mkdir -p adoptopenjdkPBTests || true
-	cd adoptopenjdkPBTests
-	mkdir -p logFiles || true
+	cd $WORKSPACE
+	if [ ! -d "adoptopenjdkPBTests" ]; then
+		mkdir adoptopenjdkPBTests
+	fi
+	if [ ! -d "adoptopenjdkPBTests/logFiles" ]; then
+		mkdir adoptopenjdkPBTests/logFiles
+	fi
 }
 
 setupGit()
 {
-	cd $HOME/adoptopenjdkPBTests
+	cd $WORKSPACE/adoptopenjdkPBTests
 	if [ "$branchName" == "NULL" ]; then
 		echo "Detected as the master branch"
 		if [ ! -d "$folderName-master" ]; then
@@ -114,15 +134,15 @@ startVMPlaybook()
 {
 	local OS=$1
 	if [ "$branchName" == "NULL" ]; then
-		cd $HOME/adoptopenjdkPBTests/$folderName-master/ansible
+		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
 		branchName="master"
 	else
-		cd $HOME/adoptopenjdkPBTests/$folderName-$branchName/ansible
+		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	fi
 	ln -sf Vagrantfile.$OS Vagrantfile
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
-	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags "adoptopenjdk,jenkins" main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuild
 	fi
@@ -138,7 +158,7 @@ destroyVM()
 # Takes in OS as arg 1, branchName as arg 2
 searchLogFiles()
 {
-	cd $HOME/adoptopenjdkPBTests/logFiles
+	cd $WORKSPACE/adoptopenjdkPBTests/logFiles
 	if grep -q 'failed=[1-9]' *$2.$1.log
 	then
 		printf "\n$1 Failed\n"
@@ -172,10 +192,7 @@ splitURL()
 }
 # var1 = GitURL, var2 = y/n for VM retention
 processArgs $*
-if [ "$gitURL" == "" ]; then
-	echo "No GitURL specified; Defaulting to adoptopenjdk/openjdk-infrastructure"
-	gitURL=https://github.com/adoptopenjdk/openjdk-infrastructure
-fi
+defaultVars
 splitURL
 checkVagrantOS
 setupFiles
