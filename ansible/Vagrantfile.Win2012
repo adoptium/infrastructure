@@ -1,12 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Runs powershell as an administator and gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it.
+# Runs powershell as an administator and gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it. Then places a file in the shared folder of the VM that contains the IP address of the VM.
 $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
-ipConfig
+$IPArray=Get-NetIPAddress | % {$_.IPAddress }
+$IPArray -split('\n')
+echo $IPArray[5] | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -u
+set -eu
 
 branchName=''
 folderName=''
@@ -71,8 +71,10 @@ checkVagrantOS()
 			vagrantOS="CentOS6" ;;
 		"CentOS7" | "centos7" | "C7" | "c7" )
 			vagrantOS="CentOS7" ;;
+		"Windows2012" | "Win2012" | "W12" | "w12" )
+			vagrantOS="Win2012";;
 		"all" )
-			vagrantOS="Ubuntu1604 Ubuntu1804 CentOS6 CentOS7" ;;
+			vagrantOS="Ubuntu1604 Ubuntu1804 CentOS6 CentOS7 Windows2012" ;;
 		*) echo "Not a currently supported OS" ; vagrantOSList; exit 1;
 	esac
 }
@@ -84,7 +86,8 @@ vagrantOSList()
 		- Ubuntu1604
 		- Ubuntu1804
 		- CentOS6
-		- CentOS7"
+		- CentOS7
+		- Win2012"
 	echo
 }
 
@@ -149,6 +152,31 @@ startVMPlaybook()
 	vagrant halt
 }
 
+startVMPlaybookWin()
+{
+	local OS=$1
+	if [ "$branchName" == "" ]; then
+		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
+		branchName="master"
+	else
+		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+	fi
+	ln -sf Vagrantfile.$OS Vagrantfile
+	vagrant up
+	# Changes the value of "hosts" in main.yml
+	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
+	sed -i'' -e "s/.*ansible_password.*/ansible_password: vagrant/g" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+	# if "credssp" isn't found in adoptopenjdk_variables.yml
+	if ! grep -q "credssp" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml;
+	then
+		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
+		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+	fi
+	# run the ansible playbook on the VM & logs the output.
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+}
+
 destroyVM()
 {
 	printf "Destroying Machine . . .\n"
@@ -165,8 +193,11 @@ searchLogFiles()
 	elif grep -q '\[ERROR\]' *$2.$1.log
 	then
 		printf "\n$1 playbook was stopped\n"
-	else
+	elif grep -q 'failed=0' *$2.$1.log
+	then
 		printf "\n$1 playbook succeeded\n"
+	else
+		printf "\n$1 playbook undetermined\n"
 	fi
 }
 
@@ -200,7 +231,11 @@ setupGit
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
-	startVMPlaybook $OS
+	if [[ "$OS" == "Win2012" ]]; then
+		startVMPlaybookWin $OS
+	else
+		startVMPlaybook $OS
+	fi
 	if [[ "$retainVM" = false ]]
 	then
 		destroyVM
