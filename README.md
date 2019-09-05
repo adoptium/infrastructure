@@ -52,8 +52,8 @@ a new member? Please follow our [Onboarding Process](ONBOARDING.md).
 
 Team that holds super user access to Infrastructure
 
-- [@gdams](https://github.com/gdams) - George Adams (jClarity) - *
-- [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC) - *
+- [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
+- [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
@@ -64,8 +64,8 @@ Core infrastructure team - granted access to hosts on a case by case basis
 - [@gdams](https://github.com/gdams) - George Adams (jClarity)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-- [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC) - *
+- [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
+- [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC) - *
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM) - *
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
@@ -80,17 +80,17 @@ Issues can be assigned to these folks
 - [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
 - [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
+- [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
 
 ## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
--	[@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
-- [@gdams](https://github.com/gdams) - George Adams (jClarity)
+- [@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
+- [@gdams](https://github.com/gdams) - George Adams (Microsoft)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
-- [@johnoliver](https://github.com/johnoliver) - John Oliver (jClarity / LJC)
-- [@karianna](https://github.com/karianna) - Martijn Verburg (jClarity / LJC)
+- [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
+- [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
 - [@smlambert](https://github.com/smlambert) - Shelley Lambert (IBM)
