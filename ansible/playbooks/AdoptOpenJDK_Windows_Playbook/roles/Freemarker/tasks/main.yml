@@ -7,11 +7,15 @@
   win_stat:
     path: 'C:\openjdk\freemarker.jar'
   register: freemarker_installed
-  tags: Freemarker
+  tags:
+    - Freemarker
+    - adoptopenjdk
 
 - name: Download freemarker
   win_get_url:
     url: http://central.maven.org/maven2/freemarker/freemarker/2.3.8/freemarker-2.3.8.jar
     dest: 'C:\openjdk\freemarker.jar'
   when: (freemarker_installed.stat.exists == false)
-  tags: Freemarker
+  tags:
+    - Freemarker
+    - adoptopenjdk
