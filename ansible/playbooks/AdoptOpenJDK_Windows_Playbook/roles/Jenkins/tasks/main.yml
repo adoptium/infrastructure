@@ -11,7 +11,7 @@
     password_never_expires: true
     groups:
       - Users, Remote Desktop Users
-  tags: jenkins_user
+  tags: jenkins
 
 
 #######################################################################
@@ -35,4 +35,4 @@
     username: SYSTEM
     state: present
     enabled: true
-  tags: jenkins_workspace
+  tags: jenkins
