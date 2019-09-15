@@ -4,6 +4,8 @@ set -e
 set -u
 set -o pipefail
 
+SSH_KEY="${1-:"-i ${HOME}/.ssh/id_rsa-linux"}"
+
 if [[ ! -s "machines.txt" ]]; then 
 	grep "ip\|user" ../inventory.yml         \
 	                | awk '{print $1 $3 $5}' \
@@ -39,13 +41,13 @@ do
 
   if [[ ! -z "$(echo ${servername} | grep -i win)" ]]; then
        echo "Windows box"
-       ssh -T "${user}@${host_ip}" -i ${HOME}/.ssh/id_rsa-linux < windows.sh || true 
+       ssh -T "${user}@${host_ip}" ${SSH_KEY} < windows.sh || true 
   elif [[ ! -z "$(echo ${servername} | grep -i macos)" ]]; then
         echo "MacOS box"
-        ssh -T "${user}@${host_ip}" -i ${HOME}/.ssh/id_rsa-linux < macos.sh || true 
+        ssh -T "${user}@${host_ip}" ${SSH_KEY} < macos.sh || true 
   else
         echo "Unix/Linux box"
-        ssh -T "${user}@${host_ip}" -i ${HOME}/.ssh/id_rsa-linux < linux.sh || true 
+        ssh -T "${user}@${host_ip}" ${SSH_KEY} < linux.sh || true 
   fi
   echo "-----------------------------------------------------------------------------"
 done
