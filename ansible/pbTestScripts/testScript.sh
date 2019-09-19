@@ -132,6 +132,15 @@ testBuild()
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
 
+testBuildWin()
+{	
+	# Ensures the git config won't change line endings
+        vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
+        # Clone build repo and run buildJDKWin.sh
+	vagrant powershell -c "cd C:/;git clone https://github.com/adoptopenjdk/openjdk-build; Start-Sleep 5"
+        vagrant powershell -c "cd C:\vagrant\pbTestScripts; c:/cygwin64/bin/bash buildJDKWin.sh"
+}
+
 # Takes the OS as arg 1
 startVMPlaybook()
 {
@@ -175,6 +184,10 @@ startVMPlaybookWin()
 	fi
 	# run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	if [[ "$testNativeBuild" = true ]]; then
+                testBuildWin
+        fi
+        vagrant halt
 }
 
 destroyVM()
