@@ -7,6 +7,7 @@ gitURL=''
 vagrantOS=''
 retainVM=false
 testNativeBuild=false
+runTest=false
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -25,6 +26,8 @@ processArgs()
 				retainVM=true;;
 			"--URL" | "-u" )
 				gitURL="$1"; shift;;
+			"--test" | "-t" )
+				runTest=true;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -40,11 +43,16 @@ usage()
 					--retainVM | -r				Option to retain the VM once building them
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
+                                        --test | -t                             Runs a quick test on the built JDK
 					--help | -h				Displays this help message"
 }
 
-defaultVars()
+checkVars()
 {
+	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
+                echo "Unable to test an unbuilt JDK. Please specify both '--build' and '--test'"
+                exit 1
+        fi
 	#Sets WORKSPACE to home if WORKSPACE is empty or undefined. 
 	if [ ! -n "${WORKSPACE:-}" ]; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
@@ -148,6 +156,9 @@ startVMPlaybook()
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuild
+		if [[ "$runTest" = true ]]; then
+        	        vagrant ssh -c "cd /vagrant/pbTestScripts && ./testJDK.sh"
+	        fi
 	fi
 	vagrant halt
 }
@@ -223,7 +234,7 @@ splitURL()
 }
 # var1 = GitURL, var2 = y/n for VM retention
 processArgs $*
-defaultVars
+checkVars
 splitURL
 checkVagrantOS
 setupFiles
