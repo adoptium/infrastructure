@@ -16,7 +16,7 @@
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
-  win_shell: C:\temp\cuda_9.0.176_windows_network-exe.exe -s compiler_9.0
+  win_shell: C:\temp\cuda_9.0.176_windows_network-exe.exe -s compiler_9.0 nvml_dev_9.0
   when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
@@ -35,7 +35,7 @@
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 10 and Server 2016
-  win_shell: C:\temp\cuda_9.0.176_win10_network-exe.exe -s compiler_9.0
+  win_shell: C:\temp\cuda_9.0.176_win10_network-exe.exe -s compiler_9.0 nvml_dev_9.0
   when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 
