@@ -153,7 +153,7 @@ startVMPlaybook()
 	ln -sf Vagrantfile.$OS Vagrantfile
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
-	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuild
 		if [[ "$runTest" = true ]]; then
@@ -185,31 +185,35 @@ startVMPlaybookWin()
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
 	# run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 }
 
 destroyVM()
 {
-	printf "Destroying Machine . . .\n"
+	echo "Destroying Machine . . ."
+	echo
 	vagrant destroy -f
 }
 
 # Takes in OS as arg 1, branchName as arg 2
 searchLogFiles()
 {
+	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/logFiles
-	if grep -q 'failed=[1-9]' *$2.$1.log
+	echo
+	if grep -q 'failed=[1-9]' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 Failed\n"
-	elif grep -q '\[ERROR\]' *$2.$1.log
+		echo "$OS playbook failed"
+	elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 playbook was stopped\n"
-	elif grep -q 'failed=0' *$2.$1.log
+		echo "$OS playbook was stopped"
+	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 playbook succeeded\n"
+		echo "$OS playbook succeeded"
 	else
-		printf "\n$1 playbook undetermined\n"
+		echo "$OS playbook success is undetermined"
 	fi
+	echo
 }
 
 # Takes in the URL passed to the script, and extracts the folder name, branch name and builds the gitURL to be used later on.
@@ -254,5 +258,5 @@ do
 done
 for OS in $vagrantOS
 do
-	searchLogFiles $OS $branchName
+	searchLogFiles $OS
 done
