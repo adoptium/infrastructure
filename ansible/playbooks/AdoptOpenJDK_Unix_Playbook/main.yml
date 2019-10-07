@@ -39,10 +39,12 @@
     - cmake                       # OpenJ9 / OpenJFX
     - ccache
     - {role: nasm, when: ansible_architecture == 'x86_64'} # OpenJ9
-    - adoptopenjdk9               # JDK10 build bootstrap
-    - adoptopenjdk10              # JDK11 build bootstrap
-    - adoptopenjdk11              # JDK12 build bootstrap
-    - adoptopenjdk12              # JDK13 build bootstrap
+    - role: adoptopenjdk_install  # JDK11 Build Bootstrap
+      jdk_version: 10
+    - role: adoptopenjdk_install  # JDK13 Build Bootstrap
+      jdk_version: 12
+    - role: adoptopenjdk_install  # JDK14 Build Bootstrap
+      jdk_version: 13
     - role: local_srcinstall
       src_tarball: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
       installed_target: /usr/local/bin/protoc
