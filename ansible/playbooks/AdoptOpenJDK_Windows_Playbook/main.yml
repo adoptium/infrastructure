@@ -47,6 +47,7 @@
     - Java9                       # JDK10 build bootstrap
     - Java11                      # JDK11 build bootstrap
     - Java12                      # JDK12 build bootstrap
+    - Java13                      # JDK13 build bootstrap
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
