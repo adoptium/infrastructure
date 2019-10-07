@@ -35,6 +35,7 @@
     - Windows_Updates
     - Jenkins                     # AdoptOpenJDK infrastructure
     - MSVS_2010
+    - VS2010_SP1
     - cygwin
     - Firefox
     - Strawberry_Perl             # Testing
