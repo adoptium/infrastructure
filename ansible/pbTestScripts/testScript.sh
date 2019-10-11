@@ -216,14 +216,18 @@ searchLogFiles()
 	if grep -q 'failed=[1-9]' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook failed"
+		exit 1;
 	elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook was stopped"
+		exit 1;
 	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook succeeded"
+		exit 0;
 	else
 		echo "$OS playbook success is undetermined"
+		exit 1;
 	fi
 	echo
 }
