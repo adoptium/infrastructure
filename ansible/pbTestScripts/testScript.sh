@@ -66,6 +66,10 @@ checkVars()
 		echo "No Vagrant OS specified; Defaulting to testing all of them"
 		vagrantOS="all"
 	fi
+        if [[ ! $(vagrant plugin list | grep 'disksize') ]]; then
+                echo "Can't find vagrant-disksize plugin, installing . . ."
+                vagrant plugin install vagrant-disksize
+        fi
 }
 
 checkVagrantOS()
@@ -175,6 +179,8 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
+	# The number of bytes the disk should be (this is 95GB in bytes)
+	local diskSizeBoundary=102005473280;
 	if [ "$branchName" == "" ]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
 		branchName="master"
@@ -192,6 +198,12 @@ startVMPlaybookWin()
 	then
 		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+	fi
+	# getting the current c drive information and cutting it down to the number of GB it is.
+	export currentDiskSize=$(vagrant powershell -c "Start-Process powershell -Verb runAs; Get-Partition -Driveletter c | select Size" | grep '[0-9]{5,}')
+	if [[ $currentDiskSize -lt $diskSizeBoundary ]]; then
+		echo "Resizing C Drive"
+		vagrant powershell -c "Start-Process powershell -Verb runAs; \$size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size \$size.SizeMax"
 	fi
 	# run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
@@ -217,14 +229,18 @@ searchLogFiles()
 	if grep -q 'failed=[1-9]' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook failed"
+		exit 1;
 	elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook was stopped"
+		exit 1;
 	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook succeeded"
+		exit 0;
 	else
 		echo "$OS playbook success is undetermined"
+		exit 1;
 	fi
 	echo
 }

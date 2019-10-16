@@ -43,10 +43,13 @@
     - cmake                       # OpenJ9
     - GIT
     - Java7                       # JDK8 build bootstrap
-    - Java8                       # JDK9 build bootstrap
-    - Java9                       # JDK10 build bootstrap
-    - Java11                      # JDK11 build bootstrap
-    - Java12                      # JDK12 build bootstrap
+    - Java8                       # JDK9 build bootstrap/ For Gradle
+    - role: Java_install          # JDK11 build bootstrap
+      jdk_version: 10
+    - role: Java_install          # JDK13 build bootstrap
+      jdk_version: 12
+    - role: Java_install          # JDK14 build bootstrap
+      jdk_version: 13
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
