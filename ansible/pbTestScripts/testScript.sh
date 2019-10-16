@@ -40,7 +40,7 @@ usage()
 	echo
 	echo "Usage: ./testScript.sh			--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
 					--all | -a 				Builds and tests playbook through every OS
-					--retainVM | -r				Option to retain the VM once building them
+					--retainVM | -r				Option to retain the VM and folder after completion
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
@@ -191,7 +191,7 @@ startVMPlaybookWin()
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
 	# getting the current c drive information and cutting it down to the number of GB it is.
-	export currentDiskSize=$(vagrant powershell -c "Start-Process powershell -Verb runAs; Get-Partition -Driveletter c | select Size" | grep '[0-9]{5,}')
+	export currentDiskSize=$(vagrant powershell -c "Start-Process powershell -Verb runAs; Get-Partition -Driveletter c | select Size" | grep -E -o '[0-9]{5,}')
 	if [[ $currentDiskSize -lt $diskSizeBoundary ]]; then
 		echo "Resizing C Drive"
 		vagrant powershell -c "Start-Process powershell -Verb runAs; \$size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size \$size.SizeMax"
@@ -203,8 +203,11 @@ startVMPlaybookWin()
 destroyVM()
 {
 	echo "Destroying Machine . . ."
-	echo
 	vagrant destroy -f
+	echo "Removing Work folder"
+	rm -rf $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName
+	echo "==$WORKSPACE/adoptopenjdkPBTests/=="
+	ls -la $WORKSPACE/adoptopenjdkPBTests
 }
 
 # Takes in OS as arg 1, branchName as arg 2
