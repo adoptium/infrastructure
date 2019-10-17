@@ -62,3 +62,4 @@
     - nasm                        # OpenJ9
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
+    - Build                       # Role to build JDK8

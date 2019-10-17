@@ -1,0 +1,26 @@
+---
+################
+#  Build JDK8  #
+################
+- name: check if openjdk-build repo exists
+  win_stat:
+    path: 'C:\openjdk-build'
+  register: build_repo_exists
+  tags: build
+
+- name: check if a JDK8 has been built previously
+  win_stat:
+    path: 'C:\workspace\build\src\build\'
+  register: previous_JDK_build
+  tags: build
+
+- name: git clone openjdk-build repo
+  raw: cd C:/; git clone https://github.com/adoptopenjdk/openjdk-build
+  when: (build_repo_exists.stat.exists == false)
+  tags: build
+
+- name: Start build Script
+  raw: Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh
+  when: (previous_JDK_build.stat.exists == false)
+  register: build_script
+  tags: build

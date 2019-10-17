@@ -145,12 +145,11 @@ testBuild()
 }
 
 testBuildWin()
-{	
+{
 	# Ensures the git config won't change line endings
-        vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
-        # Clone build repo and run buildJDKWin.sh
-	vagrant powershell -c "cd C:/;git clone https://github.com/adoptopenjdk/openjdk-build; Start-Sleep 5"
-        vagrant powershell -c "cd C:\vagrant\pbTestScripts; c:/cygwin64/bin/bash buildJDKWin.sh"
+	vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
+	# Run the build role of the Playbook
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible && ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --tags build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 }
 
 # Takes the OS as arg 1
@@ -206,9 +205,9 @@ startVMPlaybookWin()
 		vagrant powershell -c "Start-Process powershell -Verb runAs; \$size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size \$size.SizeMax"
 	fi
 	# run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	if [[ "$testNativeBuild" = true ]]; then
-                testBuildWin
+		testBuildWin
         fi
         vagrant halt
 }
