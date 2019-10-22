@@ -456,7 +456,7 @@
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
-          command: installp -agXYd /tmp/stuff X11.vfb
+          command: installp -agXYd /tmp/x11 X11.vfb
           register: result.x11
           ignore_errors: yes
           when: does_x11_exist.rc != 0
@@ -465,7 +465,7 @@
         - name: Remove X11 install files
           file:
             state: absent
-            path: /tmp/stuff
+            path: /tmp/x11
           when: does_x11_exist.rc != 0
           tags: x11
 
