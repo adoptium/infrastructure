@@ -440,29 +440,33 @@
       # x11.adt.ext installp download requiring an IBMid                      #
       # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
       #########################################################################
-        - name: Check if X11.adt.ext is installed
-          shell: lslpp -l X11.adt.ext >/dev/null 2>&1
-          register: does_X11_adt_ext_exist
+          
+        - name: Check if X11 is installed
+          shell: lslpp -l X11.vfb >/dev/null 2>&1
+          register: does_x11_exist
           ignore_errors: yes
-        - name: Transfer X11 installp to remote host
-          copy:
-            src: /Vendor_Files/aix/adt/X11.adt
-            dest: /tmp/X11.adt
-          when: does_X11_adt_ext_exist.rc != 0
+          tags: x11
+          
+        - name: Transfer and extract X11
+          unarchive:
+            src: /Vendor_Files/aix/X11-new/OpenGL_X11.tar 
+            dest: /tmp
+            remote_src: no
+          when: does_x11_exist.rc != 0  
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
-          command: installp -aXYgd /tmp/X11.adt X11.adt.ext
+          command: installp -agXYd /tmp/stuff X11.vfb
           register: result.x11
           ignore_errors: yes
-          when: does_X11_adt_ext_exist.rc != 0
+          when: does_x11_exist.rc != 0 
           tags: x11
-
-        - name: Remove X11 installp
+          
+        - name: Remove X11 install files
           file:
             state: absent
-            path: /tmp/X11.adt
-          when: does_X11_adt_ext_exist.rc != 0
+            path: /tmp/stuff
+          when: does_x11_exist.rc != 0 
           tags: x11
 
       ############
