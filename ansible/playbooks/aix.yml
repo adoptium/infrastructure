@@ -440,33 +440,33 @@
       # x11.adt.ext installp download requiring an IBMid                      #
       # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
       #########################################################################
-          
+
         - name: Check if X11 is installed
           shell: lslpp -l X11.vfb >/dev/null 2>&1
           register: does_x11_exist
           ignore_errors: yes
           tags: x11
-          
+
         - name: Transfer and extract X11
           unarchive:
-            src: /Vendor_Files/aix/X11-new/OpenGL_X11.tar 
+            src: /Vendor_Files/aix/X11-new/OpenGL_X11.tar
             dest: /tmp
             remote_src: no
-          when: does_x11_exist.rc != 0  
+          when: does_x11_exist.rc != 0
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
           command: installp -agXYd /tmp/stuff X11.vfb
           register: result.x11
           ignore_errors: yes
-          when: does_x11_exist.rc != 0 
+          when: does_x11_exist.rc != 0
           tags: x11
-          
+
         - name: Remove X11 install files
           file:
             state: absent
             path: /tmp/stuff
-          when: does_x11_exist.rc != 0 
+          when: does_x11_exist.rc != 0
           tags: x11
 
       ############
