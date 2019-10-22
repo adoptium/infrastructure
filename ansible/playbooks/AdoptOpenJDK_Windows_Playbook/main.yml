@@ -58,3 +58,4 @@
     - nasm                        # OpenJ9
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
+    - Test_JDK                    # To test the built JDK
