@@ -449,7 +449,7 @@
 
         - name: Transfer and extract X11
           unarchive:
-            src: /Vendor_Files/aix/X11-new/OpenGL_X11.tar
+            src: /Vendor_Files/aix/OpenGL_X11.tar
             dest: /tmp
             remote_src: no
           when: does_x11_exist.rc != 0
