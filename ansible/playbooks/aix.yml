@@ -441,7 +441,12 @@
       # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
       #########################################################################
 
-        - name: Check if X11 is installed
+        - name: Check if X11.adt.ext is installed
+          shell: lslpp -l X11.adt.ext >/dev/null 2>&1
+          register: does_X11_adt_ext_exist
+          ignore_errors: yes
+
+        - name: Check if X11.vfb is installed
           shell: lslpp -l X11.vfb >/dev/null 2>&1
           register: does_x11_exist
           ignore_errors: yes
@@ -452,12 +457,19 @@
             src: /Vendor_Files/aix/OpenGL_X11.tar
             dest: /tmp
             remote_src: no
-          when: does_x11_exist.rc != 0
+          when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
           tags: x11
 
         - name: Install IBM X11 Extensions - installp
-          command: installp -agXYd /tmp/x11 X11.vfb
+          command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
           register: result.x11
+          ignore_errors: yes
+          when: does_X11_adt_ext_exist.rc != 0
+          tags: x11
+
+        - name: Install X11.vfb - installp
+          command: installp -agXYd /tmp/x11 X11.vfb
+          register: result.x11.vfb
           ignore_errors: yes
           when: does_x11_exist.rc != 0
           tags: x11
