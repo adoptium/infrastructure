@@ -439,6 +439,8 @@
       # Install X11 extensions                                                #
       # x11.adt.ext installp download requiring an IBMid                      #
       # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+      # x11.vfb installp download requiring an IBMid                          #
+      # http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
       #########################################################################
 
         - name: Check if X11.adt.ext is installed
