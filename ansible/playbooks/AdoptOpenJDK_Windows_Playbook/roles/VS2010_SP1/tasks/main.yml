@@ -1,0 +1,20 @@
+---
+########################################
+# Visual Studio 2010 Service Package 1 #
+########################################
+
+- name: Check if VS2010SP1 has been downloaded
+  win_stat:
+    path: 'C:\temp\vs2010sp1.exe'
+  register: vs2010sp1_installed
+  tags: VS2010_SP1
+
+- name: Download VS2010SP1
+  win_shell: Invoke-WebRequest 'http://download.microsoft.com/download/2/3/0/230C4F4A-2D3C-4D3B-B991-2A9133904E35/VS10sp1-KB983509.exe' -OutFile C:\temp\vs2010sp1.exe;
+  when: (vs2010sp1_installed.stat.exists == false)
+  tags: VS2010_SP1
+
+- name: Install VS2010SP1
+  raw: 'C:\temp\vs2010sp1.exe /q /norestart'
+  when: (vs2010sp1_installed.stat.exists == false)
+  tags: VS2010_SP1

@@ -40,7 +40,7 @@ usage()
 	echo
 	echo "Usage: ./testScript.sh			--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
 					--all | -a 				Builds and tests playbook through every OS
-					--retainVM | -r				Option to retain the VM once building them
+					--retainVM | -r				Option to retain the VM and folder after completion
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
@@ -66,6 +66,10 @@ checkVars()
 		echo "No Vagrant OS specified; Defaulting to testing all of them"
 		vagrantOS="all"
 	fi
+        if [[ ! $(vagrant plugin list | grep 'disksize') ]]; then
+                echo "Can't find vagrant-disksize plugin, installing . . ."
+                vagrant plugin install vagrant-disksize
+        fi
 }
 
 checkVagrantOS()
@@ -140,6 +144,16 @@ testBuild()
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
 
+testBuildWin()
+{
+	# Ensures the git config won't change line endings
+	vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
+	vagrant powershell -c "cd C:/; if (-not (Test-Path C:/openjdk-build -PathType Container) ) { echo 'Cloning openJDK-build repo' ; git clone https://github.com/adoptopenjdk/openjdk-build ; sleep 3 }"
+	# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
+	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible && ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
+}
+
 # Takes the OS as arg 1
 startVMPlaybook()
 {
@@ -153,7 +167,7 @@ startVMPlaybook()
 	ln -sf Vagrantfile.$OS Vagrantfile
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
-	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuild
 		if [[ "$runTest" = true ]]; then
@@ -166,6 +180,8 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
+	# The number of bytes the disk should be (this is 95GB in bytes)
+	local diskSizeBoundary=102005473280;
 	if [ "$branchName" == "" ]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
 		branchName="master"
@@ -184,32 +200,53 @@ startVMPlaybookWin()
 		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
+	# getting the current c drive information and cutting it down to the number of GB it is.
+	export currentDiskSize=$(vagrant powershell -c "Start-Process powershell -Verb runAs; Get-Partition -Driveletter c | select Size" | grep -E -o '[0-9]{5,}')
+	if [[ $currentDiskSize -lt $diskSizeBoundary ]]; then
+		echo "Resizing C Drive"
+		vagrant powershell -c "Start-Process powershell -Verb runAs; \$size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size \$size.SizeMax"
+	fi
 	# run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee ~/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	if [[ "$testNativeBuild" = true ]]; then
+		testBuildWin
+	fi
+	vagrant halt
 }
 
 destroyVM()
 {
-	printf "Destroying Machine . . .\n"
+	echo "Destroying Machine . . ."
 	vagrant destroy -f
+	echo "Removing Work folder"
+	rm -rf $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName
+	echo "==$WORKSPACE/adoptopenjdkPBTests/=="
+	ls -la $WORKSPACE/adoptopenjdkPBTests
 }
 
 # Takes in OS as arg 1, branchName as arg 2
 searchLogFiles()
 {
+	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/logFiles
-	if grep -q 'failed=[1-9]' *$2.$1.log
+	echo
+	if grep -q 'failed=[1-9]' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 Failed\n"
-	elif grep -q '\[ERROR\]' *$2.$1.log
+		echo "$OS playbook failed"
+		exit 1;
+	elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 playbook was stopped\n"
-	elif grep -q 'failed=0' *$2.$1.log
+		echo "$OS playbook was stopped"
+		exit 1;
+	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
 	then
-		printf "\n$1 playbook succeeded\n"
+		echo "$OS playbook succeeded"
+		exit 0;
 	else
-		printf "\n$1 playbook undetermined\n"
+		echo "$OS playbook success is undetermined"
+		exit 1;
 	fi
+	echo
 }
 
 # Takes in the URL passed to the script, and extracts the folder name, branch name and builds the gitURL to be used later on.
@@ -254,5 +291,5 @@ do
 done
 for OS in $vagrantOS
 do
-	searchLogFiles $OS $branchName
+	searchLogFiles $OS
 done

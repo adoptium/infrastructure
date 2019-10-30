@@ -4,32 +4,38 @@ set -eu
 # Takes in all arguments
 processArgs()
 {
+	if [ ! -n "${WORKSPACE:-}" ]; then
+		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
+		WORKSPACE=$HOME
+	fi
 	if [ $# -lt 1 ]; then
-		printf "\nScript takes 1 input argument\n"
-		printf "The project whose VMs are to be destroyed\n\n"
+		echo "Script takes 1 input argument: "
+		echo "The project whose VMs are to be destroyed"
 		exit 1
 	fi
+	
 }
 
 # Takes project name as arg 1, and OS as arg 2
 destroyVM()
 {
-	cd $HOME/adoptopenjdkPBTests/$1/ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/$1/ansible
 	ln -sf Vagrantfile.$2 Vagrantfile	# Correct Vagrantfile alias
 	vagrant destroy -f			# Force destroy without question
-	printf "\nDestroyed $2 Machine\n"	
+	echo
+	echo "Destroyed $2 Machine"	
 }
 
 # Takes the project name as arg1
 checkFolder()
 {
-	cd $HOME/adoptopenjdkPBTests
+	cd $WORKSPACE/adoptopenjdkPBTests
 	if [ -d "$1" ]; then
-		printf "\n$1 found!\n"
+		echo "$1 found!"
 		return 0
 	else
-		printf "\n$1 not found\n"
-		return 1
+		echo "$1 not found"
+		exit 1
 	fi
 }
 
@@ -37,7 +43,7 @@ checkFolder()
 processArgs $*
 if checkFolder $1; then	
  	# For all currently supported OSs
-	for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7
+	for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7 Win2012
 	do
 		destroyVM $1 $OS
 	done
