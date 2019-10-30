@@ -148,8 +148,9 @@ testBuildWin()
 {
 	# Ensures the git config won't change line endings
 	vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
-	# Run the build role of the Playbook
-	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible && ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --tags build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+	vagrant powershell -c "cd C:/; if (-not (Test-Path C:/openjdk-build -PathType Container) ) { echo 'Cloning openJDK-build repo' ; git clone https://github.com/adoptopenjdk/openjdk-build ; sleep 3 }"
+	# Runs the build script via ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible && ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
 }
 
 # Takes the OS as arg 1
@@ -209,7 +210,7 @@ startVMPlaybookWin()
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuildWin
         fi
-        vagrant halt
+	vagrant halt
 }
 
 destroyVM()
