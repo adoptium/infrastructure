@@ -102,3 +102,29 @@
     - nvidia_cuda_toolkit
     # TODO: Package installs should not use latest
     - skip_ansible_lint
+
+- name: Download/install Nvidia CUDA Repo deb - Ubuntu 16 on PPC64LE
+  apt:
+    deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/ppc64el/cuda-toolkit-9-0_9.0.176-1_ppc64el.deb
+  when:
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Add a key for Nvidia CUDA Repo - Ubuntu 16 on PPC64LE
+  apt_key:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/ppc64el/7fa2af80.pub
+  when:
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
+
+- name: Install NVidia CUDA toolkit - Ubuntu 16 on PPC64LE
+  apt:
+    name: cuda-toolkit-9-0
+    update_cache: yes
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
+    - ansible_architecture == "ppc64le"
+  tags: nvidia_cuda_toolkit
