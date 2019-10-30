@@ -144,6 +144,16 @@ testBuild()
 	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 }
 
+testBuildWin()
+{
+	# Ensures the git config won't change line endings
+	vagrant powershell -c "Start-Process powershell -Verb runAs; C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config"
+	vagrant powershell -c "cd C:/; if (-not (Test-Path C:/openjdk-build -PathType Container) ) { echo 'Cloning openJDK-build repo' ; git clone https://github.com/adoptopenjdk/openjdk-build ; sleep 3 }"
+	# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
+	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible && ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
+}
+
 # Takes the OS as arg 1
 startVMPlaybook()
 {
@@ -197,7 +207,11 @@ startVMPlaybookWin()
 		vagrant powershell -c "Start-Process powershell -Verb runAs; \$size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size \$size.SizeMax"
 	fi
 	# run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	if [[ "$testNativeBuild" = true ]]; then
+		testBuildWin
+	fi
+	vagrant halt
 }
 
 destroyVM()
