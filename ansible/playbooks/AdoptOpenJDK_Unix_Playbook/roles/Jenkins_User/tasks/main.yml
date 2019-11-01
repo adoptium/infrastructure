@@ -51,3 +51,19 @@
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
   when: (ansible_distribution != "MacOSX")
+
+- name: Ensure proper limits are set in /etc/security/limits.conf
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ Jenkins_Username }} {{ item.limit_type }} {{ item.limit_name }} {{ item.limit_value }}"
+    state: present
+  with_items:
+    - {limit_type: 'hard', limit_name: 'nofile', limit_value: '1048576'}
+    - {limit_type: 'hard', limit_name: 'nproc', limit_value: 'unlimited'}
+    - {limit_type: 'hard', limit_name: 'core', limit_value: 'unlimited'}
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags:
+    - jenkins_user
