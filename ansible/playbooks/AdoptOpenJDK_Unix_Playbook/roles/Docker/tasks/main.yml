@@ -196,6 +196,42 @@
     - ansible_architecture == "x86_64"
   tags: docker
 
+# Debian
+
+- name: Add Docker GPG apt Key for Debian
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian"
+  tags: docker
+
+- name: Install Docker prerequisites for Debian
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian"
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Add Docker Repo for Debian x86_64
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian"
+    - ansible_architecture == "x86_64"
+  tags: docker
+
 # All OS' - Common
 - name: Run apt-get update
   apt:
@@ -225,13 +261,23 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Add Jenkins user to the docker group for Ubuntu
+- name: Install Docker for Debian
+  package: "name=docker-ce state=latest"
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian"
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Add Jenkins user to the docker group for Ubuntu and Debian
   user: name={{ Jenkins_Username }}
     groups=docker
     append=yes
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
+    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
   tags: docker
 
 - name: Add Jenkins user to the docker group for SLES 12, cent7, and RHEL7
@@ -244,14 +290,14 @@
     - ansible_architecture == "x86_64"
   tags: docker
 
-- name: Enable and Start Docker Service for Ubuntu
+- name: Enable and Start Docker Service for Ubuntu and Debian
   service:
     name: docker
     state: restarted
     enabled: yes
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
+    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
   tags: docker
 
 - name: Enable and Start Docker Service for SLES 12, cent7, and RHEL7
