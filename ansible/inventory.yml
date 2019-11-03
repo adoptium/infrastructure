@@ -136,6 +136,7 @@ hosts:
       - marist:
           sles12-s390x-1: {ip: 148.100.110.56}
           ubuntu1604-s390x-1: {ip: 148.100.33.147}
+          ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}
@@ -150,7 +151,6 @@ hosts:
 
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}
-          ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.193.234}
