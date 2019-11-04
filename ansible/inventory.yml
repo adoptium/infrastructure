@@ -33,8 +33,8 @@ hosts:
           centos69-x64-2: {ip: 167.71.130.191}
 
       - linaro:
-          centos74-armv8-1: {ip: 64.28.99.122}
-          centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
+          centos76-armv8-1: {ip: 213.146.141.99, user: centos}
+          centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
       - macstadium:
           macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
