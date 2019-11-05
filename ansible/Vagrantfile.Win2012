@@ -9,6 +9,18 @@ wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/Co
 $IPArray=Get-NetIPAddress | % {$_.IPAddress }
 $IPArray -split('\n')
 echo $IPArray[5] | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+# Retrieving disk's current size
+$currentDiskSize =(Get-Partition -DriveLetter c | select Size)
+$currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
+# The size the disk should be, in bytes (95GB)
+$diskSizeBoundary = 102005473280
+# Changing the disksize to max supported size (~100GB)
+if ([long]$currentDiskSize -lt $diskSizeBoundary) {
+        echo "Resizing disk to max size"
+        $size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size $size.SizeMax
+}else {
+        echo "Disk is already at max size"
+}
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
