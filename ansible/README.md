@@ -110,8 +110,8 @@ You can do this by following these steps:
 6) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME`.
 7) From the `../ansible` directory, running `sudo ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
 
-Note: if using a macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=yes` will be required before starting the playbook.
- 
+Note: if using macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` will be required before starting the playbook.
+
 ## Can I have multiple VMs on different OSs?
 
 As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
