@@ -178,6 +178,8 @@ startVMPlaybookWin()
 	fi
 	ln -sf Vagrantfile.$OS Vagrantfile
 	vagrant up
+	cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	# Changes the value of "hosts" in main.yml
 	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
