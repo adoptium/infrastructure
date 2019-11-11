@@ -6,8 +6,8 @@ $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
-$IPArray=(Get-NetIPAddress -InterfaceAlias "Ethernet*" -AddressFamily ipv4 | select -First 1 -ExpandProperty IPAddress)
-echo $IPArray | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+$IPArray=(Get-NetIPAddress -InterfaceAlias "Ethernet*" -AddressFamily ipv4 | select -ExpandProperty IPAddress)
+echo $IPArray | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
 # Retrieving disk's current size
 $currentDiskSize =(Get-Partition -DriveLetter c | select Size)
 $currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
