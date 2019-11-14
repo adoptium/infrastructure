@@ -158,11 +158,14 @@ startVMPlaybook()
 	vagrant up
 	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
 	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	echo The playbook finished at : `date +%T`
 	if [[ "$testNativeBuild" = true ]]; then
 		testBuild
+		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
         	        vagrant ssh -c "cd /vagrant/pbTestScripts && ./testJDK.sh"
-	        fi
+	        	echo The test finished at : `date +%T`
+		fi
 	fi
 	vagrant halt
 }
@@ -192,16 +195,19 @@ startVMPlaybookWin()
 	fi
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	echo The playbook finished at : `date +%T`
 	if [[ "$testNativeBuild" = true ]]; then
 		echo "Building a JDK"
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
         	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
+		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 			echo "Running test against the built JDK"
 			# Runs a script on the VM to test the built JDK
 			ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "sh C:/vagrant/pbTestScripts/testJDKWin.sh"
+			echo The test finished at : `date +%T`
 		fi
 	fi
 	vagrant halt
