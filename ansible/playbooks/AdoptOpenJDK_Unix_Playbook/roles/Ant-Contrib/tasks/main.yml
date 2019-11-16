@@ -27,6 +27,7 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+  retries: 3
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 
