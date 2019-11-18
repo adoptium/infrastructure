@@ -2,19 +2,34 @@
 set -eu
 
 osToDestroy=''
-
+force=False
 # Takes in all arguments
 processArgs()
 {
-	if [ $# -lt 1 ]; then
-		echo "Script takes 1 input argument: "
-		echo "The OS of the VMs you want to destroy."
-		exit 1
-	fi
+	while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]] ; do
+		local opt="$1";
+		shift;
+		case "$opt" in
+			"--OS" | "-o" )
+				osToDestroy=$1; shift;;
+			"--force" | "-f" )
+				force=True;;
+			"--help" | "-h" )
+				usage; exit 0;;
+			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
+		esac
+	done
+}
+
+usage() {
+
+		echo "Usage: ./vmDestroy <option>
+		--force | -f		Force destroy the VMs without asking confirmation
+		--help | -h		Displays this help message"
 }
 
 checkOS() {
-	local OS=$1
+	local OS=$osToDestroy
         case "$OS" in
                 "Ubuntu1604" | "U16" | "u16" )
 			osToDestroy="U16";;
@@ -28,7 +43,7 @@ checkOS() {
                         osToDestroy="W2012";;
                 "all" )
                         osToDestroy="U16 U18 C6 C7 W2012" ;;
-                *) echo "Not a currently supported OS" ; listOS; exit 1;
+                *) echo "$OS is not a currently supported OS" ; listOS; exit 1;
         esac
 }
 
@@ -50,9 +65,18 @@ destroyVMs() {
 }
 
 processArgs $*
-checkOS $1
-for OS in $osToDestroy
+checkOS
+if [[ "$force" == False ]]; then
+	userInput=""
+	echo "Are you sure you want to destroy ALL Vms with the following OS(s)? (Y/n)"
+	echo "$osToDestroy"
+	read userInput
+	if [[ "$userInput" != "Y" ]]; then
+		echo "Cancelling ..."
+		exit 1;
+	fi
+fi	
+for OS in $osToDestroy 
 do
 	destroyVMs $OS
 done
-
