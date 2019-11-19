@@ -74,7 +74,7 @@ def main():
     inventory_path = path.abspath(path.join(basepath, "..", "..", "inventory.yml"))
     with open(inventory_path, 'r') as stream:
         try:
-            hosts = yaml.load(stream)
+            hosts = yaml.load(stream, Loader=yaml.FullLoader)
 
         except yaml.YAMLError as exc:
             print(exc)

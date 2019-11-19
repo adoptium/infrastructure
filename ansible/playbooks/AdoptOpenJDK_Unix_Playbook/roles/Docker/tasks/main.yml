@@ -16,6 +16,10 @@
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+  tags: docker
 
 - name: Add Docker Repo for Ubuntu x86_64
   apt_repository:
@@ -47,6 +51,26 @@
     - ansible_architecture == "ppc64le"
   tags: docker
 
+- name: Add Docker Repo for Ubuntu aarch64
+  apt_repository:
+    repo: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "aarch64"
+  tags: docker
+
+- name: Add Docker Repo for Ubuntu armv7l
+  apt_repository:
+    repo: "deb [arch=armhf] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Ubuntu"
+    - ansible_architecture == "armv7l"
+  tags: docker
+
 - name: Install Docker prerequisites for Ubuntu
   apt: pkg={{ item }} state=latest update_cache=yes
   with_items:
@@ -57,7 +81,6 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -72,21 +95,10 @@
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version == "14"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
     - skip_ansible_lint
-
-- name: Import Docker Repo key for Ubuntu
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
-  tags: docker
 
 # RedHat
 - name: Install EPEL repo for RedHat 7
@@ -197,7 +209,6 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -221,7 +232,6 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 - name: Add Jenkins user to the docker group for SLES 12, cent7, and RHEL7
@@ -242,7 +252,6 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x" or ansible_architecture == "ppc64le")
   tags: docker
 
 - name: Enable and Start Docker Service for SLES 12, cent7, and RHEL7
