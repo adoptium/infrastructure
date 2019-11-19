@@ -5,7 +5,7 @@ $script = <<SCRIPT
 sudo apt-get install tree -y
 sudo apt-get install software-properties-common -y
 sudo apt-add-repository ppa:ansible/ansible
-cd /etc/apt/sources.list.d && sudo perl -p -i -e 's/jessie/bionic/g' ansible-ansible-jessie.list
+cd /etc/apt/sources.list.d && sudo perl -p -i -e 's/jessie/trusty/g' ansible-ansible-jessie.list
 sudo apt-get update
 sudo apt-get install ansible -y
 sudo mkdir /ansible
