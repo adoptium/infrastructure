@@ -11,7 +11,14 @@ processArgs()
 		shift;
 		case "$opt" in
 			"--OS" | "-o" )
-				osToDestroy=$1; shift;;
+				if [[ -z "${1:-}" ]]; then
+					echo "Please specifiy an OS with the '-o' option"
+					usage
+					exit 1
+				else
+					osToDestroy=$1;
+				fi
+				shift;;
 			"--force" | "-f" )
 				force=True;;
 			"--help" | "-h" )
@@ -22,10 +29,11 @@ processArgs()
 }
 
 usage() {
-
-		echo "Usage: ./vmDestroy <option>
+	   echo "Usage: ./vmDestroy.sh (<options>) -o <os_list>
+		--OS | -o		Specifies the OS of the vagrant VMs you want to destroy
 		--force | -f		Force destroy the VMs without asking confirmation
 		--help | -h		Displays this help message"
+		listOS
 }
 
 checkOS() {
@@ -43,7 +51,9 @@ checkOS() {
                         osToDestroy="W2012";;
                 "all" )
                         osToDestroy="U16 U18 C6 C7 W2012" ;;
-                *) echo "$OS is not a currently supported OS" ; listOS; exit 1;
+		"")
+			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
+		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
         esac
 }
 
@@ -60,7 +70,7 @@ listOS() {
 
 destroyVMs() {
 	local OS=$1
-	vagrant global-status | grep "adoptopenjdk$OS" | awk '{ print $1 }' | xargs vagrant destroy -f
+	vagrant global-status | awk "/adoptopenjdk$OS/ { print \$1 }" | xargs vagrant destroy -f
 	echo "Destroyed all $OS Vagrant VMs"
 }
 
