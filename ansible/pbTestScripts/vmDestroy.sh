@@ -60,7 +60,7 @@ listOS() {
 
 destroyVMs() {
 	local OS=$1
-	vagrant global-status | grep "adoptopenjdk$OS" | awk '{ print $1 }' | xargs -I {} vagrant destroy -f {}
+	vagrant global-status | grep "adoptopenjdk$OS" | awk '{ print $1 }' | xargs vagrant destroy -f
 	echo "Destroyed all $OS Vagrant VMs"
 }
 
@@ -71,7 +71,7 @@ if [[ "$force" == False ]]; then
 	echo "Are you sure you want to destroy ALL Vms with the following OS(s)? (Y/n)"
 	echo "$osToDestroy"
 	read userInput
-	if [[ "$userInput" != "Y" ]]; then
+	if [ "$userInput" != "Y" ] && [ "$userInput" != "y" ]; then
 		echo "Cancelling ..."
 		exit 1;
 	fi
