@@ -8,6 +8,7 @@ vagrantOS=''
 retainVM=false
 testNativeBuild=false
 runTest=false
+vmHalt=true
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -28,6 +29,8 @@ processArgs()
 				gitURL="$1"; shift;;
 			"--test" | "-t" )
 				runTest=true;;
+			"--no-halt" | "-nh" )
+				vmHalt=false;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -44,6 +47,7 @@ usage()
 					--build | -b				Option to enable testing a native build on the VM
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
+					--no-halt | -nh				Option to stop the vagrant VMs halting
 					--help | -h				Displays this help message"
 }
 
@@ -65,6 +69,10 @@ checkVars()
 	if [ "$vagrantOS" == "" ]; then
 		echo "No Vagrant OS specified; Defaulting to testing all of them"
 		vagrantOS="all"
+	fi
+	if [[ "$retainVM" == false && "$vmHalt" == false ]]; then
+		echo "Must halt the VM to destroy it; Ignoring '--no-halt' option"
+		vmHalt=true;
 	fi
         if [[ ! $(vagrant plugin list | grep 'disksize') ]]; then
                 echo "Can't find vagrant-disksize plugin, installing . . ."
@@ -167,7 +175,9 @@ startVMPlaybook()
 	        	echo The test finished at : `date +%T`
 		fi
 	fi
-	vagrant halt
+	if [[ "$vmHalt" = true ]]; then
+		vagrant halt
+	fi	
 }
 
 startVMPlaybookWin()
@@ -210,7 +220,9 @@ startVMPlaybookWin()
 			echo The test finished at : `date +%T`
 		fi
 	fi
-	vagrant halt
+        if [[ "$vmHalt" = true ]]; then
+                vagrant halt
+        fi
 }
 
 destroyVM()
