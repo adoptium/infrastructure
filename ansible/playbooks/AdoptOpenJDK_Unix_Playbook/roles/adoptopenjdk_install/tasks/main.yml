@@ -72,13 +72,13 @@
 
 - name: Get /usr/lib/jvm/jdk-{{ jdk_version }}* full path name
   shell: ls -ld /usr/lib/jvm/jdk-{{ jdk_version }}* 2>/dev/null | awk '{print $9}'
-  register: adoptopenjdk{{ jdk_version }}_dir
+  register: adoptopenjdk_dir
   when: adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk
 
 - name: Chown /usr/lib/jvm/jdk-{{ jdk_version }}*
   file:
-    path: '{{ adoptopenjdk{{ jdk_version }}_dir.stdout }}'
+    path: '{{ adoptopenjdk_dir.stdout }}'
     state: directory
     owner: root
     group: root
