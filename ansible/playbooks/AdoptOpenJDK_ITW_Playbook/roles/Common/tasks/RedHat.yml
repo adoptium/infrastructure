@@ -1,0 +1,166 @@
+---
+##########
+# RedHat #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Enable rhel-7-server-extras-rpms Repo for x86_64
+  shell: |
+    subscription-manager repos --enable=rhel-7-server-extras-rpms
+    subscription-manager repos --enable rhel-7-server-optional-rpms
+  ignore_errors: yes
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: patch_update
+
+- name: Enable EPEL Release
+  shell: |
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  ignore_errors: yes
+  when: ansible_architecture != "s390x"
+  tags: patch_update
+
+- name: YUM upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags: patch_update
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools for RHEL 7
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL7 }}"
+  when: ansible_distribution_major_version == "7"
+  tags: build_tools
+
+- name: Install additional build tools for RHEL 7 on ppc64le
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL7_PPC64LE }}"
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: build_tools
+
+- name: Install numactl-devel excluding RHEL 7 on s390x
+  package: "name=numactl-devel state=latest"
+  when:
+    - (ansible_distribution_major_version != "7" and ansible_architecture != "s390x")
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+#################
+# xorg Packages #
+#################
+- name: Install xorg-x11-server-Xorg if host is x86_64
+  yum: name=xorg-x11-server-Xorg state=installed
+  when: (ansible_architecture == "x86_64")
+  tags: test_tools
+
+- name: Install xorg-x11-server-common if host is s390x
+  yum: name=xorg-x11-server-common state=installed
+  when: (ansible_architecture == "s390x")
+  tags: test_tools
+
+################
+# Install Java #
+################
+- name: Install Java (Not RedHat 6 on ppc64)
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
+  when: not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+
+- name: Install Java when RedHat 6 on ppc64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_RHEL6_PPC64 }}"
+  when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+
+####################
+# Set default Java #
+####################
+- name: Set default java version - RHEL 6 x86_64
+  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+  when:
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+  tags: default_java
+
+- name: Set default java version - RHEL 7 x86_64
+  shell: update-alternatives --set java java-1.8.0-openjdk.x86_64
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "x86_64"
+  tags: default_java
+
+- name: Set default java version - RHEL 6 ppc64
+  shell: update-alternatives --set java /usr/lib/jvm/jre-1.8.0-ibm.ppc64/bin/java
+  when:
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "ppc64"
+  tags: default_java
+
+- name: Set default java version - RHEL 7 ppc64
+  shell: update-alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.el7_4.ppc64/jre/bin/java
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64"
+  tags: default_java
+
+- name: Set default java version - RHEL 7 ppc64le
+  shell: update-alternatives --set java java-1.8.0-openjdk.ppc64le
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: default_java
+
+- name: Set default java version - RHEL 7 ppc64le
+  shell: update-alternatives --set java java-1.8.0-openjdk.s390x
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "s390x"
+  tags: default_java
+
+###########
+# Locales #
+###########
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags: locales
+
+- name: Create Japanese locale
+  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales

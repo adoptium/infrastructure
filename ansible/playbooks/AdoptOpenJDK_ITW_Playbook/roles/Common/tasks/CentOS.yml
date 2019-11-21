@@ -1,0 +1,198 @@
+---
+##########
+# CentOS #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Enable EPEL release
+  yum:
+    name: epel-release
+    state: installed
+    update_cache: yes
+    validate_certs: no
+  tags: patch_update
+
+- name: YUM upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags: patch_update
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Import AZUL public key
+  rpm_key:
+    state: present
+    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+  when:
+    - ansible_architecture == "x86_64"
+  tags: azul-key
+
+- name: Add AZUL to yum repo
+  get_url:
+    url: http://repos.azulsystems.com/rhel/zulu.repo
+    dest: /etc/yum.repos.d/zulu.repo
+    timeout: 25
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools for CentOS 7
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_CentOS7 }}"
+  when: ansible_distribution_major_version == "7"
+  tags: build_tools
+
+- name: Add devtools-2 to yum repo list for gcc 4.8
+  get_url:
+    url: https://people.centos.org/tru/devtools-2/devtools-2.repo
+    dest: /etc/yum.repos.d/devtools-2.repo
+    timeout: 25
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Install gcc4.8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc48_devtoolset_compiler }}"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+
+- name: Install CentOS SCL x86_64 repo for gcc7.3
+  package: "name=centos-release-scl state=latest"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install gcc7.3
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc73_devtoolset_compiler }}"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install additional build tools for x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/gcc to gcc
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/gcc
+    dest: /usr/bin/gcc
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/g++ to g++
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/g++
+    dest: /usr/bin/g++
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/c++ to c++
+  file:
+    src: /opt/rh/devtoolset-2/root/usr/bin/c++
+    dest: /usr/bin/c++
+    force: true
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  tags: build_tools
+
+##############################
+# expat on CentOS on x86_64 #
+##############################
+- name: Install expat
+  get_url:
+    url: https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    validate_certs: no
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Extract expat
+  unarchive:
+    src: /tmp/expat-2.2.5.tar.bz2
+    dest: /tmp/
+    copy: False
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+- name: Running ./configure & make for expat
+  shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
+  become: yes
+  when:
+    - ansible_architecture == "x86_64"
+  tags: expat
+
+###########
+# Locales #
+###########
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags: locales
+
+- name: Create Japanese locale
+  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales

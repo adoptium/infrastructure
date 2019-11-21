@@ -1,0 +1,75 @@
+---
+##########
+# RedHat #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib-devel
+  - autoconf
+  - bind-utils
+  - bison                         # OpenJ9
+  - bzip2
+  - cpio
+  - cups-devel
+  - elfutils-libelf-devel
+  - expat-devel                   # Used for buiding the XML::Parser CPAN module
+  - flex                          # OpenJ9
+  - fontconfig-devel
+  - freetype-devel
+  - gcc
+  - gcc-c++
+  - gettext
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gmp-devel
+  - libcurl-devel
+  - libdwarf-devel                # OpenJ9
+  - libffi-devel
+  - libmpc-devel
+  - libpng-devel
+  - libXext-devel
+  - libXi-devel                   # JDK12+ compilation
+  - libXrandr-devel               # JDK12+ compilation
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+  - make
+  - mesa-libGL-devel
+  - mpfr-devel
+  - ntp
+  - openssl-devel
+  - perl-CPAN
+  - perl-devel
+  - pkgconfig
+  - systemtap-sdt-devel
+  - unzip
+  - wget
+  - xz
+  - zip
+
+Additional_Build_Tools_RHEL7:
+  - libstdc++-static
+
+Additional_Build_Tools_RHEL7_PPC64LE:
+  - libstdc++.so.5
+
+Additional_Build_Tools_RHEL_x86_64:
+  - glibc-devel.i686
+
+Java_NOT_RHEL6_PPC64:
+  - java-1.7.0-openjdk-devel
+  - java-1.8.0-openjdk-devel
+
+Java_RHEL6_PPC64:
+  - java-1.7.0-ibm-devel
+  - java-1.8.0-ibm-devel
+
+Test_Tool_Packages:
+  - acl
+  - perl
+  - xorg-x11-xauth
+  - xorg-x11-server-Xvfb
+
+crontab_Patching: "/usr/bin/yum -y update && yum clean packages"

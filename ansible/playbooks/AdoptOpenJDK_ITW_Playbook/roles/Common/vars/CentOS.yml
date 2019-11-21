@@ -1,0 +1,80 @@
+---
+##########
+# CentOS #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib-devel
+  - autoconf
+  - bind-utils
+  - bison                         # OpenJ9
+  - bzip2
+  - cpio
+  - cups-devel
+  - elfutils-libelf-devel
+  - expat-devel                   # Used for buiding the XML::Parser CPAN module
+  - flex                          # OpenJ9
+  - fontconfig-devel
+  - freetype-devel
+  - gcc
+  - gcc-c++
+  - gettext
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gmp-devel
+  - java-1.7.0-openjdk-devel
+  - java-1.8.0-openjdk-devel
+  - libcurl-devel
+  - libdwarf-devel                # OpenJ9
+  - libpng-devel
+  - libXext-devel
+  - libXi-devel                   # JDK12+ compilation
+  - libXrandr-devel               # JDK12+ compilations
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+  - lbzip2
+  - make
+  - mesa-libGL-devel
+  - mpfr-devel
+  - numactl-devel                 # OpenJ9
+  - ntp
+  - openssl-devel
+  - perl-CPAN
+  - perl-DBI
+  - perl-devel
+  - perl-GD
+  - perl-libwww-perl
+  - perl-Time-HiRes
+  - systemtap-sdt-devel
+  - unzip
+  - wget
+  - xz
+  - zip
+
+gcc48_devtoolset_compiler:
+  - devtoolset-2-gcc
+  - devtoolset-2-binutils
+  - devtoolset-2-gcc-c++
+
+gcc73_devtoolset_compiler:
+  - devtoolset-7-gcc              # OpenJ9
+  - devtoolset-7-binutils         # OpenJ9
+  - devtoolset-7-gcc-c++          # OpenJ9
+
+Additional_Build_Tools_CentOS7:
+  - libstdc++-static
+
+Additional_Build_Tools_x86_64:
+  - zulu-9
+
+Test_Tool_Packages:
+  - mercurial
+  - perl
+  - xorg-x11-xauth
+  - xorg-x11-server-Xorg
+  - xorg-x11-server-Xvfb
+
+crontab_Patching: "/usr/bin/yum -y update"
