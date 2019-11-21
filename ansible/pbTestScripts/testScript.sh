@@ -223,6 +223,7 @@ startVMPlaybookWin()
         if [[ "$vmHalt" = true ]]; then
                 vagrant halt
         fi
+	rm playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
 }
 
 destroyVM()
