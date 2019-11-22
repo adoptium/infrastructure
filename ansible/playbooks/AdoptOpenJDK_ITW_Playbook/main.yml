@@ -13,11 +13,9 @@
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
 
-    
 #########
 # Roles #
 #########
-
   roles:
     - Common
     - GIT_Source
