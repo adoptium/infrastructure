@@ -27,6 +27,10 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+  retries: 3
+  delay: 5
+  register: curl_download
+  until: curl_download is not failed
   when:
     - ((curl_version.stdout == '') or ((curl_version.stdout != '') and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
   tags: curl

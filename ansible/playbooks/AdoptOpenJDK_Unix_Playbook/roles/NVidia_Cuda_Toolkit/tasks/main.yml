@@ -12,6 +12,10 @@
   get_url:
     url: "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
     dest: "/tmp/cuda9_linux-run"
+  retries: 3
+  delay: 5
+  register: nvidia_cuda_toolkit_download
+  until: nvidia_cuda_toolkit_download is not failed
   when:
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7") )
@@ -39,6 +43,10 @@
   get_url:
     url: https://developer.download.nvidia.com/compute/cuda/repos/rhel7/ppc64le/cuda-repo-rhel7-9.0.176-1.ppc64le.rpm
     dest: /tmp/cuda-repo-rhel7-9.ppc64le.rpm
+  retries: 3
+  delay: 5
+  register: nvidia_cuda_toolkit_download
+  until: nvidia_cuda_toolkit_download is not failed
   when:
     - cuda_installed.stat.isdir is not defined
     - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
@@ -70,6 +78,10 @@
   get_url:
     url: https://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm
     dest: /tmp/sles12_cuda9_repo.rpm
+  retries: 3
+  delay: 5
+  register: nvidia_cuda_toolkit_download
+  until: nvidia_cuda_toolkit_download is not failed
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
@@ -106,6 +118,10 @@
 - name: Download/install Nvidia CUDA Repo deb - Ubuntu 16 on PPC64LE
   apt:
     deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/ppc64el/cuda-toolkit-9-0_9.0.176-1_ppc64el.deb
+  retries: 3
+  delay: 5
+  register: nvidia_cuda_toolkit_download
+  until: nvidia_cuda_toolkit_download is not failed
   when:
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
     - ansible_architecture == "ppc64le"
