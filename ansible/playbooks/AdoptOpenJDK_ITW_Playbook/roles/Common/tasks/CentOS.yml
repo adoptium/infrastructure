@@ -49,15 +49,15 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additional build tools for CentOS 7
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS7 }}"
-  when: ansible_distribution_major_version == "7"
-  tags: build_tools
+# - name: Install additional build tools for CentOS 7
+#   package: "name={{ item }} state=latest"
+#   with_items: "{{ Additional_Build_Tools_CentOS7 }}"
+#   when: ansible_distribution_major_version == "7"
+#   tags: build_tools
 
-- name: Install additional build tools for x86_64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_x86_64 }}"
-  when:
-    - ansible_architecture == "x86_64"
-  tags: build_tools
+# - name: Install additional build tools for x86_64
+#   package: "name={{ item }} state=latest"
+#   with_items: "{{ Additional_Build_Tools_x86_64 }}"
+#   when:
+#     - ansible_architecture == "x86_64"
+#   tags: build_tools
