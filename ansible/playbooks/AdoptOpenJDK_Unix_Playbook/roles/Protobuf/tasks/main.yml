@@ -7,13 +7,67 @@
 #
 # Note: this role is optional
 # to apply the role, add "Protobuf" to the playbook roles (see ../../../main.yml)
+# this role also requires gcc7 role already applied to the system
+
+- name: Checking for /usr/bin/gcc-7
+  stat: path=/usr/bin/gcc-7
+  register: gcc7
+  tags: protobuf
+- name: Setting CC to /usr/bin/gcc-7 if found
+  set_fact:
+    CC: "/usr/bin/gcc-7"
+    CXX: "/usr/bin/g++-7"
+  when: gcc7.stat.exists == True
+  tags: protobuf
+
+- name: Checking for devtools-7 installation
+  stat: path=/opt/rh/devtoolset-7/root/usr/bin/gcc
+  register: gcc7
+  tags: protobuf
+- name: Setting CC to devtools-7 if found
+  set_fact:
+    CC: "/opt/rh/devtoolset-7/root/usr/bin/gcc"
+    CXX: "/opt/rh/devtoolset-7/root/usr/bin/g++"
+  when: gcc7.stat.exists == True
+  tags: protobuf
+
+- name: Checking for gcc-7.3 binary installation
+  stat: path=/usr/local/gcc/bin/gcc-7.3
+  register: gcc7
+  tags: protobuf
+- name: Setting CC to gcc-7.3 binary found
+  set_fact:
+    CC: "/usr/local/gcc/bin/gcc-7.3"
+    CXX: "/usr/local/gcc/bin/g++-7.3"
+  when: gcc7.stat.exists == True
+  tags: protobuf
+
+- name: Checking for gcc-7.4 binary installation
+  stat: path=/usr/local/gcc/bin/gcc-7.4
+  register: gcc7
+  tags: protobuf
+- name: Setting CC to gcc-7.4 binary found
+  set_fact:
+    CC: "/usr/local/gcc/bin/gcc-7.4"
+    CXX: "/usr/local/gcc/bin/g++-7.4"
+  when: gcc7.stat.exists == True
+  tags: protobuf
+
+- debug:
+    msg: "VARIABLE CC SET TO {{ CC }}"
+  when: CC is defined
+  tags: protobuf
+
+- debug:
+    msg: "VARIABLE CXX SET TO {{ CXX }}"
+  when: CXX is defined
+  tags: protobuf
 
 - name: Check if Protocol Buffers v3.5.1 is installed
   stat:
     path: /usr/local/bin/protoc
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
   register: protobuf_status
   tags: protobuf
 
@@ -26,7 +80,6 @@
     validate_certs: no
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
   tags: protobuf
 
@@ -37,7 +90,6 @@
     copy: False
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
   tags: protobuf
 
@@ -45,7 +97,6 @@
   command: ldconfig -p | grep /usr/local/lib
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
   register: linker_search_path
   ignore_errors: True
@@ -58,16 +109,14 @@
     create: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
     - linker_search_path.stdout == ''
   tags: protobuf
 
 - name: Build and install Protocol Buffers v3.5.1
-  shell: cd /tmp/protobuf-3.5.1 && ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC && make && make install && ldconfig
+  shell: cd /tmp/protobuf-3.5.1 && ./configure --disable-shared --with-pic && make && make install && ldconfig
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
   tags: protobuf
 
@@ -81,6 +130,5 @@
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
-    - ansible_architecture == "x86_64"
     - protobuf_status.stat.exists == False
   tags: protobuf
