@@ -21,7 +21,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Extract OpenSSL v1.0.2r
@@ -32,7 +32,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Build and install OpenSSL v1.0.2r
@@ -40,7 +40,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Remove downloaded packages for OpenSSL v1.0.2r
@@ -54,5 +54,5 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout | version_compare('1.0.2', operator='lt', strict=True))))
+    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
