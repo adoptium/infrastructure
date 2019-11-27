@@ -5,15 +5,11 @@
 
 # Command Build Tool Packages
 Build_Tool_Packages:
-  # - alsa-lib-devel
   - autoconf
   - bind-utils
   - bzip2
   - cpio
-  # - cups-devel
   - elfutils-libelf-devel
-  # - fontconfig-devel
-  # - freetype-devel
   - gcc
   - gcc-c++
   - glibc
@@ -23,10 +19,8 @@ Build_Tool_Packages:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libcurl-devel
-  # - libpng-devel
   - lbzip2
   - make
-  # - mesa-libGL-devel
   - mpfr-devel
   - ntp
   - openssl-devel
@@ -41,11 +35,5 @@ Build_Tool_Packages:
   - wget
   - xz
   - zip
-
-# Additional_Build_Tools_CentOS7:
-#   - libstdc++-static
-
-# Additional_Build_Tools_x86_64:
-#   - zulu-9
 
 crontab_Patching: "/usr/bin/yum -y update"
