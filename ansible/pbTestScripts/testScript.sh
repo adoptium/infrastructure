@@ -78,6 +78,10 @@ checkVars()
                 echo "Can't find vagrant-disksize plugin, installing . . ."
                 vagrant plugin install vagrant-disksize
         fi
+	if [[ ! -f ~/.ssh/id_rsa ]]; then
+		echo "Creating SSH key to share to the VMs"
+		ssh-keygen -q -f ~/.ssh/id_rsa -t rsa -N ''
+	fi
 }
 
 checkVagrantOS()
@@ -146,11 +150,6 @@ setupGit()
 	fi
 }
 
-testBuild()
-{
-	vagrant ssh -c "git clone https://github.com/AdoptOpenJDK/openjdk-build"
-	vagrant ssh -c "cd /vagrant/pbTestScripts && ./buildJDK.sh"
-}
 
 # Takes the OS as arg 1
 startVMPlaybook()
@@ -162,17 +161,26 @@ startVMPlaybook()
 	else
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	fi
+
 	ln -sf Vagrantfile.$OS Vagrantfile
+	# Copy the machine's ssh key for the VMs to use, after removing prior files
+	[[ -f id_rsa.pub ]] && rm id_rsa.pub
+	cp ~/.ssh/id_rsa.pub $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	vagrant up
-	# Remotely moves to the correct directory in the VM and builds the playbook. Then logs the VM's output to a file, in a separate directory
-	vagrant ssh -c "cd /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook && sudo ansible-playbook --skip-tags adoptopenjdk,jenkins main.yml" 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
+	[[ -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx ]] && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+	cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx	&& rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
+	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+	# Increase timeout to 30 seconds
+	sed -i'' -e "s/\[defaults\]/&\'$'\ntimeout = 30/g" ansible.cfg
+	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
 	if [[ "$testNativeBuild" = true ]]; then
-		testBuild
+		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-        	        vagrant ssh -c "cd /vagrant/pbTestScripts && ./testJDK.sh"
-	        	echo The test finished at : `date +%T`
+	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
+			echo The test finished at : `date +%T`
 		fi
 	fi
 	if [[ "$vmHalt" = true ]]; then
