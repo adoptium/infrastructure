@@ -45,4 +45,3 @@
 ############################
 - name: Call Build Packages and Tools Task
   include_tasks: build_packages_and_tools.yml
-
