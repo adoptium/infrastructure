@@ -77,12 +77,13 @@ Additional_Packages_Ubuntu18:
   - libgstreamer1.0-dev                 # OpenJFX prereq
   - libgstreamer-plugins-base1.0-dev    # OpenJFX prereq
 
-Additional_Build_Tools_x86_64:
+Additional_Build_Tools_x86:
   - zulu-9
   - libnuma-dev
   - numactl
   - gcc-7
   - g++-7
+  - gcc-multilib                        # a dependency required for executing a 32-bit C binary
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev

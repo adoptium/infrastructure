@@ -92,9 +92,9 @@
     - ansible_architecture == "x86_64"
   tags: build_tools
 
-- name: Install additional build tools for x86_64
+- name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools

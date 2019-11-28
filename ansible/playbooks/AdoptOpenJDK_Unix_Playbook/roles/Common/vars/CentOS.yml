@@ -67,8 +67,11 @@ gcc73_devtoolset_compiler:
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
 
-Additional_Build_Tools_x86_64:
+Additional_Build_Tools_CentOS_x86:
   - zulu-9
+  - glibc.i686                    # a dependency required for executing a 32-bit C binary
+  - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
+  - libstdc++.i686                # a dependency required for executing a 32-bit C binary
 
 Test_Tool_Packages:
   - mercurial
