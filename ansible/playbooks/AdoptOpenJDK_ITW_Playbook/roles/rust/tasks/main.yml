@@ -1,0 +1,30 @@
+---
+#######################################
+# ansible install rust version 1.34.1 #
+#######################################
+
+- name: Check if Rust 1.34.1 is already installed
+  shell: rustc --version | grep 1.34.1
+  ignore_errors: yes
+  register: rust_installed
+
+- name: Download Rust 1.34.1 tar
+  get_url:
+    url: https://static.rust-lang.org/dist/rust-1.34.1-x86_64-unknown-linux-gnu.tar.gz
+    dest: /tmp/rust-1.34.1-x86_64-unknown-linux-gnu.tar.gz
+    mode: 0440
+  when:
+    - rust_installed.rc != 0
+
+- name: Extract Rust tar
+  unarchive:
+    src: /tmp/rust-1.34.1-x86_64-unknown-linux-gnu.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - rust_installed.rc != 0
+
+- name: Run rust ./install.sh script
+  shell: cd /tmp/rust-1.34.1-x86_64-unknown-linux-gnu && ./install.sh
+  when:
+    - rust_installed.rc != 0

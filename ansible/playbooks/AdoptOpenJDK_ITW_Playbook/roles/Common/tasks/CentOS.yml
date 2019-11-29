@@ -1,0 +1,47 @@
+---
+##########
+# CentOS #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Enable EPEL release
+  yum:
+    name: epel-release
+    state: installed
+    update_cache: yes
+    validate_certs: no
+  tags: patch_update
+
+- name: YUM upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags: patch_update
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Import AZUL public key
+  rpm_key:
+    state: present
+    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+  when:
+    - ansible_architecture == "x86_64"
+  tags: azul-key
+
+- name: Add AZUL to yum repo
+  get_url:
+    url: http://repos.azulsystems.com/rhel/zulu.repo
+    dest: /etc/yum.repos.d/zulu.repo
+    timeout: 25
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
