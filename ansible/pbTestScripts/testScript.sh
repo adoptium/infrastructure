@@ -160,7 +160,7 @@ startVMPlaybook()
 
 	ln -sf Vagrantfile.$OS Vagrantfile
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
-	[[ -f id_rsa.pub ]] && rm -f id_rsa.pub id_rsa
+	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 	vagrant up
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
