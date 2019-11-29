@@ -78,10 +78,6 @@ checkVars()
                 echo "Can't find vagrant-disksize plugin, installing . . ."
                 vagrant plugin install vagrant-disksize
         fi
-	if [[ ! -f ~/.ssh/id_rsa ]]; then
-		echo "Creating SSH key to share to the VMs"
-		ssh-keygen -q -f ~/.ssh/id_rsa -t rsa -N ''
-	fi
 }
 
 checkVagrantOS()
@@ -164,8 +160,8 @@ startVMPlaybook()
 
 	ln -sf Vagrantfile.$OS Vagrantfile
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
-	[[ -f id_rsa.pub ]] && rm id_rsa.pub
-	cp ~/.ssh/id_rsa.pub $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+	[[ -f id_rsa.pub ]] && rm id_rsa.pub id_rsa
+	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 	vagrant up
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
 	[[ -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx ]] && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
