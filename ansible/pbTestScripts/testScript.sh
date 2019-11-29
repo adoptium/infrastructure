@@ -171,6 +171,7 @@ startVMPlaybook()
 	sed -i'' -e "s/\[defaults\]/&\'$'\ntimeout = 30/g" ansible.cfg
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
+	searchLogFiles $OS
 	if [[ "$testNativeBuild" = true ]]; then
 		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
@@ -194,6 +195,9 @@ startVMPlaybookWin()
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	fi
 	ln -sf Vagrantfile.$OS Vagrantfile
+	# Remove the Hosts files if they're found
+	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
+	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	vagrant up
 	cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
@@ -210,6 +214,7 @@ startVMPlaybookWin()
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
+	searchLogFiles $OS
 	if [[ "$testNativeBuild" = true ]]; then
 		echo "Building a JDK"
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
@@ -227,7 +232,6 @@ startVMPlaybookWin()
         if [[ "$vmHalt" = true ]]; then
                 vagrant halt
         fi
-	rm playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
 }
 
 destroyVM()
@@ -240,7 +244,7 @@ destroyVM()
 	ls -la $WORKSPACE/adoptopenjdkPBTests
 }
 
-# Takes in OS as arg 1, branchName as arg 2
+# Takes in OS as arg 1
 searchLogFiles()
 {
 	local OS=$1
@@ -257,7 +261,6 @@ searchLogFiles()
 	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook succeeded"
-		exit 0;
 	else
 		echo "$OS playbook success is undetermined"
 		exit 1;
@@ -304,8 +307,4 @@ do
 	then
 		destroyVM
 	fi
-done
-for OS in $vagrantOS
-do
-	searchLogFiles $OS
 done
