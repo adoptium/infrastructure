@@ -165,10 +165,15 @@ startVMPlaybook()
 	vagrant up
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
 	[[ -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx ]] && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-	cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx	&& rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
-	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-	# Increase timeout to 30 seconds
-	sed -i'' -e "s/\[defaults\]/&\'$'\ntimeout = 30/g" ansible.cfg
+	cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
+	local vagrantIP=$(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
+	# Remove IP from known_hosts if already found
+	grep -q "$vagrantIP" ~/.ssh/known_hosts && ssh-keygen -R $vagrantIP
+	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+	# Alter ansible.cfg to increase timeout and to specify which private key to use
+	# NOTE! Only works with GNU sed
+	! grep -q "timeout" ansible.cfg && sed -i -e 's/\[defaults\]/&\ntimeout = 30/g' ansible.cfg
+	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
 	if [[ "$testNativeBuild" = true ]]; then
@@ -181,7 +186,7 @@ startVMPlaybook()
 	fi
 	if [[ "$vmHalt" = true ]]; then
 		vagrant halt
-	fi	
+	fi
 }
 
 startVMPlaybookWin()
