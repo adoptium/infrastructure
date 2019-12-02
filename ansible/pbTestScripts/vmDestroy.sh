@@ -70,7 +70,7 @@ listOS() {
 
 destroyVMs() {
 	local OS=$1
-	vagrant global-status | awk "/adoptopenjdk$OS/ { print \$1 }" | xargs vagrant destroy -f
+	vagrant global-status --prune | awk "/adoptopenjdk$OS/ { print \$1 }" | xargs vagrant destroy -f
 	echo "Destroyed all $OS Vagrant VMs"
 }
 
