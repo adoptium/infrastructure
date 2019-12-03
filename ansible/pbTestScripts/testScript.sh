@@ -125,7 +125,7 @@ setupFiles()
 setupGit()
 {
 	cd $WORKSPACE/adoptopenjdkPBTests
-	if [ "$branchName" == "" ]; then
+	if [ "$branchName" == "master" ]; then
 		echo "Detected as the master branch"
 		if [ ! -d "$folderName-master" ]; then
    			git clone $gitURL
@@ -138,7 +138,7 @@ setupGit()
 		echo "Branch detected"
 		if [ ! -d "$folderName-$branchName" ]; then
   			git clone -b $branchName --single-branch $gitURL
-			mv $folderName "$folderName-$branchName"
+			mv $folderName $folderName-$branchName
 		else
 			cd "$folderName-$branchName"
 			git pull origin $branchName
@@ -151,13 +151,7 @@ setupGit()
 startVMPlaybook()
 {
 	local OS=$1
-	if [ "$branchName" == "" ]; then
-		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
-		branchName="master"
-	else
-		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-	fi
-
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	ln -sf Vagrantfile.$OS Vagrantfile
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
@@ -178,6 +172,7 @@ startVMPlaybook()
 	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	if [[ "$testNativeBuild" = true ]]; then
+		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
@@ -193,12 +188,7 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
-	if [ "$branchName" == "" ]; then
-		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-master/ansible
-		branchName="master"
-	else
-		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-	fi
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	ln -sf Vagrantfile.$OS Vagrantfile
 	# Remove the Hosts files if they're found
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
@@ -255,7 +245,7 @@ searchLogFiles()
 	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/logFiles
 	echo
-	if grep -q 'failed=[1-9]' *$folderName.$branchName.$OS.log
+	if grep -q 'failed=[1-9]\|unreachable=[1-9]' *$folderName.$branchName.$OS.log
 	then
 		echo "$OS playbook failed"
 		exit 1;
@@ -291,6 +281,7 @@ splitURL()
 		done
 	else
 		folderName=${array[@]: -1:1}
+		branchName="master"
 	fi
 }
 # var1 = GitURL, var2 = y/n for VM retention
