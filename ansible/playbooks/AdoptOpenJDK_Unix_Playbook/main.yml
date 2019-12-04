@@ -49,7 +49,7 @@
       src_tarball: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
       installed_target: /usr/local/bin/protoc
       when:
-        - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+        - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "Debian" )
         - ansible_architecture == "x86_64"
     - OpenSSL102                  # OpenJ9
     - Nagios_Plugins              # AdoptOpenJDK Infrastructure
