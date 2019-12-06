@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eu
+export PATH=/usr/local/bin/:$PATH
 if [ -z "${WORKSPACE:-}" ]; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
 		WORKSPACE=$HOME
