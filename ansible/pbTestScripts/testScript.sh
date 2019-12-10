@@ -86,15 +86,15 @@ checkVars()
 checkVagrantOS()
 {
 	cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
-	local vagrantOSlist=$(find Vagrantfile.* | cut -d. -f 2)
+	local vagrantOSlist=$(ls -1 Vagrantfile.* | cut -d. -f 2)
 	if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
 		echo "Vagrantfile detected"
 	elif [[ "$vagrantOS" == "all" ]]; then
 		vagrantOS=$vagrantOSlist
 	else
-	        echo "Vagrantfile not found. These are the currently found Vagrantfiles:"
+	        echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
 	        echo $vagrantOSlist
-        	exit 1;	
+        	exit 1
 	fi
 }
 
@@ -121,7 +121,7 @@ splitURL()
 
 setupWorkspace()
 {
-	local workFolder=$WORKSPACE/adoptopenjdkPBTests/
+	local workFolder=$WORKSPACE/adoptopenjdkPBTests
 	mkdir -p ${workFolder}/logFiles
 
 	if [[ "$cleanWorkspace" = true && -d ${workFolder}/${folderName}-${branchName} ]]; then
@@ -229,20 +229,12 @@ searchLogFiles()
 {
         local OS=$1
         cd $WORKSPACE/adoptopenjdkPBTests/logFiles
-        echo
-        if grep -q 'failed=[1-9]\|unreachable=[1-9]' *$folderName.$branchName.$OS.log
-        then
-                return 1;
-        elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
-        then
-                return 1;
-        elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
+        if grep -q 'failed=0' *$folderName.$branchName.$OS.log && grep -q 'unreachable=0' *$folderName.$branchName.$OS.log
         then
                 return 0;
         else
                 return 1;
         fi
-        echo
 }
 
 destroyVM()
