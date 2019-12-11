@@ -42,7 +42,7 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
 
   # valid roles - add as necessary
-  'type': ('build', 'test', 'jck', 'infrastructure'),
+  'type': ('build', 'test', 'jck', 'infrastructure', 'perf'),
 
   # providers - validated for consistency
   'provider': ('azure', 'joyent', 'marist', 'osuosl', 'scaleway',
