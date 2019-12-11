@@ -141,7 +141,7 @@ setupGit()
 			mv $folderName $folderName-$branchName
 		else
 			cd "$folderName-$branchName"
-			git pull origin $branchName
+			git pull
 		fi
 	fi
 }
