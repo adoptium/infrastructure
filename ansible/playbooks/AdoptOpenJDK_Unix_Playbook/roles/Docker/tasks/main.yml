@@ -207,6 +207,15 @@
     - ansible_distribution == "Debian"
   tags: docker
 
+- name: Add Docker GPG apt key for Raspbian
+  apt_key:
+    url: htps://yum.dockerproject.org/gpg
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian" and ansible_architecture == "armv7l"
+  tags: docker
+
 - name: Install Docker prerequisites for Debian
   apt: pkg={{ item }} state=latest
   with_items:
@@ -222,7 +231,7 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Add Docker Repo for Debian x86_64
+- name: Add Docker repo for Debian x86_64
   apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
     state: present
@@ -230,6 +239,16 @@
     - docker_installed.rc != 0
     - ansible_distribution == "Debian"
     - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Docker repo for Raspbian arm7vl
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "Debian"
+    - ansible_architecture == "armv7l"
   tags: docker
 
 # All OS' - Common
