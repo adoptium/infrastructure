@@ -16,9 +16,7 @@
   tags: git
 
 - name: Download GIT installer
-  win_get_url:
-    url: 'https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe'
-    dest: 'C:\temp\git.exe'
+  win_shell: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget https://github.com/git-for-windows/git/releases/download/v2.24.1.windows.2/Git-2.24.1.2-64-bit.exe -Outfile C:/temp/git.exe'
   when: (git_download.stat.exists == false) and (git_installed.stat.exists == false)
   tags: git
 
