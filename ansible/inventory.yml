@@ -33,6 +33,9 @@ hosts:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
+      - ibm:
+          aix71-ppc64-11: {ip: 129.33.196.209, user: b9s010a}
+
       - linaro:
           centos76-armv8-1: {ip: 213.146.141.99, user: centos}
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
