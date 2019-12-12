@@ -177,10 +177,10 @@ startVMPlaybook()
 	local pb_failed=$(searchLogFiles $OS)
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
+		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
+	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
 			echo The test finished at : `date +%T`
 		fi
 	fi
