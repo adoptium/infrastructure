@@ -71,6 +71,12 @@ hosts:
           win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
           win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
+  - perf:
+
+      - macstadium:
+          macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
+          macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
+
   - test:
 
       - azure:
