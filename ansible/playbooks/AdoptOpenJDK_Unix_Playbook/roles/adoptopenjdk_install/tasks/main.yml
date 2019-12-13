@@ -35,6 +35,10 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/x64/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture == "x86_64"
@@ -45,6 +49,10 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/s390x/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture == "s390x"
@@ -55,6 +63,10 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/ppc64le/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture == "ppc64le"
@@ -65,6 +77,10 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/aarch64/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture == "aarch64"
