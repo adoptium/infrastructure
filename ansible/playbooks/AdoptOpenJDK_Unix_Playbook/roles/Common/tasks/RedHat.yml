@@ -73,7 +73,7 @@
   tags: build_tools
 
 - name: Install additional build tools for RHEL on s390x
-  package: "name={{ item }} state=latest"
+  package: "name={{ item }} state=present"
   with_items: "{{ Additional_Build_Tools_RHEL_s390x }}"
   when:
     - ansible_architecture == "s390x"
