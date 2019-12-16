@@ -9,6 +9,7 @@ retainVM=false
 testNativeBuild=false
 runTest=false
 vmHalt=true
+cleanWorkspace=false
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -31,6 +32,8 @@ processArgs()
 				runTest=true;;
 			"--no-halt" | "-nh" )
 				vmHalt=false;;
+			"--clean-workspace" | "-c" )
+				cleanWorkspace=true;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -40,11 +43,11 @@ processArgs()
 
 usage()
 {
-	echo
 	echo "Usage: ./testScript.sh			--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
 					--all | -a 				Builds and tests playbook through every OS
 					--retainVM | -r				Option to retain the VM and folder after completion
 					--build | -b				Option to enable testing a native build on the VM
+					--clean-workspace | -c			Will remove the old work folder if detected
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
 					--no-halt | -nh				Option to stop the vagrant VMs halting
@@ -82,70 +85,71 @@ checkVars()
 
 checkVagrantOS()
 {
-	case "$vagrantOS" in
-		"Ubuntu1604" | "U16" | "u16" )
-			vagrantOS="Ubuntu1604";;
-		"Ubuntu1804" | "U18" | "u18" )
-			vagrantOS="Ubuntu1804";;
-		"CentOS6" | "centos6" | "C6" | "c6" )
-			vagrantOS="CentOS6" ;;
-		"CentOS7" | "centos7" | "C7" | "c7" )
-			vagrantOS="CentOS7" ;;
-		"Windows2012" | "Win2012" | "W12" | "w12" )
-			vagrantOS="Win2012";;
-		"all" )
-			vagrantOS="Ubuntu1604 Ubuntu1804 CentOS6 CentOS7 Windows2012" ;;
-		*) echo "Not a currently supported OS" ; vagrantOSList; exit 1;
-	esac
-}
-
-vagrantOSList()
-{
-	echo
-	echo "Currently supported Vagrant OSs :
-		- Ubuntu1604
-		- Ubuntu1804
-		- CentOS6
-		- CentOS7
-		- Win2012"
-	echo
-}
-
-setupFiles()
-{
-	cd $WORKSPACE
-	if [ ! -d "adoptopenjdkPBTests" ]; then
-		mkdir adoptopenjdkPBTests
-	fi
-	if [ ! -d "adoptopenjdkPBTests/logFiles" ]; then
-		mkdir adoptopenjdkPBTests/logFiles
-	fi
-}
-
-setupGit()
-{
-	cd $WORKSPACE/adoptopenjdkPBTests
-	if [ "$branchName" == "master" ]; then
-		echo "Detected as the master branch"
-		if [ ! -d "$folderName-master" ]; then
-   			git clone $gitURL
-			mv $folderName $folderName-master
-		else
-			cd "$folderName-master"
-    			git pull 
-		fi
+	cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
+	local vagrantOSlist=$(ls -1 Vagrantfile.* | cut -d. -f 2)
+	if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
+		echo "Vagrantfile detected"
+	elif [[ "$vagrantOS" == "all" ]]; then
+		vagrantOS=$vagrantOSlist
 	else
-		echo "Branch detected"
-		if [ ! -d "$folderName-$branchName" ]; then
-  			git clone -b $branchName --single-branch $gitURL
-			mv $folderName $folderName-$branchName
-		else
-			cd "$folderName-$branchName"
-			git pull
-		fi
+	        echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
+	        echo $vagrantOSlist
+        	exit 1
 	fi
 }
 
+splitURL()
+{
+        # IFS stands for Internal Field Seperator and determines the delimiter for splitting.
+        IFS='/' read -r -a array <<< "$gitURL"
+        if [ ${array[@]: -2:1} == 'tree' ]
+        then
+                gitURL=""
+                branchName=${array[@]: -1:1}
+                folderName=${array[@]: -3:1}
+                unset 'array[${#array[@]}-1]'
+                unset 'array[${#array[@]}-1]'
+                for i in "${array[@]}"
+                do
+                        gitURL="$gitURL$i/"
+                done
+        else
+                folderName=${array[@]: -1:1}
+                branchName="master"
+        fi
+}
+
+setupWorkspace()
+{
+	local workFolder=$WORKSPACE/adoptopenjdkPBTests
+	mkdir -p ${workFolder}/logFiles
+
+	if [[ "$cleanWorkspace" = true && -d ${workFolder}/${folderName}-${branchName} ]]; then
+		echo "Cleaning old workspace"
+		rm -rf ${workFolder}/${folderName}-${branchName}
+	elif [[ "$cleanWorkspace" = true && ! -d $workFolder/${folderName}-${branchName} ]]; then
+		echo "No old workspace detected, moving on"
+	fi
+
+        if [ "$branchName" == "master" ]; then
+                echo "Detected as the master branch"
+                if [ ! -d "${workFolder}/${folderName}-master" ]; then
+                        git clone $gitURL ${workFolder}/${folderName}-master
+                else
+                        cd ${workFolder}/${folderName}-master
+                        git pull
+                fi
+        else
+                echo "Branch detected"
+                if [ ! -d "${workFolder}/${folderName}-${branchName}" ]; then
+                        git clone -b $branchName --single-branch $gitURL ${workFolder}/${folderName}-${branchName}
+                else
+                        cd ${workFolder}/${folderName}-${branchName}
+                        git pull origin $branchName
+                fi
+        fi
+
+}
 
 # Takes the OS as arg 1
 startVMPlaybook()
@@ -170,18 +174,15 @@ startVMPlaybook()
 	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	searchLogFiles $OS
-	if [[ "$testNativeBuild" = true ]]; then
+	local pb_failed=$(searchLogFiles $OS)
+	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
+		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
+	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
 			echo The test finished at : `date +%T`
 		fi
-	fi
-	if [[ "$vmHalt" = true ]]; then
-		vagrant halt
 	fi
 }
 
@@ -209,88 +210,46 @@ startVMPlaybookWin()
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	searchLogFiles $OS
-	if [[ "$testNativeBuild" = true ]]; then
-		echo "Building a JDK"
+	local pbFailed=$(searchLogFiles $OS)
+        if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
         	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-			echo "Running test against the built JDK"
 			# Runs a script on the VM to test the built JDK
 			ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "sh C:/vagrant/pbTestScripts/testJDKWin.sh"
 			echo The test finished at : `date +%T`
 		fi
 	fi
-        if [[ "$vmHalt" = true ]]; then
-                vagrant halt
+}
+
+searchLogFiles()
+{
+        local OS=$1
+        cd $WORKSPACE/adoptopenjdkPBTests/logFiles
+        if grep -q 'failed=0' *$folderName.$branchName.$OS.log && grep -q 'unreachable=0' *$folderName.$branchName.$OS.log
+        then
+                return 0;
+        else
+                return 1;
         fi
 }
 
 destroyVM()
 {
-	echo "Destroying Machine . . ."
-	vagrant destroy -f
-	echo "Removing Work folder"
-	rm -rf $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName
-	echo "==$WORKSPACE/adoptopenjdkPBTests/=="
-	ls -la $WORKSPACE/adoptopenjdkPBTests
-}
-
-# Takes in OS as arg 1
-searchLogFiles()
-{
 	local OS=$1
-	cd $WORKSPACE/adoptopenjdkPBTests/logFiles
-	echo
-	if grep -q 'failed=[1-9]\|unreachable=[1-9]' *$folderName.$branchName.$OS.log
-	then
-		echo "$OS playbook failed"
-		exit 1;
-	elif grep -q '\[ERROR\]' *$folderName.$branchName.$OS.log
-	then
-		echo "$OS playbook was stopped"
-		exit 1;
-	elif grep -q 'failed=0' *$folderName.$branchName.$OS.log
-	then
-		echo "$OS playbook succeeded"
-	else
-		echo "$OS playbook success is undetermined"
-		exit 1;
-	fi
-	echo
+	echo "Destroying the $OS Machine"
+	vagrant global-status --prune | awk "/${folderName}-${branchName}/ { print \$1 }" | xargs vagrant destroy -f	
 }
 
-# Takes in the URL passed to the script, and extracts the folder name, branch name and builds the gitURL to be used later on.
-splitURL()
-{
-	# IFS stands for Internal Field Seperator and determines the delimiter for splitting.
-	IFS='/' read -r -a array <<< "$gitURL"
-	if [ ${array[@]: -2:1} == 'tree' ]
-	then
-		gitURL=""
-		branchName=${array[@]: -1:1}
-		folderName=${array[@]: -3:1}
-		unset 'array[${#array[@]}-1]'
-		unset 'array[${#array[@]}-1]'
-		for i in "${array[@]}"
-		do
-			gitURL="$gitURL$i/"
-		done
-	else
-		folderName=${array[@]: -1:1}
-		branchName="master"
-	fi
-}
-# var1 = GitURL, var2 = y/n for VM retention
 processArgs $*
 checkVars
 splitURL
+setupWorkspace
 checkVagrantOS
-setupFiles
-setupGit
+
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
@@ -299,8 +258,10 @@ do
 	else
 		startVMPlaybook $OS
 	fi
-	if [[ "$retainVM" = false ]]
-	then
-		destroyVM
+  	if [[ "$vmHalt" == true ]]; then
+                vagrant halt
+	fi
+	if [[ "$retainVM" == false ]]; then
+		destroyVM $OS
 	fi
 done
