@@ -19,16 +19,6 @@
   set_fact:
     root_group: "root"
 
-#########################
-# Override for Raspbian #
-#########################
-- name: If Raspbian on armv7l override ansible_distribution
-  set_fact:
-    ansible_distribution: "Ubuntu"
-  when:
-    - ansible_distribution == "Debian"
-    - ansible_architecture == "armv7l"
-
 ################
 # Set Hostname #
 ################
