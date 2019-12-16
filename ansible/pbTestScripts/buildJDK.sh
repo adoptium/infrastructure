@@ -7,15 +7,16 @@ if [ -z "${WORKSPACE:-}" ]; then
 fi
 [[ ! -d "$WORKSPACE/openjdk-build" ]] && git clone https://github.com/adoptopenjdk/openjdk-build $WORKSPACE/openjdk-build
 
-# If detected GCC version is <7, set it to 7 
-export gccVer=$(gcc --version | grep "gcc" | awk '{ print $4 }' | cut -d. -f1)
-[[ ${gccVer} -lt 7 ]] && ln -sf /usr/bin/gcc-7 /usr/bin/gcc && ln -sf /usr/bin/g++-7 /usr/bin/g++
-
 export TARGET_OS=linux
 export ARCHITECTURE=x64
 export JAVA_TO_BUILD=jdk8u
 export VARIANT=openj9
-export JDK7_BOOT_DIR=/usr/lib/jvm/java-1.7.0
+
+# Differences in openJDK7 name between OSs. Search for CentOS one
+export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk.x86_64)
+# If the CentOS JDK7 can't be found, search for the Ubuntu one
+[[ -z "$JDK7_BOOT_DIR" ]] && export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk-\*)
+
 # Differences in openJDK8 name between Ubuntu and CentOS
 export JAVA_HOME=$(find /usr/lib/jvm/ -name java-1.8.0-openjdk-\*)
 cd $WORKSPACE/openjdk-build
