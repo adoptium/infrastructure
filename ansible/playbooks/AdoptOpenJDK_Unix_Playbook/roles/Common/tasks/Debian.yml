@@ -38,6 +38,16 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
+# Both repositories needed for gcc/g++-4.8
+- name: Add additional repositories for Raspbian Buster
+  apt-repository: repo={{ item }}
+  with_items:
+    - deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+    - deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
+  tags: patch_update
+
 - name: Add additional repositories for BeagleBone
   apt_repository: repo={{ item }}
   with_items:
@@ -76,6 +86,15 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  tags: build_tools
+
+- name: Install GCC G++ on Raspian Buster
+  packages: "name={{ item }} state=latest"
+  with_items:
+    - gcc-4.8
+    - g++-4.8
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
   tags: build_tools
 
 - name: Install additional build tools for x86_64
