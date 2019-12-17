@@ -145,7 +145,7 @@ setupWorkspace()
                         git clone -b $branchName --single-branch $gitURL ${workFolder}/${folderName}-${branchName}
                 else
                         cd ${workFolder}/${folderName}-${branchName}
-                        git pull origin $branchName
+                        git pull
                 fi
         fi
 
@@ -174,7 +174,8 @@ startVMPlaybook()
 	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	local pb_failed=$(searchLogFiles $OS)
+	searchLogFiles $OS
+	local pb_failed=$?
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
 		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
@@ -210,7 +211,8 @@ startVMPlaybookWin()
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	local pbFailed=$(searchLogFiles $OS)
+	searchLogFiles $OS
+	local pbFailed=$?
         if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
