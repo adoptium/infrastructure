@@ -41,7 +41,8 @@
 - name: Install additional build tools for RHEL 7
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_RHEL7 }}"
-  when: ansible_distribution_major_version == "7"
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture != "aarch64")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7 on ppc64le
@@ -82,6 +83,11 @@
 #################
 # xorg Packages #
 #################
+- name: Install xorg test tools NOT aarch64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Test_Tools_RHEL_NOT_aarch64 }}"
+  when: not (ansible_architecture == "aarch64")
+
 - name: Install xorg-x11-server-Xorg if host is x86_64
   yum: name=xorg-x11-server-Xorg state=installed
   when: (ansible_architecture == "x86_64")
@@ -141,6 +147,13 @@
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
+  tags: default_java
+
+- name: Set default java version - RHEL 7 aarch64
+  shell: update-alternatives --set java java-1.8.0-openjdk.aarch64
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "aarch64"
   tags: default_java
 
 - name: Set default java version - RHEL 7 ppc64le
