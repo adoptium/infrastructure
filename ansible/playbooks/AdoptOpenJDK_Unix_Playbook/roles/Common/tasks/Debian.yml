@@ -40,7 +40,7 @@
 
 # Both repositories needed for gcc/g++-4.8
 - name: Add additional repositories for Raspbian Buster
-  apt-repository: repo={{ item }}
+  apt_repository: repo={{ item }}
   with_items:
     - deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
     - deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
@@ -89,7 +89,7 @@
   tags: build_tools
 
 - name: Install GCC G++ on Raspian Buster
-  packages: "name={{ item }} state=latest"
+  package: "name={{ item }} state=latest"
   with_items:
     - gcc-4.8
     - g++-4.8
