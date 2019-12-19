@@ -29,6 +29,19 @@
     state: latest
   tags: patch_update
 
+# TODO: We should find a better way of doing this in the future, for some reason these deps aren't in the aarch64 rhel 7 repos.
+- name: Install missing Rhel7 aarch64 deps from Centos Mirror
+  yum: "name={{ packages }} state=present"
+  vars:
+    packages:
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libdwarf-devel-20130207-4.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libmpc-devel-1.0.1-3.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-common-1.20.4-7.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-Xvfb-1.20.4-7.el7.aarch64.rpm
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture == "aarch64")
+  tags: build_tools, test_tools
+
 ############################
 # Build Packages and tools #
 ############################
@@ -83,11 +96,6 @@
 #################
 # xorg Packages #
 #################
-- name: Install xorg test tools NOT aarch64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Test_Tools_RHEL_NOT_aarch64 }}"
-  when: not (ansible_architecture == "aarch64")
-
 - name: Install xorg-x11-server-Xorg if host is x86_64
   yum: name=xorg-x11-server-Xorg state=installed
   when: (ansible_architecture == "x86_64")

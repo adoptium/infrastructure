@@ -25,7 +25,9 @@ Build_Tool_Packages:
   - glibc-devel
   - gmp-devel
   - libcurl-devel
+  - libdwarf-devel                # OpenJ9
   - libffi-devel
+  - libmpc-devel
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -57,22 +59,16 @@ Additional_Build_Tools_RHEL_x86:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
-  - libdwarf-devel                # OpenJ9
-  - libmpc-devel
 
 Additional_Build_Tools_RHEL_ppc64:
   - glibc.ppc                     # a dependency required for executing a 32-bit C binary
   - glibc-devel.ppc               # a dependency required for executing a 32-bit C binary
   - libstdc++.ppc                 # a dependency required for executing a 32-bit C binary
-  - libdwarf-devel                # OpenJ9
-  - libmpc-devel
 
 Additional_Build_Tools_RHEL_s390x:
   - glibc.s390                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
-  - libdwarf-devel                # OpenJ9
-  - libmpc-devel
 
 Java_NOT_RHEL6_PPC64:
   - java-1.7.0-openjdk-devel
@@ -86,8 +82,6 @@ Test_Tool_Packages:
   - acl
   - perl
   - xorg-x11-xauth
-
-Additional_Test_Tools_RHEL_NOT_aarch64:
   - xorg-x11-server-Xvfb
 
 crontab_Patching: "/usr/bin/yum -y update && yum clean packages"
