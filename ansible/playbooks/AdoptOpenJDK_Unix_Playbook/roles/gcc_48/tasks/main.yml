@@ -18,6 +18,7 @@
     dest: '/tmp/gcc-4.8.5.tar.gz'
     force: no
     mode: 0755
+    checksum: sha256:1dbc5cd94c9947fe5dffd298e569de7f44c3cedbd428fceea59490d336d8295a
   when:
     - gcc_installed.rc != 0
     - ansible_distribution == "RedHat"

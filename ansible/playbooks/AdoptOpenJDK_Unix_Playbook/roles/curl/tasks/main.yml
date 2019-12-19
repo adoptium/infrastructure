@@ -27,6 +27,7 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha256:eaa812e9a871ea10dbe8e1d3f8f12a64a8e3e62aeab18cb23742e2f1727458ae
   retries: 3
   delay: 5
   register: curl_download
