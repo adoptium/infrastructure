@@ -16,11 +16,18 @@
   tags: git
 
 - name: Download GIT installer
-  win_shell: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; wget https://github.com/git-for-windows/git/releases/download/v2.24.1.windows.2/Git-2.24.1.2-64-bit.exe -Outfile C:/temp/git.exe'
+  win_get_url:
+    url: 'https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe'
+    dest: 'C:\temp\git.exe'
   when: (git_download.stat.exists == false) and (git_installed.stat.exists == false)
   tags: git
 
+- name: Create GIT properties file
+  win_shell: 'New-Item -Path C:\temp -Name git_props.cfg -ItemType file -Value "[Setup]`nCRLFOption=CRLFCommitAsIs"'
+  when: (git_installed.stat.exists == false)
+  tags: git
+
 - name: Install GIT
-  win_command: 'C:\temp\git.exe /SILENT /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
+  win_command: 'C:\temp\git.exe /SILENT /LOADINF="C:\temp\git_props.cfg" /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"'
   when: (git_installed.stat.exists == false)
   tags: git

@@ -52,6 +52,10 @@
     - perl-Text-CSV
   tags: cygwin
 
+- name: Change git config to not replace Line endings
+  win_shell: "C:/cygwin64/bin/git config --system core.autocrlf false"
+  tags: cygwin
+
 ###############################################################################
 # Cygwin by default installs latest versions of packages, which is 3.0-2 for
 # grep. This version of grep is unable to match EOL (with $) when the file use
