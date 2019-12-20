@@ -56,6 +56,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
+    checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
   when:
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
@@ -87,4 +88,5 @@
     url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
     dest: /usr/local/nagios/libexec/check_yum
     mode: 0755
+    checksum: sha256:f93372dee2b1aa4ea45f1a2ee30ffa9d5ebc5fe2a44f8d5e69b7f9f38420be7e
   tags: [nagios_plugins, adoptopenjdk]
