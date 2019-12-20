@@ -45,6 +45,7 @@
       - "swap_path: {{ swap_path | default('***Undefined***') }} "
       - "swap_tmp: {{ swap_tmp.rc | default('***Undefined***') }} "
       - "swap_root: {{ swap_root.rc | default('***Undefined***') }} "
+    tags: swap_file
 
 - name: Disable dphys-swapfile where applicable
   command: "dphys-swapfile uninstall"
