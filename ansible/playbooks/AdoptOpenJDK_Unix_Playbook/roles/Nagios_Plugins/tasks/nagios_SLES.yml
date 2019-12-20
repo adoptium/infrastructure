@@ -39,6 +39,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
+    checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
   tags: [nagios_plugins, adoptopenjdk]
 
 - name: Extract nagios-plugins
@@ -61,4 +62,5 @@
     url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
     dest: /usr/local/nagios/libexec/check_zypper
     mode: 0755
+    checksum: sha256:005f7008c7d817e6de9bd1650fe198ad9fd0ebaade74ce45f1c6a9ae3fd278af
   tags: [nagios_plugins, adoptopenjdk]

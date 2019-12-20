@@ -12,6 +12,7 @@
   get_url:
     url: "https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
     dest: "/tmp/cuda9_linux-run"
+    checksum: sha256:96863423feaa50b5c1c5e1b9ec537ef7ba77576a3986652351ae43e66bcd080c
   retries: 3
   delay: 5
   register: nvidia_cuda_toolkit_download

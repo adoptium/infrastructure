@@ -78,6 +78,7 @@
     force: no
     mode: 0755
     validate_certs: no
+    checksum: sha256:c28dba8782da2cfea1e11c61d335958c31a9c1bc553063546af9cbe98f204092
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - protobuf_status.stat.exists == False
