@@ -214,10 +214,10 @@ startVMPlaybookWin()
 	searchLogFiles $OS
 	local pbFailed=$?
         if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
-		vagrant reload
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
         	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+		vagrant reload
 		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
