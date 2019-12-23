@@ -1,65 +1,24 @@
-# Ansible playbooks to download and install dependencies for OpenJDK on various platforms
+# Ansible playbooks to download and install dependencies for OpenJDK build and test on various platforms
 
-# Quickstart Guide
+# Quickstart guide
 
-To test the ansible scripts, you'll need to install the following programs.
+The ansible playbooks under the `playbook` directory are used to set up all
+of the adoptopenjdk machines to be able to run building and testing of the
+openjdk and related projects.
 
-For macOS:
+The main playbooks should be run from this directory using, for example, the
+following command (the skipped tags are one that aren't needed on most
+user's machines, but are needed if you're setting up a machine for the
+official AdoptOpenJDK infrastructure):
 
-1. Install Homebrew 2.1.7 or later
-  ```bash
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  ```
-2. Install Vagrant 2.2.5 or later
-  ```bash
-  brew cask install vagrant
-  ```
-3. Install Virtualbox 6.0.8 or later:
-  ```bash
-  brew cask install virtualbox
-  ```
- 
-# Running via Vagrant and VirtualBox
-
-To test the ansible scripts you can set up a Virtual Machine isolated from your own local system.
-A `Vagrantfile` has been provided and the usual `vagrant` commands should get it up and running.
-
-The following method runs the ansible playbooks on the local connection.
-Normally you will be running ansible on your development machine, and using it
-to modify remote hosts.
-
-**NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from
-e.g. `~/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
-
-```bash
-vagrant up
-
-vagrant ssh # Uses default ssh login, user=vagrant, password=vagrant
-
-cd /vagrant/playbooks
+```
+ansible-playbook -i inventory_file --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
-Note:
- - A `hosts` file containing `localhost ansible_connection=local` will already be present in the directory with the playbook scripts (`/vagrant/playbooks`).
- - A public key file `id_rsa.pub` will already be present in the `/home/vagrant/.ssh/` folder
+If you are interesting in running the playbooks within a virtual machine on your
+host, checkout the section on Vagrant later in this readme
 
-1) Run a playbook to install dependencies, for Ubuntu 14.x on x86:
-
-`ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml`
-
-or
-
-`ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml`
-
-In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
-
-```bash
-ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
-```
-
-# Running Manually
-
-## Do I need to be a superuser to run the playbooks?
+## Do I need to be a superuser on the target machine to run the playbooks?
 
 Yes, in order to access the package repositories (we will perform either `yum install` or `apt-get` commands)
 
@@ -89,17 +48,17 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 3) Run a playbook to install dependencies, e.g. for Ubuntu 14.x on x86:
     ```bash
-    ansible-playbook -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+    ansible-playbook -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins
 
     # Or to use a custom hosts file:
-    ansible-playbook -i /path/to/hosts -s AdoptOpenJDK_Unix_Playbook/main.yml
+    ansible-playbook -i /path/to/hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins
     ```
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
-## How do I run the playbook on a Windows Machine?
+## How do I run the playbook against a Windows Machine?
 
-As Ansible can't run on Windows, it has to be run on a seperate system and then pointed at a Windows machine (such as a VM). To test the playbook, a vagrant VM can be used.
+As Ansible can't run on Windows, it has to be run on a seperate system (e.g. a Linux VM) and then pointed at a Windows machine
 You can do this by following these steps:
 
 1) Run `vagrant plugin install vagrant-disksize`. This will install a plugin that allows the user to specify the disksize of the VM and is required to use the Windows Vagrantfile.
@@ -111,7 +70,7 @@ You can do this by following these steps:
 7) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME` to `ansible_password: vagrant`.
 8) From the `../ansible` directory, running `ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp -u vagrant --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
 
-Alternatively, `openjdk-infrastructure/ansible/pbTestScripts/testScript.sh` will do this for you when executing `./testScript.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
+Alternatively, [pbTestScripts/vagrantPlaybookCheck.sh](pbTestScripts/vagrantPlaybookCheck.sh) will do this for you when executing `./testScript.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
 
 Note: if using macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` will be required before starting the playbook and executing `testScript.sh`
 
@@ -121,14 +80,28 @@ As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be s
 You can do this by following these steps:
 
   1. Make a copy of the existing directory you have.
-  2. The "vagrantfile" is an alias to the vagrantfile that is labelled with the desired OS. Replace this so it is an alias of the OS you want. (default OS is CentOS)
+  2. The `Vagrantfile` is a symmlink or copy of the Vagrantfile that is labelled with the desired OS (e.g. `VagrantFile.Ubuntu1804`)
   3. Continue the vagrant functions as normal.
 
-To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into. 
+To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into.
+Use `vagrant-global-status` to find out which VMs you have in each directory
 
 ## Which playbook do I run?
 
-Our playbooks are named according to the operating system they are supported for, keep in mind that package availability may differ between operating system releases
+Our playbooks are named according to the operating system they are supported for, keep in mind that package availability may differ between operating system releases.
+
+The main ones are as follows:
+
+- AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
+- AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
+- aix.yml (For AIX systems - not currently split out into individual roles)
+- AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
+
+There are also various playbooks used to set up other machines in the
+adoptopenjdk infrastructure - generally most end users won't need these but
+I'll include them for completeness:
+
+- vagrant.yml (Used to set up an Ubuntu machine to run Vagrant playbook testing)
 
 ## Where can I run the playbooks?
 
@@ -143,27 +116,29 @@ Running `ansible --version` will display your Ansible configuration folder that 
 
 ## Skipping one or more tags via CLI when running Ansible playbooks
 
-One of the two examples below is appropriate to run a playbook and skip tags, leading to linked and dependent tasks to be not executed:
+In general skipping `adoptopenjdk` and `jenkins` as per all of the examples
+above will be all that's needed -  those tags are in place for all roles
+that will probe problematic on a non-AdoptOpenJDK owned machine. Most of the
+roles have their own tags you can use to skip them if required, but one that
+might be useful is `dont_remove_system`. We have one or two roles such as
+`GIT_source` in the *IX playbook which can potentially remove any system
+installed version of the tool after building a later one from source into
+/usr/local. For maximum safety you can use that too, but you should consider
+whether that's really what you want to do if you add that to your skip list.
 
-```bash
-ansible-playbook -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags "jenkins_user"
-
-ansible-playbook -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags "install_zulu, jenkins_authorized_key, nagios_add_key, add_zeus_user_key"
-```
-
-## Skipping tasks via CLI when running Ansible playbooks (conditional and skipping tasks)
+## Passing in extra variables from the command line
 
 The below example is appropriate to run playbook by skipping tasks by using a combination of conditionals and tags (linked and dependent tasks will not be executed):
 
 ```bash
-ansible-playbook -i [/path/to/hosts] -s AdoptOpenJDK_Unix_Playbook/main.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="install_zulu"
+ansible-playbook -i [/path/to/hosts] -s AdoptOpenJDK_Unix_Playbook/main.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="adoptopenjdk,jenkins,dont_remove_system"
 ```
 
-Note that when running from inside the `vagrant` instance:
+Note that when running from inside a `vagrant` instance:
  - the `[/path/to/hosts]` can be replace with `/vagrant/playbooks/hosts`
  - the `[/path/to/id_rsa.pub]` can be replaced with `/home/vagrant/.ssh/id_rsa.pub`
 
-Useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
+This is useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
 
 ## Verbose mode, debugging Ansible playbooks
 
@@ -183,21 +158,82 @@ A snippet from the man pages of Ansible:
 
 ## Expected output of a successful Ansible build
 
-When the above `ansible-playbook` commands succeed, we should get something of this output (snippet):
+When the above `ansible-playbook` commands succeed, we should get something like this:
 
 ```
-TASK [Start NTP] ***************************************************************
- changed: [localhost]
-
-TASK [Remove unneeded packages from the cache] *********************************
- ok: [localhost]
-
-TASK [Remove apt dependencies that are no longer required] *********************
- ok: [localhost]
-
-TASK [Send Slack notification, successful] *************************************
- skipping: [localhost]
-
 PLAY RECAP *********************************************************************
- localhost                  : ok=49   changed=21   unreachable=0    failed=0
+172.28.128.134             : ok=131  changed=96   unreachable=0    failed=0   
 ```
+
+# Running via Vagrant and VirtualBox
+
+We have some automation for running under Vagrant which we use to validate
+playbook changes befor they are merged. See the
+[pbTestScripts](pbTestScripts/) folder for more info. The scripts from there
+are run on jenkins in the
+[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/) job
+
+## Vagrant setup guide - macOS
+
+To test the ansible scripts, you'll need to install the following programs.
+
+1. Install Homebrew 2.1.7 or later
+  ```bash
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  ```
+2. Install Vagrant 2.2.5 or later
+  ```bash
+  brew cask install vagrant
+  ```
+3. Install Virtualbox 6.0.8 or later:
+  ```bash
+  brew cask install virtualbox
+  ```
+
+## Vagrant setup guide - Ubuntu (other Linuxes are similar)
+
+If you're on Ubuntu we have a playbook that can be used to set up your
+machine to run vagrant in [playbooks/vagrant.yml](playbooks/vagrant.yml) but
+it simply installs Vagrant from https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
+and also [virtualbox from their web site](https://www.virtualbox.org/wiki/Downloads)
+
+## Executing under vagrant
+
+To test the ansible scripts you can set up a Virtual Machine isolated from your own host system.
+Several `Vagrantfile`s have been provided and the usual `vagrant` commands should get it up and running.
+
+The following method runs the ansible playbooks on the local connection.
+Normally you will be running ansible on your development machine, and using it
+to modify remote hosts.
+
+**NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from
+e.g. `~/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
+
+```bash
+ln -s Vagrantfile.Centos6 Vagrantfile
+
+vagrant up
+
+vagrant ssh # Uses default ssh login, user=vagrant, password=vagrant
+
+cd /vagrant/playbooks
+```
+
+Note when using our Vagrantfiles:
+ - A `hosts` file containing `localhost ansible_connection=local` will already be present in the directory with the playbook scripts (`/vagrant/playbooks`).
+ - A public key file `id_rsa.pub` will already be present in the `/home/vagrant/.ssh/` folder
+
+1) Run a playbook to install dependencies, for Linux on x86:
+
+`ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
+
+or
+
+`ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
+
+In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
+
+```bash
+ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+```
+
