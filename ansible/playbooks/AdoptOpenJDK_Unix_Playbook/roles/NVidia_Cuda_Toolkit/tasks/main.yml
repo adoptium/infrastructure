@@ -91,9 +91,7 @@
   tags: nvidia_cuda_toolkit
 
 - name: Enable NVidia CUDA toolkit Repo for SLES12 on x86_64
-  command: |
-    rpm -i /tmp/sles12_cuda9_repo.rpm
-    sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
+  command: rpm -i /tmp/sles12_cuda9_repo.rpm
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
@@ -103,6 +101,19 @@
     - nvidia_cuda_toolkit
     #TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
+
+- name: Sed change gpgcheck for SLES12 on x86_64
+  command: sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/cuda.repo
+  when:
+    - cuda_installed.stat.islnk is not defined
+    - ansible_architecture == "x86_64"
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+  tags:
+    - nvidia_cuda_toolkit
+    #TODO: rpm used in place of yum or rpm_key module
+    - skip_ansible_lint
+
 
 - name: Install NVidia CUDA toolkit for SLES12 on x86_64
   zypper: pkg=cuda state=latest update_cache=yes
