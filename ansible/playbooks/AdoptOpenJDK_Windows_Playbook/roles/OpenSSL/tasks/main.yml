@@ -18,6 +18,7 @@
   win_get_url:
     url: https://www.openssl.org/source/openssl-1.1.1d.tar.gz
     dest: C:\temp\openssl-1.1.1d.tar.gz
+    checksum: sha256:1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
   when: (openssl32_installed.stat.exists == false) or (openssl64_installed.stat.exists == false)
   tags: openssl
 
