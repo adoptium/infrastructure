@@ -10,16 +10,17 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 
 These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
 
-The script takes a number of options:
+The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 
-| Option               | Description                                           | Example                                                                           |
-|----------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------|
-| --all / -a           | Runs for all OSs                                      | `./testScript.sh -a`                                                              |
-| --retainVM / -r      | Retains the VM after running the Playbook             | `./testScript.sh -a --retainVM`                                                   |
-| --build / -b         | Build JDK8 on the VM after the playbook               | `./testScript.sh -a --build`                                                      |
-| --URL / -u Git URL   | Specify the URL of the infrastructure repo to clone * | `./testScript.sh -a --URL https://github.com/adoptopenjdk/openjdk-infrastructure` |
-| --test / -t          | Run a small test on the built JDK within the VM **    | `./testScript.sh -a --build --test`                                               |
-| --help               | Displays usage                                        | `./testScript.sh --help`                                                          |
+| Option               | Description                                           | Example                                                                                 |
+|----------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| --vagrantfile / -v OS| Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                   |
+| --all / -a           | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                              |
+| --retainVM / -r      | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                                                   |
+| --build / -b         | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                      |
+| --URL / -u Git URL   | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/mybranch` |
+| --test / -t          | Run a small test on the built JDK within the VM **    | `./vagrantPlaybookCheck.sh -a --build --test`                                               |
+| --help               | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                          |
 
 Notes:
  - If not specified, the URL will default to `https://github.com/adoptopenjdk/openjdk-infrastructure`
@@ -38,6 +39,6 @@ After each playbook is ran through, a summary is given, containing which OS play
 
 If specified, the VMs will then be tested by building JDK8 - if all dependencies are filled by the playbook as they should be, the JDK will be successfully built. If the `--test` option is then specified, the JDK will then have a simple test ran against it that will ensure it was built properly.
 
-If the VMs were chosen *not* to be destroyed, they can be later by running the _vmDestroy.sh_ script, which takes the `project folder` as an argument. If that folder is found, it will run through and destroy the VMs.
+If the VMs were chosen *not* to be destroyed, they can be later by running the _vmDestroy.sh_ script, which takes the `Vagrant OS` as an argument. If found, every Vagrant VM with this OS will be destroyed, therefore the user will be asked to confirm they want this. The `--force` option will skip this prompt.
 
 The additional scripts in the _pbTestScripts_ folder are called from `testScript.sh`
