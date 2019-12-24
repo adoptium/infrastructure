@@ -10,16 +10,17 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 
 These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
 
-The script takes a number of options:
+The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 
 | Option               | Description                                           | Example                                                                                 |
 |----------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| --all / -a           | Runs for all OSs                                      | `./vagrantPlaybookCheck -a`                                                             |
-| --retainVM / -r      | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck-a --retainVM`                                                   |
-| --build / -b         | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck-a --build`                                                      |
-| --URL / -u Git URL   | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck-a --URL https://github.com/adoptopenjdk/openjdk-infrastructure` |
-| --test / -t          | Run a small test on the built JDK within the VM **    | `./vagrantPlaybookCheck-a --build --test`                                               |
-| --help               | Displays usage                                        | `./vagrantPlaybookCheck--help`                                                          |
+| --vagrantfile / -v OS| Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                   |
+| --all / -a           | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                              |
+| --retainVM / -r      | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                                                   |
+| --build / -b         | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                      |
+| --URL / -u Git URL   | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/mybranch` |
+| --test / -t          | Run a small test on the built JDK within the VM **    | `./vagrantPlaybookCheck.sh -a --build --test`                                               |
+| --help               | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                          |
 
 Notes:
  - If not specified, the URL will default to `https://github.com/adoptopenjdk/openjdk-infrastructure`
