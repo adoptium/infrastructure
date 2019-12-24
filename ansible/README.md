@@ -102,15 +102,18 @@ Yes, in order to access the package repositories (we will perform either `yum in
 As Ansible can't run on Windows, it has to be run on a seperate system and then pointed at a Windows machine (such as a VM). To test the playbook, a vagrant VM can be used.
 You can do this by following these steps:
 
-1) Run `vagrant plugin install vagrant-disksize`. This will install a plugin that allows the user to specify the disksize of the VM.
+1) Run `vagrant plugin install vagrant-disksize`. This will install a plugin that allows the user to specify the disksize of the VM and is required to use the Windows Vagrantfile.
 2) `git clone "https://github.com/AdoptOpenJdk/openjdk-infrastructure/"`
-3) `ln -sf Vagrantfile.WindowsS12 Vagrantfile && vagrant up` in the cloned `/openjdk-infrastructure/ansible` directory
-4) Note the IP address that is output from running `vagrant up` and place it into a text file. e.g. `hosts.win`. Place this text file in `../anisble/playbooks/AdoptopenJDK_Windows_Playbook`
-5) Edit `../AdoptOpenJDK_Windows_Playbook/main.yml` so the `- hosts :{{ groups['Vendor_groups'] ... etc` becomes `- hosts: all`
-6) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME`.
-7) From the `../ansible` directory, running `sudo ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
+3) `ln -sf Vagrantfile.Win2012 Vagrantfile && vagrant up` in the cloned `openjdk-infrastructure/ansible` directory
+4) You can optionally edit `Vagantfile.Win2012` so the GUI is shown when running `vagrant up` by changing `v.gui = false` to `v.gui = true`, though this is not necessary to run the playbook.
+5) In `../ansible/playbooks/AdoptOpenJDK_Windows_Playbook/` a file called `hosts.tmp` will have been generated containing 2 IP addresses. Edit this file to remove the CRs and the lower IP address.
+6) Edit `../AdoptOpenJDK_Windows_Playbook/main.yml` so the `- hosts :{{ groups['Vendor_groups'] ... etc` becomes `- hosts: all`
+7) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME` to `ansible_password: vagrant`.
+8) From the `../ansible` directory, running `ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp -u vagrant --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
 
-Note: if using macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` will be required before starting the playbook.
+Alternatively, `openjdk-infrastructure/ansible/pbTestScripts/testScript.sh` will do this for you when executing `./testScript.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
+
+Note: if using macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` will be required before starting the playbook and executing `testScript.sh`
 
 ## Can I have multiple VMs on different OSs?
 
