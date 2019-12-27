@@ -36,7 +36,7 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdkD8 do |adoptopenjdkD8|
-    adoptopenjdkD8.vm.box = "debian/jessie64"
+    adoptopenjdkD8.vm.box = "roboxes/debian8"
     adoptopenjdkD8.vm.synced_folder ".", "/vagrant"
     adoptopenjdkD8.vm.hostname = "adoptopenjdkD8"
     adoptopenjdkD8.vm.network :private_network, type: "dhcp"
