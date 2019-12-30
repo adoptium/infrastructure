@@ -6,11 +6,22 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
-- name: Add the openjdk repository to apt
+- name: Allow https apt sources
+  package: "name=apt-transport-https state=latest"
+
+- name: Add the openjdk repository to apt for openjdk7
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
     - ansible_architecture != "armv7l"
   tags: patch_update
+
+- name: Add AdoptOpenJDK GPG key
+  apt_key:
+    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    state: present
+
+- name: Add the adoptopenjdk repository to apt for JDK8
+  apt_repository: repo='deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb jessie main' update_cache=no
 
 - name: Add the ubuntu toolchain repository to apt
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
