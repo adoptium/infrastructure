@@ -27,7 +27,7 @@ echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains **
 cat $VAGRANT_MOUNT/playbooks/hosts
 echo "---------------------------------------------------------------------------------------"
 # Get IPs of the VM, and output to shared folder
-ifconfig | grep "inet" | awk '{print $2}' | sed 's/addr://'  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
+ip address show | grep -e "\\binet\\b" | cut -d' ' -f6 | cut -d/ -f1  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
 # Put the host machine's IP into the authorised_keys file on the VM
 [ -r /vagrant/id_rsa.pub ] && mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 SCRIPT
@@ -36,7 +36,7 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdkD8 do |adoptopenjdkD8|
-    adoptopenjdkD8.vm.box = "debian/jessie64"
+    adoptopenjdkD8.vm.box = "roboxes/debian8"
     adoptopenjdkD8.vm.synced_folder ".", "/vagrant"
     adoptopenjdkD8.vm.hostname = "adoptopenjdkD8"
     adoptopenjdkD8.vm.network :private_network, type: "dhcp"
