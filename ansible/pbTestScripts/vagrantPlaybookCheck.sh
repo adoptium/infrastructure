@@ -156,7 +156,7 @@ startVMPlaybook()
 {
 	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-	ln -sf Vagrantfile.$OS Vagrantfile
+	ln -sf $WORKSPACE/ansile/pbTestScripts/Vagrantfile.$OS Vagrantfile
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
