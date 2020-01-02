@@ -10,6 +10,7 @@ testNativeBuild=false
 runTest=false
 vmHalt=true
 cleanWorkspace=false
+newVagrantFiles=false
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -34,6 +35,8 @@ processArgs()
 				vmHalt=false;;
 			"--clean-workspace" | "-c" )
 				cleanWorkspace=true;;
+			"--new-vagrant-files" | "-nv" )
+				newVagrantFiles=true;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -50,7 +53,8 @@ usage()
 					--clean-workspace | -c			Will remove the old work folder if detected
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
-					--no-halt | -nh				Option to stop the vagrant VMs halting
+					--no-halt | -n				Option to stop the vagrant VMs halting
+					--new-vagrant-files | -nv		Use vagrantfiles from the the specified git repository
 					--help | -h				Displays this help message"
 }
 
@@ -87,7 +91,9 @@ checkVagrantOS()
 {
 	cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
 	local vagrantOSlist=$(ls -1 Vagrantfile.* | cut -d. -f 2)
-	if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
+	if [[ "$newVagrantFiles" = "true" ]] && [[ -f "Vagrantfile.${vagrantOS}" ]]; then
+		echo "Vagrantfile detected"
+	elif [[ "$newVagrantFiles" != "true" ]] && [[ -f "$WORKSPACE/ansible/pbTestScripts/Vagrantfile.${vagrantOS}" ]]; then
 		echo "Vagrantfile detected"
 	elif [[ "$vagrantOS" == "all" ]]; then
 		vagrantOS=$vagrantOSlist
@@ -156,7 +162,11 @@ startVMPlaybook()
 {
 	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-	ln -sf $WORKSPACE/ansile/pbTestScripts/Vagrantfile.$OS Vagrantfile
+	if [ "$newVagrantFiles" = "true" ]; then
+	  ln -sf Vagrantfile.$OS Vagrantfile
+	else
+	  ln -sf $WORKSPACE/ansible/pbTestScripts/Vagrantfile.$OS Vagrantfile
+	fi
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
@@ -191,7 +201,11 @@ startVMPlaybookWin()
 {
 	local OS=$1
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-	ln -sf Vagrantfile.$OS Vagrantfile
+	if [ "$newVagrantFiles" = "true" ]; then
+	  ln -sf Vagrantfile.$OS Vagrantfile
+	else
+	  ln -sf $WORKSPACE/ansible/pbTestScripts/Vagrantfile.$OS Vagrantfile
+	fi
 	# Remove the Hosts files if they're found
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
