@@ -1,11 +1,19 @@
 # Scripts to test Unix playbooks on Vagrant VMs
 
+Most people will not need to run this directly, but if you can it will
+reduce the likelihood of breaking things when you adjust the playbooks.
+These scripts can be invoked via the
+[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/work%20in%20progress/job/VagrantPlaybookCheck/)
+job if you have access to our jenkins, and they take 60-90 minutes to run
+on the UNIX/Linux-based platforms, but closer to three hours for Windows.
+
 This folder contains the scripts necessary to start separate vagrant machines with the following OSs:
 
 * Ubuntu 16.04
 * Ubuntu 18.04
 * CentOS6
 * CentOS7
+* Debian8
 * Windows Server 2012 R2
 
 These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
