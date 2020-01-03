@@ -27,7 +27,7 @@ Build_Tool_Packages:
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
-  - git
+  - git-core
   - libfreetype6
   - libXext6
   - libXi6                        # JDK12+ compilation
