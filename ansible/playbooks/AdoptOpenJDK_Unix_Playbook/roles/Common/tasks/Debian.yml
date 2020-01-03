@@ -6,6 +6,9 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+- name: Install aptitude
+  package: name=aptitude state=latest
+
 - name: Allow https apt sources
   package: "name=apt-transport-https state=latest"
 
