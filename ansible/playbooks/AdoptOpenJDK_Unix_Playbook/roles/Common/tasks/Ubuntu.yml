@@ -6,6 +6,9 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+- name: Install aptitude
+  package: name=aptitude state=latest
+
 - name: Add the openjdk repository to apt
   apt_repository: repo='ppa:openjdk-r/ppa'
   when:
