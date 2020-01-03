@@ -165,8 +165,8 @@ startVMPlaybook()
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 	vagrant up
-	# FreeBSD12 uses a different shared folder type- required to get hosts.tmp from VM
-	if [[ "$OS" == "FreeBSD12" ]]; then
+	# FreeBSD12 & SLES12 uses a different shared folder type- required to get hosts.tmp from VM
+	if [[ "$OS" == "FreeBSD12" || "$OS" == "SLES12" ]]; then
                vagrant rsync-back
 	fi
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
