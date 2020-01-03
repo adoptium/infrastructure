@@ -81,6 +81,10 @@ checkVars()
                 echo "Can't find vagrant-disksize plugin, installing . . ."
                 vagrant plugin install vagrant-disksize
         fi
+        if [[ ! $(vagrant plugin list | grep 'rsync-back') ]]; then
+                echo "Can't find vagrant-rsync-back plugin, installing . . ."
+                vagrant plugin install vagrant-rsync-back
+        fi
 }
 
 checkVagrantOS()
@@ -161,6 +165,10 @@ startVMPlaybook()
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 	vagrant up
+	# FreeBSD12 & SLES12 uses a different shared folder type- required to get hosts.tmp from VM
+	if [[ "$OS" == "FreeBSD12" || "$OS" == "SLES12" ]]; then
+               vagrant rsync-back
+	fi
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
 	[[ -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx ]] && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
 	cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx && rm playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
