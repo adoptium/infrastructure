@@ -32,7 +32,7 @@
 
 - name: Install latest release if one not already installed (Linux/x64)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/x64/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
@@ -46,7 +46,7 @@
 
 - name: Install latest release if one not already installed (Linux/s390x)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/s390x/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/s390x/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
@@ -60,7 +60,7 @@
 
 - name: Install latest release if one not already installed (Linux/ppc64le)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/ppc64le/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/ppc64le/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
@@ -74,7 +74,7 @@
 
 - name: Install latest Hotspot release if one not already installed (Linux/aarch64)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/aarch64/jdk/{{ bootjdk }}/hotspot/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/aarch64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
