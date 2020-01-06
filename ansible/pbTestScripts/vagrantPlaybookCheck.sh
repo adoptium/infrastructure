@@ -97,7 +97,7 @@ checkVagrantOS()
 	local vagrantOSlist=$(ls -1 Vagrantfile.* | cut -d. -f 2)
 	if [[ "$newVagrantFiles" = "true" ]] && [[ -f "Vagrantfile.${vagrantOS}" ]]; then
 		echo "Vagrantfile detected"
-	elif [[ "$newVagrantFiles" != "true" ]] && [[ -f "$WORKSPACE/ansible/pbTestScripts/Vagrantfile.${vagrantOS}" ]]; then
+	elif [[ "$newVagrantFiles" != "true" ]] && [[ -f "$WORKSPACE/ansible/Vagrantfile.${vagrantOS}" ]]; then
 		echo "Vagrantfile detected"
 	elif [[ "$vagrantOS" == "all" ]]; then
 		vagrantOS=$vagrantOSlist
@@ -169,7 +169,7 @@ startVMPlaybook()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/pbTestScripts/Vagrantfile.$OS Vagrantfile
+	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
 	fi
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
@@ -212,7 +212,7 @@ startVMPlaybookWin()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/pbTestScripts/Vagrantfile.$OS Vagrantfile
+	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
 	fi
 	# Remove the Hosts files if they're found
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
