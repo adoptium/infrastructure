@@ -11,6 +11,7 @@ runTest=false
 vmHalt=true
 cleanWorkspace=false
 newVagrantFiles=false
+skipFullSetup=''
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -37,6 +38,8 @@ processArgs()
 				cleanWorkspace=true;;
 			"--new-vagrant-files" | "-nv" )
 				newVagrantFiles=true;;
+			"--skip-more" | "-sm" )
+				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -55,6 +58,7 @@ usage()
                                         --test | -t                             Runs a quick test on the built JDK
 					--no-halt | -n				Option to stop the vagrant VMs halting
 					--new-vagrant-files | -nv		Use vagrantfiles from the the specified git repository
+					--skip-more | -sm			Run playbook faster by exluding things not required by buildJDK
 					--help | -h				Displays this help message"
 }
 
@@ -193,7 +197,7 @@ startVMPlaybook()
 	# NOTE! Only works with GNU sed
 	! grep -q "timeout" ansible.cfg && sed -i -e 's/\[defaults\]/&\ntimeout = 30/g' ansible.cfg
 	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
-	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pb_failed=$?
@@ -234,7 +238,7 @@ startVMPlaybookWin()
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
 	# Run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk,build playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pbFailed=$?
