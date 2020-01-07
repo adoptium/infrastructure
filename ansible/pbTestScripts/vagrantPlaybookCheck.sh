@@ -93,19 +93,22 @@ checkVars()
 
 checkVagrantOS()
 {
-	cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
-	local vagrantOSlist=$(ls -1 Vagrantfile.* | cut -d. -f 2)
-	if [[ "$newVagrantFiles" = "true" ]] && [[ -f "Vagrantfile.${vagrantOS}" ]]; then
-		echo "Vagrantfile detected"
-	elif [[ "$newVagrantFiles" != "true" ]] && [[ -f "$WORKSPACE/ansible/Vagrantfile.${vagrantOS}" ]]; then
-		echo "Vagrantfile detected"
-	elif [[ "$vagrantOS" == "all" ]]; then
-		vagrantOS=$vagrantOSlist
-	else
-	        echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
-	        echo $vagrantOSlist
-        	exit 1
-	fi
+        local vagrantOSList
+        if [[ "$newVagrantFiles" = "true" ]]; then
+                cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
+        else    
+                cd $WORKSPACE/ansible/
+        fi
+        vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
+        if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
+                echo "Vagrantfile Detected"
+        elif [[ "$vagrantOS" == "all" ]]; then
+                vagrantOS=$vagrantOSList
+        else    
+                echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
+                echo $vagrantOSList
+                exit 1
+        fi
 }
 
 splitURL()
