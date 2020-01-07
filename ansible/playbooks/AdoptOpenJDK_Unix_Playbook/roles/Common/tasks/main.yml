@@ -19,24 +19,23 @@
   set_fact:
     root_group: "root"
 
-#########################
-# Override for Raspbian #
-#########################
-- name: If Raspbian on armv7l override ansible_distribution
-  set_fact:
-    ansible_distribution: "Ubuntu"
-  when:
-    - ansible_distribution == "Debian"
-    - ansible_architecture == "armv7l"
-
 ################
 # Set Hostname #
 ################
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: Domain == "adoptopenjdk.net"
-  tags: hostname
+  when: Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
+  tags: hostname,adoptopenjdk
+
+- name: Set hostname to inventory_hostname (macOS)
+  command: "{{ item }}"
+  with_items:
+    - "sudo scutil --set HostName {{ inventory_hostname }}.adoptopenjdk.net"
+    - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
+    - "dscacheutil -flushcache"
+  when: Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
+  tags: hostname,adoptopenjdk
 
 #####################
 # Update /etc/hosts #
@@ -78,6 +77,7 @@
 ##############################
 # OS setup and configuration #
 ##############################
+# If this errors, upgrade ansible to >=2.4
 - name: Perform OS setup and configuration
   include_tasks: "{{ ansible_distribution }}.yml"
   tags: main

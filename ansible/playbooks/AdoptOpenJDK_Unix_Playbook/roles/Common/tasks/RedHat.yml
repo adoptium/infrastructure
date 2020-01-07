@@ -29,6 +29,19 @@
     state: latest
   tags: patch_update
 
+# TODO: We should find a better way of doing this in the future, for some reason these deps aren't in the aarch64 rhel 7 repos.
+- name: Install missing Rhel7 aarch64 deps from Centos Mirror
+  yum: "name={{ packages }} state=present"
+  vars:
+    packages:
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libdwarf-devel-20130207-4.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libmpc-devel-1.0.1-3.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-common-1.20.4-7.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-Xvfb-1.20.4-7.el7.aarch64.rpm
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture == "aarch64")
+  tags: build_tools, test_tools
+
 ############################
 # Build Packages and tools #
 ############################
@@ -41,7 +54,8 @@
 - name: Install additional build tools for RHEL 7
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_RHEL7 }}"
-  when: ansible_distribution_major_version == "7"
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture != "aarch64")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7 on ppc64le
@@ -58,11 +72,25 @@
     - (ansible_distribution_major_version != "7" and ansible_architecture != "s390x")
   tags: build_tools
 
-- name: Install additional build tools for RHEL on x86_64
+- name: Install additional build tools for RHEL on x86
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_x86_64 }}"
+  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
   when:
     - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on ppc64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_ppc64 }}"
+  when:
+    - ansible_architecture == "ppc64"
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on s390x
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_s390x }}"
+  when:
+    - ansible_architecture == "s390x"
   tags: build_tools
 
 #################
@@ -84,7 +112,7 @@
 - name: Install Java (Not RedHat 6 on ppc64)
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
-  when: (ansible_distribution_major_version != "6" and ansible_architecture != "ppc64")
+  when: not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
@@ -95,7 +123,7 @@
 # Set default Java #
 ####################
 - name: Set default java version - RHEL 6 x86_64
-  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-ibm.x86_64/bin/java
+  shell: update-alternatives --set java  /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
   when:
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
@@ -129,9 +157,45 @@
     - ansible_architecture == "ppc64le"
   tags: default_java
 
+- name: Set default java version - RHEL 7 aarch64
+  shell: update-alternatives --set java java-1.8.0-openjdk.aarch64
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "aarch64"
+  tags: default_java
+
 - name: Set default java version - RHEL 7 ppc64le
   shell: update-alternatives --set java java-1.8.0-openjdk.s390x
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "s390x"
   tags: default_java
+
+###########
+# Locales #
+###########
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags: locales
+
+- name: Create Japanese locale
+  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales

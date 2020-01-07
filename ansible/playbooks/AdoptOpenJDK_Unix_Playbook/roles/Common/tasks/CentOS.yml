@@ -36,6 +36,7 @@
     url: http://repos.azulsystems.com/rhel/zulu.repo
     dest: /etc/yum.repos.d/zulu.repo
     timeout: 25
+    checksum: sha256:a7403b21c3eaad3104195746bfb0784fe2747a2722cf7ffb787f9ea4fc0cd39b
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
@@ -46,9 +47,6 @@
 - name: Call Build Packages and Tools Task
   include_tasks: build_packages_and_tools.yml
 
-##########################
-# Additional build tools #
-##########################
 ##########################
 # Additional build tools #
 ##########################
@@ -63,6 +61,7 @@
     url: https://people.centos.org/tru/devtools-2/devtools-2.repo
     dest: /etc/yum.repos.d/devtools-2.repo
     timeout: 25
+    checksum: sha256:a8ebeb4bed624700f727179e6ef771dafe47651131a00a78b342251415646acc
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
@@ -92,9 +91,9 @@
     - ansible_architecture == "x86_64"
   tags: build_tools
 
-- name: Install additional build tools for x86_64
+- name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
@@ -148,6 +147,7 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - ansible_architecture == "x86_64"
   tags: expat
@@ -167,3 +167,32 @@
   when:
     - ansible_architecture == "x86_64"
   tags: expat
+
+###########
+# Locales #
+###########
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags: locales
+
+- name: Create Japanese locale
+  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales

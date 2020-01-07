@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Runs powershell as an administator and gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it. Then places a file in the shared folder of the VM that contains the IP address of the VM.
+$script = <<SCRIPT
+Start-Process powershell -Verb runAs
+wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+.\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+$IPArray=(Get-NetIPAddress -InterfaceAlias "Ethernet*" -AddressFamily ipv4 | select -ExpandProperty IPAddress)
+echo $IPArray | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
+# Retrieving disk's current size
+$currentDiskSize =(Get-Partition -DriveLetter c | select Size)
+$currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
+# The size the disk should be, in bytes (95GB)
+$diskSizeBoundary = 102005473280
+# Changing the disksize to max supported size (~100GB)
+if ([long]$currentDiskSize -lt $diskSizeBoundary) {
+        echo "Resizing disk to max size"
+        $size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size $size.SizeMax
+}else {
+        echo "Disk is already at max size"
+}
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkW2012 do |adoptopenjdkW2012|
+    adoptopenjdkW2012.vm.box = "mwrock/Windows2012R2"
+    adoptopenjdkW2012.vm.hostname = "adoptopenjdkW2012"
+    adoptopenjdkW2012.vm.communicator = "winrm"
+    adoptopenjdkW2012.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW2012.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW2012.vm.provision "shell", inline: $script, privileged: false
+    adoptopenjdkW2012.disksize.size = '100GB'
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+  end
+end

@@ -31,6 +31,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
+    checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
   tags: [nagios_plugins, adoptopenjdk]
 
 - name: Extract nagios-plugins
@@ -53,4 +54,5 @@
     url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_pkg
     dest: /usr/local/nagios/libexec/check_pkg
     mode: 0755
+    checksum: sha256:1ccbd48c22dfc42f712f31d09b2509cc93f2b5ef7bb804ba1d0d7db0a4803874
   tags: [nagios_plugins, adoptopenjdk]

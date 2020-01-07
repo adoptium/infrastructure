@@ -8,12 +8,13 @@ Build_Tool_Packages:
   - alsa-lib-devel
   - autoconf
   - bind-utils
-  - bison
+  - bison                         # OpenJ9
   - bzip2
   - cpio
   - cups-devel
   - elfutils-libelf-devel
-  - flex
+  - expat-devel                   # Used for buiding the XML::Parser CPAN module
+  - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
   - gcc
@@ -26,11 +27,11 @@ Build_Tool_Packages:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
   - libcurl-devel
-  - libdwarf-devel
+  - libdwarf-devel                # OpenJ9
   - libpng-devel
   - libXext-devel
-  - libXi-devel # JDK12+ compilation
-  - libXrandr-devel # JDK12+ compilations
+  - libXi-devel                   # JDK12+ compilation
+  - libXrandr-devel               # JDK12+ compilations
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
@@ -38,7 +39,7 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
-  - numactl-devel
+  - numactl-devel                 # OpenJ9
   - ntp
   - openssl-devel
   - perl-CPAN
@@ -47,6 +48,7 @@ Build_Tool_Packages:
   - perl-GD
   - perl-libwww-perl
   - perl-Time-HiRes
+  - systemtap-sdt-devel
   - unzip
   - wget
   - xz
@@ -58,15 +60,18 @@ gcc48_devtoolset_compiler:
   - devtoolset-2-gcc-c++
 
 gcc73_devtoolset_compiler:
-  - devtoolset-7-gcc
-  - devtoolset-7-binutils
-  - devtoolset-7-gcc-c++
+  - devtoolset-7-gcc              # OpenJ9
+  - devtoolset-7-binutils         # OpenJ9
+  - devtoolset-7-gcc-c++          # OpenJ9
 
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
 
-Additional_Build_Tools_x86_64:
+Additional_Build_Tools_CentOS_x86:
   - zulu-9
+  - glibc.i686                    # a dependency required for executing a 32-bit C binary
+  - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
+  - libstdc++.i686                # a dependency required for executing a 32-bit C binary
 
 Test_Tool_Packages:
   - mercurial

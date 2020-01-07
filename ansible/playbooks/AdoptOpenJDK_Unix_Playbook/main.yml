@@ -2,9 +2,18 @@
 ###################################
 # AdoptOpenJDK - Ansible Playbook #
 ###################################
-- hosts: "{{ groups['Vendor_groups'] | default('localhost:build:test:!*zos*:!*win*:!*macos*:!*aix*') }}"
+# Groups can be passed in as a command-line variable in Ansible playbook.
+# It can be defined as 'all' or a specific group which the host belongs to.
+# For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
+- hosts: "{{ Groups | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
 
   #########
   # Roles #
@@ -15,40 +24,40 @@
     - Common
     - autoconf
     - curl
-    - Jenkins_User
-    - freemarker
-    - ant
-    - Ant-Contrib
+    - Jenkins_User                # AdoptOpenJDK Infrastructure
+    - freemarker                  # OpenJ9
+    - ant                         # Testing
+    - Ant-Contrib                 # Testing
     - GIT_Source
     - CPAN
-    - cmake
     - gmake
-    - Docker
-    - NVidia_Cuda_Toolkit
-    - Superuser
+    - Docker                      # Testing
+    - NVidia_Cuda_Toolkit         # OpenJ9
+    - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
-    - x11
     - NTP_TIME
     - gcc_48
-    - gcc_7
-    - role: local_srcinstall
-      src_tarball: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
-      installed_target: /usr/local/bin/cmake
-    - {role: nasm, when: ansible_architecture == 'x86_64'}
-    - adoptopenjdk9
-    - adoptopenjdk10
-    - adoptopenjdk11
-    - OpenSSL
+    - gcc_7                       # OpenJ9
+    - cmake                       # OpenJ9 / OpenJFX
+    - ccache
+    - {role: nasm, when: ansible_architecture == 'x86_64'} # OpenJ9
+    - role: adoptopenjdk_install  # JDK11 Build Bootstrap
+      jdk_version: 10
+    - role: adoptopenjdk_install  # JDK13 Build Bootstrap
+      jdk_version: 12
+    - role: adoptopenjdk_install  # JDK14 Build Bootstrap
+      jdk_version: 13
     - role: local_srcinstall
       src_tarball: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
       installed_target: /usr/local/bin/protoc
       when:
-        - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" oransible_distribution == "SLES")
+        - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "Debian" )
         - ansible_architecture == "x86_64"
-    - Nagios_Plugins
-    - Nagios_Master_Config
-    - Nagios_Tunnel
+    - OpenSSL102                  # OpenJ9
+    - Nagios_Plugins              # AdoptOpenJDK Infrastructure
+    - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
+    - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
     - Clean_Up
     - Security
     - Vendor

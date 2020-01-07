@@ -69,7 +69,7 @@
 - name: Download nasm sources
   shell: cd /tmp && wget https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/nasm-2.13.03.tar.gz
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne') ) )
   tags: nasm
 
 - name: Extract nasm sources
@@ -78,13 +78,13 @@
     dest: /tmp/
     copy: False
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne') ) )
   tags: nasm
 
 - name: Running ./configure & make for nasm
   shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} ./configure -prefix=/usr/local && make install
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout | version_compare('2.13.03', operator='ne') ) )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne') ) )
   tags: nasm
 
 - name: Remove downloaded packages for nasm

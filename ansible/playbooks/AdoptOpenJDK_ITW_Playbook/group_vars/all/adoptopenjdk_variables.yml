@@ -1,0 +1,10 @@
+---
+##########################
+# adoptopenjdk_variables #
+##########################
+
+# Domain for setting hostname
+Domain: adoptopenjdk.net
+
+# Sudoers file
+Sudoers_File: /etc/sudoers

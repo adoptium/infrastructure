@@ -2,6 +2,11 @@
 ################
 # Jenkins user #
 ################
+
+# Add Jenkins user to Performance Log Users in order to view counter data.
+# see https://docs.microsoft.com/en-us/windows/win32/perfctrs/limited-user-access-support
+# Required by OpenJ9 tests: testOSMXBean*
+
 - name: Create Jenkins user
   win_user:
     name: "{{ Jenkins_Username }}"
@@ -10,8 +15,8 @@
     state: present
     password_never_expires: true
     groups:
-      - Users, Remote Desktop Users
-  tags: jenkins_user
+      - Users, Remote Desktop Users, Performance Log Users
+  tags: jenkins
 
 
 #######################################################################
@@ -35,4 +40,4 @@
     username: SYSTEM
     state: present
     enabled: true
-  tags: jenkins_workspace
+  tags: jenkins

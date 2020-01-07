@@ -7,47 +7,27 @@
 Build_Tool_Packages:
   - alsa-lib
   - autoconf
-  - automake
   - bash
-  - binutils
-  - bison
   - cups
-  - curl
   - fontconfig
   - freetype2
-  - gcc
-  - gcc-ecj
+  - giflib
   - git
   - gmake
-  - libICE
-  - libSM
-  - libX11
-  - libXau
-  - libXdmcp
+  - jpeg-turbo
+  - lcms2
   - libXext
-  - libXfixes
   - libXi
+  - libX11
   - libXrandr # JDK12+ compilation
   - libXrender
   - libXt
   - libXtst
-  - libdaemon
-  - libffi
-  - libfontenc
-  - libgnomecups
-  - libiconv
-  - libxcb
-  - m4
-  - mercurial
-  - mkfontdir
-  - nano
   - openjdk
   - openjdk8
-  - ntp
-  - gtar
-  - xextproto
-  - xproto
-  - wget
+  - pkgconf
+  - png
+  - unzip
   - zip
 
 gcc_compiler:

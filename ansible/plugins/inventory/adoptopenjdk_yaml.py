@@ -42,12 +42,12 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
 
   # valid roles - add as necessary
-  'type': ('build', 'test', 'jck', 'infrastructure'),
+  'type': ('build', 'test', 'jck', 'infrastructure', 'perf'),
 
   # providers - validated for consistency
-  'provider': ('azure', 'cloudcone', 'joyent', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro', '1and1',
-        'digitalocean', 'ibm')
+  'provider': ('azure', 'marist', 'osuosl', 'scaleway',
+        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro',
+        'digitalocean', 'ibm', 'godaddy', 'aws')
 }
 
 # customisation options per host:
@@ -74,7 +74,7 @@ def main():
     inventory_path = path.abspath(path.join(basepath, "..", "..", "inventory.yml"))
     with open(inventory_path, 'r') as stream:
         try:
-            hosts = yaml.load(stream)
+            hosts = yaml.load(stream, Loader=yaml.FullLoader)
 
         except yaml.YAMLError as exc:
             print(exc)

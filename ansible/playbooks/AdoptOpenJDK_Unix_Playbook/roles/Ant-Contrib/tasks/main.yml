@@ -27,6 +27,11 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha256:c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf
+  retries: 3
+  delay: 5
+  register: antContrib_download
+  until: antContrib_download is not failed
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 

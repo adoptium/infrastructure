@@ -9,11 +9,8 @@
   tags: ccache
 
 - name: Download ccache.tar.gz
-  get_url:
-    url: https://www.samba.org/ftp/ccache/ccache-3.4.2.tar.gz
-    dest: /tmp/ccache.tar.gz
-    mode: 0440
-    validate_certs: False
+  command: wget -O /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v3.4.2/ccache-3.4.2.tar.gz
+    warn=False
   when: ccache_status.stat.isdir is not defined
   tags: ccache
 
@@ -30,6 +27,7 @@
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture != "s390x"
+    - ansible_distribution != "FreeBSD"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for s390x
@@ -37,6 +35,14 @@
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_architecture == "s390x"
+    - ansible_distribution != "FreeBSD"
+  tags: ccache
+
+- name: Running ./configure & make for CCACHE for FreeBSD
+  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_cores }} && gmake install
+  when:
+    - ccache_status.stat.isdir is not defined
+    - ansible_distribution == "FreeBSD"
   tags: ccache
 
 - name: Remove downloaded packages for ccache

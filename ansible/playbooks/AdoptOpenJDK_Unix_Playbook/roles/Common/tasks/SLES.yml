@@ -8,7 +8,7 @@
 #########################################
 - zypper_repository:
     name: devel-tools
-    repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/SLE_12_SP3/'
+    repo: 'https://download.opensuse.org/repositories/devel:/tools/SLE_12_SP4/'
     auto_import_keys: yes
     state: present
   when:
@@ -52,6 +52,13 @@
     - ansible_distribution_major_version == "11"
   tags: build_tools
 
+- name: Install additional build tools for SLES on x86
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES_x86 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
 ########
 # zlib #
 ########
@@ -61,16 +68,17 @@
   register: zlib_status
   tags: zlib
 
-- name: Download Zlib - SLES 11 PPC64
+- name: Download Zlib
   get_url:
-    url: https://www.zlib.net/zlib-1.2.11.tar.gz
+    url: http://www.zlib.net/zlib-1.2.11.tar.gz
     dest: /tmp/zlib-1.2.11.tar.gz
     mode: 0440
+    checksum: sha256:c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
   when:
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
-- name: Extract Zlib - SLES 11 PPC64
+- name: Extract Zlib
   unarchive:
     src: /tmp/zlib-1.2.11.tar.gz
     dest: /tmp
@@ -79,10 +87,19 @@
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
-- name: Running ./configure & make for Zlib - SLES 11 PPC64
+- name: Running ./configure & make for Zlib on Linux x86-64 or PPC64LE
   shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
+    - ansible_architecture != "s390x"
+    - zlib_status.stat.islnk is not defined
+  tags: zlib
+
+- name: Running ./configure & make for Zlib on Linux s390x
+  shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_cores }} && make install
+  become: yes
+  when:
+    - ansible_architecture == "s390x"
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
@@ -142,35 +159,54 @@
     - java8_installed.stat.exists == false
   tags: java8_SLES11
 
-##############################
-# expat on SLES 11 on x86_64 #
-##############################
-- name: Install expat on SLES 11
+#########
+# expat #
+#########
+- name: Test if expat is installed
+  stat:
+    path: /usr/local/lib/libexpat.so
+  register: expat_installed
+  when:
+    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+  tags: expat
+
+- name: Download expat
   get_url:
     url: https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2
     dest: /tmp/
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
-    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
-    - ansible_architecture == "x86_64"
+    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+    - expat_installed.stat.exists == false
   tags: expat
 
-- name: Extract expat on SLES 11
+- name: Extract expat
   unarchive:
     src: /tmp/expat-2.2.5.tar.bz2
     dest: /tmp/
     copy: False
   when:
-    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
-    - ansible_architecture == "x86_64"
+    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+    - expat_installed.stat.exists == false
   tags: expat
 
-- name: Running ./configure & make for expat on SLES 11
+- name: Running ./configure & make for expat on Linux x86-64
   shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
   become: yes
   when:
-    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
+    - ansible_distribution_major_version == "11"
     - ansible_architecture == "x86_64"
+    - expat_installed.stat.exists == false
+  tags: expat
+
+- name: Running ./configure & make for expat on Linux s390x
+  shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_cores }} && sudo make install
+  become: yes
+  when:
+    - ansible_distribution_major_version == "12"
+    - ansible_architecture == "s390x"
+    - expat_installed.stat.exists == false
   tags: expat

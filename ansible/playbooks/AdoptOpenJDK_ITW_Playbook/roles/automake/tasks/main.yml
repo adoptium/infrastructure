@@ -1,0 +1,40 @@
+---
+###########################################
+# ansible install automake version 1.31.1 #
+###########################################
+
+- name: Check if automake 1.31.1 is installed
+  shell: automake --version | grep 1.13.1
+  ignore_errors: yes
+  register: automake_installed
+
+- name: Download latest automake tar
+  get_url:
+    url: https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz
+    dest: /tmp/automake-1.13.1.tar.gz
+    mode: 0440
+  when:
+    - automake_installed.rc != 0
+
+- name: Extract automake tar
+  unarchive:
+    src: /tmp/automake-1.13.1.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - automake_installed.rc != 0
+
+- name: Configure, make and make install automake
+  shell: cd /tmp/automake-1.13.1/ && bash configure && make && make install
+  when:
+    - automake_installed.rc != 0
+
+- name: Remove the /usr/local/bin/automake directory
+  shell: rm -rf /usr/local/bin/automake
+  when:
+    - automake_installed.rc != 0
+
+- name: Create sym link from /usr/local/bin/automake-1.13 to /usr/local/bin/automake
+  shell: ln -s /usr/local/bin/automake-1.13 /usr/local/bin/automake
+  when:
+    - automake_installed.rc != 0

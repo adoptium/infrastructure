@@ -20,6 +20,7 @@
     url: https://cygwin.com/setup-x86_64.exe
     dest: 'C:\temp\cygwin.exe'
     force: no
+    checksum: sha256:ae481452927771af871e218c85252192e1448c48fbc54bfe38c1bd2303af4ad0
   tags: cygwin
 
 - name: Install Cygwin and its packages
@@ -50,9 +51,10 @@
     - libpng15
     - libpng-devel
     - perl-Text-CSV
-    - xinit
-    - xorg-server
-    - xterm
+  tags: cygwin
+
+- name: Change git config to not replace Line endings
+  win_shell: "C:/cygwin64/bin/git config --system core.autocrlf false"
   tags: cygwin
 
 ###############################################################################
@@ -68,6 +70,7 @@
     url: "{{ Cygwin_SITE_URL + '/x86_64/release/grep/grep-2.27-2.tar.xz' }}"
     dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\grep.tar.xz' }}"
     force: no
+    checksum: sha256:36ae2483f68b3c5a4bd93814fa4f7e2576dbe6559d4ffa0589c2159e85de91f6
   tags: cygwin
 
 - name: Extract grep-2.27-2
@@ -76,14 +79,25 @@
 
 - name: Remove c:\cygwin64\bin from the path if it exists
   win_path:
+    name: PATH
     elements:
       - 'C:\cygwin64\bin'
+    scope: machine
     state: absent
   tags: cygwin
 
-- name: Add c:\cygwin64\bin to the start of the %PATH%
-  raw: setx PATH "C:\cygwin64\bin;$env:Path" /m
+# NOTE: This construct is because an SQL Server entry is being added to
+# the path which has an erroneous quote in it which causes problems for SETX
+- name: Add c:\cygwin64\bin to front of %PATH%
+  win_shell: 'setx /M PATH "C:\cygwin64\bin;%PATH:\"=%"'
+  args:
+    executable: cmd
   tags:
     - cygwin
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
+
+- name: Reboot machine for PATH changes to take effect
+  win_reboot:
+    reboot_timeout: 1800
+  tags: cygwin

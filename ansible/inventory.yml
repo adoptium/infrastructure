@@ -18,32 +18,38 @@ hosts:
 
       - softlayer:
           ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
+          vagrant-x64-1: {ip: 52.117.150.132, description: Bare metal machien to run VM playbook testing}
+
+      - godaddy:
+          ubuntu1604-x64-1: {ip: 160.153.247.225, description: git-hg/load relief for jenkins master}
 
   - build:
 
       - azure:
-          win2008r2-x64-1: {ip: 40.117.211.183, user: adoptopenjdk}
-
-      - cloudcone:
-          ubuntu1604-x64-1: {ip: 173.82.219.221}
+          win2008r2-x64-1: {ip: 13.90.22.129, user: adoptopenjdk}
+          win2008r2-x64-2: {ip: 13.82.55.70, user: adoptopenjdk}
 
       - digitalocean:
           centos69-x64-1: {ip: 159.65.95.239}
+          centos69-x64-2: {ip: 167.71.130.191}
+
+      - ibm:
+          aix71-ppc64-11: {ip: 129.33.196.209, user: b9s010a}
 
       - linaro:
-          centos74-armv8-1: {ip: 64.28.99.122}
-          centos74-armv8-2: {ip: 64.28.99.122, port: 2222}
+          centos76-armv8-1: {ip: 213.146.141.99, user: centos}
+          centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
       - macstadium:
           macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
+          macos1012-x64-1: {ip: 207.254.28.22, user: Administrator}
+          macos1012-x64-2: {ip: 207.254.71.42, user: Administrator}
 
       - marist:
-          rhel74-s390x-1: {ip: 148.100.110.129}
-          rhel74-s390x-2: {ip: 148.100.110.131}
-          sles12-s390x-1: {ip: 148.100.110.56}
-          ubuntu1604-s390x-2: {ip: 148.100.33.178}
-          ubuntu1604-s390x-3: {ip: 148.100.33.179}
+          rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
+          rhel77-s390x-2: {ip: 148.100.86.218, user: linux1}
+          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
           zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
           zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
@@ -58,9 +64,6 @@ hosts:
           centos74-armv8-1: {ip: 147.75.196.30}
           ubuntu1604-armv8-2: {ip: 147.75.77.146}
 
-      - joyent:
-          centos69-x64-1: {ip: 165.225.149.157}
-
       - scaleway:
           ubuntu1604-x64-2: {ip: 51.15.46.107}
           ubuntu1604-armv7-1: {ip: 212.47.233.28}
@@ -70,14 +73,59 @@ hosts:
           win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
           win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
 
+  - perf:
+
+      - macstadium:
+          macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
+          macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
+
   - test:
 
       - azure:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
+          win2012r2-x64-2: {ip: 40.121.164.56, user: adoptopenjdk}
+          win2012r2-x64-3: {ip: 13.68.219.237, user: adoptopenjdk}
+
+      - godaddy:
+          win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
+          win2016-x64-2: {ip: 160.153.234.5, user: adoptopenjdk}
+          win2016-x64-3: {ip: 160.153.234.8, user: adoptopenjdk}
+          win2016-x64-4: {ip: 160.153.234.22, user: adoptopenjdk}
+          debian8-x64-1: {ip: 160.153.246.223, user: adoptopenjdk}
+          debian8-x64-2: {ip: 160.153.246.42, user: adoptopenjdk}
+          debian8-x64-3: {ip: 160.153.246.234, user: adoptopenjdk}
+          debian8-x64-4: {ip: 160.153.246.220, user: adoptopenjdk}
+          ubuntu1604-x64-1: {ip: 160.153.245.145, user: adoptopenjdk}
+          ubuntu1604-x64-2: {ip: 160.153.246.176, user: adoptopenjdk}
+          ubuntu1604-x64-3: {ip: 160.153.246.222, user: adoptopenjdk}
+          ubuntu1604-x64-4: {ip: 160.153.246.214, user: adoptopenjdk}
+          centos7-x64-1: {ip: 160.153.244.82, user: adoptopenjdk}
+          centos7-x64-2: {ip: 160.153.246.204, user: adoptopenjdk}
+          centos7-x64-3: {ip: 160.153.246.194, user: adoptopenjdk}
+          centos7-x64-4: {ip: 160.153.244.42, user: adoptopenjdk}
+
+      - aws:
+          rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
+          rhel76-armv8-2: {ip: 34.245.159.35, user: ec2-user}
+          rhel76-armv8-3: {ip: 34.246.191.41, user: ec2-user}
+          rhel76-armv8-4: {ip: 54.154.138.147, user: ec2-user}
+          rhel76-armv8-5: {ip: 52.209.17.37, user: ec2-user}
+          rhel76-armv8-6: {ip: 54.229.245.232, user: ec2-user}
 
       - osuosl:
+          centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
+          centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
+          centos74-ppc64le-3: {ip: 140.211.168.225, user: centos}
+          centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
+          ubuntu1604-ppc64le-3: {ip: 140.211.168.248, user: ubuntu}
+          ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
+          ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
+          ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
+          ubuntu1804-ppc64le-3: {ip: 140.211.168.4, user: ubuntu}
+          aix71-ppc64-1: {ip: 140.211.9.28}
+          aix71-ppc64-2: {ip: 140.211.9.36}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.74.50}
@@ -89,9 +137,19 @@ hosts:
       - macincloud:
           macos1010-x64-1: {ip: 74.80.250.151, user: admin}
           macos1010-x64-2: {ip: 74.80.250.173, user: admin}
+          macos1012-x64-1: {ip: 92.63.141.139, user: admin}
+          macos1013-x64-1: {ip: 46.20.235.28, user: admin}
+          macos1013-x64-2: {ip: 92.63.134.23, user: admin}
+          macos1014-x64-1: {ip: 87.237.62.57, user: admin}
+          macos1014-x64-2: {ip: 92.63.134.40, user: admin}
+          macos1014-x64-3: {ip: 74.80.249.207, user: admin}
 
       - marist:
-          ubuntu1604-s390x-1: {ip: 148.100.33.147}
+          sles12-s390x-1: {ip: 148.100.86.128}
+          ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
+          ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu}
+          ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
+          ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}
@@ -104,23 +162,11 @@ hosts:
 
   - jck:
 
-      - macstadium:
-          macos1010-x64-1: {ip: 207.254.71.30, user: Administrator}
-          macos1010-x64-2: {ip: 207.254.71.31, user: Administrator}
-
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.33.183, user: linux1}
-          ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
-
-      - osuosl:
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.225, user: ubuntu}
-          ubuntu1604-ppc64le-2: {ip: 140.211.168.217, user: ubuntu}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.193.234}
-
-      - joyent:
-          win2012r2-x64-1: {ip: 165.225.150.83, user: Administrator}
 
       - softlayer:
           ubuntu1604-x64-1: {ip: 159.122.210.205}
