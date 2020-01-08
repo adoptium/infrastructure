@@ -29,6 +29,7 @@ The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 | --URL / -u Git URL       | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/mybranch` |
 | --test / -t              | Run a small test on the built JDK within the VM **    | `./vagrantPlaybookCheck.sh -a --build --test`                                                       |
 | --new-vagrant-file / -nv | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`                                                |
+| --skip-more / -sm        | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`
 | --help                   | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                                  |
 
 Notes:
