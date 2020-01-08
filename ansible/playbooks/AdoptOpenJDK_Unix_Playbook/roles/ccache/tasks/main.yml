@@ -39,7 +39,7 @@
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for FreeBSD
-  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_cores }} && gmake install
+  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_vcpus }} && gmake install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_distribution == "FreeBSD"
