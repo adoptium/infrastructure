@@ -201,8 +201,8 @@ startVMPlaybook()
 	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pb_failed=$?
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
-		cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
@@ -242,10 +242,10 @@ startVMPlaybookWin()
 	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pbFailed=$?
+	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
         if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
-        	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 		vagrant reload
 		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
 		echo The build finished at : `date +%T`
