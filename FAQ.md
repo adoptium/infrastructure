@@ -129,7 +129,7 @@ are restricted further via the `Enable project-based security` section of
 the job definition. In the case of those two in particular it's `jenkins-admins` and
 `release` teams only who have access to them respectively.
 
-## Addiing new systems
+## Adding new systems
 
 To add a new system:
 
