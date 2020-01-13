@@ -6,11 +6,11 @@
 ###########################
 # Overide amd64 to x86_64 #
 ###########################
-- name: If ansible_distribution is amd64 set it to x86_64
+- name: If ansible_architecture is amd64 set it to x86_64
   set_fact:
-    ansible_distribution: "x86_64"
+    ansible_architecture: "x86_64"
   when:
-    - ansible_distribution == "amd64"
+    - ansible_architecture == "amd64"
 
 ##################
 # Set root group #

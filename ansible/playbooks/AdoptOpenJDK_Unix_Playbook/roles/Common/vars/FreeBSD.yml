@@ -14,6 +14,7 @@ Build_Tool_Packages:
   - giflib
   - git
   - gmake
+  - gtar
   - jpeg-turbo
   - lcms2
   - libXext
@@ -28,6 +29,7 @@ Build_Tool_Packages:
   - pkgconf
   - png
   - unzip
+  - wget
   - zip
 
 gcc_compiler:
