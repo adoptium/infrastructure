@@ -12,6 +12,15 @@
   when:
     - ansible_architecture == "amd64"
 
+###############################
+# Set ansible_processor_vcpus #
+###############################
+- name: If ansible_processor_cpus is not defined, set to ansible_processor_cores or 1
+  set_fact:
+    ansible_processor_vcpus: "{{ ansible_processor_cores | default(1) }}"
+  when:
+    - ansible_processor_vcpus is not defined
+
 ##################
 # Set root group #
 ##################

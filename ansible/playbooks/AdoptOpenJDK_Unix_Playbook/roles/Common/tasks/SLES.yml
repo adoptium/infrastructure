@@ -91,15 +91,6 @@
   shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
-    - ansible_architecture != "s390x"
-    - zlib_status.stat.islnk is not defined
-  tags: zlib
-
-- name: Running ./configure & make for Zlib on Linux s390x
-  shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_cores }} && make install
-  become: yes
-  when:
-    - ansible_architecture == "s390x"
     - zlib_status.stat.islnk is not defined
   tags: zlib
 
@@ -197,16 +188,5 @@
   shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
   become: yes
   when:
-    - ansible_distribution_major_version == "11"
-    - ansible_architecture == "x86_64"
-    - expat_installed.stat.exists == false
-  tags: expat
-
-- name: Running ./configure & make for expat on Linux s390x
-  shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_cores }} && sudo make install
-  become: yes
-  when:
-    - ansible_distribution_major_version == "12"
-    - ansible_architecture == "s390x"
     - expat_installed.stat.exists == false
   tags: expat
