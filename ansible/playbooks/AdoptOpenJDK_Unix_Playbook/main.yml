@@ -40,6 +40,7 @@
     - gcc_48
     - gcc_7                       # OpenJ9
     - cmake                       # OpenJ9 / OpenJFX
+    - Protobuf                    # OpenJ9 (JITserver)
     - ccache
     - {role: nasm, when: ansible_architecture == 'x86_64'} # OpenJ9
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
