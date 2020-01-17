@@ -67,7 +67,7 @@
   stat:
     path: /usr/local/bin/protoc
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
   register: protobuf_status
   tags: protobuf
 
@@ -80,7 +80,7 @@
     validate_certs: no
     checksum: sha256:c28dba8782da2cfea1e11c61d335958c31a9c1bc553063546af9cbe98f204092
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf
 
@@ -90,14 +90,14 @@
     dest: /tmp
     copy: False
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf
 
 - name: Check if the linker search paths contains /usr/local/lib
   command: ldconfig -p | grep /usr/local/lib
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   register: linker_search_path
   ignore_errors: True
@@ -109,7 +109,7 @@
     line: /usr/local/lib
     create: yes
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
     - linker_search_path.stdout == ''
   tags: protobuf
@@ -117,7 +117,7 @@
 - name: Build and install Protocol Buffers v3.5.1
   shell: cd /tmp/protobuf-3.5.1 && ./configure --disable-shared --with-pic && make && make install && ldconfig
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf
 
@@ -130,6 +130,6 @@
     - /tmp/protobuf-3.5.1
   ignore_errors: yes
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf

@@ -74,7 +74,7 @@
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
 
-# SLES
+# SLES/SUSE
 - name: Download NVidia CUDA toolkit Repo RPM for SLES12 on x86_64
   get_url:
     url: https://developer.download.nvidia.com/compute/cuda/repos/sles122/x86_64/cuda-repo-sles122-9.0.176-1.x86_64.rpm
@@ -86,7 +86,7 @@
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
-    - ansible_distribution == "SLES"
+    - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
     - ansible_distribution_major_version == "12"
   tags: nvidia_cuda_toolkit
 
@@ -95,7 +95,7 @@
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
-    - ansible_distribution == "SLES"
+    - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
     - ansible_distribution_major_version == "12"
   tags:
     - nvidia_cuda_toolkit
@@ -107,7 +107,7 @@
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
-    - ansible_distribution == "SLES"
+    - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
     - ansible_distribution_major_version == "12"
   tags:
     - nvidia_cuda_toolkit
@@ -120,7 +120,7 @@
   when:
     - cuda_installed.stat.islnk is not defined
     - ansible_architecture == "x86_64"
-    - ansible_distribution == "SLES"
+    - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
     - ansible_distribution_major_version == "12"
   tags:
     - nvidia_cuda_toolkit
