@@ -32,8 +32,13 @@ export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk.x86_64)
 # Differences in openJDK8 name between Ubuntu and CentOS
 export JAVA_HOME=$(find /usr/lib/jvm/ -name java-1.8.0-openjdk-\*)
 if [ -z "$JAVA_HOME" ]; then
-  export JAVA_HOME=$(ls -1d /usr/lib/jvm/adoptopenjdk-8-* | head -1)
+	export JAVA_HOME=$(ls -1d /usr/lib/jvm/adoptopenjdk-8-* | head -1)
 fi
+
+if grep 'openSUSE' /etc/os-release >/dev/null 2>&1; then
+	echo "Running on openSUSE"
+	JAVA_HOME=$(find /usr/lib/jvm/ -name jdk8u*)
+fi	
 
 # Only build Hotspot on FreeBSD
 if [[ $(uname) == "FreeBSD" ]]; then
