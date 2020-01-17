@@ -3,7 +3,7 @@ set -eu
 
 # Argument parsing
 if [[ $# == 0 ]]; then
-        echo "No arguments added, defaulting to JDK8"
+        echo "No arguments input, defaulting to JDK8"
         export JAVA_TO_BUILD=jdk8u
 elif [[ $# == 1 ]]; then
         export JAVA_TO_BUILD=$1
@@ -41,9 +41,10 @@ if [[ $(uname) == "FreeBSD" ]]; then
         export TARGET_OS=FreeBSD
         export VARIANT=hotspot
         export JDK7_BOOT_DIR=/usr/local/openjdk7
+	export JAVA_HOME=/usr/local/openjdk8
 fi
 
-echo " DEBUG:
+echo "DEBUG:
         TARGET_OS=$TARGET_OS
         ARCHITECTURE=$ARCHITECTURE
         JAVA_TO_BUILD=$JAVA_TO_BUILD
