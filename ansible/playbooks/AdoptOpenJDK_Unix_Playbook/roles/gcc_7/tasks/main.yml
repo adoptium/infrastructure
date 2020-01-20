@@ -9,7 +9,7 @@
   ignore_errors: yes
   register: gcc7_installed
   tags: gcc-7
-  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
 
 # Installation on CentOS x86_64 will be handled via the scl repo in the Common CentOS playbook
 
@@ -19,7 +19,7 @@
     dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
     force: no
     mode: 0644
-    checksum: db3dcf4867acbf0cdcd9cb3a97f2e47d72d1a2a59e9e60359f267742f5fa650a
+    checksum: sha256:db3dcf4867acbf0cdcd9cb3a97f2e47d72d1a2a59e9e60359f267742f5fa650a
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
