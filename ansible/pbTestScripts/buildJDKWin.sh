@@ -6,8 +6,6 @@ export JAVA_TO_BUILD=jdk8
 export VARIANT=hotspot
 export JDK7_BOOT_DIR=/cygdrive/c/openjdk/jdk7
 export PATH=/usr/bin/:$PATH
-# Ensures Git won't replace line endings (CRLF)
-C:/cygwin64/bin/sed -i -e 's/autocrlf.*/autocrlf = false/g' C:\\ProgramData/Git/config
 # Git clone openjdk-build if it's not currently there.
 cd C:/
 if [ ! -d "openjdk-build" ]; then

@@ -17,6 +17,7 @@
     force: no
     mode: 0755
     validate_certs: no
+    checksum: sha256:ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian")
     - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))

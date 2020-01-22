@@ -69,6 +69,7 @@ Core infrastructure team - granted access to hosts on a case by case basis
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM) - *
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM) - * 
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
 
@@ -78,11 +79,15 @@ Issues can be assigned to these folks
 
 - [@AdamBrousseau](https://github.com/AdamBrousseau) - Adam Brousseau (IBM)
 - [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
+- [@cwesMills](https://github.com/cwesMills) - Colton Mills (IBM)
 - [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
+- [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (IBM)
+- [@HusainYusafali](https://github.com/HusainYusufali) - Husain Yusufali (IBM)
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
+- [@Willsparker](https://github.com/Willsparker) - William Parker (IBM)
 
 ## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)

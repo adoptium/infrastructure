@@ -33,6 +33,9 @@ hosts:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
+      - ibm:
+          aix71-ppc64-11: {ip: 129.33.196.209, user: b9s010a}
+
       - linaro:
           centos76-armv8-1: {ip: 213.146.141.99, user: centos}
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
@@ -44,10 +47,9 @@ hosts:
           macos1012-x64-2: {ip: 207.254.71.42, user: Administrator}
 
       - marist:
-          rhel74-s390x-1: {ip: 148.100.110.129}
-          rhel74-s390x-2: {ip: 148.100.110.131}
-          ubuntu1604-s390x-2: {ip: 148.100.33.178}
-          ubuntu1604-s390x-3: {ip: 148.100.33.179}
+          rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
+          rhel77-s390x-2: {ip: 148.100.86.218, user: linux1}
+          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
           zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
           zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
@@ -106,11 +108,13 @@ hosts:
           centos7-x64-3: {ip: 160.153.246.194, user: adoptopenjdk}
           centos7-x64-4: {ip: 160.153.244.42, user: adoptopenjdk}
 
-      - openlab:
-          ubuntu1604-armv8-1: {ip: 199.204.45.100, user: ubuntu}
-          ubuntu1604-armv8-2: {ip: 199.204.45.53, user: ubuntu}
-          ubuntu1804-armv8-1: {ip: 199.204.45.37, user: ubuntu}
-          ubuntu1804-armv8-2: {ip: 162.253.55.204, user: ubuntu}
+      - aws:
+          rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
+          rhel76-armv8-2: {ip: 34.245.159.35, user: ec2-user}
+          rhel76-armv8-3: {ip: 34.246.191.41, user: ec2-user}
+          rhel76-armv8-4: {ip: 54.154.138.147, user: ec2-user}
+          rhel76-armv8-5: {ip: 52.209.17.37, user: ec2-user}
+          rhel76-armv8-6: {ip: 54.229.245.232, user: ec2-user}
 
       - osuosl:
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
@@ -145,9 +149,11 @@ hosts:
           macos1014-x64-3: {ip: 74.80.249.207, user: admin}
 
       - marist:
-          sles12-s390x-1: {ip: 148.100.110.56}
-          ubuntu1604-s390x-1: {ip: 148.100.33.147}
-          ubuntu1604-s390x-2: {ip: 148.100.33.184, user: linux1}
+          sles12-s390x-1: {ip: 148.100.86.128}
+          ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
+          ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu}
+          ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
+          ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}

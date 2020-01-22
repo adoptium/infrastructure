@@ -9,22 +9,12 @@
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
 
-- name: Test swapfile path - /swapfile
-  command: ls /swapfile
+- name: Test if swapfile exists
+  command: grep swap /etc/fstab
   ignore_errors: yes
-  register: swap_root
+  register: swap_exists
   tags:
     - swap_file
-    # TODO: use stat to check file existence
-    - skip_ansible_lint
-
-- name: Test swapfile path - /tmp/swapfile
-  command: ls /tmp/swapfile
-  ignore_errors: yes
-  register: swap_tmp
-  tags:
-    - swap_file
-    # TODO: use stat to check file existence
     - skip_ansible_lint
 
 - name: Set Swapfile path - /swapfile
@@ -43,8 +33,8 @@
   debug:
     msg:
       - "swap_path: {{ swap_path | default('***Undefined***') }} "
-      - "swap_tmp: {{ swap_tmp.rc | default('***Undefined***') }} "
-      - "swap_root: {{ swap_root.rc | default('***Undefined***') }} "
+      - "swap_exists: {{ swap_exists.rc | default('***Undefined***') }} "
+  tags: swap_file
 
 - name: Disable dphys-swapfile where applicable
   command: "dphys-swapfile uninstall"
@@ -56,7 +46,7 @@
 - name: Create swap file - via DD
   command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
+    - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Set swap file permissions
@@ -65,19 +55,19 @@
         group="{{ root_group }}"
         mode=0600
   when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
+    - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Create swap area device
   command: "mkswap {{ swap_path }}"
   when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
+    - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Mount swap file
   command: "swapon {{ swap_path }}"
   when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
+    - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Add swap to fstab
@@ -89,5 +79,5 @@
     dump=0
     state=present
   when:
-    - (swap_root.rc != 0 and swap_tmp.rc != 0)
+    - (swap_exists.rc != 0)
   tags: swap_file

@@ -47,6 +47,7 @@
     url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
     dest: /usr/local/nagios/libexec/check_mem
     mode: 0755
+    checksum: sha256:47666dce9d11d5908c3e775d229dcbdcd11ce13fd5ea576859987eccbdfc3efa
   when:
     - Nagios_Plugins == "Enabled"
   tags: [nagios_plugins, adoptopenjdk]

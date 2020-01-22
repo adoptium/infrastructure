@@ -6,11 +6,22 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
-- name: Add the openjdk repository to apt
+- name: Allow https apt sources
+  package: "name=apt-transport-https state=latest"
+
+- name: Add the openjdk repository to apt for openjdk7
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
     - ansible_architecture != "armv7l"
   tags: patch_update
+
+- name: Add AdoptOpenJDK GPG key
+  apt_key:
+    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    state: present
+
+- name: Add the adoptopenjdk repository to apt for JDK8
+  apt_repository: repo='deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb jessie main' update_cache=no
 
 - name: Add the ubuntu toolchain repository to apt
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
@@ -36,6 +47,16 @@
   apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
   when:
     - ansible_architecture == "x86_64"
+  tags: patch_update
+
+# Both repositories needed for gcc/g++-4.8
+- name: Add additional repositories for Raspbian Buster
+  apt_repository: repo={{ item }}
+  with_items:
+    - deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+    - deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
   tags: patch_update
 
 - name: Add additional repositories for BeagleBone
@@ -76,6 +97,15 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  tags: build_tools
+
+- name: Install GCC G++ on Raspian Buster
+  package: "name={{ item }} state=latest"
+  with_items:
+    - gcc-4.8
+    - g++-4.8
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
   tags: build_tools
 
 - name: Install additional build tools for x86_64

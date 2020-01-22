@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Doesn't come pre-installed in the vagrant box
+sudo pkg install -y python
+sudo ln -sf /usr/local/bin/python /usr/bin/python
+# Get IPs of the VM, and output to shared folder
+ifconfig | grep "inet" | awk '{print $2}' | sed 's/addr://'  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
+# Put the host machine's IP into the authorised_keys file on the VM
+[ -r /vagrant/id_rsa.pub ] && mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkFBSD12 do |adoptopenjdkFBSD12|
+    adoptopenjdkFBSD12.vm.box = "generic/freebsd12"
+    adoptopenjdkFBSD12.vm.synced_folder ".", "/vagrant", type: 'rsync'
+    adoptopenjdkFBSD12.vm.hostname = "adoptopenjdkFBSD12"
+    adoptopenjdkFBSD12.vm.network :private_network, type: "dhcp"
+    adoptopenjdkFBSD12.vm.provision "shell", inline: $script, privileged: false
+  end
+end
