@@ -74,6 +74,14 @@ Additional_Build_Tools_CentOS_x86:
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
 
 Test_Tool_Packages:
+  - gcc
+  - gcc-c++
+  - unzip
+  - lbzip2
+  - zlib-devel
+  - perl-devel
+  - libcurl-devel
+  - openssl-devel
   - mercurial
   - perl
   - xorg-x11-xauth
