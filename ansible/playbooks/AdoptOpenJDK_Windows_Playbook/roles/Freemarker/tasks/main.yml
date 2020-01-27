@@ -13,6 +13,7 @@
   win_get_url:
     url: http://central.maven.org/maven2/freemarker/freemarker/2.3.8/freemarker-2.3.8.jar
     dest: 'C:\openjdk\freemarker.jar'
-    checksum: sha256:cf0507fbe4901946e1842c1b63ac95e4b8ed59c0ea27b4398e207428f07633bf
+    checksum: cf0507fbe4901946e1842c1b63ac95e4b8ed59c0ea27b4398e207428f07633bf
+    checksum_algorithm: sha256
   when: (freemarker_installed.stat.exists == false)
   tags: Freemarker
