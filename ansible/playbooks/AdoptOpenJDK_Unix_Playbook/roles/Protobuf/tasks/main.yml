@@ -1,6 +1,6 @@
 ---
 ###########################
-# Protocol Buffers v3.5.1 #
+# Protocol Buffers v3.7.1 #
 ###########################
 # Required by OpenJ9 for out-of-process JIT compilation aka JITaaS
 # Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
@@ -63,7 +63,7 @@
   when: CXX is defined
   tags: protobuf
 
-- name: Check if Protocol Buffers v3.5.1 is installed
+- name: Check if Protocol Buffers v3.7.1 is installed
   stat:
     path: /usr/local/bin/protoc
   when:
@@ -71,22 +71,22 @@
   register: protobuf_status
   tags: protobuf
 
-- name: Download Protocol Buffers v3.5.1
+- name: Download Protocol Buffers v3.7.1
   get_url:
-    url: https://github.com/protocolbuffers/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz
-    dest: /tmp/protobuf-cpp-3.5.1.tar.gz
+    url: https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protobuf-cpp-3.7.1.tar.gz
+    dest: /tmp/protobuf-cpp-3.7.1.tar.gz
     force: no
     mode: 0755
     validate_certs: no
-    checksum: sha256:c28dba8782da2cfea1e11c61d335958c31a9c1bc553063546af9cbe98f204092
+    checksum: sha256:97f6cdaa0724d5a8cd3375d5f5cf4bd253d5ad5291154f533ed0d94a9d501ef3
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf
 
-- name: Extract Protocol Buffers v3.5.1
+- name: Extract Protocol Buffers v3.7.1
   unarchive:
-    src: /tmp/protobuf-cpp-3.5.1.tar.gz
+    src: /tmp/protobuf-cpp-3.7.1.tar.gz
     dest: /tmp
     copy: False
   when:
@@ -114,20 +114,20 @@
     - linker_search_path.stdout == ''
   tags: protobuf
 
-- name: Build and install Protocol Buffers v3.5.1
-  shell: cd /tmp/protobuf-3.5.1 && ./configure --disable-shared --with-pic && make && make install && ldconfig
+- name: Build and install Protocol Buffers v3.7.1
+  shell: cd /tmp/protobuf-3.7.1 && ./configure --disable-shared --with-pic && make && make install && ldconfig
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
   tags: protobuf
 
-- name: Remove downloaded packages for Protocol Buffers v3.5.1
+- name: Remove downloaded packages for Protocol Buffers v3.7.1
   file:
     path: "{{ item }}"
     state: absent
   with_items:
-    - /tmp/protobuf-cpp-3.5.1.tar.gz
-    - /tmp/protobuf-3.5.1
+    - /tmp/protobuf-cpp-3.7.1.tar.gz
+    - /tmp/protobuf-3.7.1
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")

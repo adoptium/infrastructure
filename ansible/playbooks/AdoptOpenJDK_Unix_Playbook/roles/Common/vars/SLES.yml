@@ -48,6 +48,8 @@ Additional_Build_Tools_SLES_x86:
   - libstdc++6-32bit              # a dependency required for executing a 32-bit C binary
 
 Test_Tool_Packages:
+  - gcc
+  - gcc-c++
   - perl
   - pulseaudio
   - xorg-x11

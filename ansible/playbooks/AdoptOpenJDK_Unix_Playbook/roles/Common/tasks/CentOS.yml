@@ -168,6 +168,21 @@
     - ansible_architecture == "x86_64"
   tags: expat
 
+####################
+# Set Default Java #
+####################
+- name: Create Java 8 Alternative
+  shell: alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk/bin/java 1
+  when:
+    - ansible_architecture == "x86_64"
+  tags: default_java
+
+- name: Set Default Java Version
+  shell: alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+  when:
+    - ansible_architecture == "x86_64"
+  tags: default_java
+
 ###########
 # Locales #
 ###########
