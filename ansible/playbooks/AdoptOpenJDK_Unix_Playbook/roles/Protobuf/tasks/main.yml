@@ -116,6 +116,9 @@
 
 - name: Build and install Protocol Buffers v3.7.1
   shell: cd /tmp/protobuf-3.7.1 && ./configure --disable-shared --with-pic && make && make install && ldconfig
+  environment:
+    - CC: "{{ CC }}"
+    - CXX: "{{ CXX }}"
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
     - protobuf_status.stat.exists == False
