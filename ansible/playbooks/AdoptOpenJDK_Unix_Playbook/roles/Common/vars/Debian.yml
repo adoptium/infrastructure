@@ -73,7 +73,6 @@ Additional_Packages_Debian8:
   - libmpfr4-dbg
 
 Additional_Build_Tools_x86_64:
-  - zulu-9
   - libnuma-dev
   - numactl
   - gcc-7
