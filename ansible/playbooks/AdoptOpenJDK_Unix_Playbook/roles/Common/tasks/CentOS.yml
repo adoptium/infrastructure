@@ -20,27 +20,6 @@
     state: latest
   tags: patch_update
 
-#########################################
-# Configure Repos and Update the system #
-#########################################
-- name: Import AZUL public key
-  rpm_key:
-    state: present
-    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
-  when:
-    - ansible_architecture == "x86_64"
-  tags: azul-key
-
-- name: Add AZUL to yum repo
-  get_url:
-    url: http://repos.azulsystems.com/rhel/zulu.repo
-    dest: /etc/yum.repos.d/zulu.repo
-    timeout: 25
-    checksum: sha256:a7403b21c3eaad3104195746bfb0784fe2747a2722cf7ffb787f9ea4fc0cd39b
-  when:
-    - ansible_architecture == "x86_64"
-  tags: build_tools
-
 ############################
 # Build Packages and tools #
 ############################
