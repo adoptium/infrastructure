@@ -70,6 +70,7 @@ Additional_Packages_Ubuntu16:
   - libgstreamer0.10-dev                # OpenJFX prereq
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - openjdk-7-jdk
+  - openjdk-8-jdk
   - libmpfr4
   - libmpfr4-dbg
 
@@ -78,7 +79,6 @@ Additional_Packages_Ubuntu18:
   - libgstreamer-plugins-base1.0-dev    # OpenJFX prereq
 
 Additional_Build_Tools_x86:
-  - zulu-9
   - libnuma-dev
   - numactl
   - gcc-7
@@ -109,6 +109,10 @@ Test_Tool_Packages:
   - xvfb
   - binfmt-support
   - qemu-user-static
+  - unzip
+  - cpanminus
+  - libexpat1-dev
+  - libcurl4-openssl-dev
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

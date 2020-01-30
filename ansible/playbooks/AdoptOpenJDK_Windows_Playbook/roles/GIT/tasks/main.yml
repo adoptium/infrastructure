@@ -19,7 +19,8 @@
   win_get_url:
     url: 'https://github.com/git-for-windows/git/releases/download/v2.14.3.windows.1/Git-2.14.3-64-bit.exe'
     dest: 'C:\temp\git.exe'
-    checksum: sha256:9610e082b823beb7f0da91a98d9f73e1f3f2430c21b2c4e15517dea4f981be3f
+    checksum: 9610e082b823beb7f0da91a98d9f73e1f3f2430c21b2c4e15517dea4f981be3f
+    checksum_algorithm: sha256
   when: (git_download.stat.exists == false) and (git_installed.stat.exists == false)
   tags: git
 
