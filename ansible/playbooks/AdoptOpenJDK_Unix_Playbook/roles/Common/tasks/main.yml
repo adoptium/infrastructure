@@ -20,6 +20,8 @@
     ansible_processor_vcpus: "{{ ansible_processor_cores | default(1) }}"
   when:
     - ansible_processor_vcpus is not defined
+  tags:
+    - cmake
 
 ##################
 # Set root group #
