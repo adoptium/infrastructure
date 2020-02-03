@@ -127,7 +127,7 @@ done
 			export DRIVE="-drive file=$workFolder/S390X.dsk,if=none,id=hd0 -device virtio-blk-ccw,drive=hd0,id=virtio-disk0";
 			export COMMAND="s390x";;
 		"PPC64LE" )
-			export MACHINE="pseries";
+			export MACHINE="pseries-2.12";
 			export DRIVE="-hda $workFolder/PPC64LE.dsk";
 			export COMMAND="ppc64";;
 		"ARM64" )
