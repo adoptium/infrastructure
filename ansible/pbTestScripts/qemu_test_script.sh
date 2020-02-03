@@ -156,9 +156,9 @@ done
         ssh-keygen -q -R "[localhost]:$PORTNO"
 
 	# Required to auto-accept the host ECDSA key
-	./expect_script.sh password ssh linux@localhost -p "$PORTNO" -o StrictHostKeyChecking=no 'uname -a' 
+	sshpass -p 'password' ssh linux@localhost -p "$PORTNO" -o StrictHostKeyChecking=no 'uname -a' 
 	# Add ssh key to VM's authorized_keys
-	./expect_script.sh password ssh-copy-id -p "$PORTNO" -i "$workFolder"/id_rsa.pub linux@localhost 
+	sshpass -p 'password' ssh-copy-id -p "$PORTNO" -i "$workFolder"/id_rsa.pub linux@localhost 
 }
 
 ## Run the playbook ( and build/test the JDK if applicable )
