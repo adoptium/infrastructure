@@ -1,4 +1,4 @@
-#!/usr/local/bin/expect -f
+#!/usr/bin/expect -f
 
 set timeout 20
 
