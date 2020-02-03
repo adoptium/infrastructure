@@ -25,6 +25,7 @@
               - build-essential
               - gettext
               - libcurl4-openssl-dev
+              - qemu
 
         - name: Run apt-get upgrade
           apt: upgrade=safe
