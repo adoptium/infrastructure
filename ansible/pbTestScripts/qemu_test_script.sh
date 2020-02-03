@@ -3,6 +3,7 @@
 ## Parse arguments
 
 ARCHITECTURE=""
+skipFullSetup=""
 PORTNO=10022
 current_dir=false
 cleanWorkspace=false
@@ -29,6 +30,8 @@ processArgs() {
 				retainVM=true;;
 			"--test" | "-t" )
 				testJDK=true;;
+			"--skip-more" | "-sm" )
+				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
 		esac
 	done
@@ -59,8 +62,8 @@ defaultVars() {
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
 	esac
 	if [[ -z "${WORKSPACE:-}" && "$current_dir" == false ]] ; then
-                echo "WORKSPACE not found, setting it as environment variable 'HOME'"
-                WORKSPACE=$HOME
+		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
+		WORKSPACE=$HOME
 	elif [[ "$current_dir" = true ]]; then
 		echo "Setting WORKSPACE to the current directory"
 		WORKSPACE=$PWD	
@@ -165,7 +168,7 @@ runPlaybook() {
 
 	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone https://github.com/adoptopenjdk/openjdk-infrastructure "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
-	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$workFolder"/logFiles/"$ARCHITECTURE".log
+	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$workFolder"/logFiles/"$ARCHITECTURE".log
 
 	if [[ "$buildJDK" == true ]]; then
 		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh"
