@@ -115,7 +115,7 @@ local EXTRA_ARGS=""
 local workFolder="$WORKSPACE/qemu_pbCheck"
 
 # Find/stop port collisions
-while ps | grep "$PORTNO" | grep -q -v "grep"; do
+while ps -aux | grep "$PORTNO" | grep -q -v "grep"; do
 	((PORTNO++))
 done
 	echo "Using Port: $PORTNO"
@@ -182,7 +182,7 @@ runPlaybook() {
 }
 
 destroyVM() {	
-	local PID=$(ps | grep "$PORTNO" | grep -v "grep" | awk '{ print $1 }')
+	local PID=$(ps -aux | grep "$PORTNO" | grep -v "grep" | awk '{ print $2 }')
 	echo "Killing this process: $PID"
 	kill $PID
 }
