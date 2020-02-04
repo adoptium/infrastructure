@@ -90,7 +90,8 @@ showArchList() {
 setupWorkspace() {
 	local workFolder=$WORKSPACE/qemu_pbCheck
 	# Images are in this consistent place on the 'vagrant' jenkins machines
-	local imageLocation="$HOME/qemu_images/"
+#	local imageLocation="/qemu_base_images$HOME/qemu_images/"
+	local imageLocation="/qemu_base_images/"
 	
 	mkdir -p "$workFolder"/logFiles
 	if [[ "$cleanWorkspace" = true ]]; then
@@ -101,11 +102,11 @@ setupWorkspace() {
 	fi
 	if [[ ! -f "${workFolder}/${ARCHITECTURE}.dsk" ]]; then 
 		echo "Copying new disk image"
-        	cp "$imageLocation"/"$ARCHITECTURE".dsk "$workFolder"
+        	xz -cd "$imageLocation"/"$ARCHITECTURE".dsk.xz > "$workFolder"/"$ARCHITECTURE".dsk
 		# Arm64 requires the initrd and kernel files to boot
 		if [[ "$ARCHITECTURE" == "ARM64" ]]; then
 			echo "ARM64 - copy additional files"
-			cp "$imageLocation"/initrd* "$imageLocation"/vmlinuz* "$workFolder"
+			cp "$imageLocation"/initrd*arm64 "$imageLocation"/vmlinuz*arm64 "$workFolder"
 		fi
 	else
 		echo "Using old disk image"
