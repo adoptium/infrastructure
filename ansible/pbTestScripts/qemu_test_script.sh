@@ -144,7 +144,7 @@ done
 	# Run the command, mask output and send to background
 	(qemu-system-$COMMAND \
 	  -smp 4 \
-	  -m 1024 \
+	  -m 3072 \
      	  -M $MACHINE \
 	  -net user,hostfwd=tcp::$PORTNO-:22 -net nic \
 	  $DRIVE \
