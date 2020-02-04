@@ -5,6 +5,9 @@
 ARCHITECTURE=""
 skipFullSetup=""
 PORTNO=10022
+if [ "$EXECUTOR_NUMBER" ]; then
+  PORTNO=1002$EXECUTOR_NUMBER
+fi
 current_dir=false
 cleanWorkspace=false
 retainVM=false
@@ -170,7 +173,7 @@ runPlaybook() {
 	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone https://github.com/adoptopenjdk/openjdk-infrastructure "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$workFolder"/logFiles/"$ARCHITECTURE".log
-	if grep -q 'failed[1-9]\|unreachable=[1-9]' "$workFolder"/logFiles/"$ARCHITECTURE".log then
+	if grep -q 'failed[1-9]\|unreachable=[1-9]' "$workFolder"/logFiles/"$ARCHITECTURE".log; then
 		echo "Playbook failed"
 		destroyVM
 		exit 1;
