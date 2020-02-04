@@ -118,8 +118,9 @@ local EXTRA_ARGS=""
 local workFolder="$WORKSPACE/qemu_pbCheck"
 
 # Find/stop port collisions
-while ps -aux | grep "$PORTNO" | grep -q -v "grep"; do
-	((PORTNO++))
+# while ps -aux | grep "$PORTNO" | grep -q -v "grep"; do
+while netstat -lp 2>/dev/null | grep "tcp.*:$PORTNO " > /dev/nulln; do
+  ((PORTNO++))
 done
 	echo "Using Port: $PORTNO"
 
