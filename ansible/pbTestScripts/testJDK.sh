@@ -12,7 +12,6 @@ mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/openjdk-tests ] && git clone https://github.com/adoptopenjdk/openjdk-tests $HOME/testLocation/openjdk-tests
 $HOME/testLocation/openjdk-tests/get.sh -t $HOME/testLocation/openjdk-tests
 cd $HOME/testLocation/openjdk-tests/TKG || exit 1
-$MAKE_COMMAND -f run_configure.mk
-export BUILD_LIST=MachineInfo
+export BUILD_LIST=system
 $MAKE_COMMAND compile
 $MAKE_COMMAND _MachineInfo
