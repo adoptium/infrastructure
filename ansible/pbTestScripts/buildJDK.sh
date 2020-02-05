@@ -18,7 +18,11 @@ if [ -z "${WORKSPACE:-}" ]; then
 	WORKSPACE=$HOME
 fi
 
-[[ ! -d "$WORKSPACE/openjdk-build" ]] && git clone https://github.com/adoptopenjdk/openjdk-build $WORKSPACE/openjdk-build
+if [[ ! -d "$WORKSPACE/openjdk-build" ]]; then
+  git clone -b freebsd https://github.com/gdams/openjdk-build $WORKSPACE/openjdk-build $WORKSPACE/openjdk-build
+else
+  git clone https://github.com/adoptopenjdk/openjdk-build $WORKSPACE/openjdk-build $WORKSPACE/openjdk-build
+fi
 
 export TARGET_OS=linux
 export VARIANT=openj9
