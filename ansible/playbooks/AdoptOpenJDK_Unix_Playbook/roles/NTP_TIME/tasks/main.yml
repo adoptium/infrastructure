@@ -30,7 +30,9 @@
     state: restarted
     enabled: yes
   when:
-    - (ansible_distribution == "RedHat") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "8") or
+      (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
   tags: ntp_time
 
 - name: Start NTP for SUSE12
@@ -41,4 +43,13 @@
   when:
     - (ansible_distribution == "openSUSE" and ansible_distribution_major_version == "12")
     - ansible_architecture == "x86_64"
+  tags: ntp_time
+
+- name: Start chronyd for RHEL8
+  service:
+    name: chronyd
+    state: restarted
+    enabled: yes
+  when:
+    - ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
   tags: ntp_time

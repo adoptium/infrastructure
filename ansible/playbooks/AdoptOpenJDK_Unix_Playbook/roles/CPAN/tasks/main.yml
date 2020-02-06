@@ -32,6 +32,8 @@
 # All
 - name: Install JSON
   command: cpanm --with-recommends --sudo JSON
+  when:
+    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "8")
   tags:
     - cpan
     - json
@@ -40,6 +42,8 @@
 
 - name: Install Text::CSV
   command: cpanm --with-recommends --sudo Text::CSV
+  when:
+    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "8")
   tags:
     - cpan
     - text_csv
@@ -48,7 +52,9 @@
 
 - name: Install XML::Parser
   command: cpanm --with-recommends --sudo XML::Parser
-  when: ansible_distribution != "SLES" and ansible_distribution_major_version != "12"
+  when:
+    - not (ansible_distribution == "SLES" and ansible_distribution_major_version == "12")
+    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "8")
   tags:
     - cpan
     - xml_parser
