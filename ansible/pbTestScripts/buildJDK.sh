@@ -18,8 +18,6 @@ if [ -z "${WORKSPACE:-}" ]; then
 	WORKSPACE=$HOME
 fi
 
-[[ ! -d "$WORKSPACE/openjdk-build" ]] && git clone https://github.com/adoptopenjdk/openjdk-build $WORKSPACE/openjdk-build
-
 export TARGET_OS=linux
 export VARIANT=openj9
 export ARCHITECTURE=x64
@@ -64,6 +62,12 @@ echo "DEBUG:
         JDK7_BOOT_DIR=$JDK7_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE"
+
+if [[ ! -d "$WORKSPACE/openjdk-build" && "$TARGET_OS" == "FreeBSD" ]]; then
+  git clone -b freebsd https://github.com/gdams/openjdk-build $WORKSPACE/openjdk-build
+elif [[ ! -d "$WORKSPACE/openjdk-build" ]]; then
+  git clone https://github.com/adoptopenjdk/openjdk-build $WORKSPACE/openjdk-build
+fi
 
 cd $WORKSPACE/openjdk-build
 build-farm/make-adopt-build-farm.sh

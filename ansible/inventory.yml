@@ -86,6 +86,10 @@ hosts:
           win2012r2-x64-2: {ip: 40.121.164.56, user: adoptopenjdk}
           win2012r2-x64-3: {ip: 13.68.219.237, user: adoptopenjdk}
 
+      - aws:
+          win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
+          win2019-x64-2: {ip: 34.245.29.235, user: Administrator}
+
       - godaddy:
           win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
           win2016-x64-2: {ip: 160.153.234.5, user: adoptopenjdk}
