@@ -8,13 +8,17 @@
 # s390x, x86_64, on SLES12 on x86_64 and on Ubuntu14 on x86_64
 # Proceed with downloading and installing make
 # Addresses https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/499
+# For RHEL 8, use gmake 4.2.1 already installed.
 
 - name: Test if self-built make 4.1 is available
   shell: /usr/local/bin/make --version >/dev/null
   ignore_errors: yes
   register: goodmake_installed
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and ansible_architecture == "x86_64"))
+    - (((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8"
   tags: goodmake_source
 
 - name: Download make 4.1 source
@@ -23,7 +27,10 @@
     dest: /tmp/make-4.1.tar.gz
     mode: 0440
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and ansible_architecture == "x86_64"))
+    - (((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8"
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -33,14 +40,20 @@
     dest: /tmp
     copy: False
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and ansible_architecture == "x86_64"))
+    - (((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8"
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
 - name: Compile and install make 4.1 from source
   shell: cd /tmp/make-4.1 && ./configure --prefix=/usr/local && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and ansible_architecture == "x86_64"))
+    - (((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8"
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -52,6 +65,9 @@
     group: root
     state: link
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and ansible_architecture == "x86_64"))
+    - (((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8"
     - goodmake_installed.rc != 0
   tags: goodmake_source
