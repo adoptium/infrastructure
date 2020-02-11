@@ -20,6 +20,8 @@
     url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip
     dest: c:\temp\ant.zip
     force: no
+    checksum: 9028e2fc64491cca0f991acc09b06ee7fe644afe41d1d6caf72702ca25c4613c
+    checksum_algorithm: sha256
   when: (ant_installed.stat.exists == false) and (ant_download.stat.exists == false)
   register: ant_download
   tags: ANT
@@ -56,6 +58,8 @@
     url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
     dest: c:\temp\ant-contrib.zip
     force: no
+    checksum: 22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc
+    checksum_algorithm: sha256
   when: (ant_contrib_installed.stat.exists == false)
   tags: ANT
 

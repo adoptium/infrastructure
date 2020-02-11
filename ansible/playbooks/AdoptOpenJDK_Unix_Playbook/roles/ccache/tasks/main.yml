@@ -26,14 +26,14 @@
   shell: cd /tmp/ccache-3.4.2 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - ccache_status.stat.isdir is not defined
-    - ansible_architecture != "s390x"
+    - ansible_distribution != "FreeBSD"
   tags: ccache
 
-- name: Running ./configure & make for CCACHE for s390x
-  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_cores }} && make install
+- name: Running ./configure & make for CCACHE for FreeBSD
+  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_vcpus }} && gmake install
   when:
     - ccache_status.stat.isdir is not defined
-    - ansible_architecture == "s390x"
+    - ansible_distribution == "FreeBSD"
   tags: ccache
 
 - name: Remove downloaded packages for ccache

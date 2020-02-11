@@ -19,6 +19,8 @@
   win_get_url:
     url: https://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip
     dest: 'C:\temp\jdk7u75-b13.zip'
+    checksum: 505a6a2440ae2d48e61a50049f0bb9fce789ab4618953e0c72e07c5987b725ab
+    checksum_algorithm: sha256
   when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
   tags: Java7
 

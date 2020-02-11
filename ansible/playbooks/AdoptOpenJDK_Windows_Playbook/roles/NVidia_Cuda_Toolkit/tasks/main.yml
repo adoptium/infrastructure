@@ -12,6 +12,8 @@
   win_get_url:
     url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_windows_network-exe'
     dest: 'C:\temp\cuda_9.0.176_windows_network-exe.exe'
+    checksum: ab1c3d046d43e8c190f74a6a4ea94b2e87b9be4c8bc0e67304e460fc0d7caccc
+    checksum_algorithm: sha256
   when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
@@ -31,6 +33,8 @@
   win_get_url:
     url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_win10_network-exe'
     dest: 'C:\temp\cuda_9.0.176_win10_network-exe.exe'
+    checksum: 9a2f4bc524437b0b46e6374d69976bfda431c4d55c247078fb1fcad410573b15
+    checksum_algorithm: sha256
   when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 

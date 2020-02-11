@@ -12,6 +12,8 @@
   win_get_url:
     url: https://www.nasm.us/pub/nasm/releasebuilds/2.13.03/win64/nasm-2.13.03-win64.zip
     dest: C:\temp\nasm-2.13.03.zip
+    checksum: b3a1f896b53d07854884c2e0d6be7defba7ebd09b864bbb9e6d69ada1c3e989f
+    checksum_algorithm: sha256
   when: (nasm_installed.stat.exists == false)
   tags: nasm
 

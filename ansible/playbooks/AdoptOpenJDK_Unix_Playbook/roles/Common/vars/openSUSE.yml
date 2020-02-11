@@ -1,0 +1,62 @@
+---
+########
+# SUSE #
+########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-devel
+  - bind-utils
+  - bison                         # OpenJ9
+  - cpio
+  - curl
+  - cups
+  - cups-devel
+  - flex
+  - gcc
+  - gcc-c++
+  - glibc
+  - glibc-devel
+  - libcurl-devel
+  - libdw1
+  - libdwarf-devel
+  - libelf-devel
+  - libelf0
+  - libelf1
+  - libnuma-devel
+  - make
+  - ntp
+  - numactl
+  - pkg-config
+  - systemtap-sdt-devel
+  - unzip
+  - wget
+  - zip
+  - zlib-devel
+
+Additional_Build_Tools_SUSE12:
+  - git-core
+  - libfreetype6
+  - libXext6
+  - libXi6                        # JDK12+ compilation
+  - libXrandr2                    # JDK12+ compilation
+  - libXrender1
+  - libXt6
+  - libXtst6
+  - Mesa-libGL1
+  - perl-CPAN-Meta
+
+Additional_Build_Tools_SUSE_x86:
+  - glibc-32bit                   # a dependency required for executing a 32-bit C binary
+  - glibc-devel-32bit             # a dependency required for executing a 32-bit C binary
+
+Test_Tool_Packages:
+  - perl
+  - pulseaudio
+  - xorg-x11
+  - xorg-x11-devel
+  - xorg-x11-server
+  - xorg-x11-server-extra
+  - glibc-locale                  # Internationalization tests
+
+crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"

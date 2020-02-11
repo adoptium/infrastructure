@@ -3,13 +3,6 @@
 # cmake  - required by OpenJ9 and OpenJFX builds - requires C++11 compiler #
 ############################################################################
 
-- name: Set ansible_processor_vcpus
-  set_fact:
-    ansible_processor_vcpus: "{{ ansible_processor_cores }}"
-  when:
-    - ansible_architecture == "s390x"
-  tags: cmake
-
 - name: Test if cmake is installed on path
   shell: cmake >/dev/null 2>&1
   ignore_errors: yes
@@ -31,9 +24,11 @@
     mode: 0440
     force: no
     validate_certs: no
+    checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_distribution != "openSUSE")
   tags: cmake
 
 - name: Extract cmake
@@ -44,6 +39,7 @@
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_distribution != "openSUSE")
   tags: cmake
 
 # NOTE: PATH setting is for RHEL6/CentOS6 since gcc 4.4.7 is not C++11 compliant
@@ -52,6 +48,7 @@
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_distribution != "openSUSE")
   tags: cmake
 
 # cmake on armv7l

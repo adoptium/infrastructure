@@ -19,6 +19,8 @@
   win_get_url:
     url: http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip
     dest: C:\temp\strawberry-perl.zip
+    checksum: 0f89ce99be64679f930e9cca25ccec09de8aff2fc5db3c0dd4158d9606532ad5
+    checksum_algorithm: sha256
   when: (strawberry_perl_download.stat.exists == false) and (strawberry_perl_installed.stat.exists == false)
   tags: Strawberry_Perl
 

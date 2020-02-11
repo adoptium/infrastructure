@@ -14,6 +14,8 @@
     url: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.msi
     dest: 'C:\temp\cmake.msi'
     force: no
+    checksum: 8b0cbfc6be83e31a058c8ef282fe204862809ffcd8788bc19a8f0eb457f71187
+    checksum_algorithm: sha256
   when: (cmake_installed.stat.exists == false)
   tags: cmake
 

@@ -1,50 +1,101 @@
 #!/bin/bash
 set -eu
 
+osToDestroy=''
+force=False
 # Takes in all arguments
 processArgs()
 {
-	if [ ! -n "${WORKSPACE:-}" ]; then
-		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
-		WORKSPACE=$HOME
-	fi
-	if [ $# -lt 1 ]; then
-		echo "Script takes 1 input argument: "
-		echo "The project whose VMs are to be destroyed"
-		exit 1
-	fi
-	
-}
-
-# Takes project name as arg 1, and OS as arg 2
-destroyVM()
-{
-	cd $WORKSPACE/adoptopenjdkPBTests/$1/ansible
-	ln -sf Vagrantfile.$2 Vagrantfile	# Correct Vagrantfile alias
-	vagrant destroy -f			# Force destroy without question
-	echo
-	echo "Destroyed $2 Machine"	
-}
-
-# Takes the project name as arg1
-checkFolder()
-{
-	cd $WORKSPACE/adoptopenjdkPBTests
-	if [ -d "$1" ]; then
-		echo "$1 found!"
-		return 0
-	else
-		echo "$1 not found"
-		exit 1
-	fi
-}
-
-# Script takes project name as arg 1
-processArgs $*
-if checkFolder $1; then	
- 	# For all currently supported OSs
-	for OS in Ubuntu1804 Ubuntu1604 CentOS6 CentOS7 Win2012
-	do
-		destroyVM $1 $OS
+	while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]] ; do
+		local opt="$1";
+		shift;
+		case "$opt" in
+			"--OS" | "-o" )
+				if [[ -z "${1:-}" ]]; then
+					echo "Please specifiy an OS with the '-o' option"
+					usage
+					exit 1
+				else
+					osToDestroy=$1;
+				fi
+				shift;;
+			"--force" | "-f" )
+				force=True;;
+			"--help" | "-h" )
+				usage; exit 0;;
+			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
+		esac
 	done
-fi
+}
+
+usage() {
+	   echo "Usage: ./vmDestroy.sh (<options>) -o <os_list>
+		--OS | -o		Specifies the OS of the vagrant VMs you want to destroy
+		--force | -f		Force destroy the VMs without asking confirmation
+		--help | -h		Displays this help message"
+		listOS
+}
+
+checkOS() {
+	local OS=$osToDestroy
+        case "$OS" in
+                "Ubuntu1604" | "U16" | "u16" )
+			osToDestroy="U16";;
+                "Ubuntu1804" | "U18" | "u18" )
+                        osToDestroy="U18";;
+                "CentOS6" | "centos6" | "C6" | "c6" )
+                        osToDestroy="C6" ;;
+                "CentOS7" | "centos7" | "C7" | "c7" )
+                        osToDestroy="C7" ;;
+                "Debian8" | "debian8" | "D7" | "d7" )
+                        osToDestroy="D8" ;;
+		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
+			osToDestroy="FBSD12" ;;
+		"SUSE12" | "suse12" | "S12" | "s12" )
+			osToDestroy="S12" ;;
+		"Windows2012" | "Win2012" | "W12" | "w12" )
+                        osToDestroy="W2012";;
+                "all" )
+                        osToDestroy="U16 U18 C6 C7 D8 FBSD12 S12 W2012" ;;
+		"")
+			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
+		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
+        esac
+}
+
+listOS() {
+	echo
+	echo "Currently supported OSs:
+		- Ubuntu1604
+		- Ubuntu1804
+		- CentOS6
+		- CentOS7
+		- Debian8
+		- FreeBSD12
+		- SUSE12
+		- Win2012"
+	echo
+}
+
+destroyVMs() {
+	local OS=$1
+	vagrant global-status --prune | awk "/adoptopenjdk$OS/ { print \$1 }" | xargs vagrant destroy -f
+	echo "Destroyed all $OS Vagrant VMs"
+}
+
+processArgs $*
+checkOS
+if [[ "$force" == False ]]; then
+	userInput=""
+	echo "Are you sure you want to destroy ALL Vms with the following OS(s)? (Y/n)"
+	echo "$osToDestroy"
+	read userInput
+	if [ "$userInput" != "Y" ] && [ "$userInput" != "y" ]; then
+		echo "Cancelling ..."
+		exit 1;
+	fi
+fi	
+for OS in $osToDestroy 
+do
+	destroyVMs $OS
+done

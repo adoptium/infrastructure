@@ -15,6 +15,8 @@
     url: https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
     dest: 'C:\temp\'
     force: no
+    checksum: 74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6
+    checksum_algorithm: sha256
   when: clang_64bit_installed.stat.exists == false
   tags: clang_64bit
 

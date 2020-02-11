@@ -9,6 +9,8 @@
     url: https://www.7-zip.org/a/7z1805-x64.exe
     dest: 'C:\temp\7z.exe'
     force: no
+    checksum: c1e42d8b76a86ea1890ad080e69a04c75a5f2c0484bdcd838dc8fa908dd4a84c
+    checksum_algorithm: sha256
   tags: 7zip
 
 - name: Install 7-Zip

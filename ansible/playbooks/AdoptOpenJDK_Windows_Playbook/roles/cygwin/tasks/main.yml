@@ -20,6 +20,8 @@
     url: https://cygwin.com/setup-x86_64.exe
     dest: 'C:\temp\cygwin.exe'
     force: no
+    checksum: c74f5e301bfc1c9b92f48922666c0f86944ff6bbdf09e1cf94f5b940b5b39c34
+    checksum_algorithm: sha256
   tags: cygwin
 
 - name: Install Cygwin and its packages
@@ -52,6 +54,10 @@
     - perl-Text-CSV
   tags: cygwin
 
+- name: Change git config to not replace Line endings
+  win_shell: "C:/cygwin64/bin/git config --system core.autocrlf false"
+  tags: cygwin
+
 ###############################################################################
 # Cygwin by default installs latest versions of packages, which is 3.0-2 for
 # grep. This version of grep is unable to match EOL (with $) when the file use
@@ -65,6 +71,8 @@
     url: "{{ Cygwin_SITE_URL + '/x86_64/release/grep/grep-2.27-2.tar.xz' }}"
     dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\grep.tar.xz' }}"
     force: no
+    checksum: 36ae2483f68b3c5a4bd93814fa4f7e2576dbe6559d4ffa0589c2159e85de91f6
+    checksum_algorithm: sha256
   tags: cygwin
 
 - name: Extract grep-2.27-2

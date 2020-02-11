@@ -29,8 +29,8 @@ fi
 cd openjdk-tests
 
 ./get.sh -t $HOME/testLocation/openjdk-tests -p x64_windows
-cd TestConfig
+cd TKG
 make -f run_configure.mk AUTO_DETECT=true
-export BUILD_LIST=MachineInfo
+export BUILD_LIST=system
 make compile
-make _MachineInfo
+make _extended.system 

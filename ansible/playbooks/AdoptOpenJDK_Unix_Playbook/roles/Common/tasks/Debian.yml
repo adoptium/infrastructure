@@ -1,0 +1,181 @@
+---
+##########
+# Debian #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+- name: Allow https apt sources
+  package: "name=apt-transport-https state=latest"
+
+- name: Add the openjdk repository to apt for openjdk7
+  apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
+  when:
+    - ansible_architecture != "armv7l"
+  tags: patch_update
+
+- name: Add AdoptOpenJDK GPG key
+  apt_key:
+    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    state: present
+
+- name: Add the adoptopenjdk repository to apt for JDK8
+  apt_repository: repo='deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb jessie main' update_cache=no
+
+- name: Add the ubuntu toolchain repository to apt
+  apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
+  when:
+    - ansible_architecture != "armv7l"
+  tags: patch_update
+
+- name: Change Jessie to Trusty in the sources files
+  command: sed -i "s/jessie/trusty/g" /etc/apt/sources.list.d/ppa_openjdk_r_ppa_jessie.list  /etc/apt/sources.list.d/ppa_ubuntu_toolchain_r_test_jessie.list
+  when:
+    - ansible_architecture != "armv7l"
+  tags: patch_update
+
+- name: Add Azul Zulu GPG Package Signing Key for x86_64
+  apt_key:
+    url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    state: present
+  when:
+    - ansible_architecture == "x86_64"
+  tags: [patch_update, azul-key]
+
+- name: Add Azul Zulu repository for x86_64
+  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+  when:
+    - ansible_architecture == "x86_64"
+  tags: patch_update
+
+# Both repositories needed for gcc/g++-4.8
+- name: Add additional repositories for Raspbian Buster
+  apt_repository: repo={{ item }}
+  with_items:
+    - deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+    - deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
+  tags: patch_update
+
+- name: Add additional repositories for BeagleBone
+  apt_repository: repo={{ item }}
+  with_items:
+    - deb https://deb.debian.org/debian/ stable main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable main contrib non-free
+    - deb https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb-src https://deb.debian.org/debian/ stable-updates main contrib non-free
+    - deb https://deb.debian.org/debian-security stable/updates main
+    - deb-src https://deb.debian.org/debian-security stable/updates main
+    - deb http://ftp.debian.org/debian stretch-backports main
+    - deb-src http://ftp.debian.org/debian stretch-backports main
+  when:
+    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
+  tags: patch_update
+
+- name: Run apt-get upgrade
+  apt: upgrade=safe update_cache=yes
+  tags: patch_update
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Call Build Packages and Tools Task for OpenJFX
+  package: "name={{ item }} state=latest"
+  with_items: "{{ OpenJFX_Build_Tool_Packages }}"
+  tags: [build_tools, build_tools_jfx]
+
+- name: Install GCC G++ on supported platforms
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc_compiler }}"
+  when:
+    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+  tags: build_tools
+
+- name: Install GCC G++ on Raspian Buster
+  package: "name={{ item }} state=latest"
+  with_items:
+    - gcc-4.8
+    - g++-4.8
+  when:
+    - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
+  tags: build_tools
+
+- name: Install additional build tools for x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install additional build tools for PPC64LE
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_ppc64le }}"
+  when:
+    - ansible_architecture == "ppc64le"
+  tags: build_tools
+
+- name: Install additional build tools for S390x
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_s390x }}"
+  when:
+    - ansible_architecture == "s390x"
+  tags: build_tools
+
+- name: Install additional build tools for aarch64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_aarch64 }}"
+  when:
+    - ansible_architecture == "aarch64"
+  tags: build_tools
+
+#########################
+# Additional Test Tools #
+#########################
+- name: Install additional Test Tool Packages for x86_64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Test_Tool_Packages_x86_64 }}"
+  when:
+    - ansible_architecture == "x86_64"
+  tags: test_tools
+
+- name: Install additional Packages specific to Debian 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Packages_Debian8 }}"
+  when:
+    - ansible_distribution_major_version == "8"
+  tags: test_tools
+
+##################
+# Enable Locales #
+##################
+- name: Enable ja_JP locale
+  locale_gen:
+    name: ja_JP.UTF-8
+    state: present
+  tags: locales
+
+- name: Enable ko_KR locale
+  locale_gen:
+    name: ko_KR.UTF-8
+    state: present
+  tags: locales
+
+- name: Enable zh_CN locale
+  locale_gen:
+    name: zh_CN.UTF-8
+    state: present
+  tags: locales
+
+- name: Enable zh_TW locale
+  locale_gen:
+    name: zh_TW.UTF-8
+    state: present
+  tags: locales

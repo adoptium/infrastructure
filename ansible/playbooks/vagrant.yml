@@ -1,0 +1,215 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+#  ------------- Vagrant --------------#
+########################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+
+  tasks:
+    - block:
+        - name: Apt install Prerequisites
+          apt:
+            name: "{{ packages }}"
+            update_cache: yes
+          vars:
+            packages:
+              - software-properties-common
+              - tree
+              - zlib1g
+              - zlib1g-dev
+              - python-pip
+              - python-dev
+              - build-essential
+              - gettext
+              - libcurl4-openssl-dev
+
+        - name: Run apt-get upgrade
+          apt: upgrade=safe
+
+        - name: Pip install winrm modules
+          pip:
+            executable: /usr/bin/pip
+            name: ["requests-credssp", "pywinrm"]
+
+        - name: Check tmp folder exists
+          stat:
+            path: /tmp
+          register: tmp_folder
+
+        - name: Create tmp folder if necessary
+          file:
+            path: /tmp
+            state: directory
+          when: tmp_folder.stat.isdir is not defined
+
+        - name: Check /usr/lib/jvm exists
+          stat: path=/usr/lib/jvm
+          register: usr_lib_jvm_exists
+
+        - name: Create /usr/lib/jvm if necessary
+          file:
+            path: /usr/lib/jvm
+            state: directory
+          when: usr_lib_jvm_exists.stat.isdir is not defined
+
+      ##########
+      # Java 8 #
+      ##########
+
+        - name: Check if JDK8 is already installed in the target location
+          shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
+          ignore_errors: yes
+          register: adoptopenjdk_installed
+
+        - name: Check if there is a default Java
+          shell: java -version >/dev/null 2>&1
+          ignore_errors: yes
+          register: default_java
+
+        - name: Install latest release if not already installed (Linux/x64)
+          unarchive:
+            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&heap_size=normal&release=latest&type=jdk
+            dest: /usr/lib/jvm
+            remote_src: yes
+          when:
+            - adoptopenjdk_installed.rc != 0
+            - ansible_architecture == "x86_64"
+
+        - name: Assign JDK-8 as default java
+          shell: ln -sf /usr/lib/jvm/jdk8*/bin/java /usr/bin/java && ln -sf /usr/lib/jvm/jdk8*/bin/javac /usr/bin/javac
+          when: default_java.rc != 0
+
+      ###########
+      # Ansible #
+      ###########
+
+        - name: Check if Ansible is installed
+          shell: which ansible >/dev/null 2>&1
+          ignore_errors: yes
+          register: ansible_installed
+
+        - name: Add Ansible repository
+          apt_repository:
+            repo: ppa:ansible/ansible
+          when: ansible_installed.rc != 0
+
+        - name: Install Ansible
+          apt:
+            name: ansible
+            update_cache: yes
+          when: ansible_installed.rc != 0
+
+      #######
+      # Git #
+      #######
+
+        - name: Check if Git is installed
+          shell: git --version >/dev/null 2>&1
+          ignore_errors: yes
+          register: git_installed
+
+        - name: Test if Git is installed at the correct version
+          shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+          when: git_installed.rc == 0
+          register: git_version
+
+        - name: Download Git Source
+          get_url:
+            url: https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz
+            dest: /tmp/git-2.15.0.tar.xz
+            mode: 0440
+            checksum: sha256:107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
+        - name: Extract Git Source
+          unarchive:
+            src: /tmp/git-2.15.0.tar.xz
+            dest: /tmp/
+            copy: False
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
+        - name: Compile and Install Git from Source
+          shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
+          become: yes
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
+        - name: Remove system git if needed
+          apt:
+            name: git
+            state: absent
+          when:
+            - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
+        - name: Symlink git to /usr/bin/git
+          shell: ln -sf /tmp/git-2.15.0/git /usr/bin/git
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
+      ###########
+      # Vagrant #
+      ###########
+
+        - name: Check if Vagrant is installed
+          shell: which vagrant >/dev/null 2>&1
+          ignore_errors: yes
+          register: vagrant_installed
+
+        - name: Test if the Vagrant version is >2.1
+          shell: vagrant --version | sed -e 's/Vagrant //g' | awk -F'[.]' '{print $1 "." $2 "." $3}'
+          when: vagrant_installed.rc == 0
+          register: vagrant_version
+
+        - name: Download Vagrant
+          get_url:
+            url: https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
+            dest: /tmp/vagrant_2.2.5_x86_64.deb
+            checksum: sha256:415f50b93235e761db284c761f6a8240a6ef6762ee3ec7ff869d2bccb1a1cdf7
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+
+        - name: Remove system vagrant if necessary
+          apt:
+            name: vagrant
+            state: absent
+          when: (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+
+        - name: Install Vagrant
+          command: dpkg -i /tmp/vagrant_2.2.5_x86_64.deb
+          become: yes
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+
+      ##############
+      # VirtualBox #
+      ##############
+
+        - name: Check if Virtualbox is installed
+          shell: which virtualbox >/dev/null 2>&1
+          ignore_errors: yes
+          register: virtualbox_installed
+
+        - name: Import GPG keys
+          apt_key:
+            url: "{{ item }}"
+            state: present
+          with_items:
+            - https://www.virtualbox.org/download/oracle_vbox_2016.asc
+            - https://www.virtualbox.org/download/oracle_vbox.asc
+          when: virtualbox_installed.rc != 0
+
+        - name: Add Virtualbox Repository
+          apt_repository:
+            repo: deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bionic contrib
+          when: virtualbox_installed.rc != 0
+
+        - name: Install Virtualbox
+          apt:
+            name: virtualbox-6.0
+            update_cache: yes
+          when: virtualbox_installed.rc != 0

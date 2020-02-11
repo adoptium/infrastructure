@@ -26,8 +26,16 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: t
+ retry_antcontrib
   retries: 3
+=======
+    checksum: sha256:c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf
+  retries: 3
+  delay: 5
+  register: antContrib_download
+  until: antContrib_download is not failed
+ master
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 
@@ -35,7 +43,7 @@
   unarchive:
     src: /tmp/ant-contrib-1.0b2-bin.tar.gz
     dest: /tmp/
-    copy: False
+    copy: t
   when: antcontrib_status.stat.exists == False
   tags: ant-contrib
 

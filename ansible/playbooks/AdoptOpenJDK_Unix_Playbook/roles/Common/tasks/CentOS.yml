@@ -20,35 +20,12 @@
     state: latest
   tags: patch_update
 
-#########################################
-# Configure Repos and Update the system #
-#########################################
-- name: Import AZUL public key
-  rpm_key:
-    state: present
-    key: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
-  when:
-    - ansible_architecture == "x86_64"
-  tags: azul-key
-
-- name: Add AZUL to yum repo
-  get_url:
-    url: http://repos.azulsystems.com/rhel/zulu.repo
-    dest: /etc/yum.repos.d/zulu.repo
-    timeout: 25
-  when:
-    - ansible_architecture == "x86_64"
-  tags: build_tools
-
 ############################
 # Build Packages and tools #
 ############################
 - name: Call Build Packages and Tools Task
   include_tasks: build_packages_and_tools.yml
 
-##########################
-# Additional build tools #
-##########################
 ##########################
 # Additional build tools #
 ##########################
@@ -63,6 +40,7 @@
     url: https://people.centos.org/tru/devtools-2/devtools-2.repo
     dest: /etc/yum.repos.d/devtools-2.repo
     timeout: 25
+    checksum: sha256:a8ebeb4bed624700f727179e6ef771dafe47651131a00a78b342251415646acc
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
@@ -92,9 +70,9 @@
     - ansible_architecture == "x86_64"
   tags: build_tools
 
-- name: Install additional build tools for x86_64
+- name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
@@ -148,6 +126,7 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - ansible_architecture == "x86_64"
   tags: expat
@@ -167,6 +146,21 @@
   when:
     - ansible_architecture == "x86_64"
   tags: expat
+
+####################
+# Set Default Java #
+####################
+- name: Create Java 8 Alternative
+  shell: alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk/bin/java 1
+  when:
+    - ansible_architecture == "x86_64"
+  tags: default_java
+
+- name: Set Default Java Version
+  shell: alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+  when:
+    - ansible_architecture == "x86_64"
+  tags: default_java
 
 ###########
 # Locales #

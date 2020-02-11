@@ -19,6 +19,8 @@
   win_get_url:
     url: https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
     dest: C:\temp\ft253.zip
+    checksum: cb7475e88852893b83d9c99a5ffedefd46398edc8ef8410396d4d73f1a1281b9
+    checksum_algorithm: sha256
   when: (freetype_installed.stat.exists == false) and (freetype_download.stat.exists == false)
   tags: Freetype
 

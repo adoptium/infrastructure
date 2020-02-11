@@ -17,8 +17,10 @@
 
 - name: Download Firefox
   win_get_url:
-    url: https://download.mozilla.org/?product=firefox-54.0-SSL&os=win64&lang=en-US
+    url: https://ftp.mozilla.org/pub/firefox/releases/54.0/win64/en-GB/Firefox%20Setup%2054.0.exe
     dest: 'C:\temp\firefox.exe'
+    checksum: 9a1fbbb7eb68347decafbf048fc9728777fc213fefc5224119625b1f58a626fc
+    checksum_algorithm: sha256
   when: (firefox_download.stat.exists == false) and (firefox_installed.stat.exists == false)
   tags: Firefox
 

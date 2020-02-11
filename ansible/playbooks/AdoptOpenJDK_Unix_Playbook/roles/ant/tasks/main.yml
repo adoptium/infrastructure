@@ -20,6 +20,7 @@
     mode: 0440
     timeout: 25
     validate_certs: no
+    checksum: sha512:2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163
   when:
     - ant_installed.rc != 0
   tags: ant

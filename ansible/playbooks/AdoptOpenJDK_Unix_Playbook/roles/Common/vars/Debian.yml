@@ -1,0 +1,109 @@
+---
+##########
+# Debian #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - apt-transport-https
+  - autoconf
+  - bison                         # OpenJ9
+  - build-essential
+  - cpanminus
+  - cpio
+  - curl
+  - flex                          # Openj9
+  - g++
+  - gcc
+  - gettext
+  - libasound2-dev
+  - libcups2-dev
+  - libcurl4-openssl-dev
+  - libdwarf-dev                  # OpenJ9
+  - libelf-dev
+  - libexpat1-dev
+  - libffi-dev
+  - libfreetype6-dev
+  - libfontconfig1-dev
+  - libgmp3-dev
+  - libmpfr-dev
+  - libmpfr-doc
+  - libssl-dev
+  - libwww-perl
+  - libx11-dev
+  - libxext-dev
+  - libxi-dev                     # JDK12+ compilation
+  - libxrandr-dev                 # JDK12+ compilation
+  - libxrender-dev
+  - libxt-dev
+  - libxtst-dev
+  - make
+  - ntp
+  - pigz
+  - pkg-config
+  - systemtap-sdt-dev
+  - wget
+  - zip
+
+OpenJFX_Build_Tool_Packages:
+  - gperf
+  - libavcodec-dev
+  - libavformat-dev
+  - libgl1-mesa-dev
+  - libgtk2.0-dev
+  - libgtk-3-dev
+  - libjpeg-dev
+  - libpng-dev
+  - libudev-dev
+  - libxml2-dev
+  - libxslt1-dev
+  - libxxf86vm-dev
+  - ruby
+
+gcc_compiler:
+  - g++-4.8
+  - gcc-4.8
+
+Additional_Packages_Debian8:
+  - libgstreamer0.10-dev                # OpenJFX prereq
+  - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
+  - openjdk-7-jdk
+  - adoptopenjdk-8-hotspot
+  - libmpfr4
+  - libmpfr4-dbg
+
+Additional_Build_Tools_x86_64:
+  - libnuma-dev
+  - numactl
+  - gcc-7
+  - g++-7
+
+Additional_Build_Tools_ppc64le:
+  - libnuma-dev
+  - numactl
+  - gcc-7                         # OpenJ9
+  - g++-7                         # OpenJ9
+
+Additional_Build_Tools_s390x:
+  - gcc-7                         # OpenJ9
+  - g++-7                         # OpenJ9
+  - numactl
+  - libfreetype6-dev              # Needed by test state=installed
+
+Additional_Build_Tools_aarch64:
+  - libpng-dev
+
+Test_Tool_Packages:
+  - acl
+  - mercurial
+  - perl
+  - xauth
+  - xorg
+  - xvfb
+  - binfmt-support
+  - qemu-user-static
+
+Test_Tool_Packages_x86_64:
+  - pulseaudio
+
+crontab_Patching: "/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
