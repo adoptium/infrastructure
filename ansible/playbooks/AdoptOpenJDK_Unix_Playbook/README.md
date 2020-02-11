@@ -84,9 +84,6 @@ FreeBSD 11
     │       ├── RedHat.yml
     │       ├── SLES.yml
     │       └── Ubuntu.yml
-    ├── CPAN
-    │   └── tasks
-    │       └── main.yml
     ├── Crontab
     │   └── tasks
     │       └── main.yml

@@ -24,7 +24,6 @@ Build_Tool_Packages:
   - mpfr-devel
   - ntp
   - openssl-devel
-  - perl-CPAN
   - perl-DBI
   - perl-devel
   - perl-GD

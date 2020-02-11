@@ -37,7 +37,6 @@ Additional_Build_Tools_SLES12:
   - libXtst6
   - Mesa-libGL1
   - perl-CPAN-Meta
-
 Additional_Build_Tools_SLES11:
   - perl-Error
   - libwww-perl
