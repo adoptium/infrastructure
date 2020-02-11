@@ -51,7 +51,7 @@ checkOS() {
                         osToDestroy="D8" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
 			osToDestroy="FBSD12" ;;
-		"SLES12" | "sles12" | "S12" | "s12" )
+		"SUSE12" | "suse12" | "S12" | "s12" )
 			osToDestroy="S12" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
@@ -72,7 +72,7 @@ listOS() {
 		- CentOS7
 		- Debian8
 		- FreeBSD12
-		- SLES12
+		- SUSE12
 		- Win2012"
 	echo
 }

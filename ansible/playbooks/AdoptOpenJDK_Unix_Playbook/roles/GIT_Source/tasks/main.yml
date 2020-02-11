@@ -106,7 +106,7 @@
     state: absent
   when:
     - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
-    - ansible_distribution == "SLES"
+    - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
   tags:
     - git_source
     - dont_remove_system

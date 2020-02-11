@@ -34,7 +34,7 @@ hosts:
           centos69-x64-2: {ip: 167.71.130.191}
 
       - ibm:
-          aix71-ppc64-11: {ip: 129.33.196.209, user: b9s010a}
+          aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
 
       - linaro:
           centos76-armv8-1: {ip: 213.146.141.99, user: centos}
@@ -44,7 +44,7 @@ hosts:
           macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1010-x64-2: {ip: 208.83.1.242, user: Administrator}
           macos1012-x64-1: {ip: 207.254.28.22, user: Administrator}
-          macos1012-x64-2: {ip: 207.254.71.42, user: Administrator}
+          macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
 
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
@@ -86,6 +86,10 @@ hosts:
           win2012r2-x64-2: {ip: 40.121.164.56, user: adoptopenjdk}
           win2012r2-x64-3: {ip: 13.68.219.237, user: adoptopenjdk}
 
+      - aws:
+          win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
+          win2019-x64-2: {ip: 34.245.29.235, user: Administrator}
+
       - godaddy:
           win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
           win2016-x64-2: {ip: 160.153.234.5, user: adoptopenjdk}
@@ -112,6 +116,9 @@ hosts:
           rhel76-armv8-5: {ip: 52.209.17.37, user: ec2-user}
           rhel76-armv8-6: {ip: 54.229.245.232, user: ec2-user}
 
+      - ibm:
+          aix71-ppc64-1: {ip: 129.33.196.210, user: b9s010a}
+
       - osuosl:
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
@@ -124,8 +131,8 @@ hosts:
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu1804-ppc64le-3: {ip: 140.211.168.4, user: ubuntu}
-          aix71-ppc64-1: {ip: 140.211.9.28}
-          aix71-ppc64-2: {ip: 140.211.9.36}
+          aix72-ppc64-1: {ip: 140.211.9.28}
+          aix72-ppc64-2: {ip: 140.211.9.36}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.74.50}
