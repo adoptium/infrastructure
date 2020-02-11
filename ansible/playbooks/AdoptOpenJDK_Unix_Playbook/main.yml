@@ -49,6 +49,7 @@
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
+    - adoptopenjdk8
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
       tags: build_tools
