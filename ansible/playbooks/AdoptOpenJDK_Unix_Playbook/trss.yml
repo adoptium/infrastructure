@@ -1,0 +1,91 @@
+---
+############################################
+# AdoptOpenJDK Ansible TRSS Playbook       #
+# Currently supports Ubuntu 18 on x64 only #
+############################################
+- hosts: all
+  user: root
+  become: yes
+  tasks:
+    - block:
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+
+        - name: Set hostname to trss.adoptopenjdk.net
+          hostname:
+            name: trss.adoptopenjdk.net
+          tags: hostname
+
+        - name: OS update -- apt-get upgrade
+          apt: upgrade=safe update_cache=yes
+          tags: patch_update
+
+        - name: Add Node.js v8.x
+          raw: "curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -"
+          tags: dependencies
+
+        - name: Import MongoDB key
+          raw: "wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -"
+          tags: mongodb
+
+        - name: Create list file for MongoDB
+          raw: "echo \"deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse\" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list"
+          tags: mongodb
+
+        - name: Install API prerequisistes
+          apt:
+            name: "{{ item }}"
+            update_cache: yes
+          with_items:
+            - git
+            - nodejs
+            - mongodb-org
+          tags:
+            - dependencies
+            - skip_ansible_lint
+
+        - name: Start mongoDB
+          systemd:
+            name: mongod
+            state: started
+          tags: mongodb
+
+        - name: Create Jenkins user
+          action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
+          ignore_errors: yes
+          tags: jenkins_user
+
+        - name: Install NPM packages globally
+          npm:
+            name: "{{ item }}"
+            global: yes
+            state: present
+          with_items:
+            - forever-service
+            - yarn
+          tags: forever
+
+        - name: Git Clone openjdk-test-tools.git
+          git:
+            repo: 'https://github.com/AdoptOpenJDK/openjdk-test-tools.git'
+            dest: "/home/{{ Jenkins_Username }}/openjdk-test-tools"
+            update: yes
+            force: yes
+          tags:
+            # TODO: Git checkouts must contain explicit version
+            - skip_ansible_lint
+
+        - name: Change owner permissions
+          file:
+            path: /home/{{ Jenkins_Username }}/openjdk-test-tools
+            owner: "{{ Jenkins_Username }}"
+            group: "{{ Jenkins_Username }}"
+
+        - name: Add cron job to check for updates
+          cron: name="Check for Updates every Sunday at 5am"
+            weekday="6"
+            minute="0"
+            hour="5"
+            user=root
+            job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
+            state=present
