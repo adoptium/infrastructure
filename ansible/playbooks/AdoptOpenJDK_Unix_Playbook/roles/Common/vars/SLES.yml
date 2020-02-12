@@ -15,7 +15,6 @@ Build_Tool_Packages:
   - glibc
   - glibc-devel
   - libdw1
-  - libelf0
   - libelf1
   - make
   - ntp
@@ -25,10 +24,29 @@ Build_Tool_Packages:
   - wget
   - zip
 
+Additional_Build_Tools_SLES15:
+  - alsa-devel
+  - cups-devel
+  - fontconfig-devel
+  - java-1_8_0-openjdk
+  - libcurl-devel
+  - libdwarf-devel
+  - libelf-devel
+  - libnuma-devel
+  - libX11-devel
+  - libXext-devel
+  - libXext-devel
+  - libXi-devel
+  - libXrandr-devel                 # JDK12+ compilation
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
   - git-core
   - libfreetype6
+  - libelf0
   - libXext6
   - libXi6                        # JDK12+ compilation
   - libXrandr2                    # JDK12+ compilation
@@ -40,6 +58,7 @@ Additional_Build_Tools_SLES12:
 
 Additional_Build_Tools_SLES11:
   - perl-Error
+  - libelf0
   - libwww-perl
 
 Additional_Build_Tools_SLES_x86:

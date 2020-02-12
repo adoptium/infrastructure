@@ -25,6 +25,15 @@
     - (ansible_distribution_major_version == "12" and ansible_architecture == "s390x")
   tags: patch_update
 
+- zypper_repository:
+    name: devel-tools
+    repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15/"
+    auto_import_keys: yes
+    state: present
+  when:
+    - ansible_distribution_major_version == "15"
+  tags: patch_update
+
 - name: zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
@@ -38,6 +47,13 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Install additional build tools for SLES 15
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES15 }}"
+  when:
+    - ansible_distribution_major_version == "15"
+  tags: build_tools
+
 - name: Install additional build tools for SLES 12
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_SLES12 }}"
@@ -158,7 +174,8 @@
     path: /usr/local/lib/libexpat.so
   register: expat_installed
   when:
-    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+    - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
   tags: expat
 
 - name: Download expat
@@ -170,7 +187,8 @@
     validate_certs: no
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
-    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+    - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
     - expat_installed.stat.exists == false
   tags: expat
 
@@ -180,7 +198,8 @@
     dest: /tmp/
     copy: False
   when:
-    - ((ansible_distribution_major_version == "11" and ansible_architecture == "x86_64") or (ansible_distribution_major_version == "12" and ansible_architecture == "s390x"))
+    - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
     - expat_installed.stat.exists == false
   tags: expat
 
@@ -188,5 +207,7 @@
   shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
   become: yes
   when:
+    - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
     - expat_installed.stat.exists == false
   tags: expat
