@@ -30,7 +30,6 @@
     - ant                         # Testing
     - Ant-Contrib                 # Testing
     - GIT_Source
-    - CPAN
     - gmake
     - Docker                      # Testing
     - role: NVidia_Cuda_Toolkit   # OpenJ9

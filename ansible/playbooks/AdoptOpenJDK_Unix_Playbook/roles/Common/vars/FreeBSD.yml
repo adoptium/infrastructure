@@ -42,6 +42,5 @@ Test_Tool_Packages:
   - xorg
   - xorg-vfbserver
   - pulseaudio
-  - p5-App-cpanminus
 
 crontab_Patching: "/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"

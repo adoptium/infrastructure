@@ -13,7 +13,6 @@ Build_Tool_Packages:
   - cpio
   - cups-devel
   - elfutils-libelf-devel
-  - expat-devel                   # Used for buiding the XML::Parser CPAN module
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
@@ -39,7 +38,6 @@ Build_Tool_Packages:
   - mesa-libGL-devel
   - mpfr-devel
   - openssl-devel
-  - perl-CPAN
   - perl-devel
   - pkgconfig
   - systemtap-sdt-devel
