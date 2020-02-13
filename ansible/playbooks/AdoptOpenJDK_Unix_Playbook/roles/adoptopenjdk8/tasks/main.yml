@@ -10,6 +10,8 @@
 - name: Checking for /usr/lib/jvm
   stat: path=/usr/lib/jvm
   register: usr_lib_jvm_exists
+  when:
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk8
 
 - name: Creating /usr/lib/jvm if not found
@@ -18,13 +20,17 @@
     state: directory
     owner: root
     mode: 0755
-  when: usr_lib_jvm_exists.stat.exists != True
+  when:
+    - ansible_os_family != "Darwin"
+    - usr_lib_jvm_exists.stat.exists != True
   tags: adoptopenjdk8
 
 - name: Check if jdk8 is already installed in the target location
   shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk8_installed
+  when:
+    - ansible_os_family != "Darwin"
   tags:
     - adoptopenjdk8
     - skip_ansible_lint
@@ -39,13 +45,14 @@
   register: adoptopenjdk8_download
   until: adoptopenjdk8_download is not failed
   when:
+    - ansible_os_family != "Darwin"
     - adoptopenjdk8_installed.rc != 0
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk8
 
-- name: Install latest release if one not already installed (Linux/s390x)
+- name: Install latest release if one not already installed (Linux/NOT x64)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/s390x/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/{{ ansible_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
@@ -53,42 +60,16 @@
   register: adoptopenjdk8_download
   until: adoptopenjdk8_download is not failed
   when:
+    - ansible_os_family != "Darwin"
     - adoptopenjdk8_installed.rc != 0
-    - ansible_architecture == "s390x"
-  tags: adoptopenjdk8
-
-- name: Install latest release if one not already installed (Linux/ppc64le)
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/ppc64le/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr/lib/jvm
-    remote_src: yes
-  retries: 3
-  delay: 5
-  register: adoptopenjdk8_download
-  until: adoptopenjdk8_download is not failed
-  when:
-    - adoptopenjdk8_installed.rc != 0
-    - ansible_architecture == "ppc64le"
-  tags: adoptopenjdk8
-
-- name: Install latest Hotspot release if one not already installed (Linux/aarch64)
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/aarch64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr/lib/jvm
-    remote_src: yes
-  retries: 3
-  delay: 5
-  register: adoptopenjdk8_download
-  until: adoptopenjdk8_download is not failed
-  when:
-    - adoptopenjdk8_installed.rc != 0
-    - ansible_architecture == "aarch64"
+    - ansible_architecture != "x86_64"
   tags: adoptopenjdk8
 
 - name: Get /usr/lib/jvm/jdk8* full path name
   shell: ls -ld /usr/lib/jvm/jdk8* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk8_dir
   when:
+    - ansible_os_family != "Darwin"
     - adoptopenjdk8_installed.rc != 0
   tags: adoptopenjdk8
 
@@ -98,5 +79,7 @@
     state: directory
     owner: root
     recurse: yes
-  when: adoptopenjdk8_installed.rc != 0
+  when:
+    - ansible_os_family != "Darwin"
+    - adoptopenjdk8_installed.rc != 0
   tags: adoptopenjdk8
