@@ -29,7 +29,9 @@ echo "--------------------------------------------------------------------------
 # Get IPs of the VM, and output to shared folder
 ip address show | grep -e "\\binet\\b" | cut -d' ' -f6 | cut -d/ -f1  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
 # Put the host machine's IP into the authorised_keys file on the VM
-[ -r /vagrant/id_rsa.pub ] && mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
