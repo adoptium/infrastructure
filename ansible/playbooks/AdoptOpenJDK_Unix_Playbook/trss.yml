@@ -40,6 +40,8 @@
             - git
             - nodejs
             - mongodb-org
+            - nginx
+            - make
           tags:
             - dependencies
             - skip_ansible_lint
