@@ -849,51 +849,6 @@
             - /tmp/freemarker-2.3.8.tar.gz
           tags: freemarker
 
-      ########
-      # cpan #
-      ########
-
-        - name: Check if Text::CSV is already installed
-          command: perldoc -l Text::CSV
-          register: TextCSV_is_installed
-          ignore_errors: yes
-          tags: cpan
-
-        - name: Check if XML::Parser is already installed
-          command: perldoc -l XML::Parser
-          register: XMLParser_is_installed
-          ignore_errors: yes
-          tags: cpan
-
-        - name: Ensure memory limits for root are unlimited
-          shell: ulimit -m unlimited && ulimit -d unlimited
-          when: TextCSV_is_installed.rc != 0
-          tags: cpan
-
-        - name: Link to compiler location
-          file: src=/opt/IBM/xlC/13.1.3/bin dest=/usr/vac/bin state=link
-          when: TextCSV_is_installed.rc != 0
-          tags: cpan
-
-      ##########################################################
-      # The 1st time cpan starts it asks to be configured, so  #
-      # we echo a blank to it as the default answer is yes     #
-      ##########################################################
-        - name: Get CPAN to auto-configure
-          shell: echo | cpan
-          when: TextCSV_is_installed.rc != 0
-          tags: cpan
-
-        - name: Install Text::CSV
-          command: cpan -i Text::CSV
-          when: TextCSV_is_installed.rc != 0
-          tags: cpan
-
-        - name: Install XML::Parser
-          command: cpan -i XML::Parser
-          when: XMLParser_is_installed.rc != 0
-          tags: cpan
-
       ##################
       # Nagios plugins #
       ##################

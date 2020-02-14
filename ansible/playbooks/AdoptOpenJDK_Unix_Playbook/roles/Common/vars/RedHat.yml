@@ -13,7 +13,6 @@ Build_Tool_Packages:
   - cpio
   - cups-devel
   - elfutils-libelf-devel
-  - expat-devel                   # Used for buiding the XML::Parser CPAN module
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
@@ -38,9 +37,7 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
-  - ntp
   - openssl-devel
-  - perl-CPAN
   - perl-devel
   - pkgconfig
   - systemtap-sdt-devel
@@ -48,6 +45,15 @@ Build_Tool_Packages:
   - wget
   - xz
   - zip
+
+Additional_Build_Tools_NOT_RHEL8:
+  - ntp                           # in RHEL8, ntp package is replaced by chrony
+
+Additional_Build_Tools_RHEL8:
+  - glibc-locale-source
+  - glibc-langpack-ja             # required for creating Japanese locales
+  - glibc-langpack-ko             # required for creating Korean locales
+  - glibc-langpack-zh             # required for creating Chinese locales
 
 Additional_Build_Tools_RHEL7:
   - libstdc++-static
@@ -70,7 +76,10 @@ Additional_Build_Tools_RHEL_s390x:
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
 
-Java_NOT_RHEL6_PPC64:
+Java_RHEL8:
+  - java-1.8.0-openjdk-devel
+
+Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
 

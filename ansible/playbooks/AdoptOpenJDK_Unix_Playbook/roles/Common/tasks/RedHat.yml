@@ -51,6 +51,13 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Install additional build tools if NOT RHEL 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
+  when:
+    - (ansible_distribution_major_version != "8")
+  tags: build_tools
+
 - name: Install additional build tools for RHEL 7
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_RHEL7 }}"
@@ -93,6 +100,13 @@
     - ansible_architecture == "s390x"
   tags: build_tools
 
+- name: Install additional build tools for RHEL 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL8 }}"
+  when:
+    - (ansible_distribution_major_version == "8")
+  tags: build_tools
+
 #################
 # xorg Packages #
 #################
@@ -112,12 +126,19 @@
 - name: Install Java (Not RedHat 6 on ppc64)
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
-  when: not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+  when:
+    - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+    - not (ansible_distribution_major_version == "8")
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL6_PPC64 }}"
   when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+
+- name: Install Java when RedHat 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_RHEL8 }}"
+  when: (ansible_distribution_major_version == "8")
 
 ####################
 # Set default Java #
@@ -169,6 +190,12 @@
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "s390x"
+  tags: default_java
+
+- name: Set default java version - RHEL 8
+  shell: update-alternatives --set java java-1.8.0-openjdk.{{ ansible_architecture }}
+  when:
+    - ansible_distribution_major_version == "8"
   tags: default_java
 
 ###########
