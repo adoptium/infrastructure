@@ -45,11 +45,12 @@
     - ansible_architecture == "x86_64"
   tags: ntp_time
 
-- name: Start chronyd for RHEL8
+- name: Start chronyd for RHEL8 and SLES15
   service:
     name: chronyd
     state: restarted
     enabled: yes
   when:
-    - ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
+      (ansible_distribution == "SLES" and ansible_distribution_major_version == "15")
   tags: ntp_time
