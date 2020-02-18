@@ -6,12 +6,35 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
-- name: Enable EPEL release
+- name: Enable EPEL release (not CentOS8)
   yum:
     name: epel-release
     state: installed
     update_cache: yes
     validate_certs: no
+  when: ansible_distribution_major_version != "8"
+  tags: patch_update
+
+- name: Enable EPEL release for CentOS8
+  shell: |
+    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  ignore_errors: yes
+  when:
+    - ansible_architecture != "s390x"
+    - ansible_distribution_major_version == "8"
+  tags: patch_update
+
+- name: Enable CentOS-Powershell repo for CentOS8
+  shell: sed -i -e 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-PowerTools.repo
+  ignore_errors: yes
+  when:
+    - ansible_distribution_major_version == "8"
+  tags: patch_update
+
+- name: Clean dnf cache
+  shell: dnf clean all && rm -rf /var/cache/dnf
+  when:
+    - ansible_distribution_major_version == "8"
   tags: patch_update
 
 - name: YUM upgrade all packages
@@ -35,6 +58,19 @@
   when: ansible_distribution_major_version == "7"
   tags: build_tools
 
+- name: Install additional build tools for CentOS 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_CentOS8 }}"
+  when: ansible_distribution_major_version == "8"
+  tags: build_tools
+
+- name: Install additional build tools for NOT CentOS8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8 }}"
+  when:
+    - ansible_distribution_major_version != "8"
+  tags: build_tools
+
 - name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
     url: https://people.centos.org/tru/devtools-2/devtools-2.repo
@@ -42,7 +78,6 @@
     timeout: 25
     checksum: sha256:a8ebeb4bed624700f727179e6ef771dafe47651131a00a78b342251415646acc
   when:
-    - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
@@ -50,7 +85,6 @@
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc48_devtoolset_compiler }}"
   when:
-    - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
@@ -58,16 +92,16 @@
 - name: Install CentOS SCL x86_64 repo for gcc7.3
   package: "name=centos-release-scl state=latest"
   when:
-    - ansible_distribution == "CentOS"
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version != "8"
   tags: build_tools
 
 - name: Install gcc7.3
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc73_devtoolset_compiler }}"
   when:
-    - ansible_distribution == "CentOS"
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version != "8"
   tags: build_tools
 
 - name: Install additional build tools for CentOS on x86
@@ -86,7 +120,6 @@
     group: root
     state: link
   when:
-    - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
@@ -99,7 +132,6 @@
     group: root
     state: link
   when:
-    - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
@@ -112,7 +144,6 @@
     group: root
     state: link
   when:
-    - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6"
   tags: build_tools
 

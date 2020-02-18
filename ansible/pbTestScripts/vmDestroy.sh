@@ -47,6 +47,8 @@ checkOS() {
                         osToDestroy="C6" ;;
                 "CentOS7" | "centos7" | "C7" | "c7" )
                         osToDestroy="C7" ;;
+                "CentOS8" | "centos8" | "C8" | "c8" )
+                        osToDestroy="C8" ;;
                 "Debian8" | "debian8" | "D7" | "d7" )
                         osToDestroy="D8" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
@@ -70,6 +72,7 @@ listOS() {
 		- Ubuntu1804
 		- CentOS6
 		- CentOS7
+		- CentOS8
 		- Debian8
 		- FreeBSD12
 		- SUSE12
