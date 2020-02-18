@@ -17,7 +17,10 @@
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
 # .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
-- hosts: "{{ groups['Vendor_groups'] | default('build*win*:test*win*') }}"
+# Groups can be passed in as a command-line variable in Ansible playbook.
+# It can be defined as 'all' or a specific group which the host belongs to.
+# For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
+- hosts: "{{ Groups | default('build*win*:test*win*') }}"
   gather_facts: yes
   tasks:
     - block:
