@@ -1,12 +1,34 @@
 #!/bin/bash
 set -eu
 
+checkJDKVersion() {
+        local jdk=$1
+        case "$jdk" in
+                "jdk8u" | "jdk8" | "8" | "8u" )
+                        JAVA_TO_BUILD="jdk8u";;
+                "jdk9u" | "jdk9" | "9" | "9u" )
+                        JAVA_TO_BUILD="jdk9u";;
+                "jdk10u" | "jdk10" | "10" | "10u" )
+                        JAVA_TO_BUILD="jdk10u";;
+                "jdk11u" | "jdk11" | "11" | "11u" )
+                        JAVA_TO_BUILD="jdk11u";;
+                "jdk12u" | "jdk12" | "12" | "12u" )
+                        JAVA_TO_BUILD="jdk12u";;
+                "jdk13u" | "jdk13" | "13" | "13u" )
+                        JAVA_TO_BUILD="jdk13u";;
+                "jdk14u" | "jdk14" | "14" | "14u" )
+                        JAVA_TO_BUILD="jdk14u";;
+                *)
+                        echo "Not a valid JDK Version" ; exit 1;;
+        esac
+}
+
 # Argument parsing
+export JAVA_TO_BUILD=jdk8u
 if [[ $# == 0 ]]; then
         echo "No arguments input, defaulting to JDK8"
-        export JAVA_TO_BUILD=jdk8u
 elif [[ $# == 1 ]]; then
-        export JAVA_TO_BUILD=$1
+	checkJDKVersion $1
 else
         echo "Too many arguments"
         exit 1;
