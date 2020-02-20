@@ -114,6 +114,12 @@ CLEAN_WORKSPACE=false
 
 processArgs $*
 
+# All architectures are referred to in make-adopt-build-farm.sh, except x86_64, which is 'x64'
+unameOutput=$(uname -m)
+if [[ ${unameOutput} != "x86_64" ]]; then
+       export ARCHITECTURE=${unameOutput}
+fi
+
 # Differences in openJDK7 name between OSs. Search for CentOS one
 export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk.x86_64)
 # If the CentOS JDK7 can't be found, search for the Ubuntu one
@@ -135,8 +141,9 @@ if [[ $(uname) == "FreeBSD" ]]; then
         echo "Running on FreeBSD"
         export TARGET_OS=FreeBSD
         export VARIANT=hotspot
-        export JDK7_BOOT_DIR=/usr/local/openjdk7
-	export JAVA_HOME=/usr/local/openjdk8
+        export JAVA_TO_BUILD=jdk11u
+        export JDK_BOOT_DIR=/usr/local/openjdk10
+        export JAVA_HOME=/usr/local/openjdk8
 fi
 
 echo "DEBUG:

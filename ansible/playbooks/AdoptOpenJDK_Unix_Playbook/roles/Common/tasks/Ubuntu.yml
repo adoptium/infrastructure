@@ -6,6 +6,13 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+- name: Install gnugp2 for S390x
+  apt:
+    name: gnupg2
+    state: present
+  when: ansible_architecture == "s390x"
+  tags: patch_update
+
 - name: Add the openjdk repository to apt
   apt_repository: repo='ppa:openjdk-r/ppa'
   when:

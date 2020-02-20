@@ -25,6 +25,7 @@
               - build-essential
               - gettext
               - libcurl4-openssl-dev
+              - sshpass
 
         - name: Run apt-get upgrade
           apt: upgrade=safe
@@ -213,3 +214,44 @@
             name: virtualbox-6.0
             update_cache: yes
           when: virtualbox_installed.rc != 0
+
+      ##########
+      #  QEMU  #
+      ##########
+
+        - name: Check to see if QEMU is installed
+          shell: qemu-system-s390x --version >/dev/null 2>&1
+          ignore_errors: yes
+          register: qemu_installed
+
+        - name: Install QEMU dependencies
+          apt:
+            name: "{{ packages }}"
+            update_cache: yes
+          vars:
+            packages:
+              - libglib2.0-dev
+              - libfdt-dev
+              - libpixman-1-dev
+              - zliblg-dev
+              - libnfs-dev
+              - libiscsi-dev
+          when: qemu_installed.rc != 0
+          tags: QEMU
+
+        - name: Extract source code
+          unarchive:
+            src: https://download.qemu.org/qemu-4.2.0.tar.xz
+            dest: /tmp/qemu-4.2.0
+            remote_src: yes
+          retries: 3
+          delay: 5
+          register: qemu_download
+          until: qemu_download is not failed
+          when: qemu_installed.rc != 0
+          tags: QEMU
+
+        - name: Install QEMU 4.2
+          shell: cd /tmp/qemu-4.2.0 && ./configure && make && make install
+          when: qemu_installed.rc != 0
+          tags: QEMU
