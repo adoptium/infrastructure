@@ -70,7 +70,6 @@ Test_Tool_Packages:
   - gcc
   - gcc-c++
   - perl
-  - pulseaudio
   - xorg-x11
   - xorg-x11-server
   - xorg-x11-server-extra
