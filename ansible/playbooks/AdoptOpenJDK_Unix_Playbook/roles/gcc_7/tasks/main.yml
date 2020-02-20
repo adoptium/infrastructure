@@ -13,9 +13,9 @@
 
 # Installation on CentOS x86_64 will be handled via the scl repo in the Common CentOS playbook
 
-- name: Download AdoptOpenJDK gcc-7.3.0 binary
+- name: Download AdoptOpenJDK gcc-7.5.0 binary
   get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc730+ccache.{{ ansible_architecture }}.tar.xz
+    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar.xz
     dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
     force: no
     mode: 0644
@@ -23,20 +23,6 @@
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
-    - ansible_architecture != "s390x"
-    - gcc7_installed.rc != 0
-  tags: gcc-7
-
-- name: Download AdoptOpenJDK gcc-7.4.0 binary for s390x
-  get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc740+ccache.{{ ansible_architecture }}.tar.xz
-    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
-    force: no
-    mode: 0644
-  when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
-    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
-    - ansible_architecture == "s390x"
     - gcc7_installed.rc != 0
   tags: gcc-7
 
@@ -60,34 +46,3 @@
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
     - gcc7_installed.rc != 0
   tags: gcc-7
-
-# Not keen on this from gcc 4.8 so skipping - sxa
-# Leaving it commented out so it's clear what could be done
-#- name: Create symlink for libstdc++.so.6.0.19
-#  file:
-#    src: /opt/gcc-4.8.5/lib64/libstdc++.so.6.0.19
-#    dest: /usr/lib64/libstdc++.so.6.0.19
-#    owner: root
-#    group: root
-#    state: link
-#  when:
-#    - gcc_installed.rc != 0
-#    - ansible_distribution == "RedHat"
-#    - ansible_distribution_major_version == "6"
-#    - ansible_architecture == "x86_64"
-#  tags: gcc-4.8
-#
-#- name: Create symlink for libstdc++.so.6
-#  file:
-#    src: /usr/lib64/libstdc++.so.6.0.19
-#    dest: /usr/lib64/libstdc++.so.6
-#    owner: root
-#    group: root
-#    state: link
-#    force: true
-#  when:
-#    - gcc_installed.rc != 0
-#    - ansible_distribution == "RedHat"
-#    - ansible_distribution_major_version == "6"
-#    - ansible_architecture == "x86_64"
-#  tags: gcc-4.8
