@@ -10,8 +10,8 @@ processArgs() {
 				JAVA_TO_BUILD="$1"; shift;;
 			"--URL" | "-u" )
 				GIT_URL="$1"; shift;;
-			"--openj9" | "-j9" )
-				VARIANT=openj9;;
+			"--hotspot" | "-hs" )
+				VARIANT=hotspot;;
 			"--clean-workspace" | "-c" )
 				CLEAN_WORKSPACE=true;;
 			"--help" | "-h" )
@@ -41,7 +41,7 @@ usage() {
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
 		
-	If not specified, JDK8-HS will be built with the standard openjdk-build repo"
+	If not specified, JDK8-J9 will be built with the standard openjdk-build repo"
 	echo
 	showJDKVersions
 }
@@ -107,7 +107,7 @@ cloneRepo() {
 export JAVA_TO_BUILD=jdk8u
 export PATH=/usr/local/bin/:$PATH
 export TARGET_OS=linux
-export VARIANT=hotspot
+export VARIANT=openj9
 export ARCHITECTURE=x64
 GIT_URL="https://github.com/adoptopenjdk/openjdk-build"
 CLEAN_WORKSPACE=false
@@ -147,7 +147,7 @@ echo "DEBUG:
         JDK7_BOOT_DIR=$JDK7_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
-	GIT_URL=$GIT_URL"
+        GIT_URL=$GIT_URL"
 
 cloneRepo 
 
