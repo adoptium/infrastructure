@@ -172,7 +172,7 @@ done
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 
-	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone -b qemu https://github.com/Willsparker/openjdk-infrastructure "$workFolder"/openjdk-infrastructure
+	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone https://github.com/adoptopenjdk/openjdk-infrastructure "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$workFolder"/logFiles/"$ARCHITECTURE".log
 	if grep -q 'failed=[1-9]\|unreachable=[1-9]' "$workFolder"/logFiles/"$ARCHITECTURE".log; then
@@ -181,7 +181,7 @@ runPlaybook() {
 		exit 1;
 	fi
 	if [[ "$buildJDK" == true ]]; then
-		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone -b qemu https://github.com/Willsparker/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh"
+		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh"
 		if [[ "$testJDK" == true ]]; then
 			ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "\$HOME/openjdk-infrastructure/ansible/pbTestScripts/testJDK.sh" 
 		fi	
