@@ -19,7 +19,6 @@
     dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.xz'
     force: no
     mode: 0644
-    checksum: sha256:db3dcf4867acbf0cdcd9cb3a97f2e47d72d1a2a59e9e60359f267742f5fa650a
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
