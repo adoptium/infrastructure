@@ -34,7 +34,6 @@ Additional_Build_Tools_SLES15:
   - libnuma-devel
   - libX11-devel
   - libXext-devel
-  - libXext-devel
   - libXi-devel
   - libXrandr-devel                 # JDK12+ compilation
   - libXrender-devel
