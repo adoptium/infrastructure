@@ -128,7 +128,7 @@
             state: restarted
           when: nginx_installed.rc == 0
           tags: nginx_conf
-          
+
         - name: Add cron job to check for updates
           cron: name="Check for Updates every Sunday at 5am"
             weekday="6"
