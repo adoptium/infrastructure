@@ -54,11 +54,6 @@ gcc48_devtoolset_compiler:
   - devtoolset-2-binutils
   - devtoolset-2-gcc-c++
 
-gcc73_devtoolset_compiler:
-  - devtoolset-7-gcc              # OpenJ9
-  - devtoolset-7-binutils         # OpenJ9
-  - devtoolset-7-gcc-c++          # OpenJ9
-
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
 
