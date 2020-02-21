@@ -44,4 +44,9 @@ Vagrant.configure("2") do |config|
     adoptopenjdkD8.vm.network :private_network, type: "dhcp"
     adoptopenjdkD8.vm.provision "shell", inline: $script, privileged: false
   end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 2560
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  end
 end
