@@ -20,11 +20,11 @@
           apt: upgrade=safe update_cache=yes
           tags: patch_update
 
-        - name: Add Node.js v8.x
-          raw: "curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -"
+        - name: Add Node.js v12.x
+          raw: "curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -"
           tags: dependencies
 
-        - name: Import MongoDB key
+        - name: Import MongoDB 4.2 key
           raw: "wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -"
           tags: mongodb
 
@@ -40,8 +40,9 @@
             - git
             - nodejs
             - mongodb-org
-            - nginx
             - make
+            - build-essential
+            - g++
           tags:
             - dependencies
             - skip_ansible_lint
@@ -63,6 +64,7 @@
             global: yes
             state: present
           with_items:
+            - forever
             - forever-service
             - yarn
           tags: forever
@@ -73,9 +75,6 @@
             dest: "/home/{{ Jenkins_Username }}/openjdk-test-tools"
             update: yes
             force: yes
-          tags:
-            # TODO: Git checkouts must contain explicit version
-            - skip_ansible_lint
 
         - name: Change owner permissions
           file:
@@ -83,6 +82,53 @@
             owner: "{{ Jenkins_Username }}"
             group: "{{ Jenkins_Username }}"
 
+        - name: npm ci && npm run build of test-result-summary-client
+          shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/ && npm ci && npm run build
+
+        - name: npm ci of TestResultSummaryService
+          shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/TestResultSummaryService/ && npm ci
+
+        - name: Install nginx seperately
+          apt:
+            name: nginx
+            state: present
+          tags: nginx_conf
+          register: nginx_installed
+
+        - name: Add app root directorty to /etc/nginx/sites-enabled/default
+          lineinfile:
+            path: /etc/nginx/sites-enabled/default
+            regex: 'root /var/www/html;'
+            line: 'root /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/build/;'
+            state: present
+          when: nginx_installed.rc == 0
+          tags: nginx_conf
+
+        - name: Add server name trss.adoptopenjdk.net /etc/nginx/sites-enabled/default
+          lineinfile:
+            path: /etc/nginx/sites-enabled/default
+            regex: 'server_name _;'
+            line: 'server_name trss.adoptopenjdk.net;'
+            state: present
+          when: nginx_installed.rc == 0
+          tags: nginx_conf
+
+        - name: Add Location line to /etc/nginx/sites-enabled/default
+          lineinfile:
+            path: /etc/nginx/sites-enabled/default
+            insertafter: 'server_name trss.adoptopenjdk.net;'
+            line: 'location /api/ { proxy_pass http://localhost:3001; proxy_http_version 1.1; }'
+            state: present
+          when: nginx_installed.rc == 0
+          tags: nginx_conf
+
+        - name: Restart nginx service
+          service:
+            name: nginx
+            state: restarted
+          when: nginx_installed.rc == 0
+          tags: nginx_conf
+          
         - name: Add cron job to check for updates
           cron: name="Check for Updates every Sunday at 5am"
             weekday="6"
