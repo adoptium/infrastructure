@@ -142,7 +142,7 @@ if [[ $(uname) == "FreeBSD" ]]; then
         export TARGET_OS=FreeBSD
         export VARIANT=hotspot
         export JAVA_TO_BUILD=jdk11u
-        export JDK_BOOT_DIR=/usr/local/openjdk10
+        export JDK_BOOT_DIR=/usr/local/openjdk11
         export JAVA_HOME=/usr/local/openjdk8
 fi
 
