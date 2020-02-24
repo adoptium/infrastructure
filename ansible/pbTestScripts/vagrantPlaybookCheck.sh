@@ -4,6 +4,7 @@ set -eu
 branchName=''
 folderName=''
 gitURL=''
+buildURL=''
 vagrantOS=''
 retainVM=false
 testNativeBuild=false
@@ -40,6 +41,8 @@ processArgs()
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
 				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
+			"--build-repo" | "-br" )
+				buildURL="--URL $1"; shift;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -203,7 +206,7 @@ startVMPlaybook()
 	local pb_failed=$?
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
-		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh"
+		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"

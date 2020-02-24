@@ -26,6 +26,7 @@ Build_Tool_Packages:
   - libXtst
   - openjdk
   - openjdk8
+  - openjdk11
   - pkgconf
   - png
   - unzip
