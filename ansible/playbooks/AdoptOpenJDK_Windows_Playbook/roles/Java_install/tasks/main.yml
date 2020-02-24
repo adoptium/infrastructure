@@ -16,7 +16,7 @@
 
 - name: Download Java{{ jdk_version }}
   win_get_url:
-    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk{{ jdk_version }}?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk&heap_size={{ heapsize }}
+    url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
   when: (java_download.stat.exists == false) and (java_installed.stat.exists == false)
   tags: Java_install
