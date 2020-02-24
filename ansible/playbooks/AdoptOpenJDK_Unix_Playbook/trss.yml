@@ -101,7 +101,7 @@
             regex: 'root /var/www/html;'
             line: 'root /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/build/;'
             state: present
-          when: nginx_installed.rc == 0
+          # when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add server name trss.adoptopenjdk.net /etc/nginx/sites-enabled/default
@@ -110,23 +110,41 @@
             regex: 'server_name _;'
             line: 'server_name trss.adoptopenjdk.net;'
             state: present
-          when: nginx_installed.rc == 0
+          # when: nginx_installed.rc == 0
           tags: nginx_conf
 
-        - name: Add Location line to /etc/nginx/sites-enabled/default
+        - name: Add Location /api/ to /etc/nginx/sites-enabled/default
           lineinfile:
             path: /etc/nginx/sites-enabled/default
             insertafter: 'server_name trss.adoptopenjdk.net;'
             line: 'location /api/ { proxy_pass http://localhost:3001; proxy_http_version 1.1; }'
             state: present
-          when: nginx_installed.rc == 0
+          # when: nginx_installed.rc == 0
+          tags: nginx_conf
+
+        - name: Add file extension rule to /etc/nginx/sites-enabled/default
+          lineinfile:
+            path: /etc/nginx/sites-enabled/default
+            insertafter: 'server_name trss.adoptopenjdk.net;'
+            line: 'location ~ ^.+\..+$ { try_files $uri =404; }'
+            state: present
+          # when: nginx_installed.rc == 0
+          tags: nginx_conf
+
+        - name: Add without file extension rule to /etc/nginx/sites-enabled/default
+          lineinfile:
+            path: /etc/nginx/sites-enabled/default
+            regexp: try_files \$uri \$uri/ =404;
+            line: 'try_files $uri $uri/ /index.html;'
+            state: present
+          # when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Restart nginx service
           service:
             name: nginx
             state: restarted
-          when: nginx_installed.rc == 0
+          # when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add cron job to check for updates
