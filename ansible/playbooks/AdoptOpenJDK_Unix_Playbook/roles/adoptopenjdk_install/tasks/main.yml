@@ -7,9 +7,27 @@
 # Check if target is installed
 # Proceed with installing to /usr/lib/jvm
 
+- name: Set path variable when jdk_version == 8
+  set_fact:
+    path: /usr/lib/jvm/jdk8
+  when:
+    - jdk_version == 8
+    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
+- name: Set path variable when jdk_version != 8
+  set_fact:
+    path: /usr/lib/jvm/jdk-{{ jdk_version }}
+  when:
+    - jdk_version != 8
+    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
 - name: Checking for /usr/lib/jvm
   stat: path=/usr/lib/jvm
   register: usr_lib_jvm_exists
+  when:
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
 - name: Creating /usr/lib/jvm if not found
@@ -18,13 +36,17 @@
     state: directory
     owner: root
     mode: 0755
-  when: usr_lib_jvm_exists.stat.exists != True
+  when:
+    - usr_lib_jvm_exists.stat.exists != True
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
 - name: Check if jdk-{{ jdk_version }} is already installed in the target location
-  shell: ls -ld /usr/lib/jvm/jdk-{{ jdk_version }}* >/dev/null 2>&1
+  shell: ls -ld {{ path }}* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk_installed
+  when:
+    - ansible_os_family != "Darwin"
   tags:
     - adoptopenjdk_install
     - skip_ansible_lint
@@ -41,11 +63,12 @@
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture == "x86_64"
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
-- name: Install latest release if one not already installed (Linux/s390x)
+- name: Install latest release if one not already installed (Linux/NOT x64)
   unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/s390x/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ ansible_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
     remote_src: yes
   retries: 3
@@ -54,48 +77,25 @@
   until: adoptopenjdk_download is not failed
   when:
     - adoptopenjdk_installed.rc != 0
-    - ansible_architecture == "s390x"
+    - ansible_architecture != "x86_64"
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
-- name: Install latest release if one not already installed (Linux/ppc64le)
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/ppc64le/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr/lib/jvm
-    remote_src: yes
-  retries: 3
-  delay: 5
-  register: adoptopenjdk_download
-  until: adoptopenjdk_download is not failed
-  when:
-    - adoptopenjdk_installed.rc != 0
-    - ansible_architecture == "ppc64le"
-  tags: adoptopenjdk_install
-
-- name: Install latest Hotspot release if one not already installed (Linux/aarch64)
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/aarch64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr/lib/jvm
-    remote_src: yes
-  retries: 3
-  delay: 5
-  register: adoptopenjdk_download
-  until: adoptopenjdk_download is not failed
-  when:
-    - adoptopenjdk_installed.rc != 0
-    - ansible_architecture == "aarch64"
-  tags: adoptopenjdk_install
-
-- name: Get /usr/lib/jvm/jdk-{{ jdk_version }}* full path name
-  shell: ls -ld /usr/lib/jvm/jdk-{{ jdk_version }}* 2>/dev/null | awk '{print $9}'
+- name: Get {{ path }}* full path name
+  shell: ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
-  when: adoptopenjdk_installed.rc != 0
+  when:
+    - adoptopenjdk_installed.rc != 0
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
-- name: Chown /usr/lib/jvm/jdk-{{ jdk_version }}*
+- name: Chown {{ path }}*
   file:
     path: '{{ adoptopenjdk_dir.stdout }}'
     state: directory
     owner: root
     recurse: yes
-  when: adoptopenjdk_installed.rc != 0
+  when:
+    - adoptopenjdk_installed.rc != 0
+    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
