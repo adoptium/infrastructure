@@ -96,14 +96,6 @@
     - ansible_distribution_major_version != "8"
   tags: build_tools
 
-- name: Install gcc7.3
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc73_devtoolset_compiler }}"
-  when:
-    - ansible_architecture == "x86_64"
-    - ansible_distribution_major_version != "8"
-  tags: build_tools
-
 - name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"

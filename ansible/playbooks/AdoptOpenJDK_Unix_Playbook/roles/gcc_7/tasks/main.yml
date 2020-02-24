@@ -1,11 +1,11 @@
 ---
-##########
-# gcc_73 #
-##########
+#########
+# gcc_7 #
+#########
 
 
-- name: Check if gcc-7 is installed on RHEL/CentOS
-  shell: /opt/rh/devtoolset-7/root/usr/bin/gcc --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.3 --version 2>&1 > /dev/null || /usr/local/gcc/bin/gcc-7.4 --version 2>&1 > /dev/null || /usr/bin/gcc-7.3 --version 2>&1 > /dev/null
+- name: Check if gcc 7.5 is installed on RHEL/CentOS
+  shell: /usr/local/gcc/bin/gcc-7.5 --version 2>&1 > /dev/null
   ignore_errors: yes
   register: gcc7_installed
   tags: gcc-7
