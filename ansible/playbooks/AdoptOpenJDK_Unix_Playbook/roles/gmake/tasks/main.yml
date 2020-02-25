@@ -18,7 +18,7 @@
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
       ansible_architecture == "x86_64") or
-      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8")
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
   tags: goodmake_source
 
 - name: Download make 4.1 source
@@ -30,7 +30,7 @@
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
       ansible_architecture == "x86_64") or
-      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8")
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -43,7 +43,7 @@
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
       ansible_architecture == "x86_64") or
-      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8")
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -53,7 +53,7 @@
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
       ansible_architecture == "x86_64") or
-      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8")
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
@@ -68,6 +68,6 @@
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
       ansible_architecture == "x86_64") or
-      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version != "8")
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
   tags: goodmake_source
