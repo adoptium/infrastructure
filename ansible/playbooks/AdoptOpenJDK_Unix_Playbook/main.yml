@@ -29,6 +29,7 @@
       tags: [build_tools, build_tools_openj9]
     - ant                         # Testing
     - Ant-Contrib                 # Testing
+    - maven                       # Testing
     - GIT_Source
     - gmake
     - Docker                      # Testing
