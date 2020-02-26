@@ -7,8 +7,8 @@
   tasks:
     - block:
       # Set standard variables
-      - name: Load AdoptOpenJDKs variable file
-        include_vars: group_vars/all/adoptopenjdk_variables.yml
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
 
