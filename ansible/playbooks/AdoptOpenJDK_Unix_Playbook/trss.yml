@@ -95,7 +95,7 @@
           tags: nginx_conf
           register: nginx_installed
 
-        - name: Add app root directorty to /etc/nginx/sites-enabled/default
+        - name: Add app root directory to /etc/nginx/sites-enabled/default
           lineinfile:
             path: /etc/nginx/sites-enabled/default
             regex: 'root /var/www/html;'
