@@ -1,0 +1,33 @@
+---
+#######################################################
+# AdoptOpenJDK - Ansible Playbook for git-hg machines #
+#######################################################
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - Version
+    - Common
+    - GIT_Source
+    - Jenkins_User                # AdoptOpenJDK Infrastructure
+    - git-hg                      # Mercurial client for mirror jobs
+    - Superuser                   # AdoptOpenJDK Infrastructure
+    - Swap_File
+    - Crontab
+    - NTP_TIME
+    - role: adoptopenjdk_install  # JDK11 Build Bootstrap
+      jdk_version: 11
+    - Clean_Up
+    - Security
+    - Vendor

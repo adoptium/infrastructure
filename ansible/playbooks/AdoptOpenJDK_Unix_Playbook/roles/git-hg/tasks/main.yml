@@ -1,0 +1,47 @@
+---
+##################################################
+# AdoptOpenJDK - Prereqs for running git-hg jobs #
+##################################################
+- name: Install packages for java and git
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - openjdk-8-jre-headless
+    - mercurial
+    - git
+
+- name: Create /usr/local/bin
+  file: path=/usr/local/bin state=directory
+
+- name: Download git-remote-hg
+  get_url:
+    url: https://raw.github.com/felipec/git-remote-hg/master/git-remote-hg
+    dest: /usr/local/bin/git-remote-hg
+    mode: 0555
+
+- name: Install prereqs needed for git-hg jobs
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - gcc
+    - zlib1g-dev
+    - libcurl4-openssl-dev
+    - gettext
+
+- name: Install prereqs needed for other jobs which will runon the machine (jtreg, jemmy, jtharness)
+  apt:
+    name: "{{ packages }}"
+  with_items:
+    - unzip
+    - zip
+    - ant
+
+- name: Set Jenkins' git username to "AdoptOpenJDK Github Bot"
+  shell: git config --global user.name "AdoptOpenJDK Github Bot"
+  become: yes
+  become_user: jenkins
+
+- name: Set Jenkins' git user email to "AdoptOpenJDK Github Bot"
+  shell: git config --global user.email "adoptopenjdk+githubbot@gmail.com"
+  become: yes
+  become_user: jenkins
