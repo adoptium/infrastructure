@@ -4,9 +4,8 @@
 ##################################################
 - name: Install packages for java and git
   apt:
-    name: "{{ packages }}"
-  vars:
-    packages:
+    name: "{{ item }}"
+  with_items:
     - openjdk-8-jre-headless
     - mercurial
     - git
