@@ -22,9 +22,8 @@
 
 - name: Install prereqs needed for git-hg jobs
   apt:
-    name: "{{ packages }}"
-  vars:
-    packages:
+    name: "{{ item }}"
+  with_items:
     - gcc
     - zlib1g-dev
     - libcurl4-openssl-dev
@@ -33,8 +32,7 @@
 - name: Install prereqs needed for other jobs which will runon the machine (jtreg, jemmy, jtharness)
   apt:
     name: "{{ packages }}"
-  vars:
-    packages:
+  with_items:
     - unzip
     - zip
     - ant
@@ -42,9 +40,9 @@
 - name: Set Jenkins' git username to "AdoptOpenJDK Github Bot"
   shell: git config --global user.name "AdoptOpenJDK Github Bot"
   become: yes
-  become: jenkins
+  become_user: jenkins
 
 - name: Set Jenkins' git user email to "AdoptOpenJDK Github Bot"
   shell: git config --global user.email "adoptopenjdk+githubbot@gmail.com"
   become: yes
-  become: jenkins
+  become_user: jenkins
