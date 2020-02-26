@@ -1,0 +1,22 @@
+FROM centos:6.9
+
+ARG user=jenkins
+
+RUN yum -y update; yum clean all
+RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm; \
+ yum -y install ansible sudo; yum clean all
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,adoptopenjdk_install"
+
+RUN groupadd -g 1000 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
+
+# OpenJDK 9+ gets auto installed in the build scripts
+ENV JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk.x86_64"
+ENV JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"

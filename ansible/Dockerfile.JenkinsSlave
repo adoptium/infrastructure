@@ -1,0 +1,24 @@
+FROM adoptopenjdk/centos6_image
+
+ARG VERSION=4.0.1
+ARG user=jenkins
+ARG AGENT_WORKDIR=/home/${user}/agent
+
+RUN curl --create-dirs -fsSLo /usr/share/jenkins/agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
+  && chmod 755 /usr/share/jenkins \
+  && chmod 644 /usr/share/jenkins/agent.jar \
+  && ln -sf /usr/share/jenkins/agent.jar /usr/share/jenkins/slave.jar
+
+RUN curl --create-dirs -fsLo /usr/local/bin/jenkins-agent https://raw.githubusercontent.com/jenkinsci/docker-jnlp-slave/master/jenkins-agent \
+  && chmod +x /usr/local/bin/jenkins-agent \
+  && ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
+
+USER ${user}
+ENV AGENT_WORKDIR=${AGENT_WORKDIR}
+RUN mkdir /home/${user}/.jenkins && mkdir -p ${AGENT_WORKDIR}
+
+VOLUME /home/${user}/.jenkins
+VOLUME ${AGENT_WORKDIR}
+WORKDIR /home/${user}
+
+ENTRYPOINT ["jenkins-agent"]

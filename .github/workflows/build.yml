@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  pull_request:
+    paths:
+    - ansible/**
+    branches:         
+    - master
+  push:
+    paths:
+    - ansible/**
+    branches:         
+    - master
+
+env:
+  AWS_DEFAULT_REGION: eu-west-1
+  AWS_DEFAULT_OUTPUT: json
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  CONTAINER_IMAGE: adoptopenjdk/centos6_image
+  SLAVE_IMAGE: adoptopenjdk/jenkins_slave
+
+jobs:
+  build-and-push:
+    name: Building and pushing image to AWS ECR
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Login to ECR
+      if: github.ref == 'refs/heads/master'
+      run: |
+        $( aws ecr get-login --no-include-email )
+
+    - name: Build and tag Centos6 Image
+      run: |
+        docker build \
+          -t $CONTAINER_IMAGE \
+          -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE ./ansible/Dockerfile.CentOS6
+
+    - name: Push Centos6 Image
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CONTAINER_IMAGE
+
+    - name: Build and tag Jenkins Slave Image
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker build \
+          -t $SLAVE_IMAGE \
+          -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$SLAVE_IMAGE ./ansible/Dockerfile.JenkinsSlave
+
+    - name: Push Slave Image
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$SLAVE_IMAGE
