@@ -26,7 +26,7 @@
             dest: /tmp/node-v12.16.1-linux-x64.tar.xz
             mode: 0440
           tags: node_install
-        
+
         - name: Extract Node tarball
           unarchive:
             src: /tmp/node-v12.16.1-linux-x64.tar.xz
