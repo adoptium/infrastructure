@@ -20,9 +20,30 @@
           apt: upgrade=safe update_cache=yes
           tags: patch_update
 
-        - name: Add Node.js v12.x
-          raw: "curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -"
-          tags: dependencies
+        - name: Download Nodev12.16.1 tarball
+          get_url:
+            url: https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz
+            dest: /tmp/node-v12.16.1-linux-x64.tar.xz
+            mode: 0440
+          tags: node_install
+        
+        - name: Extract Node tarball
+          unarchive:
+            src: /tmp/node-v12.16.1-linux-x64.tar.xz
+            dest: /usr/local/lib/
+            copy: False
+          tags: node_install
+
+        - name: Create symlinks for node, npm and npx from node install directory to /usr/local/bin/
+          file:
+            src: /usr/local/lib/node-v12.16.1-linux-x64/bin/{{ item }}
+            dest: /usr/local/bin/{{ item }}
+            state: link
+          with_items:
+            - node
+            - npm
+            - npx
+          tags: node_install
 
         - name: Import MongoDB 4.2 key
           raw: "wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -"
@@ -38,7 +59,6 @@
             update_cache: yes
           with_items:
             - git
-            - nodejs
             - mongodb-org
             - make
             - build-essential
@@ -101,7 +121,6 @@
             regex: 'root /var/www/html;'
             line: 'root /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/build/;'
             state: present
-          when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add server name trss.adoptopenjdk.net /etc/nginx/sites-enabled/default
@@ -110,7 +129,6 @@
             regex: 'server_name _;'
             line: 'server_name trss.adoptopenjdk.net;'
             state: present
-          when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add Location /api/ to /etc/nginx/sites-enabled/default
@@ -119,7 +137,6 @@
             insertafter: 'server_name trss.adoptopenjdk.net;'
             line: 'location /api/ { proxy_pass http://localhost:3001; proxy_http_version 1.1; }'
             state: present
-          when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add file extension rule to /etc/nginx/sites-enabled/default
@@ -128,23 +145,12 @@
             insertafter: 'server_name trss.adoptopenjdk.net;'
             line: 'location ~ ^.+\..+$ { try_files $uri =404; }'
             state: present
-          when: nginx_installed.rc == 0
-          tags: nginx_conf
-
-        - name: Add without file extension rule to /etc/nginx/sites-enabled/default
-          lineinfile:
-            path: /etc/nginx/sites-enabled/default
-            regexp: try_files \$uri \$uri/ =404;
-            line: 'try_files $uri $uri/ /index.html;'
-            state: present
-          when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Restart nginx service
           service:
             name: nginx
             state: restarted
-          when: nginx_installed.rc == 0
           tags: nginx_conf
 
         - name: Add cron job to check for updates
