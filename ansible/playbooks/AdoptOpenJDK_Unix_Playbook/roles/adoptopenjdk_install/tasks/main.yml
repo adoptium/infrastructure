@@ -66,7 +66,22 @@
     - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
-- name: Install latest release if one not already installed (Linux/NOT x64)
+- name: Install latest release if one not already installed (Linux/arm)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/arm/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - adoptopenjdk_installed.rc != 0
+    - ansible_architecture == "armv7l"
+    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
+- name: Install latest release if one not already installed (Linux/Everything else)
   unarchive:
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ ansible_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr/lib/jvm
@@ -78,6 +93,7 @@
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_architecture != "x86_64"
+    - ansible_architecture != "armv7l"
     - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
