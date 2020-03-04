@@ -56,17 +56,21 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
-## Can I have multiple VMs on different OSs?
+## How do I run the playbooks on a remote Windows host?
 
-As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
-You can do this by following these steps:
+Ansible can't be installed locally on a Windows machine, therefore the playbook has to be ran on a seperate system and then pointed at a Windows Machine.
 
-  1. Make a copy of the existing directory you have.
-  2. The `Vagrantfile` is a symmlink or copy of the Vagrantfile that is labelled with the desired OS (e.g. `VagrantFile.Ubuntu1804`)
-  3. Continue the vagrant functions as normal.
+This can be done by doing the following: 
 
-To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into.
-Use `vagrant-global-status` to find out which VMs you have in each directory
+1) In `playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
+2) Alter `playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` to add `ansible_winrm_transport: credssp`. Uncomment and set `ansible_password` to your admin user's password.
+3) Create a `hosts` file containing the IP address of the Windows machine.
+
+The playbook can then be run by executing the following, from the `openjdk-infrastructure/ansible` directory:
+
+```bash
+ansible-playbook -i hosts -u ADMIN_USER --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+```
 
 ## Which playbook do I run?
 
@@ -264,3 +268,19 @@ ansible-playbook -i playbooks/AdoptOpenJDK_Windows_playbook/hosts.tmp -u vagrant
 ```
 
 Alternatively, [pbTestScripts/vagrantPlaybookCheck.sh](pbTestScripts/vagrantPlaybookCheck.sh) will do this for you when executing `./vagrantPlaybookCheck.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
+
+## Can I have multiple VMs on different OSs?
+
+As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
+You can do this by following these steps:
+
+  1. Make a copy of the existing directory you have.
+  2. The `Vagrantfile` is a symlink or copy of the Vagrantfile that is labelled with the desired OS (e.g. `VagrantFile.Ubuntu1804`)
+  3. Continue the vagrant functions as normal.
+
+To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into, or the ID of the machine can be used:
+
+```bash
+vagrant ssh 1a2b3c4d
+```
+Use `vagrant-global-status --prune` to find the directory the vagrant VM is in and the ID of the machine.
