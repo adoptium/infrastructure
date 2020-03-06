@@ -16,7 +16,7 @@
 
 - name: Download Java 8
   win_get_url:
-    url: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl={{ bootjdk }}&os=windows&arch=x64&release=latest&type=jdk&heap_size={{ heapsize }}
+    url: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/windows/x64/jdk/{{ bootjdk }}/{{ heapsize }}/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-8.zip'
   when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
   tags: Java8
