@@ -159,6 +159,8 @@ playbook changes before they are merged. See the
 are run on jenkins in the
 [VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/) job
 
+Any additional help in setting up Vagrant with Virtualbox can be found [here](https://www.vagrantup.com/intro/getting-started/index.html)
+
 ## Vagrant setup guide - macOS
 
 To test the ansible scripts, you'll need to install the following programs.
@@ -197,8 +199,10 @@ to modify remote hosts.
 **NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from
 e.g. `~/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
 
+Within the `openjdk-infrastructure/ansible` directory:
+
 ```bash
-ln -s Vagrantfile.Centos6 Vagrantfile
+ln -sf Vagrantfile.Centos6 Vagrantfile
 
 vagrant up
 
@@ -225,7 +229,7 @@ ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zul
 The following method runs the ansible playbooks against a Vagrant VM remotely.
 
 ```bash
-ln -s Vagrantfile.CentOS6 Vagrantfile
+ln -sf Vagrantfile.CentOS6 Vagrantfile
 
 ssh-keygen -q -f id_rsa -t rsa -N '' # Generate a keypair for use between host and VM
 
@@ -250,7 +254,9 @@ To run the playbook against a Windows Vagrant VM remotely, the follow steps can 
 ```bash
 vagrant plugin install vagrant-disksize
 
-ln -s Vagrantfile.Win2012 Vagrantfile
+pip install pywinrm requests-credssp	# Pre-reqs for using winrm
+
+ln -sf Vagrantfile.Win2012 Vagrantfile
 
 vagrant up
 ```
