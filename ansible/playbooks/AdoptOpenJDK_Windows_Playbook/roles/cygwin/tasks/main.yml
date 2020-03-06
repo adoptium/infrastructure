@@ -30,7 +30,7 @@
                 --local-package-dir {{ Cygwin_PACKAGE_DIR }}
                 --root {{ Cygwin_ROOT_INST_DIR }}
                 --categories {{ Cygwin_CATEGORIES }}
-  when: (cygwin_installed.stat.exists == false)
+  when: (cygwin_installed.stat.exists == "false")
   tags: cygwin
 
 - name: Install Cygwin build extra packages
