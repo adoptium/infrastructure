@@ -16,8 +16,7 @@
   tags: patch_update
 
 - name: Enable EPEL release for CentOS8
-  shell: |
-    rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   ignore_errors: yes
   when:
     - ansible_architecture != "s390x"
@@ -25,7 +24,10 @@
   tags: patch_update
 
 - name: Enable CentOS-Powershell repo for CentOS8
-  shell: sed -i -e 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-PowerTools.repo
+  lineinfile:
+    path: /etc/yum.repos.d/CentOS-PowerTools.repo
+    regexp: '^enabled=0$'
+    line: 'enabled=1'
   ignore_errors: yes
   when:
     - ansible_distribution_major_version == "8"
@@ -174,13 +176,19 @@
 # Set Default Java #
 ####################
 - name: Create Java 8 Alternative
-  shell: alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk/bin/java 1
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+    priority: 1
   when:
     - ansible_architecture == "x86_64"
   tags: default_java
 
 - name: Set Default Java Version
-  shell: alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
   when:
     - ansible_architecture == "x86_64"
   tags: default_java
@@ -192,24 +200,34 @@
   shell: locale -a
   register: localeList
   changed_when: False
-  tags: locales
+  tags:
+    - locales
+    - skip_ansible_lint
 
 - name: Create Japanese locale
-  shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
+  locale_gen:
+    name: ja_JP.UTF-8
+    state: present
   when: localeList.stdout|lower is not search("ja_jp\.utf8")
   tags: locales
 
 - name: Create Korean locale
-  shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
+  locale_gen:
+    name: ko_KR.UTF-8
+    state: present
   when: localeList.stdout|lower is not search("ko_kr\.utf8")
   tags: locales
 
 - name: Create Chinese locale
-  shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
+  locale_gen:
+    name: zh_CN.UTF-8
+    state: present
   when: localeList.stdout|lower is not search("zh_cn\.utf8")
   tags: locales
 
 - name: Create Taiwanese locale
-  shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
+  locale_gen:
+    name: zh_TW.UTF-8
+    state: present
   when: localeList.stdout|lower is not search("zh_tw\.utf8")
   tags: locales

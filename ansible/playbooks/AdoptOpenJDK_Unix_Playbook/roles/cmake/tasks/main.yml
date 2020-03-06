@@ -12,7 +12,7 @@
     - skip_ansible_lint
 
 - name: Test if cmake is installed at the correct version
-  shell: cmake --version 2>/dev/null | grep version | awk '{print $3}'
+  shell: set -o pipefail | cmake --version 2>/dev/null | grep version | awk '{print $3}'
   when: cmake_installed.rc == 0
   register: cmake_version
   tags: cmake

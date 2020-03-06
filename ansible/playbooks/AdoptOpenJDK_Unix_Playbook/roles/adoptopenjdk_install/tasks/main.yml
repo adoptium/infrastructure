@@ -37,7 +37,7 @@
     owner: root
     mode: 0755
   when:
-    - usr_lib_jvm_exists.stat.exists != True
+    - usr_lib_jvm_exists.stat.exists != "True"
     - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
@@ -82,7 +82,7 @@
   tags: adoptopenjdk_install
 
 - name: Get {{ path }}* full path name
-  shell: ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
+  shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
   when:
     - adoptopenjdk_installed.rc != 0
