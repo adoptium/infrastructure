@@ -56,35 +56,21 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 4) The Ansible playbook will download and install any dependencies needed to build OpenJDK
 
-## How do I run the playbook against a Windows Machine?
+## How do I run the playbooks on a remote Windows host?
 
-As Ansible can't run on Windows, it has to be run on a seperate system (e.g. a Linux VM) and then pointed at a Windows machine
-You can do this by following these steps:
+Ansible can't be installed locally on a Windows machine, therefore the playbook has to be ran on a seperate system and then pointed at a Windows Machine.
 
-1) Run `vagrant plugin install vagrant-disksize`. This will install a plugin that allows the user to specify the disksize of the VM and is required to use the Windows Vagrantfile.
-2) `git clone "https://github.com/AdoptOpenJdk/openjdk-infrastructure/"`
-3) `ln -sf Vagrantfile.Win2012 Vagrantfile && vagrant up` in the cloned `openjdk-infrastructure/ansible` directory
-4) You can optionally edit `Vagantfile.Win2012` so the GUI is shown when running `vagrant up` by changing `v.gui = false` to `v.gui = true`, though this is not necessary to run the playbook.
-5) In `../ansible/playbooks/AdoptOpenJDK_Windows_Playbook/` a file called `hosts.tmp` will have been generated containing 2 IP addresses. Edit this file to remove the CRs and the lower IP address.
-6) Edit `../AdoptOpenJDK_Windows_Playbook/main.yml` so the `- hosts :{{ groups['Vendor_groups'] ... etc` becomes `- hosts: all`
-7) Add into `../AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` the line `ansible_winrm_transport: credssp`. You'll also need to uncomment and change `ansible_password: CHANGE_ME` to `ansible_password: vagrant`.
-8) From the `../ansible` directory, running `ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp -u vagrant --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` will start the playbook.
+This can be done by doing the following: 
 
-Alternatively, [pbTestScripts/vagrantPlaybookCheck.sh](pbTestScripts/vagrantPlaybookCheck.sh) will do this for you when executing `./testScript.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
+1) In `playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
+2) Alter `playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` to add `ansible_winrm_transport: credssp`. Uncomment and set `ansible_password` to your admin user's password.
+3) Create a `hosts` file containing the IP address of the Windows machine.
 
-Note: if using macOS Mojave, `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` will be required before starting the playbook and executing `testScript.sh`
+The playbook can then be run by executing the following, from the `openjdk-infrastructure/ansible` directory:
 
-## Can I have multiple VMs on different OSs?
-
-As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
-You can do this by following these steps:
-
-  1. Make a copy of the existing directory you have.
-  2. The `Vagrantfile` is a symmlink or copy of the Vagrantfile that is labelled with the desired OS (e.g. `VagrantFile.Ubuntu1804`)
-  3. Continue the vagrant functions as normal.
-
-To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into.
-Use `vagrant-global-status` to find out which VMs you have in each directory
+```bash
+ansible-playbook -i hosts -u ADMIN_USER --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+```
 
 ## Which playbook do I run?
 
@@ -168,10 +154,12 @@ PLAY RECAP *********************************************************************
 # Running via Vagrant and VirtualBox
 
 We have some automation for running under Vagrant which we use to validate
-playbook changes befor they are merged. See the
+playbook changes before they are merged. See the
 [pbTestScripts](pbTestScripts/) folder for more info. The scripts from there
 are run on jenkins in the
 [VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/) job
+
+Any additional help in setting up Vagrant with Virtualbox can be found [here](https://www.vagrantup.com/intro/getting-started/index.html)
 
 ## Vagrant setup guide - macOS
 
@@ -189,6 +177,8 @@ To test the ansible scripts, you'll need to install the following programs.
   ```bash
   brew cask install virtualbox
   ```
+
+Note: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` is required before running the playbook on macOS.
 
 ## Vagrant setup guide - Ubuntu (other Linuxes are similar)
 
@@ -209,8 +199,10 @@ to modify remote hosts.
 **NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from
 e.g. `~/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
 
+Within the `openjdk-infrastructure/ansible` directory:
+
 ```bash
-ln -s Vagrantfile.Centos6 Vagrantfile
+ln -sf Vagrantfile.Centos6 Vagrantfile
 
 vagrant up
 
@@ -227,13 +219,74 @@ Note when using our Vagrantfiles:
 
 `ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
 
-or
-
-`ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
-
 In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```bash
-ansible-playbook -i hosts -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+```
+## Using Ansible to modify Vagrant VM remote hosts (linux)
+
+The following method runs the ansible playbooks against a Vagrant VM remotely.
+
+```bash
+ln -sf Vagrantfile.CentOS6 Vagrantfile
+
+ssh-keygen -q -f id_rsa -t rsa -N '' # Generate a keypair for use between host and VM
+
+vagrant up
+```
+After starting the vagrant machine, several files need to be edited to allow ansible to make the connection.
+
+1) In `playbooks/AdoptOpenJDK_Unix_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
+2) Add `timeout=30` and `private_key_file=id_rsa` under the `[defaults]` section in `ansible.cfg`
+3) Alter the `playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp` file generated by the Vagrantfile to only contain the larger IP Address
+
+To start running the playbook against the VM, from the `openjdk-infrastructure/ansible` directory:
+
+```bash
+ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp -u vagrant -b --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
+## Using Ansible to modify Vagrant VM remote hosts (Windows)
+
+To run the playbook against a Windows Vagrant VM remotely, the follow steps can be taken: 
+
+```bash
+vagrant plugin install vagrant-disksize
+
+pip install pywinrm requests-credssp	# Pre-reqs for using winrm
+
+ln -sf Vagrantfile.Win2012 Vagrantfile
+
+vagrant up
+```
+
+Several files will also need to be edited for Windows:
+
+1) In `playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
+2) Alter the `playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp` file generated by the Vagrantfile to remove the CRs and only contain the larger IP Address
+3) Alter `playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` to add `ansible_winrm_transport: credssp`. Uncomment and set `ansible_password` to `vagrant`
+
+To run the playbook against the VM, from the `openjdk-infrastructure/ansible` directory:
+
+```bash
+ansible-playbook -i playbooks/AdoptOpenJDK_Windows_playbook/hosts.tmp -u vagrant --skip-tags jenkins,adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+```
+
+Alternatively, [pbTestScripts/vagrantPlaybookCheck.sh](pbTestScripts/vagrantPlaybookCheck.sh) will do this for you when executing `./vagrantPlaybookCheck.sh -v Win2012 -u https://github.com/adoptopenjdk/openjdk-infrastructure --retainVM`
+
+## Can I have multiple VMs on different OSs?
+
+As vagrant uses Virtualbox to create VMs, multiple VMs on different OSs can be setup.
+You can do this by following these steps:
+
+  1. Make a copy of the existing directory you have.
+  2. The `Vagrantfile` is a symlink or copy of the Vagrantfile that is labelled with the desired OS (e.g. `VagrantFile.Ubuntu1804`)
+  3. Continue the vagrant functions as normal.
+
+To access each vagrant VM, you'll need to be in the correct directory to `vagrant ssh` into, or the ID of the machine can be used:
+
+```bash
+vagrant ssh 1a2b3c4d
+```
+Use `vagrant-global-status --prune` to find the directory the vagrant VM is in and the ID of the machine.
