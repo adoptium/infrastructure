@@ -46,6 +46,8 @@ hosts:
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
           rhel77-s390x-2: {ip: 148.100.86.218, user: linux1}
+          rhel77-s390x-3: {ip: 148.100.244.180, user: linux1}
+          rhel77-s390x-4: {ip: 148.100.245.197, user: linux1}
           ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
           zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
           zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
@@ -69,6 +71,7 @@ hosts:
       - softlayer:
           win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
           win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
+          centos6-x64-1: {ip: 52.117.29.5}
 
   - perf:
 
