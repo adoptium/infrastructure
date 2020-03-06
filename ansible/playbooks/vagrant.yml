@@ -80,7 +80,17 @@
             - ansible_architecture == "x86_64"
 
         - name: Assign JDK-8 as default java
-          shell: ln -sf /usr/lib/jvm/jdk8*/bin/java /usr/bin/java && ln -sf /usr/lib/jvm/jdk8*/bin/javac /usr/bin/javac
+          file:
+            src: /usr/lib/jvm/jdk8*/bin/java
+            dest: /usr/bin/java
+            state: link
+          when: default_java.rc != 0
+
+        - name: Assign JDK-8 as default javac
+          file:
+            src: ln -sf /usr/lib/jvm/jdk8*/bin/javac
+            dest: /usr/bin/javac
+            state: link
           when: default_java.rc != 0
 
       ###########
@@ -111,11 +121,15 @@
           shell: git --version >/dev/null 2>&1
           ignore_errors: yes
           register: git_installed
+          tags:
+            - skip_ansible_lint
 
         - name: Test if Git is installed at the correct version
           shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
           when: git_installed.rc == 0
           register: git_version
+          tags:
+            - skip_ansible_lint
 
         - name: Download Git Source
           get_url:
@@ -148,7 +162,10 @@
             - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
 
         - name: Symlink git to /usr/bin/git
-          shell: ln -sf /tmp/git-2.15.0/git /usr/bin/git
+          file:
+            src: /tmp/git-2.15.0/git
+            dest: /usr/bin/git
+            state: link
           when:
             - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
 

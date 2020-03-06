@@ -7,6 +7,8 @@
   shell: pkg-config --version | grep 0.29.2
   ignore_errors: yes
   register: pkg_config_installed
+  tags:
+    - skip_ansible_lint
 
 - name: Download newer version of pkg-config tar
   get_url:
@@ -31,3 +33,5 @@
 
 - name: export PKG_CONFIG_PATH=/usr/local/bin
   shell: export PKG_CONFIG_PATH=/usr/local/bin
+  tags:
+    - skip_ansible_lint
