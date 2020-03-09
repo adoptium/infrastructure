@@ -95,6 +95,7 @@
             dest: "/home/{{ Jenkins_Username }}/openjdk-test-tools"
             update: yes
             force: yes
+          tags: skip_ansible_lint
 
         - name: Change owner permissions
           file:

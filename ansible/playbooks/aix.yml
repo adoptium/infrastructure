@@ -648,7 +648,7 @@
 
         - debug:
             msg: "ant-contrib.jar installed, skipping download"
-          when: antcontrib.stat.exists == True
+          when: antcontrib.stat.exists == "True"
           tags: ant-contrib
 
         - name: Download and extract ant-contrib
@@ -656,12 +656,12 @@
             src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
             dest: /tmp/
             remote_src: yes
-          when: antcontrib.stat.exists == False
+          when: antcontrib.stat.exists == "False"
           tags: ant-contrib
 
         - name: Move ant-contrib.jar to lib folder
           command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
-          when: antcontrib.stat.exists == False
+          when: antcontrib.stat.exists == "False"
           tags: ant-contrib
 
         - name: Clean ant-contrib tmp files
@@ -821,7 +821,7 @@
 
         - debug:
             msg: "freemarker.jar found, skipping download"
-          when: freemarker.stat.exists == True
+          when: freemarker.stat.exists == "True"
           tags: freemarker
 
         - name: Download and extract freemarker.jar
@@ -832,12 +832,12 @@
             owner: "{{ Jenkins_Username }}"
             group: staff
             mode: 0755
-          when: freemarker.stat.exists == False
+          when: freemarker.stat.exists == "False"
           tags: freemarker
 
         - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
           command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-          when: freemarker.stat.exists == False
+          when: freemarker.stat.exists == "False"
           tags: freemarker
 
         - name: Clean freemarker tmp files
@@ -957,10 +957,10 @@
             swap_line=$(lsps -a | tail -n 1)
             curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
             swap_lv=$(echo $swap_line | awk '{print $1}')
-            if [[ $curr_swap_size -lt {{swap_size}} ]]
+            if [[ $curr_swap_size -lt {{ swap_size }} ]]
             then
               echo "Extending swap LV..."
-              extendlv $swap_lv $(expr {{swap_size}} - $curr_swap_size)M
+              extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
             fi
           register: extendlv_result
           changed_when: "'Extending' in extendlv_result.stdout"
