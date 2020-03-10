@@ -18,14 +18,14 @@
   win_get_url:
     url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
-  when: (java_download.stat.exists == "false") and (java_installed.stat.exists == "false")
+  when: (not java_download.stat.exists) and (not java_installed.stat.exists)
   tags: Java_install
 
 - name: Install Java{{ jdk_version }}
   win_unzip:
     src: C:\temp\jdk-{{ jdk_version }}.zip
     dest: C:\Program Files\Java
-  when: (java_installed.stat.exists == "false")
+  when: (not java_installed.stat.exists)
   tags: Java_install
 
 - name: Create symlink to directory without spaces if not already there

@@ -7,7 +7,7 @@
 # Workaround for Ansible not detecting cores #
 ##############################################
 - name: Get number of cores on FreeBSD
-  shell: ysctl hw.ncpu | awk '{print $2}'
+  shell: sysctl hw.ncpu | awk '{print $2}'
   register: freebsd_cores
   tags:
     - skip_ansible_lint

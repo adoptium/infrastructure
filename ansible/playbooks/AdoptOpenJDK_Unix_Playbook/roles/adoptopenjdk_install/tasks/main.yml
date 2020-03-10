@@ -37,7 +37,7 @@
     owner: root
     mode: 0755
   when:
-    - usr_lib_jvm_exists.stat.exists != "True"
+    - not usr_lib_jvm_exists.stat.exists
     - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 

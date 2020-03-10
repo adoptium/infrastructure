@@ -27,10 +27,10 @@
   tags: SUSE_gcc48
 
 - name: Sed change gpgcheck for gcc repo on x86_64
-  lineinfile:
+  replace:
     path: /etc/zypp/repos.d/devel_gcc.repo
-    regexp: '^gpgcheck=1$'
-    line: 'gpgcheck=0'
+    regexp: 'gpgcheck=1'
+    replace: "gpgcheck=0"
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
   tags: SUSE_gcc48
@@ -38,7 +38,6 @@
 - name: Install gcc48
   zypper:
     name: gcc48
-    extra_args: "--force-resolution"
     extra_args_precommand: "-non-interactive"
     state: present
   when:
@@ -146,7 +145,7 @@
     state: directory
     owner: root
     mode: 0755
-  when: usr_lib_jvm_exists.stat.exists != "True"
+  when: not usr_lib_jvm_exists.stat.exists
   tags: java8_SUSE
 
 - name: Check if jdk-8 is already installed in the target location
@@ -201,7 +200,7 @@
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == "false"
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Extract expat
@@ -211,7 +210,7 @@
     copy: False
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == "false"
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Running ./configure & make for expat on Linux x86-64
@@ -219,5 +218,5 @@
   become: yes
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == "false"
+    - not expat_installed.stat.exists
   tags: expat

@@ -17,7 +17,7 @@
   set_fact:
     CC: "/usr/bin/gcc-7"
     CXX: "/usr/bin/g++-7"
-  when: gcc7.stat.exists == "True"
+  when: gcc7.stat.exists
   tags: protobuf
 
 - name: Checking for devtools-7 installation
@@ -28,7 +28,7 @@
   set_fact:
     CC: "/opt/rh/devtoolset-7/root/usr/bin/gcc"
     CXX: "/opt/rh/devtoolset-7/root/usr/bin/g++"
-  when: gcc7.stat.exists == "True"
+  when: gcc7.stat.exists
   tags: protobuf
 
 - name: Checking for gcc-7.5 binary installation
@@ -39,7 +39,7 @@
   set_fact:
     CC: "/usr/local/gcc/bin/gcc-7.5"
     CXX: "/usr/local/gcc/bin/g++-7.5"
-  when: gcc7.stat.exists == "True"
+  when: gcc7.stat.exists
   tags: protobuf
 
 - debug:
@@ -70,7 +70,7 @@
     checksum: sha256:97f6cdaa0724d5a8cd3375d5f5cf4bd253d5ad5291154f533ed0d94a9d501ef3
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
+    - not protobuf_status.stat.exists
   tags: protobuf
 
 - name: Extract Protocol Buffers v3.7.1
@@ -80,14 +80,14 @@
     copy: False
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
+    - not protobuf_status.stat.exists
   tags: protobuf
 
 - name: Check if the linker search paths contains /usr/local/lib
   command: ldconfig -p | grep /usr/local/lib
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
+    - not protobuf_status.stat.exists
   register: linker_search_path
   ignore_errors: True
   tags: protobuf
@@ -99,8 +99,8 @@
     create: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
-    - linker_search_path.stdout  | length == 0
+    - not protobuf_status.stat.exists
+    - not linker_search_path.stdout
   tags: protobuf
 
 - name: Build and install Protocol Buffers v3.7.1
@@ -110,7 +110,7 @@
     - CXX: "{{ CXX }}"
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
+    - not protobuf_status.stat.exists
   tags: protobuf
 
 - name: Remove downloaded packages for Protocol Buffers v3.7.1
@@ -123,5 +123,5 @@
   ignore_errors: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
-    - protobuf_status.stat.exists == "False"
+    - not protobuf_status.stat.exists
   tags: protobuf

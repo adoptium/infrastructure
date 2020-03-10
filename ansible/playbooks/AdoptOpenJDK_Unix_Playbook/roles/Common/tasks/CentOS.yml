@@ -24,10 +24,10 @@
   tags: patch_update
 
 - name: Enable CentOS-Powershell repo for CentOS8
-  lineinfile:
+  replace:
     path: /etc/yum.repos.d/CentOS-PowerTools.repo
-    regexp: '^enabled=0$'
-    line: 'enabled=1'
+    regexp: 'enabled=0'
+    replace: "enabled=1"
   ignore_errors: yes
   when:
     - ansible_distribution_major_version == "8"
@@ -183,6 +183,18 @@
     priority: 1
   when:
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version != "6"
+  tags: default_java
+
+- name: Create Java 8 Alternative (for CentOS6)
+  alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/java
+    priority: 1
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version == "6"
   tags: default_java
 
 - name: Set Default Java Version
@@ -191,6 +203,16 @@
     path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
   when:
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version != "6"
+  tags: default_java
+
+- name: Set Default Java Version (for CentOS6)
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/java
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version == "6"
   tags: default_java
 
 ###########
