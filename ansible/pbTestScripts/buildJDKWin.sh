@@ -22,8 +22,8 @@ processArgs() {
 
 	checkJDKVersion $JAVA_TO_BUILD
 	if [ -z "${WORKSPACE:-}" ]; then
-        	echo "WORKSPACE not found, setting it as environment variable 'HOME'"
-        	WORKSPACE=$HOME
+        	echo "WORKSPACE not found, setting it as to C:/ drive"
+        	WORKSPACE=C:/
 	fi
 	if [ $CLEAN_WORKSPACE == true ]; then
 		echo "Cleaning workspace"
@@ -133,4 +133,5 @@ echo "DEBUG:
         WORKSPACE=$WORKSPACE
         GIT_URL=$GIT_URL"	
 
-/cygdrive/c/openjdk-build/build-farm/make-adopt-build-farm.sh
+echo "Running $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh"
+$WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh
