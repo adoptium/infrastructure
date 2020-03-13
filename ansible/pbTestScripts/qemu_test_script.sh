@@ -4,6 +4,8 @@
 
 ARCHITECTURE=""
 skipFullSetup=""
+gitURL="https://github.com/adoptopenjdk/openjdk-infrastructure"
+gitBranch="master"
 PORTNO=10022
 if [ "$EXECUTOR_NUMBER" ]; then
   PORTNO=1002$EXECUTOR_NUMBER
@@ -33,6 +35,10 @@ processArgs() {
 				retainVM=true;;
 			"--test" | "-t" )
 				testJDK=true;;
+			"--infra-repo" | "-ir" )
+				gitURL="$1"; shift;;
+			"--infra-branch" | "-ib" )
+				gitBranch=$1; shift;;
 			"--skip-more" | "-sm" )
 				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -47,6 +53,10 @@ usage() {
 		--currentDir | -c		Set Workspace to directory of this script
 		--clean-workspace | -cw		Removes the old work folder (including logs)
 		--help | -h 			Shows this help message
+		--infra-repo | -ir		Which openjdk-infrastructure to retrieve the playbooks (default: www.github.com/adoptopenjdk/openjdk-infrastructure)
+		--infra-branch | -ib		Specify the branch of the infra-repo (default: master)
+		--retainVM | -r			Retain the VM once running the playbook
+		--skip-more | -sm		Skip non-essential roles from the playbook
 		--test | -t			Test the built JDK
 		"	
 	showArchList
@@ -80,7 +90,6 @@ defaultVars() {
 
 showArchList() {
 	echo "Currently supported architectures:
-	- arm64
 	- ppc64le
 	- s390x"
 }
@@ -91,7 +100,7 @@ setupWorkspace() {
 	local workFolder=$WORKSPACE/qemu_pbCheck
 	# Images are in this consistent place on the 'vagrant' jenkins machines
 #	local imageLocation="/qemu_base_images$HOME/qemu_images/"
-	local imageLocation="/qemu_base_images/"
+	local imageLocation="/qemu_base_images"
 	
 	mkdir -p "$workFolder"/logFiles
 	if [[ "$cleanWorkspace" = true ]]; then
@@ -102,7 +111,7 @@ setupWorkspace() {
 	fi
 	if [[ ! -f "${workFolder}/${ARCHITECTURE}.dsk" ]]; then 
 		echo "Copying new disk image"
-        	xz -cd "$imageLocation"/"$ARCHITECTURE".dsk.xz > "$workFolder"/"$ARCHITECTURE".dsk
+		xz -cd "$imageLocation"/"$ARCHITECTURE".dsk.xz > "$workFolder"/"$ARCHITECTURE".dsk
 		# Arm64 requires the initrd and kernel files to boot
 		if [[ "$ARCHITECTURE" == "ARM64" ]]; then
 			echo "ARM64 - copy additional files"
@@ -120,7 +129,7 @@ local workFolder="$WORKSPACE/qemu_pbCheck"
 
 # Find/stop port collisions
 # while ps -aux | grep "$PORTNO" | grep -q -v "grep"; do
-while netstat -lp 2>/dev/null | grep "tcp.*:$PORTNO " > /dev/nulln; do
+while netstat -lp 2>/dev/null | grep "tcp.*:$PORTNO " > /dev/null; do
   ((PORTNO++))
 done
 	echo "Using Port: $PORTNO"
@@ -172,7 +181,7 @@ done
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 
-	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone https://github.com/adoptopenjdk/openjdk-infrastructure "$workFolder"/openjdk-infrastructure
+	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone -b "$gitBranch" "$gitURL" "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$workFolder"/logFiles/"$ARCHITECTURE".log
 	if grep -q 'failed=[1-9]\|unreachable=[1-9]' "$workFolder"/logFiles/"$ARCHITECTURE".log; then
