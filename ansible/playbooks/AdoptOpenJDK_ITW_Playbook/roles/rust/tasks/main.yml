@@ -7,6 +7,8 @@
   shell: rustc --version | grep 1.34.1
   ignore_errors: yes
   register: rust_installed
+  tags:
+    - skip_ansible_lint
 
 - name: Download Rust 1.34.1 tar
   get_url:
