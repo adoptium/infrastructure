@@ -37,7 +37,7 @@ script:
   - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
   - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_ITW_Playbook/main.yml
   - ansible-lint -x 403,204 playbooks/aix.yml
-  - ansible-lint -x 403.204 playbooks/vagrant.yml
+  - ansible-lint -x 403,204 playbooks/vagrant.yml
   - ansible-lint -x 403,204 playbooks/ubuntu-jck.yml
 
     # Check Playbook syntax.
