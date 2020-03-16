@@ -199,7 +199,7 @@
     - ansible_architecture == "aarch64"
   tags: default_java
 
-- name: Set default java version - RHEL 7 ppc64le
+- name: Set default java version - RHEL 7 s390x
   alternatives:
     name: java
     path: java-1.8.0-openjdk.s390x
@@ -219,6 +219,7 @@
 ###########
 # Locales #
 ###########
+# Skipping linting as no alternative to shell can be used (lint error 305)
 - name: Get locale list
   shell: locale -a
   register: localeList

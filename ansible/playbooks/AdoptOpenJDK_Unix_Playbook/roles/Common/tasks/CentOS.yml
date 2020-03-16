@@ -218,6 +218,8 @@
 ###########
 # Locales #
 ###########
+
+# Skipping linting as no alternative to shell can be used (lint error 305)
 - name: Get locale list
   shell: locale -a
   register: localeList

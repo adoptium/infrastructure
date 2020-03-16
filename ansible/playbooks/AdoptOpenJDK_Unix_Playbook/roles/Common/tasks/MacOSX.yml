@@ -4,6 +4,7 @@
 # Updates all packages for macos-based distributions
 #
 
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Check for xcode-tools
   raw: xcode-select --print-path &> /dev/null
   register: xcode
@@ -44,6 +45,7 @@
   homebrew_tap:
     name: AdoptOpenJDK/openjdk
 
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
   become: yes
   become_user: "{{ ansible_user }}"
@@ -95,7 +97,7 @@
       kern.sysv.shmmax=125839605760
       kern.sysv.shmall=30722560
   register: kernel
-
+# Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:
     reboot_timeout: 3600

@@ -29,6 +29,7 @@
     - ansible_architecture != "armv7l"
   tags: patch_update
 
+# Required as 'Ubuntu Jessie' doesn't exist. See openjdk-infrastructure issue #1015
 - name: Change Jessie to Trusty in the sources files
   replace:
     path: "{{ item }}"

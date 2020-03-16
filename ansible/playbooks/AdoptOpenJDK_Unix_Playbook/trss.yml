@@ -88,7 +88,8 @@
             - forever-service
             - yarn
           tags: forever
-
+        
+        # Skipping linting as we want the latest checkouts (lint error 401)
         - name: Git Clone openjdk-test-tools.git
           git:
             repo: 'https://github.com/AdoptOpenJDK/openjdk-test-tools.git'
