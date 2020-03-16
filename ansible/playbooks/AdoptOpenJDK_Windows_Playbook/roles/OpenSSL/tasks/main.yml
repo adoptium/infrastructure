@@ -8,10 +8,16 @@
   register: openssl32_installed
   tags: openssl
 
-- name: Check if OpenSSL 64bit installed
+- name: Check if OpenSSL 64bit VS2013 installed
   win_stat:
     path: C:\openjdk\OpenSSL-1.1.1d-x86_64
   register: openssl64_installed
+  tags: openssl
+
+- name: Check if OpenSSL 64bit VS2017 installed
+  win_stat:
+    path: C:\openjdk\OpenSSL-1.1.1d-x86_64.VS2017
+  register: openssl64_VS2017_installed
   tags: openssl
 
 - name: Download OpenSSL-1.1.1d
@@ -21,6 +27,15 @@
     checksum: 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
     checksum_algorithm: sha256
   when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists)
+  tags: openssl
+
+- name: Retrieve OpenSSL-1.1.1d 64-bit (VS2017)
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/OpenSSL111win/OpenSSL111d-64bitVS2017.tgz
+    dest: C:\temp\openssl-1.1.1d-VS2017.tar.gz
+    checksum: 60ef36d98a369ad9086347b0cfb87816c472ac4b048e5aea178134e8ab82e0b1
+    checksum_algorithm: sha256
+  when: (not openssl64_VS2017_installed.stat.exists)
   tags: openssl
 
 - name: Unpack OpenSSL-1.1.1d for installation
@@ -47,11 +62,22 @@
   when: (not openssl64_installed.stat.exists)
   tags: openssl
 
+- name: Unpack OpenSSL-1.1.1d 64-bit (VS2017)
+  win_shell: |
+    cd C:\temp
+    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d-VS2017.tar.gz
+    cd C:\openjdk
+    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d-VS2017.tar
+  when: (not openssl64_VS2017_installed.stat.exists)
+  tags: openssl
+
 - name: Cleanup OpenSSL source files
   win_file:
     path: C:\temp\{{ item }}
     state: absent
   with_items:
+    - openssl-1.1.1d-VS2017.tar.gz
+    - openssl-1.1.1d-VS2017.tar
     - openssl-1.1.1d.tar.gz
     - openssl-1.1.1d.tar
     - openssl-1.1.1d

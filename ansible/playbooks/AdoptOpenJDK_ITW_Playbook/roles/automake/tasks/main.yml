@@ -7,7 +7,8 @@
   shell: automake --version | grep 1.13.1
   ignore_errors: yes
   register: automake_installed
-  tags: skip_ansible_lint
+  tags:
+    - skip_ansible_lint
 
 - name: Download latest automake tar
   get_url:

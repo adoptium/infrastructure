@@ -30,15 +30,22 @@ script:
   - yamllint -c yamllint.yml .
 
     # Ansible code static analysis
+
   - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbooks/trss.yml
   - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
   - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_ITW_Playbook/main.yml
   - ansible-lint -x 403,204 playbooks/aix.yml
+  - ansible-lint -x 403.204 playbooks/vagrant.yml
   - ansible-lint -x 403,204 playbooks/ubuntu-jck.yml
 
     # Check Playbook syntax.
   - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
+  - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/trss.yml --syntax-check
   - ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
   - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml --syntax-check
+  - ansible-playbook playbooks/AdoptOpenJDK_ITW_Playbook/main.yml --syntax-check
+  - ansible-playbook playbooks/vagrant.yml --syntax-check
   - ansible-playbook playbooks/aix.yml --syntax-check
   - ansible-playbook playbooks/ubuntu-jck.yml --syntax-check

@@ -161,6 +161,14 @@
           when:
             - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
 
+        - name: Symlink git to /usr/bin/git
+          file:
+            src: /tmp/git-2.15.0/git
+            dest: /usr/bin/git
+            state: link
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+
       ###########
       # Vagrant #
       ###########
