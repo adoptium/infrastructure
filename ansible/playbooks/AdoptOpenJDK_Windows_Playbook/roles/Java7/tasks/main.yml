@@ -21,7 +21,7 @@
     dest: 'C:\temp\jdk7u75-b13.zip'
     checksum: 505a6a2440ae2d48e61a50049f0bb9fce789ab4618953e0c72e07c5987b725ab
     checksum_algorithm: sha256
-  when: (java7_download.stat.exists == false) and (java7_installed.stat.exists == false)
+  when: (not java7_download.stat.exists) and (not java7_installed.stat.exists)
   tags: Java7
 
 - name: Install Java 7
@@ -29,7 +29,7 @@
     src: C:\temp\jdk7u75-b13.zip
     dest: C:\Program Files\Java
     delete_archive: yes
-  when: (java7_installed.stat.exists == false)
+  when: (not java7_installed.stat.exists)
   tags: Java7
 
 - name: Test if Java 7 symlink is already created
@@ -40,5 +40,5 @@
 
 - name: Create symlink to Java 7
   raw: cmd /c mklink /D "C:\openjdk\jdk7" "C:\Program Files\Java\java-se-7u75-ri"
-  when: (java7_symlink.stat.exists == false)
+  when: (not java7_symlink.stat.exists)
   tags: Java7

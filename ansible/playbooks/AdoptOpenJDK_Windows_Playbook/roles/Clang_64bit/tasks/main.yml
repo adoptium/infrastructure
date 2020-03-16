@@ -17,12 +17,12 @@
     force: no
     checksum: 74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6
     checksum_algorithm: sha256
-  when: clang_64bit_installed.stat.exists == false
+  when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
 - name: Install Clang 64bit
   win_command: 'c:\temp\LLVM-7.0.0-win64.exe /S'
-  when: clang_64bit_installed.stat.exists == false
+  when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
 - name: Test if LLVM64 symlink is already created
@@ -33,7 +33,7 @@
 
 - name: Create symlink to C:\openjdk\LLVM64
   raw: cmd /c mklink /D "C:\openjdk\LLVM64" "C:\Program Files\LLVM"
-  when: (llvm64_symlink.stat.exists == false)
+  when: not llvm64_symlink.stat.exists
   tags: clang_64bit
 
 - name: Cleanup Clang 64bit installer

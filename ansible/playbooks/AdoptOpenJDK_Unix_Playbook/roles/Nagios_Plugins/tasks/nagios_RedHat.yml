@@ -12,10 +12,11 @@
 ###############
 # Nagios user #
 ###############
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Allow Nagios to use yum while restricting it to check-update only
   shell: |
     echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
-  tags: [nagios_plugins, adoptopenjdk]
+  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 # Can't find nagios-plugins-all on RHEL74/s390x so removing this
 # ###################

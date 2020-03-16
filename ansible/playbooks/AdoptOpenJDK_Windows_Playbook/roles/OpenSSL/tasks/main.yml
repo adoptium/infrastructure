@@ -26,7 +26,7 @@
     dest: C:\temp\openssl-1.1.1d.tar.gz
     checksum: 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
     checksum_algorithm: sha256
-  when: (openssl32_installed.stat.exists == false) or (openssl64_installed.stat.exists == false)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists)
   tags: openssl
 
 - name: Retrieve OpenSSL-1.1.1d 64-bit (VS2017)
@@ -43,7 +43,7 @@
     cd C:\temp
     C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d.tar.gz
     C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d.tar
-  when: (openssl32_installed.stat.exists == false) or (openssl64_installed.stat.exists == false)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists)
   tags: openssl
 
 - name: Install OpenSSL-1.1.1d 32-bit
@@ -51,7 +51,7 @@
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools'
     executable: cmd
-  when: (openssl32_installed.stat.exists == false)
+  when: (not openssl32_installed.stat.exists)
   tags: openssl
 
 - name: Install OpenSSL-1.1.1d 64-bit
@@ -59,7 +59,7 @@
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC'
     executable: cmd
-  when: (openssl64_installed.stat.exists == false)
+  when: (not openssl64_installed.stat.exists)
   tags: openssl
 
 - name: Unpack OpenSSL-1.1.1d 64-bit (VS2017)

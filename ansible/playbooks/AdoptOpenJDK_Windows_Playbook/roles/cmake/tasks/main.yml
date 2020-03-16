@@ -16,13 +16,13 @@
     force: no
     checksum: 8b0cbfc6be83e31a058c8ef282fe204862809ffcd8788bc19a8f0eb457f71187
     checksum_algorithm: sha256
-  when: (cmake_installed.stat.exists == false)
+  when: (not cmake_installed.stat.exists)
   tags: cmake
 
 - name: Install cmake
   raw: C:\temp\cmake.msi /quiet
   ignore_errors: yes
-  when: (cmake_installed.stat.exists == false)
+  when: (not cmake_installed.stat.exists)
   tags: cmake
 
 - name: Cleanup cmake

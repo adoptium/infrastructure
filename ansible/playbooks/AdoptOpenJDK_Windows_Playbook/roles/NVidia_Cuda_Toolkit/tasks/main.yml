@@ -14,19 +14,19 @@
     dest: 'C:\temp\cuda_9.0.176_windows_network-exe.exe'
     checksum: ab1c3d046d43e8c190f74a6a4ea94b2e87b9be4c8bc0e67304e460fc0d7caccc
     checksum_algorithm: sha256
-  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
   win_shell: C:\temp\cuda_9.0.176_windows_network-exe.exe -s compiler_9.0 nvml_dev_9.0
-  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
 - name: Cleanup NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
   win_file:
     path: C:\temp\cuda_9.0.176_windows_network-exe.exe
     state: absent
-  when: (cuda_installed.stat.exists == false) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
+  when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
 - name: Download NVidia CUDA toolkit - Windows 10 and Server 2016
@@ -35,17 +35,17 @@
     dest: 'C:\temp\cuda_9.0.176_win10_network-exe.exe'
     checksum: 9a2f4bc524437b0b46e6374d69976bfda431c4d55c247078fb1fcad410573b15
     checksum_algorithm: sha256
-  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 10 and Server 2016
   win_shell: C:\temp\cuda_9.0.176_win10_network-exe.exe -s compiler_9.0 nvml_dev_9.0
-  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 
 - name: Cleanup NVidia CUDA toolkit - Windows 10 and Server 2016
   win_file:
     path: C:\temp\cuda_9.0.176_win10_network-exe.exe
     state: absent
-  when: (cuda_installed.stat.exists == false and ansible_distribution_major_version == "10")
+  when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit

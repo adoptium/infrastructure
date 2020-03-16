@@ -4,7 +4,7 @@
 ###################################################
 
 - name: Test if OpenSSL v1.0.2r is installed
-  shell: export LD_LIBRARY_PATH=/usr/local/openssl-1.0.2/lib &&  /usr/local/openssl-1.0.2/bin/openssl version | awk '{print $2}' | cut -c 1-5
+  shell: set -o pipefail | export LD_LIBRARY_PATH=/usr/local/openssl-1.0.2/lib &&  /usr/local/openssl-1.0.2/bin/openssl version | awk '{print $2}' | cut -c 1-5
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian" or ansible_distribution == "openSUSE")
   register: openssl_version
@@ -20,7 +20,7 @@
     checksum: sha256:ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian" or ansible_distribution == "openSUSE")
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
+    - ((not openssl_version.stdout) or ((openssl_version.stdout) and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Extract OpenSSL v1.0.2r
@@ -30,14 +30,14 @@
     copy: False
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian" or ansible_distribution == "openSUSE")
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
+    - ((not openssl_version.stdout) or ((openssl_version.stdout) and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Build and install OpenSSL v1.0.2r
   shell: cd /tmp/openssl-1.0.2r && ./config --prefix=/usr/local/openssl-1.0.2 shared && make && make install
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian" or ansible_distribution == "openSUSE")
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
+    - ((not openssl_version.stdout) or ((openssl_version.stdout) and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl
 
 - name: Remove downloaded packages for OpenSSL v1.0.2r
@@ -50,5 +50,5 @@
   ignore_errors: yes
   when:
     - (ansible_distribution_major_version == "6" and (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") or ansible_distribution == "Debian" or ansible_distribution == "openSUSE")
-    - ((openssl_version.stdout == '') or ((openssl_version.stdout != '') and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
+    - ((not openssl_version.stdout) or ((openssl_version.stdout) and (openssl_version.stdout is version_compare('1.0.2', operator='lt', strict=True))))
   tags: openssl

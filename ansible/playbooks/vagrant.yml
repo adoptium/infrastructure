@@ -88,7 +88,7 @@
 
         - name: Assign JDK-8 as default javac
           file:
-            src: ln -sf /usr/lib/jvm/jdk8*/bin/javac
+            src: /usr/lib/jvm/jdk8*/bin/javac
             dest: /usr/bin/javac
             state: link
           when: default_java.rc != 0

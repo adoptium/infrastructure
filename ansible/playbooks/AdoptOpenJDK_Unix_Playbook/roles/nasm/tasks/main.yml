@@ -19,7 +19,7 @@
 - name: Setting CC to /usr/bin/gcc-7 if found
   set_fact:
     CC: "/usr/bin/gcc-7"
-  when: gcc7.stat.exists == True and CC is not defined
+  when: gcc7.stat.exists and CC is not defined
   tags: nasm
 
 - name: Checking for devtools-7 installation
@@ -29,7 +29,7 @@
 - name: Setting CC to devtools-7 if found
   set_fact:
     CC: "/opt/rh/devtoolset-7/root/usr/bin/gcc"
-  when: gcc7.stat.exists == True and CC is not defined
+  when: gcc7.stat.exists and CC is not defined
   tags: nasm
 
 - name: Checking for gcc-7.3 binary installation
@@ -39,7 +39,7 @@
 - name: Setting CC to gcc-7.3 binary found
   set_fact:
     CC: "/usr/local/gcc/bin/gcc-7.3"
-  when: gcc7.stat.exists == True and CC is not defined
+  when: gcc7.stat.exists and CC is not defined
   tags: nasm
 
 - debug:
@@ -60,7 +60,7 @@
   tags: nasm
 
 - name: Capture nasm is installed version
-  shell: nasm --version 2>/dev/null | grep version | awk '{print $3}'
+  shell: set -o pipefail | nasm --version 2>/dev/null | grep version | awk '{print $3}'
   when:
     - (nasm_installed.rc is defined) and (nasm_installed.rc == 0 )
   register: nasm

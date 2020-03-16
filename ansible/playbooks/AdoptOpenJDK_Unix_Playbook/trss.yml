@@ -89,12 +89,14 @@
             - yarn
           tags: forever
 
+        # Skipping linting as we want the latest checkouts (lint error 401)
         - name: Git Clone openjdk-test-tools.git
           git:
             repo: 'https://github.com/AdoptOpenJDK/openjdk-test-tools.git'
             dest: "/home/{{ Jenkins_Username }}/openjdk-test-tools"
             update: yes
             force: yes
+          tags: skip_ansible_lint
 
         - name: Change owner permissions
           file:

@@ -6,7 +6,8 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
-- zypper_repository:
+- name: Add Devel-Tools repository (SLES12, x86_64/ppc64le)
+  zypper_repository:
     name: devel-tools
     repo: 'https://download.opensuse.org/repositories/devel:/tools/SLE_12_SP4/'
     auto_import_keys: yes
@@ -16,7 +17,8 @@
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: patch_update
 
-- zypper_repository:
+- name: Add Devel-Tools repository (SLES12, s390x)
+  zypper_repository:
     name: devel-tools
     repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Factory_zSystems/'
     auto_import_keys: yes
@@ -25,7 +27,8 @@
     - (ansible_distribution_major_version == "12" and ansible_architecture == "s390x")
   tags: patch_update
 
-- zypper_repository:
+- name: Add Devel-Tools repository (SLES15)
+  zypper_repository:
     name: devel-tools
     repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15/"
     auto_import_keys: yes
@@ -143,7 +146,7 @@
     validate_certs: no
   when:
     - ansible_distribution_major_version == "11"
-    - java8_installed.stat.exists == false
+    - not java8_installed.stat.exists
   tags: java8_SLES11
 
 - name: Create IBM Java 8 response file
@@ -153,17 +156,35 @@
     echo "LICENSE_ACCEPTED=TRUE" >> /tmp/ibm-java.response.properties
   when:
     - ansible_distribution_major_version == "11"
-    - java8_installed.stat.exists == false
+    - not java8_installed.stat.exists
+  tags: java8_SLES11
+
+- name: Make /opt/ibm dir
+  file:
+    path: /opt/ibm
+    state: directory
+    mode: '0755'
+  when:
+    - ansible_distribution_major_version == "11"
+    - not java8_installed.stat.exists
+  tags: java8_SLES11
+
+- name: chmod +x /tmp/ibm-java.bin
+  file:
+    path: /tmp/ibm-java.bin
+    state: file
+    mode: a+x
+  when:
+    - ansible_distribution_major_version == "11"
+    - not java8_installed.stat.exists
   tags: java8_SLES11
 
 - name: Install Java 8
   shell: |
-    mkdir -p /opt/ibm
-    chmod +x /tmp/ibm-java.bin
     /tmp/ibm-java.bin -i silent -f /tmp/ibm-java.response.properties
   when:
     - ansible_distribution_major_version == "11"
-    - java8_installed.stat.exists == false
+    - not java8_installed.stat.exists
   tags: java8_SLES11
 
 #########
@@ -189,7 +210,7 @@
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
     - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Extract expat
@@ -200,7 +221,7 @@
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
     - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Running ./configure & make for expat on Linux x86-64
@@ -209,5 +230,5 @@
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
     - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat

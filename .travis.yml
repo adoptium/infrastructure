@@ -15,7 +15,7 @@ install:
   # Install ansible
   - pip install ansible
   - pip install yamllint==1.13.0
-  - pip install ansible-lint==3.5.1
+  - pip install ansible-lint==4.2.0
 
   # Check ansible version
   - ansible --version
@@ -30,14 +30,15 @@ script:
   - yamllint -c yamllint.yml .
 
     # Ansible code static analysis
-  - ansible-lint playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-  - ansible-lint playbooks/AdoptOpenJDK_Unix_Playbooks/trss.yml
-  - ansible-lint playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
-  - ansible-lint playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
-  - ansible-lint playbooks/AdoptOpenJDK_ITW_Playbook/main.yml
-  - ansible-lint playbooks/aix.yml
-  - ansible-lint playbooks/vagrant.yml
-  - ansible-lint playbooks/ubuntu-jck.yml
+
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbooks/trss.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
+  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_ITW_Playbook/main.yml
+  - ansible-lint -x 403,204 playbooks/aix.yml
+  - ansible-lint -x 403,204 playbooks/vagrant.yml
+  - ansible-lint -x 403,204 playbooks/ubuntu-jck.yml
 
     # Check Playbook syntax.
   - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check

@@ -14,12 +14,12 @@
     dest: 'C:\temp\vs2010_professional.exe'
     checksum: a03ef907e301ae9fc81c6b8bbe17112a449f1ab6c79eaa623b6e50a6cec366ba
     checksum_algorithm: sha256
-  when: (vs2010_installed.stat.exists == false)
+  when: (not vs2010_installed.stat.exists)
   tags: MSVS_2010
 
 - name: Install Visual Studio 2010 Professional
   raw: 'C:\temp\vs2010_professional.exe /q /norestart'
-  when: (vs2010_installed.stat.exists == false)
+  when: (not vs2010_installed.stat.exists)
   tags: MSVS_2010
 
 - name: Register Visual Studio 2010 DIA SDK shared libraries
@@ -33,5 +33,5 @@
   win_reboot:
     reboot_timeout: 1800
     shutdown_timeout: 1800
-  when: (vs2010_installed.stat.exists == false)
+  when: (not vs2010_installed.stat.exists)
   tags: MSVS_2010

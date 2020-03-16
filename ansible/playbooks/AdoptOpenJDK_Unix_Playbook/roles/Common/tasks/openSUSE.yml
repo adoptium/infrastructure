@@ -7,7 +7,8 @@
 # Configure Repos and Update the system #
 #########################################
 
-- zypper_repository:
+- name: Add devel-tools repository (SUSE12, s390x)
+  zypper_repository:
     name: devel-tools
     repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Factory_zSystems/'
     auto_import_keys: yes
@@ -16,7 +17,8 @@
     - (ansible_distribution_major_version == "12" and ansible_architecture == "s390x")
   tags: patch_update
 
-- zypper_repository:
+- name: Add gcc48 repository (SUSE12)
+  zypper_repository:
     repo: 'https://download.opensuse.org/repositories/devel:/gcc/SLE-12/devel:gcc.repo'
     auto_import_keys: yes
     state: present
@@ -25,13 +27,19 @@
   tags: SUSE_gcc48
 
 - name: Sed change gpgcheck for gcc repo on x86_64
-  command: sed 's/gpgcheck=1/gpgcheck=0/' -i /etc/zypp/repos.d/devel_gcc.repo
+  replace:
+    path: /etc/zypp/repos.d/devel_gcc.repo
+    regexp: 'gpgcheck=1'
+    replace: "gpgcheck=0"
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
   tags: SUSE_gcc48
 
 - name: Install gcc48
-  shell: zypper -n in --force-resolution gcc48
+  zypper:
+    name: gcc48
+    extra_args_precommand: "-non-interactive"
+    state: present
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
   tags: patch_update
@@ -137,7 +145,7 @@
     state: directory
     owner: root
     mode: 0755
-  when: usr_lib_jvm_exists.stat.exists != True
+  when: not usr_lib_jvm_exists.stat.exists
   tags: java8_SUSE
 
 - name: Check if jdk-8 is already installed in the target location
@@ -157,7 +165,7 @@
   tags: java8_SUSE
 
 - name: Get /usr/lib/jvm/jdk8* full path name
-  shell: ls -ld /usr/lib/jvm/jdk8* 2>/dev/null | awk '{print $9}'
+  shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
   when: adoptopenjdk_installed.rc != 0
   tags: java8_SUSE
@@ -192,7 +200,7 @@
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Extract expat
@@ -202,7 +210,7 @@
     copy: False
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat
 
 - name: Running ./configure & make for expat on Linux x86-64
@@ -210,5 +218,5 @@
   become: yes
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-    - expat_installed.stat.exists == false
+    - not expat_installed.stat.exists
   tags: expat

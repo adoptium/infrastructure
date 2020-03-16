@@ -18,14 +18,14 @@
   win_get_url:
     url: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/windows/x64/jdk/{{ bootjdk }}/{{ heapsize }}/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-8.zip'
-  when: (java8_download.stat.exists == false) and (java8_installed.stat.exists == false)
+  when: (not java8_download.stat.exists) and (not java8_installed.stat.exists)
   tags: Java8
 
 - name: Install Java 8
   win_unzip:
     src: C:\temp\jdk-8.zip
     dest: C:\Program Files\Java
-  when: (java8_installed.stat.exists == false)
+  when: (not java8_installed.stat.exists)
   tags: Java8
 
 - name: Create symlink to directory without spaces if not already there
@@ -41,7 +41,7 @@
     elements: C:\openjdk\jdk-8
     scope: machine
     state: present
-  when: (java8_installed.stat.exists == false)
+  when: (not java8_installed.stat.exists)
   tags: Java8
 
 - name: Add JAVA_HOME/bin to Path
@@ -50,5 +50,5 @@
     elements: C:\openjdk\jdk-8\bin
     scope: machine
     state: present
-  when: (java8_installed.stat.exists == false)
+  when: (not java8_installed.stat.exists)
   tags: Java8

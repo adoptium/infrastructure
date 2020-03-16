@@ -24,11 +24,12 @@
 ###############
 # Nagios user #
 ###############
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Allow Nagios to use zypper while restricting it to check-update only
   shell: |
     echo "nagios ALL = NOPASSWD: /usr/bin/zypper ref" >> /etc/sudoers
     echo "nagios ALL = NOPASSWD: /usr/bin/zypper list-patches" >> /etc/sudoers
-  tags: [nagios_plugins, adoptopenjdk]
+  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 ###################
 # Install plugins #
@@ -49,10 +50,11 @@
     copy: False
   tags: [nagios_plugins, adoptopenjdk]
 
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Configure, make and make install nagios-plugins
   shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
-  tags: [nagios_plugins, adoptopenjdk]
+  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 ##############################
 # Install additional plugins #

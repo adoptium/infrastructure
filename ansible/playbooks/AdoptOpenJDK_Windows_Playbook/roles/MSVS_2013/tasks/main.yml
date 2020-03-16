@@ -14,13 +14,13 @@
     url: 'https://go.microsoft.com/fwlink/?LinkId=532495'
     dest: 'C:\TEMP\vs2013_community.exe'
     force: no
-  when: (vs2013_installed.stat.exists == false)
+  when: (not vs2013_installed.stat.exists)
   tags: MSVS_2013
 
 - name: Install Visual Studio Community 2013
   raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
         /Log C:\TEMP\vs2013_install_log.txt'
-  when: (vs2013_installed.stat.exists == false)
+  when: (not vs2013_installed.stat.exists)
   tags: MSVS_2013
 
 - name: Register Visual Studio Community 2013 DIA SDK shared libraries
@@ -34,5 +34,5 @@
   win_reboot:
     reboot_timeout: 1800
     shutdown_timeout: 1800
-  when: (vs2013_installed.stat.exists == false)
+  when: (not vs2013_installed.stat.exists)
   tags: MSVS_2013

@@ -22,7 +22,7 @@
     force: no
     checksum: 9028e2fc64491cca0f991acc09b06ee7fe644afe41d1d6caf72702ca25c4613c
     checksum_algorithm: sha256
-  when: (ant_installed.stat.exists == false) and (ant_download.stat.exists == false)
+  when: (not ant_installed.stat.exists) and (not ant_download.stat.exists)
   register: ant_download
   tags: ANT
 
@@ -31,12 +31,12 @@
     src: c:\temp\ant.zip
     dest: c:\apache-ant\
     creates: c:\apache-ant
-  when: (ant_installed.stat.exists == false)
+  when: (not ant_installed.stat.exists)
   tags: ANT
 
 - name: Set ANT_HOME
   raw: setx ANT_HOME "C:\apache-ant\apache-ant-1.10.5" /m
-  when: (ant_installed.stat.exists == false)
+  when: (not ant_installed.stat.exists)
   tags: ANT
 
 - name: Add %ANT_HOME%\bin to %PATH%
@@ -44,7 +44,7 @@
     elements:
       - '%ANT_HOME%\bin'
     state: present
-  when: (ant_installed.stat.exists == false)
+  when: (not ant_installed.stat.exists)
   tags: ANT
 
 - name: Test if ant-contrib is already installed
@@ -60,7 +60,7 @@
     force: no
     checksum: 22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc
     checksum_algorithm: sha256
-  when: (ant_contrib_installed.stat.exists == false)
+  when: (not ant_contrib_installed.stat.exists)
   tags: ANT
 
 - name: unzip ant-contrib
@@ -68,7 +68,7 @@
     src: c:\temp\ant-contrib.zip
     dest: c:\temp\ant-contrib
     creates: c:\temp\ant-contrib
-  when: (ant_contrib_installed.stat.exists == false)
+  when: (not ant_contrib_installed.stat.exists)
   tags: ANT
 
 - name: Copy the ant-contrib.jar to ANT's lib folder
@@ -76,5 +76,5 @@
     src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
     dest: C:\apache-ant\apache-ant-1.10.5\lib\ant-contrib.jar
     remote_src: True
-  when: (ant_contrib_installed.stat.exists == false)
+  when: (not ant_contrib_installed.stat.exists)
   tags: ANT

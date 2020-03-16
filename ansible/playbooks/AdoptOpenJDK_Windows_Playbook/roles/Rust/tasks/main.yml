@@ -16,13 +16,13 @@
     force: no
     checksum: cc27799843a146745d4054afa5de1f1f5ab19d539d8c522a909b3c8119e46f99
     checksum_algorithm: sha256
-  when: (rust_installed.stat.exists == false)
+  when: (not rust_installed.stat.exists)
   tags: Rust
 
 - name: Install Rust
   raw: msiexec /i C:\temp\rust.msi INSTALLDIR="c:\rust" /quiet
   ignore_errors: yes
-  when: (rust_installed.stat.exists == false)
+  when: (not rust_installed.stat.exists)
   tags: Rust
 
 - name: Cleanup Rust

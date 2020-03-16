@@ -6,9 +6,13 @@
 ##############################################
 # Workaround for Ansible not detecting cores #
 ##############################################
+
+# Skipping linting as no situation where this can't run (lint error 301)
 - name: Get number of cores on FreeBSD
   shell: sysctl hw.ncpu | awk '{print $2}'
   register: freebsd_cores
+  tags:
+    - skip_ansible_lint
 
 - name: Set ansible_processor_vcpus
   set_fact:

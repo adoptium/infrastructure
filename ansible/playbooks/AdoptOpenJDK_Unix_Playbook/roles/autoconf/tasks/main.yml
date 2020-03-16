@@ -4,7 +4,7 @@
 ###############
 
 - name: Test if Autoconf v2.69 is installed
-  shell: autoconf --version | grep autoconf | awk '{print $4}'
+  shell: set -o pipefail | autoconf --version | grep autoconf | awk '{print $4}'
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"

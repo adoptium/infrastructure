@@ -38,7 +38,7 @@
   when:
     - automake_installed.rc != 0
 
-- name: Create sym link from /usr/local/bin/automake-1.13 to /usr/local/bin/automake
+- name: Create symlink from /usr/local/bin/automake-1.13 to /usr/local/bin/automake
   file:
     src: /usr/local/bin/automake-1.13
     dest: /usr/local/bin/automake

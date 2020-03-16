@@ -21,10 +21,10 @@
     dest: 'C:\temp\firefox.exe'
     checksum: 9a1fbbb7eb68347decafbf048fc9728777fc213fefc5224119625b1f58a626fc
     checksum_algorithm: sha256
-  when: (firefox_download.stat.exists == false) and (firefox_installed.stat.exists == false)
+  when: (not firefox_download.stat.exists) and (not firefox_installed.stat.exists)
   tags: Firefox
 
 - name: Install Firefox
   raw: C:\temp\firefox.exe -ms
-  when: (firefox_installed.stat.exists == false)
+  when: (not firefox_installed.stat.exists)
   tags: Firefox

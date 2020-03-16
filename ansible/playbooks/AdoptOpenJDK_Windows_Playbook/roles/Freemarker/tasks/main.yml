@@ -15,5 +15,5 @@
     dest: 'C:\openjdk\freemarker.jar'
     checksum: 357472da121499a66175af0a4cd5e8be84b8b4d2fdc6bcc974937937ba3003bc
     checksum_algorithm: sha256
-  when: (freemarker_installed.stat.exists == false)
+  when: (not freemarker_installed.stat.exists)
   tags: Freemarker

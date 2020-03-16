@@ -32,7 +32,7 @@
   delay: 5
   register: antContrib_download
   until: antContrib_download is not failed
-  when: antcontrib_status.stat.exists == False
+  when: not antcontrib_status.stat.exists
   tags: ant-contrib
 
 - name: Extract ant-contrib
@@ -40,11 +40,10 @@
     src: /tmp/ant-contrib-1.0b2-bin.tar.gz
     dest: /tmp/
     copy: False
-  when: antcontrib_status.stat.exists == False
+  when: not antcontrib_status.stat.exists
   tags: ant-contrib
 
 - name: Move ant-contrib.jar to ant lib folder
   command: mv /tmp/ant-contrib/lib/ant-contrib.jar {{ ant_lib_dir }}
-  when:
-    - antcontrib_status.stat.exists == False
+  when: not antcontrib_status.stat.exists
   tags: ant-contrib

@@ -29,8 +29,15 @@
     - ansible_architecture != "armv7l"
   tags: patch_update
 
+# Required as 'Ubuntu Jessie' doesn't exist. See openjdk-infrastructure issue #1015
 - name: Change Jessie to Trusty in the sources files
-  command: sed -i "s/jessie/trusty/g" /etc/apt/sources.list.d/ppa_openjdk_r_ppa_jessie.list  /etc/apt/sources.list.d/ppa_ubuntu_toolchain_r_test_jessie.list
+  replace:
+    path: "{{ item }}"
+    regexp: 'jessie'
+    replace: "trusty"
+  with_items:
+    - /etc/apt/sources.list.d/ppa_openjdk_r_ppa_jessie.list
+    - /etc/apt/sources.list.d/ppa_ubuntu_toolchain_r_test_jessie.list
   when:
     - ansible_architecture != "armv7l"
   tags: patch_update

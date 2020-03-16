@@ -21,7 +21,7 @@
     dest: 'C:\temp\icedteaWEB182.msi'
     checksum: 7887693462e357e9ea20901066f9cf015e8fd1b47f9eec9d075a5fd155de27ca
     checksum_algorithm: sha256
-  when: (icedteaweb_download.stat.exists == false) and (icedteaweb_install.stat.exists == false)
+  when: (not icedteaweb_download.stat.exists) and (not icedteaweb_install.stat.exists)
   tags: IcedTea-Web
 
 - name: Install IcedTea-Web 1.8.2
@@ -30,5 +30,5 @@
     creates_path: 'C:\Program Files\IcedTeaWeb\WebStart\bin\javaws.exe'
     state: present
     arguments: /l* C:\temp\icedteaweb.log /quiet INSTALLDIR="C:\Program Files\IcedTeaWEB"
-  when: (icedteaweb_install.stat.exists == false)
+  when: (not icedteaweb_install.stat.exists)
   tags: IcedTea-Web
