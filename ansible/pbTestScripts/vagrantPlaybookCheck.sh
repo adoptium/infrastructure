@@ -13,6 +13,7 @@ vmHalt=true
 cleanWorkspace=false
 newVagrantFiles=false
 skipFullSetup=''
+jdkToBuild=''
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -27,6 +28,8 @@ processArgs()
 				vagrantOS="all";;
 			"--build" | "-b" )
 				testNativeBuild=true;;
+			"--JDK-Version" | "-jdk" )
+				jdkToBuild="--version $1"; shift;;
 			"--retainVM" | "-r" )
 				retainVM=true;;
 			"--URL" | "-u" )
@@ -56,6 +59,8 @@ usage()
 					--all | -a 				Builds and tests playbook through every OS
 					--retainVM | -r				Option to retain the VM and folder after completion
 					--build | -b				Option to enable testing a native build on the VM
+					--JDK-Version | -jdk			Specify which JDK to build, if build is specified
+					--build-repo | -br			Specify the openjdk-build repo to build with
 					--clean-workspace | -c			Will remove the old work folder if detected
 					--URL | -u <GitURL>			The URL of the git repository
                                         --test | -t                             Runs a quick test on the built JDK
@@ -206,7 +211,7 @@ startVMPlaybook()
 	local pb_failed=$?
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
-		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL"
+		ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 	        	ansible all -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -m raw -a "cd /vagrant/pbTestScripts && ./testJDK.sh"
@@ -250,7 +255,7 @@ startVMPlaybookWin()
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
 		vagrant reload
-		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh"
+		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh $buildURL $jdkToBuild"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 			vagrant reload

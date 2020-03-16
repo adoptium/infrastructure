@@ -3,11 +3,11 @@
 export MAKE_COMMAND="make"
 if [[ $(uname) == "FreeBSD" ]]; then
 	export MAKE_COMMAND="gmake"
-	cp -r $HOME/openjdk-build/workspace/build/src/build/*/jdk $HOME
+	cp -r $HOME/openjdk-build/workspace/build/src/build/*/jdk* $HOME
 	export TEST_JDK_HOME=$HOME/jdk
 else
-	mv $HOME/openjdk-build/workspace/build/src/build/*/images/jdk8* $HOME
-	export TEST_JDK_HOME=$(find $HOME -maxdepth 1 -type d -name "*jdk8u*"|grep -v ".*jre.*")
+	mv $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* $HOME
+	export TEST_JDK_HOME=$(find $HOME -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre.*"|grep -v ".*test-image.*)
 fi
 
 mkdir -p $HOME/testLocation
