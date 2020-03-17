@@ -20,7 +20,7 @@
     url: https://cygwin.com/setup-x86_64.exe
     dest: 'C:\temp\cygwin.exe'
     force: no
-    checksum: bc39c6b2bef856994b2ec11dc0fce4d0dff9d45b04ae58d8ae08bc5a3f4e5cef
+    checksum: 4a3fc472b6051d8ec136831e64b9b4bbd328b587d66eef1eedf2a58a620bde97
     checksum_algorithm: sha256
   tags: cygwin
 
