@@ -2,73 +2,63 @@
 ###########
 # OpenSSL #
 ###########
-- name: Check if OpenSSL 32bit installed
+- name: Check if OpenSSL 32bit VS2013 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1d-x86_32
+    path: C:\openjdk\OpenSSL-1.1.1e-x86_32
   register: openssl32_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2013 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1d-x86_64
+    path: C:\openjdk\OpenSSL-1.1.1e-x86_64
   register: openssl64_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2017 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1d-x86_64.VS2017
-  register: openssl64_VS2017_installed
+    path: C:\openjdk\OpenSSL-1.1.1e-x86_64-VS2017
+  register: openssl64_vs2017_installed
   tags: openssl
 
-- name: Download OpenSSL-1.1.1d
+- name: Download OpenSSL-1.1.1e
   win_get_url:
-    url: https://www.openssl.org/source/openssl-1.1.1d.tar.gz
-    dest: C:\temp\openssl-1.1.1d.tar.gz
-    checksum: 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
+    url: https://www.openssl.org/source/openssl-1.1.1e.tar.gz
+    dest: C:\temp\openssl-1.1.1e.tar.gz
+    checksum: 694f61ac11cb51c9bf73f54e771ff6022b0327a43bbdfa1b2f19de1662a6dcbe
     checksum_algorithm: sha256
-  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
   tags: openssl
 
-- name: Retrieve OpenSSL-1.1.1d 64-bit (VS2017)
-  win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/OpenSSL111win/OpenSSL111d-64bitVS2017.tgz
-    dest: C:\temp\openssl-1.1.1d-VS2017.tar.gz
-    checksum: 60ef36d98a369ad9086347b0cfb87816c472ac4b048e5aea178134e8ab82e0b1
-    checksum_algorithm: sha256
-  when: (not openssl64_VS2017_installed.stat.exists)
-  tags: openssl
-
-- name: Unpack OpenSSL-1.1.1d for installation
+- name: Unpack OpenSSL-1.1.1e for installation
   win_shell: |
     cd C:\temp
-    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d.tar.gz
-    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d.tar
-  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists)
+    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1e.tar.gz
+    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1e.tar
+  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
   tags: openssl
 
-- name: Install OpenSSL-1.1.1d 32-bit
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vsvars32.bat && cd C:\temp\openssl-1.1.1d && perl C:\temp\openssl-1.1.1d\Configure VC-WIN32 --prefix=C:\openjdk\OpenSSL-1.1.1d-x86_32 && nmake install > C:\temp\openssl32.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1e 32-bit (VS2013)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vsvars32.bat && cd C:\temp\openssl-1.1.1e && perl C:\temp\openssl-1.1.1e\Configure VC-WIN32 --prefix=C:\openjdk\OpenSSL-1.1.1e-x86_32 && nmake install > C:\temp\openssl32.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools'
     executable: cmd
   when: (not openssl32_installed.stat.exists)
   tags: openssl
 
-- name: Install OpenSSL-1.1.1d 64-bit
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\openssl-1.1.1d && perl C:\temp\openssl-1.1.1d\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1d-x86_64 && nmake install > C:\temp\openssl64.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1e 64-bit (VS2013)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\openssl-1.1.1e && perl C:\temp\openssl-1.1.1e\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1e-x86_64 && nmake install > C:\temp\openssl64.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC'
     executable: cmd
   when: (not openssl64_installed.stat.exists)
   tags: openssl
 
-- name: Unpack OpenSSL-1.1.1d 64-bit (VS2017)
-  win_shell: |
-    cd C:\temp
-    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d-VS2017.tar.gz
-    cd C:\openjdk
-    C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1d-VS2017.tar
-  when: (not openssl64_VS2017_installed.stat.exists)
+- name: Install OpenSSL-1.1.1e 64-bit (VS2017)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\openssl-1.1.1e && perl C:\temp\openssl-1.1.1e\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1e-x86_64-VS2017 && nmake install > C:\temp\openssl64.log && nmake -f makefile clean
+  args:
+    chdir: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build'
+    executable: cmd
+  when: (not openssl64_vs2017_installed.stat.exists)
   tags: openssl
 
 - name: Cleanup OpenSSL source files
@@ -76,9 +66,7 @@
     path: C:\temp\{{ item }}
     state: absent
   with_items:
-    - openssl-1.1.1d-VS2017.tar.gz
-    - openssl-1.1.1d-VS2017.tar
-    - openssl-1.1.1d.tar.gz
-    - openssl-1.1.1d.tar
-    - openssl-1.1.1d
+    - openssl-1.1.1e.tar.gz
+    - openssl-1.1.1e.tar
+    - openssl-1.1.1e
   tags: openssl
