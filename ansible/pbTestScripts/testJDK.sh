@@ -7,7 +7,7 @@ if [[ $(uname) == "FreeBSD" ]]; then
 	export TEST_JDK_HOME=$HOME/jdk
 else
 	mv $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* $HOME
-	export TEST_JDK_HOME=$(find $HOME -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre.*"|grep -v ".*test-image.*)
+	export TEST_JDK_HOME=$(find $HOME -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre.*"|grep -v ".*test-image.*")
 fi
 
 mkdir -p $HOME/testLocation
