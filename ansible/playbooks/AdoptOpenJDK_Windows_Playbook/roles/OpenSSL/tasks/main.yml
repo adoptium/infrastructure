@@ -10,8 +10,8 @@
 
 - name: Check if OpenSSL 64bit VS2013 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1e-x86_64
-  register: openssl64_installed
+    path: C:\openjdk\OpenSSL-1.1.1e-x86_64-VS2013
+  register: openssl64_vs2013_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2017 installed
@@ -26,7 +26,7 @@
     dest: C:\temp\openssl-1.1.1e.tar.gz
     checksum: 694f61ac11cb51c9bf73f54e771ff6022b0327a43bbdfa1b2f19de1662a6dcbe
     checksum_algorithm: sha256
-  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
   tags: openssl
 
 - name: Unpack OpenSSL-1.1.1e for installation
@@ -34,7 +34,7 @@
     cd C:\temp
     C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1e.tar.gz
     C:\7-Zip\7z.exe x C:\temp\openssl-1.1.1e.tar
-  when: (not openssl32_installed.stat.exists) or (not openssl64_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
   tags: openssl
 
 - name: Install OpenSSL-1.1.1e 32-bit (VS2013)
@@ -46,11 +46,11 @@
   tags: openssl
 
 - name: Install OpenSSL-1.1.1e 64-bit (VS2013)
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\openssl-1.1.1e && perl C:\temp\openssl-1.1.1e\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1e-x86_64 && nmake install > C:\temp\openssl64.log && nmake -f makefile clean
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\openssl-1.1.1e && perl C:\temp\openssl-1.1.1e\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1e-x86_64-VS2013 && nmake install > C:\temp\openssl64.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC'
     executable: cmd
-  when: (not openssl64_installed.stat.exists)
+  when: (not openssl64_vs2013_installed.stat.exists)
   tags: openssl
 
 - name: Install OpenSSL-1.1.1e 64-bit (VS2017)
