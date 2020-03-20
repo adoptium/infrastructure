@@ -24,6 +24,28 @@
     checksum_algorithm: sha256
   tags: cygwin
 
+- name: Get Cygwin64 cached folder
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz
+    dest: 'C:\temp\cygwin64.tar.xz'
+    force: no
+    checksum: 
+    checksum_algorithm:
+  retries: 3
+  delay: 5
+  register: cached_folder_download
+  until: cached_folder_download is not failed
+  when: (not cygwin_installed.stat.exists)
+  tags: cygwin
+
+- name: Decompress Cygwin64.tar.xz
+  win_shell: |
+    cd C:\
+    C:\7-Zip\7z.exe x C:\temp\cygwin64.tar.xz
+    C:\7-Zip\7z.exe x C:\cygwin64.tar
+  when: (not cygwin_installed.stat.exists)
+  tags: cygwin
+
 - name: Install Cygwin and its packages
   win_command: c:\temp\cygwin.exe --quiet-mode --download --local-install
                 --delete-orphans --site {{ Cygwin_SITE_URL }}
@@ -56,6 +78,16 @@
 
 - name: Change git config to not replace Line endings
   win_shell: "C:/cygwin64/bin/git config --system core.autocrlf false"
+  tags: cygwin
+
+- name: Remove temp cache files
+  win_file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - 'C:/temp/cygwin64.tar.xz'
+    - 'C:/cygwin64.tar'
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 ###############################################################################
