@@ -29,8 +29,8 @@
     url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz
     dest: 'C:\temp\cygwin64.tar.xz'
     force: no
-    checksum: 
-    checksum_algorithm:
+    checksum: 5b2050882a4c13e2a6762bbe876eac153ce27cfd51b6963f976728917a461886
+    checksum_algorithm: sha256
   retries: 3
   delay: 5
   register: cached_folder_download
