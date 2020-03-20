@@ -59,8 +59,8 @@ showJDKVersions() {
 }
 
 checkJDKVersion() {
-        local jdk=$1
-        case "$jdk" in
+	local jdk=$1
+	case "$jdk" in
                 "jdk8u" | "jdk8" | "8" | "8u" )
                         JAVA_TO_BUILD="jdk8u";;
                 "jdk9u" | "jdk9" | "9" | "9u" )
@@ -77,7 +77,26 @@ checkJDKVersion() {
                         JAVA_TO_BUILD="jdk14u";;
                 *)
                         echo "Not a valid JDK Version" ; showJDKVersions; exit 1;;
-        esac
+	esac
+	setBootJDK 
+}
+
+setBootJDK() {
+	local buildJDKNumber=$(echo ${JAVA_TO_BUILD//[!0-9]/})
+	local bootJDKNumber=$(($buildJDKNumber - 1));
+        # if building JDK8/9 look for 'jdk8u', not 'jdk-x'
+	if [[ $buildJDKNumber -eq 8 || $buildJDKNumber -eq 9 ]]; then
+		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk8*)	
+		return
+	else
+		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk-$bootJDKNumber*)
+	fi
+
+	if [ -z "${JDK_BOOT_DIR}" ]
+	then
+		echo "Can't find jdk$bootJDKNumber to build JDK, looking for jdk$buildJDKNumber"
+		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk-$buildJDKNumber*)
+	fi
 }
 
 cloneRepo() {
@@ -134,7 +153,7 @@ fi
 if grep 'openSUSE' /etc/os-release >/dev/null 2>&1; then
 	echo "Running on openSUSE"
 	JAVA_HOME=$(find /usr/lib/jvm/ -name jdk8u*)
-fi	
+fi
 
 # Only build Hotspot on FreeBSD
 if [[ $(uname) == "FreeBSD" ]]; then
@@ -151,7 +170,7 @@ echo "DEBUG:
         ARCHITECTURE=$ARCHITECTURE
         JAVA_TO_BUILD=$JAVA_TO_BUILD
         VARIANT=$VARIANT
-        JDK7_BOOT_DIR=$JDK7_BOOT_DIR
+        JDK_BOOT_DIR=$JDK_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
         GIT_URL=$GIT_URL"
