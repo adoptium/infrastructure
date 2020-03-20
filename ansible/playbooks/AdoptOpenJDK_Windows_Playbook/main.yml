@@ -39,6 +39,7 @@
     - Jenkins                     # AdoptOpenJDK infrastructure
     - MSVS_2010
     - VS2010_SP1
+    - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
     - Firefox
     - Strawberry_Perl             # Testing
@@ -58,7 +59,6 @@
     - MSVS_2017                   # OpenJ9
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
-    - 7-Zip                       # Mostly extracting other prereqs :-)
     - Clang_64bit                 # OpenJ9
     - Clang_32bit                 # OpenJ9
     - nasm                        # OpenJ9
