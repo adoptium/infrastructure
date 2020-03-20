@@ -44,8 +44,6 @@
       tags: [build_tools, build_tools_openj9]
     - role: cmake                 # OpenJ9 / OpenJFX
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
-    - role: Protobuf              # OpenJ9 (JITserver)
-      tags: [build_tools, build_tools_openj9]
     - ccache
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
