@@ -6,7 +6,7 @@
 
 - name: Test if Clang 64bit is already installed (required by OpenJ9)
   win_stat:
-    path: 'C:\Program Files\LLVM\bin\clang.exe'
+    path: 'C:\Program Files\LLVM64\bin\clang.exe'
   register: clang_64bit_installed
   tags: clang_64bit
 
@@ -20,8 +20,11 @@
   when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
-- name: Install Clang 64bit
-  win_command: 'c:\temp\llvm-7.0.0-win64.exe /S'
+- name: Install (unzip) Clang 64bit
+  win_unzip:
+    src: C:\temp\llvm-7.0.0-win64.zip
+    dest: C:\
+    creates: 'C:\Program Files\LLVM64\bin\clang.exe'
   when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
@@ -32,13 +35,13 @@
   tags: clang_64bit
 
 - name: Create symlink to C:\openjdk\LLVM64
-  raw: cmd /c mklink /D "C:\openjdk\LLVM64" "C:\Program Files\LLVM"
+  raw: cmd /c mklink /D "C:\openjdk\LLVM64" "C:\Program Files\LLVM64"
   when: not llvm64_symlink.stat.exists
   tags: clang_64bit
 
 - name: Cleanup Clang 64bit installer
   win_file:
-    path: 'c:\temp\llvm-7.0.0-win64.exe'
+    path: 'C:\temp\llvm-7.0.0-win64.zip'
     state: absent
   ignore_errors: yes
   tags: clang_64bit
