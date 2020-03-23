@@ -37,7 +37,7 @@ usage() {
 	Options:
 		--version | -v		Specify the JDK version to build
 		--URL | -u		Specify the github URL to clone openjdk-build from
-		--openj9 | -j9		Builds openJ9, instead of hotspot
+		--hotspot | -hs		Builds hotspot, default is openj9
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
 		
