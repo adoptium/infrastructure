@@ -31,7 +31,7 @@
 
 - name: Retrieve OpenSSL-1.1.1d 64-bit (VS2017)
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/OpenSSL111win/OpenSSL111d-64bitVS2017.tgz
+    url: https://ci.adoptopenjdk.net/userContent/winansible/openssl/OpenSSL111d-64bitVS2017.tgz
     dest: C:\temp\openssl-1.1.1d-VS2017.tar.gz
     checksum: 60ef36d98a369ad9086347b0cfb87816c472ac4b048e5aea178134e8ab82e0b1
     checksum_algorithm: sha256
