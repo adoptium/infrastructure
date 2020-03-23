@@ -3,6 +3,7 @@
 # LLVM/Clang 64bit #
 ####################
 # Clang 64bit is an OpenJ9 prerequisite.
+# The original source of Clang64 was https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe being executed with the /S parameter
 
 - name: Test if Clang 64bit is already installed (required by OpenJ9)
   win_stat:
