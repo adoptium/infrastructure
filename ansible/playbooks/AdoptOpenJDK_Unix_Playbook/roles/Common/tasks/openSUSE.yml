@@ -40,7 +40,7 @@
   shell: zypper -n in --force-resolution gcc48
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-  tags: 
+  tags:
     - patch_update
     - skip_ansible_lint
 
