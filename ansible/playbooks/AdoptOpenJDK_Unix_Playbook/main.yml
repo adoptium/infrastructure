@@ -60,9 +60,9 @@
     - role: adoptopenjdk_install  # JDK14 Build Bootstrap
       jdk_version: 13
     - OpenSSL102                  # OpenJ9
-    - Nagios_Plugins              # AdoptOpenJDK Infrastructure
-    - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
-    - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
+    # - Nagios_Plugins              # AdoptOpenJDK Infrastructure
+    # - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
+    # - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
     - Clean_Up
     - Security
     - Vendor
