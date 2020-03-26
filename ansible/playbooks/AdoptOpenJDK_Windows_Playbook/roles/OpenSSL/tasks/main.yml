@@ -69,4 +69,5 @@
     - openssl-1.1.1e.tar.gz
     - openssl-1.1.1e.tar
     - openssl-1.1.1e
+    - pax_global_header
   tags: openssl
