@@ -1,0 +1,60 @@
+---
+########################
+# riscv_cross_compiler #
+########################
+
+# An optional role for CentOS machines to enable them building JDK11/J9 for riscv64
+
+- name: Check if the riscv toolchain is installed
+  stat:
+    path: /opt/riscv_toolchain_linux
+  register: riscv_toolchain_installed
+  when:
+    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+  tags:
+    - riscv
+    - adoptopenjdk
+
+- name: Check if the fedora sysroot folder is in place
+  stat:
+    path: /opt/fedora28_riscv_root
+  register: fedora_folder
+  when:
+    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+  tags:
+    - riscv
+    - adoptopenjdk
+
+- name: Yum install libmpc-devel
+  yum:
+    name: libmpc-devel
+    state: latest
+  when:
+    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+  tags:
+    - riscv
+    - adoptopenjdk
+
+- name: Retrieve and unpack the riscv toolchain
+  unarchive:
+    src: https://ci.adoptopenjdk.net/userContent/riscv/riscv_toolchain_linux64.tar.xz
+    dest: /opt/
+    remote_src: yes
+  when:
+    - not riscv_toolchain_installed.stat.exists
+    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+  tags:
+    - riscv
+    - adoptopenjdk
+
+- name: Retrieve and Unpack the fedora sysroot folder
+  unarchive:
+    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot.tar.xz
+    dest: /opt/
+    remote_src: yes
+  when:
+    - not fedora_folder.stat.exists
+    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+  tags:
+    - riscv
+    - adoptopenjdk
