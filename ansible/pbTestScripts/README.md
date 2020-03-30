@@ -3,7 +3,7 @@
 Most people will not need to run this directly, but if you can it will
 reduce the likelihood of breaking things when you adjust the playbooks.
 These scripts can be invoked via the
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/work%20in%20progress/job/VagrantPlaybookCheck/)
+[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/)
 job if you have access to our jenkins, and they take 60-90 minutes to run
 on the UNIX/Linux-based platforms, but closer to three hours for Windows.
 
@@ -13,27 +13,39 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * Ubuntu 18.04
 * CentOS6
 * CentOS7
+* CentOS8
 * Debian8
+* OpenSUSE12-SP3
+* FreeBSD12
 * Windows Server 2012 R2
 
 These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
 
 The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 
-| Option                   | Description                                           | Example                                                                                             |
-|--------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| --vagrantfile / -v OS    | Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                           |
-| --all / -a               | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                                      |
-| --retainVM / -r          | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                                                           |
-| --build / -b             | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                              |
-| --URL / -u Git URL       | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/mybranch` |
-| --test / -t              | Run a small test on the built JDK within the VM **    | `./vagrantPlaybookCheck.sh -a --build --test`                                                       |
-| --new-vagrant-file / -nv | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`                                                |
-| --skip-more / -sm        | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`
-| --help                   | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                                  |
+| Option                           | Description                                           | Example                                                                                             |
+|----------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `--vagrantfile` / `-v` OS        | Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                           |
+| `--all` / `-a`                   | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                                      |
+|                                  |                                                       |                                                                                                     |
+| `--URL` / `-u` Git URL           | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/myBranch` |
+| `--new-vagrant-file` / `-nv`     | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`                                                |
+| `--skip-more` / `-sm`            | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`                                                                  |
+| `--clean-workspace` / `-c`       | Delete the old workspace                              | `./vagrantPlaybookCheck.sh -a -c`                                                                   |
+| `--retainVM` / `-r`              | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                                                           |
+| `--no-halt` / `-nh`              | Don't halt the Vagrant VMs at the end of the script   | `./vagrantPlaybookCheck.sh -a --retainVM -nh`                                                       |
+| `--help`                         | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                                  |
+|                                  |                                                       |                                                                                                     |
+| `--build` / `-b`                 | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                              |
+| `--build-repo` / `-br` build URL | Specify the URL of the openjdk-build repo *           | `./vagrantPlaybookCheck.sh -a --build -br https://github.com/sxa555/openjdk-build/tree/myBranch     |
+| `--build-hotspot`                | Specify to build the JDK with the Hotspot JVM *       | `./vagrantPlaybookCheck.sh -a --build --build-hotspot                                               |
+| `--JDK-Version` / `-jdk` jdk     | Specify which JDK to build, if applicable             | `./vagrantPlaybookCheck.sh -a --build --JDK-version jdk11                                           |
+| `--test` / `-t`                  | Run a small test on the built JDK within the VM *     | `./vagrantPlaybookCheck.sh -a --build --test`                                                       |
 
 Notes:
  - If not specified, the URL will default to `https://github.com/adoptopenjdk/openjdk-infrastructure`
+ - If not specified, the build URL will default to `https://github.com/adoptopenjdk/openjdk-build`
+ - By default, the JDK will be built with the OpenJ9 JVM, as it has more dependencies which is a better test for the playbooks.
  - `--test` requires `--build` be enabled, otherwise the script will error.
 
 The script is able to test specific branches of repositories, as well as the master branch, for example:
@@ -51,4 +63,4 @@ If specified, the VMs will then be tested by building JDK8 - if all dependencies
 
 If the VMs were chosen *not* to be destroyed, they can be later by running the _vmDestroy.sh_ script, which takes the `Vagrant OS` as an argument. If found, every Vagrant VM with this OS will be destroyed, therefore the user will be asked to confirm they want this. The `--force` option will skip this prompt.
 
-The additional scripts in the _pbTestScripts_ folder are called from `testScript.sh`
+The additional scripts in the _pbTestScripts_ folder are called from `vagrantPlaybookCheck.sh`

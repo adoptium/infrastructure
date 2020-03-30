@@ -3,6 +3,7 @@
 # LLVM/Clang 64bit #
 ####################
 # Clang 64bit is an OpenJ9 prerequisite.
+# The original source of Clang64 was https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe being executed with the /S parameter
 
 - name: Test if Clang 64bit is already installed (required by OpenJ9)
   win_stat:
@@ -12,16 +13,19 @@
 
 - name: Download Clang 64bit
   win_get_url:
-    url: https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
+    url: https://ci.adoptopenjdk.net/userContent/winansible/llvm-7.0.0-win64.zip
     dest: 'C:\temp\'
     force: no
-    checksum: 74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6
+    checksum: e61c3d115778dbb54f91cec8ca7682cbad601d61e2c40a9a97e554aa1f1bb2b6
     checksum_algorithm: sha256
   when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
-- name: Install Clang 64bit
-  win_command: 'c:\temp\LLVM-7.0.0-win64.exe /S'
+- name: Install (unzip) Clang 64bit
+  win_unzip:
+    src: C:\temp\llvm-7.0.0-win64.zip
+    dest: C:\
+    creates: 'C:\Program Files\LLVM\bin\clang.exe'
   when: not clang_64bit_installed.stat.exists
   tags: clang_64bit
 
@@ -38,7 +42,7 @@
 
 - name: Cleanup Clang 64bit installer
   win_file:
-    path: 'c:\temp\LLVM-7.0.0-win64.exe'
+    path: 'C:\temp\llvm-7.0.0-win64.zip'
     state: absent
   ignore_errors: yes
   tags: clang_64bit

@@ -22,6 +22,7 @@
     force: no
     checksum: 4a3fc472b6051d8ec136831e64b9b4bbd328b587d66eef1eedf2a58a620bde97
     checksum_algorithm: sha256
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Install Cygwin and its packages
@@ -37,10 +38,11 @@
   win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
   with_items:
     - autoconf
-    - make
+    - cpio
+    - libguile2.0_22            # Required for Make v4.2.1-2
     - unzip
     - zip
-    - cpio
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Install Cygwin test extra packages
@@ -52,6 +54,7 @@
     - libpng15
     - libpng-devel
     - perl-Text-CSV
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Change git config to not replace Line endings
@@ -73,10 +76,27 @@
     force: no
     checksum: 36ae2483f68b3c5a4bd93814fa4f7e2576dbe6559d4ffa0589c2159e85de91f6
     checksum_algorithm: sha256
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Extract grep-2.27-2
   win_command: "{{ Cygwin_ROOT_INST_DIR + '\\bin\\bash.exe -l -c \"tar -C / -xvf /tmp/grep.tar.xz\"' }}"
+  when: (not cygwin_installed.stat.exists)
+  tags: cygwin
+
+- name: Download make-4.2.1-2
+  win_get_url:
+    url: "{{ Cygwin_SITE_URL + '/x86_64/release/make/make-4.2.1-2.tar.xz' }}"
+    dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\make.tar.xz' }}"
+    force: no
+    checksum: 919037ac0ae0402639a08b474a60807499ae47b0aec98e7009820f9c05ea6515
+    checksum_algorithm: sha256
+  when: (not cygwin_installed.stat.exists)
+  tags: cygwin
+
+- name: Extract make-4.2.1-2
+  win_command: "{{ Cygwin_ROOT_INST_DIR + '\\bin\\bash.exe -l -c \"tar -C / -xvf /tmp/make.tar.xz\"' }}"
+  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Remove c:\cygwin64\bin from the path if it exists

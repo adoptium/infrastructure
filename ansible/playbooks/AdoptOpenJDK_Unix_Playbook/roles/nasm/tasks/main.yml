@@ -32,13 +32,13 @@
   when: gcc7.stat.exists and CC is not defined
   tags: nasm
 
-- name: Checking for gcc-7.3 binary installation
-  stat: path=/usr/local/gcc/bin/gcc-7.3
+- name: Checking for gcc-7.5 binary installation
+  stat: path=/usr/local/gcc/bin/gcc-7.5
   register: gcc7
   tags: nasm
-- name: Setting CC to gcc-7.3 binary found
+- name: Setting CC to gcc-7.5 binary found
   set_fact:
-    CC: "/usr/local/gcc/bin/gcc-7.3"
+    CC: "/usr/local/gcc/bin/gcc-7.5"
   when: gcc7.stat.exists and CC is not defined
   tags: nasm
 

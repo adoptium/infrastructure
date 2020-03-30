@@ -35,14 +35,14 @@
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
   tags: SUSE_gcc48
 
+# Skipping ansible lint as shell module is required to use the --force-resolution option (lint error 305)
 - name: Install gcc48
-  zypper:
-    name: gcc48
-    extra_args_precommand: "-non-interactive"
-    state: present
+  shell: zypper -n in --force-resolution gcc48
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-  tags: patch_update
+  tags:
+    - patch_update
+    - skip_ansible_lint
 
 - name: zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
