@@ -2,17 +2,9 @@
 
 # Script to execute the MachineInfo test on the previously built JDK.
 
-cd /cygdrive/c/workspace/build/src/build/windows-x86_64-normal-server-release/images/
-
-# If the JDK is where it is after building
-if [[ $(find . -name "jdk8*" -type d) ]];
-then
-	echo "Moving JDK to correct directory";
-	mv /cygdrive/c/workspace/build/src/build/windows-x86_64-normal-server-release/images/jdk8* $HOME
-fi
-
-# Ensures to set it to the JDK, not the JRE
-export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk8u*"|grep -v ".*jre.*")
+mv /cygdrive/c/workspace/build/src/build/*/images/jdk* $HOME
+# Ensures to set it to the JDK, not JRE or different images
+export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
 
 cd $HOME
 if [ ! -d "testLocation" ];
@@ -30,7 +22,6 @@ cd openjdk-tests
 
 ./get.sh -t $HOME/testLocation/openjdk-tests -p x64_windows
 cd TKG
-make -f run_configure.mk AUTO_DETECT=true
 export BUILD_LIST=system
 make compile
 make _extended.system 
