@@ -10,7 +10,8 @@
     path: /opt/riscv_toolchain_linux
   register: riscv_toolchain_installed
   when:
-    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6" 
+    - ansible_architecture == "x86_64"
   tags:
     - riscv
     - adoptopenjdk
@@ -20,7 +21,8 @@
     path: /opt/fedora28_riscv_root
   register: fedora_folder
   when:
-    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
   tags:
     - riscv
     - adoptopenjdk
@@ -30,7 +32,8 @@
     name: libmpc-devel
     state: latest
   when:
-    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
   tags:
     - riscv
     - adoptopenjdk
@@ -42,7 +45,8 @@
     remote_src: yes
   when:
     - not riscv_toolchain_installed.stat.exists
-    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
   tags:
     - riscv
     - adoptopenjdk
@@ -54,7 +58,8 @@
     remote_src: yes
   when:
     - not fedora_folder.stat.exists
-    - ansible_distribution == "CentOS" and ansible_architecture == "x86_64"
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
   tags:
     - riscv
     - adoptopenjdk
