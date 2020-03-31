@@ -115,14 +115,13 @@ export VARIANT=openj9
 export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
-export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
 export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
 processArgs $*
 cloneRepo
-
+export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
 echo "DEBUG:
 	TARGET_OS=$TARGET_OS
 	ARCHITECTURE=$ARCHITECTURE
