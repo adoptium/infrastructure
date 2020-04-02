@@ -22,7 +22,7 @@
 
 - name: Download OpenSSL-1.1.1e
   win_get_url:
-    url: https://www.openssl.org/source/openssl-1.1.1e.tar.gz
+    url: https://www.openssl.org/source/old/1.1.1/openssl-1.1.1e.tar.gz
     dest: C:\temp\openssl-1.1.1e.tar.gz
     checksum: 694f61ac11cb51c9bf73f54e771ff6022b0327a43bbdfa1b2f19de1662a6dcbe
     checksum_algorithm: sha256
