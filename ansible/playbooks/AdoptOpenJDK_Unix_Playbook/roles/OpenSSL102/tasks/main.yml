@@ -12,7 +12,7 @@
 
 - name: Download OpenSSL v1.0.2r
   get_url:
-    url: https://www.openssl.org/source/openssl-1.0.2r.tar.gz
+    url: https://www.openssl.org/source/old/1.0.2/openssl-1.0.2r.tar.gz
     dest: /tmp/openssl-1.0.2r.tar.gz
     force: no
     mode: 0755
