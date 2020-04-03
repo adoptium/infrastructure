@@ -1,0 +1,33 @@
+---
+##############
+# Shortnames #
+##############
+
+# Ensures that directories have an 8dot3 shortname
+
+- name: Query to see if shortnames are enabled
+  win_shell: "fsutil 8dot3name query C: | grep enabled"
+  register: enabled_shortnames
+  ignore_errors: true
+  tags:
+    - shortnames
+
+- name: Enable shortnames on drive C:/
+  win_shell: "fsutil 8dot3name set C: 0"
+  when: (not enabled_shortnames.stdout)
+  tags:
+    - shortnames
+
+- name: Create 8dot3 shortnames
+  script: scripts/shortName.ps1 "{{ item.name }}" "{{ item.shortname }}"
+  with_items:
+    - { name: "WiX Toolset v3.14", shortname: "WIXTOO~1.14" }
+    - { name: "Microsoft Visual Studio", shortname: "MIB055~1" }
+    - { name: "Microsoft Visual Studio 9.0" , shortname: "MICROS~2.0" }
+    - { name: "Microsoft Visual Studio 10.0" , shortname: "MICROS~3.0" }
+    - { name: "Microsoft Visual Studio 11.0" , shortname: "MICROS~4.0" }
+    - { name: "Microsoft Visual Studio 12.0" , shortname: "MICROS~1.0" }
+    - { name: "Microsoft Visual Studio 14.0" , shortname: "MI0E91~1.0" }
+    - { name: "Windows Kits" , shortname: "WINDOW~4" }
+  tags:
+    - shortnames

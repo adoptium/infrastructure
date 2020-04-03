@@ -67,3 +67,4 @@
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
+    - Shortnames
