@@ -35,6 +35,9 @@ hosts:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
+      - godaddy:
+          rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
+
       - linaro:
           centos76-armv8-1: {ip: 213.146.141.99, user: centos}
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
@@ -171,6 +174,10 @@ hosts:
           win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
 
   - docker:
+
+      - aws:
+          ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
+          ubuntu1604-x64-2: {ip: 34.250.61.39, user: ubuntu}
 
       - godaddy:
           ubuntu1604-x64-1: {ip: 160.153.235.114, user: adoptopenjdk}
