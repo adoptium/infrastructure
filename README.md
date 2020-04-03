@@ -133,7 +133,6 @@ The following items are stored in GitHub.
 |  Description | Storage Location | Frequency  |
 |---|---|---|
 | Jenkins (ci) - Configuration and Settings | localhost `/mnt/backup-server/jenkins_backup` | Daily |
-| Jenkins (ci-jck) - Configuration and Settings | localhost `/mnt/backup/` | Daily |
 | Nagios - Configuration and Settings | localhost `/root/backups` | Weekly |
 | AWX - Configuration and Settings | not currently backed up | N/A |
 
