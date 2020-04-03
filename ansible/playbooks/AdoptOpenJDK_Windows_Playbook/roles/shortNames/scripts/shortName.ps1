@@ -1,3 +1,5 @@
+# This script checks if an 8dot3 shortname exists for a specified directory in the Program Files (x86) folder
+
 $dirName=$Args[0]
 $shortName=$Args[1]
 
