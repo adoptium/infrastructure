@@ -10,7 +10,7 @@
     path: /opt/riscv_toolchain_linux
   register: riscv_toolchain_installed
   when:
-    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6" 
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
   tags:
     - riscv
