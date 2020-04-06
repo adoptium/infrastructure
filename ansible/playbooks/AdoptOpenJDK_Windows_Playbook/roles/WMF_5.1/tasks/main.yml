@@ -8,8 +8,7 @@
   args:
     executable: powershell
   register: powershell_output
-  tags:
-    - WMF
+  tags: WMF
 
 - name: Get WMF 5.1 Packages
   win_get_url:
@@ -33,6 +32,6 @@
   win_reboot:
     reboot_timeout: 1800
   when:
-    - hotfix_install.reboot_required
     - (powershell_output.stdout < '5')
+    - hotfix_install.reboot_required
   tags: WMF
