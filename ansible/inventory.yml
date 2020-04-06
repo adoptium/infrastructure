@@ -186,3 +186,4 @@ hosts:
           rhel74-x64-1: {ip: 169.55.170.70}
           rhel69-x64-1: {ip: 169.55.150.147}
           win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
+          win2012r2-x64-2: {ip: 52.117.29.13, user: Administrator}
