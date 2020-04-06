@@ -21,13 +21,13 @@
 - name: Create 8dot3 shortnames
   script: scripts/shortName.ps1 "{{ item.name }}" "{{ item.shortname }}"
   with_items:
-    - { name: "WiX Toolset v3.14", shortname: "WIXTOO~1.14" }
-    - { name: "Microsoft Visual Studio", shortname: "MIB055~1" }
-    - { name: "Microsoft Visual Studio 9.0" , shortname: "MICROS~2.0" }
-    - { name: "Microsoft Visual Studio 10.0" , shortname: "MICROS~3.0" }
-    - { name: "Microsoft Visual Studio 11.0" , shortname: "MICROS~4.0" }
-    - { name: "Microsoft Visual Studio 12.0" , shortname: "MICROS~1.0" }
-    - { name: "Microsoft Visual Studio 14.0" , shortname: "MI0E91~1.0" }
-    - { name: "Windows Kits" , shortname: "WINDOW~4" }
+    - {name: "WiX Toolset v3.14", shortname: "WIXTOO~1.14"}
+    - {name: "Microsoft Visual Studio", shortname: "MIB055~1"}
+    - {name: "Microsoft Visual Studio 9.0", shortname: "MICROS~2.0"}
+    - {name: "Microsoft Visual Studio 10.0", shortname: "MICROS~3.0"}
+    - {name: "Microsoft Visual Studio 11.0", shortname: "MICROS~4.0"}
+    - {name: "Microsoft Visual Studio 12.0", shortname: "MICROS~1.0"}
+    - {name: "Microsoft Visual Studio 14.0", shortname: "MI0E91~1.0"}
+    - {name: "Windows Kits", shortname: "WINDOW~4"}
   tags:
     - shortnames
