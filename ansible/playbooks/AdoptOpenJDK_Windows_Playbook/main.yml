@@ -36,6 +36,7 @@
     - Version
     - Common
     - Windows_Updates
+    - WMF_5.1
     - Jenkins                     # AdoptOpenJDK infrastructure
     - CodesignCert
     - MSVS_2010

@@ -1,0 +1,38 @@
+---
+###########
+# WMF 5.1 #
+###########
+
+- name: Check Powershell Major Version
+  win_shell: $PSVersionTable.PSVersion | select -ExpandProperty Major
+  args:
+    executable: powershell
+  register: powershell_output
+  tags:
+    - WMF
+
+- name: Get WMF 5.1 Packages
+  win_get_url:
+    # link is specific to Win2012r2. Find others at https://www.microsoft.com/en-us/download/details.aspx?id=54616
+    url: https://go.microsoft.com/fwlink/?linkid=839516
+    dest: C:/temp/WMFinstaller.msu
+    checksum: a8d788fa31b02a999cc676fb546fc782e86c2a0acd837976122a1891ceee42c0
+    checksum_algorithm: sha256
+  when: (powershell_output.stdout < '5')
+  tags: WMF
+
+- name: Install WMF 5.1
+  win_hotfix:
+    source: C:\temp\WMFinstaller.msu
+    state: present
+  register: hotfix_install
+  when: (powershell_output.stdout < '5')
+  tags: WMF
+
+- name: Reboot machine for installation to complete
+  win_reboot:
+    reboot_timeout: 1800
+  when:
+    - hotfix_install.reboot_required
+    - (powershell_output.stdout < '5')
+  tags: WMF
