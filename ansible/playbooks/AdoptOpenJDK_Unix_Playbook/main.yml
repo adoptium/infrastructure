@@ -54,6 +54,9 @@
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
       tags: build_tools
+    - role: adoptopenjdk_install
+      jdk_version: 11
+      tags: build_tools
     - role: adoptopenjdk_install  # JDK13 Build Bootstrap
       jdk_version: 12
       tags: build_tools
