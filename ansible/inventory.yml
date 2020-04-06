@@ -26,8 +26,6 @@ hosts:
   - build:
 
       - azure:
-          win2008r2-x64-1: {ip: 13.90.22.129, user: adoptopenjdk}
-          win2008r2-x64-2: {ip: 52.226.64.244, user: adoptopenjdk}
           win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk}
           win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk}
 
