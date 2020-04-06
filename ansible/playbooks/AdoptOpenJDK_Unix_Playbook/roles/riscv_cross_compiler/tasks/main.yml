@@ -44,9 +44,9 @@
     dest: /opt/
     remote_src: yes
   when:
-    - not riscv_toolchain_installed.stat.exists
     - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - not riscv_toolchain_installed.stat.exists
   tags:
     - riscv
     - adoptopenjdk
@@ -57,9 +57,9 @@
     dest: /opt/
     remote_src: yes
   when:
-    - not fedora_folder.stat.exists
     - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
+    - not fedora_folder.stat.exists
   tags:
     - riscv
     - adoptopenjdk
