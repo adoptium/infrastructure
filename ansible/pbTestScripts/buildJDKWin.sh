@@ -63,25 +63,25 @@ checkJDKVersion() {
         case "$jdk" in
                 "jdk8u" | "jdk8" | "8" | "8u" )
                         JAVA_TO_BUILD="jdk8u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7;;
                 "jdk9u" | "jdk9" | "9" | "9u" )
                         JAVA_TO_BUILD="jdk9u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8;;
                 "jdk10u" | "jdk10" | "10" | "10u" )
                         JAVA_TO_BUILD="jdk10u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
                 "jdk11u" | "jdk11" | "11" | "11u" )
                         JAVA_TO_BUILD="jdk11u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
                 "jdk12u" | "jdk12" | "12" | "12u" )
                         JAVA_TO_BUILD="jdk12u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
                 "jdk13u" | "jdk13" | "13" | "13u" )
                         JAVA_TO_BUILD="jdk13u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
                 "jdk14u" | "jdk14" | "14" | "14u" )
                         JAVA_TO_BUILD="jdk14";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-13;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-13;;
                 *)
                         echo "Not a valid JDK Version" ; showJDKVersions; exit 1;;
         esac
@@ -115,19 +115,21 @@ export VARIANT=openj9
 export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
+export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
+export JDK8_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
 processArgs $*
 cloneRepo
-export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
 echo "DEBUG:
 	TARGET_OS=$TARGET_OS
 	ARCHITECTURE=$ARCHITECTURE
 	JAVA_TO_BUILD=$JAVA_TO_BUILD
         VARIANT=$VARIANT
         JDK_BOOT_DIR=$JDK_BOOT_DIR
+        JDK8_BOOT_DIR=$JDK8_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
         GIT_URL=$GIT_URL"	
