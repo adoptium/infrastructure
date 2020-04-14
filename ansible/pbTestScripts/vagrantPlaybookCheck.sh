@@ -12,6 +12,7 @@ runTest=false
 vmHalt=true
 cleanWorkspace=false
 newVagrantFiles=false
+fastMode=false
 skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
@@ -30,7 +31,7 @@ processArgs()
 			"--build" | "-b" )
 				testNativeBuild=true;;
 			"--JDK-Version" | "-jdk" )
-				jdkToBuild="--version $1"; shift;;
+				jdkToBuild="$1"; shift;;
 			"--retainVM" | "-r" )
 				retainVM=true;;
 			"--URL" | "-u" )
@@ -44,7 +45,7 @@ processArgs()
 			"--new-vagrant-files" | "-nv" )
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
-				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
+				fastMode=true;;
 			"--build-repo" | "-br" )
 				buildURL="--URL $1"; shift;;
 			"--build-hotspot" )
@@ -105,6 +106,20 @@ checkVars()
                 echo "Can't find vagrant-rsync-back plugin, installing . . ."
                 vagrant plugin install vagrant-rsync-back
         fi
+	if [[ "$fastMode" == true ]]; then
+		skipFullSetup=",nvidia_cuda_toolkit"
+		case "$jdkToBuild" in
+			"jdk8" )
+				skipFullSetup="$skipFullSetup,MSVS_2017";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1"
+				fi
+				;;
+                	"jdk11" | "jdk13" | "jdk14" )
+				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013";;
+		esac
+	fi
+	jdkToBuild="--version $jdkToBuild"
 }
 
 checkVagrantOS()
