@@ -44,7 +44,7 @@ processArgs()
 			"--new-vagrant-files" | "-nv" )
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
-				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,VS2010_SP1";;
+				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
 			"--build-repo" | "-br" )
 				buildURL="--URL $1"; shift;;
 			"--build-hotspot" )
