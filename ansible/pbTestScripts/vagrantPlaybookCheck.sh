@@ -44,7 +44,7 @@ processArgs()
 			"--new-vagrant-files" | "-nv" )
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
-				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
+				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,VS2010_SP1";;
 			"--build-repo" | "-br" )
 				buildURL="--URL $1"; shift;;
 			"--build-hotspot" )
@@ -194,8 +194,8 @@ startVMPlaybook()
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 	vagrant up
-	# FreeBSD12 & SLES12 uses a different shared folder type- required to get hosts.tmp from VM
-	if [[ "$OS" == "FreeBSD12" || "$OS" == "SLES12" ]]; then
+	# FreeBSD12 uses a different shared folder type- required to get hosts.tmp from VM
+	if [[ "$OS" == "FreeBSD12" ]]; then
                vagrant rsync-back
 	fi
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
@@ -256,13 +256,14 @@ startVMPlaybookWin()
 	local pbFailed=$?
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
         if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
+		# Restarting the VM as the shared folder disappears after the playbook runs. (Possibly due to the restarts in the playbook)
+		vagrant halt --force && vagrant up
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
-		vagrant reload
 		ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "Start-Process powershell.exe -Verb runAs; cd C:/; sh C:/vagrant/pbTestScripts/buildJDKWin.sh $buildURL $jdkToBuild $buildHotspot"
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-			vagrant reload
+			vagrant halt --force && vagrant up
 			# Runs a script on the VM to test the built JDK
 			ansible all -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -m raw -a "sh C:/vagrant/pbTestScripts/testJDKWin.sh"
 			echo The test finished at : `date +%T`
@@ -304,7 +305,7 @@ do
 		startVMPlaybook $OS
 	fi
   	if [[ "$vmHalt" == true ]]; then
-                vagrant halt
+                vagrant halt --force
 	fi
 	if [[ "$retainVM" == false ]]; then
 		destroyVM $OS
