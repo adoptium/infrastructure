@@ -11,7 +11,7 @@
   tags: gcc-7
   when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
 
-# Installation on CentOS x86_64 will be handled via the scl repo in the Common CentOS playbook
+  # Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 
 - name: Download AdoptOpenJDK gcc-7.5.0 binary
   get_url:
@@ -21,7 +21,6 @@
     mode: 0644
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
-    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
     - gcc7_installed.rc != 0
   tags: gcc-7
 
@@ -32,7 +31,6 @@
     copy: False
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
-    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
     - gcc7_installed.rc != 0
   tags: gcc-7
 
@@ -42,6 +40,5 @@
     state: absent
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
-    - ansible_architecture != "CentOS" and ansible_architecture != "x86-64"
     - gcc7_installed.rc != 0
   tags: gcc-7
