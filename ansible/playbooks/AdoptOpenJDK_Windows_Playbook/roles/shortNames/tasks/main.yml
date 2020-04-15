@@ -29,5 +29,6 @@
     - {name: "Microsoft Visual Studio 12.0", shortname: "MICROS~1.0"}
     - {name: "Microsoft Visual Studio 14.0", shortname: "MI0E91~1.0"}
     - {name: "Windows Kits", shortname: "WINDOW~4"}
+  when: (not enabled_shortnames.stdout)
   tags:
     - shortnames

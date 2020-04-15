@@ -115,7 +115,7 @@ checkVars()
 					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1"
 				fi
 				;;
-                	"jdk11" | "jdk13" | "jdk14" )
+                	*)
 				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013";;
 		esac
 	fi
