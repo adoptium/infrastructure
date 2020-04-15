@@ -116,8 +116,6 @@ export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
 export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
-export JDK8_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
-export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
@@ -129,7 +127,6 @@ echo "DEBUG:
 	JAVA_TO_BUILD=$JAVA_TO_BUILD
         VARIANT=$VARIANT
         JDK_BOOT_DIR=$JDK_BOOT_DIR
-        JDK8_BOOT_DIR=$JDK8_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
         GIT_URL=$GIT_URL"	
