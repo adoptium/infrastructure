@@ -116,20 +116,23 @@ export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
 export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
+export JDK8_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
 processArgs $*
 cloneRepo
+export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
 echo "DEBUG:
 	TARGET_OS=$TARGET_OS
 	ARCHITECTURE=$ARCHITECTURE
 	JAVA_TO_BUILD=$JAVA_TO_BUILD
-        VARIANT=$VARIANT
-        JDK_BOOT_DIR=$JDK_BOOT_DIR
-        JAVA_HOME=$JAVA_HOME
-        WORKSPACE=$WORKSPACE
-        GIT_URL=$GIT_URL"	
+	VARIANT=$VARIANT
+	JDK_BOOT_DIR=$JDK_BOOT_DIR
+	JAVA_HOME=$JAVA_HOME
+	WORKSPACE=$WORKSPACE
+	GIT_URL=$GIT_URL
+	FILENAME=$FILENAME"
 
 echo "Running $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh"
 $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh
