@@ -22,8 +22,8 @@ processArgs() {
 
 	checkJDKVersion $JAVA_TO_BUILD
 	if [ -z "${WORKSPACE:-}" ]; then
-        	echo "WORKSPACE not found, setting it as to C:/ drive"
-        	WORKSPACE=C:/
+        	echo "WORKSPACE not found, setting it to /tmp"
+        	WORKSPACE=/tmp/
 	fi
 	if [ $CLEAN_WORKSPACE == true ]; then
 		echo "Cleaning workspace"
