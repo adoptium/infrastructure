@@ -37,7 +37,7 @@ usage() {
 	Options:
 		--version | -v		Specify the JDK version to build
 		--URL | -u		Specify the github URL to clone openjdk-build from
-		--openj9 | -j9		Builds openJ9, instead of hotspot
+		--hotspot | -hs		Builds hotspot, instead of openj9 (openj9 by default)
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
 
@@ -116,7 +116,6 @@ export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
 export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
-export JDK8_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
