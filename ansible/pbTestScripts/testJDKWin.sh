@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Script to execute the MachineInfo test on the previously built JDK.
+# Script to execute System tests on the previously built JDK.
 
-mv /cygdrive/c/workspace/build/src/build/*/images/jdk* $HOME
+mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* $HOME
 # Ensures to set it to the JDK, not JRE or different images
 export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
 

@@ -22,8 +22,8 @@ processArgs() {
 
 	checkJDKVersion $JAVA_TO_BUILD
 	if [ -z "${WORKSPACE:-}" ]; then
-        	echo "WORKSPACE not found, setting it as to C:/ drive"
-        	WORKSPACE=C:/
+        	echo "WORKSPACE not found, setting it to /tmp"
+        	WORKSPACE=/tmp/
 	fi
 	if [ $CLEAN_WORKSPACE == true ]; then
 		echo "Cleaning workspace"
@@ -37,7 +37,7 @@ usage() {
 	Options:
 		--version | -v		Specify the JDK version to build
 		--URL | -u		Specify the github URL to clone openjdk-build from
-		--openj9 | -j9		Builds openJ9, instead of hotspot
+		--hotspot | -hs		Builds hotspot, instead of openj9 (openj9 by default)
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
 
@@ -63,25 +63,25 @@ checkJDKVersion() {
         case "$jdk" in
                 "jdk8u" | "jdk8" | "8" | "8u" )
                         JAVA_TO_BUILD="jdk8u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7;;
                 "jdk9u" | "jdk9" | "9" | "9u" )
                         JAVA_TO_BUILD="jdk9u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8;;
                 "jdk10u" | "jdk10" | "10" | "10u" )
                         JAVA_TO_BUILD="jdk10u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
                 "jdk11u" | "jdk11" | "11" | "11u" )
                         JAVA_TO_BUILD="jdk11u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-10;;
                 "jdk12u" | "jdk12" | "12" | "12u" )
                         JAVA_TO_BUILD="jdk12u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
                 "jdk13u" | "jdk13" | "13" | "13u" )
                         JAVA_TO_BUILD="jdk13u";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-12;;
                 "jdk14u" | "jdk14" | "14" | "14u" )
                         JAVA_TO_BUILD="jdk14";
-			JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-13;;
+                        export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-13;;
                 *)
                         echo "Not a valid JDK Version" ; showJDKVersions; exit 1;;
         esac
@@ -115,22 +115,23 @@ export VARIANT=openj9
 export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
 export ARCHITECTURE=x64
-export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-8
+export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
 GIT_URL=https://github.com/adoptopenjdk/openjdk-build
 CLEAN_WORKSPACE=false
 
 processArgs $*
 cloneRepo
-export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
+export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
 echo "DEBUG:
 	TARGET_OS=$TARGET_OS
 	ARCHITECTURE=$ARCHITECTURE
 	JAVA_TO_BUILD=$JAVA_TO_BUILD
-        VARIANT=$VARIANT
-        JDK_BOOT_DIR=$JDK_BOOT_DIR
-        JAVA_HOME=$JAVA_HOME
-        WORKSPACE=$WORKSPACE
-        GIT_URL=$GIT_URL"	
+	VARIANT=$VARIANT
+	JDK_BOOT_DIR=$JDK_BOOT_DIR
+	JAVA_HOME=$JAVA_HOME
+	WORKSPACE=$WORKSPACE
+	GIT_URL=$GIT_URL
+	FILENAME=$FILENAME"
 
 echo "Running $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh"
 $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh
