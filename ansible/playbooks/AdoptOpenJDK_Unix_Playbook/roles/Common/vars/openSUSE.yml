@@ -25,6 +25,13 @@ Build_Tool_Packages:
   - libelf0
   - libelf1
   - libnuma-devel
+  - libpng15-devel
+  - libXext-devel
+  - libXi-devel
+  - libXrandr-devel
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
   - make
   - ntp
   - numactl
