@@ -8,24 +8,18 @@
   register: java_installed
   tags: Java_install
 
-- name: Check if Java{{ jdk_version }} is already downloaded
-  win_stat:
-    path: 'C:\temp\jdk-{{ jdk_version }}.zip'
-  register: java_download
-  tags: Java_install
-
 - name: Download Java{{ jdk_version }}
   win_get_url:
     url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
-  when: (not java_download.stat.exists) and (not java_installed.stat.exists)
+  when: not java_installed.stat.exists
   tags: Java_install
 
 - name: Install Java{{ jdk_version }}
   win_unzip:
     src: C:\temp\jdk-{{ jdk_version }}.zip
     dest: C:\Program Files\Java
-  when: (not java_installed.stat.exists)
+  when: not java_installed.stat.exists
   tags: Java_install
 
 - name: Create symlink to directory without spaces if not already there
@@ -33,4 +27,11 @@
   args:
     executable: cmd.exe
     creates: 'C:\openjdk\jdk-{{ jdk_version }}'
+  tags: Java_install
+
+- name: Remove temp zip file
+  win_file:
+    path: 'C:\temp\jdk-{{ jdk_version }}.zip'
+    state: absent
+  when: not java_installed.stat.exists
   tags: Java_install
