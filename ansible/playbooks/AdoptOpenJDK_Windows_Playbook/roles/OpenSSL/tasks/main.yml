@@ -43,7 +43,9 @@
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools'
     executable: cmd
   when: (not openssl32_installed.stat.exists)
-  tags: openssl
+  tags:
+    - openssl
+    - MSVS_2013
 
 - name: Install OpenSSL-1.1.1g 64-bit (VS2013)
   win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2013 && nmake install > C:\temp\openssl64-VS2013.log && nmake -f makefile clean
@@ -51,7 +53,9 @@
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC'
     executable: cmd
   when: (not openssl64_vs2013_installed.stat.exists)
-  tags: openssl
+  tags:
+    - openssl
+    - MSVS_2013
 
 - name: Install OpenSSL-1.1.1g 64-bit (VS2017)
   win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2017 && nmake install > C:\temp\openssl64-VS2017.log && nmake -f makefile clean
@@ -59,7 +63,9 @@
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build'
     executable: cmd
   when: (not openssl64_vs2017_installed.stat.exists)
-  tags: openssl
+  tags:
+    - openssl
+    - MSVS_2017
 
 - name: Cleanup OpenSSL source files
   win_file:
