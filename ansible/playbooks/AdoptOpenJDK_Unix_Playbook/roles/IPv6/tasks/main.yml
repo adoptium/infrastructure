@@ -9,8 +9,10 @@
     state: present
     reload: no
   when:
-    - ansible_distribution == "RedHat"
-  tags: IPv6_sysctl
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+  tags:
+    - IPv6_sysctl
+    - adoptopenjdk
 
 - sysctl:
     name: net.ipv6.conf.default.disable_ipv6
@@ -19,5 +21,8 @@
     state: present
     reload: yes
   when:
-    - ansible_distribution == "RedHat"
-  tags: IPv6_sysctl
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+  tags:
+    - IPv6_sysctl
+    - adoptopenjdk
+
