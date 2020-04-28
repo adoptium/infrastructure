@@ -287,7 +287,7 @@ destroyVM()
 {
 	local OS=$1
 	echo "Destroying the $OS Machine"
-	vagrant global-status --prune | awk "/${folderName}-${branchName}/ { print \$1 }" | xargs vagrant destroy -f	
+	vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \$1 }" | xargs vagrant destroy -f	
 }
 
 processArgs $*
