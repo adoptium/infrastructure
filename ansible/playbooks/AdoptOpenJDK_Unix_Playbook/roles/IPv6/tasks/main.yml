@@ -2,7 +2,8 @@
 # Enable IPv6 in sysctl.conf #
 ##############################
 
-- sysctl:
+- name: Setting net.ipv6.conf.all.disable_ipv6 = 0
+  sysctl:
     name: net.ipv6.conf.all.disable_ipv6
     value: '0'
     sysctl_set: yes
@@ -14,7 +15,8 @@
     - IPv6_sysctl
     - adoptopenjdk
 
-- sysctl:
+- name: Setting net.ipv6.conf.default.disable_ipv6 = 0
+  sysctl:
     name: net.ipv6.conf.default.disable_ipv6
     value: '0'
     sysctl_set: yes
