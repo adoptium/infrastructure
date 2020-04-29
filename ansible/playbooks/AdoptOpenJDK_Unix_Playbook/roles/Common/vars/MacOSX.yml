@@ -17,6 +17,7 @@ Build_Tool_Packages:
 
 Build_Tool_Casks:
   - adoptopenjdk8
+  - adoptopenjdk10
   - adoptopenjdk11
 
 Test_Tool_Packages:
