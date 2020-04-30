@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import sys
-import winrm
 import getopt
+import winrm
 
 def usage():
     print("Usage: %s -i <VM_IPAddress> -a <buildJDKWin_arguments>" % sys.argv[0])
@@ -16,10 +16,10 @@ def run_winrm(vmIP, buildArgs, mode):
         cmd_str += "buildJDKWin.sh "
     else:
         cmd_str += "testJDKWin.sh "
-    command_string += buildArgs
-    print("Running :      %s" %command_string)
+    cmd_str += buildArgs
+    print("Running :      %s" %cmd_str)
     session = winrm.Session(str(vmIP), auth=('vagrant', 'vagrant'))
-    session.run_ps(command_string, sys.stdout, sys.stderr)
+    session.run_ps(cmd_str, sys.stdout, sys.stderr)
 
 def main(argv):
     # mode refers to whether its running a build or a test
