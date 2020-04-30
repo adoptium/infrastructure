@@ -20,6 +20,8 @@ if ([long]$currentDiskSize -lt $diskSizeBoundary) {
 }else {
         echo "Disk is already at max size"
 }
+Start-Process cmd -Verb runAs
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
