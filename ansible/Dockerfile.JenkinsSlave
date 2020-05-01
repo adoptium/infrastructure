@@ -1,4 +1,4 @@
-FROM 016425676475.dkr.ecr.eu-west-1.amazonaws.com/adoptopenjdk/centos6_image
+FROM adoptopenjdk/centos6_build_image
 
 ARG VERSION=4.0.1
 ARG user=jenkins
