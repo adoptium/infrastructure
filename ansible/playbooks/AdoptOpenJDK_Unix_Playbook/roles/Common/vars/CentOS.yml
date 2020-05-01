@@ -40,6 +40,7 @@ Build_Tool_Packages:
   - openssl-devel
   - perl-DBI
   - perl-devel
+  - perl-Digest-SHA
   - perl-GD
   - perl-libwww-perl
   - perl-Time-HiRes
