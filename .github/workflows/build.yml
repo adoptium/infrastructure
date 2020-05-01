@@ -18,9 +18,11 @@ env:
 
 jobs:
   build-and-push:
-    name: Building and pushing image to AWS ECR
+    name: Building and pushing image to Dockerhub
     runs-on: ubuntu-latest
     steps:
+
+    - uses: actions/checkout@v2
 
     - name: Docker Build & Push Centos6 Image to Docker Hub
       uses: docker/build-push-action@v1
