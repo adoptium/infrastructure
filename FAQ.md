@@ -42,7 +42,7 @@ repository, create an `inventory` text file with the word `localhost`
 and run this from the `ansible` directory:
 
 ```
-ansible-playbook -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
 NOTE: For windows machines you cannot use this method as ansible does not
