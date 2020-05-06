@@ -117,7 +117,7 @@ whether that's really what you want to do if you add that to your skip list.
 The below example is appropriate to run playbook by skipping tasks by using a combination of conditionals and tags (linked and dependent tasks will not be executed):
 
 ```bash
-ansible-playbook -i [/path/to/hosts] -s AdoptOpenJDK_Unix_Playbook/main.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="adoptopenjdk,jenkins,dont_remove_system"
+ansible-playbook -i [/path/to/hosts] -b AdoptOpenJDK_Unix_Playbook/main.yml --extra-vars "Jenkins_Username=jenkins Jenkins_User_SSHKey=[/path/to/id_rsa.pub] Nagios_Plugins=Disabled Slack_Notification=Disabled Superuser_Account=Disabled" --skip-tags="adoptopenjdk,jenkins,dont_remove_system"
 ```
 
 Note that when running from inside a `vagrant` instance:
@@ -131,10 +131,10 @@ This is useful if one or more tasks are failing to execute successfully or if th
 Below are the levels of verbosity available with using ansible scripts:
 
 ```bash
-ansible-playbook -v -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-ansible-playbook -vv -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-ansible-playbook -vvv -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-ansible-playbook -vvvv -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -v -b playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -vv -b playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -vvv -b playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -vvvv -b playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
 A snippet from the man pages of Ansible:
@@ -217,12 +217,12 @@ Note when using our Vagrantfiles:
 
 1) Run a playbook to install dependencies, for Linux on x86:
 
-`ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
+`ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
 
 In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```bash
-ansible-playbook -s AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
+ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
 ```
 ## Using Ansible to modify Vagrant VM remote hosts (linux)
 
