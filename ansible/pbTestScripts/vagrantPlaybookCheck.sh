@@ -211,8 +211,8 @@ startVMPlaybook()
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
 	# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
-	# FreeBSD12 uses a different shared folder type- required to get hosts.tmp from VM
-	if [[ "$OS" == "FreeBSD12" ]]; then
+	# FreeBSD12 / Debian10 uses an rsync shared folder type- required to get hosts.tmp from VM
+	if [[ "$OS" == "FreeBSD12" || "$OS" == "Debian10" ]]; then
                vagrant rsync-back
 	fi
 	# Generate hosts.unx file for Ansible to use, remove prior hosts.unx if there
