@@ -13,6 +13,7 @@
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
     - ansible_architecture != "armv7l"
+    - ansible_distribution_major_version != "10"
   tags: patch_update
 
 - name: Add AdoptOpenJDK GPG key
@@ -27,6 +28,7 @@
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
   when:
     - ansible_architecture != "armv7l"
+    - ansible_distribution_major_version != "10"
   tags: patch_update
 
 # Required as 'Ubuntu Jessie' doesn't exist. See openjdk-infrastructure issue #1015
@@ -40,6 +42,7 @@
     - /etc/apt/sources.list.d/ppa_ubuntu_toolchain_r_test_jessie.list
   when:
     - ansible_architecture != "armv7l"
+    - ansible_distribution_major_version == "8"
   tags: patch_update
 
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
