@@ -81,8 +81,17 @@
     - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
   tags: patch_update
 
+  # Required as a Debian 8 GPG key has expired
+- name: Allow unauthenticated packages on Debian 8
+  shell: echo "APT { Get { AllowUnauthenticated \"1\"; }; };" > /etc/apt/apt.conf.d/99allow_unauth
+  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
+  tags: patch_update
+
 - name: Run apt-get upgrade
-  apt: upgrade=safe update_cache=yes
+  apt:
+    upgrade: safe
+    update_cache: yes
+    force: yes
   tags: patch_update
 
 ############################
