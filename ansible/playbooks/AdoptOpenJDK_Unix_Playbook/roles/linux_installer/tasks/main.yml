@@ -20,8 +20,8 @@
     - rubygems
   when:
     - ansible_distribution == "Ubuntu"
-  tags: installer
+  tags: linux_installer
 
 - name: Install FPM with RubyGems
   shell: gem install --no-document fpm
-  tags: installer
+  tags: linux_installer
