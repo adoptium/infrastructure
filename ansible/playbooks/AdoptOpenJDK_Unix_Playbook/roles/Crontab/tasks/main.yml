@@ -10,4 +10,5 @@
         user=root
         job="{{ crontab_Patching }}"
         state=present
+  when: ansible_distribution != "MacOSX"
   tags: crontab

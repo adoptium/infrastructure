@@ -13,6 +13,7 @@
   command: grep swap /etc/fstab
   ignore_errors: yes
   register: swap_exists
+  when: ansible_distribution != "MacOSX"
   tags:
     - swap_file
     - skip_ansible_lint
@@ -20,12 +21,14 @@
 - name: Set Swapfile path - /swapfile
   set_fact:
     swap_path: /swapfile
+  when: ansible_distribution != "MacOSX"
   tags: swap_file
 
 - name: Set Swapfile path - /tmp/swapfile
   set_fact:
     swap_path: /tmp/swapfile
   when:
+    - ansible_distribution != "MacOSX"
     - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
   tags: swap_file
 
@@ -34,6 +37,7 @@
     msg:
       - "swap_path: {{ swap_path | default('***Undefined***') }} "
       - "swap_exists: {{ swap_exists.rc | default('***Undefined***') }} "
+  when: ansible_distribution != "MacOSX"
   tags: swap_file
 
 - name: Disable dphys-swapfile where applicable
@@ -46,6 +50,7 @@
 - name: Create swap file - via DD
   command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
+    - ansible_distribution != "MacOSX"
     - (swap_exists.rc != 0)
   tags: swap_file
 
@@ -55,18 +60,21 @@
         group="{{ root_group }}"
         mode=0600
   when:
+    - ansible_distribution != "MacOSX"
     - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Create swap area device
   command: "mkswap {{ swap_path }}"
   when:
+    - ansible_distribution != "MacOSX"
     - (swap_exists.rc != 0)
   tags: swap_file
 
 - name: Mount swap file
   command: "swapon {{ swap_path }}"
   when:
+    - ansible_distribution != "MacOSX"
     - (swap_exists.rc != 0)
   tags: swap_file
 
@@ -79,5 +87,6 @@
     dump=0
     state=present
   when:
+    - ansible_distribution != "MacOSX"
     - (swap_exists.rc != 0)
   tags: swap_file
