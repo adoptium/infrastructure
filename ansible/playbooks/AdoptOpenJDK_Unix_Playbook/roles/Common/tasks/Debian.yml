@@ -116,7 +116,6 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
-    - ansible_distribution_major_version != "10"
   tags: build_tools
 
 - name: Install GCC G++ on Raspian Buster
