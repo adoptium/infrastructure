@@ -150,8 +150,7 @@ if [ -z "$JAVA_HOME" ]; then
 	export JAVA_HOME=$(ls -1d /usr/lib/jvm/adoptopenjdk-8-* | head -1)
 fi
 
-if grep 'openSUSE' /etc/os-release >/dev/null 2>&1; then
-	echo "Running on openSUSE"
+if grep 'openSUSE' /etc/os-release || grep 'buster' /etc/os-release >/dev/null 2>&1; then
 	JAVA_HOME=$(find /usr/lib/jvm/ -name jdk8u*)
 fi
 
@@ -163,6 +162,13 @@ if [[ $(uname) == "FreeBSD" ]]; then
         export JAVA_TO_BUILD=jdk11u
         export JDK_BOOT_DIR=/usr/local/openjdk11
         export JAVA_HOME=/usr/local/openjdk8
+fi
+
+# Required as Debian Buster doesn't have gcc-4.8 available
+# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1321#discussion_r426625178
+if grep 'buster' /etc/*-release >/dev/null 2>&1; then
+	export CC=/usr/bin/gcc-7
+	export CXX=/usr/bin/g++-7
 fi
 
 echo "DEBUG:
