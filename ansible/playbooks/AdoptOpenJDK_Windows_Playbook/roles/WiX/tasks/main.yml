@@ -32,16 +32,3 @@
     state: absent
   ignore_errors: yes
   tags: Wix
-
-- name: Test if Windows 10 SDK is already installed
-  win_stat:
-    path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-  register: win10_sdk_installed
-  tags: Wix
-
-- name: Install windows-sdk-10.0 version 10.1.17763.1
-  win_chocolatey:
-    name: windows-sdk-10.1
-    version: '10.1.17763.1'
-  when: (not win10_sdk_installed.stat.exists)
-  tags: Wix
