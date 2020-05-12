@@ -1,0 +1,40 @@
+---
+##########
+# ZULU-7 #
+##########
+
+- name: Check if /usr/lib/jvm exists
+  stat: path=/usr/lib/jvm
+  register: usr_lib_jvm_exists
+  when:
+    - ansible_os_family != "Darwin"
+  tags: zulu7
+
+- name: Create /usr/lib/jvm if not found
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    owner: root
+    mode: 0755
+  when:
+    - not usr_lib_jvm_exists.stat.exists
+    - ansible_os_family != "Darwin"
+  tags: zulu7
+
+- name: Check if Zulu-7 is already installed in the target location
+  shell: ls -ld /usr/lib/jvm/zulu7 2>&1
+  ignore_errors: yes
+  register: zulu7_installed
+  when:
+    - ansible_os_family != "Darwin"
+  tags: zulu7
+
+  # See here for reason to skip_ansible_lint: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1325#issuecomment-627374329
+- name: Install latest release if not already installed
+  shell: mkdir -p /usr/lib/jvm/zulu7 && wget https://cdn.azul.com/zulu/bin/zulu7.38.0.11-ca-jdk7.0.262-linux_x64.tar.gz  -O - | tar xzf - -C /usr/lib/jvm/zulu7 --strip-components=1
+  when:
+    - ansible_os_family != "Darwin"
+    - zulu7_installed.rc != 0
+  tags:
+    - skip_ansible_lint
+    - zulu7
