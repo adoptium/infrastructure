@@ -16,12 +16,14 @@
     - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= "8")) or
       ((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and (ansible_distribution_major_version|int >= "12")) or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= "18") or
-      (ansible_distributiob == "Debian" and ansible_distribution_major_version|int >= "10")
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= "10")
   tags: zulu7
 
-  # See here for reason to skip_ansible_lint: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1325#issuecomment-627374329
 - name: Install latest release if not already installed
-  shell: mkdir -p /usr/lib/jvm/zulu7 && wget https://cdn.azul.com/zulu/bin/zulu7.38.0.11-ca-jdk7.0.262-linux_x64.tar.gz  -O - | tar xzf - -C /usr/lib/jvm/zulu7 --strip-components=1
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu7.38.0.11-ca-jdk7.0.262-linux_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
   when:
     - ansible_os_family != "Darwin"
     - ansible_architecture == "x86_64"
@@ -29,6 +31,20 @@
       ((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and (ansible_distribution_major_version|int >= "12")) or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= "18") or
       (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= "10")
-  tags:
-    - skip_ansible_lint
-    - zulu7
+    - zulu7_installed.rc != 0
+  tags: zulu7
+
+- name: Create symlink to point at zulu-7
+  file:
+    src: /usr/lib/jvm/zulu7.38.0.11-ca-jdk7.0.262-linux_x64
+    dest: /usr/lib/jvm/zulu7
+    state: link
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+    - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= "8")) or
+      ((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and (ansible_distribution_major_version|int >= "12")) or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= "18") or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= "10")
+    - zulu7_installed.rc != 0
+  tags: zulu7
