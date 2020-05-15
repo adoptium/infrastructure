@@ -39,9 +39,20 @@
   register: win10_sdk_installed
   tags: Wix
 
-- name: Install windows-sdk-10.0 version 10.1.17763.1
-  win_chocolatey:
-    name: windows-sdk-10.1
-    version: '10.1.17763.1'
-  when: (not win10_sdk_installed.stat.exists)
+- name: Download Windows-SDK-10.1.17763.1
+  win_get_url:
+    url: https://download.microsoft.com/download/9/3/9/939441D4-6FBA-48EE-9EF7-402C1AA8B8A7/windowssdk/winsdksetup.exe
+    dest: C:/temp/winSDK10.exe
+  when: not win10_sdk_installed.stat.exists
+  tags: Wix
+
+- name: Install Windows-SDK-10.1.17763.1
+  win_shell: C:/temp/winSDK10.exe /q /norestart
+  when: not win10_sdk_installed.stat.exists
+  tags: Wix
+
+- name: Reboot to complete installation
+  win_reboot:
+    reboot_timeout: 1800
+  when: not win10_sdk_installed.stat.exists
   tags: Wix
