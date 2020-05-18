@@ -77,6 +77,7 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+    - ansible_distribution_major_version != "20"
   tags: build_tools
 
 - name: Install additional build tools for x86
