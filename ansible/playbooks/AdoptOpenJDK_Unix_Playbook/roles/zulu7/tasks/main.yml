@@ -1,0 +1,65 @@
+---
+##########
+# ZULU-7 #
+##########
+
+# Install zulu-7 for OSs that don't have openjdk-7 available in their package manager:
+#  CentOS/RHEL 8, Debian 10, Ubuntu1804, openSUSE/SLES 12 (only tested for x86_64)
+
+- name: Checking for /usr/lib/jvm
+  stat: path=/usr/lib/jvm
+  register: usr_lib_jvm_exists
+  when:
+    - ansible_os_family != "Darwin"
+  tags: zulu7
+
+- name: Creating /usr/lib/jvm if not found
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    owner: root
+    mode: 0755
+  when:
+    - not usr_lib_jvm_exists.stat.exists
+    - ansible_os_family != "Darwin"
+  tags: zulu7
+
+- name: Check if Zulu-7 is already installed in the target location
+  shell: ls -ld /usr/lib/jvm/zulu7 2>&1
+  ignore_errors: yes
+  register: zulu7_installed
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+    - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= 8)) or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10)
+  tags: zulu7
+
+- name: Install latest release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu7.38.0.11-ca-jdk7.0.262-linux_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+    - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= 8)) or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10)
+    - zulu7_installed.rc != 0
+  tags: zulu7
+
+- name: Create symlink to point at zulu-7
+  file:
+    src: /usr/lib/jvm/zulu7.38.0.11-ca-jdk7.0.262-linux_x64
+    dest: /usr/lib/jvm/zulu7
+    state: link
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "x86_64"
+    - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= 8)) or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int >= 18) or
+      (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 10)
+    - zulu7_installed.rc != 0
+  tags: zulu7

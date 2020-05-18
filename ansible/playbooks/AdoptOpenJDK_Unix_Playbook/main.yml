@@ -48,6 +48,7 @@
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
+    - zulu7                       # JDK8 Build Bootstrap
     - role: adoptopenjdk_install
       jdk_version: 8
       tags: build_tools
