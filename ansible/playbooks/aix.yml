@@ -229,7 +229,7 @@
       ##############
         - name: Check for Java7 availability
           stat:
-            path: /usr/java7_64
+            path: /usr/j2sdk-image
           register: java7
           tags: java7
 
@@ -238,11 +238,6 @@
             src: /Vendor_Files/aix/openjdk-7u-aix.tar
             dest: /usr
             remote_src: no
-          when: java7.stat.isdir is not defined
-          tags: java7
-
-        - name: Rename j2sdk_image to java7_64
-          command: mv /usr/j2sdk_image /usr/java7_64
           when: java7.stat.isdir is not defined
           tags: java7
 

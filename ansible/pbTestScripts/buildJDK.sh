@@ -82,21 +82,26 @@ checkJDKVersion() {
 }
 
 setBootJDK() {
-	local buildJDKNumber=$(echo ${JAVA_TO_BUILD//[!0-9]/})
-	local bootJDKNumber=$(($buildJDKNumber - 1));
-        # if building JDK8/9 look for 'jdk8u', not 'jdk-x'
-	if [[ $buildJDKNumber -eq 8 || $buildJDKNumber -eq 9 ]]; then
-		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk8*)	
-		return
-	else
-		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk-$bootJDKNumber*)
-	fi
-
-	if [ -z "${JDK_BOOT_DIR}" ]
-	then
-		echo "Can't find jdk$bootJDKNumber to build JDK, looking for jdk$buildJDKNumber"
-		export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk-$buildJDKNumber*)
-	fi
+        local buildJDKNumber=$(echo ${JAVA_TO_BUILD//[!0-9]/})
+        local bootJDKNumber=$(($buildJDKNumber - 1));
+        [[ $bootJDKNumber != "8" ]] && bootJDKNumber="-$bootJDKNumber"
+        if [[ $buildJDKNumber -eq 8 ]]; then
+                # CentOS JDK7
+                export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name java-1.7.0-openjdk.x86_64)
+                # Ubuntu JDK7
+                [[ -z "$JDK_BOOT_DIR" ]] && export JDK_BOOT_DIR=$(find /usr/lib/jvm/ -maxdepth 1 -name java-1.7.0-openjdk-\*)
+                # Zulu-7 for OSs without JDK7
+                [[ -z "$JDK_BOOT_DIR" ]] && export JDK_BOOT_DIR=$(find /usr/lib/jvm/ -maxdepth 1 -name zulu7)
+        else
+                export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk$bootJDKNumber*)
+        fi
+        # If JDK (jdkToBuild - 1) can't be found, look for equal boot and build jdk
+        if [ -z "${JDK_BOOT_DIR}" ]
+        then
+                [[ $buildJDKNumber != "8" ]] && buildJDKNumber="-$buildJDKNumber"
+                echo "Can't find jdk$bootJDKNumber to build JDK, looking for jdk$buildJDKNumber"
+                export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk$buildJDKNumber*)
+        fi
 }
 
 cloneRepo() {
@@ -139,20 +144,8 @@ if [[ ${unameOutput} != "x86_64" ]]; then
        export ARCHITECTURE=${unameOutput}
 fi
 
-# Differences in openJDK7 name between OSs. Search for CentOS one
-export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk.x86_64)
-# If the CentOS JDK7 can't be found, search for the Ubuntu one
-[[ -z "$JDK7_BOOT_DIR" ]] && export JDK7_BOOT_DIR=$(find /usr/lib/jvm/ -name java-1.7.0-openjdk-\*)
-
-# Differences in openJDK8 name between Ubuntu and CentOS
-export JAVA_HOME=$(find /usr/lib/jvm/ -name java-1.8.0-openjdk-\*)
-if [ -z "$JAVA_HOME" ]; then
-	export JAVA_HOME=$(ls -1d /usr/lib/jvm/adoptopenjdk-8-* | head -1)
-fi
-
-if grep 'openSUSE' /etc/os-release || grep 'buster' /etc/os-release >/dev/null 2>&1; then
-	JAVA_HOME=$(find /usr/lib/jvm/ -name jdk8u*)
-fi
+# Use the JDK8 installed with the adoptopenjdk_install role to run Gradle with.
+export JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name *jdk8*)
 
 # Only build Hotspot on FreeBSD
 if [[ $(uname) == "FreeBSD" ]]; then
