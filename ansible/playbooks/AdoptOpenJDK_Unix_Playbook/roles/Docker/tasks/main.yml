@@ -262,7 +262,7 @@
   tags: docker
 
 - name: Install Docker for Ubuntu
-  package: "name=docker-ce state=latest"
+  package: "name=docker.io state=latest"
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Ubuntu"
