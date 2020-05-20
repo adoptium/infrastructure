@@ -1,0 +1,27 @@
+---
+#####################################################
+# Build tool prerequisites for Linux installer jobs #
+# Currently only supports Ubuntu 18.04              #
+#####################################################
+
+- name: Install FPM prerequisites
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - make
+    - gcc
+    - git
+    - ruby
+    - ruby-dev
+    - build-essential
+    - rpm
+    - rubygems
+  when:
+    - ansible_distribution == "Ubuntu"
+  tags: linux_installer
+
+- name: Install FPM with RubyGems
+  shell: gem install --no-document fpm
+  tags: linux_installer
