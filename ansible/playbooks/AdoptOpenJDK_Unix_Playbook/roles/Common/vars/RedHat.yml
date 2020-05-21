@@ -59,7 +59,7 @@ Additional_Build_Tools_RHEL7:
   - libstdc++-static
 
 Additional_Build_Tools_RHEL7_PPC64LE:
-  - libstdc++.so.5
+  - libstdc++
 
 Additional_Build_Tools_RHEL_x86:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
