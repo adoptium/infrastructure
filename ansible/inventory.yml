@@ -60,7 +60,7 @@ hosts:
 
       - packet:
           centos74-armv8-1: {ip: 147.75.196.30}
-          ubuntu1804-armv8l-1: {ip: 139.178.82.234}
+          ubuntu1804-armv8-1: {ip: 139.178.82.234}
 
       - scaleway:
           ubuntu1604-armv7-1: {ip: 212.47.233.28}
