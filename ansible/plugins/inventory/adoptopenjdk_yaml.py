@@ -46,8 +46,8 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'packet', 'linaro',
-        'digitalocean', 'ibm', 'godaddy', 'aws')
+        'macstadium', 'macincloud', 'softlayer', 'spearhead',
+        'packet', 'linaro','digitalocean', 'ibm', 'godaddy', 'aws')
 }
 
 # customisation options per host:

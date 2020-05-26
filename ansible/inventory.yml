@@ -37,7 +37,6 @@ hosts:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 
       - linaro:
-          centos76-armv8-1: {ip: 213.146.141.99, user: centos}
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
       - macstadium:
@@ -49,27 +48,32 @@ hosts:
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
-          zos21-s390x-1: {ip: 148.100.36.136, user: OPEN1}
-          zos21-s390x-2: {ip: 148.100.36.137, user: OPEN1}
+          ubuntu1604-s390x-1: {ip: 148.100.113.58}
+          zOS-s390x-1: {ip: 148.100.36.136, user: OPEN1}
+          zOS-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
       - osuosl:
-          centos74-ppc64le-1: {ip: 140.211.168.138}
-          centos74-ppc64le-2: {ip: 140.211.168.117}
           aix71-ppc64-1: {ip: 140.211.9.10}
           aix71-ppc64-2: {ip: 140.211.9.12}
+          centos74-ppc64le-1: {ip: 140.211.168.138}
+          centos74-ppc64le-2: {ip: 140.211.168.117}
 
       - packet:
           centos74-armv8-1: {ip: 147.75.196.30}
+          ubuntu1804-armv8-1: {ip: 139.178.82.234}
 
       - scaleway:
-          ubuntu1604-x64-2: {ip: 51.15.46.107}
           ubuntu1604-armv7-1: {ip: 212.47.233.28}
           ubuntu1604-armv7-2: {ip: 212.47.246.7}
+          ubuntu1604-x64-1: {ip: 51.15.46.107}
 
       - softlayer:
+          centos6-x64-1: {ip: 52.117.29.5}
           win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
           win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
-          centos6-x64-1: {ip: 52.117.29.5}
+
+      - spearhead:
+          freebsd12-x64-1: {ip: 185.131.222.224}
 
   - docker:
 
