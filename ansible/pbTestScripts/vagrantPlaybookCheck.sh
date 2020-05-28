@@ -276,13 +276,13 @@ startVMPlaybookWin()
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
         if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
 		# Restarting the VM as the shared folder disappears after the playbook runs. (Possibly due to the restarts in the playbook)
-		vagrant halt --force && vagrant up
+		vagrant halt && vagrant up
 		# Runs the build script via ansible, as vagrant powershell gives error messages that ansible doesn't. 
         	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/942#issuecomment-539946564
 		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b
 		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
-			vagrant halt --force && vagrant up
+			vagrant halt && vagrant up
 			# Runs a script on the VM to test the built JDK
 			python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -t
 			echo The test finished at : `date +%T`
@@ -324,7 +324,7 @@ do
 		startVMPlaybook $OS
 	fi
   	if [[ "$vmHalt" == true ]]; then
-                vagrant halt --force
+                vagrant halt 
 	fi
 	if [[ "$retainVM" == false ]]; then
 		destroyVM $OS
