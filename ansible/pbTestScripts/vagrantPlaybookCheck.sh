@@ -320,6 +320,9 @@ destroyVM()
 	fi
         echo === Final status:
         vagrant global-status
+        cd "$HOME/VirtualBox VMs"
+        rm -f "$WORKSPACE/virtualboxlogs.*.tar.xz"
+        tar cvJf "$WORKSPACE/virtualboxlogs.$OS.tar.xz" */Logs
 }
 
 processArgs $*
