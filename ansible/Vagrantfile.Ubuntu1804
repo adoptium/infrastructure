@@ -6,6 +6,7 @@ sudo apt-get install tree -y
 sudo apt-get install software-properties-common
 sudo apt-add-repository ppa:ansible/ansible
 sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --only-upgrade grub-pc
 sudo apt-get install ansible -y
 sudo mkdir /ansible
 sudo cp /etc/ansible/ansible.cfg /ansible
