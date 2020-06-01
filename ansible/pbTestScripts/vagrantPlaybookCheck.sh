@@ -308,10 +308,11 @@ destroyVM()
 	echo "Destroying the $OS Machine"
 	echo === `date +%T`: showing global status before pruning:
 	vagrant global-status
+	free
 	echo === showing global status while pruning:
 	vagrant global-status --prune
 	echo === Determining VM to destroy:
-	VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \$1 }"`
+	VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \\$1 }"`
 	if [ ! -z "$VM_TO_DESTROY" ]; then
 	  echo === Destroying VM with id $VM_TO_DESTROY
 	  vagrant destroy -f $VM_TO_DESTROY
@@ -320,9 +321,11 @@ destroyVM()
 	fi
         echo === Final status:
         vagrant global-status
+        free
         cd "$HOME/VirtualBox VMs"
         rm -f "$WORKSPACE/virtualboxlogs.*.tar.xz"
         tar cvJf "$WORKSPACE/virtualboxlogs.$OS.tar.xz" */Logs
+  
 }
 
 processArgs $*
