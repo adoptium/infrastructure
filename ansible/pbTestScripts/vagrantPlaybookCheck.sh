@@ -306,7 +306,26 @@ destroyVM()
 {
 	local OS=$1
 	echo "Destroying the $OS Machine"
-	vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \$1 }" | xargs vagrant destroy -f	
+	echo === `date +%T`: showing global status before pruning:
+	vagrant global-status
+	free
+	echo === showing global status while pruning:
+	vagrant global-status --prune
+	echo === Determining VM to destroy:
+	VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \\$1 }"`
+	if [ ! -z "$VM_TO_DESTROY" ]; then
+	  echo === Destroying VM with id $VM_TO_DESTROY
+	  vagrant destroy -f $VM_TO_DESTROY
+	else
+	  echo === NOT DESTROYING ANY VM as no suitable ID was found searching for $OS and ${folderName}-${branchName}
+	fi
+        echo === Final status:
+        vagrant global-status
+        free
+        cd "$HOME/VirtualBox VMs"
+        rm -f "$WORKSPACE/virtualboxlogs.*.tar.xz"
+        tar cvJf "$WORKSPACE/virtualboxlogs.$OS.tar.xz" */Logs
+  
 }
 
 processArgs $*
