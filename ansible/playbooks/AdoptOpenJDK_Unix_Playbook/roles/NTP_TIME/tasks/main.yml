@@ -13,7 +13,9 @@
   service:
     name: systemd-timesyncd
     enabled: no
-  when: ansible_distribution != "CentOS" and ansible_distribution != "RedHat"
+  when: 
+    - ansible_distribution != "CentOS" and ansible_distribution != "RedHat"
+    - ansible_distribution != "FreeBSD"
   tags: ntp_time
 
 - name: Configure NTP server pools
