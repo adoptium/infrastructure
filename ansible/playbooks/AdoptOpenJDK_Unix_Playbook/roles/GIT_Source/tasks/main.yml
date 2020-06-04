@@ -32,6 +32,7 @@
     dest: /tmp/git-2.15.0.tar.xz
     mode: 0440
     checksum: sha256:107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a
+    validate_certs: no
   retries: 3
   delay: 5
   register: git_download
