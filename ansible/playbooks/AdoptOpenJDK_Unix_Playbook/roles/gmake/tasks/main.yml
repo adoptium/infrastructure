@@ -71,3 +71,13 @@
       ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
   tags: goodmake_source
+
+- name: Remove downloaded packages for gmake
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/make-4.1
+    - /tmp/make-4.1.tar.gz
+  ignore_errors: yes
+  tags: goodmake_source

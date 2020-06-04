@@ -44,8 +44,6 @@
     - /tmp/ant-contrib # ant-contrib
     - /tmp/ant-contrib-1.0b2-bin.tar.gz # ant-contrib
     - /tmp/ant-contrib-1.0b3-3.4.1.noarch.rpm # ant-contrib
-    - /tmp/cmake-3.7.2 # cmake
-    - /tmp/cmake-3.7.2.tar.gz # cmake
     - /tmp/cuda9_linux-run # NVidia_Cuda_Toolkit
     - /tmp/cuda-repo-rhel7-9.ppc64le.rpm # NVidia_Cuda_Toolkit
     - /tmp/dkms.noarch.rpm # NVidia_Cuda_Toolkit
