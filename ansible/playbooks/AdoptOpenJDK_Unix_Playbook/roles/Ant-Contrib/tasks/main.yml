@@ -5,6 +5,10 @@
 
 # ANT_HOME/lib is: /usr/local/apache-ant-*/lib
 
+- name: Set ant-contrib version
+  set_fact: antContribVersion=1.0b2
+  tags: ant-contrib
+
 - name: Set ant_lib_dir variable for on {{ ansible_distribution }} {{ ansible_architecture }}
   set_fact:
     ant_lib_dir: /usr/local/apache-ant-1.10.5/lib
@@ -22,7 +26,7 @@
 
 - name: Download ant-contrib
   get_url:
-    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz
     dest: /tmp/
     mode: 0440
     timeout: 25
@@ -37,7 +41,7 @@
 
 - name: Extract ant-contrib
   unarchive:
-    src: /tmp/ant-contrib-1.0b2-bin.tar.gz
+    src: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
     dest: /tmp/
     copy: False
   when: not antcontrib_status.stat.exists
@@ -46,4 +50,14 @@
 - name: Move ant-contrib.jar to ant lib folder
   command: mv /tmp/ant-contrib/lib/ant-contrib.jar {{ ant_lib_dir }}
   when: not antcontrib_status.stat.exists
+  tags: ant-contrib
+
+- name: Remove downloaded packages for ant-contrib
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/ant-contrib
+    - /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+  ignore_errors: yes
   tags: ant-contrib
