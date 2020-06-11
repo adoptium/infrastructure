@@ -48,6 +48,5 @@
   with_items:
     - /tmp/ccache.tar.gz
     - /tmp/ccache-{{ ccacheVersion }}
-    - /home/{{ Jenkins_Username }}/ccache.tar
   ignore_errors: yes
   tags: ccache
