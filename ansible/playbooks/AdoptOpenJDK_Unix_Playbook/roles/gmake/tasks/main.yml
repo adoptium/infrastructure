@@ -10,7 +10,11 @@
 # Addresses https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/499
 # For RHEL 8, use gmake 4.2.1 already installed.
 
-- name: Test if self-built make 4.1 is available
+- name: Set make version
+  set_fact: makeVersion=4.1
+  tags: goodmake_source
+
+- name: Test if self-built make {{ makeVersion }} is available
   shell: /usr/local/bin/make --version >/dev/null
   ignore_errors: yes
   register: goodmake_installed
@@ -21,10 +25,10 @@
       ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
   tags: goodmake_source
 
-- name: Download make 4.1 source
+- name: Download make {{ makeVersion }} source
   get_url:
-    url: https://ftp.gnu.org/gnu/make/make-4.1.tar.gz
-    dest: /tmp/make-4.1.tar.gz
+    url: https://ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
+    dest: /tmp/make-{{ makeVersion }}.tar.gz
     mode: 0440
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
@@ -34,9 +38,9 @@
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
-- name: Extract make 4.1 source
+- name: Extract make {{ makeVersion }} source
   unarchive:
-    src: /tmp/make-4.1.tar.gz
+    src: /tmp/make-{{ makeVersion }}.tar.gz
     dest: /tmp
     copy: False
   when:
@@ -47,8 +51,8 @@
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
-- name: Compile and install make 4.1 from source
-  shell: cd /tmp/make-4.1 && ./configure --prefix=/usr/local && make clean && make -j {{ ansible_processor_vcpus }} && make install
+- name: Compile and install make {{ makeVersion }} from source
+  shell: cd /tmp/make-{{ makeVersion }} && ./configure --prefix=/usr/local && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
@@ -57,7 +61,7 @@
     - goodmake_installed.rc != 0
   tags: goodmake_source
 
-- name: Create symlink for /usr/bin/gmake to our built 4.1 in /usr/local/bin/make
+- name: Create symlink for /usr/bin/gmake to our built {{ makeVersion }} in /usr/local/bin/make
   file:
     src: /usr/local/bin/make
     dest: /usr/local/bin/gmake
@@ -70,4 +74,14 @@
       ansible_architecture == "x86_64") or
       ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
     - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: Remove downloaded packages for gmake
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/make-{{ makeVersion }}
+    - /tmp/make-{{ makeVersion }}.tar.gz
+  ignore_errors: yes
   tags: goodmake_source

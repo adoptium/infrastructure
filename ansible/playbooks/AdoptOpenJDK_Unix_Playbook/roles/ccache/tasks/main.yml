@@ -2,6 +2,11 @@
 ##########
 # ccache #
 ##########
+
+- name: Set ccache version
+  set_fact: ccacheVersion=3.4.2
+  tags: ccache
+
 - name: Check if ccache is already installed
   stat:
     path: /usr/local/bin/ccache
@@ -9,7 +14,7 @@
   tags: ccache
 
 - name: Download ccache.tar.gz
-  command: wget -O /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v3.4.2/ccache-3.4.2.tar.gz
+  command: wget -O /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v{{ ccacheVersion }}/ccache-{{ ccacheVersion }}.tar.gz
     warn=False
   when: ccache_status.stat.isdir is not defined
   tags: ccache
@@ -23,14 +28,14 @@
   tags: ccache
 
 - name: Running ./configure & make for CCACHE
-  shell: cd /tmp/ccache-3.4.2 && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/ccache-{{ ccacheVersion }} && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_distribution != "FreeBSD"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for FreeBSD
-  shell: cd /tmp/ccache-3.4.2 && ./configure && make -j {{ ansible_processor_vcpus }} && gmake install
+  shell: cd /tmp/ccache-{{ ccacheVersion }} && ./configure && make -j {{ ansible_processor_vcpus }} && gmake install
   when:
     - ccache_status.stat.isdir is not defined
     - ansible_distribution == "FreeBSD"
@@ -42,6 +47,6 @@
     state: absent
   with_items:
     - /tmp/ccache.tar.gz
-    - /tmp/ccache-3.4.2
+    - /tmp/ccache-{{ ccacheVersion }}
   ignore_errors: yes
   tags: ccache

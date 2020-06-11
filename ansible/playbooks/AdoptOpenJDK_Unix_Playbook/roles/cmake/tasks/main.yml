@@ -3,6 +3,10 @@
 # cmake  - required by OpenJ9 and OpenJFX builds - requires C++11 compiler #
 ############################################################################
 
+- name: Set cmake version
+  set_fact: cmakeVersion=3.11.4
+  tags: cmake
+
 - name: Test if cmake is installed on path
   shell: cmake >/dev/null 2>&1
   ignore_errors: yes
@@ -19,36 +23,46 @@
 
 - name: Download cmake
   get_url:
-    url: https://cmake.org/files/v3.11/cmake-3.11.4.tar.gz
-    dest: /tmp/cmake-3.11.4.tar.gz
+    url: https://cmake.org/files/v3.11/cmake-{{ cmakeVersion }}.tar.gz
+    dest: /tmp/cmake-{{ cmakeVersion }}.tar.gz
     mode: 0440
     force: no
     validate_certs: no
     checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
 - name: Extract cmake
   unarchive:
-    src: /tmp/cmake-3.11.4.tar.gz
+    src: /tmp/cmake-{{ cmakeVersion }}.tar.gz
     dest: /tmp
     copy: False
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
 # NOTE: PATH setting is for RHEL6/CentOS6 since gcc 4.4.7 is not C++11 compliant
 - name: Running ./configure & make for cmake
-  shell: cd /tmp/cmake-3.11.4 && ./configure && PATH=/opt/gcc-4.8.5/bin:$PATH make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/cmake-{{ cmakeVersion }} && ./configure && PATH=/opt/gcc-4.8.5/bin:$PATH make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare('3.11.4', operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
     - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
     - (ansible_distribution != "openSUSE")
+  tags: cmake
+
+- name: Remove downloaded packages for cmake
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/cmake-{{ cmakeVersion }}
+    - /tmp/cmake-{{ cmakeVersion }}.tar.gz
+  ignore_errors: yes
   tags: cmake
 
 # cmake on armv7l

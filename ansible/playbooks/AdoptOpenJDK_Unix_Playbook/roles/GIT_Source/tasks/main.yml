@@ -110,3 +110,13 @@
   tags:
     - git_source
     - dont_remove_system
+
+- name: Remove downloaded packages for git source
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/git-2.15.0
+    - /tmp/git-2.15.0.tar.xz
+  ignore_errors: yes
+  tags: git_source

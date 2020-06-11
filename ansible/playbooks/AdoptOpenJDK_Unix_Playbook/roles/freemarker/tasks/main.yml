@@ -2,6 +2,11 @@
 ###################################
 # freemarker to Jenkins User home #
 ###################################
+
+- name: Set freemarker version
+  set_fact: freemarkerVersion=2.3.8
+  tags: [freemarker, adoptopenjdk]
+
 - name: Check that the freemarker.jar exists
   stat:
     path: /home/{{ Jenkins_Username }}/freemarker.jar
@@ -12,7 +17,7 @@
 # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
 - name: Download and extract freemarker.jar
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/freemarker-2.3.8.tar.gz
+    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
     dest: /tmp/
     remote_src: yes
     mode: 0755
@@ -20,11 +25,21 @@
   tags: [freemarker, adoptopenjdk]
 
 - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-  command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+  command: mv /tmp/freemarker-{{ freemarkerVersion }}/lib/freemarker.jar /home/{{ Jenkins_Username }}
   when: not freemarker.stat.exists and ansible_distribution != "MacOSX"
   tags: [freemarker, adoptopenjdk]
 
 - name: Move freemarker.jar to /Users/{{ Jenkins_Username }} folder (macOS)
-  command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /Users/{{ Jenkins_Username }}
+  command: mv /tmp/freemarker-{{ freemarkerVersion }}/lib/freemarker.jar /Users/{{ Jenkins_Username }}
   when: not freemarker.stat.exists and ansible_distribution == "MacOSX"
+  tags: [freemarker, adoptopenjdk]
+
+- name: Remove downloaded packages for freemarker.jar
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/freemarker-{{ freemarkerVersion }}
+    - /tmp/freemarker-{{ freemarkerVersion }}.tar.gz
+  ignore_errors: yes
   tags: [freemarker, adoptopenjdk]

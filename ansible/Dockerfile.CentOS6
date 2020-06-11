@@ -12,7 +12,9 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,adoptopenjdk_install"
+ ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,adoptopenjdk_install"
+
+RUN rm -rf /ansible; yum remove ansible; yum clean all
 
 RUN groupadd -g 1000 ${user}
 RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}

@@ -156,3 +156,14 @@
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16")
     - ansible_architecture == "ppc64le"
   tags: nvidia_cuda_toolkit
+
+- name: Remove downloaded packages for NVidia CUDA toolki
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/cuda9_linux-run
+    - /tmp/cuda-repo-rhel7-9.ppc64le.rpm
+    - /tmp/dkms.noarch.rpm
+  ignore_errors: yes
+  tags: nvidia_cuda_toolkit
