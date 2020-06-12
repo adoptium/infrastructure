@@ -29,6 +29,7 @@
   when:
     - ansible_os_family != "Darwin"
     - ansible_architecture == "x86_64"
+  tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for armv7l
   set_fact:
@@ -36,6 +37,7 @@
   when:
     - ansible_os_family != "Darwin"
     - ansible_architecture == "armv7l"
+  tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for everything else
   set_fact:
@@ -44,9 +46,11 @@
     - ansible_os_family != "Darwin"
     - ansible_architecture != "armv7l" and
       ansible_architecture != "x86_64"
+  tags: adoptopenjdk_install
 
 - debug:
     var: api_architecture
+  tags: adoptopenjdk_install
 
 - name: Checking for /usr/lib/jvm
   stat: path=/usr/lib/jvm
@@ -93,6 +97,16 @@
 - name: Get {{ path }}* full path name
   shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
+  when:
+    - adoptopenjdk_installed.rc != 0
+    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
+- name: Create symlink to major version
+  file:
+    src: '{{ adoptopenjdk_dir.stdout }}'
+    dest: '{{ path }}'
+    state: link
   when:
     - adoptopenjdk_installed.rc != 0
     - ansible_os_family != "Darwin"
