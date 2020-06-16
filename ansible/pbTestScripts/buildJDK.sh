@@ -145,7 +145,7 @@ if [[ ${unameOutput} != "x86_64" ]]; then
 fi
 
 # Use the JDK8 installed with the adoptopenjdk_install role to run Gradle with.
-export JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -name *jdk8*)
+export JAVA_HOME=/usr/lib/jvm/jdk8
 
 # Only build Hotspot on FreeBSD
 if [[ $(uname) == "FreeBSD" ]]; then
