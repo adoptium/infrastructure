@@ -86,6 +86,9 @@
   ignore_errors: yes
   tags: goodmake_source
 
+
+# Disabiling updates to system 'make' to ensure the symlink above doesn't break.
+# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1106
 - name: Check if /etc/yum.conf exists
   stat:
     path: /etc/yum.conf
