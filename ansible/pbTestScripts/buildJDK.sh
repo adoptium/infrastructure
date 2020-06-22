@@ -84,6 +84,7 @@ checkJDKVersion() {
 setBootJDK() {
         local buildJDKNumber=$(echo ${JAVA_TO_BUILD//[!0-9]/})
         local bootJDKNumber=$(($buildJDKNumber - 1));
+        # Refer to 8 as 'jdk8'. Anything else is 'jdk-XX'
         [[ $bootJDKNumber != "8" ]] && bootJDKNumber="-$bootJDKNumber"
         if [[ $buildJDKNumber -eq 8 ]]; then
                 # CentOS JDK7
@@ -93,14 +94,14 @@ setBootJDK() {
                 # Zulu-7 for OSs without JDK7
                 [[ -z "$JDK_BOOT_DIR" ]] && export JDK_BOOT_DIR=$(find /usr/lib/jvm/ -maxdepth 1 -name zulu7)
         else
-                export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk$bootJDKNumber*)
+                export JDK_BOOT_DIR=/usr/lib/jvm/jdk${bootJDKNumber}
         fi
         # If JDK (jdkToBuild - 1) can't be found, look for equal boot and build jdk
         if [ -z "${JDK_BOOT_DIR}" ]
         then
                 [[ $buildJDKNumber != "8" ]] && buildJDKNumber="-$buildJDKNumber"
                 echo "Can't find jdk$bootJDKNumber to build JDK, looking for jdk$buildJDKNumber"
-                export JDK_BOOT_DIR=$(find /usr/lib/jvm -maxdepth 1 -name *jdk$buildJDKNumber*)
+                export JDK_BOOT_DIR=/usr/lib/jvm/jdk${buildJDKNumber}
         fi
 }
 
