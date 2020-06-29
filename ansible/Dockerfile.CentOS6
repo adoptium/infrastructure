@@ -26,5 +26,5 @@ ENV \
     JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
     JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
     JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
-    JDKLATEST_BOOT_DIR=${JDK14_BOOT_DIR} \
-    JAVA_HOME=${JDK8_BOOT_DIR}
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
