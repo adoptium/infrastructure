@@ -10,6 +10,11 @@ COPY . /ansible
 
 RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
+# Install cuda headers https://github.com/eclipse/openj9/blob/master/buildenv/docker/mkdocker.sh#L586-L593
+RUN mkdir -p /usr/local/cuda-9.0/nvvm
+COPY --from=nvidia/cuda:9.0-devel-ubuntu16.04 /usr/local/cuda-9.0/include /usr/local/cuda-9.0/include
+COPY --from=nvidia/cuda:9.0-devel-ubuntu16.04 /usr/local/cuda-9.0/nvvm/include /usr/local/cuda-9.0/nvvm/include
+
 RUN set -eux; \
  cd /ansible; \
  ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
@@ -27,4 +32,5 @@ ENV \
     JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
     JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
     JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
-    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
+    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64" \
+    CUDA_HOME="/usr/local/cuda-9.0"
