@@ -1,4 +1,4 @@
-name: Build
+name: Docker
 
 on:
   pull_request:
@@ -12,13 +12,10 @@ on:
     branches:         
     - master
 
-env:
-  CONTAINER_IMAGE: adoptopenjdk/centos6_image
-  SLAVE_IMAGE: adoptopenjdk/jenkins_slave
 
 jobs:
-  build-and-push:
-    name: Building and pushing image to Dockerhub
+  build-and-push-centos6:
+    name: Centos6
     runs-on: ubuntu-latest
     steps:
 
@@ -34,12 +31,19 @@ jobs:
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
 
-    - name: Docker Build & Push Jenkins Slave Image to Docker Hub
+  build-and-push-centos7:
+    name: Centos7
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Docker Build & Push Centos7 Image to Docker Hub
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        dockerfile: ./ansible/Dockerfile.JenkinsSlave
-        repository: adoptopenjdk/jenkins_slave
+        dockerfile: ./ansible/Dockerfile.CentOS7
+        repository: adoptopenjdk/centos7_build_image
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
