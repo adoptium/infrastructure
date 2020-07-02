@@ -429,6 +429,7 @@
           shell: lslpp -l X11.adt.ext >/dev/null 2>&1
           register: does_X11_adt_ext_exist
           ignore_errors: yes
+          tags: x11
 
         - name: Check if X11.vfb is installed
           shell: lslpp -l X11.vfb >/dev/null 2>&1
