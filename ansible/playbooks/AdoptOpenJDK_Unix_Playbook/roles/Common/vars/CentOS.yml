@@ -13,6 +13,7 @@ Build_Tool_Packages:
   - cpio
   - cups-devel
   - elfutils-libelf-devel
+  - file
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
