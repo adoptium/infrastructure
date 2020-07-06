@@ -9,6 +9,8 @@ env:
 os: 
   - linux
 
+dist: bionic
+
 install: skip
 
 script:
