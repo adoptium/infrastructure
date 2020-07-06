@@ -45,6 +45,8 @@
   unarchive:
     src: /tmp/git-2.15.0.tar.xz
     dest: /tmp/
+    extra_opts:
+      - --no-same-owner
     copy: False
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )

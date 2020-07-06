@@ -1,51 +1,31 @@
----
-language: python
-python: "2.7"
+arch:
+  - amd64
+  - arm64
+  - ppc64le
 
-sudo: required
-dist: trusty
+env: 
+  - TARGET="adoptopenjdk/centos7_build_image"
 
-# Install ansible
-addons:
-  apt:
-    packages:
-      - python-pip
+os: 
+  - linux
 
-install:
-  # Install ansible
-  - pip install ansible
-  - pip install yamllint==1.13.0
-  - pip install ansible-lint==4.2.0
-
-  # Check ansible version
-  - ansible --version
+install: skip
 
 script:
-  - cd ansible
+  - docker build -t $TARGET:$TRAVIS_OS_NAME-$TRAVIS_CPU_ARCH -f ansible/Dockerfile.CentOS7 .
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push $TARGET:$TRAVIS_OS_NAME-$TRAVIS_CPU_ARCH; fi
 
-    # Check that the inventory is valid
-  - ansible-inventory --host=build-marist-rhel77-s390x-1
-
-    # Check YAML validity
-  - yamllint -c yamllint.yml .
-
-    # Ansible code static analysis
-
-  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Unix_Playbooks/trss.yml
-  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
-  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml
-  - ansible-lint -x 403,204 playbooks/AdoptOpenJDK_ITW_Playbook/main.yml
-  - ansible-lint -x 403,204 playbooks/aix.yml
-  - ansible-lint -x 403,204 playbooks/vagrant.yml
-  - ansible-lint -x 403,204 playbooks/ubuntu-jck.yml
-
-    # Check Playbook syntax.
-  - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --syntax-check
-  - ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/trss.yml --syntax-check
-  - ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
-  - ansible-playbook playbooks/AdoptOpenJDK_Services_Playbooks/ubuntu-jckservices.yml --syntax-check
-  - ansible-playbook playbooks/AdoptOpenJDK_ITW_Playbook/main.yml --syntax-check
-  - ansible-playbook playbooks/vagrant.yml --syntax-check
-  - ansible-playbook playbooks/aix.yml --syntax-check
-  - ansible-playbook playbooks/ubuntu-jck.yml --syntax-check
+jobs:
+  include:
+    - stage: manifest
+      script: export DOCKER_CLI_EXPERIMENTAL=enabled &&
+        AMD64=$TARGET:linux-amd64 &&
+        ARM64=$TARGET:linux-arm64 &&
+        PPC64LE=$TARGET:linux-ppc64le &&
+        docker manifest create adoptopenjdk/centos7_build_image $AMD64 $ARM64 $PPC64LE &&
+        docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux &&
+        docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux &&
+        docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+      after_success:
+        - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker manifest push $TARGET; fi
