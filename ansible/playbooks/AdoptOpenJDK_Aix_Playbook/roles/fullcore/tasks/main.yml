@@ -1,0 +1,7 @@
+############################
+# Enable full core support #
+############################
+- name: ensure full AIX core files are enabled
+  command: chdev -l sys0 -a fullcore=true
+  changed_when: False
+  tags: fullcore

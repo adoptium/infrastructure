@@ -1,0 +1,29 @@
+################################
+# AIX RAMDISK configuration    #
+################################
+- name: Create /usr/local/bin if it doesn't exist
+  file:
+    path: /usr/local/bin
+    state: directory
+  tags: ramdisk
+
+- name: Update inittab
+  lineinfile:
+    line: "ramdisk:2:once:/usr/local/bin/AIX_ramdisk.ksh >/dev/null 2>&1"
+    path: /etc/inittab
+  tags: ramdisk
+
+- name: Check if AIX_ramdisk.ksh exists
+  stat:
+    path: /usr/local/bin/AIX_ramdisk.ksh
+    register: ramdisk_script_exists
+  tags: ramdisk
+
+- name: Download AIX ramdisk script
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_ramdisk.ksh
+    dest: /usr/local/bin/AIX_ramdisk.ksh
+    mode: 0775
+    validate_certs: no
+  when: not ramdisk_script_exists.stat.exists
+  tags: ramdisk

@@ -1,0 +1,21 @@
+#####################
+# Enable swap space #
+#####################
+- name: ensure swap space is of adequate size
+  shell: |
+    swap_line=$(lsps -a | tail -n 1)
+    curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
+    swap_lv=$(echo $swap_line | awk '{print $1}')
+    if [[ $curr_swap_size -lt {{ swap_size }} ]]
+    then
+        echo "Extending swap LV..."
+        extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+    fi
+  register: extendlv_result
+  changed_when: "'Extending' in extendlv_result.stdout"
+  notify:
+    - restart machine
+  tags:
+    - swap
+    # Environment variables don't work as part of command
+    - skip_ansible_lint
