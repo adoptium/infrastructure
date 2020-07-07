@@ -22,6 +22,7 @@
     - Debug
     - Version
     - Common
+    - Providers                   # AdoptOpenJDK Infrastructure
     - autoconf
     - curl
     - Jenkins_User                # AdoptOpenJDK Infrastructure
