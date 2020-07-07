@@ -21,7 +21,7 @@
   tags:
     - providers
     - adoptopenjdk
- 
+
 - debug:
     msg: "The provider found is: {{ provider_name.stdout }}"
   when:
