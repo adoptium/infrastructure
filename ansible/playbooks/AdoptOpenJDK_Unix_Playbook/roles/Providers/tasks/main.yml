@@ -1,0 +1,64 @@
+---
+###########################
+# Provider Specific Tasks #
+###########################
+#
+# Certain providers of machines have idiosyncrasies that should be addressed here
+
+# Skipping linting as no situation where this can't run (lint error 301)
+- name: Determine the provider by the hostname
+  shell: set -o pipefail | hostname | cut -d- -f2
+  ignore_errors: yes
+  register: provider_name
+  tags:
+    - providers
+    - adoptopenjdk
+    - skip_ansible_lint
+
+- debug:
+    msg: "No provider could be found"
+  when: provider_name.stdout | length == 0
+  tags:
+    - providers
+    - adoptopenjdk
+
+- debug:
+    msg: "The provider found is: {{ provider_name.stdout }}"
+  when:
+    - (provider_name.rc == 0) and (provider_name.stdout | length > 0)
+  tags:
+    - providers
+    - adoptopenjdk
+
+###########
+# GoDaddy #
+###########
+
+# GoDaddy machines need their host template updated for changes to /etc/hosts to persist
+- name: Update /etc/cloud/templates/hosts.debian.tmpl file- IP FQDN hostname (GoDaddy)
+  lineinfile:
+    dest: /etc/cloud/templates/hosts.debian.tmpl
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    state: present
+  when:
+    - provider_name.rc == 0
+    - provider_name.stdout == "godaddy"
+    - Domain == "adoptopenjdk.net"
+  tags:
+    - providers
+    - adoptopenjdk
+
+- name: Update /etc/cloud/templates/hosts.debian.tmpl file- IP FQDN hostname (Domian != "adoptopenjdk.net") (GoDaddy)
+  lineinfile:
+    dest: /etc/cloud/templates/hosts.debian.tmpl
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+  when:
+    - provider_name.rc == 0
+    - provider_name.stdout == "godaddy"
+    - Domain != "adoptopenjdk.net"
+  tags:
+    - providers
+    - adoptopenjdk
