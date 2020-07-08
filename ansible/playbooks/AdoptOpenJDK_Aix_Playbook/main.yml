@@ -55,7 +55,7 @@
     - fullcore
     - swap
 
-   handlers:
+  handlers:
     - name: restart machine
       shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
       async: 1

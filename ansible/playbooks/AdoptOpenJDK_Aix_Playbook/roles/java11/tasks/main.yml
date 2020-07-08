@@ -2,7 +2,7 @@
 # OpenJ9 JDK 11 #
 #################
 - name: Check for Java11 availability
-    stat:
+  stat:
     path: /usr/java11_64
   register: java11
   tags: java11
