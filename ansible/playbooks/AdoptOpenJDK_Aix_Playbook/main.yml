@@ -18,15 +18,15 @@
     - block:
         # Set standard variables
         - name: Load AdoptOpenJDKs variable file
-            include_vars: ../adoptopenjdk_variables.yml
+          include_vars: ../adoptopenjdk_variables.yml
         # Install bash if it's not already there
         - name: Check if bash is installed
-            shell: bash --version >/dev/null 2>&1
-            register: does_bash_exist
-            ignore_errors: yes
+          shell: bash --version >/dev/null 2>&1
+          register: does_bash_exist
+          ignore_errors: yes
         - name: install bash
-            yum: name=bash state=present update_cache=yes
-            when: does_bash_exist.rc != 0
+          yum: name=bash state=present update_cache=yes
+          when: does_bash_exist.rc != 0
 
   roles:
     - filesystem
