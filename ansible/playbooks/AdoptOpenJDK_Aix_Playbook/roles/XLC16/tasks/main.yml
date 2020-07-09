@@ -44,5 +44,5 @@
 - name: Clean XLC16 tmp files
   file:
     path: /tmp/usr
-  state: absent
+    state: absent
   tags: xlc16

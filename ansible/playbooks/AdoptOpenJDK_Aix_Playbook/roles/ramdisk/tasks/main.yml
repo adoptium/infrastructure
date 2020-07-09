@@ -16,7 +16,7 @@
 - name: Check if AIX_ramdisk.ksh exists
   stat:
     path: /usr/local/bin/AIX_ramdisk.ksh
-    register: ramdisk_script_exists
+  register: ramdisk_script_exists
   tags: ramdisk
 
 - name: Download AIX ramdisk script
