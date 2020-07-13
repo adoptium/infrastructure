@@ -164,7 +164,7 @@ if grep 'buster' /etc/*-release >/dev/null 2>&1; then
 	export CC=/usr/bin/gcc-7
 	export CXX=/usr/bin/g++-7
 fi
-
+export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
 echo "DEBUG:
         TARGET_OS=$TARGET_OS
         ARCHITECTURE=$ARCHITECTURE
@@ -173,7 +173,8 @@ echo "DEBUG:
         JDK_BOOT_DIR=$JDK_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
-        GIT_URL=$GIT_URL"
+        GIT_URL=$GIT_URL
+        FILENAME=$FILENAME"
 
 cloneRepo 
 
