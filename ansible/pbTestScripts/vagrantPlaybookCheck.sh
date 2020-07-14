@@ -199,7 +199,8 @@ setupWorkspace()
 startVMPlaybook()
 {
 	local OS=$1
-	local vagrantIP=""
+	local vagrantPORT=""
+
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
@@ -212,12 +213,12 @@ startVMPlaybook()
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
 	# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
+	vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
 
 	rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-	echo "[127.0.0.1]:$(vagrant  port | grep host | awk '{ print $4 }')" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-	vagrantIP=$(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
+	echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
 	# Remove IP from known_hosts if already found
-	ssh-keygen -R $vagrantIP
+	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
 	
 	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	# Alter ansible.cfg to increase timeout and to specify which private key to use
@@ -230,9 +231,9 @@ startVMPlaybook()
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
-		ssh -p $(vagrant  port | grep host | awk '{ print $4 }') -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot"
+		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot"
 		if [[ "$runTest" = true ]]; then
-			ssh -p $(vagrant  port | grep host | awk '{ print $4 }') -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh"
+			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh"
 		fi
 	fi
 }
