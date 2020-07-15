@@ -226,14 +226,17 @@ startVMPlaybook()
 	! grep -q "timeout" ansible.cfg && sed -i -e 's/\[defaults\]/&\ntimeout = 30/g' ansible.cfg
 	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pb_failed=$?
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 
 	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
 		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot"
+		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh"
+			echo The test finished at : `date +%T`
 		fi
 	fi
 }
@@ -266,6 +269,7 @@ startVMPlaybookWin()
 	fi
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	echo The playbook finished at : `date +%T`
 	searchLogFiles $OS
 	local pbFailed=$?
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
@@ -275,10 +279,12 @@ startVMPlaybookWin()
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
 		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b
+		echo The build finished at : `date +%T`
 		if [[ "$runTest" = true ]]; then
 			vagrant halt && vagrant up
 			# Run a python script to start a test for the built JDK on the Windows VM
 			python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -t
+			echo The test finished at : `date +%T`
 		fi
 	fi
 }
