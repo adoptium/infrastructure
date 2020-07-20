@@ -26,8 +26,6 @@ echo "--------------------------------------------------------------------------
 echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains ***"
 cat $VAGRANT_MOUNT/playbooks/hosts
 echo "---------------------------------------------------------------------------------------"
-# Get IPs of the VM, and output to shared folder
-ip address show | grep -e "\\binet\\b" | cut -d' ' -f6 | cut -d/ -f1  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
