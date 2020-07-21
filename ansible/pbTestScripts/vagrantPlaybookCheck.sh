@@ -59,24 +59,31 @@ processArgs()
 
 usage()
 {
-	echo "Usage: ./testScript.sh			--vagrantfile | -v <OS_Version>		Specifies which OS the VM is
-					--all | -a 				Builds and tests playbook through every OS
-					--retainVM | -r				Option to retain the VM and folder after completion
-					--build | -b				Option to enable testing a native build on the VM
-					--JDK-Version | -jdk <JDKVersion>	Specify which JDK to build, if build is specified
-					--build-repo | -br <GitURL>		Specify the openjdk-build repo to build with
-					--build-hotspot				Build the JDK with Hotspot (Default is OpenJ9)
-					--clean-workspace | -c			Will remove the old work folder if detected
-					--URL | -u <GitURL>			The URL of the git repository
-                                        --test | -t                             Runs a quick test on the built JDK
-					--no-halt | -n				Option to stop the vagrant VMs halting
-					--new-vagrant-files | -nv		Use vagrantfiles from the the specified git repository
-					--skip-more | -sm			Run playbook faster by exluding things not required by buildJDK
-					--help | -h				Displays this help message"
+	echo "Usage: ./vagrantPlaybookCheck.sh [options] (-a|-v <OS>)
+  --vagrantfile | -v <OS>        Specifies which OS/distribution to test
+  --all | -a                     Builds and tests playbook through every OS
+  --retainVM | -r                Option to retain the VM and folder after completion
+  --build | -b                   Option to enable testing a native build on the VM
+  --JDK-Version | -jdk <Version> Specify which JDK to build, if build is specified
+  --build-repo | -br <GitURL>    Specify the openjdk-build repo to build with
+  --build-hotspot                Build the JDK with Hotspot (Default is OpenJ9)
+  --clean-workspace | -c         Remove the old work folder if detected
+  --URL | -u <GitURL>            The URL of the git repository
+  --test | -t                    Runs a quick test on the built JDK
+  --no-halt | -n                 Option to stop the vagrant VMs halting
+  --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
+  --skip-more | -sm              Run playbook faster by excluding things not required by buildJDK
+  --help | -h                    Displays this help message"
 }
 
 checkVars()
 {
+	if [ "$vagrantOS" == "" ]; then
+                usage
+		echo "ERROR: No Vagrant OS specified - Use -h for help, -a for all or -v with one of the following:"
+		ls -1 ../Vagrantfile.* | cut -d. -f4
+                exit 1
+	fi
 	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
                 echo "Unable to test an unbuilt JDK. Please specify both '--build' and '--test'"
                 exit 1
@@ -89,10 +96,6 @@ checkVars()
 	if [ "$gitURL" == "" ]; then
 		echo "No GitURL specified; Defaulting to adoptopenjdk/openjdk-infrastructure"
 		gitURL=https://github.com/adoptopenjdk/openjdk-infrastructure
-	fi
-	if [ "$vagrantOS" == "" ]; then
-		echo "No Vagrant OS specified; Defaulting to testing all of them"
-		vagrantOS="all"
 	fi
 	if [[ "$retainVM" == false && "$vmHalt" == false ]]; then
 		echo "Must halt the VM to destroy it; Ignoring '--no-halt' option"
