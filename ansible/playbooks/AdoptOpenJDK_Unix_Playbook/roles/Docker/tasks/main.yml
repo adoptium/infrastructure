@@ -283,7 +283,7 @@
     - skip_ansible_lint
 
 - name: Install Docker for Debian
-  package: "name=docker-ce state=latest"
+  package: "name=docker.io state=latest"
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Debian"
