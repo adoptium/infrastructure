@@ -10,6 +10,7 @@
   apt:
     name: gnupg2
     state: present
+    update_cache: yes
   when: ansible_architecture == "s390x"
   tags: patch_update
 
