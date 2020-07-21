@@ -200,13 +200,14 @@
 
 # Debian
 
-- name: Add Docker GPG apt Key for Debian
+- name: Add Docker GPG apt Key for Debian ( < 10 )
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
     state: present
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Debian"
+    - ansible_distribution_major_version|int <10
   tags: docker
 
 - name: Add Docker GPG apt key for Raspbian
@@ -240,6 +241,7 @@
   when:
     - docker_installed.rc != 0
     - ansible_distribution == "Debian"
+    - ansible_distribution_major_version|int <10
     - ansible_architecture == "x86_64"
   tags: docker
 
