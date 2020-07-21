@@ -16,6 +16,7 @@ fastMode=false
 skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
+testDocker=false
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -50,6 +51,8 @@ processArgs()
 				buildURL="--URL $1"; shift;;
 			"--build-hotspot" )
 				buildHotspot="--hotspot";;
+			"--test-docker" )
+				testDocker=true;;
 			"--help" | "-h" )
 				usage; exit 0;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -237,6 +240,19 @@ startVMPlaybook()
 		if [[ "$runTest" = true ]]; then
 			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh"
 			echo The test finished at : `date +%T`
+		fi
+	fi
+
+        if [[ "$testDocker" == "true" ]]; then
+        	if [ "$OS" == "FreeBSD12" -o "$OS" == "CentOS8" -o "$OS" == "CentOS6" ]; then
+        		echo Skipping docker test as we do not set it up on $OS
+        	else
+#			if ! ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 /usr/sbin/service docker status; then
+#				echo WARNING: Docker service was not started on the VM ... Attempting to start
+#	        		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 /usr/sbin/service docker start
+#	        	fi
+        		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 sudo docker run alpine /bin/echo Hello World from inside docker
+			echo The docker validation finished at : `date +%T`
 		fi
 	fi
 }
