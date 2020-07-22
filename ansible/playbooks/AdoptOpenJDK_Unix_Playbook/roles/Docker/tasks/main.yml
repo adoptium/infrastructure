@@ -271,12 +271,23 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Install Docker for Cent/Rhel 7
+- name: Install Docker for Cent/Rhel 7 x86
   package: "name=docker-ce state=latest"
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
     - ansible_architecture == "x86_64"
+  tags:
+    - docker
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Install Docker for Cent/Rhel 7 ppc64le
+  package: "name=docker state=latest"
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+    - ansible_architecture == "ppc64le"
   tags:
     - docker
     # TODO: Package installs should not use latest
