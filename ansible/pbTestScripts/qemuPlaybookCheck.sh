@@ -1,7 +1,5 @@
 #!/bin/bash
 
-## Parse arguments
-
 ARCHITECTURE=""
 skipFullSetup=""
 gitURL="https://github.com/adoptopenjdk/openjdk-infrastructure"
@@ -15,7 +13,10 @@ cleanWorkspace=false
 retainVM=false
 buildJDK=false
 testJDK=false
+# Default to building jdk8u
+jdkToBuild="jdk8u"
 
+# Parse Arguments
 processArgs() {
 	while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]]; do
 		local opt="$1";
@@ -41,6 +42,8 @@ processArgs() {
 				gitBranch=$1; shift;;
 			"--skip-more" | "-sm" )
 				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
+			"--jdk-version" | "-v" )
+				jdkToBuild="$1"; shift;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
 		esac
 	done
@@ -55,6 +58,7 @@ usage() {
 		--help | -h 			Shows this help message
 		--infra-repo | -ir		Which openjdk-infrastructure to retrieve the playbooks (default: www.github.com/adoptopenjdk/openjdk-infrastructure)
 		--infra-branch | -ib		Specify the branch of the infra-repo (default: master)
+		--jdk-version | -v		Specify which JDK to build if '-b' is used (default: jdk8u)
 		--retainVM | -r			Retain the VM once running the playbook
 		--skip-more | -sm		Skip non-essential roles from the playbook
 		--test | -t			Test the built JDK
@@ -189,7 +193,7 @@ runPlaybook() {
 	fi
 
 	if [[ "$buildJDK" == true ]]; then
-		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh"
+		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh --version $jdkToBuild"
 		if [[ "$testJDK" == true ]]; then
 			ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "\$HOME/openjdk-infrastructure/ansible/pbTestScripts/testJDK.sh" 
 		fi	
