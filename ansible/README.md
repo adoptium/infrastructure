@@ -72,6 +72,22 @@ The playbook can then be run by executing the following, from the `openjdk-infra
 ansible-playbook -i hosts -u ADMIN_USER --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 ```
 
+Due to the time taken to execute some of the roles on the playbook, such as the cygwin and MSVS installations, a ConnectTimeout error could occur.
+
+```bash
+ConnectTimeout: HTTPSConnectionPool(host='x.xx.xxx.xxx', port=5986): Max retries exceeded with url: /wsman (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x7f1f31ef2d10>, 'Connection to x.xx.xxx.xxx timed out. (connect timeout=30)'))
+fatal: [x.xx.xxx.xxx]: FAILED! => {"msg": "Unexpected failure during module execution.", "stdout": ""}
+```
+
+In certain cases, this can be fixed by increasing a couple of timeout variables in `playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml`
+
+```bash
+ansible_winrm_operation_timeout_sec: 600
+ansible_winrm_read_timeout_sec: 630
+```
+
+Additional information about `winrm` variables can be found [here](https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/user_guide/windows_winrm.rst#inventory-options)
+
 ## Which playbook do I run?
 
 Our playbooks are named according to the operating system they are supported for, keep in mind that package availability may differ between operating system releases.

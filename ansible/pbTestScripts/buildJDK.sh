@@ -170,6 +170,8 @@ if [ "$ARCHITECTURE" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT == 
 	JAVA_TO_BUILD=jdk11u
 fi
 
+export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
+
 echo "DEBUG:
         TARGET_OS=$TARGET_OS
         ARCHITECTURE=$ARCHITECTURE
@@ -178,7 +180,8 @@ echo "DEBUG:
         JDK_BOOT_DIR=$JDK_BOOT_DIR
         JAVA_HOME=$JAVA_HOME
         WORKSPACE=$WORKSPACE
-        GIT_URL=$GIT_URL"
+        GIT_URL=$GIT_URL
+        FILENAME=$FILENAME"
 
 cloneRepo 
 

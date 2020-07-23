@@ -2,8 +2,6 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
-# Get IPs of the VM, and output to shared folder
-ip address show | grep -w inet | cut -d/ -f 1 | sed 's/inet//g' | tr -d '[:blank:]' >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys

@@ -5,8 +5,6 @@ $script = <<SCRIPT
 # Doesn't come pre-installed in the vagrant box
 sudo pkg install -y python
 sudo ln -sf /usr/local/bin/python /usr/bin/python
-# Get IPs of the VM, and output to shared folder
-ifconfig | grep "inet" | awk '{print $2}' | sed 's/addr://'  >> /vagrant/playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
