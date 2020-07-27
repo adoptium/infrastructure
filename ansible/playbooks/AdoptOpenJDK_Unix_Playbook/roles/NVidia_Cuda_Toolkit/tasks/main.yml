@@ -2,7 +2,7 @@
 #######################
 # NVidia_Cuda_Toolkit #
 #######################
-- name: Check if NVidia CUDA toolkit is aready installed
+- name: Check if NVidia CUDA toolkit is already installed
   stat:
     path: /usr/local/cuda-9.0
   register: cuda_installed
