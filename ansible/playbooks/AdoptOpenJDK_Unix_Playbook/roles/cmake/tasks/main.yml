@@ -31,7 +31,7 @@
     checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x") or (ansible_architecture == "aarch64")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
@@ -42,7 +42,7 @@
     copy: False
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x") or (ansible_architecture == "aarch64")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
@@ -51,7 +51,7 @@
   shell: cd /tmp/cmake-{{ cmakeVersion }} && ./configure && PATH=/opt/gcc-4.8.5/bin:$PATH make -j {{ ansible_processor_vcpus }} && make install
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x")
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le") or (ansible_architecture == "s390x") or (ansible_architecture == "aarch64")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
