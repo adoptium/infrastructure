@@ -92,3 +92,15 @@
 - name: Perform OS setup and configuration
   include_tasks: "{{ ansible_distribution }}.yml"
   tags: main
+
+###################
+# cmake on armv7l #
+###################
+- name: Install cmake on armv7l
+  apt: pkg=cmake state=latest update_cache=yes
+  when:
+    - ansible_architecture == "armv7l"
+  tags:
+    - cmake
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
