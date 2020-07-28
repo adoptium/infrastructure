@@ -229,7 +229,7 @@ startVMPlaybook()
 	
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	if grep -q 'unreachable=0.*failed=0' $pbLogPath; then
+	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
 		echo PLAYBOOK FAILED 
 		exit 1
 	fi
@@ -238,7 +238,7 @@ startVMPlaybook()
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
 		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
-		if grep -q '] Error' $buildLogPath; then
+		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
 			exit 127
 		fi
@@ -289,7 +289,7 @@ startVMPlaybookWin()
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $pbLogPath
 	echo The playbook finished at : `date +%T`
-	if grep -q 'unreachable=0.*failed=0' $pbLogPath; then
+	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
 		echo PLAYBOOK FAILED 
 		exit 1
 	fi
@@ -302,7 +302,7 @@ startVMPlaybookWin()
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
 		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
-		if grep -q '] Error' $buildLogPath; then
+		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
 			exit 127
 		fi
