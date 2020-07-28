@@ -188,7 +188,7 @@ runPlaybook() {
 
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$pbLogPath"
 	if grep -q 'failed=[1-9]\|unreachable=[1-9]' "$pbLogPath"; then
-		echo "Playbook failed"
+		echo "PLAYBOOK FAILED"
 		destroyVM
 		exit 1;
 	fi
@@ -197,7 +197,7 @@ runPlaybook() {
 		local buildLogPath="$workFolder/logFiles/$ARCHITECTURE.build_log"
 		
 		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh --version $jdkToBuild" 2>&1 | tee "$buildLogPath"
-		if grep -q '] Error' "$buildLogPath"; then
+		if grep -q '] Error' "$buildLogPath" || grep -q 'configure: error' "$buildLogPath"; then
 			echo BUILD FAILED
 			destroyVM
 			exit 127
@@ -206,7 +206,7 @@ runPlaybook() {
 		if [[ "$testJDK" == true ]]; then
 			local testLogPath="$workFolder/logFiles/$ARCHITECTURE.test_log"
 
-			ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "\$HOME/openjdk-infrastructure/ansible/pbTestScripts/testJDK.sh" 2>&1 | tee $testLogPath
+			ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "\$HOME/openjdk-infrastructure/ansible/pbTestScripts/testJDK.sh" 2>&1 | tee "$testLogPath"
 			if ! grep -q 'FAILED: 0' "$testLogPath"; then
 				echo TEST FAILED
 				destroyVM
