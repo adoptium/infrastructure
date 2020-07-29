@@ -206,6 +206,7 @@ startVMPlaybook()
 {
 	local OS=$1
 	local vagrantPORT=""
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log"
 
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
@@ -227,22 +228,32 @@ startVMPlaybook()
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
 	
 	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-	# Alter ansible.cfg to increase timeout and to specify which private key to use
-	# NOTE! Only works with GNU sed
-	! grep -q "timeout" ansible.cfg && sed -i -e 's/\[defaults\]/&\ntimeout = 30/g' ansible.cfg
-	! grep -q "private_key_file" ansible.cfg && sed -i -e 's/\[defaults\]/&\nprivate_key_file = id_rsa/g' ansible.cfg
+	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+	
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
-	searchLogFiles $OS
-	local pb_failed=$?
-	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
+		echo PLAYBOOK FAILED 
+		exit 1
+	fi
 
-	if [[ "$testNativeBuild" = true && "$pb_failed" == 0 ]]; then
-		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot"
+	if [[ "$testNativeBuild" = true ]]; then
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
+		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
+		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
+			echo BUILD FAILED
+			exit 127
+		fi
+
 		if [[ "$runTest" = true ]]; then
-			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh"
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.test_log"
+			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh" 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
+			if ! grep -q 'FAILED: 0' $testLogPath; then
+				echo TEST FAILED
+				exit 127
+			fi
 		fi
 	fi
 
@@ -263,12 +274,15 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log"
+
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
 	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
 	fi
+
 	# Remove the Hosts files if they're found
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.*
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
@@ -276,6 +290,7 @@ startVMPlaybookWin()
 	BUILD_ID=dontKillMe vagrant up
 	cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+	
 	# Changes the value of "hosts" in main.yml
 	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
@@ -286,38 +301,40 @@ startVMPlaybookWin()
 		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
+	
 	# Run the ansible playbook on the VM & logs the output.
-	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
+	ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $pbLogPath
 	echo The playbook finished at : `date +%T`
-	searchLogFiles $OS
-	local pbFailed=$?
-	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
-        if [[ "$testNativeBuild" = true && "$pbFailed" == 0 ]]; then
+	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
+		echo PLAYBOOK FAILED 
+		exit 1
+	fi
+        
+	if [[ "$testNativeBuild" = true ]]; then
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
 		# Restarting the VM as the shared folder disappears after the playbook runs. (Possibly due to the restarts in the playbook)
 		vagrant halt && vagrant up
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b
+		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
+		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
+			echo BUILD FAILED
+			exit 127
+		fi
+	
 		if [[ "$runTest" = true ]]; then
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.test_log"
 			vagrant halt && vagrant up
 			# Run a python script to start a test for the built JDK on the Windows VM
-			python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -t
+			python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -t 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
+			if ! grep -q 'FAILED: 0' $testLogPath; then 
+				echo TEST FAILED
+				exit 127
+			fi
 		fi
 	fi
-}
-
-searchLogFiles()
-{
-        local OS=$1
-        cd $WORKSPACE/adoptopenjdkPBTests/logFiles
-        if grep -q 'failed=0' *$folderName.$branchName.$OS.log && grep -q 'unreachable=0' *$folderName.$branchName.$OS.log
-        then
-                return 0;
-        else
-                return 1;
-        fi
 }
 
 destroyVM()
