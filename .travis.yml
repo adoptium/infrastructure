@@ -11,6 +11,8 @@ os:
 
 dist: bionic
 
+virt: lxd
+group: edge
 install: skip
 
 script:
