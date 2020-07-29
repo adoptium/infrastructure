@@ -11,5 +11,6 @@
 - name: Reboot machine if necessary
   win_reboot:
     reboot_timeout: 3600
+  ignore_errors: yes
   when: update_result.reboot_required
   tags: Windows_Updates
