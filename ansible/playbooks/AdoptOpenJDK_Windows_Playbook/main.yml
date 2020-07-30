@@ -61,6 +61,7 @@
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
+    - MSVS_2019                   # OpenJ9
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - Clang_64bit                 # OpenJ9
