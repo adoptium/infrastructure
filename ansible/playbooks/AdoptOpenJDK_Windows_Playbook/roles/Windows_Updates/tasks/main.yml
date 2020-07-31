@@ -2,6 +2,9 @@
 ###################
 # Windows Updates #
 ###################
+
+# The following tasks have ignore_errors enabled as some Windows Providers can have issues updating due to the Administrator managed updates
+# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1469
 - name: Download and Install Windows Updates
   win_updates:
   register: update_result
@@ -11,5 +14,6 @@
 - name: Reboot machine if necessary
   win_reboot:
     reboot_timeout: 3600
+  ignore_errors: yes
   when: update_result.reboot_required
   tags: Windows_Updates
