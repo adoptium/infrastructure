@@ -16,7 +16,11 @@
   when:
     - ansible_distribution != "CentOS" and ansible_distribution != "RedHat"
     - ansible_distribution != "FreeBSD"
+<<<<<<< HEAD
     - ansible_distribution != "Alpine"
+=======
+    - ansible_architecture != "riscv64"
+>>>>>>> ansible: add test-gdams-debian10-riscv64-1 to inventory
   tags: ntp_time
 
 - name: Configure NTP server pools

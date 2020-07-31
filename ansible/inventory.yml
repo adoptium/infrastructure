@@ -125,6 +125,9 @@ hosts:
           win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
           win2019-x64-2: {ip: 34.245.29.235, user: Administrator}
 
+      - gdams:
+          debian10-riscv64-1: {ip: gdams.ddns.net}
+
       - godaddy:
           centos7-x64-1: {ip: 160.153.244.82, user: adoptopenjdk}
           centos7-x64-2: {ip: 160.153.246.204, user: adoptopenjdk}

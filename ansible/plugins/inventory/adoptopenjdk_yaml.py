@@ -38,16 +38,25 @@ except ImportError:
 
 valid = {
   # taken from nodejs/node.git: ./configure
+<<<<<<< HEAD
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
+=======
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'riscv64'),
+>>>>>>> ansible: add test-gdams-debian10-riscv64-1 to inventory
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
+<<<<<<< HEAD
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
         'aws', 'inspira')
+=======
+        'macstadium', 'macincloud', 'softlayer', 'spearhead',
+        'packet', 'linaro','digitalocean', 'ibm', 'godaddy', 'aws', 'gdams')
+>>>>>>> ansible: add test-gdams-debian10-riscv64-1 to inventory
 }
 
 INVENTORY_FILENAME = "inventory.yml"

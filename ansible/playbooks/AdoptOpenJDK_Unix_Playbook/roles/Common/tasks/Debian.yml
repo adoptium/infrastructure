@@ -13,6 +13,7 @@
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
     - ansible_architecture != "armv7l"
+    - ansible_architecture != "riscv64"
     - ansible_distribution_major_version != "10"
   tags: patch_update
 
@@ -20,14 +21,19 @@
   apt_key:
     url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     state: present
+  when:
+    - ansible_architecture != "riscv64"
 
 - name: Add the adoptopenjdk repository to apt for JDK8
   apt_repository: repo='deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb jessie main' update_cache=no
+  when:
+    - ansible_architecture != "riscv64"
 
 - name: Add the ubuntu toolchain repository to apt
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
   when:
     - ansible_architecture != "armv7l"
+    - ansible_architecture != "riscv64"
     - ansible_distribution_major_version != "10"
   tags: patch_update
 
@@ -122,6 +128,7 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+    - ansible_architecture != "riscv64"
     - ansible_distribution_major_version != "10"
   tags: build_tools
 
@@ -160,6 +167,20 @@
   with_items: "{{ Additional_Build_Tools_aarch64 }}"
   when:
     - ansible_architecture == "aarch64"
+  tags: build_tools
+
+- name: Install additional build tools for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
+  tags: build_tools
+
+- name: Install additional build tools for NOT riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_riscv64 }}"
+  when:
+    - ansible_architecture != "riscv64"
   tags: build_tools
 
 #########################

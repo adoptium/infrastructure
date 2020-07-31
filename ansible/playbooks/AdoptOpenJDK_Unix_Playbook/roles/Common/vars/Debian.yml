@@ -90,6 +90,13 @@ Additional_Build_Tools_s390x:
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
+Additional_Build_Tools_riscv64:
+  - locales
+
+Additional_Build_Tools_NOT_riscv64:
+  - g++-7                         # OpenJ9
+  - gcc-7                         # OpenJ9
+
 Test_Tool_Packages:
   - acl
   - mercurial
