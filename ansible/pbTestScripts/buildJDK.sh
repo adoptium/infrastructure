@@ -1,13 +1,26 @@
 #!/bin/bash
 set -eu
 
+setJDKVars() {
+	wget -q https://api.adoptopenjdk.net/v3/info/available_releases
+	JDK_MAX=$(awk -F: '/tip_version/{gsub("[, ]","",$2); print$2}' < available_releases)
+	JDK_GA=$(awk -F: '/most_recent_feature_release/{gsub("[, ]","",$2); print$2}' < available_releases)
+	rm available_releases
+}
+
 processArgs() {
 	while [[ $# -gt 0 ]] && [[ ."$1" = .-* ]] ; do
 		local opt="$1";
 		shift;
 		case "$opt" in
 			"--version" | "-v" )
-				JAVA_TO_BUILD="$1"; shift;;
+				if [ $1 == "jdk" ]; then
+					JAVA_TO_BUILD=$JDK_MAX
+				else
+					JAVA_TO_BUILD=$(echo $1 | tr -d [:alpha:])
+				fi
+				checkJDK
+				shift;;
 			"--URL" | "-u" )
 				GIT_URL="$1"; shift;;
 			"--hotspot" | "-hs" )
@@ -20,7 +33,6 @@ processArgs() {
 		esac
 	done
 
-	checkJDKVersion $JAVA_TO_BUILD
 	if [ -z "${WORKSPACE:-}" ]; then
         	echo "WORKSPACE not found, setting it as environment variable 'HOME'"
         	WORKSPACE=$HOME
@@ -43,47 +55,29 @@ usage() {
 		
 	If not specified, JDK8-J9 will be built with the standard openjdk-build repo"
 	echo
-	showJDKVersions
 }
 
-showJDKVersions() {
-	echo "Currently supported JDK versions: 
-		- JDK8
-		- JDK9
-		- JDK10
-		- JDK11
-		- JDK12
-		- JDK13
-		- JDK14"
-	echo
-}
-
-checkJDKVersion() {
-	local jdk=$1
-	case "$jdk" in
-                "jdk8u" | "jdk8" | "8" | "8u" )
-                        JAVA_TO_BUILD="jdk8u";;
-                "jdk9u" | "jdk9" | "9" | "9u" )
-                        JAVA_TO_BUILD="jdk9u";;
-                "jdk10u" | "jdk10" | "10" | "10u" )
-                        JAVA_TO_BUILD="jdk10u";;
-                "jdk11u" | "jdk11" | "11" | "11u" )
-                        JAVA_TO_BUILD="jdk11u";;
-                "jdk12u" | "jdk12" | "12" | "12u" )
-                        JAVA_TO_BUILD="jdk12u";;
-                "jdk13u" | "jdk13" | "13" | "13u" )
-                        JAVA_TO_BUILD="jdk13u";;
-                "jdk14u" | "jdk14" | "14" | "14u" )
-                        JAVA_TO_BUILD="jdk14u";;
-                *)
-                        echo "Not a valid JDK Version" ; showJDKVersions; exit 1;;
-	esac
-	setBootJDK 
+checkJDK() {
+	if ! ((JAVA_TO_BUILD >= 8 && JAVA_TO_BUILD <= JDK_MAX)); then
+		echo "Please input a JDK between 8 & ${JDK_MAX}, or 'jdk'"
+		echo "i.e. The following formats will work for jdk8: 'jdk8u', 'jdk8' , '8'"
+		exit 1
+	fi
+	setBootJDK
+	if ((JAVA_TO_BUILD <= JDK_GA)); then
+		JAVA_TO_BUILD="jdk${JAVA_TO_BUILD}u"
+	elif ((JAVA_TO_BUILD == JDK_MAX)); then
+		JAVA_TO_BUILD="jdk"
+	else
+		JAVA_TO_BUILD="jdk${JAVA_TO_BUILD}"
+	fi
 }
 
 setBootJDK() {
-        local buildJDKNumber=$(echo ${JAVA_TO_BUILD//[!0-9]/})
-        local bootJDKNumber=$(($buildJDKNumber - 1));
+        local buildJDKNumber=$JAVA_TO_BUILD
+        local bootJDKNumber=$((buildJDKNumber - 1))
+        # Use latest GA as JDK_BOOT_DIR if building above JDK_GA
+        if ((bootJDKNumber > JDK_GA)); then bootJDKNumber=$JDK_GA; fi
         # Refer to 8 as 'jdk8'. Anything else is 'jdk-XX'
         [[ $bootJDKNumber != "8" ]] && bootJDKNumber="-$bootJDKNumber"
         if [[ $buildJDKNumber -eq 8 ]]; then
@@ -136,7 +130,10 @@ export VARIANT=openj9
 export ARCHITECTURE=x64
 GIT_URL="https://github.com/adoptopenjdk/openjdk-build"
 CLEAN_WORKSPACE=false
+JDK_MAX=
+JDK_GA=
 
+setJDKVars
 processArgs $*
 
 # All architectures are referred to in make-adopt-build-farm.sh, except x86_64, which is 'x64'
