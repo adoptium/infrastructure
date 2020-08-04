@@ -14,7 +14,7 @@
 # gcc
 - name: Download gcc-4.8.5 source
   get_url:
-    url: http://gnu.mirror.globo.tech/gcc/gcc-4.8.5/gcc-4.8.5.tar.gz
+    url: https://ftp.gnu.org/gnu/gcc/gcc-4.8.5/gcc-4.8.5.tar.gz
     dest: '/tmp/gcc-4.8.5.tar.gz'
     force: no
     mode: 0755
