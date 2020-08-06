@@ -111,22 +111,15 @@
 
 # NOTE: This construct is because an SQL Server entry is being added to
 # the path which has an erroneous quote in it which causes problems for SETX
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1401
-- name: Remove speech mark from the %PATH%
-  win_shell: 'setx /M PATH "%PATH:\"=%"'
+# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1485
+- name: Remove double quote from %PATH% & Add C:\cygwin64\bin to the front
+  win_shell: |
+    $NewPath=$env:path.Replace('"','')
+    [Environment]::SetEnvironmentVariable("Path", "C:\cygwin64\bin;" + $NewPath, [System.EnvironmentVariableTarget]::Machine)
   args:
-    executable: cmd
+    executable: powershell
   when: (not cygwin_installed.stat.exists)
-  tags:
-    - cygwin
-
-- name: Add c:\cygwin64\bin to front of %PATH%
-  win_shell: 'setx /M PATH "C:\cygwin64\bin;%PATH%"'
-  args:
-    executable: cmd
-  when: (not cygwin_installed.stat.exists)
-  tags:
-    - cygwin
+  tags: cygwin
 
 - name: Reboot machine for PATH changes to take effect
   win_reboot:
