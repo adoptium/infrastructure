@@ -1,0 +1,21 @@
+FROM alpine:3
+
+RUN apk update; apk add ansible
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ rm -rf /ansible; apk del ansible
+
+# ENV \
+#     JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk.x86_64" \
+#     JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
+#     JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+#     JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
+#     JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+#     JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+#     JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
