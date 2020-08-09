@@ -56,5 +56,3 @@ Test_Tool_Packages:
   - xauth
   - xorg-server
   - xvfb
-
-# crontab_Patching: "/usr/bin/yum -y update"

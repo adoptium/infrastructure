@@ -13,7 +13,7 @@ RUN set -eux; \
 
 ENV \
     JDK8_BOOT_DIR="/usr/lib/jvm/zulu8" \
-    JDK14_BOOT_DIR="usr/lib/jvm/zulu14" \
+    JDK14_BOOT_DIR="/usr/lib/jvm/zulu14" \
     JDK15_BOOT_DIR="/usr/lib/jvm/zulu15" \
     JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu15" \
     JAVA_HOME="/usr/lib/jvm/zulu8"

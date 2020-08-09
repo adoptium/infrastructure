@@ -63,7 +63,7 @@
 
 - name: Create symlink to point at zulu-14
   file:
-    src: /usr/lib/jvm/zulu14.29.23-ca-jdk14.0.2-linux_musl_x64.tar.gz
+    src: /usr/lib/jvm/zulu14.29.23-ca-jdk14.0.2-linux_musl_x64
     dest: /usr/lib/jvm/zulu14
     state: link
   when:
