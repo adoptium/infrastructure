@@ -37,7 +37,9 @@
   tags: clang_32bit
 
 - name: Create symlink to C:\openjdk\LLVM32
-  raw: cmd /c mklink /D "C:\openjdk\LLVM32" "C:\Program Files (x86)\LLVM"
+  win_shell: mklink /D "C:\openjdk\LLVM32" "C:\Program Files (x86)\LLVM"
+  args:
+    executable: cmd
   when: (not llvm32_symlink.stat.exists)
   tags: clang_32bit
 
