@@ -212,7 +212,7 @@
 
 - name: Add Docker GPG apt key for Raspbian
   apt_key:
-    url: htps://yum.dockerproject.org/gpg
+    url: https://download.docker.com/linux/debian/gpg
     state: present
   when:
     - docker_installed.rc != 0
