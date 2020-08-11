@@ -113,7 +113,7 @@
     - ansible_architecture == "x86_64"
   tags: docker
 
-- name: Add Docker Repo for RedHat 7
+- name: Add Docker Repo for RedHat 7 x86_64
   get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
@@ -127,6 +127,20 @@
     - ansible_distribution == "RedHat"
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Add Docker repo for RedHat 7 ppc64le
+  yum_repository:
+    name: docker
+    description: docker YUM repo ppc64le
+    baseurl: http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - docker_installed.rc != 0
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
   tags: docker
 
 - name: Import Docker Repo key for RedHat
@@ -278,7 +292,7 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -341,5 +355,5 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
   tags: docker
