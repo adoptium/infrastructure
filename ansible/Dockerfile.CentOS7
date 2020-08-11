@@ -1,5 +1,7 @@
 FROM centos:7
 
+ARG user=jenkins
+
 RUN yum -y update; yum -y install epel-release
 RUN yum -y install ansible sudo; yum clean all
 
@@ -12,6 +14,9 @@ RUN set -eux; \
  ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
 
 RUN rm -rf /ansible; yum remove ansible; yum clean all
+
+RUN groupadd -g 1000 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
 
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk" \
