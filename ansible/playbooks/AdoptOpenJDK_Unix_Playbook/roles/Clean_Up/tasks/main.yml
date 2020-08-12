@@ -24,6 +24,7 @@
     warn: no
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version != "6")
+    - ansible_architecture != "aarch64"
   tags: clean_up
 
 - name: Remove pkg dependencies that are no longer required - FreeBSD
