@@ -57,12 +57,10 @@ checkOS() {
                         osToDestroy="D10" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
 			osToDestroy="FBSD12" ;;
-		"SUSE12" | "suse12" | "S12" | "s12" )
-			osToDestroy="S12" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
                 "all" )
-                        osToDestroy="U16 U18 U20 C6 C7 D8 D10 FBSD12 S12 W2012" ;;
+                        osToDestroy="U16 U18 U20 C6 C7 C8 D8 D10 FBSD12 W2012" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
@@ -81,7 +79,6 @@ listOS() {
 		- Debian8
 		- Debian10
 		- FreeBSD12
-		- SUSE12
 		- Win2012"
 	echo
 }
