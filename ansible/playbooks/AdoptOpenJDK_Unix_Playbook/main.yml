@@ -95,8 +95,7 @@
     # - Nagios_Plugins              # AdoptOpenJDK Infrastructure
     # - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
     # - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
-    - role: riscv_cross_compiler    # For building JDK11/J9 on RISC-V architecture
-      when: ansible_architecture != "riscv64"
+    - riscv_cross_compiler    # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security
     - Vendor
