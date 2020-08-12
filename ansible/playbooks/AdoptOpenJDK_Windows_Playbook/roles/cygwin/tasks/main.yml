@@ -109,13 +109,9 @@
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
-# NOTE: This construct is because an SQL Server entry is being added to
-# the path which has an erroneous quote in it which causes problems for SETX
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1485
-- name: Remove double quote from %PATH% & Add C:\cygwin64\bin to the front
+- name: Add C:\cygwin64\bin to the front of the path
   win_shell: |
-    $NewPath=$env:path.Replace('"','')
-    [Environment]::SetEnvironmentVariable("Path", "C:\cygwin64\bin;" + $NewPath, [System.EnvironmentVariableTarget]::Machine)
+    [Environment]::SetEnvironmentVariable("Path", "C:\cygwin64\bin;" + $env:Path, [System.EnvironmentVariableTarget]::Machine)
   args:
     executable: powershell
   when: (not cygwin_installed.stat.exists)
