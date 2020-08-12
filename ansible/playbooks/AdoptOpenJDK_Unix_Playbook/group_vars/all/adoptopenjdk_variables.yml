@@ -28,7 +28,7 @@ jckftp_Username: jckftp
 
 # Vendor Variables:
 Vendor_File: Disabled
-Vendor_Playbook: ~/Vendor_Files/Vendor_Playbook/Vendor.yml
+Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 
 # Default BootJDK installed
 bootjdk: hotspot
