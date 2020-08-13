@@ -9,8 +9,6 @@ wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/Co
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 .\\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
 .\\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
-$IPArray=(Get-NetIPAddress -InterfaceAlias "Ethernet*" -AddressFamily ipv4 | select -ExpandProperty IPAddress)
-echo $IPArray | Out-file -Encoding ASCII -FilePath C:/vagrant/playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp
 # Retrieving disk's current size
 $currentDiskSize =(Get-Partition -DriveLetter c | select Size)
 $currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
