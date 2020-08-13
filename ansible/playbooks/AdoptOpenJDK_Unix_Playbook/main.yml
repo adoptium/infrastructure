@@ -52,18 +52,23 @@
     - zulu7                       # JDK8 Build Bootstrap
     - role: adoptopenjdk_install
       jdk_version: 8
+      when: ansible_distribution != "Alpine"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
+      when: ansible_distribution != "Alpine"
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11
+      when: ansible_distribution != "Alpine"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK14 Build Bootstrap
       jdk_version: 13
+      when: ansible_distribution != "Alpine"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK15 Build Bootstrap
       jdk_version: 14
+      when: ansible_distribution != "Alpine"
       tags: build_tools
     - OpenSSL102                  # OpenJ9
     # - Nagios_Plugins              # AdoptOpenJDK Infrastructure

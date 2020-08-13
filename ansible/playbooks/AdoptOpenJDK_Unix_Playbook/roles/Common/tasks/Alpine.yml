@@ -1,0 +1,94 @@
+---
+##########
+# Alpine #
+##########
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+- name: Checking for /usr/lib/jvm
+  stat: path=/usr/lib/jvm
+  register: usr_lib_jvm_exists
+  tags: build_tools
+
+- name: Creating /usr/lib/jvm if not found
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    owner: root
+    mode: 0755
+  when:
+    - not usr_lib_jvm_exists.stat.exists
+  tags: build_tools
+
+- name: Check if zulu-8 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu8
+  register: zulu8_installed
+  tags: build_tools
+
+- name: Install latest zulu-8 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu8.48.0.53-ca-jdk8.0.265-linux_musl_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu8_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-8
+  file:
+    src: /usr/lib/jvm/zulu8.48.0.53-ca-jdk8.0.265-linux_musl_x64
+    dest: /usr/lib/jvm/zulu8
+    state: link
+  when:
+    - not zulu8_installed.stat.exists
+  tags: build_tools
+
+- name: Check if zulu-14 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu14
+  register: zulu14_installed
+  tags: build_tools
+
+- name: Install latest zulu-14 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu14.29.23-ca-jdk14.0.2-linux_musl_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu14_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-14
+  file:
+    src: /usr/lib/jvm/zulu14.29.23-ca-jdk14.0.2-linux_musl_x64
+    dest: /usr/lib/jvm/zulu14
+    state: link
+  when:
+    - not zulu14_installed.stat.exists
+  tags: build_tools
+
+- name: Check if zulu-15 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu15
+  register: zulu15_installed
+  tags: build_tools
+
+- name: Install latest zulu-15 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu15.0.73-ea-jdk15.0.0-ea.34-linux_musl_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu15_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-15
+  file:
+    src: /usr/lib/jvm/zulu15.0.73-ea-jdk15.0.0-ea.34-linux_musl_x64
+    dest: /usr/lib/jvm/zulu15
+    state: link
+  when:
+    - not zulu15_installed.stat.exists
+  tags: build_tools
