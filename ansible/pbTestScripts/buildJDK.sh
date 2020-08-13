@@ -162,7 +162,7 @@ if grep 'buster' /etc/*-release >/dev/null 2>&1; then
 	export CXX=/usr/bin/g++-7
 fi
 
-if [ "$ARCHITECTURE" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT == "openj9" ]; then
+if [[ "$ARCHITECTURE" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT == "openj9" ]]; then
 	echo "Can't build OpenJ9 JDK8 on AARCH64, Defaulting to jdk11"
 	JAVA_TO_BUILD=jdk11u
 fi
