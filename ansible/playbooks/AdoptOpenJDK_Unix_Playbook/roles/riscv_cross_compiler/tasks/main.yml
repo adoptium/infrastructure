@@ -14,6 +14,7 @@
     - ansible_architecture == "x86_64"
   tags:
     - riscv
+    - adoptopenjdk
 
 - name: Check if the fedora sysroot folder is in place
   stat:
@@ -24,6 +25,7 @@
     - ansible_architecture == "x86_64"
   tags:
     - riscv
+    - adoptopenjdk
 
 - name: Yum install libmpc-devel
   yum:
@@ -34,6 +36,7 @@
     - ansible_architecture == "x86_64"
   tags:
     - riscv
+    - adoptopenjdk
 
 - name: Retrieve and unpack the riscv toolchain
   unarchive:
@@ -46,6 +49,7 @@
     - not riscv_toolchain_installed.stat.exists
   tags:
     - riscv
+    - adoptopenjdk
 
 - name: Retrieve and Unpack the fedora sysroot folder
   unarchive:
@@ -58,3 +62,4 @@
     - not fedora_folder.stat.exists
   tags:
     - riscv
+    - adoptopenjdk
