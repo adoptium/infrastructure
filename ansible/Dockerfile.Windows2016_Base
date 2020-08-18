@@ -1,6 +1,6 @@
 # escape=`
 
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-command"]
 
@@ -9,6 +9,7 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     New-Item -Path C:\ -Name 'openjdk' -ItemType 'directory'; `
     New-Item -Path C:\ -Name 'temp' -ItemType 'directory'; `
     # cygwin
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
     Invoke-WebRequest 'http://cygwin.com/setup-x86_64.exe' -OutFile C:\temp\cygwin.exe; `
     Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '--quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'; `
     Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P wget'; `

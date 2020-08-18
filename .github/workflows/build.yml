@@ -48,21 +48,21 @@ jobs:
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
 
-  build-and-push-windows2019:
-    name: Windows 2019
-    runs-on: windows-2019
+  build-and-push-windows2016:
+    name: Windows 2016
+    runs-on: windows-2016
     steps:
 
     - uses: actions/checkout@v2
 
-    - name: Docker Build & Push Windows 2019 Base Image to Docker Hub
+    - name: Docker Build & Push Windows 2016 Base Image to Docker Hub
       run: |
-        docker build -t adoptopenjdk/windows2019_build_image_base -f ansible/Dockerfile.windows2019_Base .
+        docker build -t adoptopenjdk/windows2016_build_image_base -f ansible/Dockerfile.windows2016_Base .
 
-    - name: Docker Build & Push Windows 2019 VS2017 Image to Docker Hub
+    - name: Docker Build & Push Windows 2016 VS2017 Image to Docker Hub
       run: |
-        docker build -t adoptopenjdk/windows2019_build_image_vs2017 -f ansible/Dockerfile.windows2019_VS2017 .
+        docker build -t adoptopenjdk/windows2016_build_image_vs2017 -f ansible/Dockerfile.windows2016_VS2017 .
 
-    - name: Docker Build & Push Windows 2019 VS2013 Image to Docker Hub
+    - name: Docker Build & Push Windows 2016 VS2013 Image to Docker Hub
       run: |
-        docker build -t adoptopenjdk/windows2019_build_image_vs2013 -f ansible/Dockerfile.windows2019_VS2013 .
+        docker build -t adoptopenjdk/windows2016_build_image_vs2013 -f ansible/Dockerfile.windows2016_VS2013 .

@@ -1,6 +1,6 @@
 # escape=`
 
-FROM windows2019_build_image_base:latest
+FROM windows2016_build_image_base:latest
 
 SHELL ["powershell", "-command"]
 
