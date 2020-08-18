@@ -74,6 +74,8 @@ defaultVars() {
                         echo "arm64 selected"; ARCHITECTURE=ARM64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
+		"arm32" | "ARM32")
+			echo "arm32 selected"; ARCHITECTURE=ARM32;;
 		"" )
 			echo "Please input an architecture to test"; exit 1;;
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
@@ -96,7 +98,8 @@ showArchList() {
 	echo "Currently supported architectures:
 	- ppc64le
 	- s390x
-	- arm64"
+	- arm64
+	- arm32"
 }
 
 # Setup the file system
@@ -150,6 +153,9 @@ done
 			export QEMUARCH="aarch64"
 			export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
 			export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
+		"ARM32" )
+			export MACHINE="virt"
+			export QEMUARCH="arm";;
 	esac
 	
 	# Run the command, mask output and send to background
