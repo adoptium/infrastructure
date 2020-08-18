@@ -47,3 +47,22 @@ jobs:
         repository: adoptopenjdk/alpine3_build_image
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
+
+  build-and-push-windows2019:
+    name: Windows 2019
+    runs-on: windows-2019
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Docker Build & Push Windows 2019 Base Image to Docker Hub
+      run: |
+        docker build -t adoptopenjdk/windows2019_build_image_base -f ansible/Dockerfile.windows2019_Base .
+
+    - name: Docker Build & Push Windows 2019 VS2017 Image to Docker Hub
+      run: |
+        docker build -t adoptopenjdk/windows2019_build_image_vs2017 -f ansible/Dockerfile.windows2019_VS2017 .
+
+    - name: Docker Build & Push Windows 2019 VS2013 Image to Docker Hub
+      run: |
+        docker build -t adoptopenjdk/windows2019_build_image_vs2013 -f ansible/Dockerfile.windows2019_VS2013 .
