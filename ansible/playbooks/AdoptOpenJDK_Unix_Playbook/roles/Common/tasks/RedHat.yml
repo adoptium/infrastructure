@@ -220,6 +220,13 @@
 ###########
 # Locales #
 ###########
+
+- name: Install 'locales' package
+  package:
+    name: locales
+    state: present
+  tags: locales
+
 # Skipping linting as no alternative to shell can be used (lint error 305)
 - name: Get locale list
   shell: locale -a

@@ -176,6 +176,13 @@
 ##################
 # Enable Locales #
 ##################
+
+- name: Install 'locales' package
+  package:
+    name: locales
+    state: present
+  tags: locales
+
 - name: Enable ja_JP locale
   locale_gen:
     name: ja_JP.UTF-8
