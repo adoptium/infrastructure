@@ -10,25 +10,16 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     New-Item -Path C:\ -Name 'temp' -ItemType 'directory'; `
     # cygwin
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
-    Invoke-WebRequest 'http://cygwin.com/setup-x86_64.exe' -OutFile C:\temp\cygwin.exe; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '--quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P wget'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P rsync'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P gnupg'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P git'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P autoconf'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P make'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P unzip'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P zip'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P cpio'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P curl'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P curl-debuginfo'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P libcurl-devel'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P libpng15'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P libpng-devel'; `
-    Start-Process -Wait -FilePath C:\temp\cygwin.exe -ArgumentList '-q -P perl-Text-CSV'; `
-    Invoke-WebRequest 'https://mirrors.kernel.org/sourceware/cygwin/x86_64/release/grep/grep-2.27-2.tar.xz' -OutFile C:\cygwin64\tmp\grep.tar.xz; `
-    Start-Process -Wait -FilePath C:\cygwin64\bin\bash.exe -ArgumentList '-l -c "tar -C / -xvf /tmp/grep.tar.xz"'; `
+    Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz' -OutFile C:\temp\cygwin64.tar.xz; `
+    Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip' -OutFile C:\temp\cyg_toolset.zip; `
+    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp; `
+    C:\temp\bin\tar --force-local -xvf C:\temp\cygwin64.tar.xz C:\ ; `
+    # Remove speech mark from the %PATH%
+    setx /M PATH "%PATH:\"=%" ; `
+    # Add c:\cygwin64\bin to front of %PATH%
+    setx /M PATH "C:\cygwin64\bin;%PATH%" ; `
+    # Change git config to not replace Line endings
+    C:\cygwin64\bin\git config --system core.autocrlf false ; `
     # perl
     Invoke-WebRequest 'http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip' -OutFile C:\temp\strawberry-perl.zip; `
     Expand-Archive -LiteralPath C:\temp\strawberry-perl.zip -DestinationPath C:\Strawberry; `
@@ -39,7 +30,7 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
      # java 7
     Invoke-WebRequest 'http://download.java.net/openjdk/jdk7u75/ri/jdk_ri-7u75-b13-windows-i586-18_dec_2014.zip' -OutFile C:\temp\jdk7u75-b13.zip; `
     Expand-Archive -LiteralPath C:\temp\jdk7u75-b13.zip -DestinationPath 'C:\Program Files\Java'; `
-    New-Item -ItemType SymbolicLink -Path C:\openjdk\jdk7 -Target 'C:\Program Files\Java\java-se-7u75-ri'; `
+    New-Item -ItemType SymbolicLink -Path C:\openjdk\jdk-7 -Target 'C:\Program Files\Java\java-se-7u75-ri'; `
     # java 8
     Invoke-WebRequest 'https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u265-b01/OpenJDK8U-jdk_x86-32_windows_hotspot_8u265b01.zip' -OutFile C:\temp\jdk-8.zip; `
     Expand-Archive -LiteralPath C:\temp\jdk-8.zip -DestinationPath 'C:\Program Files\Java'; `
@@ -49,7 +40,7 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     Expand-Archive -LiteralPath C:\temp\jdk-10.zip -DestinationPath 'C:\Program Files\Java'; `
     New-Item -ItemType SymbolicLink -Path C:\openjdk\jdk-10 -Target 'C:\Program Files\Java\jdk-10.0.2+13'; `
     # set env
-    [Environment]::SetEnvironmentVariable('JDK7_BOOT_DIR', '/cygdrive/c/openjdk/jdk7', [EnvironmentVariableTarget]::Machine); `
+    [Environment]::SetEnvironmentVariable('JDK7_BOOT_DIR', '/cygdrive/c/openjdk/jdk-7', [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('JDK8_BOOT_DIR', '/cygdrive/c/openjdk/jdk-8', [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('JDK10_BOOT_DIR', '/cygdrive/c/openjdk/jdk-10', [EnvironmentVariableTarget]::Machine); `
     # ant
