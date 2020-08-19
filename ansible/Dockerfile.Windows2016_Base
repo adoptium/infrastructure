@@ -13,16 +13,13 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz' -OutFile C:\temp\cygwin64.tar.xz; `
     Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip' -OutFile C:\temp\cyg_toolset.zip; `
     Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp; `
-    $env:path='C:\temp\bin;$env:Path'; `
+    $env:path='C:\temp\bin;' + $env:Path; `
     cd C:\ ;`
     tar --force-local -xf C:\temp\cygwin64.tar.xz ; `
     Remove-Item C:\temp\cygwin64.tar.xz; `
     Remove-Item C:\temp\cyg_toolset.zip; `
     Remove-Item C:\temp\bin -Recurse; `
-    # Remove speech mark from the %PATH%
-    $NewPath=$env:path.Replace('"','') ; `
-    [Environment]::SetEnvironmentVariable('Path', $NewPath, [System.EnvironmentVariableTarget]::Machine); `
-    # Change git config to not replace Line endings
+    # change git config to not replace Line endings
     C:\cygwin64\bin\git config --system core.autocrlf false ; `
     # perl
     Invoke-WebRequest 'http://strawberryperl.com/download/5.26.0.1/strawberry-perl-5.26.0.1-64bit.zip' -OutFile C:\temp\strawberry-perl.zip; `
@@ -57,7 +54,9 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     # set env
     [Environment]::SetEnvironmentVariable('ANT_HOME', 'C:\apache-ant\apache-ant-1.10.5', [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('JAVA_HOME', '/cygdrive/c/openjdk/jdk-8', [EnvironmentVariableTarget]::Machine); `
-    [Environment]::SetEnvironmentVariable('Path', 'C:\Strawberry\perl\bin;C:\openjdk\jdk-8\bin;C:\apache-ant\apache-ant-1.10.5\bin;C:\cygwin64\bin;C:\Program Files\Git\bin;' + $env:Path, [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('HOME', 'C:\Users\ContainerAdministrator', [EnvironmentVariableTarget]::Machine); `
+    # remove speech mark from the %PATH%
+    $NewPath=$env:path.Replace('\"',''); `
+    [Environment]::SetEnvironmentVariable('Path', 'C:\Strawberry\perl\bin;C:\openjdk\jdk-8\bin;C:\apache-ant\apache-ant-1.10.5\bin;C:\cygwin64\bin;C:\Program Files\Git\bin;' + $NewPath, [EnvironmentVariableTarget]::Machine); `
     # clean up
     Remove-Item C:\temp -Recurse
