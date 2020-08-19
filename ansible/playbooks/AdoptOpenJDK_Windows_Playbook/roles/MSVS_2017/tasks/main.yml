@@ -14,7 +14,7 @@
     url: 'https://aka.ms/vs/15/release/vs_community.exe'
     dest: 'C:\TEMP\vs_community.exe'
     force: no
-    checksum: a4bfd3d43684963707877f8ef5108b5f9bc5ee986f7009bfaea9602c0c3a7e16
+    checksum: 29aeed55de6158a0968f8cb17944b733f65b0300cd10ffb2a53011f29159f1c1
     checksum_algorithm: sha256
   when: (not vs2017_installed.stat.exists)
   tags: MSVS_2017
