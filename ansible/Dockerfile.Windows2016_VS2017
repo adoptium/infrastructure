@@ -1,6 +1,6 @@
 # escape=`
 
-FROM adoptopenjdk/windows2016_build_image_base:latest
+FROM adoptopenjdk/windows2016_build_image:base
 
 SHELL ["powershell", "-command"]
 

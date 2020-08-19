@@ -1,0 +1,41 @@
+name: Docker_Windows
+
+on:
+  pull_request:
+    paths:
+    - ansible/DockerFile.Windows2016*
+    branches:         
+    - master
+  push:
+    paths:
+    - ansible/DockerFile.Windows2016*
+    branches:         
+    - master
+
+jobs:
+  build-and-push-windows2016:
+    name: Windows 2016
+    runs-on: windows-2016
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Docker Build Windows 2016 Base Image to Docker Hub
+      run: docker build -t adoptopenjdk/windows2016_build_image:base -f ansible/Dockerfile.windows2016_Base .
+
+    - name: Docker Build Windows 2016 VS2017 Image to Docker Hub
+      run: docker build -t adoptopenjdk/windows2016_build_image:vs2017 -f ansible/Dockerfile.windows2016_VS2017 .
+
+    - name: Docker Build Windows 2016 VS2013 Image to Docker Hub
+      run: docker build -t adoptopenjdk/windows2016_build_image:vs2013 -f ansible/Dockerfile.windows2016_VS2013 .
+
+    - name: Push Windows images to Docker Hub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker push adoptopenjdk/windows2016_build_image:base
+        docker push adoptopenjdk/windows2016_build_image:vs2017
+        docker push adoptopenjdk/windows2016_build_image:vs2013
+      if: github.ref == 'refs/heads/master'
