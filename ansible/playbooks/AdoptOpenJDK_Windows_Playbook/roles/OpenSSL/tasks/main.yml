@@ -20,13 +20,19 @@
   register: openssl64_vs2017_installed
   tags: openssl
 
+- name: Check if OpenSSL 64bit VS2019 installed
+  win_stat:
+    path: C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2019
+  register: openssl64_vs2019_installed
+  tags: openssl
+
 - name: Download OpenSSL-1.1.1g
   win_get_url:
     url: https://www.openssl.org/source/openssl-1.1.1g.tar.gz
     dest: C:\temp\OpenSSL-1.1.1g.tar.gz
     checksum: ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46
     checksum_algorithm: sha256
-  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists) or (not openssl64_vs2019_installed.stat.exists)
   tags: openssl
 
 - name: Unpack OpenSSL-1.1.1g for installation
@@ -34,7 +40,7 @@
     cd C:\temp
     C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1g.tar.gz
     C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1g.tar
-  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists)
+  when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists) or (not openssl64_vs2019_installed.stat.exists)
   tags: openssl
 
 - name: Install OpenSSL-1.1.1g 32-bit (VS2013)
@@ -66,6 +72,16 @@
   tags:
     - openssl
     - MSVS_2017
+
+- name: Install OpenSSL-1.1.1g 64-bit (VS2019)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2019 && nmake install > C:\temp\openssl64-VS2019.log && nmake -f makefile clean
+  args:
+    chdir: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build'
+    executable: cmd
+  when: (not openssl64_vs2019_installed.stat.exists)
+  tags:
+    - openssl
+    - MSVS_2019
 
 - name: Cleanup OpenSSL source files
   win_file:
