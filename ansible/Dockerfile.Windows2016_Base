@@ -13,11 +13,15 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz' -OutFile C:\temp\cygwin64.tar.xz; `
     Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip' -OutFile C:\temp\cyg_toolset.zip; `
     Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp; `
-    C:\temp\bin\tar --force-local -xvf C:\temp\cygwin64.tar.xz C:\ ; `
+    $env:path='C:\temp\bin;$env:Path'; `
+    cd C:\ ;`
+    tar --force-local -xf C:\temp\cygwin64.tar.xz ; `
+    Remove-Item C:\temp\cygwin64.tar.xz; `
+    Remove-Item C:\temp\cyg_toolset.zip; `
+    Remove-Item C:\temp\bin -Recurse; `
     # Remove speech mark from the %PATH%
-    setx /M PATH "%PATH:\"=%" ; `
-    # Add c:\cygwin64\bin to front of %PATH%
-    setx /M PATH "C:\cygwin64\bin;%PATH%" ; `
+    $NewPath=$env:path.Replace('"','') ; `
+    [Environment]::SetEnvironmentVariable('Path', $NewPath, [System.EnvironmentVariableTarget]::Machine); `
     # Change git config to not replace Line endings
     C:\cygwin64\bin\git config --system core.autocrlf false ; `
     # perl
@@ -56,5 +60,4 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     [Environment]::SetEnvironmentVariable('Path', 'C:\Strawberry\perl\bin;C:\openjdk\jdk-8\bin;C:\apache-ant\apache-ant-1.10.5\bin;C:\cygwin64\bin;C:\Program Files\Git\bin;' + $env:Path, [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('HOME', 'C:\Users\ContainerAdministrator', [EnvironmentVariableTarget]::Machine); `
     # clean up
-    Remove-Item C:\temp -Recurse; `
-    Remove-Item C:\cygwin_packages -Recurse
+    Remove-Item C:\temp -Recurse
