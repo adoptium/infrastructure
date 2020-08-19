@@ -1,14 +1,18 @@
-name: Docker_Windows
+name: Docker Windows
 
 on:
   pull_request:
     paths:
-    - ansible/DockerFile.Windows2016*
+    - ansible/DockerFile.Windows2016_Base
+    - ansible/Dockerfile.Windows2016_VS2013
+    - ansible/Dockerfile.Windows2016_VS2017
     branches:         
     - master
   push:
     paths:
-    - ansible/DockerFile.Windows2016*
+    - ansible/DockerFile.Windows2016_Base
+    - ansible/Dockerfile.Windows2016_VS2013
+    - ansible/Dockerfile.Windows2016_VS2017
     branches:         
     - master
 
