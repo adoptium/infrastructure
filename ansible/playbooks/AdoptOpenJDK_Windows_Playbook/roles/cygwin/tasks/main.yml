@@ -17,9 +17,9 @@
 
 - name: Retrieve cygwin cache from ci.adoptopenjdk.net
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.xz
-    dest: C:/temp/cygwin64.tar.xz
-    checksum: e89608178b4d99042fd356687c84aa18e220fb0dcd0c9d4bc60983ce538d9efe
+    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.gz
+    dest: C:/temp/cygwin64.tar.gz
+    checksum: 8f8b1d7d00233e384e725390c4018941fe7125290b94ecc0eeb3cf6684b4ce23
     checksum_algorithm: sha256
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
@@ -28,23 +28,17 @@
   win_get_url:
     url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip
     dest: C:/temp/cyg_toolset.zip
-    checksum: 5974b93eefe033bd57cc14c30f7ba67584a5b9249b71cede7d9e05d87113d908
+    checksum: 39a94bb8ac6e5810437d7928381943d9f3a811729ad05d2967a5a7da8bce5b7d
     checksum_algorithm: sha256
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
-- name: Extract cygwin_toolset to C:/temp
+- name: Use cygwin 'tar' and 'pigz' to extract cygwin cache
   win_shell: |
-    cd C:\temp
-    C:\7-Zip\7z.exe x C:\temp\cyg_toolset.zip
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Use cygwin 'tar' to extract cygwin cache
-  win_shell: |
-    $env:path="C:\temp\bin;$env:Path"
+    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp;
+    $env:path="C:\temp\bin;$env:path"
     cd C:\
-    tar --force-local -xvf C:\temp\cygwin64.tar.xz
+    tar --force-local -I pigz -xf C:\temp\cygwin64.tar.gz
   args:
     executable: powershell
   when: (not cygwin_installed.stat.exists)
