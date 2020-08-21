@@ -30,9 +30,6 @@ jobs:
     - name: Docker Build Windows 2016 VS2017 Image to Docker Hub
       run: docker build -t adoptopenjdk/windows2016_build_image:vs2017 -f ansible/Dockerfile.windows2016_VS2017 .
 
-    - name: Docker Build Windows 2016 VS2013 Image to Docker Hub
-      run: docker build -t adoptopenjdk/windows2016_build_image:vs2013 -f ansible/Dockerfile.windows2016_VS2013 .
-
     - name: Push Windows images to Docker Hub
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -41,5 +38,4 @@ jobs:
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         docker push adoptopenjdk/windows2016_build_image:base
         docker push adoptopenjdk/windows2016_build_image:vs2017
-        docker push adoptopenjdk/windows2016_build_image:vs2013
       if: github.ref == 'refs/heads/master'
