@@ -15,6 +15,7 @@
   register: cygwin_installed
   tags: cygwin
 
+# For details about the cache, see: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1210#issuecomment-679076545
 - name: Retrieve cygwin cache from ci.adoptopenjdk.net
   win_get_url:
     url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.gz
@@ -26,17 +27,18 @@
 
 - name: Retrieve cygwin toolset from ci.adoptopenjdk.net
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip
+    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64_bootstrap.zip
     dest: C:/temp/cyg_toolset.zip
-    checksum: 39a94bb8ac6e5810437d7928381943d9f3a811729ad05d2967a5a7da8bce5b7d
+    checksum: d7950df964a0618ac47561d349276d4644e27f5b8f0a5fba9b10db702d09ecad
     checksum_algorithm: sha256
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Use cygwin 'tar' and 'pigz' to extract cygwin cache
   win_shell: |
-    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp;
-    $env:path="C:\temp\bin;$env:path"
+    New-Item -ItemType directory -Name cygwin_toolset -Path C:\temp\
+    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp\cygwin_toolset;
+    $env:path="C:\temp\cygwin_toolset;$env:path"
     cd C:\
     tar --force-local -I pigz -xf C:\temp\cygwin64.tar.gz
   args:
