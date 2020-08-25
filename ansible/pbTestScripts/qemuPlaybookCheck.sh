@@ -74,6 +74,8 @@ defaultVars() {
                         echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
+		"RISC-V" | "riscv" | "risc-v" | "RISCV" )
+			echo "riscv selected"; ARCHITECTURE=RISCV;;
 		"" )
 			echo "Please input an architecture to test"; exit 1;;
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
@@ -96,7 +98,8 @@ showArchList() {
 	echo "Currently supported architectures:
 	- ppc64le
 	- s390x
-	- aarch64"
+	- aarch64
+	- riscv"
 }
 
 # Setup the file system
@@ -150,6 +153,12 @@ done
 			export QEMUARCH="aarch64"
 			export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
 			export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
+		"RISCV" )
+			export QEMUARCH="riscv64"
+			export MACHINE="virt"
+			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/${ARCHITECTURE}.dsk,if=none,id=hd"
+			export SSH_CMD="-device virtio-net-device,netdev=net -netdev user,id=net,hostfwd=tcp::$PORTNO-:22"
+			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/qemu/virt/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000"
 	esac
 	
 	# Run the command, mask output and send to background
@@ -182,11 +191,17 @@ done
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 	local pbLogPath="$workFolder/logFiles/$ARCHITECTURE.log"
+	local extraAnsibleArgs=""
+
+	# RISCV requires this be specified
+	if [[ $ARCHITECTURE == "RISCV" ]]; then
+		extraAnsibleArgs="-e ansible_python_interpreter=/usr/bin/python3"
+	fi
 
 	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone -b "$gitBranch" "$gitURL" "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 
-	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$pbLogPath"
+	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b ${extraAnsibleArgs} --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$pbLogPath"
 	if grep -q 'failed=[1-9]\|unreachable=[1-9]' "$pbLogPath"; then
 		echo "PLAYBOOK FAILED"
 		destroyVM
