@@ -74,7 +74,7 @@ defaultVars() {
                         echo "arm64 selected"; ARCHITECTURE=ARM64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
-		"arm32" | "ARM32")
+		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
 			echo "arm32 selected"; ARCHITECTURE=ARM32;;
 		"" )
 			echo "Please input an architecture to test"; exit 1;;
@@ -155,7 +155,10 @@ done
 			export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
 		"ARM32" )
 			export MACHINE="virt"
-			export QEMUARCH="arm";;
+			export QEMUARCH="arm"
+			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp:$PORTNO-:22"
+			export DRIVE="-drive if=none,file=$workFolder/ARM32.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
+			export EXTRA_ARGS="-kernel kernel.arm32 -initrd initrd.arm32 -append 'root=/dev/vda2'";;
 	esac
 	
 	# Run the command, mask output and send to background
