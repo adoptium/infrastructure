@@ -156,9 +156,9 @@ done
 		"ARM32" )
 			export MACHINE="virt"
 			export QEMUARCH="arm"
-			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp:$PORTNO-:22"
+			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
 			export DRIVE="-drive if=none,file=$workFolder/ARM32.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
-			export EXTRA_ARGS="-kernel kernel.arm32 -initrd initrd.arm32 -append 'root=/dev/vda2'";;
+			export EXTRA_ARGS="-kernel $workFolder/kernel.arm32 -initrd $workFolder/initrd.arm32 -append root=/dev/vda2";
 	esac
 	
 	# Run the command, mask output and send to background
