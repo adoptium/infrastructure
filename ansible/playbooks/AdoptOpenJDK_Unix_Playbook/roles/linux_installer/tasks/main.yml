@@ -10,6 +10,7 @@
     state: present
     update_cache: yes
   with_items:
+    - openjdk-8-jdk-headless
     - make
     - gcc
     - git

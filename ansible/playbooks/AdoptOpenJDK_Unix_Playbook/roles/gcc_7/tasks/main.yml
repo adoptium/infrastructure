@@ -3,16 +3,14 @@
 # gcc_7 #
 #########
 
-
 - name: Check if gcc 7.5 is installed on RHEL/CentOS
   shell: /usr/local/gcc/bin/gcc-7.5 --version 2>&1 > /dev/null
   ignore_errors: yes
   register: gcc7_installed
-  tags: gcc-7
   when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+  tags: gcc_7
 
-  # Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
-
+# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-7.5.0 binary
   get_url:
     url: https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar.xz
@@ -22,7 +20,7 @@
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - gcc7_installed.rc != 0
-  tags: gcc-7
+  tags: gcc_7
 
 - name: Extract AdoptOpenJDK gcc-7 binary to /usr/local/gcc
   unarchive:
@@ -32,7 +30,7 @@
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - gcc7_installed.rc != 0
-  tags: gcc-7
+  tags: gcc_7
 
 - name: Remove downloaded gcc 7 binary tarball
   file:
@@ -41,4 +39,24 @@
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
     - gcc7_installed.rc != 0
-  tags: gcc-7
+  tags: gcc_7
+
+# Stops buildng ccache from source when unnecessary
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1472
+- name: Check if ccache is at /usr/local/bin/ccache
+  stat:
+    path: /usr/local/bin/ccache
+  register: ccache_symlink
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+  tags: gcc_7
+
+- name: Create symlink for ccache
+  file:
+    src: /usr/local/gcc/bin/ccache
+    dest: /usr/local/bin/ccache
+    state: link
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - not ccache_symlink.stat.exists
+  tags: gcc_7

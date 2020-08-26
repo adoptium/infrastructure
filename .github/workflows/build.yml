@@ -30,3 +30,20 @@ jobs:
         repository: adoptopenjdk/centos6_build_image
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
+
+  build-and-push-alpine3:
+    name: Alpine3
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Docker Build & Push Alpine3 Image to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./ansible/Dockerfile.Alpine3
+        repository: adoptopenjdk/alpine3_build_image
+        tags: latest
+        push: ${{ github.ref == 'refs/heads/master' }}

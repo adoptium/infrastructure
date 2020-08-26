@@ -275,6 +275,7 @@ startVMPlaybookWin()
 {
 	local OS=$1
 	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log"
+	local vagrantPort=
 
 	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
@@ -288,7 +289,11 @@ startVMPlaybookWin()
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
         # See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
-	cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.tmp | tr -d \\r | sort -nr | head -1 > playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+	
+	# 5986 refers to the winrm_ssl port on the guest
+	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-672930832
+	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
+	echo "[127.0.0.1]:$vagrantPort" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	
 	# Changes the value of "hosts" in main.yml
@@ -312,11 +317,19 @@ startVMPlaybookWin()
         
 	if [[ "$testNativeBuild" = true ]]; then
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
-		# Restarting the VM as the shared folder disappears after the playbook runs. (Possibly due to the restarts in the playbook)
+
+		# Restarting the VM as the shared folder disappears after the playbook runs due to the restarts in the playbook
 		vagrant halt && vagrant up
+
+		# Restaring the VM may change the port Number
+                vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
+                # The port used by startScriptWin.sh must be the winRM port, not the winRM_ssl port
+                # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-673329953
+                local winRMPort=$(( vagrantPort -1 ))
+
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -a "$buildURL $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -a "$buildURL $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
@@ -325,9 +338,9 @@ startVMPlaybookWin()
 	
 		if [[ "$runTest" = true ]]; then
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.test_log"
-			vagrant halt && vagrant up
+			
 			# Run a python script to start a test for the built JDK on the Windows VM
-			python pbTestScripts/startScriptWin.py -i $(cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win) -t 2>&1 | tee $testLogPath
+			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -t 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then 
 				echo TEST FAILED

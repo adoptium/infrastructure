@@ -29,6 +29,18 @@
     - c:\Program Files (x86)\Microsoft Visual Studio 10.0\DIA SDK\bin\amd64\msdia100.dll
   tags: MSVS_2010
 
+# NOTE: This construct is because an SQL Server entry is being added to
+# the path which has an erroneous quote in it, causing OpenSSL not to build
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1485
+- name: Remove double quote from %PATH%
+  win_shell: |
+    $NewPath=$env:path.Replace('"','')
+    [Environment]::SetEnvironmentVariable("Path", $NewPath, [System.EnvironmentVariableTarget]::Machine)
+  args:
+    executable: powershell
+  when: (not vs2010_installed.stat.exists)
+  tags: MSVS_2010
+
 - name: Reboot machine after Visual Studio 2010 installation
   win_reboot:
     reboot_timeout: 1800

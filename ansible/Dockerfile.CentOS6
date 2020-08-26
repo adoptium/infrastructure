@@ -12,7 +12,8 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
+ ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ ansible-playbook -i hosts -s ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --tags="riscv"
 
 RUN rm -rf /ansible; yum remove ansible; yum clean all
 
