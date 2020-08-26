@@ -7,7 +7,7 @@ Regardless of the architecture that QEMU is emulating, all of the disk images me
 | Rule | Explanation |
 |--|--|
 | 15GB Image size | This is to allow enough space for the Unix Playbook to fully run and build a JDK.
-User: 'linux', Password: 'password'  | This is allow for `sshpass` to add the generated ssh key to the QEMU machine, allowing for automatic sign in.
+User: `linux`, Password: `password`  | This is allow for `sshpass` to add the generated ssh key to the QEMU machine, allowing for automatic sign in.
 | Password-less `sudo` | This is to allow for the `-b` option to be used in the `ansible-playbook` command automatically.
 | `sudo`, `python2` / `python3` are installed | The playbooks aren't setup to install any of these, but they are required to run the Ansible commands.
 
