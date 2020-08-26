@@ -14,8 +14,6 @@
     url: 'https://aka.ms/vs/16/release/vs_community.exe'
     dest: 'C:\temp\vs_community19.exe'
     force: no
-    checksum: 03f1768299410a2c359f61c88abbe038c5bcfd51d71854cf6437e633ebdefa06
-    checksum_algorithm: sha256
   when: (not vs2019_installed.stat.exists)
   tags: MSVS_2019
 
