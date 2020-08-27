@@ -71,7 +71,7 @@ defaultVars() {
 		"s390x" | "S390X" | "S390x" )
 			echo "s390x selected"; ARCHITECTURE=S390X;;
 		"aarch64" | "arm64" | "ARM64" )
-      echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
+      			echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
 		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
@@ -106,7 +106,7 @@ showArchList() {
 	echo "Currently supported architectures:
 	- ppc64le
 	- s390x
-	- arm32"
+	- arm32
 	- aarch64
 	- riscv"
 }
@@ -167,7 +167,7 @@ done
 			export QEMUARCH="arm"
 			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
 			export DRIVE="-drive if=none,file=$workFolder/ARM32.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
-			export EXTRA_ARGS="-kernel $workFolder/kernel.arm32 -initrd $workFolder/initrd.arm32 -append root=/dev/vda2";;
+			export EXTRA_ARGS="-kernel /qemu_base_images/arm32_tools/kernel.arm32 -initrd /qemu_base_images/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
 		"RISCV" )
 			export QEMUARCH="riscv64"
 			export MACHINE="virt"
