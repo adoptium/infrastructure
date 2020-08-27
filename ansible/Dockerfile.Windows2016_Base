@@ -4,24 +4,17 @@ FROM mcr.microsoft.com/windows/servercore:ltsc2016
 
 SHELL ["powershell", "-command"]
 
+# Workaround for https://github.com/moby/moby/issues/41058
+ENV CYGWIN winsymlinks:lnk
+ADD .github/cygwin-build/setup-x86_64.exe C:\temp\cygwin.exe
+
 RUN $ProgressPreference = 'SilentlyContinue'; `
     # pre install
     New-Item -Path C:\ -Name 'openjdk' -ItemType 'directory'; `
-    New-Item -Path C:\ -Name 'temp' -ItemType 'directory'; `
     # cygwin
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
     # Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'; `
-    # Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages wget,bsdtar,rsync,gnupg,git,autoconf,make,gcc-core,mingw64-x86_64-gcc-core,unzip,zip,cpio,curl,grep,perl --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'; `
-    # TODO: remove this workaround once https://github.com/moby/moby/issues/41058 is resolved.
-    Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.gz' -OutFile C:\temp\cygwin64.tar.gz; `
-    Invoke-WebRequest 'https://ci.adoptopenjdk.net/userContent/winansible/cygwin64/bin/*zip*/bin.zip' -OutFile C:\temp\cyg_toolset.zip; `
-    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp; `
-    $env:path='C:\temp\bin;' + $env:Path; `
-    cd C:\ ;`
-    tar --force-local -I pigz -xf C:\temp\cygwin64.tar.gz ; `
-    Remove-Item C:\temp\cygwin64.tar.gz; `
-    Remove-Item C:\temp\cyg_toolset.zip; `
-    Remove-Item C:\temp\bin -Recurse; `
+    Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bsdtar,cpio,curl,gcc-core,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip --quiet-mode --download --no-admin --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'; `
     # change git config to not replace Line endings
     C:\cygwin64\bin\git config --system core.autocrlf false ; `
     # perl
@@ -39,14 +32,9 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     Invoke-WebRequest 'https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u265-b01/OpenJDK8U-jdk_x86-32_windows_hotspot_8u265b01.zip' -OutFile C:\temp\jdk-8.zip; `
     Expand-Archive -LiteralPath C:\temp\jdk-8.zip -DestinationPath 'C:\Program Files\Java'; `
     New-Item -ItemType SymbolicLink -Path C:\openjdk\jdk-8 -Target 'C:\Program Files\Java\jdk8u265-b01'; `
-    # java 10
-    Invoke-WebRequest 'https://github.com/AdoptOpenJDK/openjdk10-binaries/releases/download/jdk-10.0.2%2B13.1/OpenJDK10U-jdk_x64_windows_hotspot_10.0.2_13.zip' -OutFile C:\temp\jdk-10.zip; `
-    Expand-Archive -LiteralPath C:\temp\jdk-10.zip -DestinationPath 'C:\Program Files\Java'; `
-    New-Item -ItemType SymbolicLink -Path C:\openjdk\jdk-10 -Target 'C:\Program Files\Java\jdk-10.0.2+13'; `
     # set env
     [Environment]::SetEnvironmentVariable('JDK7_BOOT_DIR', '/cygdrive/c/openjdk/jdk-7', [EnvironmentVariableTarget]::Machine); `
     [Environment]::SetEnvironmentVariable('JDK8_BOOT_DIR', '/cygdrive/c/openjdk/jdk-8', [EnvironmentVariableTarget]::Machine); `
-    [Environment]::SetEnvironmentVariable('JDK10_BOOT_DIR', '/cygdrive/c/openjdk/jdk-10', [EnvironmentVariableTarget]::Machine); `
     # ant
     Invoke-WebRequest 'http://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip' -OutFile C:\temp\ant.zip; `
     Expand-Archive -LiteralPath C:\temp\ant.zip -DestinationPath C:\apache-ant\; `
