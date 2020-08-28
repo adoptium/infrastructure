@@ -182,44 +182,49 @@
 ####################
 # Set Default Java #
 ####################
-- name: Create Java 8 Alternative
-  alternatives:
-    name: java
-    link: /usr/bin/java
-    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
-    priority: 1
-  when:
-    - ansible_architecture == "x86_64"
-    - ansible_distribution_major_version != "6"
+
+- name: Find Default JRE
+  stat:
+    path: /usr/lib/jvm/jre-1.8.0
+  register: jre_path
   tags: default_java
 
-- name: Create Java 8 Alternative (for CentOS6)
+- name: Find Default JDK
+  stat:
+    path: /usr/lib/jvm/java-1.8.0
+  register: jdk_path
+  tags: default_java
+
+- name: Set Default JRE (CentOS 6)
   alternatives:
     name: java
-    link: /usr/bin/java
-    path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/java
-    priority: 1
+    path: "/usr/lib/jvm/jre-1.8.0-openjdk.{{ ansible_architecture }}/bin/java"
   when:
-    - ansible_architecture == "x86_64"
     - ansible_distribution_major_version == "6"
   tags: default_java
 
-- name: Set Default Java Version
+- name: Set Default JRE (CentOS 7 and later)
   alternatives:
     name: java
-    path: /usr/lib/jvm/java-1.8.0-openjdk/bin/java
+    path: "{{ jre_path.stat.lnk_source }}/bin/java"
   when:
-    - ansible_architecture == "x86_64"
-    - ansible_distribution_major_version != "6"
+    - ansible_distribution_major_version > "6"
   tags: default_java
 
-- name: Set Default Java Version (for CentOS6)
+- name: Set Default JDK (CentOS 6)
   alternatives:
-    name: java
-    path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/java
+    name: javac
+    path: "/usr/lib/jvm/java-1.8.0-openjdk.{{ ansible_architecture }}/bin/javac"
   when:
-    - ansible_architecture == "x86_64"
     - ansible_distribution_major_version == "6"
+  tags: default_java
+
+- name: Set Default JDK (CentOS 7 and later)
+  alternatives:
+    name: javac
+    path: "{{ jdk_path.stat.lnk_source }}/bin/javac"
+  when:
+    - ansible_distribution_major_version > "6"
   tags: default_java
 
 ###########
