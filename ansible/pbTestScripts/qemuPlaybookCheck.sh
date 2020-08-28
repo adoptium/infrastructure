@@ -71,7 +71,7 @@ defaultVars() {
 		"s390x" | "S390X" | "S390x" )
 			echo "s390x selected"; ARCHITECTURE=S390X;;
 		"aarch64" | "arm64" | "ARM64" )
-      			echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
+			echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
 		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
