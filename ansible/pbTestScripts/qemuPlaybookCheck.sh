@@ -71,9 +71,11 @@ defaultVars() {
 		"s390x" | "S390X" | "S390x" )
 			echo "s390x selected"; ARCHITECTURE=S390X;;
 		"aarch64" | "arm64" | "ARM64" )
-                        echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
+			echo "aarch64 selected"; ARCHITECTURE=AARCH64;;
 		"ppc64le" | "ppc64" | "PPC64LE" | "PPC64" )
 			echo "ppc64le selected"; ARCHITECTURE=PPC64LE;;
+		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
+			echo "arm32 selected"; ARCHITECTURE=ARM32;;
 		"RISC-V" | "riscv" | "risc-v" | "RISCV" )
 			echo "riscv selected"; ARCHITECTURE=RISCV;;
 		"" )
@@ -104,6 +106,7 @@ showArchList() {
 	echo "Currently supported architectures:
 	- ppc64le
 	- s390x
+	- arm32
 	- aarch64
 	- riscv"
 }
@@ -159,12 +162,18 @@ done
 			export QEMUARCH="aarch64"
 			export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
 			export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
+		"ARM32" )
+			export MACHINE="virt"
+			export QEMUARCH="arm"
+			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
+			export DRIVE="-drive if=none,file=$workFolder/ARM32.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
+			export EXTRA_ARGS="-kernel /qemu_base_images/arm32_tools/kernel.arm32 -initrd /qemu_base_images/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
 		"RISCV" )
 			export QEMUARCH="riscv64"
 			export MACHINE="virt"
 			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/${ARCHITECTURE}.dsk,if=none,id=hd"
 			export SSH_CMD="-device virtio-net-device,netdev=net -netdev user,id=net,hostfwd=tcp::$PORTNO-:22"
-			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/qemu/virt/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000"
+			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/qemu/virt/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000";;
 	esac
 	
 	# Run the command, mask output and send to background
