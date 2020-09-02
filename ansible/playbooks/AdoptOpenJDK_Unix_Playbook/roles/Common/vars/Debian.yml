@@ -13,9 +13,7 @@ Build_Tool_Packages:
   - curl
   - flex                          # OpenJ9
   - g++
-  - g++-7                         # OpenJ9
   - gcc
-  - gcc-7                         # OpenJ9
   - gettext
   - libasound2-dev
   - libcups2-dev
@@ -60,6 +58,10 @@ OpenJFX_Build_Tool_Packages:
   - libxslt1-dev
   - libxxf86vm-dev
   - ruby
+
+gcc_7:                            # On all architectures but arm32
+  - g++-7                         # OpenJ9
+  - gcc-7                         # OpenJ9
 
 gcc_compiler:
   - g++-4.8
