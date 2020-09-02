@@ -23,7 +23,7 @@
     executable: cmd
   when: (not vs2019_installed.stat.exists)
   register: vs2019_error
-  failed_when: vs2019_error.rc != 1 and vs2019_error.rc != 0
+  failed_when: vs2019_error.rc != 0 and vs2019_error.rc != 3010
   tags: MSVS_2019
 
 - name: Register Visual Studio Community 2019 DIA SDK shared libraries
