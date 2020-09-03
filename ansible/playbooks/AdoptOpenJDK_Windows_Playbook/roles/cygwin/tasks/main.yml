@@ -15,88 +15,39 @@
   register: cygwin_installed
   tags: cygwin
 
-- name: Download Cygwin installer
+# For details about the cache, see: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1210#issuecomment-679076545
+- name: Retrieve cygwin cache from ci.adoptopenjdk.net
   win_get_url:
-    url: https://cygwin.com/setup-x86_64.exe
-    dest: 'C:\temp\cygwin.exe'
-    force: no
-    checksum: 4dd4d4531e8e63ade849daaaf587ba1c1430368701772c8ee42a27f4e8c373e4
+    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.gz
+    dest: C:/temp/cygwin64.tar.gz
+    checksum: 8f8b1d7d00233e384e725390c4018941fe7125290b94ecc0eeb3cf6684b4ce23
     checksum_algorithm: sha256
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
-- name: Install Cygwin and its packages
-  win_command: c:\temp\cygwin.exe --quiet-mode --download --local-install
-                --delete-orphans --site {{ Cygwin_SITE_URL }}
-                --local-package-dir {{ Cygwin_PACKAGE_DIR }}
-                --root {{ Cygwin_ROOT_INST_DIR }}
-                --categories {{ Cygwin_CATEGORIES }}
+- name: Retrieve cygwin toolset from ci.adoptopenjdk.net
+  win_get_url:
+    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64_bootstrap.zip
+    dest: C:/temp/cyg_toolset.zip
+    checksum: d7950df964a0618ac47561d349276d4644e27f5b8f0a5fba9b10db702d09ecad
+    checksum_algorithm: sha256
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
-- name: Install Cygwin build extra packages
-  win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
-  with_items:
-    - autoconf
-    - cpio
-    - libguile2.0_22            # Required for Make v4.2.1-2
-    - unzip
-    - zip
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Install Cygwin test extra packages
-  win_command: C:\temp\cygwin.exe -q -P "{{ item }}"
-  with_items:
-    - curl
-    - curl-debuginfo
-    - libcurl-devel
-    - libpng15
-    - libpng-devel
-    - perl-Text-CSV
+- name: Use cygwin 'tar' and 'pigz' to extract cygwin cache
+  win_shell: |
+    New-Item -ItemType directory -Name cygwin_toolset -Path C:\temp\
+    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp\cygwin_toolset;
+    $env:path="C:\temp\cygwin_toolset;$env:path"
+    cd C:\
+    tar --force-local -I pigz -xf C:\temp\cygwin64.tar.gz
+  args:
+    executable: powershell
   when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Change git config to not replace Line endings
   win_shell: "C:/cygwin64/bin/git config --system core.autocrlf false"
-  tags: cygwin
-
-###############################################################################
-# Cygwin by default installs latest versions of packages, which is 3.0-2 for
-# grep. This version of grep is unable to match EOL (with $) when the file use
-# windows style CRLF sequence at end of lines and it is required for openjdk8
-# builds to complete. The following two steps downloads the latest known
-# version of grep to satisfy this requirement and overwrites the installed
-# grep version.
-###############################################################################
-- name: Download grep-2.27-2
-  win_get_url:
-    url: "{{ Cygwin_SITE_URL + '/x86_64/release/grep/grep-2.27-2.tar.xz' }}"
-    dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\grep.tar.xz' }}"
-    force: no
-    checksum: 36ae2483f68b3c5a4bd93814fa4f7e2576dbe6559d4ffa0589c2159e85de91f6
-    checksum_algorithm: sha256
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Extract grep-2.27-2
-  win_command: "{{ Cygwin_ROOT_INST_DIR + '\\bin\\bash.exe -l -c \"tar -C / -xvf /tmp/grep.tar.xz\"' }}"
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Download make-4.2.1-2
-  win_get_url:
-    url: "{{ Cygwin_SITE_URL + '/x86_64/release/make/make-4.2.1-2.tar.xz' }}"
-    dest: "{{ Cygwin_ROOT_INST_DIR + '\\tmp\\make.tar.xz' }}"
-    force: no
-    checksum: 919037ac0ae0402639a08b474a60807499ae47b0aec98e7009820f9c05ea6515
-    checksum_algorithm: sha256
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Extract make-4.2.1-2
-  win_command: "{{ Cygwin_ROOT_INST_DIR + '\\bin\\bash.exe -l -c \"tar -C / -xvf /tmp/make.tar.xz\"' }}"
-  when: (not cygwin_installed.stat.exists)
   tags: cygwin
 
 - name: Remove c:\cygwin64\bin from the path if it exists
