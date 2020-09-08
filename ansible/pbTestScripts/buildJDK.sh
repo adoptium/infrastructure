@@ -165,7 +165,7 @@ fi
 if [[ "$ARCHITECTURE" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT == "openj9" ]]; then
 	echo "Can't build OpenJ9 JDK8 on AARCH64, Defaulting to jdk11"
 	JAVA_TO_BUILD=jdk11u
-	JDK_BOOT_DIR=/usr/lib/jvm/jdk10
+	JDK_BOOT_DIR=/usr/lib/jvm/jdk-10
 fi
 
 export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
