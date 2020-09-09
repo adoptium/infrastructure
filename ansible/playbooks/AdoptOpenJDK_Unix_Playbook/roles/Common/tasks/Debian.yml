@@ -106,6 +106,12 @@
 ##########################
 # Additional build tools #
 ##########################
+- name: Call gcc-7 for all but arm32
+  package: "name={{ item }} state=latest"
+  with_items: "{{ gcc_7 }}"
+  when: ansible_architecture != "armv7l"
+  tags: build_tools
+
 - name: Call Build Packages and Tools Task for OpenJFX
   package: "name={{ item }} state=latest"
   with_items: "{{ OpenJFX_Build_Tool_Packages }}"
