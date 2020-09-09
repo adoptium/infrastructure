@@ -168,6 +168,11 @@ if [[ "$ARCHITECTURE" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT ==
 	JDK_BOOT_DIR=/usr/lib/jvm/jdk10
 fi
 
+if [[ "$ARCHITECTURE" == "armv7l" && "$VARIANT" == "openj9" ]]; then
+	echo "Can't build an OpenJ9 JDK on ARMv7l, Defaulting to Hotspot"
+	export VARIANT=hotspot
+fi
+
 export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
 
 echo "DEBUG:
