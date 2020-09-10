@@ -146,6 +146,13 @@ checkVagrantOS()
                 echo $vagrantOSList
                 exit 1
         fi
+        # The Windows VM is setup to use 5GB of memory, which can be an issue on machines with only 8GB installed.
+        # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1532#issue-481189847
+        if [[ "$vagrantOS" == "Win2012" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
+                echo "Warning: Windows VM requires 5Gb of free memory to run. On laptops with only 8Gb this can be an issue."
+                echo "Reducing the Windows VM memory requirement to 2560Mb."
+                sed -i -e "s/5120/2560/g" Vagrantfile.Win2012
+        fi
 }
 
 splitURL()

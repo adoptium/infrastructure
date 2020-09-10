@@ -276,6 +276,8 @@ ln -sf Vagrantfile.Win2012 Vagrantfile
 
 vagrant up
 ```
+Note: If the machine running this only has 8G of memory, the windows VM may go into an aborted state on bootup. This is due to assigning the VM too much memory.
+To stop this, halve the memory to the VM by changing the following line in the Windows vagrantfile: `v.memory = 5120`
 
 Several files will also need to be edited for Windows:
 
