@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ARCHITECTURE=""
+OS=""
 skipFullSetup=""
 gitURL="https://github.com/adoptopenjdk/openjdk-infrastructure"
 gitBranch="master"
@@ -51,6 +52,8 @@ processArgs() {
 				gitBranch=$1; shift;;
 			"--skip-more" | "-sm" )
 				skipFullSetup=",nvidia_cuda_toolkit,MSVS_2010,MSVS_2017";;
+			"--operating-system" | "-o")
+				OS="$1"; shift;;
 			"--jdk-version" | "-v" )
 				jdkToBuild="$1"; shift;;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
@@ -72,6 +75,7 @@ usage() {
 		--infra-branch | -ib		Specify the branch of the infra-repo (default: master)
 		--jdk-version | -v		Specify which JDK to build if '-b' is used (default: jdk8u)
 		--retainVM | -r			Retain the VM once running the playbook
+		--operating-system | -o Combined with --architecture runs a VM with the desired architecture and OS combo.
 		--skip-more | -sm		Skip non-essential roles from the playbook
 		--test | -t			Test the built JDK
 		"	
@@ -94,6 +98,18 @@ defaultVars() {
 			echo "Please input an architecture to test"; exit 1;;
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
 	esac
+
+	case "$OS" in
+		"debian8" | "Debian8" | "deb8" )
+			echo "debian8 selected for $ARCHITECTURE"; OS=debian8;;
+		"debian10" | "Debian10" | "deb10" )
+			echo "debian10 selected for $ARCHITECURE"; OS=debian10;;
+		"ubuntu18" | "u18" | "Ubuntu18" )
+			echo "ubuntu18 selected for $ARCHITECURE"; OS=ubuntu18;;
+		* )
+			echo "Please use the -o flag to select a supported OS"; showArchList; exit 1;;
+	esac
+
 	if [[ -z "${WORKSPACE:-}" && "$current_dir" == false ]] ; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
 		WORKSPACE=$HOME
@@ -115,11 +131,16 @@ defaultVars() {
 }
 
 showArchList() {
-	echo "Currently supported architectures:
+	echo "Currently supported architectures and operating systems:
 	- ppc64le
+		- ubuntu18
 	- s390x
+		- ubuntu18
 	- arm32
+		- debian8
 	- aarch64
+		- debian10
+		- ubuntu18
 	- riscv"
 }
 
@@ -169,11 +190,19 @@ done
 			export QEMUARCH="ppc64"
 			export SSH_CMD="-net user,hostfwd=tcp::$PORTNO-:22 -net nic";;
 		"AARCH64" )
-			export MACHINE="virt"
-			export DRIVE="-drive if=none,file=$workFolder/${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
 			export QEMUARCH="aarch64"
-			export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
-			export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
+			case $OS in
+				"ubuntu18" )
+					export MACHINE="virt,gic-version=max"
+					export DRIVE="-drive file=$workFolder/ubuntu18-arm64.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
+					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
+					export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu max";;
+				"debian10" )
+					export MACHINE="virt"
+					export DRIVE="-drive if=none,file=$workFolder/${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
+					export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
+					export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
+			esac
 		"ARM32" )
 			export MACHINE="virt"
 			export QEMUARCH="arm"
