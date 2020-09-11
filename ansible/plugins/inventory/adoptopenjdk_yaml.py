@@ -38,7 +38,7 @@ except ImportError:
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64'),
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
