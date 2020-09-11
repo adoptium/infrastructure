@@ -93,7 +93,7 @@ defaultVars() {
 		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
 			echo "arm32 selected"; ARCHITECTURE=ARM32;;
 		"RISC-V" | "riscv" | "risc-v" | "RISCV" )
-			echo "riscv selected"; ARCHITECTURE=RISCV;;
+			echo "riscv selected"; ARCHITECTURE=RISCV; OS=RISCV;;
 		"" )
 			echo "Please input an architecture to test"; exit 1;;
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
@@ -101,11 +101,11 @@ defaultVars() {
 
 	case "$OS" in
 		"debian8" | "Debian8" | "deb8" )
-			echo "debian8 selected for $ARCHITECTURE"; OS=debian8;;
+			echo "debian8 selected for $ARCHITECTURE"; OS=DEBIAN8;;
 		"debian10" | "Debian10" | "deb10" )
-			echo "debian10 selected for $ARCHITECURE"; OS=debian10;;
+			echo "debian10 selected for $ARCHITECURE"; OS=DEBIAN10;;
 		"ubuntu18" | "u18" | "Ubuntu18" )
-			echo "ubuntu18 selected for $ARCHITECURE"; OS=ubuntu18;;
+			echo "ubuntu18 selected for $ARCHITECURE"; OS=UBUNTU18;;
 		* )
 			echo "Please use the -o flag to select a supported OS"; showArchList; exit 1;;
 	esac
@@ -158,9 +158,9 @@ setupWorkspace() {
 		find "$workFolder" -type f | xargs rm -f
 		rm -rf "$workFolder"/openjdk-infrastructure "$workFolder"/openjdk-build
 	fi
-	if [[ ! -f "${workFolder}/${ARCHITECTURE}.dsk" ]]; then 
+	if [[ ! -f "${workFolder}/$OS.${ARCHITECTURE}.dsk" ]]; then 
 		echo "Copying new disk image"
-		xz -cd "$imageLocation"/"$ARCHITECTURE".dsk.xz > "$workFolder"/"$ARCHITECTURE".dsk
+		xz -cd "$imageLocation"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
 	else
 		echo "Using old disk image"
 	fi
@@ -181,38 +181,38 @@ done
 	case "$ARCHITECTURE" in
 		"S390X" )
 			export MACHINE="s390-ccw-virtio"
-			export DRIVE="-drive file=$workFolder/${ARCHITECTURE}.dsk,if=none,id=hd0 -device virtio-blk-ccw,drive=hd0,id=virtio-disk0"
+			export DRIVE="-drive file=$workFolder/$OS.${ARCHITECTURE}.dsk,if=none,id=hd0 -device virtio-blk-ccw,drive=hd0,id=virtio-disk0"
 			export QEMUARCH="s390x"
 			export SSH_CMD="-net user,hostfwd=tcp::$PORTNO-:22 -net nic";;
 		"PPC64LE" )
 			export MACHINE="pseries-2.12"
-			export DRIVE="-hda $workFolder/${ARCHITECTURE}.dsk"
+			export DRIVE="-hda $workFolder/$OS.${ARCHITECTURE}.dsk"
 			export QEMUARCH="ppc64"
 			export SSH_CMD="-net user,hostfwd=tcp::$PORTNO-:22 -net nic";;
 		"AARCH64" )
 			export QEMUARCH="aarch64"
 			case $OS in
-				"ubuntu18" )
+				"UBUNTU18" )
 					export MACHINE="virt,gic-version=max"
-					export DRIVE="-drive file=$workFolder/ubuntu18-arm64.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
+					export DRIVE="-drive file=$workFolder/$OS.$ARCHITECTURE.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
 					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
 					export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu max";;
-				"debian10" )
+				"DEBIAN10" )
 					export MACHINE="virt"
-					export DRIVE="-drive if=none,file=$workFolder/${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
+					export DRIVE="-drive if=none,file=$workFolder/$OS.${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
 					export SSH_CMD="-device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:$PORTNO-:22"
 					export EXTRA_ARGS="-cpu cortex-a57 -bios /usr/share/qemu-efi-aarch64/QEMU_EFI.fd";;
-			esac
+			esac ;;
 		"ARM32" )
 			export MACHINE="virt"
 			export QEMUARCH="arm"
 			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
-			export DRIVE="-drive if=none,file=$workFolder/ARM32.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
+			export DRIVE="-drive if=none,file=$workFolder/$OS.$ARCHITECTURE.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
 			export EXTRA_ARGS="-kernel /qemu_base_images/arm32_tools/kernel.arm32 -initrd /qemu_base_images/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
 		"RISCV" )
 			export QEMUARCH="riscv64"
 			export MACHINE="virt"
-			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/${ARCHITECTURE}.dsk,if=none,id=hd"
+			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/$OS.${ARCHITECTURE}.dsk,if=none,id=hd"
 			export SSH_CMD="-device virtio-net-device,netdev=net -netdev user,id=net,hostfwd=tcp::$PORTNO-:22"
 			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/qemu/virt/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000";;
 	esac
@@ -246,7 +246,7 @@ done
 
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
-	local pbLogPath="$workFolder/logFiles/$ARCHITECTURE.log"
+	local pbLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.log"
 	local extraAnsibleArgs=""
 
 	# RISCV requires this be specified
@@ -269,7 +269,7 @@ runPlaybook() {
 	fi
 
 	if [[ "$buildJDK" == true ]]; then
-		local buildLogPath="$workFolder/logFiles/$ARCHITECTURE.build_log"
+		local buildLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.build_log"
 		
 		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone https://github.com/adoptopenjdk/openjdk-infrastructure \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh --version $jdkToBuild $buildVariant --URL $buildURL/tree/$buildBranch" 2>&1 | tee "$buildLogPath"
 		if grep -q '] Error' "$buildLogPath" || grep -q 'configure: error' "$buildLogPath"; then
@@ -279,7 +279,7 @@ runPlaybook() {
 		fi
 
 		if [[ "$testJDK" == true ]]; then
-			local testLogPath="$workFolder/logFiles/$ARCHITECTURE.test_log"
+			local testLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.test_log"
 
 			ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "\$HOME/openjdk-infrastructure/ansible/pbTestScripts/testJDK.sh" 2>&1 | tee "$testLogPath"
 			if ! grep -q 'FAILED: 0' "$testLogPath"; then
