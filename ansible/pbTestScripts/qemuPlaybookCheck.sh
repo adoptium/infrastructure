@@ -196,7 +196,7 @@ done
 					export MACHINE="virt,gic-version=max"
 					export DRIVE="-drive file=$workFolder/$OS.$ARCHITECTURE.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
 					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
-					export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu max";;
+					export EXTRA_ARGS="-drive file=/qemu_base_images/arm64_tools/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=/qemu_base_images/arm64_tools/flash1.img,format=raw,if=pflash -cpu max";;
 				"DEBIAN10" )
 					export MACHINE="virt"
 					export DRIVE="-drive if=none,file=$workFolder/$OS.${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
