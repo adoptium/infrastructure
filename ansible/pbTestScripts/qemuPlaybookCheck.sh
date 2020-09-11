@@ -93,7 +93,7 @@ defaultVars() {
 		"arm32" | "ARM32" | "armv7l" | "ARMV7L")
 			echo "arm32 selected"; ARCHITECTURE=ARM32;;
 		"RISC-V" | "riscv" | "risc-v" | "RISCV" )
-			echo "riscv selected"; ARCHITECTURE=RISCV; OS=RISCV;;
+			echo "riscv selected"; ARCHITECTURE=RISCV;;
 		"" )
 			echo "Please input an architecture to test"; exit 1;;
 		*) echo "Please select a valid architecture"; showArchList; exit 1;;
