@@ -106,6 +106,8 @@ defaultVars() {
 			echo "DEBIAN10 selected for $ARCHITECTURE"; OS=DEBIAN10;;
 		"ubuntu18" | "u18" | "Ubuntu18" )
 			echo "UBUNTU18 selected for $ARCHITECTURE"; OS=UBUNTU18;;
+		"debian11" | "deb11" | "Debian11" )
+			echo "DEBIAN11 selected for $ARCHITECTURE"; OS=DEBIAN11;;
 		* )
 			echo "Please use the -o flag to select a supported OS"; showArchList; exit 1;;
 	esac
@@ -141,7 +143,8 @@ showArchList() {
 	- aarch64
 		- debian10
 		- ubuntu18
-	- riscv"
+	- riscv
+		- debian11"
 }
 
 # Setup the file system
@@ -163,9 +166,9 @@ setupWorkspace() {
 		find "$workFolder" -type f | xargs rm -f
 		rm -rf "$workFolder"/openjdk-infrastructure "$workFolder"/openjdk-build
 	fi
-	if [[ ! -f "${workFolder}/$OS.${ARCHITECTURE}.dsk" ]]; then 
+	if [[ ! -f "$workFolder/$OS.$ARCHITECTURE.dsk" ]]; then 
 		echo "Copying new disk image"
-		xz -cd "$imageLocation"/"$OS.{$ARCHITECTURE}".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
+		xz -cd "$imageLocation"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
 	else
 		echo "Using old disk image"
 	fi
