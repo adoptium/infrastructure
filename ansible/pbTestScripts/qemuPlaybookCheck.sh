@@ -62,7 +62,7 @@ processArgs() {
 }
 
 usage() {
-	echo "Usage: ./qemu_test_script.sh (<options>) -a <architecture>
+	echo "Usage: ./qemu_test_script.sh (<options>) -a <architecture> -o <os>
 		--architecture | -a		Specifies the architecture to build the OS on
 		--build | -b			Build a JDK on the qemu VM
 		--build-repo | -br		Which openjdk-build to retrieve the build scripts from
