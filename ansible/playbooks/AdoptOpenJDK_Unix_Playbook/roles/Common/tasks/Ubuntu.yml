@@ -14,7 +14,7 @@
   when: ansible_architecture == "s390x"
   tags: patch_update
 
-- name: Install gnugp2 for aarch64
+- name: Install gnupg2 for aarch64
   apt:
     name: gnupg2
     state: present
