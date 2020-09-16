@@ -1,0 +1,61 @@
+---
+#####################
+# Iced-Tea Web Jars #
+#####################
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/738
+
+- name: Create C:/cygwin64/usr/share/java if it doesn't exist
+  win_file:
+    path: C:\cygwin64\usr\share\java
+    state: directory
+  tags: ITW
+
+- name: Retrieve tagsoup jar
+  win_get_url:
+    url: http://vrici.lojban.org/~cowan/XML/tagsoup/tagsoup-1.2.1.jar
+    dest: C:\cygwin64\usr\share\java\
+    checksum: ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04
+    checksum_algorithm: sha256
+  tags: ITW
+
+- name: Retrieve mslinks jar
+  win_get_url:
+    url: https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar
+    dest: C:\cygwin64\usr\share\java\
+    checksum: e14d756f81b310b75baeb5baf219d25592b6a8635eb215c4059f17493b0cea5c
+    checksum_algorithm: sha256
+  tags: ITW
+
+- name: Retrieve Wixgen jar
+  win_get_url:
+    url: https://github.com/akashche/wixgen/releases/download/1.7/wixgen.jar
+    dest: C:\cygwin64\usr\share\java\
+    checksum: 57e68a91c46a2f4b1b41a3f93793e331d62d6d151ddc222fa4d3ec9ce876f967
+    checksum_algorithm: sha256
+  tags: ITW
+
+- name: Retrieve Rhino zip
+  win_get_url:
+    url: http://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip
+    dest: C:\temp\
+    checksum: c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866
+    checksum_algorithm: sha256
+  tags: ITW
+
+- name: Unzip Rhino zip
+  win_shell: |
+    cd C:\temp
+    C:\7-Zip\7z.exe x rhino1_6R7.zip
+    Move-Item -Path rhino1_6R7\js.jar -Destination C:\cygwin64\usr\share\java
+  args:
+    executable: powershell
+  tags: ITW
+
+- name: Remove unnecessary Rhino files
+  win_file:
+    path: 'C:\temp\{{ item }}'
+    state: absent
+  with_items:
+    - rhino1_6R7.zip
+    - rhino1_6R7
+  tags: ITW

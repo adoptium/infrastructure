@@ -70,5 +70,6 @@
     - OpenSSL                     # OpenJ9
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
+    - ITW_prereqs                 # IcedTea-Web
     - WiX                         # For creating installers
     - shortNames
