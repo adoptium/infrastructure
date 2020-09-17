@@ -1,0 +1,5 @@
+Exit values used in the scripts
+
+127:	Not running as root
+126:	BASH not installed
+125:	DISK too small (< 40 G)
