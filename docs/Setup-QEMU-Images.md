@@ -74,6 +74,40 @@ $ apt install qemu-efi-aarch64
 ```
 The setup instructions also suggests installing `qemu-system-arm` and `qemu-utils`, however `qemu-system-arm` isn't required if `QEMU 5.0.0` has been built on the system, and `qemu-utils` just wasn't used.
 
+### Ubuntu 18 ARM64
+This disk image was setup using the instructions [here](https://futurewei-cloud.github.io/ARM-Datacenter/qemu/how-to-launch-aarch64-vm/)
+
+To summarise the instructions in the link:
+
+The packages `qemu-system-arm`, `qemu-efi-aarch64` and `qemu-utils` are installed.
+Two flash images are created using the commands
+```bash
+dd if=/dev/zero of=flash1.img bs=1M count=64
+dd if=/dev/zero of=flash0.img bs=1M count=64
+dd if=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd of=flash0.img conv=notrunc
+```
+An empty disk image is created, using the command
+```bash
+qemu-img create ubuntu-image.img 20G
+```
+Then the disk image can be booted up using an installer. The instructions use a Ubuntu 18 installer http://ports.ubuntu.com/ubuntu-ports/dists/bionic-updates/main/installer-arm64/current/images/netboot/mini.iso
+
+The image is booted up the first time using 
+```bash
+qemu-system-aarch64 -nographic -machine virt,gic-version=max -m 512M -cpu max -smp 4 \
+-netdev user,id=vnet,hostfwd=:127.0.0.1:0-:22 -device virtio-net-pci,netdev=vnet \
+-drive file=ubuntu-image.img,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0 \
+-drive file=mini.iso,if=none,id=drive1,cache=writeback -device virtio-blk,drive=drive1,bootindex=1 \
+-drive file=flash0.img,format=raw,if=pflash -drive file=flash1.img,format=raw,if=pflash
+```
+Once the OS is installed, the disk image can be booted on subsequent use without the installer
+```bash
+qemu-system-aarch64 -nographic -machine virt,gic-version=max -m 512M -cpu max -smp 4 \
+-netdev user,id=vnet,hostfwd=:127.0.0.1:0-:22 -device virtio-net-pci,netdev=vnet \
+-drive file=ubuntu-image.img,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0 \
+-drive file=flash0.img,format=raw,if=pflash -drive file=flash1.img,format=raw,if=pflash
+```
+
 ### RISC-V Images:
 For information on how to setup several different kind of RISC-V VMs, see [https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md)
 
