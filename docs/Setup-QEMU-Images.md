@@ -108,6 +108,73 @@ qemu-system-aarch64 -nographic -machine virt,gic-version=max -m 512M -cpu max -s
 -drive file=flash0.img,format=raw,if=pflash -drive file=flash1.img,format=raw,if=pflash
 ```
 
+### Debian 8 ARM32
+This disk image was setup using the instructions [here](https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+
+To summarise the instructions in the link:
+
+The packages `qemu-system-arm, libguestfs-tools` and `qemu-utils` are installed.
+`libguestfs-tools` is a tool package used for reading and writing to the disk image.
+
+Create an empty disk image
+```bash
+qemu-img create -f qcow2 debian8.arm32 20G
+```
+`qcow2` is the format of the image.
+
+The instructions recommend using an initrd and a kernel from the Debain website
+```bash
+wget -O installer-vmlinuz http://http.us.debian.org/debian/dists/jessie/main/installer-armhf/current/images/netboot/vmlinuz
+wget -O installer-initrd.gz http://http.us.debian.org/debian/dists/jessie/main/installer-armhf/current/images/netboot/initrd.gz
+```
+
+Then boot up the disk image for the first time and install the OS
+```bash
+qemu-system-arm -M virt -m 2G \
+  -kernel installer-vmlinuz \
+  -initrd installer-initrd.gz \
+  -drive if=none,file=debian8.arm32,format=qcow2,id=hd \
+  -device virtio-blk-device,drive=hd \
+  -netdev user,id=mynet \
+  -device virtio-net-device,netdev=mynet \
+  -nographic -no-reboot
+```
+
+During the installation, you will recieve a message complaining about no bootloader installed. Disregard this and continue the installation.
+After the installation, the VM should exit since we have used the `-no-reboot` option.
+
+The installer places the initrd and kernel files onto the disk image in the `/boot` directory. These need to be copied out of the disk image and passed as command line parameters to the VM.
+
+Using `libguestfs-tools` installed earlier (the VM MUST not be running when using `libguestfs-tools`), we can see inside the `/boot` directory of the disk image.
+```bash
+virt-ls -a debian8.arm32 /boot/
+
+System.map-3.16.0-4-armmp-lpae
+config-3.16.0-4-armmp-lpae
+initrd.img
+initrd.img-3.16.0-4-armmp-lpae
+lost+found
+vmlinuz
+vmlinuz-3.16.0-4-armmp-lpae
+```
+
+Copy out the appropriate files
+```bash
+virt-copy-out -a debian8.arm32 /boot/vmlinuz-3.16.0-4-armmp-lpae /boot/initrd.img-3.16.0-4-armmp-lpae .
+```
+
+Finally, boot up the VM
+```bash
+qemu-system-arm -M virt -m 2G \
+  -kernel vmlinuz-3.16.0-4-armmp-lpae \
+  -initrd initrd.img-3.16.0-4-armmp-lpae \
+  -append 'root=/dev/vda2' \
+  -drive if=none,file=debian8.arm32,format=qcow2,id=hd \
+  -device virtio-blk-device,drive=hd \
+  -device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::10022-:22 \
+  -nographic
+```
+
 ### RISC-V Images:
 For information on how to setup several different kind of RISC-V VMs, see [https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md)
 
