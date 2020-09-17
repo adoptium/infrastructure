@@ -19,12 +19,21 @@ DF="/usr/bin/df"
 # Collect System Information #
 ##############################
 #
-Total_Disk_Size=$(bootinfo -s $(bootinfo -b))						# Determine overall size of disk
-Total_Disk_in_GB=$(expr $Total_Disk_Size / 1024)					# Convert to GB
-if [[ $Total_Disk_in_GB -lt "40" ]]; then						# Disk is too small for script
+# LQUERYVG returns low-level statistics (no text) about the VG
+# by using the bootdisk $(bootinfo -b) we get the VG rootvg
+# By putting two lines in an environment variable we strip the newline
+# and can use awk to multiple the two arguments
+NP_SZ=$(lqueryvg -p $(bootinfo -b) -a | head -15 | tail -2)
+Total_VG_in_MB=$(echo ${NP_SZ} | awk '{print $1 * $2 }'
+# 40G disk has 40960 PP of 128 MB each.
+# 40960 - 40832 is 128 PP for VGDA storage - not included in VG size
+# So we test for 40832 as smallest accepted value
+# assumes single disk volume group
+if [[ $Total_VG_in_MB -lt "40832" ]]; then						# Disk is too small
 	echo "Error: Disk is too small (less than 40GB), manual configuration is required. Exiting..."
 	exit 125									# Disk too small
 fi
+Total_VG_in_GB=$(expr $Total_VG_in_MB / 1024)						# Convert to GB
 #
 # Determine the current size of the filesystems
 cur_root=`${DF} -g / | tail -1 | awk '{print $2}' | sed 's/\..*//'`
@@ -38,8 +47,7 @@ lsattr -E -l sys0 -a maxuproc | read attr Maximum_Processes rest			# Read Maximu
 #
 # Display Debug Information
 echo "******Debug Info: filesystem size******" 
-echo "Total_Disk_Size:" $Total_Disk_Size
-echo "Total_Disk_in_GB:" $Total_Disk_in_GB
+echo "Total_VG_in_GB:" $Total_VG_in_GB
 echo "cur_root:" $cur_root
 echo "cur_usr:" $cur_usr
 echo "cur_var:" $cur_var
