@@ -9,6 +9,8 @@
   register: vs2019_installed
   tags: MSVS_2019
 
+# We're not using the checksum here as it changes too often
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1517#issue-470753202
 - name: Download Visual Studio Community 2019
   win_get_url:
     url: 'https://aka.ms/vs/16/release/vs_community.exe'

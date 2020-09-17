@@ -9,6 +9,8 @@
   register: vs2017_installed
   tags: MSVS_2017
 
+# We're not using the checksum here as it changes too often
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1545#issue-487838598
 - name: Download Visual Studio Community 2017
   win_get_url:
     url: 'https://aka.ms/vs/15/release/vs_community.exe'
