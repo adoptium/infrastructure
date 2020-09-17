@@ -135,16 +135,16 @@ defaultVars() {
 showArchList() {
 	echo "Currently supported architectures and operating systems:
 	- ppc64le
-		- ubuntu18
+		- Ubuntu18
 	- s390x
-		- ubuntu18
+		- Ubuntu18
 	- arm32
-		- debian8
+		- Debian8
 	- aarch64
-		- debian10
-		- ubuntu18
+		- Debian10
+		- Ubuntu18
 	- riscv
-		- debian11"
+		- Debian11"
 }
 
 # Setup the file system
