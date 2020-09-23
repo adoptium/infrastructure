@@ -39,7 +39,7 @@ from os import path
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64'),
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),

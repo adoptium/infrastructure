@@ -7,6 +7,7 @@
 
 Build_Tool_Packages:
   - autoconf
+  - bash # OpenJ9 needs bash v4 or later
   - ccache
   - cmake # OpenJ9
   - coreutils
@@ -15,9 +16,6 @@ Build_Tool_Packages:
   - nasm # openj9 jdk13+
   - wget
 
-Build_Tool_Packages_NOT_arm64:
-  - bash # OpenJ9 needs bash v4 or later
-
 Build_Tool_Casks:
   - adoptopenjdk8
   - adoptopenjdk10
@@ -25,8 +23,6 @@ Build_Tool_Casks:
 
 Test_Tool_Packages:
   - mercurial
-
-Test_Tool_Packages_NOT_arm64:
   - pulseaudio
 
 Test_Tool_Casks:

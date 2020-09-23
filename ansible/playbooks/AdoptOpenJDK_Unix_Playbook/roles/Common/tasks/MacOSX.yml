@@ -21,14 +21,6 @@
     path: /usr/local/bin/brew
   register: brew
 
-- name: Fix broken fiddle install (Apple Silicone)
-  become: yes
-  become_user: "{{ ansible_user }}"
-  script: scripts/install-fiddle.sh
-  when:
-    - ansible_architecture == "arm64"
-    - not brew.stat.exists
-
 - name: Install Homebrew
   become: yes
   become_user: "{{ ansible_user }}"
@@ -68,22 +60,11 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
-- name: Install Build Tool Packages NOT arm64
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
-  with_items: "{{ Build_Tool_Packages_NOT_arm64 }}"
-  when:
-    - ansible_architecture != "arm64"
-  tags: build_tools
-
 - name: Install Build Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Casks }}"
-  when:
-    - ansible_architecture != "arm64"
   tags: build_tools
 
 - name: Install Test Tool Packages
@@ -93,22 +74,11 @@
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
-- name: Install Test Tool Packages NOT arm64
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
-  with_items: "{{ Test_Tool_Packages_NOT_arm64 }}"
-  when:
-    - ansible_architecture != "arm64"
-  tags: test_tools
-
 - name: Install Test Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Test_Tool_Casks }}"
-  when:
-    - ansible_architecture != "arm64"
   tags: test_tools
 
 # As per https://github.com/eclipse/openj9/issues/3790
