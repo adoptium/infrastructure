@@ -20,6 +20,7 @@ Build_Tool_Casks:
   - adoptopenjdk8
   - adoptopenjdk10
   - adoptopenjdk11
+  - packages
 
 Test_Tool_Packages:
   - mercurial
