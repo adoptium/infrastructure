@@ -10,6 +10,7 @@
   tags:
     - ccert
     - jenkins
+    - adoptopenjdk
 
 # The vendor files are retrieved by the Get_Vendor_Files role
 - name: Get windows.p12 and put in C:\openjdk Directory
@@ -20,3 +21,4 @@
   tags:
     - ccert
     - jenkins
+    - adoptopenjdk
