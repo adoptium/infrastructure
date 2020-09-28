@@ -30,6 +30,9 @@
     - Jenkins_User                # AdoptOpenJDK Infrastructure
     - role: freemarker            # OpenJ9
       tags: [build_tools, build_tools_openj9]
+    - role: macos_codesign
+      tags: [codesign, adoptopenjdk]
+      when: ansible_distribution == "MacOSX" 
     - ant                         # Testing
     - Ant-Contrib                 # Testing
     - maven                       # Testing
