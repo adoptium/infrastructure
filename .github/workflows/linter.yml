@@ -2,13 +2,9 @@ name: Linter
 
 on:
   pull_request:
-    paths:
-    - ansible/**
     branches:         
     - master
   push:
-    paths:
-    - ansible/**
     branches:         
     - master
 
