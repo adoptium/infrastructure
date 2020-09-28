@@ -22,7 +22,7 @@
   authorized_key:
     user: "{{ Jenkins_Username }}"
     state: present
-    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+    key: "{{ Jenkins_User_SSHKey }}"
   tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
 
 - name: Add Jenkins user to the audio group

@@ -19,7 +19,7 @@
   authorized_key:
     user: root
     state: present
-    key: "{{ lookup('file', '{{ Keybox_SSHKey }}') }}"
+    key: "{{ Keybox_SSHKey }}"
   when:
     - Security == "Enabled"
   tags: [security, adoptopenjdk]
