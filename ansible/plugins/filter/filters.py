@@ -21,12 +21,13 @@
 # IN THE SOFTWARE.
 #
 
-from ansible.errors import AnsibleFilterError
 import re
+
+from ansible.errors import AnsibleFilterError
 
 
 def match_key(value, dictionary, raise_error=True, feedback_name='os'):
-    for key, val in dictionary.iteritems():
+    for key, val in dictionary.items():
         # yes, yes; we can lambda this but my old self in
         # two years will cry having to understand
         if type(val) is list:
