@@ -7,9 +7,6 @@
   user:
     name: jenkins
     password: "{{ macOS_Jenkins_Password }}"
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Create Jenkins password file
   file: path="/Users/jenkins/.password" state=touch
@@ -26,9 +23,6 @@
   register: default_keychain
   become_user: jenkins
   ignore_errors: true
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Create Keychain if it doesn't exist
   shell: security create-keychain -p "{{ macOS_Jenkins_Password }}" "/Users/jenkins/Library/Keychains/login.keychain-db"
@@ -36,9 +30,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - default_keychain.stderr | regex_search("A default keychain could not be found")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Set Default keychain
   shell: security default-keychain -s "/Users/jenkins/Library/Keychains/login.keychain-db"
@@ -46,9 +37,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - default_keychain.stdout != "/Users/jenkins/Library/Keychains/login.keychain-db"
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Reboot macOS after setting Default keychain
   reboot:
@@ -56,9 +44,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - default_keychain.stdout != "/Users/jenkins/Library/Keychains/login.keychain-db"
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Test Application Certificate
   shell: |
@@ -70,9 +55,6 @@
   ignore_errors: true
   when:
     - not macos_version | regex_search("10.10")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Get the Application Certificate from Vendor Secrets
   copy:
@@ -81,9 +63,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - application_cert.stderr | regex_search("The specified item could not be found in the keychain")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Install Application Certificate
   shell: |
@@ -93,9 +72,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - application_cert.stderr | regex_search("The specified item could not be found in the keychain")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Test Installer Certificate
   shell: |
@@ -109,9 +85,6 @@
   ignore_errors: true
   when:
     - not macos_version | regex_search("10.10")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Get the Installer Certificate from Vendor Secrets
   copy:
@@ -120,9 +93,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - installer_cert.stderr | regex_search("no identity found")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Install Installer Certificate
   shell: |
@@ -132,9 +102,6 @@
   when:
     - not macos_version | regex_search("10.10")
     - installer_cert.stderr | regex_search("no identity found")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Allow codesign via ssh
   shell: |
@@ -143,9 +110,6 @@
   become_user: jenkins
   when:
     - not macos_version | regex_search("10.10")
-  tags:
-   - adoptopenjdk
-   - codesign
 
 - name: Cleanup files
   file:
@@ -158,6 +122,3 @@
     - /Users/jenkins/installer.pkg
     - /Users/jenkins/installer_signed.pkg
   ignore_errors: yes
-  tags:
-   - adoptopenjdk
-   - codesign
