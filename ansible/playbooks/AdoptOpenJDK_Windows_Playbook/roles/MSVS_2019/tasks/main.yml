@@ -11,9 +11,11 @@
 
 - name: Download Visual Studio Community 2019
   win_get_url:
-    url: 'https://aka.ms/vs/16/release/vs_community.exe'
+    url: 'https://ci.adoptopenjdk.net/userContent/winansible/MSVS_installers/vs_community19.exe'
     dest: 'C:\temp\vs_community19.exe'
     force: no
+    checksum: 57a346bc1f6a3d9018057aa275f7a9e9b78307fce28b220ba50ef3c2fbc4127f
+    checksum_algorithm: sha256
   when: (not vs2019_installed.stat.exists)
   tags: MSVS_2019
 
