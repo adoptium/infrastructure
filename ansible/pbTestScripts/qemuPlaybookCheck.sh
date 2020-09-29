@@ -226,14 +226,14 @@ done
 	esac
 	
 	# Run the command, mask output and send to background
-	qemu-system-$QEMUARCH \
+	(qemu-system-$QEMUARCH \
 	  -smp 4 \
 	  -m 3072 \
      	  -M $MACHINE \
 	  $SSH_CMD \
 	  $DRIVE \
      	  $EXTRA_ARGS \
-	  -nographic
+	  -nographic) > /dev/null 2>&1 &
 
 	echo "Machine is booting; Please be patient"
 	sleep 120
