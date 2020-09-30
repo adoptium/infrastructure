@@ -90,9 +90,6 @@ hosts:
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.77.146}
 
-      - osuosl:
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.243}
-
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
