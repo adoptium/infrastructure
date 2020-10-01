@@ -1,0 +1,27 @@
+###############
+#     ant     #
+###############
+---
+- name: Checking for Ant availability
+  stat:
+    path: /usr/bin/ant
+  register: ant
+  tags: ant
+
+- debug:
+    msg: "Ant installed, skipping download and installation"
+  when: ant.stat.islnk is defined
+  tags: ant
+
+- name: Download and extract ant
+  unarchive:
+    src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
+    dest: /opt
+    remote_src: yes
+  when: ant.stat.islnk is not defined
+  tags: ant
+
+- name: Create symlink for ant
+  file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
+  when: ant.stat.islnk is not defined
+  tags: ant
