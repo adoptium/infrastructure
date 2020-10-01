@@ -1,0 +1,977 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# --------------- AIX ---------------  #
+########################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+  environment:
+    PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
+    PERL_MB_OPT: "--install_base /opt/freeware"
+    PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
+  vars:
+    swap_size: 4096
+
+  tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: ./adoptopenjdk_variables.yml
+      # Install bash if it's not already there
+        - name: Check if bash is installed
+          shell: bash --version >/dev/null 2>&1
+          register: does_bash_exist
+          ignore_errors: yes
+        - name: install bash
+          yum: name=bash state=present update_cache=yes
+          when: does_bash_exist.rc != 0
+
+
+      ################################
+      # AIX filesystem configuration #
+      ################################
+
+        - name: Download AIX filesystem configuration script
+          get_url:
+            url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
+            dest: /tmp/AIX_filesystem_config.sh
+            mode: 0775
+            validate_certs: no
+          tags: filesystem
+
+        - name: Execute AIX filesystem configuration script
+          command: /tmp/AIX_filesystem_config.sh
+          tags: filesystem
+
+        - name: Remove AIX filesystem configuration script
+          file:
+            state: absent
+            path: /tmp/AIX_filesystem_config.sh
+          tags: filesystem
+
+      ################################
+      # AIX RAMDISK configuration    #
+      ################################
+        - name: Create /usr/local/bin if it doesn't exist
+          file:
+            path: /usr/local/bin
+            state: directory
+          tags: ramdisk
+
+        - name: Update inittab
+          lineinfile:
+            line: "ramdisk:2:once:/usr/local/bin/AIX_ramdisk.ksh >/dev/null 2>&1"
+            path: /etc/inittab
+          tags: ramdisk
+
+        - name: Check if AIX_ramdisk.ksh exists
+          stat:
+            path: /usr/local/bin/AIX_ramdisk.ksh
+          register: ramdisk_script_exists
+          tags: ramdisk
+
+        - name: Download AIX ramdisk script
+          get_url:
+            url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_ramdisk.ksh
+            dest: /usr/local/bin/AIX_ramdisk.ksh
+            mode: 0775
+            validate_certs: no
+          when: not ramdisk_script_exists.stat.exists
+          tags: ramdisk
+
+      ##################################################################
+      # Install openssl from IBM installp                              #
+      # openssl installp download requiring an IBMid                   #
+      # https://www-01.ibm.com/support/docview.wss?uid=isg3T1027135    #
+      ##################################################################
+        - name: Check if openssl is installed
+          shell: openssl version >/dev/null 2>&1
+          register: does_openssl_exist
+          ignore_errors: yes
+          tags: openssl
+
+        - name: Transfer Openssl to remote host
+          copy:
+            src: /Vendor_Files/aix/openssl/openssl-1.0.2.1601.tar.Z
+            dest: /tmp/openssl-1.0.2.1601.tar.Z
+          when: does_openssl_exist.rc != 0
+          tags: openssl
+
+        - name: Extract Openssl
+          shell: uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
+          when: does_openssl_exist.rc != 0
+          tags: openssl
+
+        - name: Install IBM Openssl - installp
+          command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
+          register: result.openssl
+          ignore_errors: yes
+          when: does_openssl_exist.rc != 0
+          tags: openssl
+
+        - name: Clean openssl tmp files
+          file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - /tmp/openssl-1.0.2.1601
+            - /tmp/openssl-1.0.2.1601.tar.Z
+          when: does_openssl_exist.rc != 0
+          tags: openssl
+
+      ####################################################
+      # Uninstall conflicting packages from base image   #
+      # if they were installed via rpm unless yum exists #
+      ####################################################
+        - name: Confirm yum is installed - /usr/bin/yum
+          stat:
+            path: /usr/bin/yum
+          register: yum
+
+        - name: Uninstall conflicting packages
+          shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
+          ignore_errors: True
+          when: yum.stat.islnk is not defined
+          tags:
+            - rpm_remove
+            # TODO: rpm used in place of yum or rpm_key module
+            - skip_ansible_lint
+
+      ####################################
+      # Install yum and update to latest #
+      ####################################
+        - name: Download yum.sh
+          get_url:
+            url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+            validate_certs: False
+            dest: /tmp/
+            mode: 0775
+            timeout: 25
+          when: yum.stat.islnk is not defined
+          tags: yum
+
+        - name: Install yum and dependencies
+          command: /tmp/yum.sh
+          register: result.yum
+          ignore_errors: yes
+          when: yum.stat.islnk is not defined
+          tags:
+            - yum
+            #TODO: Package installs should not use latest
+            - skip_ansible_lint
+
+        - name: Yum update
+          yum:
+            update_cache: yes
+            name: '*'
+            state: latest
+          tags:
+            - yum
+            #TODO: Package installs should not use latest
+            - skip_ansible_lint
+
+        - name: Install yum package support
+          yum: name={{ item }} state=present update_cache=yes
+          with_items:
+            - autoconf
+            - bc
+            - bison
+            - coreutils
+            - cpio
+            - cups-devel
+            - cups-libs
+            - expect
+            - flex
+            - freetype2-devel
+            - fontconfig-devel
+            - gawk
+            - git
+            - grep
+            - libXrender-devel
+            - libffi-devel
+            - make
+            - m4
+            - pcre
+            - pkg-config
+            - popt
+            - sed
+            - sudo
+            - tar
+            - tcl
+            - tk
+            - unzip
+            - wget
+            - xz-libs
+            - zip
+            - zsh
+          tags: yum
+
+      ##############################################
+      # Additional Tools not available through yum #
+      ##############################################
+        - name: Install yum package support
+          yum: name={{ item }} state=present update_cache=yes
+          with_items:
+            - http://www.bullfreeware.com/download/bin/2328/libiconv-1.14-22.aix6.1.ppc.rpm
+            - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
+            - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
+            - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
+          tags: rpm_install
+
+        - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+          shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+          ignore_errors: True
+          tags: rpm_install
+
+      ##############
+      # Boot JDK 7 #
+      ##############
+        - name: Check for Java7 availability
+          stat:
+            path: /usr/j2sdk-image
+          register: java7
+          tags: java7
+
+        - name: Transfer and Extract Java7
+          unarchive:
+            src: /Vendor_Files/aix/openjdk-7u-aix.tar
+            dest: /usr
+            remote_src: no
+          when: java7.stat.isdir is not defined
+          tags: java7
+
+      ##############
+      # Boot JDK 8 #
+      ##############
+        - name: Get java8 path information
+          stat:
+            path: /usr/java8_64
+          register: java8
+          tags: java8
+
+        - name: Transfer and Extract AdoptOpenJDK 8
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+            dest: /usr
+            remote_src: yes
+          when: java8.stat.isdir is not defined
+          tags: java8
+
+        - name: Find java8 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk8u*'
+          when: java8.stat.isdir is not defined
+          register: java8_files_matched
+          tags: java8
+
+        - name: Symlink to java8_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java8_64
+            state: link
+          with_items:
+            - "{{ java8_files_matched.files }}"
+          when: java8.stat.isdir is not defined
+          tags: java8
+
+        - name: Setting Java 8 as default
+          file:
+            src: /usr/java8_64
+            dest: /usr/bin/java
+            state: link
+          tags: java8
+
+      ##############
+      # Boot JDK 9 #
+      ##############
+        - name: Check for Java9 availability
+          stat:
+            path: /usr/java9_64
+          register: java9
+          tags: java9
+
+        - name: Transfer and Extract AdoptOpenJDK 9
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/9/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+            dest: /usr
+            remote_src: yes
+          when: java9.stat.isdir is not defined
+          tags: java9
+
+        - name: Find java9 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-9*'
+          when: java9.stat.isdir is not defined
+          register: java9_files_matched
+          tags: java9
+
+        - name: Symlink to java9_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java9_64
+            state: link
+          with_items:
+            - "{{ java9_files_matched.files }}"
+          when: java9.stat.isdir is not defined
+          tags: java9
+
+
+        #################
+        # OpenJ9 JDK 10 #
+        #################
+        - name: Check for Java10 availability
+          stat:
+            path: /usr/java10_64
+          register: java10
+          tags: java10
+
+        - name: Transfer and Extract AdoptOpenJDK 10
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/10/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+            dest: /usr
+            remote_src: yes
+          when: java10.stat.isdir is not defined
+          tags: java10
+
+        - name: Find java10 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-10*'
+          when: java10.stat.isdir is not defined
+          register: java10_files_matched
+          tags: java10
+
+        - name: Symlink to java10_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java10_64
+            state: link
+          with_items:
+            - "{{ java10_files_matched.files }}"
+          when: java10.stat.isdir is not defined
+          tags: java10
+
+
+        #################
+        # OpenJ9 JDK 11 #
+        #################
+        - name: Check for Java11 availability
+          stat:
+            path: /usr/java11_64
+          register: java11
+          tags: java11
+
+        - name: Transfer and Extract AdoptOpenJDK 11
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/11/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+            dest: /usr
+            remote_src: yes
+          when: java11.stat.isdir is not defined
+          tags: java11
+
+        - name: Find java11 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-11*'
+          when: java11.stat.isdir is not defined
+          register: java11_files_matched
+          tags: java11
+
+        - name: Symlink to java11_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java11_64
+            state: link
+          with_items:
+            - "{{ java11_files_matched.files }}"
+          when: java11.stat.isdir is not defined
+          tags: java11
+
+        #################
+        # OpenJ9 JDK 12 #
+        #################
+        - name: Check for Java12 availability
+          stat:
+            path: /usr/java12_64
+          register: java12
+          tags: java12
+
+        - name: Transfer and Extract AdoptOpenJDK 12
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/12/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+            dest: /usr
+            remote_src: yes
+          when: java12.stat.isdir is not defined
+          tags: java12
+
+        - name: Find java12 directory
+          find:
+            file_type: directory
+            paths: /usr
+            patterns: 'jdk-12*'
+          when: java12.stat.isdir is not defined
+          register: java12_files_matched
+          tags: java12
+
+        - name: Symlink to java12_64
+          file:
+            src: "{{ item.path }}"
+            dest: /usr/java12_64
+            state: link
+          with_items:
+            - "{{ java12_files_matched.files }}"
+          when: java12.stat.isdir is not defined
+          tags: java12
+
+      #########################################################################
+      # Install X11 extensions                                                #
+      # x11.adt.ext installp download requiring an IBMid                      #
+      # https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+      # x11.vfb installp download requiring an IBMid                          #
+      # http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
+      #########################################################################
+
+        - name: Check if X11.adt.ext is installed
+          shell: lslpp -l X11.adt.ext >/dev/null 2>&1
+          register: does_X11_adt_ext_exist
+          ignore_errors: yes
+          tags: x11
+
+        - name: Check if X11.vfb is installed
+          shell: lslpp -l X11.vfb >/dev/null 2>&1
+          register: does_x11_exist
+          ignore_errors: yes
+          tags: x11
+
+        - name: Transfer and extract X11
+          unarchive:
+            src: /Vendor_Files/aix/OpenGL_X11.tar
+            dest: /tmp
+            remote_src: no
+          when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+          tags: x11
+
+        - name: Install IBM X11 Extensions - installp
+          command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
+          register: result.x11
+          ignore_errors: yes
+          when: does_X11_adt_ext_exist.rc != 0
+          tags: x11
+
+        - name: Install X11.vfb - installp
+          command: installp -agXYd /tmp/x11/X11.vfb all
+          register: result.x11.vfb
+          ignore_errors: yes
+          when: does_x11_exist.rc != 0
+          tags: x11
+
+        - name: Remove X11 install files
+          file:
+            state: absent
+            path: /tmp/x11
+          when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+          tags: x11
+
+      ###################
+      # IBM XL C 13.1.3 #
+      ###################
+        - name: Checking for XLC13 availability
+          stat:
+            path: /opt/IBM/xlC/13.1.3/bin/xlc
+          register: xlc13
+          tags: xlc13
+
+        - debug:
+            msg: "xlc13 installed, skipping download and installation"
+          when: xlc13.stat.islnk is defined
+          tags: xlc13
+
+        - name: Transfer and Extract XLC13
+          unarchive:
+            src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+            dest: /tmp
+            remote_src: no
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Install IBM XLC13 - installp
+          command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+          register: result.xlc
+          ignore_errors: yes
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - debug: msg='Erorrs from the previous installp command normal'
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: TestIBM XLC13
+          command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
+          register: xlc13_qversion
+          tags: xlc13
+
+        - name: Display XLC13 qversion information
+          debug:
+            msg: "{{ xlc13_qversion.stdout }}"
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/xlc
+          file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/xlc++
+          file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/xlC
+          file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/xlc_r
+          file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/xlC_r
+          file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Symlink - /usr/bin/gxlC
+          file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+          when: xlc13.stat.islnk is not defined
+          tags: xlc13
+
+        - name: Clean XLC13 tmp files
+          file:
+            path: /tmp/usr
+            state: absent
+          tags: xlc13
+
+      ###################
+      # IBM XL C 16.1.0 #
+      ###################
+        - name: Checking for XLC16 availability
+          stat:
+            path: /opt/IBM/xlc/16.1.0/bin/xlc
+          register: xlc16
+          tags: xlc16
+
+        - debug:
+            msg: "xlc16 installed, skipping download and installation"
+          when: xlc16.stat.islnk is defined
+          tags: xlc16
+
+        - name: Transfer and Extract XLC16
+          unarchive:
+            src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+            dest: /tmp
+            remote_src: no
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - name: Install IBM XLC16 - installp
+          command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+          register: result.xlc
+          ignore_errors: yes
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - debug: msg='Erorrs from the previous installp command normal'
+          when: xlc16.stat.islnk is not defined
+          tags: xlc16
+
+        - name: TestIBM XLC16
+          command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
+          register: xlc16_qversion
+          tags: xlc16
+
+        - name: Display XLC16 qversion information
+          debug:
+            msg: "{{ xlc16_qversion.stdout }}"
+          tags: xlc16
+
+        - name: Clean XLC16 tmp files
+          file:
+            path: /tmp/usr
+            state: absent
+          tags: xlc16
+
+      ###############
+      #     ant     #
+      ###############
+        - name: Checking for Ant availability
+          stat:
+            path: /usr/bin/ant
+          register: ant
+          tags: ant
+
+        - debug:
+            msg: "Ant installed, skipping download and installation"
+          when: ant.stat.islnk is defined
+          tags: ant
+
+        - name: Download and extract ant
+          unarchive:
+            src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
+            dest: /opt
+            remote_src: yes
+          when: ant.stat.islnk is not defined
+          tags: ant
+
+        - name: Create symlink for ant
+          file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
+          when: ant.stat.islnk is not defined
+          tags: ant
+
+      ###############
+      # ant-contrib #
+      ###############
+        - name: Checking for ant-contrib availability
+          stat:
+            path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
+          register: antcontrib
+          tags: ant-contrib
+
+        - debug:
+            msg: "ant-contrib.jar installed, skipping download"
+          when: not antcontrib.stat.exists
+          tags: ant-contrib
+
+        - name: Download and extract ant-contrib
+          unarchive:
+            src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+            dest: /tmp/
+            remote_src: yes
+          when: not antcontrib.stat.exists
+          tags: ant-contrib
+
+        - name: Move ant-contrib.jar to lib folder
+          command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
+          when: not antcontrib.stat.exists
+          tags: ant-contrib
+
+        - name: Clean ant-contrib tmp files
+          file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - /tmp/ant-contrib
+            - /tmp/ant-contrib-1.0b2-bin.tar.gz
+          tags: ant-contrib
+
+      #########################
+      # Configure system logs #
+      #########################
+        - name: Ensure /etc/syslog.conf entries are present
+          blockinfile:
+            backup: yes
+            dest: /etc/syslog.conf
+            block: |
+              *.debug;*.emerg;*.alert;*.crit;*.warning /var/log/messages rotate size 1000k files 4
+              syslog.debug /var/log/syslog rotate size 1000k files 4
+              *.err;kern.debug;daemon.notice;mail.crit /var/adm/messages rotate size 1000k files 4
+          tags: syslog
+
+        - name: Ensure log files exist
+          file:
+            path: "{{ item }}"
+            state: touch
+            mode: 0644
+          with_items:
+            - /var/log/syslog
+            - /var/adm/messages
+            - /var/log/messages
+          changed_when: False
+          tags: syslog
+
+        - name: Reload syslogd
+          service: name=syslogd state=reloaded
+          changed_when: False
+          tags: syslog
+
+        - name: Ensure full core files are enabled
+          command: chdev -l sys0 -a fullcore=true
+          changed_when: False
+          tags: syslog
+
+      ######################################
+      # Add bash to available login shells #
+      ######################################
+        - name: Add bash to available login shells
+          replace:
+            path: /etc/security/login.cfg
+            regexp: 'shells = '
+            replace: 'shells = /bin/bash,'
+          tags: login_shell
+
+        - name: Add bash to available login shells
+          blockinfile:
+            dest: /etc/shells
+            block: |
+              /bin/bash
+          tags: login_shell
+
+        - name: Set variables for global environment
+          blockinfile:
+            dest: /etc/environment
+            block: |
+              AIXTHREAD_HRT=true
+              PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
+              PERL5LIB=/opt/freemarker/lib/perl5
+          tags: login_shell
+
+        - name: Add freeware and xlc to PATH for global environment
+          replace:
+            path: /etc/environment
+            regexp: 'PATH=/usr/bin'
+            replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
+          tags: login_shell
+
+      ################
+      # Jenkins user #
+      ################
+        - name: Check for user directory existence
+          stat:
+            path: /home/{{ Jenkins_Username }}
+          register: jenkins
+          tags: jenkins_user
+
+        - debug:
+            msg: "{{ Jenkins_Username }} home directory found, skipping user creation tasks"
+          when: jenkins.stat.isdir is defined
+          tags: jenkins_user
+
+        - name: Create jenkins user
+          command: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }}
+          ignore_errors: yes
+          when: jenkins.stat.isdir is not defined
+          tags: jenkins_user
+
+        - name: Create SSH Key folder for {{ Jenkins_Username }}
+          file:
+            path: /home/{{ Jenkins_Username }}/.ssh
+            owner: "{{ Jenkins_Username }}"
+            group: staff
+            mode: 0700
+            state: directory
+          when: jenkins.stat.isdir is not defined
+          tags: jenkins_user
+
+        - name: Set authorized key for jenkins user
+          authorized_key:
+            user: "{{ Jenkins_Username }}"
+            state: present
+            key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+          when: jenkins.stat.isdir is not defined
+          tags: jenkins_user
+
+        # Use the system defaults as defined in /etc/environment
+        - name: Remove .profile
+          file:
+            state: absent
+            path: /home/{{ Jenkins_Username }}/.profile
+          tags: jenkins_user
+
+        - name: Set user capabilites
+          command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
+          tags: jenkins_user
+
+
+        - name: Set group capabilites
+          command: chgroup adms=root staff
+          tags: jenkins_user
+
+        - name: ensure adequate limits are set in /etc/security/limits
+          command: chsec -f /etc/security/limits -s {{ Jenkins_Username }} -a {{ item }}
+          with_items:
+            - "fsize=-1"
+            - "core=-1"
+            - "cpu=-1"
+            - "data=262144"
+            - "rss=65536"
+            - "stack=65536"
+            - "core_hard=-1"
+            - "nofiles=-1"
+            - "nofiles_hard=-1"
+          changed_when: False
+          tags: jenkins_user
+
+      ##############
+      # freemarker #
+      ##############
+        - name: Check for freemarker.jar existence
+          stat:
+            path: /home/{{ Jenkins_Username }}/freemarker.jar
+          register: freemarker
+          tags: freemarker
+
+        - debug:
+            msg: "freemarker.jar found, skipping download"
+          when: not freemarker.stat.exists
+          tags: freemarker
+
+        - name: Download and extract freemarker.jar
+          unarchive:
+            src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+            dest: /tmp/
+            remote_src: yes
+            owner: "{{ Jenkins_Username }}"
+            group: staff
+            mode: 0755
+          when: not freemarker.stat.exists
+          tags: freemarker
+
+        - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+          command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+          when: not freemarker.stat.exists
+          tags: freemarker
+
+        - name: Clean freemarker tmp files
+          file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - /tmp/freemarker-2.3.8
+            - /tmp/freemarker-2.3.8.tar.gz
+          tags: freemarker
+
+      ##################
+      # Nagios plugins #
+      ##################
+        - name: Include Nagios Playbook
+          include_tasks: nagios/nagios_aix.yml
+          when: Nagios_Plugins == "Enabled"
+          tags: nagios
+
+      #####################
+      # superuser account #
+      #####################
+        - name: Setup zeus user
+          command: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
+          ignore_errors: yes
+          when: Superuser_Account == "Enabled"
+          tags: superuser
+
+        - name: Create SSH Key folder for zeus
+          file:
+            path: /home/zeus/.ssh
+            owner: zeus
+            group: staff
+            mode: 0700
+            state: directory
+          when: Superuser_Account == "Enabled"
+          tags: superuser
+
+        - name: Add key
+          authorized_key:
+            user: zeus
+            state: present
+            key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+          when: Superuser_Account == "Enabled"
+          tags: superuser
+
+        - name: Grant zeus sudo powers
+          lineinfile:
+            dest: /etc/sudoers
+            state: present
+            regexp: '^zeus'
+            line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+          when: Superuser_Account == "Enabled"
+          tags: superuser
+
+      ###################
+      # NTP Time Server #
+      ###################
+        - name: ensure NTP daemon is enabled
+          replace:
+            dest: /etc/rc.tcpip
+            regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
+            replace: '\1'
+          tags: ntp
+
+        - name: ensure NTP daemon is configured
+          copy:
+            content: |
+              server 1.pool.ntp.org
+              server 2.pool.ntp.org
+              server 3.pool.ntp.org
+              driftfile /etc/ntp.drift
+              tracefile /etc/ntp.trace
+            dest: /etc/ntp.conf
+            owner: root
+            group: system
+            mode: 0664
+          tags: ntp
+
+        - name: Stop NTP daemon
+          service: name=xntpd state=stopped
+          changed_when: False
+          tags: ntp
+
+        - name: Start NTP daemon
+          service: name=xntpd state=started
+          changed_when: False
+          tags: ntp
+
+      ####################
+      # Disable sendmail #
+      ####################
+        - name: ensure sendmail is stopped
+          service: name=sendmail state=stopped
+          tags: sendmail
+
+        - name: ensure sendmail is disabled
+          replace:
+            dest: /etc/rc.tcpip
+            regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+            replace: '#\1'
+          tags: sendmail
+
+      ############################
+      # Enable full core support #
+      ############################
+        - name: ensure full AIX core files are enabled
+          command: chdev -l sys0 -a fullcore=true
+          changed_when: False
+          tags: fullcore
+
+      #####################
+      # Enable swap space #
+      #####################
+        - name: ensure swap space is of adequate size
+          shell: |
+            swap_line=$(lsps -a | tail -n 1)
+            curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
+            swap_lv=$(echo $swap_line | awk '{print $1}')
+            if [[ $curr_swap_size -lt {{ swap_size }} ]]
+            then
+              echo "Extending swap LV..."
+              extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+            fi
+          register: extendlv_result
+          changed_when: "'Extending' in extendlv_result.stdout"
+          notify:
+            - restart machine
+          tags:
+            - swap
+            # Environment variables don't work as part of command
+            - skip_ansible_lint
+
+  handlers:
+    - name: restart machine
+      shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
+      async: 1
+      poll: 0
+      failed_when: False

@@ -14,12 +14,12 @@ AIX 7.2 TL levels, but these are the TL levels tested (i.e., supported)
 
 
 ## Playbook Layout: (tree view) : WIP (work in progress)
+aix == .
 ```
-.
-./scripts
-./scripts/verify
-./scripts/users
-./scripts/install
-./scripts/conf
-./variables
+aix
+aix/group_vars
+aix/roles
+aix/roles/fs
+aix/roles/oss
+aix/roles/verify
 ```
