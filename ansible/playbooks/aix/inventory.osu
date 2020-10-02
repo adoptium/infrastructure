@@ -1,14 +1,37 @@
+# Ungrouped hosts
 osu-nim
 
-[defaults]
+# Group examples - including nested groups
+# Work in Progress
+[wip]
 ojdk06.bak
 
+# Test
 [test]
 ojdk06.bak
 osu-test
 
+# AIX OS 7.1 TL4
 [aix-7104]
 ojdk06.bak
 
+# AIX OS 7.1 TL5
 [aix-7105]
 ojdk05.bak
+
+# AIX OS 7.2 TL2
+[aix-7202]
+ojdk01.bak
+ojdk02.bak
+
+
+# All OJDK at OSU
+[ojdk-osu:children]
+aix-7104
+aix-7105
+aix-7202
+
+# Variables for all OSU hosts
+[ojdk-osu:vars]
+ansible_ssh_user=root
+ansible_ssh_private_key=~/.ssh/id_rsa
