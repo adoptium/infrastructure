@@ -218,7 +218,7 @@ done
 			export QEMUARCH="arm"
 			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
 			export DRIVE="-drive if=none,file=$workFolder/${OS}.${ARCHITECTURE}.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
-			export EXTRA_ARGS="-kernel $imageLocation/arm32_tools/kernel.arm32 -initrd $imageLocation/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
+			export EXTRA_ARGS="-kernel $workFolder/kernel.arm32 -initrd $workFolder/initrd.arm32 -append root=/dev/vda2";;
 		"RISCV" )
 			export QEMUARCH="riscv64"
 			export MACHINE="virt"
@@ -228,14 +228,14 @@ done
 	esac
 	
 	# Run the command, mask output and send to background
-	qemu-system-$QEMUARCH \
+	(qemu-system-$QEMUARCH \
 	  -smp 4 \
 	  -m 3072 \
      	  -M $MACHINE \
 	  $SSH_CMD \
 	  $DRIVE \
      	  $EXTRA_ARGS \
-	  -nographic
+	  -nographic) > /dev/null 2>&1 &
 
 	echo "Machine is booting; Please be patient"
 	sleep 120
