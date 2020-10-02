@@ -52,6 +52,7 @@
 
 # Stored in Azure Blob Storage (SAS URL set to expire in 2030)
 - name: Download Solaris Studio 12.3
+  # Original file is at https://www.oracle.com/tools/developerstudio/downloads/solaris-studio-v123-downloads.html
   command: wget "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}" -O /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
   when: not solaris_studio.stat.exists and not solaris_studio_downloaded.stat.exists
   tags:
