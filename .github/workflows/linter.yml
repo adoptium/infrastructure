@@ -14,27 +14,19 @@ on:
 
 
 jobs:
-  yamlint:
-    name: Yamlint
+  yamllint:
+    name: Yamllint
     runs-on: ubuntu-latest
     steps:
 
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v2
+    - name: 'Yamllint'
+      uses: karancode/yamllint-github-action@master
       with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install yamllint==1.13.0
-
-    - name: yamlint
-      run: |
-        cd ansible
-        yamllint -c yamllint.yml .
+        yamllint_comment: true
+      env:
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   ansible_lint:
     name: Ansible Lint

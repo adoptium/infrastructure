@@ -75,8 +75,8 @@
           args:
             creates: krb5.jckusers.txt
           tags:
-            #false positive for 'use shell only when shell is required'
-            #this whole piece should be rewritten to avoid 'bashsible' code style
+            # false positive for 'use shell only when shell is required'
+            # this whole piece should be rewritten to avoid 'bashsible' code style
             - skip_ansible_lint
 
         - name: Start krb5-kdc service
