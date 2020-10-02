@@ -168,7 +168,9 @@ setupWorkspace() {
 	fi
 	if [[ ! -f "$workFolder/$OS.$ARCHITECTURE.dsk" ]]; then 
 		echo "Copying new disk image"
-		xz -cd "$imageLocation"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
+		# Copy disk image and tools from imageLocation to workFolder
+		cp "$imageLocation"/"$OS.$ARCHITECTURE" "$workFolder"
+		xz -cd "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
 	else
 		echo "Using old disk image"
 	fi
@@ -178,7 +180,6 @@ runImage() {
 
 local EXTRA_ARGS=""
 local workFolder="$WORKSPACE/qemu_pbCheck"
-local imageLocation="/home/jenkins/qemu_base_images"
 
 # Find/stop port collisions
 while netstat -lp 2>/dev/null | grep "tcp.*:$PORTNO " > /dev/null; do
@@ -205,7 +206,7 @@ done
 					export MACHINE="virt,gic-version=max"
 					export DRIVE="-drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
 					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
-					export EXTRA_ARGS="-drive file=$imageLocation/arm64_tools/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$imageLocation/arm64_tools/flash1.img,format=raw,if=pflash -cpu max";;
+					export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu max";;
 				"DEBIAN10" )
 					export MACHINE="virt"
 					export DRIVE="-drive if=none,file=$workFolder/${OS}.${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
