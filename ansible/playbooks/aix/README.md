@@ -1,4 +1,20 @@
 # AdoptOpenJDK - Ansible AIX Playbook README.MD
+# Author: aixtools (M Felt)
+
+## Additions to ansible
+
+To support installp execute the following command on the ansible server
+# the argument -c is optional. It is _needed_ in case you get the message:
+```
+ERROR! Unknown error when attempting to call Galaxy at 'https://galaxy.ansible.com/api/':
+<urlopen error A failure in the SSL library occurred (_ssl.c:852)>
+```
+There may be other workarounds (e.g., update your SSL CA file),
+but using -c is quick and easy if you are in a rush.
+
+```
+# ansible-galaxy collection [-c] install community.general
+```
 
 ## AIX OS levels Supported:
 
@@ -23,3 +39,13 @@ aix/roles/fs
 aix/roles/oss
 aix/roles/verify
 ```
+
+## Documentation
+
+(Initial) Documentation for the new playbook is provided by this file (README)
+and files in the ./docs directory, e.g., docs/inventory.md
+
+Also, as much as possible the playbook files will have in-line comments
+describing the goal(s) and/or motivation (when not using a default).
+
+Note: when a default is not used - the default will be included in a comment.

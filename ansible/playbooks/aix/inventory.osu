@@ -1,0 +1,14 @@
+osu-nim
+
+[defaults]
+ojdk06.bak
+
+[test]
+ojdk06.bak
+osu-test
+
+[aix-7104]
+ojdk06.bak
+
+[aix-7105]
+ojdk05.bak
