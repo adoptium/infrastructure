@@ -152,7 +152,7 @@ showArchList() {
 setupWorkspace() {
 	local workFolder=$WORKSPACE/qemu_pbCheck
 	# Images are in this consistent place on the 'vagrant' jenkins machines
-	local imageLocation="/qemu_base_images"
+	local imageLocation="/home/jenkins/qemu_base_images"
 
 	if [[ ! -f "$imageLocation/${OS}.${ARCHITECTURE}.dsk.xz" ]]; then
 		echo "Either this script does not support ${OS} on ${ARCHITECTURE}, or the disk image is not in $imageLocation"
@@ -178,6 +178,7 @@ runImage() {
 
 local EXTRA_ARGS=""
 local workFolder="$WORKSPACE/qemu_pbCheck"
+local imageLocation="/home/jenkins/qemu_base_images"
 
 # Find/stop port collisions
 while netstat -lp 2>/dev/null | grep "tcp.*:$PORTNO " > /dev/null; do
@@ -204,7 +205,7 @@ done
 					export MACHINE="virt,gic-version=max"
 					export DRIVE="-drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
 					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
-					export EXTRA_ARGS="-drive file=/qemu_base_images/arm64_tools/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=/qemu_base_images/arm64_tools/flash1.img,format=raw,if=pflash -cpu max";;
+					export EXTRA_ARGS="-drive file=$imageLocation/arm64_tools/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$imageLocation/arm64_tools/flash1.img,format=raw,if=pflash -cpu max";;
 				"DEBIAN10" )
 					export MACHINE="virt"
 					export DRIVE="-drive if=none,file=$workFolder/${OS}.${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
@@ -216,7 +217,7 @@ done
 			export QEMUARCH="arm"
 			export SSH_CMD="-device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::$PORTNO-:22"
 			export DRIVE="-drive if=none,file=$workFolder/${OS}.${ARCHITECTURE}.dsk,format=qcow2,id=hd -device virtio-blk-device,drive=hd"
-			export EXTRA_ARGS="-kernel /qemu_base_images/arm32_tools/kernel.arm32 -initrd /qemu_base_images/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
+			export EXTRA_ARGS="-kernel $imageLocation/arm32_tools/kernel.arm32 -initrd $imageLocation/arm32_tools/initrd.arm32 -append root=/dev/vda2";;
 		"RISCV" )
 			export QEMUARCH="riscv64"
 			export MACHINE="virt"
