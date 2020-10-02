@@ -3,7 +3,7 @@
 
 - hosts: all
   roles:
-  - role: verify
-    role: users
-    role: fs
-    role: oss
+    - verify
+    - users
+    - fs
+    - oss
