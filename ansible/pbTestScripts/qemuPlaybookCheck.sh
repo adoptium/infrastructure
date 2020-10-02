@@ -169,7 +169,7 @@ setupWorkspace() {
 	if [[ ! -f "$workFolder/$OS.$ARCHITECTURE.dsk" ]]; then 
 		echo "Copying new disk image"
 		# Copy disk image and tools from imageLocation to workFolder
-		cp "$imageLocation"/"$OS.$ARCHITECTURE" "$workFolder"
+		cp "$imageLocation"/"$OS.$ARCHITECTURE/*" "$workFolder"
 		xz -cd "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
 	else
 		echo "Using old disk image"
