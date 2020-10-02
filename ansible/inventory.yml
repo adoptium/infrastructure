@@ -33,6 +33,10 @@ hosts:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
+      - esxi:
+          solaris10u11-x64-1: {ip: 147.75.85.212}
+          solaris10u11-x64-2: {ip: 147.75.85.213}
+
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 

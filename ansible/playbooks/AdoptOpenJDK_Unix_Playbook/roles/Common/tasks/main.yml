@@ -22,6 +22,7 @@
     - ansible_processor_vcpus is not defined
   tags:
     - cmake
+    - git_source
 
 ##################
 # Set root group #
@@ -36,7 +37,7 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
+  when: Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
   tags: hostname,adoptopenjdk
 
 - name: Set hostname to inventory_hostname (macOS)
@@ -46,6 +47,16 @@
     - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
     - "dscacheutil -flushcache"
   when: Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
+  tags: hostname,adoptopenjdk
+
+- name: Set hostname to inventory_hostname (Solaris)
+  shell: "{{ item }}"
+  with_items:
+    - echo "{{ inventory_hostname }}" > /etc/nodename
+    - echo "{{ inventory_hostname }}" > /etc/hostname.e1000g0
+    - uname -S "{{ inventory_hostname }}"
+  when: Domain == "adoptopenjdk.net" and ansible_distribution == "Solaris"
+  register: foo
   tags: hostname,adoptopenjdk
 
 #####################

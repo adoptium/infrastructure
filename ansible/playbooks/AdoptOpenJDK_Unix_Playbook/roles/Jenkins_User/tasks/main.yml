@@ -18,6 +18,23 @@
     - ansible_architecture == "s390x"
   tags: [jenkins_user, adoptopenjdk]
 
+- name: Create Jenkins user's home folder (Solaris)
+  file:
+    path: /export/home/{{ Jenkins_Username }}
+    state: directory
+    owner: "{{ Jenkins_Username }}"
+    group: staff
+    mode: 0700
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Set Jenkins user's home folder (Solaris)
+  command: usermod -d /export/home/jenkins/ jenkins
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Set authorized key for Jenkins user
   authorized_key:
     user: "{{ Jenkins_Username }}"
@@ -41,7 +58,7 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: (ansible_distribution != "MacOSX")
+  when: ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
 
 - name: Unset expiry on user account for Redhat for root
   command: chage -M -1 -E -1 root
@@ -50,7 +67,7 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: (ansible_distribution != "MacOSX")
+  when: ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
 
 - name: Ensure proper limits are set in /etc/security/limits.conf
   lineinfile:
