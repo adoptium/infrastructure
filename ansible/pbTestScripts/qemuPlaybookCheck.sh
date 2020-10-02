@@ -154,7 +154,7 @@ setupWorkspace() {
 	# Images are in this consistent place on the 'vagrant' jenkins machines
 	local imageLocation="/home/jenkins/qemu_base_images"
 
-	if [[ ! -f "$imageLocation/${OS}.${ARCHITECTURE}.dsk.xz" ]]; then
+	if [[ ! -d "$imageLocation/${OS}.${ARCHITECTURE}" ]]; then
 		echo "Either this script does not support ${OS} on ${ARCHITECTURE}, or the disk image is not in $imageLocation"
 		exit 1;
 	fi
