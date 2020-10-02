@@ -36,7 +36,7 @@
     path: /usr/local
     state: directory
     mode: '0755'
-  when: ansible_distribution == "Solaris" 
+  when: ansible_distribution == "Solaris"
 
 - name: Extract ant
   unarchive:

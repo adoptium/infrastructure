@@ -17,10 +17,11 @@
 
 - name: Install pkgutil
   shell: |
+    set -o pipefail
     echo action=nocheck > responses.txt
     yes all | pkgadd -d http://get.opencsw.org/now -a responses.txt
     /opt/csw/bin/pkgutil -U
-    /opt/csw/bin/pkgutil -y -i pkgutil 
+    /opt/csw/bin/pkgutil -y -i pkgutil
     /usr/sbin/pkgchk -L CSWpkgutil
   when: pkgutil_installed.rc != 0
   tags: build_tools
@@ -34,7 +35,7 @@
   stat:
     path: /opt/solarisstudio12.3/bin/
   register: solaris_studio
-  tags: 
+  tags:
     - build_tools
     - solaris_studio
     - adoptopenjdk
@@ -44,7 +45,7 @@
     path: /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
   register: solaris_studio_downloaded
   when: not solaris_studio.stat.exists
-  tags: 
+  tags:
     - build_tools
     - solaris_studio
     - adoptopenjdk
@@ -53,16 +54,18 @@
 - name: Download Solaris Studio 12.3
   command: wget "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}" -O /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
   when: not solaris_studio.stat.exists and not solaris_studio_downloaded.stat.exists
-  tags: 
+  tags:
     - build_tools
     - solaris_studio
     - adoptopenjdk
 
 - name: Extract Solaris Studio 12.3
-  shell: bzcat SolarisStudio12.3-solaris-x86-pkg.tar.bz2 | /bin/tar -xf -
+  shell: |
+    set -o pipefail
+    bzcat SolarisStudio12.3-solaris-x86-pkg.tar.bz2 | /bin/tar -xf -
   args:
     chdir: /tmp
-  tags: 
+  tags:
     - build_tools
     - solaris_studio
     - adoptopenjdk
@@ -72,7 +75,7 @@
   shell: ./SolarisStudio12.3-solaris-x86-pkg/solarisstudio.sh --non-interactive
   args:
     chdir: /tmp
-  tags: 
+  tags:
     - build_tools
     - solaris_studio
     - adoptopenjdk
@@ -82,14 +85,14 @@
   stat:
     path: /opt/sfw/cups
   register: cups_installed
-  tags: 
+  tags:
     - build_tools
     - cups
 
 - name: Download cups 1.4.4
   command: wget https://github.com/apple/cups/releases/download/release-1.4.4/cups-1.4.4-source.tar.gz -O /tmp/cups-1.4.4-source.tar.gz
   when: not cups_installed.stat.exists
-  tags: 
+  tags:
     - build_tools
     - cups
 
@@ -98,7 +101,7 @@
   args:
     chdir: /tmp
   when: not cups_installed.stat.exists
-  tags: 
+  tags:
     - build_tools
     - cups
 
@@ -111,7 +114,7 @@
   environment:
     PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
   when: not cups_installed.stat.exists
-  tags: 
+  tags:
     - build_tools
     - cups
 

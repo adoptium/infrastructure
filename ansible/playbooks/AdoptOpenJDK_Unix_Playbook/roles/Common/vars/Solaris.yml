@@ -16,7 +16,7 @@ Build_Tool_Packages:
   - sudo
   - nano
   - ntp
-  - wget 
+  - wget
   - curl
   - freetype
   - gmake
