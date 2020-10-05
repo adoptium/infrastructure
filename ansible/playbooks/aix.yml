@@ -159,7 +159,7 @@
           when: yum.stat.islnk is not defined
           tags:
             - yum
-            #TODO: Package installs should not use latest
+            # TODO: Package installs should not use latest
             - skip_ansible_lint
 
         - name: Yum update
@@ -169,7 +169,7 @@
             state: latest
           tags:
             - yum
-            #TODO: Package installs should not use latest
+            # TODO: Package installs should not use latest
             - skip_ansible_lint
 
         - name: Install yum package support
