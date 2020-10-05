@@ -145,7 +145,6 @@ def parse_yaml(hosts, config):
 
                         if 'user' in metadata:
                             hostvars.update({'ansible_user': metadata['user']})
-                            hostvars.update({'ansible_become': True})
                             del metadata['user']
 
                         if 'password' in metadata:
