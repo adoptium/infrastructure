@@ -3,6 +3,7 @@ name: Docker Windows
 on:
   pull_request:
     paths:
+    - .github/workflows/build_windows.yml
     - ansible/DockerFile.Windows2016_Base
     - ansible/Dockerfile.Windows2016_VS2013
     - ansible/Dockerfile.Windows2016_VS2017
@@ -10,6 +11,7 @@ on:
     - master
   push:
     paths:
+    - .github/workflows/build_windows.yml
     - ansible/DockerFile.Windows2016_Base
     - ansible/Dockerfile.Windows2016_VS2013
     - ansible/Dockerfile.Windows2016_VS2017
