@@ -166,7 +166,7 @@ setupWorkspace() {
 		find "$workFolder" -type f | xargs rm -f
 		rm -rf "$workFolder"/openjdk-infrastructure "$workFolder"/openjdk-build
 	fi
-	if [[ ! -f "$workFolder/${OS}.${ARCHITECTURE}.dsk" ]]; then 
+	if [[ ! -f "${workFolder}/${OS}.${ARCHITECTURE}.dsk" ]]; then 
 		echo "Copying new disk image"
 		# Copy disk image and tools from imageLocation to workFolder
 		cp -r $imageLocation/$OS.$ARCHITECTURE/. $workFolder
