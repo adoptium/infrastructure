@@ -47,7 +47,7 @@ valid = {
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'softlayer', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'esxi')
+        'aws', 'packet_esxi')
 }
 
 INVENTORY_FILENAME = "inventory.yml"
