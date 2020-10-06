@@ -1,11 +1,4 @@
 ---
-########################
-# Include OS variables #
-########################
-- name: Include OS variables
-  include_vars: "../vars/main.yml"
-  tags: main
-
 ##########
 # cygwin #
 ##########
