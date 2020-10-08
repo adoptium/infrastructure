@@ -276,18 +276,33 @@
           register: qemu_installed
           tags: QEMU
 
+        - name: Add repos to APT
+          apt_repository:
+            repo: '{{ item }}'
+            state: present
+          with_items:
+            - "deb [trusted=yes] http://ftp.uk.debian.org/debian sid main"
+            - "deb [trusted=yes] http://ftp.uk.debian.org/debian experimental main"
+          when: qemu_installed.rc != 0
+          tags: QEMU
+
         - name: Install QEMU dependencies
           apt:
             name: "{{ packages }}"
             update_cache: yes
           vars:
             packages:
-              - libglib2.0-dev
               - libfdt-dev
-              - libpixman-1-dev
-              - zlib1g-dev
-              - libnfs-dev
+              - libglib2.0-dev
+              - libguestfs-tools
               - libiscsi-dev
+              - libnfs-dev
+              - libpixman-1-dev
+              - opensbi
+              - qemu-efi-aarch64
+              - qemu-utils
+              - u-boot-qemu
+              - zliblg-dev
           when: qemu_installed.rc != 0
           tags: QEMU
 
