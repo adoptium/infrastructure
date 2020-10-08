@@ -95,7 +95,6 @@
           register: jdk8_folder
           when: default_java.rc != 0
           tags: java
- 
         # There should only be one jdk8u* folder in /usr/lib/jvm, hence 'files[0]'
         - name: Make jdk8 the default java
           file:
