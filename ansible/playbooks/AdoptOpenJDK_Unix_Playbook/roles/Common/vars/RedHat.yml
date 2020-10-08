@@ -91,6 +91,7 @@ Test_Tool_Packages:
   - acl
   - perl
   - perl-Digest-SHA
+  - perl-Time-HiRes
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb
   - zlib-devel
