@@ -10,7 +10,7 @@ ADD .github/cygwin-build/setup-x86_64.exe C:\temp\cygwin.exe
 
 RUN $ProgressPreference = 'SilentlyContinue'; `
     # Enable 8dot3 shortnames
-    fsutil 8dot3name set C: 0; `
+    fsutil behavior set disable8dot3 0; `
     fsutil file setshortname 'c:\program files (x86)' 'PROGRA~2'; `
     # pre install
     New-Item -Path C:\ -Name 'openjdk' -ItemType 'directory'; `
