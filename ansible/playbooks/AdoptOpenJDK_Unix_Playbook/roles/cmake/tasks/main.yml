@@ -23,7 +23,7 @@
 
 - name: Download cmake
   get_url:
-    url: https://cmake.org/files/v3.11/cmake-{{ cmakeVersion }}.tar.gz
+    url: https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-{{ cmakeVersion }}.tar.gz
     dest: /tmp/cmake-{{ cmakeVersion }}.tar.gz
     mode: 0440
     force: no
