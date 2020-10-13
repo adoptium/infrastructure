@@ -36,7 +36,7 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: 
+  when:
     - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
     - inventory_hostname != ansible_default_ipv4.address
   tags: hostname,adoptopenjdk
@@ -47,7 +47,7 @@
     - "sudo scutil --set HostName {{ inventory_hostname }}.adoptopenjdk.net"
     - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
     - "dscacheutil -flushcache"
-  when: 
+  when:
     - Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
     - inventory_hostname != ansible_default_ipv4.address
   tags: hostname,adoptopenjdk
@@ -61,7 +61,7 @@
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
     line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
     state: present
-  when: 
+  when:
     - Domain == "adoptopenjdk.net"
     - inventory_hostname != ansible_default_ipv4.address
   tags: hosts_file
@@ -72,7 +72,7 @@
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
     line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
     state: present
-  when: 
+  when:
     - Domain != "adoptopenjdk.net"
     - inventory_hostname != ansible_default_ipv4.address
   tags: hosts_file
