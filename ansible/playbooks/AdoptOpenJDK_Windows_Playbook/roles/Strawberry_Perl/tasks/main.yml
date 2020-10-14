@@ -43,3 +43,9 @@
   win_command: C:\Strawberry\perl\bin\perl -MCPAN -e "install Text::CSV_XS"
   when: (not strawberry_perl_installed.stat.exists)
   tags: Strawberry_Perl
+
+- name: Clean up strawberry-perl.zip
+  win_file:
+    path: C:\temp\strawberry-perl.zip
+    state: absent
+  tags: Strawberry_Perl
