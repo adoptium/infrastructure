@@ -36,6 +36,10 @@ hosts:
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 
+      - inspira:
+          solaris10u11-sparcv9-1: {ip: }
+          solaris10u11-sparcv9-2: {ip: }
+
       - linaro:
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
@@ -141,8 +145,8 @@ hosts:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
           aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
 
-#     - inspira:
-#         solaris10u11-sparcv9-1: {ip: }
+      - inspira:
+          solaris10u11-sparcv9-1: {ip: }
 
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.28}
