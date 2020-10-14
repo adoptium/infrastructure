@@ -34,12 +34,12 @@
 
 - name: Test if Java 7 symlink is already created
   win_stat:
-    path: 'C:\openjdk\jdk7'
+    path: 'C:\openjdk\jdk-7'
   register: java7_symlink
   tags: Java7
 
 - name: Create symlink to Java 7
-  win_shell: mklink /D "C:\openjdk\jdk7" "C:\Program Files\Java\java-se-7u75-ri"
+  win_shell: mklink /D "C:\openjdk\jdk-7" "C:\Program Files\Java\java-se-7u75-ri"
   args:
     executable: cmd
   when: (not java7_symlink.stat.exists)
