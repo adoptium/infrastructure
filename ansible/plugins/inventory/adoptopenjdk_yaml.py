@@ -38,14 +38,14 @@ except ImportError:
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64' 'sparcv9'),
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'spearhead',
+        'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
         'aws', 'inspira')
 }
