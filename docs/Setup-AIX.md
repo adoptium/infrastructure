@@ -62,3 +62,16 @@ AIX will need some version of Python installed. The 'yum.sh' approach installs P
 There is a playbook to install Python3 from AIXTools. This can co-exist with the Python2 installed by 'yum.sh'.
 (# There is an intent to develop a playbook that can install Python3 - without any previous Python installed - WIP
 - work in progress).
+
+## Working with Ansible
+The playbooks for AIX use some additional modules. On the control node you will need to:
+
+$ ansible-galaxy collection install community.general
+
+The playbooks are using:
+- community.general.aix_devices
+- community.general.aix_filesystem
+- community.general.aix_inittab
+- community.general.aix_lvg
+- community.general.aix_lvol
+- community.general.installp
