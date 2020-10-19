@@ -165,14 +165,14 @@ hosts:
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
-          macos1010-x64-1: {ip: 74.80.250.151, user: admin, description: tbd}
-          macos1010-x64-2: {ip: 74.80.250.173, user: admin, description: tbd}
-          macos1012-x64-1: {ip: 92.63.141.139, user: admin, description: de139}
-          macos1013-x64-1: {ip: 46.20.235.28, user: admin, description: de328}
-          macos1013-x64-2: {ip: 92.63.134.23, user: admin, description: de923}
-          macos1014-x64-1: {ip: 87.237.62.57, user: admin, description: de657}
-          macos1014-x64-2: {ip: 92.63.134.40, user: admin, description: de940}
-          macos1014-x64-3: {ip: 74.80.249.207, user: admin, description: du807}
+          macos1010-x64-1: {ip: 74.80.250.151, user: admin, description: TBD}
+          macos1010-x64-2: {ip: 74.80.250.173, user: admin, description: TBD}
+          macos1012-x64-1: {ip: 92.63.141.139, user: admin, description: DE139}
+          macos1013-x64-1: {ip: 46.20.235.28, user: admin, description: DE328}
+          macos1013-x64-2: {ip: 92.63.134.23, user: admin, description: DE923}
+          macos1014-x64-1: {ip: 87.237.62.57, user: admin, description: DE657}
+          macos1014-x64-2: {ip: 92.63.134.40, user: admin, description: DE940}
+          macos1014-x64-3: {ip: 74.80.249.207, user: admin, description: DU807}
 
       - macstadium:
           macos11-arm64-1: {ip: 199.7.163.51, user: Administrator}
