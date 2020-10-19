@@ -67,7 +67,7 @@ checkJDK() {
 		exit 1
 	fi
 	if ((JAVA_TO_BUILD == 8)); then
-		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7
+		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-7
 		export JAVA_TO_BUILD="jdk8u"
 	elif ((JAVA_TO_BUILD > JDK_GA)); then
 		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-${JDK_GA}
@@ -106,7 +106,7 @@ cloneRepo() {
 }
 # Set defaults
 export JAVA_TO_BUILD=jdk8
-export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk7
+export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-7
 export VARIANT=openj9
 export PATH=/usr/bin/:$PATH
 export TARGET_OS=windows
