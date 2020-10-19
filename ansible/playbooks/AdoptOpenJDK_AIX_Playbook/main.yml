@@ -14,12 +14,30 @@
   vars:
     swap_size: 4096
 
+  roles:
+    - aixfs
+    - syslogs
+    - X11
+    - xlc_v13
+    - xlc_v16
+    - openssl
+
+    - yum
+
+    - bootjdk7
+    - bootjdk8
+    - bootjdk9
+    - bootjdk10
+    - bootjdk11
+    - bootjdk12
+
+    - ant
+    - ant_contrib
+
+    - jenkins_user
+    - zeus_user
+
   tasks:
-    - role: aixfs
-    - role: syslogs
-    - role: X11
-    - role: xlc_v13
-    - role: xlc_v16
   # Will move to role
   # Install bash if it's not already there
     - name: Check if bash is installed
@@ -29,19 +47,6 @@
     - name: install bash
       yum: name=bash state=present update_cache=yes
       when: does_bash_exist.rc != 0
-
-
-    - role: openssl
-    - role: yum
-    - role: bootjdk7
-    - role: bootjdk8
-    - role: bootjdk9
-    - role: bootjdk10
-    - role: bootjdk11
-    - role: bootjdk12
-
-    - role: ant
-    - role: ant_contrib
 
   ######################################
   # Add bash to available login shells #
@@ -59,9 +64,6 @@
         block: |
           /bin/bash
       tags: login_shell
-
-    - role: jenkins_user
-    - role: zeus_user
 
     # move to role later
     - name: Set variables for global environment
