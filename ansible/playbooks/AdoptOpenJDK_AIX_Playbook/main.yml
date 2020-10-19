@@ -20,14 +20,15 @@
     - role: X11
     - role: xlc_v13
     - role: xlc_v16
-      # Install bash if it's not already there
-        - name: Check if bash is installed
-          shell: bash --version >/dev/null 2>&1
-          register: does_bash_exist
-          ignore_errors: yes
-        - name: install bash
-          yum: name=bash state=present update_cache=yes
-          when: does_bash_exist.rc != 0
+  # Will move to role
+  # Install bash if it's not already there
+    - name: Check if bash is installed
+      shell: bash --version >/dev/null 2>&1
+      register: does_bash_exist
+      ignore_errors: yes
+    - name: install bash
+      yum: name=bash state=present update_cache=yes
+      when: does_bash_exist.rc != 0
 
 
     - role: openssl
@@ -42,203 +43,167 @@
     - role: ant
     - role: ant_contrib
 
+  ######################################
+  # Add bash to available login shells #
+  ######################################
+    - name: Add bash to available login shells
+      replace:
+        path: /etc/security/login.cfg
+        regexp: 'shells = '
+        replace: 'shells = /bin/bash,'
+      tags: login_shell
 
-      ######################################
-      # Add bash to available login shells #
-      ######################################
-        - name: Add bash to available login shells
-          replace:
-            path: /etc/security/login.cfg
-            regexp: 'shells = '
-            replace: 'shells = /bin/bash,'
-          tags: login_shell
+    - name: Add bash to available login shells
+      blockinfile:
+        dest: /etc/shells
+        block: |
+          /bin/bash
+      tags: login_shell
 
-        - name: Add bash to available login shells
-          blockinfile:
-            dest: /etc/shells
-            block: |
-              /bin/bash
-          tags: login_shell
+    - role: jenkins_user
+    - role: zeus_user
 
-     - role: jenkins_user
-     - role: zeus_user
+    # move to role later
+    - name: Set variables for global environment
+      blockinfile:
+        dest: /etc/environment
+        block: |
+          AIXTHREAD_HRT=true
+          PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
+          PERL5LIB=/opt/freemarker/lib/perl5
+      tags: login_shell
 
-        - name: Set variables for global environment
-          blockinfile:
-            dest: /etc/environment
-            block: |
-              AIXTHREAD_HRT=true
-              PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
-              PERL5LIB=/opt/freemarker/lib/perl5
-          tags: login_shell
+    - name: Add freeware and xlc to PATH for global environment
+      replace:
+        path: /etc/environment
+        regexp: 'PATH=/usr/bin'
+        replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
+      tags: login_shell
 
-        - name: Add freeware and xlc to PATH for global environment
-          replace:
-            path: /etc/environment
-            regexp: 'PATH=/usr/bin'
-            replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
-          tags: login_shell
+  ##############
+  # freemarker #
+  ##############
+    - name: Check for freemarker.jar existence
+      stat:
+        path: /home/{{ Jenkins_Username }}/freemarker.jar
+      register: freemarker
+      tags: freemarker
 
-      ##############
-      # freemarker #
-      ##############
-        - name: Check for freemarker.jar existence
-          stat:
-            path: /home/{{ Jenkins_Username }}/freemarker.jar
-          register: freemarker
-          tags: freemarker
+    - debug:
+        msg: "freemarker.jar found, skipping download"
+      when: not freemarker.stat.exists
+      tags: freemarker
 
-        - debug:
-            msg: "freemarker.jar found, skipping download"
-          when: not freemarker.stat.exists
-          tags: freemarker
+    - name: Download and extract freemarker.jar
+      unarchive:
+        src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+        dest: /tmp/
+        remote_src: yes
+        owner: "{{ Jenkins_Username }}"
+        group: staff
+        mode: 0755
+      when: not freemarker.stat.exists
+      tags: freemarker
 
-        - name: Download and extract freemarker.jar
-          unarchive:
-            src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
-            dest: /tmp/
-            remote_src: yes
-            owner: "{{ Jenkins_Username }}"
-            group: staff
-            mode: 0755
-          when: not freemarker.stat.exists
-          tags: freemarker
+    - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+      command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+      when: not freemarker.stat.exists
+      tags: freemarker
 
-        - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-          command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-          when: not freemarker.stat.exists
-          tags: freemarker
+    - name: Clean freemarker tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/freemarker-2.3.8
+        - /tmp/freemarker-2.3.8.tar.gz
+      tags: freemarker
 
-        - name: Clean freemarker tmp files
-          file:
-            path: "{{ item }}"
-            state: absent
-          with_items:
-            - /tmp/freemarker-2.3.8
-            - /tmp/freemarker-2.3.8.tar.gz
-          tags: freemarker
+  ##################
+  # Nagios plugins #
+  ##################
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_aix.yml
+      when: Nagios_Plugins == "Enabled"
+      tags: nagios
 
-      ##################
-      # Nagios plugins #
-      ##################
-        - name: Include Nagios Playbook
-          include_tasks: nagios/nagios_aix.yml
-          when: Nagios_Plugins == "Enabled"
-          tags: nagios
+  ###################
+  # NTP Time Server #
+  ###################
+    - name: ensure NTP daemon is enabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
+        replace: '\1'
+      tags: ntp
 
-      #####################
-      # superuser account #
-      #####################
-        - name: Setup zeus user
-          command: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
-          ignore_errors: yes
-          when: Superuser_Account == "Enabled"
-          tags: superuser
+    - name: ensure NTP daemon is configured
+      copy:
+        content: |
+          server 1.pool.ntp.org
+          server 2.pool.ntp.org
+          server 3.pool.ntp.org
+          driftfile /etc/ntp.drift
+          tracefile /etc/ntp.trace
+        dest: /etc/ntp.conf
+        owner: root
+        group: system
+        mode: 0664
+      tags: ntp
 
-        - name: Create SSH Key folder for zeus
-          file:
-            path: /home/zeus/.ssh
-            owner: zeus
-            group: staff
-            mode: 0700
-            state: directory
-          when: Superuser_Account == "Enabled"
-          tags: superuser
+    - name: Stop NTP daemon
+      service: name=xntpd state=stopped
+      changed_when: False
+      tags: ntp
 
-        - name: Add key
-          authorized_key:
-            user: zeus
-            state: present
-            key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
-          when: Superuser_Account == "Enabled"
-          tags: superuser
+    - name: Start NTP daemon
+      service: name=xntpd state=started
+      changed_when: False
+      tags: ntp
 
-        - name: Grant zeus sudo powers
-          lineinfile:
-            dest: /etc/sudoers
-            state: present
-            regexp: '^zeus'
-            line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-          when: Superuser_Account == "Enabled"
-          tags: superuser
+  ####################
+  # Disable sendmail #
+  ####################
+    - name: ensure sendmail is stopped
+      service: name=sendmail state=stopped
+      tags: sendmail
 
-      ###################
-      # NTP Time Server #
-      ###################
-        - name: ensure NTP daemon is enabled
-          replace:
-            dest: /etc/rc.tcpip
-            regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
-            replace: '\1'
-          tags: ntp
+    - name: ensure sendmail is disabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+        replace: '#\1'
+      tags: sendmail
 
-        - name: ensure NTP daemon is configured
-          copy:
-            content: |
-              server 1.pool.ntp.org
-              server 2.pool.ntp.org
-              server 3.pool.ntp.org
-              driftfile /etc/ntp.drift
-              tracefile /etc/ntp.trace
-            dest: /etc/ntp.conf
-            owner: root
-            group: system
-            mode: 0664
-          tags: ntp
+  ############################
+  # Enable full core support #
+  ############################
+    - name: ensure full AIX core files are enabled
+      command: chdev -l sys0 -a fullcore=true
+      changed_when: False
+      tags: fullcore
 
-        - name: Stop NTP daemon
-          service: name=xntpd state=stopped
-          changed_when: False
-          tags: ntp
-
-        - name: Start NTP daemon
-          service: name=xntpd state=started
-          changed_when: False
-          tags: ntp
-
-      ####################
-      # Disable sendmail #
-      ####################
-        - name: ensure sendmail is stopped
-          service: name=sendmail state=stopped
-          tags: sendmail
-
-        - name: ensure sendmail is disabled
-          replace:
-            dest: /etc/rc.tcpip
-            regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
-            replace: '#\1'
-          tags: sendmail
-
-      ############################
-      # Enable full core support #
-      ############################
-        - name: ensure full AIX core files are enabled
-          command: chdev -l sys0 -a fullcore=true
-          changed_when: False
-          tags: fullcore
-
-      #####################
-      # Enable swap space #
-      #####################
-        - name: ensure swap space is of adequate size
-          shell: |
-            swap_line=$(lsps -a | tail -n 1)
-            curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
-            swap_lv=$(echo $swap_line | awk '{print $1}')
-            if [[ $curr_swap_size -lt {{ swap_size }} ]]
-            then
-              echo "Extending swap LV..."
-              extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
-            fi
-          register: extendlv_result
-          changed_when: "'Extending' in extendlv_result.stdout"
-          notify:
-            - restart machine
-          tags:
-            - swap
-            # Environment variables don't work as part of command
-            - skip_ansible_lint
+  #####################
+  # Enable swap space #
+  #####################
+    - name: ensure swap space is of adequate size
+      shell: |
+        swap_line=$(lsps -a | tail -n 1)
+        curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
+        swap_lv=$(echo $swap_line | awk '{print $1}')
+        if [[ $curr_swap_size -lt {{ swap_size }} ]]
+        then
+          echo "Extending swap LV..."
+          extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+        fi
+      register: extendlv_result
+      changed_when: "'Extending' in extendlv_result.stdout"
+      notify:
+        - restart machine
+      tags:
+        - swap
+        # Environment variables don't work as part of command
+        - skip_ansible_lint
 
   handlers:
     - name: restart machine
