@@ -8,8 +8,9 @@
     path: /usr/bin/yum
   register: yum
 
+# Use set -o pipefail -o to quiet AnsibleLint
 - name: Uninstall conflicting packages
-  shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
+  shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
   ignore_errors: True
   when: yum.stat.islnk is not defined
   tags:

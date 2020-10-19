@@ -17,8 +17,9 @@
   when: does_openssl_exist.rc != 0
   tags: openssl
 
+# added set -o pipefail to satisify AnsibleLint - not because it helps
 - name: Extract Openssl
-  shell: uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
+  shell: set -o pipefail | uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
   when: does_openssl_exist.rc != 0
   tags: openssl
 
