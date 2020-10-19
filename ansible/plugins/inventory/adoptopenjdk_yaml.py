@@ -45,7 +45,7 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'spearhead',
+        'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy', 'aws')
 }
 
