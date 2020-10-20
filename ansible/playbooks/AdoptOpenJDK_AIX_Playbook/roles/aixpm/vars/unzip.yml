@@ -1,0 +1,8 @@
+---
+# Install variables for unzip
+tools: "http://download.aixtools.net/tools/"
+lpp: "aixtools.unzip"
+vrmf: "6.0.0.0"
+chksum: "md5:9CD3E8942776B2235BC442AF4B2AC1B8"
+tmpd: "/tmp/aixpm"
+installs: "/opt/bin/unzip"

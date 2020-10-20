@@ -1,0 +1,8 @@
+---
+# defaults file for aixpm
+package:
+  - name: NULL
+    src: "/usr/sys/inst.images"
+    src_type: fs
+    type: installp
+    version: ""

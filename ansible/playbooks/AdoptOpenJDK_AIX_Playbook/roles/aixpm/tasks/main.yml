@@ -1,0 +1,31 @@
+# AIXPM: main -Download and Install Package (from AIXTOOLS)
+#############################
+# Include Package variables #
+#############################
+---
+- name: Include Package variables
+  include_vars: "./vars/{{ pkg_name }}.yml"
+
+# Check to see if a file that is included in package already exists
+# Block below will skip if file exists.
+- stat:
+    path: "{{ installs }}"
+  register: tgt
+- block:
+  - name: Prepare to Download {{ pkg_name }}
+    file:
+        path: "{{ tmpd }}"
+        state: directory
+  - name: "Download {{ lpp }}"
+    get_url:
+      url: "{{ tools }}{{ lpp }}.{{ vrmf }}.I"
+      dest: "{{ tmpd }}"
+      checksum: "{{ chksum }}"
+  - name: "Install {{ pkg_name }} including {{ installs }} from {{ lpp }}"
+    command:
+      cmd: "/usr/sbin/installp -d {{ tmpd }} -agYX all"
+      creates: "{{ installs }}"
+    register: installp
+  - name: Cleanup {{ tmpd }}
+    file: "path={{ tmpd }} state=absent"
+  when: tgt.stat.exists == false

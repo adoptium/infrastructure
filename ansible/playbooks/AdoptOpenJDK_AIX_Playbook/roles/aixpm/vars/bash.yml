@@ -1,0 +1,8 @@
+---
+# Install variables for bash
+tools: "http://download.aixtools.net/tools/gnu/"
+lpp: "aixtools.gnu.bash"
+vrmf: "5.0.18.0"
+chksum: "md5:E6106A3CF9A82B4E8785003F587ECA13"
+tmpd: "/tmp/aixpm"
+installs: "/opt/bin/bash"
