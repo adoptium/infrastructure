@@ -1,0 +1,12 @@
+# Playbook example using aixpm role to install bash and unzip
+---
+- hosts: wip
+  gather_facts: no
+
+  roles:
+    - role: aixpm
+      vars:
+        pkg_name: bash
+    - role: aixpm
+      vars:
+        pkg_name: unzip
