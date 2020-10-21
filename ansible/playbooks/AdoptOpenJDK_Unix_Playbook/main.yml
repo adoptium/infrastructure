@@ -44,7 +44,8 @@
     - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
-    - NTP_TIME
+    - role: NTP_TIME
+      when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
@@ -54,7 +55,8 @@
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
-    - zulu7                       # JDK8 Build Bootstrap
+    - role: zulu7                 # JDK8 Build Bootstrap
+      when: ansible_distribution != "MacOSX"
     - role: adoptopenjdk_install
       jdk_version: 8
       when: ansible_distribution != "Alpine"

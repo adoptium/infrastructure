@@ -46,6 +46,8 @@
   become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: buo/cask-upgrade
+  tags:
+    - brew_cu
 
 - name: Add AdoptOpenJDK Java Repo
   become: yes
@@ -59,6 +61,7 @@
   become_user: "{{ ansible_user }}"
   command: /usr/local/bin/brew cu
   tags:
+    - brew_cu
     - skip_ansible_lint
 
 - name: Install Build Tool Packages
@@ -119,6 +122,8 @@
     mode: 0644
     owner: root
     group: wheel
+  tags:
+    - kernel_tuning
 
 - name: Writing kernel tuning parameters to /etc/sysctl.conf
   blockinfile:
@@ -127,10 +132,14 @@
       kern.sysv.shmmax=125839605760
       kern.sysv.shmall=30722560
   register: kernel
+  tags:
+    - kernel_tuning
+
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:
     reboot_timeout: 3600
   when: kernel.changed
   tags:
+    - kernel_tuning
     - skip_ansible_lint
