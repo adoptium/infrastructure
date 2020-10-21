@@ -38,7 +38,8 @@
     - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
-    - NTP_TIME
+    - role: NTP_TIME
+      when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
