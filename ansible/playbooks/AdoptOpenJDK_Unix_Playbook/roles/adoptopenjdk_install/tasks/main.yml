@@ -97,7 +97,7 @@
 
 - name: Install latest release if one not already installed (macOS)
   get_url:
-    url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /tmp/{{ jdk_version }}-installer.pkg
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
