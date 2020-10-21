@@ -69,8 +69,8 @@
     owner: root
     mode: 0755
   when:
-    - not usr_lib_jvm_exists.stat.exists
     - ansible_distribution != "MacOSX"
+    - not usr_lib_jvm_exists.stat.exists
   tags: adoptopenjdk_install
 
 - name: Check if jdk-{{ jdk_version }} is already installed in the target location
@@ -91,8 +91,8 @@
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution != "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Install latest release if one not already installed (macOS)
@@ -102,15 +102,15 @@
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Run installer (macOS)
   shell: installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Get {{ path }}* full path name
@@ -127,8 +127,8 @@
     dest: '{{ path }}'
     state: link
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution != "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Create symlink to major version
@@ -137,8 +137,8 @@
     dest: '{{ path }}'
     state: link
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution != "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Chown {{ path }}*
@@ -148,6 +148,6 @@
     owner: root
     recurse: yes
   when:
-    - adoptopenjdk_installed.rc != 0
     - ansible_distribution != "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
