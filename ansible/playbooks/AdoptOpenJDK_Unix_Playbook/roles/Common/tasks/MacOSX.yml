@@ -49,12 +49,6 @@
   tags:
     - brew_cu
 
-- name: Add AdoptOpenJDK Java Repo
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew_tap:
-    name: AdoptOpenJDK/openjdk
-
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
   become: yes
