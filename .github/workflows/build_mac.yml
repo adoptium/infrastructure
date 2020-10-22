@@ -1,4 +1,4 @@
-name: Ansible macOS
+name: Ansible Playbook
 
 on:
   pull_request:
@@ -10,8 +10,11 @@ on:
 
 jobs:
   build-macos:
-    name: macOS 10.15
-    runs-on: macos-10.15
+    name: macOS
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-10.15]
     steps:
 
     - uses: actions/checkout@v2
@@ -20,7 +23,13 @@ jobs:
       run: brew install ansible
 
     - name: Remove homebrew/cask-versions
-      run: brew untap homebrew/cask-versions
+      run: | 
+        brew untap homebrew/cask-versions
+        brew cask uninstall adoptopenjdk8
+        brew cask uninstall adoptopenjdk11
+        brew cask uninstall adoptopenjdk12
+        brew cask uninstall adoptopenjdk13
+        brew cask uninstall adoptopenjdk14
 
     - name: Run Ansible Playbook
       run: |

@@ -107,7 +107,7 @@
   tags: adoptopenjdk_install
 
 - name: Run installer (macOS)
-  shell: installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
+  shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
