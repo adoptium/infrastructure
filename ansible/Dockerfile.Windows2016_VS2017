@@ -12,6 +12,7 @@ RUN $ProgressPreference = 'SilentlyContinue'; `
     Start-Process -Wait -FilePath C:\temp\vs2017.exe -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.17763 --quiet --norestart'; `
     regsvr32 /s 'C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\DIA SDK\bin\msdia140.dll'; `
     regsvr32 /s 'C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\DIA SDK\bin\amd64\msdia140.dll'; `
+    fsutil file setshortname 'c:\program files (x86)\Microsoft Visual Studio' 'MIB055~1'; `
     # clean up
     Remove-Item C:\temp -Recurse; `
     Remove-Item 'C:\ProgramData\Package Cache' -Recurse; `

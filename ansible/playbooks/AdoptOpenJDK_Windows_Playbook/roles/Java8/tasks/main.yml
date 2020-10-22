@@ -52,3 +52,9 @@
     state: present
   when: (not java8_installed.stat.exists)
   tags: Java8
+
+- name: Clean up jdk-8.zip
+  win_file:
+    path: C:\temp\jdk-8.zip
+    state: absent
+  tags: Java8

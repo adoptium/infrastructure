@@ -4,47 +4,47 @@
 ###########
 - name: Check if OpenSSL 32bit VS2013 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1g-x86_32-VS2013
+    path: C:\openjdk\OpenSSL-1.1.1h-x86_32-VS2013
   register: openssl32_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2013 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2013
+    path: C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2013
   register: openssl64_vs2013_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2017 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2017
+    path: C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2017
   register: openssl64_vs2017_installed
   tags: openssl
 
 - name: Check if OpenSSL 64bit VS2019 installed
   win_stat:
-    path: C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2019
+    path: C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2019
   register: openssl64_vs2019_installed
   tags: openssl
 
-- name: Download OpenSSL-1.1.1g
+- name: Download OpenSSL-1.1.1h
   win_get_url:
-    url: https://www.openssl.org/source/openssl-1.1.1g.tar.gz
-    dest: C:\temp\OpenSSL-1.1.1g.tar.gz
-    checksum: ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46
+    url: https://www.openssl.org/source/openssl-1.1.1h.tar.gz
+    dest: C:\temp\OpenSSL-1.1.1h.tar.gz
+    checksum: 5c9ca8774bd7b03e5784f26ae9e9e6d749c9da2438545077e6b3d755a06595d9
     checksum_algorithm: sha256
   when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists) or (not openssl64_vs2019_installed.stat.exists)
   tags: openssl
 
-- name: Unpack OpenSSL-1.1.1g for installation
+- name: Unpack OpenSSL-1.1.1h for installation
   win_shell: |
     cd C:\temp
-    C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1g.tar.gz
-    C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1g.tar
+    C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1h.tar.gz
+    C:\7-Zip\7z.exe x C:\temp\OpenSSL-1.1.1h.tar
   when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists) or (not openssl64_vs2019_installed.stat.exists)
   tags: openssl
 
-- name: Install OpenSSL-1.1.1g 32-bit (VS2013)
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vsvars32.bat && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN32 --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_32-VS2013 && nmake install > C:\temp\openssl32.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1h 32-bit (VS2013)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vsvars32.bat && cd C:\temp\OpenSSL-1.1.1h && perl C:\temp\OpenSSL-1.1.1h\Configure VC-WIN32 --prefix=C:\openjdk\OpenSSL-1.1.1h-x86_32-VS2013 && nmake install > C:\temp\openssl32.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools'
     executable: cmd
@@ -53,8 +53,8 @@
     - openssl
     - MSVS_2013
 
-- name: Install OpenSSL-1.1.1g 64-bit (VS2013)
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2013 && nmake install > C:\temp\openssl64-VS2013.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1h 64-bit (VS2013)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1h && perl C:\temp\OpenSSL-1.1.1h\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2013 && nmake install > C:\temp\openssl64-VS2013.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC'
     executable: cmd
@@ -63,8 +63,8 @@
     - openssl
     - MSVS_2013
 
-- name: Install OpenSSL-1.1.1g 64-bit (VS2017)
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2017 && nmake install > C:\temp\openssl64-VS2017.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1h 64-bit (VS2017)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1h && perl C:\temp\OpenSSL-1.1.1h\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2017 && nmake install > C:\temp\openssl64-VS2017.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build'
     executable: cmd
@@ -73,8 +73,8 @@
     - openssl
     - MSVS_2017
 
-- name: Install OpenSSL-1.1.1g 64-bit (VS2019)
-  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1g && perl C:\temp\OpenSSL-1.1.1g\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1g-x86_64-VS2019 && nmake install > C:\temp\openssl64-VS2019.log && nmake -f makefile clean
+- name: Install OpenSSL-1.1.1h 64-bit (VS2019)
+  win_shell: set PATH=C:\Strawberry\perl\bin;C:\openjdk\nasm-2.13.03;%PATH% && .\vcvarsall.bat AMD64 && cd C:\temp\OpenSSL-1.1.1h && perl C:\temp\OpenSSL-1.1.1h\Configure VC-WIN64A --prefix=C:\openjdk\OpenSSL-1.1.1h-x86_64-VS2019 && nmake install > C:\temp\openssl64-VS2019.log && nmake -f makefile clean
   args:
     chdir: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build'
     executable: cmd
@@ -88,8 +88,8 @@
     path: C:\temp\{{ item }}
     state: absent
   with_items:
-    - OpenSSL-1.1.1g.tar.gz
-    - OpenSSL-1.1.1g.tar
-    - OpenSSL-1.1.1g
+    - OpenSSL-1.1.1h.tar.gz
+    - OpenSSL-1.1.1h.tar
+    - OpenSSL-1.1.1h
     - pax_global_header
   tags: openssl
