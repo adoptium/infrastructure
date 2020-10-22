@@ -2,6 +2,7 @@
 # adoptopenjdk_variables #
 # merge of AdoptOpenJDK_Unix_Playbook/group_vars/all/adoptopenjdk_variables.yml
 # with ./adoptopenjdk_variables.yml - written for AIX back when...
+# and renamed group_vars/all/main.yml for automatic loading
 ##########################
 # AIX variables
 ---
