@@ -36,7 +36,10 @@
 - name: Set hostname to inventory_hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
-  when: Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
+  when:
+    - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
   tags: hostname,adoptopenjdk
 
 - name: Set hostname to inventory_hostname (macOS)
@@ -45,7 +48,10 @@
     - "sudo scutil --set HostName {{ inventory_hostname }}.adoptopenjdk.net"
     - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
     - "dscacheutil -flushcache"
-  when: Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
+  when:
+    - Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
   tags: hostname,adoptopenjdk
 
 #####################
@@ -57,7 +63,10 @@
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
     line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
     state: present
-  when: Domain == "adoptopenjdk.net"
+  when:
+    - Domain == "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
   tags: hosts_file
 
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
@@ -66,8 +75,22 @@
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
     line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
     state: present
-  when: Domain != "adoptopenjdk.net"
+  when:
+    - Domain != "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
   tags: hosts_file
+
+- debug:
+    msg: "Inventory_hostname is the same as the ip address or is localhost.
+    The fqdn has not been added to /etc/hosts.
+    The hostname of the machine has not been updated.
+    Manually add the fqdn to /etc/hosts
+    and manually update the hostname in /etc/hostname.
+    Or use the command line argument --extra-vars 'inventory_hostname=<realhostname>',
+    when running the playbook next time"
+  when: (inventory_hostname == ansible_default_ipv4.address) or (inventory_hostname == "localhost")
+  tags: hosts_file, hostname
 
 - name: Update /etc/hosts file - 127.0.0.1
   lineinfile:

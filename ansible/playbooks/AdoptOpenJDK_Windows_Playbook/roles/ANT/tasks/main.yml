@@ -78,3 +78,12 @@
     remote_src: True
   when: (not ant_contrib_installed.stat.exists)
   tags: ANT
+
+- name: Clean up ant zip files
+  win_file:
+    path: "C:/temp/{{ item }}"
+    state: absent
+  with_items:
+    - ant-contrib.zip
+    - ant.zip
+  tags: ANT
