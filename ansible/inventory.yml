@@ -144,7 +144,6 @@ hosts:
           aix72-ppc64-2: {ip: 140.211.9.36}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
-          centos74-ppc64le-3: {ip: 140.211.168.225, user: centos}
           centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
@@ -152,7 +151,6 @@ hosts:
           ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
-          ubuntu1804-ppc64le-3: {ip: 140.211.168.4, user: ubuntu}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.74.50}
