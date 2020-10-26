@@ -98,6 +98,10 @@ hosts:
           macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
           macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
 
+      - ibmcloud:
+          centos76-x64-1: {ip: 159.122.231.200}
+          centos76-x64-2: {ip: 159.122.231.202}
+
   - test:
 
       - azure:
