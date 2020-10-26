@@ -9,9 +9,12 @@
   register: vs2019_installed
   tags: MSVS_2019
 
+# This is the target that you're redirected to when you go to https://aka.ms/vs/16/release/vs_community.exe
 - name: Download Visual Studio Community 2019
   win_get_url:
-    url: 'https://aka.ms/vs/16/release/vs_community.exe'
+    url: 'https://download.visualstudio.microsoft.com/download/pr/6b655578-de8c-4862-ad77-65044ca714cf/f29399a618bd3a8d1dcc96d349453f686b6176590d904308402a6402543e310b/vs_Community.exe'
+    checksum: f29399a618bd3a8d1dcc96d349453f686b6176590d904308402a6402543e310b
+    checksum_algorithm: sha256
     dest: 'C:\temp\vs_community19.exe'
     force: no
   when: (not vs2019_installed.stat.exists)

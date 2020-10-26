@@ -39,6 +39,10 @@ hosts:
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 
+      - inspira:
+          solaris10u11-sparcv9-1: {}
+          solaris10u11-sparcv9-2: {}
+
       - linaro:
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
@@ -98,6 +102,10 @@ hosts:
           macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
           macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
 
+      - ibmcloud:
+          centos76-x64-1: {ip: 159.122.231.200}
+          centos76-x64-2: {ip: 159.122.231.202}
+
   - test:
 
       - azure:
@@ -140,15 +148,14 @@ hosts:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
           aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
 
-#     - inspira:
-#         solaris10u11-sparcv9-1: {ip: }
+      - inspira:
+          solaris10u11-sparcv9-1: {}
 
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.28}
           aix72-ppc64-2: {ip: 140.211.9.36}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
-          centos74-ppc64le-3: {ip: 140.211.168.225, user: centos}
           centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
@@ -156,7 +163,6 @@ hosts:
           ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
-          ubuntu1804-ppc64le-3: {ip: 140.211.168.4, user: ubuntu}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.74.50}
