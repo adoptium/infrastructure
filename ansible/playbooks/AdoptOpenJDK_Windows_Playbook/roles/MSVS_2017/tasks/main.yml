@@ -9,9 +9,12 @@
   register: vs2017_installed
   tags: MSVS_2017
 
+# This is the target that you're redirected to when you go to https://aka.ms/vs/15/release/vs_community.exe
 - name: Download Visual Studio Community 2017
   win_get_url:
-    url: 'https://aka.ms/vs/15/release/vs_community.exe'
+    url: 'https://download.visualstudio.microsoft.com/download/pr/c5c75dfa-1b29-4419-80f8-bd39aed6bcd9/7ed8fa27575648163e07548ff5667b55b95663a2323e2b2a5f87b16284e481e6/vs_Community.exe'
+    checksum: 7ed8fa27575648163e07548ff5667b55b95663a2323e2b2a5f87b16284e481e6
+    checksum_algorithm: sha256
     dest: 'C:\TEMP\vs_community.exe'
     force: no
   when: (not vs2017_installed.stat.exists)
