@@ -19,9 +19,7 @@ Build_Tool_Packages_NOT_arm64:
   - bash # OpenJ9 needs bash v4 or later
 
 Build_Tool_Casks:
-  - adoptopenjdk8
   - adoptopenjdk10
-  - adoptopenjdk11
   - packages
 
 Test_Tool_Packages:
