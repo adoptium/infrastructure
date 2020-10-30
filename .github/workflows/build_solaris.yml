@@ -1,0 +1,45 @@
+name: Ansible Playbook
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/build_solaris.yml
+    - ansible/**
+    branches:         
+    - master
+
+jobs:
+  build-solaris:
+    name: Solaris
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Install Vagrant
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        wget https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb -O /tmp/vagrant_2.2.5_x86_64.deb
+        sudo dpkg -i /tmp/vagrant_2.2.5_x86_64.deb
+        rm -rf Vagrantfile
+        vagrant init tnarik/solaris10-minimal
+
+    - name: Install Virtualbox
+      run: |
+        wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+        wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bionic contrib"
+        sudo apt-get update
+        sudo apt-get -y install virtualbox-6.0
+
+    - run: |
+        cd ansible/pbTestScripts
+        bash -x ./vagrantPlaybookCheck.sh -v Solaris10
+
+    # - name: Run Ansible Playbook
+    #   run: |
+    #     echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+    #     set -eux
+    #     cd ansible
+    #     sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
