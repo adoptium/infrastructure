@@ -7,7 +7,6 @@ sudo /opt/csw/bin/pkgutil -y -i python
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
-sudo /usr/sbin/pkgrm -y CSWpkgutil
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
