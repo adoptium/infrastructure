@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Nagios Plugin to check the percentage of machines online for a given label on ci.adoptopenjdk.net
+
+if [ -z $1 ] || [ -z $2 ] || [ -z $3 ]; then
+  echo "UNKNOWN - Invalid arguments"
+  echo "Usage: $0 <Label> <Warning_Level> <Critical_Level>"
+  exit 3
+fi
+
+if ! command -v jq &> /dev/null; then
+  echo "UNKNOWN - JQ isn't installed"
+  exit 3
+fi
+
+# Get list of machines in label
+mapfile -t machine_array < <(curl -s https://ci.adoptopenjdk.net/label/$1/api/json | jq '.nodes[] | .nodeName' | sed 's/\"//g') 
+
+# For each machine, query if they're connected
+response_array=()
+for node in ${machine_array[@]}
+do
+  response_array+=($(curl -s "https://ci.adoptopenjdk.net/computer/${node}/api/json" | jq .offline)) 
+done
+
+online=0
+offline=0
+for response in ${response_array[@]}
+do
+  if [[ ${response} == "false" ]]; then 
+    online=$((online+1))
+  else
+    offline=$((offline+1))
+  fi
+done
+
+percentage_online=$(echo "scale=2; ($online/($offline+$online)) * 100" | bc -l)
+if (( $(echo "$percentage_online < $3" | bc -l) )); then
+  echo "CRITICAL - $percentage_online% machines online in '$1' label"
+  echo "$online online machines; $offline offline machines"
+  exit 2 
+elif (( $(echo "$percentage_online < $2" | bc -l) )); then 
+  echo "WARNING - $percentage_online% machines online in '$1' label"
+  echo "$online online machines; $offline offline machines"
+  exit 1
+else
+  echo "OK - $percentage_online% machines online in '$1' label"
+  echo "$online online machines; $offline offline machines"
+  exit 0
+fi

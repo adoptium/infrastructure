@@ -72,7 +72,7 @@ if ! [[ "$6" =~ ^[0-9]+$ ]] ; then																# Test: Ensure {{ ansible_port
 fi
 #
 ##########################################################
-# Convert command line arguments to the sciprt variables #
+# Convert command line arguments to the script variables #
 ##########################################################
 #
 Distro=$1 																			# {{ ansible_distribution }} 
@@ -104,20 +104,6 @@ Sys_Alias="yes"
 Sys_Alias_Info="Add by Ansible"
 Sys_Icon="yes"
 #
-#############
-# Ping Test #
-#############
-# Test: If the Nagios client system is pingable from the Nagio server (ICMP is enabled) if not disable the ping test 
-Ping_Test=`ping -q -c2 $Sys_IPAddress > /dev/null`
-if [[ $? -eq 0 ]] ; then
-	Sys_Pingable="yes"
-else
-	Sys_Pingable="no"
-fi
-if [[ ! $SSH_Port_Num = 22 ]] ; then																# Test: if not using default ssh port
-	Sys_Pingable="no"																	# set $Sys_Pingable to no
-fi
-#
 ################
 # Nagios Icons # 
 ################
@@ -137,7 +123,7 @@ fi
 # Detect the right package manager to monitor
 Sys_OS="yes"
 case "$Distro" in
-        Ubuntu)
+        Ubuntu|Debian)
                 Sys_OS_pkg_Template=$Template_Dir/apt.cfg ;;
         RedHat|CentOS)
                 Sys_OS_pkg_Template=$Template_Dir/yum.cfg ;;
@@ -159,7 +145,6 @@ echo "IP Address: "$Sys_IPAddress
 echo "SSH Port Number: "$SSH_Port_Num
 echo "Enable check_mem: "$Sys_Checkmem
 echo "Enable Nagios Graphs: "$Sys_Graphs
-echo "Host is pingable: "$Sys_Pingable
 echo "Enable Icons: "$Sys_Icon $Sys_Icon_Picked
 echo "Enable Notifications: "$Sys_Notifications
 echo "Add Description Info: "$Sys_Alias $Sys_Alias_Info
@@ -190,14 +175,10 @@ fi
 #
 cd $Work_Dir																			# Ensure we are in the right folder
 # Template Section
-if [[ $Sys_Graphs = "yes" ]] && [[ $Sys_Pingable = "yes" ]] ; then												# Select template to use, with or without mouse of graphs, pingable or not 
+if [[ $Sys_Graphs = "yes" ]]; then												# Select template to use, with or without mouse over graphs
 	config_template=$Template_Dir/template_with_graph.cfg
 else
-        if [[ $Sys_Graphs = "yes" ]] && [[ $Sys_Pingable = "no" ]] ; then
-                config_template=$Template_Dir/template_with_graph_no_ping.cfg
-        else
-                config_template=$Template_Dir/template.cfg
-        fi
+        config_template=$Template_Dir/template.cfg
 fi
 cp $config_template $Client_Shortname.cfg															# Create working file for new host config
 #

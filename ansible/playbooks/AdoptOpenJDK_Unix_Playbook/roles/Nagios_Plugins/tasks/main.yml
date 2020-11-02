@@ -51,3 +51,13 @@
   when:
     - Nagios_Plugins == "Enabled"
   tags: [nagios_plugins, adoptopenjdk]
+
+- name: Download add-on check_timesync plugin
+  get_url:
+    url: https://raw.githubusercntent.com/adoptopenjdk/openjdk-infrastructure/master/ansible/playbook/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
+    mode: 0755
+    checksum: sha256:86552ef2a6e9c23f6a1c85bfcfaf6db5c181730b1b7468a00969ad8aba08c57e
+  when:
+    - Nagios_Plugins == "Enabled"
+  tags: [nagios_plugins, adoptopenjdk]
