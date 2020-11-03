@@ -22,7 +22,7 @@
   authorized_key:
     user: "{{ Jenkins_Username }}"
     state: present
-    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+    key: "{{ Jenkins_User_SSHKey }}"
   tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
 
 - name: Add Jenkins user to the audio group
@@ -64,6 +64,6 @@
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
-    - ansible_distribution_major_version == "6"
+    - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"
   tags:
     - jenkins_user

@@ -72,6 +72,7 @@ Core infrastructure team - granted access to hosts on a case by case basis
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
 - [@tellison](https://github.com/tellison) - Tim Ellison (IBM) - * 
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
+- [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK) - *
 
 ## [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure)
 
@@ -87,7 +88,7 @@ Issues can be assigned to these folks
 - [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
-- [@Willsparker](https://github.com/Willsparker) - William Parker (IBM)
+- [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK)
 
 ## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)

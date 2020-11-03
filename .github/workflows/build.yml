@@ -12,7 +12,6 @@ on:
     branches:         
     - master
 
-
 jobs:
   build-and-push-centos6:
     name: Centos6

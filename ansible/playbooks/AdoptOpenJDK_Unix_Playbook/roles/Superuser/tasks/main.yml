@@ -23,7 +23,7 @@
   authorized_key:
     user: zeus
     state: present
-    key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+    key: "{{ Zeus_User_SSHKey }}"
   when: Superuser_Account == "Enabled"
   tags: [superuser, superuser_authorized_key, adoptopenjdk]
 

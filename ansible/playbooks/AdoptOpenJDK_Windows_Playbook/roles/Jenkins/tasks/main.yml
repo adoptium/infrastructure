@@ -11,7 +11,7 @@
   win_user:
     name: "{{ Jenkins_Username }}"
     fullname: AdoptOpenJDK Jenkins User
-    password: "{{ lookup('file', '{{ Jenkins_Win_Passwd }}') }}"
+    password: "{{ Jenkins_Win_Passwd }}"
     state: present
     password_never_expires: true
     groups:

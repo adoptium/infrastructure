@@ -1,12 +1,13 @@
+---
 arch:
   - amd64
   - arm64-graviton2
   - ppc64le
 
-env: 
+env:
   - TARGET="adoptopenjdk/centos7_build_image"
 
-os: 
+os:
   - linux
 
 dist: bionic

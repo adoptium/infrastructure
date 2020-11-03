@@ -1,0 +1,12 @@
+---
+extends: default
+
+ignore: |
+  .github/
+
+rules:
+  line-length: disable
+  comments-indentation: disable
+  comments: disable
+  # mixed style truthy values are OK for Ansible code
+  truthy: disable

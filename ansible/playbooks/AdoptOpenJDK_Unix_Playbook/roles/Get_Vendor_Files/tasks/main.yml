@@ -1,0 +1,26 @@
+---
+##############
+# VENDOR_FILES
+##############
+
+- name: check out AdoptOpenJDK/secrets
+  git: repo=git@github.com:AdoptOpenJDK/secrets.git dest=vendor_files force=true
+  delegate_to: localhost
+  run_once: true
+
+- name: check if dotgpg is installed
+  shell: command -v dotgpg
+  delegate_to: localhost
+  run_once: true
+
+- name: generate list of vendor_files
+  command: dotgpg cat {{ item }}
+  delegate_to: localhost
+  register: vendor_files
+  loop: "{{ lookup('fileglob', 'vendor_files/vendor_files/*', wantlist=True) }}"
+  run_once: true
+
+- name: set facts from output of dotgpg
+  set_fact: {"{{ item.item | basename | replace('.gpg','') | replace('.','_') }}":"{{ item.stdout }}"}
+  with_items: "{{ vendor_files.results }}"
+  run_once: true

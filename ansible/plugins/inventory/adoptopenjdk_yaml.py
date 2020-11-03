@@ -22,71 +22,91 @@
 # IN THE SOFTWARE.
 #
 
+from __future__ import print_function
+
 import argparse
+import json
+import os
+import subprocess
+import sys
+
+import yaml
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-try:
-    from itertools import ifilter
-except ImportError:
-    from itertools import filter as ifilter
-import json
-import yaml
-import os
-import sys
-from os import path
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x'),
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'softlayer', 'spearhead',
-        'packet', 'linaro','digitalocean', 'ibm', 'godaddy', 'aws')
+        'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
+        'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
+        'aws', 'inspira')
 }
 
-# customisation options per host:
-#
-# - ip [string] (required): ip address of host
-# - alias [string]: 'nickname', will be used in ssh config
-# - labels [sequence]: passed to jenkins
-#
-# parsing done on host naming:
-#
-# - *freebsd*: changes path to python interpreter
-# - *smartos*: changes path to python interpreter
-#
-# @TODO: properly support --list and --host $host
-
+INVENTORY_FILENAME = "inventory.yml"
 
 def main():
 
+    # load config file for special cases
+    config = configparser.RawConfigParser()
+    config.read('ansible.cfg')
+
+    # load public inventory
+    export = parse_yaml(load_yaml_file(INVENTORY_FILENAME), config)
+
+    # export in JSON for Ansible
+    print(json.dumps(export, sort_keys=True, indent=2))
+
+
+# https://stackoverflow.com/a/7205107
+def merge(a, b, path=None):
+    "merges b into a"
+    path = path or []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge(a[key], b[key], path + [str(key)])
+            elif isinstance(a[key], list) and isinstance(b[key], list):
+                a[key] = sorted(set(a[key]).union(b[key]))
+            elif a[key] == b[key]:
+                pass  # same leaf value
+            else:
+                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
+
+def load_yaml_file(file_name):
+    """Loads YAML data from a file"""
+
     hosts = {}
-    export = {'_meta': {'hostvars': {}}}
 
     # get inventory
-    basepath = path.dirname(__file__)
-    inventory_path = path.abspath(path.join(basepath, "..", "..", "inventory.yml"))
-    with open(inventory_path, 'r') as stream:
+    with open(file_name, 'r') as stream:
         try:
-            hosts = yaml.load(stream, Loader=yaml.FullLoader)
+            hosts = yaml.safe_load(stream)
 
         except yaml.YAMLError as exc:
             print(exc)
         finally:
             stream.close()
 
-    # get special cases
-    config = configparser.ConfigParser()
-    config.read('ansible.cfg')
+    return hosts
+
+def parse_yaml(hosts, config):
+    """Parses host information from the output of yaml.safe_load"""
+
+    export = {'_meta': {'hostvars': {}}}
 
     for host_types in hosts['hosts']:
-        for host_type, providers in host_types.iteritems():
+        for host_type, providers in host_types.items():
             export[host_type] = {}
             export[host_type]['hosts'] = []
 
@@ -96,58 +116,59 @@ def main():
             }
 
             for provider in providers:
-                for provider_name, hosts in provider.iteritems():
-                    for host, metadata in hosts.iteritems():
+                for provider_name, hosts in provider.items():
+                    for host, metadata in hosts.items():
+
                         # some hosts have metadata appended to provider
                         # which requires underscore
-                        delimiter = "_" if host.count('-') is 3 else "-"
+                        delimiter = "_" if host.count('-') == 3 else "-"
                         hostname = '{}-{}{}{}'.format(host_type, provider_name,
                                                       delimiter, host)
 
                         export[host_type]['hosts'].append(hostname)
 
-                        c = {}
+                        hostvars = {}
 
                         try:
                             parsed_host = parse_host(hostname)
-                            for k, v in parsed_host.iteritems():
-                                c.update({k: v[0] if type(v) is dict else v})
-                        except Exception, e:
+                            for k, v in parsed_host.items():
+                                hostvars.update({k: v[0] if type(v) is dict else v})
+                        except Exception as e:
                             raise Exception('Failed to parse host: %s' % e)
 
-                        c.update({'ansible_host': metadata['ip']})
+                        if 'ip' in metadata:
+                            hostvars.update({'ansible_host': metadata['ip']})
+                            del metadata['ip']
 
                         if 'port' in metadata:
-                            c.update({'ansible_port': str(metadata['port'])})
+                            hostvars.update({'ansible_port': str(metadata['port'])})
+                            del metadata['port']
 
                         if 'user' in metadata:
-                            c.update({'ansible_user': metadata['user']})
-                            if 'win' not in hostname:
-                                c.update({'ansible_become': True})
+                            hostvars.update({'ansible_user': metadata['user']})
+                            del metadata['user']
 
-                        if 'labels' in metadata:
-                            c.update({'labels': metadata['labels']})
+                        if 'password' in metadata:
+                            hostvars.update({'ansible_password': str(metadata['password'])})
+                            del metadata['password']
 
-                        if 'alias' in metadata:
-                            c.update({'alias': metadata['alias']})
-
-                        if 'win' in hostname:
-                            c.update({'is_win': True})
+                        hostvars.update(metadata)
 
                         # add specific options from config
-                        for option in ifilter(lambda s: s.startswith('hosts:'),
-                                              config.sections()):
+                        for option in filter(lambda s: s.startswith('hosts:'),
+                                             config.sections()):
                             # remove `hosts:`
                             if option[6:] in hostname:
                                 for o in config.items(option):
                                     # configparser returns tuples of key, value
-                                    c.update({o[0]: o[1]})
+                                    hostvars.update({o[0]: o[1]})
 
                         export['_meta']['hostvars'][hostname] = {}
-                        export['_meta']['hostvars'][hostname].update(c)
+                        export['_meta']['hostvars'][hostname].update(hostvars)
 
-    print(json.dumps(export, indent=2))
+            export[host_type]['hosts'].sort()
 
+    return export
 
 def parse_host(host):
     """Parses a host and validates it against our naming conventions"""
@@ -157,7 +178,7 @@ def parse_host(host):
 
     expected = ['type', 'provider', 'os', 'arch', 'uid']
 
-    if len(info) is not 5:
+    if len(info) != 5:
         raise Exception('Host format is invalid: %s,' % host)
 
     for key, item in enumerate(expected):
@@ -171,11 +192,12 @@ def parse_host(host):
 
 
 def has_metadata(info):
-    """Checks for metadata in variables. These are separated from the "key"
-       metadata by underscore. Not used anywhere at the moment for anything
-       other than descriptiveness"""
+    """
+    Checks for metadata in variables. These are separated from the "key"
+    metadata by underscore. Not used anywhere at the moment for anything
+    other than descriptiveness
+    """
 
-    param = dict()
     metadata = info.split('_', 1)
 
     try:

@@ -5,7 +5,7 @@
 # Groups can be passed in as a command-line variable in Ansible playbook.
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
-- hosts: "{{ Groups | default('localhost:build:test:!*zos*:!*win*:!*aix*') }}"
+- hosts: "{{ Groups | default('localhost:build:test:perf:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
     - block:
@@ -20,6 +20,8 @@
   #########
   roles:
     - Debug
+    - role: Get_Vendor_Files
+      tags: [vendor_files, adoptopenjdk]
     - Version
     - Common
     - Providers                   # AdoptOpenJDK Infrastructure
@@ -28,6 +30,9 @@
     - Jenkins_User                # AdoptOpenJDK Infrastructure
     - role: freemarker            # OpenJ9
       tags: [build_tools, build_tools_openj9]
+    - role: macos_codesign
+      tags: [adoptopenjdk, codesign]
+      when: ansible_distribution == "MacOSX"
     - ant                         # Testing
     - Ant-Contrib                 # Testing
     - maven                       # Testing
@@ -39,7 +44,8 @@
     - Superuser                   # AdoptOpenJDK Infrastructure
     - Swap_File
     - Crontab
-    - NTP_TIME
+    - role: NTP_TIME
+      when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
@@ -49,14 +55,17 @@
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
-    - zulu7                       # JDK8 Build Bootstrap
+    - role: zulu7                 # JDK8 Build Bootstrap
+      when: ansible_distribution != "MacOSX"
     - role: adoptopenjdk_install
       jdk_version: 8
       when: ansible_distribution != "Alpine"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
-      when: ansible_distribution != "Alpine"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "MacOSX"
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11

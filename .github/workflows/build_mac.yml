@@ -1,0 +1,39 @@
+name: Ansible Playbook
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/build_mac.yml
+    - ansible/**
+    branches:         
+    - master
+
+jobs:
+  build-macos:
+    name: macOS
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-10.15]
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: brew install ansible
+
+    - name: Remove homebrew/cask-versions
+      run: | 
+        brew untap homebrew/cask-versions
+        brew cask uninstall adoptopenjdk8
+        brew cask uninstall adoptopenjdk11
+        brew cask uninstall adoptopenjdk12
+        brew cask uninstall adoptopenjdk13
+        brew cask uninstall adoptopenjdk14
+
+    - name: Run Ansible Playbook
+      run: |
+        echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+        set -eux
+        cd ansible
+        sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
