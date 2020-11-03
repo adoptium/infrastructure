@@ -42,13 +42,18 @@
     - role: NVidia_Cuda_Toolkit   # OpenJ9
       tags: [build_tools, build_tools_openj9]
     - Superuser                   # AdoptOpenJDK Infrastructure
-    - Swap_File
-    - Crontab
+    - role: Swap_File
+      when: ansible_distribution != "MacOSX"
+    - role: Crontab
+      when: ansible_distribution != "MacOSX"
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
+    - role: Xcode10
+      when: ansible_distribution == "MacOSX"
+      tags: [build_tools, xcode10, adoptopenjdk]
     - role: cmake                 # OpenJ9 / OpenJFX
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
     - ccache

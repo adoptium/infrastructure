@@ -36,7 +36,16 @@
   delay: 5
   register: antContrib_download
   until: antContrib_download is not failed
-  when: not antcontrib_status.stat.exists
+  when: 
+    - not antcontrib_status.stat.exists
+    - ansible_distribution != "MacOSX"
+  tags: ant-contrib
+
+- name: Download ant-contrib (macOS)
+  command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+  when:
+    - not antcontrib_status.stat.exists
+    - ansible_distribution == "MacOSX"
   tags: ant-contrib
 
 - name: Extract ant-contrib

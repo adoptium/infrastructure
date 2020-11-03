@@ -32,3 +32,5 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 
 # Default BootJDK installed
 bootjdk: hotspot
+
+macOS_Codesign_Installer_Password: Theduges-1995

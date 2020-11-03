@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
     - .github/workflows/build_mac.yml
-    - ansible/**
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:         
     - master
 
@@ -36,4 +36,4 @@ jobs:
         echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
         set -eux
         cd ansible
-        sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
+        sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
