@@ -16,15 +16,15 @@
     - build_tools
 
 - name: Fetch CSWpkgutil.pkg
-  fetch:
+  copy:
     src: files/CSWpkgutil.pkg
     dest: /tmp/CSWpkgutil.pkg
+    force: yes
   when: pkgutil_installed.rc != 0
   tags: build_tools
 
 - name: Install pkgutil
   shell: |
-    set -o pipefail
     yes | pkgadd -d /tmp/CSWpkgutil.pkg CSWpkgutil
     /opt/csw/bin/pkgutil -U
   when: pkgutil_installed.rc != 0

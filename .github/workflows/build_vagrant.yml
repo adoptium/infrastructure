@@ -33,7 +33,7 @@ jobs:
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
     - name: Run Asible Playbook
       run: |
