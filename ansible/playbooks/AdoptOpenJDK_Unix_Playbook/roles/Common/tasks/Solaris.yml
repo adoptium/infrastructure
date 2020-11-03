@@ -15,14 +15,18 @@
   tags:
     - build_tools
 
+- name: Fetch CSWpkgutil.pkg
+  fetch:
+    src: files/CSWpkgutil.pkg
+    dest: /tmp/CSWpkgutil.pkg
+  when: pkgutil_installed.rc != 0
+  tags: build_tools
+
 - name: Install pkgutil
   shell: |
     set -o pipefail
-    echo action=nocheck > responses.txt
-    yes all | pkgadd -d http://get.opencsw.org/now -a responses.txt
+    yes | pkgadd -d /tmp/CSWpkgutil.pkg CSWpkgutil
     /opt/csw/bin/pkgutil -U
-    /opt/csw/bin/pkgutil -y -i pkgutil
-    /usr/sbin/pkgchk -L CSWpkgutil
   when: pkgutil_installed.rc != 0
   tags: build_tools
 
