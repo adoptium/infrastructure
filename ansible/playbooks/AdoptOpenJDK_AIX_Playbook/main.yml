@@ -38,16 +38,6 @@
     - zeus_user
 
   tasks:
-  # Will move to role
-  # Install bash if it's not already there
-    - name: Check if bash is installed
-      shell: bash --version >/dev/null 2>&1
-      register: does_bash_exist
-      ignore_errors: yes
-    - name: install bash
-      yum: name=bash state=present update_cache=yes
-      when: does_bash_exist.rc != 0
-
   ######################################
   # Add bash to available login shells #
   ######################################
