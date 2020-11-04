@@ -6,6 +6,7 @@ skip_list:
   - '301'  # Commands should not change things if nothing needs doing
   - '303'  # Using command rather than module 
   - '305'  # Use shell only when shell functionality is required
+  - '306'  # Shells that use pipes should set the pipefail option  
   - '401'  # Git checkouts must contain explicit version
   - '403'  # Package installs should not use latest
   - '501'  # Become_user requires become to work as expected
