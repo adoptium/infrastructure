@@ -4,14 +4,14 @@
 #############
 - name: Create Superuser account - zeus
   action: user name=zeus state=present shell=/bin/bash
-  when: 
+  when:
     - Superuser_Account == "Enabled"
     - ansible_distribution != "MacOSX"
   tags: [superuser, adoptopenjdk]
 
 - name: Create Superuser user (macOS) - zeus
   action: user name=zeus group=staff state=present shell=/bin/bash
-  when: 
+  when:
     - Superuser_Account == "Enabled"
     - ansible_distribution == "MacOSX"
   tags: [superuser, adoptopenjdk]
@@ -19,7 +19,7 @@
 - name: Enable SSH login for Superuser user (macOS)
   command: dseditgroup -o edit -a zeus -t staff com.apple.access_ssh
   ignore_errors: yes
-  when: 
+  when:
     - Superuser_Account == "Enabled"
     - ansible_distribution == "MacOSX"
   tags: [superuser, adoptopenjdk]

@@ -14,8 +14,9 @@
   set_fact:
     xcode_needed: true
   when:
-   - inventory_hostname | regex_search("test-")
-   - macos_version | regex_search("10.14") or macos_version | regex_search("10.15")
+    - inventory_hostname | regex_search("test-")
+    # We only want to install on test-*macos.14 or test-*macos10.15
+    - macos_version | regex_search("10.14") or macos_version | regex_search("10.15")
 
 - name: Check if Xcode is installed
   stat:
@@ -46,13 +47,13 @@
     - not xcode_installed.stat.exists
 
 # Stored in Azure Blob Storage (SAS URL set to expire in 2030)
-- name: Download Xcode10.xip
+- name: Download Xcode_10.3.xip (very slow)
   get_url:
-    url: "https://ansiblestorageadopt.blob.core.windows.net/xcode10/Xcode_10.xip?{{ Xcode10_SAS_TOKEN }}"
+    url: "https://ansiblestorageadopt.blob.core.windows.net/xcode10/Xcode_10.3.xip?{{ Xcode10_SAS_TOKEN }}"
     dest: /tmp/xcode10.xip
     force: no
     mode: 0755
-    checksum: sha256:04a3b5916c37b177d9142ba0f20023f26fd678ed2efcbe27344c20083677ab32
+    checksum: sha256:7a3fd9dc1b0a95d6179c44a92e3f108a928f62a122782671ef1575ed75ea6e9d
   when:
     - xcode_needed == true
     - not xcode_installed.stat.exists
