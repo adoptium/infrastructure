@@ -4,17 +4,19 @@ on:
   pull_request:
     paths:
     - ansible/**
+    - .github/workflows/build.yml
     branches:         
     - master
   push:
     paths:
     - ansible/**
+    - .github/workflows/build.yml
     branches:         
     - master
 
 jobs:
   build-and-push-centos6:
-    name: Centos6
+    name: Centos6 (x64)
     runs-on: ubuntu-latest
     steps:
 
@@ -30,8 +32,51 @@ jobs:
         tags: latest
         push: ${{ github.ref == 'refs/heads/master' }}
 
+  build-and-push-centos7:
+    name: Centos7 (x64)
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Docker Build & Push Centos7 Image to Docker Hub
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ./ansible/Dockerfile.CentOS7
+        repository: adoptopenjdk/centos7_build_image
+        tags: linux-amd64
+        push: ${{ github.ref == 'refs/heads/master' }}
+
+      - name: Wait for Travis build to complete
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: 'Travis CI - Pull Request'
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Docker Manifest
+        if: steps.wait-for-build.outputs.conclusion == 'success'
+        run: |
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          TARGET=adoptopenjdk/centos7_build_image
+          AMD64=$TARGET:linux-amd64
+          ARM64=$TARGET:linux-arm64
+          PPC64LE=$TARGET:linux-ppc64le
+          docker manifest create $TARGET $AMD64 $ARM64 $PPC64LE
+          docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+          docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+          docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+
+      - name: Push Manifest image to Docker Hub
+        run: docker manifest push adoptopenjdk/centos7_build_image
+        if: github.ref == 'refs/heads/master'
+
+
   build-and-push-alpine3:
-    name: Alpine3
+    name: Alpine3 (x64)
     runs-on: ubuntu-latest
     steps:
 
