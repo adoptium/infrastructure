@@ -1,0 +1,79 @@
+###################
+# IBM XL C 13.1.3 #
+###################
+---
+- name: Checking for XLC13 availability
+  stat:
+    path: /opt/IBM/xlC/13.1.3/bin/xlc
+  register: xlc13
+  tags: xlc13
+
+- debug:
+    msg: "xlc13 installed, skipping download and installation"
+  when: xlc13.stat.islnk is defined
+  tags: xlc13
+
+- name: Transfer and Extract XLC13
+  unarchive:
+    src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+    dest: /tmp
+    remote_src: no
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Install IBM XLC13 - installp
+  command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+  register: result.xlc
+  ignore_errors: yes
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- debug: msg='Erorrs from the previous installp command normal'
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: TestIBM XLC13
+  command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
+  register: xlc13_qversion
+  tags: xlc13
+
+- name: Display XLC13 qversion information
+  debug:
+    msg: "{{ xlc13_qversion.stdout }}"
+  tags: xlc13
+
+- name: Symlink - /usr/bin/xlc
+  file: src=/opt/IBM/xlC/13.1.3/bin/xlc dest=/usr/bin/xlc state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Symlink - /usr/bin/xlc++
+  file: src=/opt/IBM/xlC/13.1.3/bin/xlc++ dest=/usr/bin/xlc++ state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Symlink - /usr/bin/xlC
+  file: src=/opt/IBM/xlC/13.1.3/bin/xlC dest=/usr/bin/xlC state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Symlink - /usr/bin/xlc_r
+  file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlc_r state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Symlink - /usr/bin/xlC_r
+  file: src=/opt/IBM/xlC/13.1.3/bin/xlc_r dest=/usr/bin/xlC_r state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Symlink - /usr/bin/gxlC
+  file: src=/opt/IBM/xlC/13.1.3/bin/gxlC dest=/usr/bin/gxlC state=link
+  when: xlc13.stat.islnk is not defined
+  tags: xlc13
+
+- name: Clean XLC13 tmp files
+  file:
+    path: /tmp/usr
+    state: absent
+  tags: xlc13
