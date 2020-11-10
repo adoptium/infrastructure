@@ -22,7 +22,7 @@
   tags: basic_config
 
 # Builds need a shortname for Program Files (x86), that needs to be made without any major installations
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1594#issuecomment-704229594 
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1594#issuecomment-704229594
 - name: Enable shortname creation
   win_shell: "fsutil behavior set disable8dot3 0;"
   tags: basic_config
