@@ -11,7 +11,7 @@ hosts:
   - infrastructure:
 
       - aws:
-          ubuntu1604-x64-1: {ip: 34.243.30.50, user: ubuntu, description: trss.adoptopenjdk.net}
+          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
 
       - digitalocean:
           ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
