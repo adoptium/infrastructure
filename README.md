@@ -54,14 +54,14 @@ Team that holds super user access to Infrastructure
 
 - [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
-- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
 Core infrastructure team - granted access to hosts on a case by case basis
 
 - [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-- [@gdams](https://github.com/gdams) - George Adams (jClarity)
+- [@gdams](https://github.com/gdams) - George Adams (Microsoft)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
@@ -70,7 +70,7 @@ Core infrastructure team - granted access to hosts on a case by case basis
 - [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
 - [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
 - [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
-- [@tellison](https://github.com/tellison) - Tim Ellison (IBM) - * 
+- [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat) - * 
 - [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
 - [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK) - *
 
@@ -82,7 +82,7 @@ Issues can be assigned to these folks
 - [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
 - [@cwesMills](https://github.com/cwesMills) - Colton Mills (IBM)
 - [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
-- [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (IBM)
+- [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
 - [@HusainYusafali](https://github.com/HusainYusufali) - Husain Yusufali (IBM)
 - [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
@@ -92,16 +92,16 @@ Issues can be assigned to these folks
 
 ## [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
 - [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
-- [@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (IBM)
+- [@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (Red Hat)
 - [@gdams](https://github.com/gdams) - George Adams (Microsoft)
 - [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
 - [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
 - [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
 - [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
 - [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
-- [@smlambert](https://github.com/smlambert) - Shelley Lambert (IBM)
-- [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM)
-- [@tellison](https://github.com/tellison) - Tim Ellison (IBM)
+- [@smlambert](https://github.com/smlambert) - Shelley Lambert (Red Hat)
+- [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat)
+- [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat)
 - [@VermaSh](https://github.com/VermaSh) Shubham Verma (IBM)
 
 # Host Information
