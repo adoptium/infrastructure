@@ -21,6 +21,7 @@ SERVICE_STATE_KEYS=(
     "Network time on" # Ubuntu 16.04
     "systemd-timesyncd.service" # Ubuntu 18.04
     "NTP service" # Ubuntu 20.04
+    "NTP enabled" # Debian 8
 )
 SYNC_STATE_KEYS=(
     "System clock synchronized" # Ubuntu 18.04 and newer

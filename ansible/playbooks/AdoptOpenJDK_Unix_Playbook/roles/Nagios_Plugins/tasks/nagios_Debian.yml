@@ -31,3 +31,13 @@
 
 - name: Create symlink to plugins
   file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
+
+##############################
+# Install Additional Plugins #
+##############################
+
+- name: Copy check_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
+    mode: 0755

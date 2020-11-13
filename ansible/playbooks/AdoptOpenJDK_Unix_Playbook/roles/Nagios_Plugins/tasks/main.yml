@@ -47,11 +47,3 @@
     checksum: sha256:47666dce9d11d5908c3e775d229dcbdcd11ce13fd5ea576859987eccbdfc3efa
   when:
     - Nagios_Plugins == "Enabled"
-
-- name: Copy check_timesync plugin
-  copy:
-    src: playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
-    dest: /usr/local/nagios/libexec/check_timesync
-    mode: 0755
-  when:
-    - Nagios_Plugins == "Enabled"

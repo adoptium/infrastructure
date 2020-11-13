@@ -40,6 +40,12 @@
 ##############################
 - name: Copy check_yum plugin
   copy:
-    src: playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_yum
     dest: /usr/local/nagios/libexec/check_yum
+    mode: 0755
+
+- name: Copy check_ntp_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ntp_timesync
+    dest: /usr/local/nagios/libexec/check_ntp_timesync
     mode: 0755

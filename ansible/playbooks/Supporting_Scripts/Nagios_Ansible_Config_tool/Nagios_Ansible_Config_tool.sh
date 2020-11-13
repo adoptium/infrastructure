@@ -61,8 +61,8 @@ if [[ ! $4 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then														# Test: Ens
 	exit
 fi
 #
-if [ ! -f $Template_Dir/template_with_graph.cfg ] || [ ! -f $Template_Dir/template.cfg ] || [ ! -f $Template_Dir/template_with_graph_no_ping.cfg ] ; then	# Test: Ensure templates exist
-        echo "Error: Unable to locate templates" $Template_Dir/template_with_graph.cfg $Template_Dir/template.cfg $Template_Dir/template_with_graph_no_ping.cfg
+if [ ! -f $Template_Dir/template_with_graph.cfg ] || [ ! -f $Template_Dir/template.cfg ] ; then	# Test: Ensure templates exist
+        echo "Error: Unable to locate templates: "$Template_Dir/template_with_graph.cfg $Template_Dir/template.cfg
         exit
 fi
 #
@@ -89,7 +89,7 @@ SSH_Port_Num=$6																			# {{ ansible_port }}
 #
 Client_Check=`ls $Nagios_Server_Folder | grep $Client_Shortname`		
 if [[ ! $Client_Check = "" ]] ; then																# Test: If the client is already being monitored by Nagios skip
-	echo "The Nagaios client" $Sys_Hostname "is already being monitored by Nagios... Skipping."
+	echo "The Nagios client" $Sys_Hostname "is already being monitored by Nagios... Skipping."
 	exit
 fi
 #
@@ -117,18 +117,21 @@ if [ ! -f $Nagios_Logo_Folder/$Sys_Icon_Picked.gd2 ] ; then													# If the
 	echo "Logo icon was not found" $Sys_Icon_Picked "Defaulting to nagios icon"
 	Sys_Icon_Picked=nagios.gd2
 fi
-###################
-# Package Manager #
-###################
-# Detect the right package manager to monitor
+#############################
+# Distro Specific Templates #
+#############################
+# Detect the right package manager to monitor and which script to check the network timesync
 Sys_OS="yes"
 case "$Distro" in
         Ubuntu|Debian)
-                Sys_OS_pkg_Template=$Template_Dir/apt.cfg ;;
+                Sys_OS_pkg_Template=$Template_Dir/apt.cfg
+                Sys_OS_timesync_Template=$Template_Dir/check_timesync.cfg ;;
         RedHat|CentOS)
-                Sys_OS_pkg_Template=$Template_Dir/yum.cfg ;;
+                Sys_OS_pkg_Template=$Template_Dir/yum.cfg
+                Sys_OS_timesync_Template=$Template_Dir/check_ntp_timesync.cfg ;;
         SLES)
-                Sys_OS_pkg_Template=$Template_Dir/zypper.cfg ;;
+                Sys_OS_pkg_Template=$Template_Dir/zypper.cfg
+		Sys_OS_timesync_Template=$Template_Dir/check_timesync.cfg;;
 	FreeBSD|freebsd)
 		Sys_OS_pkg_Template=$Template_Dir/pkg.cfg ;;
         *)
@@ -136,7 +139,7 @@ case "$Distro" in
 esac
 #
 #####################
-# Debug Infromation #
+# Debug Information #
 #####################
 #
 echo -e "\n\n##################################################"
@@ -149,6 +152,7 @@ echo "Enable Icons: "$Sys_Icon $Sys_Icon_Picked
 echo "Enable Notifications: "$Sys_Notifications
 echo "Add Description Info: "$Sys_Alias $Sys_Alias_Info
 echo "Operating System patches "$Sys_OS $Sys_OS_pkg_Template
+echo "OS Timesync Check: "$Sys_OS_timesync_Template
 echo -e "##################################################\n"
 #
 ########
@@ -216,6 +220,9 @@ if [[ $Sys_OS = "yes" ]] ; then																	# Enable checking for Operating 
 	if [[ ! $Sys_OS_pkg_Template = "" ]] ; then														# Ensure a package manager was selected $Sys_OS_pkg_Template
 		cat $Sys_OS_pkg_Template >> $Client_Shortname.cfg
 	fi
+	if [[ ! $Sys_OS_timesync_Template = "" ]]; then
+		cat $Sys_OS_timesync_Template >> $Client_Shortname.cfg
+	fi
 fi
 #####################################
 # Swap vars with system information #
@@ -253,7 +260,7 @@ if [[ $Provider_Exists = "" ]] ; then
         sed -i "s/PROVIDER/$Provider_Name/" $Hostgroup_Template_TMP_File                                	        	                                # Swap out PROVIDER in temp file
         sed -i "s/ALIAS_INFO/$Provider_Name/" $Hostgroup_Template_TMP_File                      	                        	                # Swap out ALIAS_INFO in temp file
         cat $Hostgroup_Template_TMP_File >> $Hostgroups_File                            	                                                        	# Add new hostgroup provider to the hostgroups file
-        rm $Hostgroup_Template_TMP_File                                             	                   		                                        # Remvoe temp file
+        rm $Hostgroup_Template_TMP_File                                             	                   		                                        # Remove temp file
 	# Send slack notifications to Admins
         curl -X POST --data "payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"${SLACK_BOTNAME}\", \"icon_emoji\": \":nagios:\", \"text\": \"${ICON_EMOJI} New Nagios hostgroup was created while running an Ansible playbook on ${Client_Shortname} Please see $Template_Dir/hostgroup_template.cfg \"}" ${WEBHOOK_URL}
 fi

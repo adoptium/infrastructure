@@ -56,6 +56,12 @@
 ##############################
 - name: Copy check_zypper plugin
   copy:
-    src: playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
     dest: /usr/local/nagios/libexec/check_zypper
+    mode: 0755
+
+- name: Copy check_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
     mode: 0755

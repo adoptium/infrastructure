@@ -19,9 +19,15 @@
     pkg:
       - fping
       - nagios-plugins
-      - nagios-plugins-common
       - perl
       - qstat
+
+- name: Install nagios-plugins-common for NOT U20
+  apt:
+    state: latest
+    update_cache: yes
+    pkg: nagios-plugins-common
+  when: (ansible_distribution_major_version != 20)
 
 ##########
 # Layout #
@@ -31,3 +37,13 @@
 
 - name: Create symlink to plugins
   file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
+
+##############################
+# Install Additional Plugins #
+##############################
+
+- name: Copy check_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
+    mode: 0755

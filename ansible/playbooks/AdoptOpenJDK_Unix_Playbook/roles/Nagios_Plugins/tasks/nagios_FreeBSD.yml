@@ -41,7 +41,7 @@
 
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Configure, make and make install nagios-plugins
-  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus | default(1) }} && make install
   become: yes
 
 ##############################
@@ -49,6 +49,6 @@
 ##############################
 - name: Copy check_pkg plugin
   copy:
-    src: playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_pkg
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_pkg
     dest: /usr/local/nagios/libexec/check_pkg
     mode: 0755
