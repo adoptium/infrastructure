@@ -20,3 +20,15 @@
     dest: C:\Users\Public\Desktop\cmd.lnk
     icon: C:\Windows\System32\cmd.exe,0
   tags: basic_config
+
+# Builds need a shortname for Program Files (x86), that needs to be made without any major installations
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1594#issuecomment-704229594
+- name: Enable shortname creation
+  win_shell: "fsutil behavior set disable8dot3 0;"
+  tags: basic_config
+
+- name: Ensure 'Program Files (x86)' has a shortname
+  win_shell: "fsutil file setshortname \"C:\\Program Files (x86)\" \"PROGRA~2\""
+  args:
+    executable: cmd
+  tags: basic_config
