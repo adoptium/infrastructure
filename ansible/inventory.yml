@@ -151,6 +151,7 @@ hosts:
           solaris10u11-sparcv9-1: {}
 
       - osuosl:
+          aix71-ppc64-1: {ip: 140.211.9.99}
           aix72-ppc64-1: {ip: 140.211.9.28}
           aix72-ppc64-2: {ip: 140.211.9.36}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
