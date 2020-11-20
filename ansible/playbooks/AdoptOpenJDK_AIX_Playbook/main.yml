@@ -15,27 +15,34 @@
     swap_size: 4096
 
   roles:
-    - aixfs
-    - syslogs
+    # AIX base requirements
     - X11
+    - openssl
+    # verify/install IBM compilers
     - xlc_v13
     - xlc_v16
-    - openssl
+    # AIX configuration
+    - aixfs
+    - syslogs
 
+    # yum based installation of additional software
     - yum
 
+    # users needed - wait until here to be sure bash is installed
+    - jenkins_user
+    - zeus_user
+
+    # additional OSS packages (needing python)
+    - ant
+    - ant_contrib
+
+    # install/verify boot versions of ojdk
     - bootjdk7
     - bootjdk8
     - bootjdk9
     - bootjdk10
     - bootjdk11
     - bootjdk12
-
-    - ant
-    - ant_contrib
-
-    - jenkins_user
-    - zeus_user
 
   tasks:
   ######################################
