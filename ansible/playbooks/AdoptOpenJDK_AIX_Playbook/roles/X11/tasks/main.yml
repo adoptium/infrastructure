@@ -1,48 +1,71 @@
 #########################################################################
 # Install X11 extensions                                                #
+# x11.base.lib installp download requiring an IBMid                     #
+# https://www.ibm.com/support/pages/fileset-information-x11baselib      #
 # x11.adt.ext installp download requiring an IBMid                      #
-# https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+# https://www.ibm.com/support/pages/fileset-information-x11adtext       #
 # x11.vfb installp download requiring an IBMid                          #
-# http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
+# https://www.ibm.com/support/pages/fileset-information-x11vfb          #
 #########################################################################
 ---
-- name: Check if X11.adt.ext is installed
-  shell: lslpp -l X11.adt.ext >/dev/null 2>&1
-  register: does_X11_adt_ext_exist
-  ignore_errors: yes
+# Rather than run lslpp - use stat on the lpp directories
+# /usr/lpp/X11.base/X11.base.lib      X11.base.lib
+# /usr/lpp/X11/include/X11/extensions X11.adt.ext
+# /usr/lpp/X11.vfb                    X11.vfb
+- name: Verify X11 base library
+  stat:
+    path: /usr/lpp/X11.base/X11.base.lib
+  register: _base
+- name: Verify X11 extensions requirements
+  stat:
+    path: /usr/lpp/X11/include/X11/extensions
+  register: _ext
+- name: Verify X11 Frame Buffer Requirements
+  stat:
+    path: /usr/lpp/X11.vfb
+  register: _vfb
+- name: Verify Vendor File availability
+  stat:
+    path: /Vendor_Files/aix/OpenGL_X11.tar
+  register: _V_OpenGL_X11
   tags: x11
+- name: Verify Readiness #1
+  set_fact:
+    _x11rdy: _base.stat.exists and _ext.stat.exists and _vfb.stat.exists
+- name: Install from Vendor Files
+  block:
+    - name: Unpack Vendor Files
+      unarchive:
+        src: /Vendor_Files/aix/OpenGL_X11.tar
+        dest: /tmp/x11
+        remote_src: no
 
-- name: Check if X11.vfb is installed
-  shell: lslpp -l X11.vfb >/dev/null 2>&1
-  register: does_x11_exist
-  ignore_errors: yes
-  tags: x11
+    - name: Install IBM X11 Extensions - installp
+      command:
+        installp -e /tmp/x11.log -aXYgd /tmp/x11 X11.adt.ext X11.vfb X11.base.lib
+      register: _installp
+      ignore_errors: yes
 
-- name: Transfer and extract X11
-  unarchive:
-    src: /Vendor_Files/aix/OpenGL_X11.tar
-    dest: /tmp
-    remote_src: no
-  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+    - name: Remove X11 install files
+      file:
+        state: absent
+        path: /tmp/x11
+      when: _images.skipped == false
+    - name: Re-Verify X11 base requirements
+      stat:
+        path: /usr/lpp/X11.base/X11.base.lib
+      register: _base
+    - stat:
+        path: /usr/lpp/X11/include/X11/extensions
+      register: _ext
+    - stat:
+        path: /usr/lpp/X11.vfb
+      register: _vfb
+    - name: Re-Verify Readiness #1
+      set_fact:
+        _x11rdy: _base.stat.exists and _ext.stat.exists and _vfb.stat.exists
+  when: _V_OpenGL_X11.stat.exists and _x11rdy == false
   tags: x11
-
-- name: Install IBM X11 Extensions - installp
-  command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
-  register: result.x11
-  ignore_errors: yes
-  when: does_X11_adt_ext_exist.rc != 0
-  tags: x11
-
-- name: Install X11.vfb - installp
-  command: installp -agXYd /tmp/x11/X11.vfb all
-  register: result.x11.vfb
-  ignore_errors: yes
-  when: does_x11_exist.rc != 0
-  tags: x11
-
-- name: Remove X11 install files
-  file:
-    state: absent
-    path: /tmp/x11
-  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
-  tags: x11
+- debug:
+    msg: "Not all required X11 components are installed"
+  when: _x11rdy == false
