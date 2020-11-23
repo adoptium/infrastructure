@@ -193,7 +193,7 @@
     - docker_installed.rc != 0
     - ansible_distribution == "SLES"
     - ansible_distribution_major_version == "12"
-    - (ansible_architecture == "x86_64" or ansible_architecture == "s390x")
+    - ansible_architecture == "x86_64"
   tags:
     - docker
     # TODO: Package installs should not use latest
