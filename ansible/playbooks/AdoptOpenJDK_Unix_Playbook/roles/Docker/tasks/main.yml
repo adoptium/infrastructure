@@ -200,7 +200,6 @@
     - skip_ansible_lint
 
 # Debian
-
 - name: Add Docker GPG apt Key for Debian ( < 10 )
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
