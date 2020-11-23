@@ -10,15 +10,17 @@ hosts:
 
   - infrastructure:
 
+      - aws:
+          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
+
       - digitalocean:
           ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
 
       - packet:
           ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
 
-      - softlayer:
-          ubuntu1604-x64-3: {ip: 158.176.72.83, description: jckservices.adoptopenjdk.net}
-          ubuntu1804-x64-1: {ip: 52.117.150.132, description: Bare metal machine to run VM playbook testing}
+      - ibmcloud:
+          vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
       - godaddy:
           ubuntu1604-x64-1: {ip: 160.153.247.225, description: git-hg/load relief for jenkins master}
@@ -36,6 +38,10 @@ hosts:
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 
+      - inspira:
+          solaris10u11-sparcv9-1: {}
+          solaris10u11-sparcv9-2: {}
+
       - linaro:
           centos76-armv8-2: {ip: 213.146.141.123, user: centos}
 
@@ -48,9 +54,6 @@ hosts:
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
-          ubuntu1604-s390x-1: {ip: 148.100.113.58}
-          zOS-s390x-1: {ip: 148.100.36.136, user: OPEN1}
-          zOS-s390x-2: {ip: 148.100.36.137, user: OPEN1}
 
       - osuosl:
           aix71-ppc64-1: {ip: 140.211.9.10}
@@ -67,10 +70,9 @@ hosts:
           ubuntu1604-armv7-2: {ip: 212.47.246.7}
           ubuntu1604-x64-1: {ip: 51.15.46.107}
 
-      - softlayer:
-          centos6-x64-1: {ip: 52.117.29.5}
-          win2012r2-x64-1: {ip: 37.58.103.195, user: Administrator}
-          win2012r2-x64-2: {ip: 37.58.103.196, user: Administrator}
+      - ibmcloud:
+          win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
+          win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
 
       - spearhead:
           freebsd12-x64-1: {ip: 185.131.222.224}
@@ -90,9 +92,6 @@ hosts:
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.77.146}
 
-      - osuosl:
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.243}
-
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
@@ -101,6 +100,10 @@ hosts:
       - macstadium:
           macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
           macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
+
+      - ibmcloud:
+          centos76-x64-1: {ip: 159.122.231.200}
+          centos76-x64-2: {ip: 159.122.231.202}
 
   - test:
 
@@ -144,15 +147,15 @@ hosts:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
           aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
 
-#     - inspira:
-#         solaris10u11-sparcv9-1: {ip: }
+      - inspira:
+          solaris10u11-sparcv9-1: {}
 
       - osuosl:
+          aix71-ppc64-1: {ip: 140.211.9.99}
           aix72-ppc64-1: {ip: 140.211.9.28}
           aix72-ppc64-2: {ip: 140.211.9.36}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
-          centos74-ppc64le-3: {ip: 140.211.168.225, user: centos}
           centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
@@ -160,7 +163,6 @@ hosts:
           ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
-          ubuntu1804-ppc64le-3: {ip: 140.211.168.4, user: ubuntu}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.74.50}
@@ -171,14 +173,18 @@ hosts:
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
-          macos1010-x64-1: {ip: 74.80.250.151, user: admin}
-          macos1010-x64-2: {ip: 74.80.250.173, user: admin}
-          macos1012-x64-1: {ip: 92.63.141.139, user: admin}
-          macos1013-x64-1: {ip: 46.20.235.28, user: admin}
-          macos1013-x64-2: {ip: 92.63.134.23, user: admin}
-          macos1014-x64-1: {ip: 87.237.62.57, user: admin}
-          macos1014-x64-2: {ip: 92.63.134.40, user: admin}
-          macos1014-x64-3: {ip: 74.80.249.207, user: admin}
+          macos1010-x64-1: {ip: 74.80.250.151, user: admin, description: TBD}
+          macos1010-x64-2: {ip: 74.80.250.173, user: admin, description: TBD}
+          macos1012-x64-1: {ip: 92.63.141.139, user: admin, description: DE139}
+          macos1013-x64-1: {ip: 46.20.235.28, user: admin, description: DE328}
+          macos1013-x64-2: {ip: 92.63.134.23, user: admin, description: DE923}
+          macos1014-x64-1: {ip: 87.237.62.57, user: admin, description: DE657}
+          macos1014-x64-2: {ip: 92.63.134.40, user: admin, description: DE940}
+          macos1014-x64-3: {ip: 74.80.249.207, user: admin, description: DU807}
+
+      - macstadium:
+          macos11-arm64-1: {ip: 199.7.163.51, user: Administrator}
+          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}
 
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
@@ -190,9 +196,9 @@ hosts:
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}
 
-      - softlayer:
-          rhel74-x64-1: {ip: 169.55.170.70}
-          rhel69-x64-1: {ip: 169.55.150.147}
+      - ibmcloud:
+          rhel6-x64-1: {ip: 169.48.4.140}
+          rhel7-x64-1: {ip: 169.48.4.136}
           ubuntu1604-x64-1: {ip: 169.55.150.155}
-          win2012r2-x64-1: {ip: 169.55.170.72, user: admin}
-          win2012r2-x64-2: {ip: 52.117.29.13, user: Administrator}
+          win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
+          win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}

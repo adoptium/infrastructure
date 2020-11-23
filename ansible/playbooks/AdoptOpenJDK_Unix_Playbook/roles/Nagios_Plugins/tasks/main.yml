@@ -25,7 +25,7 @@
   authorized_key:
     user: nagios
     state: present
-    key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
+    key: "{{ Nagios_User_SSHKey }}"
   when:
     - Nagios_Plugins == "Enabled"
   tags: [nagios_plugins, adoptopenjdk]

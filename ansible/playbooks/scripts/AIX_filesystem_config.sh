@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/ksh
 ##############################################################
 # AdoptOpenJDK - Script to configure filesystem sizes on AIX #
 ##############################################################
@@ -6,11 +6,6 @@
 ##################
 # Error Checking #
 ##################
-#
-if ! type bash >/dev/null 2>&1; then										                      # Ensure bash is installed
-        echo "Error: Can't find bash, please ensure bash is installed. Exiting..."
-        exit
-fi
 #
 if ! [ $(id -u) = 0 ]; then											                              # Ensure we are root
 	echo "Error: You must be root (userid 0) to execute this script. Exiting..."
@@ -25,7 +20,7 @@ Total_Disk_Size=`getconf DISK_SIZE /dev/hdisk0`    								          # Determine
 Total_Disk_in_GB=`expr $Total_Disk_Size / 1024`    								          # Convert to GB
 Maximum_Processes=`lsattr -E -l sys0 | grep maxuproc | awk '{print $2}'`
 #
-if [[ $Total_Disk_in_GB -lt "40" ]]; then									                  # Disk is too small for script
+if [[ $Total_Disk_in_GB -lt "79" ]]; then									                  # Disk is too small for script
 	echo "Error: Disk is too small (less than 40GB), manually configuration is required. Exiting..."
 	exit
 fi

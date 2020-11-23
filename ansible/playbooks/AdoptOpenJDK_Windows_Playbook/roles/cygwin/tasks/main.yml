@@ -1,11 +1,4 @@
 ---
-########################
-# Include OS variables #
-########################
-- name: Include OS variables
-  include_vars: "../vars/main.yml"
-  tags: main
-
 ##########
 # cygwin #
 ##########
@@ -15,35 +8,19 @@
   register: cygwin_installed
   tags: cygwin
 
-# For details about the cache, see: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1210#issuecomment-679076545
-- name: Retrieve cygwin cache from ci.adoptopenjdk.net
+- name: Retrieve Cygwin setup
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64.tar.gz
-    dest: C:/temp/cygwin64.tar.gz
-    checksum: 8f8b1d7d00233e384e725390c4018941fe7125290b94ecc0eeb3cf6684b4ce23
-    checksum_algorithm: sha256
-  when: (not cygwin_installed.stat.exists)
+    url: https://cygwin.com/setup-x86_64.exe
+    dest: C:\temp\cygwin.exe
+  when: not cygwin_installed.stat.exists
   tags: cygwin
 
-- name: Retrieve cygwin toolset from ci.adoptopenjdk.net
-  win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/winansible/cygwin64_bootstrap.zip
-    dest: C:/temp/cyg_toolset.zip
-    checksum: d7950df964a0618ac47561d349276d4644e27f5b8f0a5fba9b10db702d09ecad
-    checksum_algorithm: sha256
-  when: (not cygwin_installed.stat.exists)
-  tags: cygwin
-
-- name: Use cygwin 'tar' and 'pigz' to extract cygwin cache
+- name: Install Cygwin
   win_shell: |
-    New-Item -ItemType directory -Name cygwin_toolset -Path C:\temp\
-    Expand-Archive -LiteralPath C:\temp\cyg_toolset.zip -DestinationPath C:\temp\cygwin_toolset;
-    $env:path="C:\temp\cygwin_toolset;$env:path"
-    cd C:\
-    tar --force-local -I pigz -xf C:\temp\cygwin64.tar.gz
+    Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bsdtar,cpio,curl,gcc-core,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
   args:
     executable: powershell
-  when: (not cygwin_installed.stat.exists)
+  when: not cygwin_installed.stat.exists
   tags: cygwin
 
 - name: Change git config to not replace Line endings

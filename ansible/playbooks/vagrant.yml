@@ -5,12 +5,28 @@
 ########################################
 
 - hosts: all
+  gather_facts: yes
   remote_user: root
   become: yes
 
   tasks:
     - block:
-        - name: Apt install Prerequisites
+        - name: Print facts
+          debug:
+            msg:
+              - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
+              - "ansible_hostname: {{ ansible_hostname | default('***Undefined***') }}"
+              - "ansible_fqdn: {{ ansible_fqdn | default('***Undefined***') }}"
+              - "ansible_user: {{ ansible_user | default('***Undefined***') }}"
+              - "ansible_default_ipv4.address: {{ ansible_default_ipv4.address | default('***Undefined***') }}"
+              - "ansible_os_family: {{ ansible_os_family | default('***Undefined***') }} "
+              - "ansible_distribution: {{ ansible_distribution | default('***Undefined***') }} "
+              - "ansible_distribution_major_version: {{ ansible_distribution_major_version | default('***Undefined***') }} "
+              - "ansible_architecture: {{ ansible_architecture | default('***Undefined***') }} "
+              - "ansible_processor_vcpus: {{ ansible_processor_vcpus | default('***Undefined***') }} "
+              - "ansible_processor_cores: {{ ansible_processor_cores | default('***Undefined***') }} "
+
+        - name: Install pre-reqs
           apt:
             name: "{{ packages }}"
             update_cache: yes
@@ -35,63 +51,61 @@
             executable: /usr/bin/pip
             name: ["requests-credssp", "pywinrm"]
 
-        - name: Check tmp folder exists
-          stat:
-            path: /tmp
-          register: tmp_folder
-
         - name: Create tmp folder if necessary
           file:
             path: /tmp
             state: directory
-          when: tmp_folder.stat.isdir is not defined
-
-        - name: Check /usr/lib/jvm exists
-          stat: path=/usr/lib/jvm
-          register: usr_lib_jvm_exists
 
         - name: Create /usr/lib/jvm if necessary
           file:
             path: /usr/lib/jvm
             state: directory
-          when: usr_lib_jvm_exists.stat.isdir is not defined
 
       ##########
       # Java 8 #
       ##########
 
-        - name: Check if JDK8 is already installed in the target location
+        - name: Check if jdk8 is already installed in the target location
           shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
           ignore_errors: yes
           register: adoptopenjdk_installed
+          tags: java
 
-        - name: Check if there is a default Java
+        - name: Check if there is a default java
           shell: java -version >/dev/null 2>&1
           ignore_errors: yes
           register: default_java
+          tags: java
 
-        - name: Install latest release if not already installed (Linux/x64)
+        - name: Install latest jdk8 release if not already installed
           unarchive:
-            src: https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&heap_size=normal&release=latest&type=jdk
+            src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/adoptopenjdk?project=jdk
             dest: /usr/lib/jvm
             remote_src: yes
           when:
             - adoptopenjdk_installed.rc != 0
-            - ansible_architecture == "x86_64"
+          tags: java
 
-        - name: Assign JDK-8 as default java
-          file:
-            src: /usr/lib/jvm/jdk8*/bin/java
-            dest: /usr/bin/java
-            state: link
+        # This is due to ansible not liking wildcard searches in the file module :(
+        - name: Find jdk8 folder in /usr/lib/jvm
+          find:
+            paths: /usr/lib/jvm
+            file_type: directory
+            contains: jdk8u*
+          register: jdk8_folder
           when: default_java.rc != 0
-
-        - name: Assign JDK-8 as default javac
+          tags: java
+        # There should only be one jdk8u* folder in /usr/lib/jvm, hence 'files[0]'
+        - name: Make jdk8 the default java
           file:
-            src: /usr/lib/jvm/jdk8*/bin/javac
-            dest: /usr/bin/javac
+            src: "{{ jdk8_folder.files[0].path }}{{ item }}"
+            dest: /usr{{ item }}
             state: link
+          with_items:
+            - /bin/java
+            - /bin/javac
           when: default_java.rc != 0
+          tags: java
 
       ###########
       # Ansible #
@@ -101,17 +115,20 @@
           shell: which ansible >/dev/null 2>&1
           ignore_errors: yes
           register: ansible_installed
+          tags: ansible
 
         - name: Add Ansible repository
           apt_repository:
             repo: ppa:ansible/ansible
           when: ansible_installed.rc != 0
+          tags: ansible
 
         - name: Install Ansible
           apt:
             name: ansible
             update_cache: yes
           when: ansible_installed.rc != 0
+          tags: ansible
 
       #######
       # Git #
@@ -123,6 +140,7 @@
           register: git_installed
           tags:
             - skip_ansible_lint
+            - git
 
         - name: Test if Git is installed at the correct version
           shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
@@ -130,6 +148,7 @@
           register: git_version
           tags:
             - skip_ansible_lint
+            - git
 
         - name: Download Git Source
           get_url:
@@ -139,6 +158,7 @@
             checksum: sha256:107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a
           when:
             - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+          tags: git
 
         - name: Extract Git Source
           unarchive:
@@ -147,12 +167,14 @@
             copy: False
           when:
             - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+          tags: git
 
         - name: Compile and Install Git from Source
           shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
           become: yes
           when:
             - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+          tags: git
 
         - name: Remove system git if needed
           apt:
@@ -160,6 +182,7 @@
             state: absent
           when:
             - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+          tags: git
 
         - name: Symlink git to /usr/bin/git
           file:
@@ -168,6 +191,7 @@
             state: link
           when:
             - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+          tags: git
 
       ###########
       # Vagrant #
@@ -177,11 +201,13 @@
           shell: which vagrant >/dev/null 2>&1
           ignore_errors: yes
           register: vagrant_installed
+          tags: vagrant
 
         - name: Test if the Vagrant version is >2.1
           shell: vagrant --version | sed -e 's/Vagrant //g' | awk -F'[.]' '{print $1 "." $2 "." $3}'
           when: vagrant_installed.rc == 0
           register: vagrant_version
+          tags: vagrant
 
         - name: Download Vagrant
           get_url:
@@ -190,18 +216,21 @@
             checksum: sha256:415f50b93235e761db284c761f6a8240a6ef6762ee3ec7ff869d2bccb1a1cdf7
           when:
             - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+          tags: vagrant
 
         - name: Remove system vagrant if necessary
           apt:
             name: vagrant
             state: absent
           when: (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+          tags: vagrant
 
         - name: Install Vagrant
           command: dpkg -i /tmp/vagrant_2.2.5_x86_64.deb
           become: yes
           when:
             - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+          tags: vagrant
 
       ##############
       # VirtualBox #
@@ -211,6 +240,7 @@
           shell: which virtualbox >/dev/null 2>&1
           ignore_errors: yes
           register: virtualbox_installed
+          tags: VBox
 
         - name: Import GPG keys
           apt_key:
@@ -220,17 +250,20 @@
             - https://www.virtualbox.org/download/oracle_vbox_2016.asc
             - https://www.virtualbox.org/download/oracle_vbox.asc
           when: virtualbox_installed.rc != 0
+          tags: VBox
 
         - name: Add Virtualbox Repository
           apt_repository:
             repo: deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bionic contrib
           when: virtualbox_installed.rc != 0
+          tags: VBox
 
         - name: Install Virtualbox
           apt:
             name: virtualbox-6.0
             update_cache: yes
           when: virtualbox_installed.rc != 0
+          tags: VBox
 
       ##########
       #  QEMU  #
@@ -240,6 +273,17 @@
           shell: qemu-system-s390x --version >/dev/null 2>&1
           ignore_errors: yes
           register: qemu_installed
+          tags: QEMU
+
+        - name: Add repos to APT
+          apt_repository:
+            repo: '{{ item }}'
+            state: present
+          with_items:
+            - "deb [trusted=yes] http://ftp.uk.debian.org/debian sid main"
+            - "deb [trusted=yes] http://ftp.uk.debian.org/debian experimental main"
+          when: qemu_installed.rc != 0
+          tags: QEMU
 
         - name: Install QEMU dependencies
           apt:
@@ -247,19 +291,24 @@
             update_cache: yes
           vars:
             packages:
-              - libglib2.0-dev
               - libfdt-dev
-              - libpixman-1-dev
-              - zliblg-dev
-              - libnfs-dev
+              - libglib2.0-dev
+              - libguestfs-tools
               - libiscsi-dev
+              - libnfs-dev
+              - libpixman-1-dev
+              - opensbi
+              - qemu-efi-aarch64
+              - qemu-utils
+              - u-boot-qemu
+              - zliblg-dev
           when: qemu_installed.rc != 0
           tags: QEMU
 
         - name: Extract source code
           unarchive:
-            src: https://download.qemu.org/qemu-4.2.0.tar.xz
-            dest: /tmp/qemu-4.2.0
+            src: https://download.qemu.org/qemu-5.0.0.tar.xz
+            dest: /tmp
             remote_src: yes
           retries: 3
           delay: 5
@@ -268,7 +317,7 @@
           when: qemu_installed.rc != 0
           tags: QEMU
 
-        - name: Install QEMU 4.2
-          shell: cd /tmp/qemu-4.2.0 && ./configure && make && make install
+        - name: Install QEMU
+          shell: cd /tmp/qemu-5.0.0 && ./configure && make && make install
           when: qemu_installed.rc != 0
           tags: QEMU

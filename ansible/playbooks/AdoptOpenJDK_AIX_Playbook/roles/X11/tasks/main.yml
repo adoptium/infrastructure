@@ -1,0 +1,48 @@
+#########################################################################
+# Install X11 extensions                                                #
+# x11.adt.ext installp download requiring an IBMid                      #
+# https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+# x11.vfb installp download requiring an IBMid                          #
+# http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
+#########################################################################
+---
+- name: Check if X11.adt.ext is installed
+  shell: lslpp -l X11.adt.ext >/dev/null 2>&1
+  register: does_X11_adt_ext_exist
+  ignore_errors: yes
+  tags: x11
+
+- name: Check if X11.vfb is installed
+  shell: lslpp -l X11.vfb >/dev/null 2>&1
+  register: does_x11_exist
+  ignore_errors: yes
+  tags: x11
+
+- name: Transfer and extract X11
+  unarchive:
+    src: /Vendor_Files/aix/OpenGL_X11.tar
+    dest: /tmp
+    remote_src: no
+  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+  tags: x11
+
+- name: Install IBM X11 Extensions - installp
+  command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
+  register: result.x11
+  ignore_errors: yes
+  when: does_X11_adt_ext_exist.rc != 0
+  tags: x11
+
+- name: Install X11.vfb - installp
+  command: installp -agXYd /tmp/x11/X11.vfb all
+  register: result.x11.vfb
+  ignore_errors: yes
+  when: does_x11_exist.rc != 0
+  tags: x11
+
+- name: Remove X11 install files
+  file:
+    state: absent
+    path: /tmp/x11
+  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+  tags: x11

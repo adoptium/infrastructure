@@ -5,19 +5,20 @@
 
 - name: Check if windows.p12 exists
   win_stat:
-    path: C:\Users\jenkins\windows.p12
+    path: C:\openjdk\windows.p12
   register: cert_installed
   tags:
     - ccert
     - jenkins
+    - adoptopenjdk
 
-- name: Get windows.p12 and put in Jenkins Home Directory
-  win_get_url:
-    url: https://github.com/AdoptOpenJDK/openjdk-installer/raw/master/windows.p12
-    dest: C:\Users\jenkins
-    checksum: 836c302e944cae970b1fa57b9e5cff552e3d61f0ce4445e79185900c1098e40e
-    checksum_algorithm: sha256
+# The vendor files are retrieved by the Get_Vendor_Files role
+- name: Get windows.p12 and put in C:\openjdk Directory
+  win_copy:
+    src: vendor_files/windows.p12
+    dest: C:\openjdk\windows.p12
   when: (not cert_installed.stat.exists)
   tags:
     - ccert
     - jenkins
+    - adoptopenjdk

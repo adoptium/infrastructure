@@ -18,7 +18,7 @@
     - block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
-          include_vars: adoptopenjdk_variables.yml
+          include_vars: ./adoptopenjdk_variables.yml
       # Install bash if it's not already there
         - name: Check if bash is installed
           shell: bash --version >/dev/null 2>&1
@@ -159,7 +159,7 @@
           when: yum.stat.islnk is not defined
           tags:
             - yum
-            #TODO: Package installs should not use latest
+            # TODO: Package installs should not use latest
             - skip_ansible_lint
 
         - name: Yum update
@@ -169,7 +169,7 @@
             state: latest
           tags:
             - yum
-            #TODO: Package installs should not use latest
+            # TODO: Package installs should not use latest
             - skip_ansible_lint
 
         - name: Install yum package support
@@ -197,6 +197,7 @@
             - pkg-config
             - popt
             - sed
+            - sudo
             - tar
             - tcl
             - tk
@@ -442,6 +443,7 @@
           shell: lslpp -l X11.adt.ext >/dev/null 2>&1
           register: does_X11_adt_ext_exist
           ignore_errors: yes
+          tags: x11
 
         - name: Check if X11.vfb is installed
           shell: lslpp -l X11.vfb >/dev/null 2>&1
@@ -505,6 +507,7 @@
           register: result.xlc
           ignore_errors: yes
           when: xlc13.stat.islnk is not defined
+          tags: xlc13
 
         - debug: msg='Erorrs from the previous installp command normal'
           when: xlc13.stat.islnk is not defined

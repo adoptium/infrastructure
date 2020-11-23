@@ -14,6 +14,14 @@
   when: ansible_architecture == "s390x"
   tags: patch_update
 
+- name: Install gnupg2 for aarch64
+  apt:
+    name: gnupg2
+    state: present
+    update_cache: yes
+  when: ansible_architecture == "aarch64"
+  tags: patch_update
+
 - name: Add the openjdk repository to apt
   apt_repository: repo='ppa:openjdk-r/ppa'
   when:

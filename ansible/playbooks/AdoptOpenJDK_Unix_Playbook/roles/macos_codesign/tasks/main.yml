@@ -1,0 +1,124 @@
+---
+##################
+# macOS Codesign #
+##################
+
+- name: Set Jenkins user password
+  user:
+    name: jenkins
+    password: "{{ macOS_Jenkins_Password }}"
+
+- name: Create Jenkins password file
+  file: path="/Users/jenkins/.password" state=touch
+
+- name: Copy password to file
+  copy: content="{{ macOS_Jenkins_Password }}" dest="/Users/jenkins/.password"
+
+- name: Get macOS version
+  shell: sw_vers -productVersion
+  register: macos_version
+
+- name: Check if Default keychain is correct
+  shell: security default-keychain | tr -d '[:space:]' | sed 's/"//g'
+  register: default_keychain
+  become_user: jenkins
+  ignore_errors: true
+
+- name: Create Keychain if it doesn't exist
+  shell: security create-keychain -p "{{ macOS_Jenkins_Password }}" "/Users/jenkins/Library/Keychains/login.keychain-db"
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+    - default_keychain.stderr | regex_search("A default keychain could not be found")
+
+- name: Set Default keychain
+  shell: security default-keychain -s "/Users/jenkins/Library/Keychains/login.keychain-db"
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+    - default_keychain.stdout != "/Users/jenkins/Library/Keychains/login.keychain-db"
+
+- name: Reboot macOS after setting Default keychain
+  reboot:
+    reboot_timeout: 3600
+  when:
+    - not macos_version | regex_search("10.10")
+    - default_keychain.stdout != "/Users/jenkins/Library/Keychains/login.keychain-db"
+
+- name: Test Application Certificate
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    rm -rf /Users/jenkins/test && touch /Users/jenkins/test
+    codesign --sign "Developer ID Application: London Jamocha Community CIC" /Users/jenkins/test
+  become_user: jenkins
+  register: application_cert
+  ignore_errors: true
+  when:
+    - not macos_version | regex_search("10.10")
+
+- name: Get the Application Certificate from Vendor Secrets
+  copy:
+    src: vendor_files/macos_codesign_certs/application.p12
+    dest: /Users/jenkins/application.p12
+  when:
+    - not macos_version | regex_search("10.10")
+    - application_cert.stderr | regex_search("The specified item could not be found in the keychain")
+
+- name: Install Application Certificate
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    security import /Users/jenkins/application.p12 -P "{{ macOS_Codesign_Application_Password }}" -T /usr/bin/codesign
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+    - application_cert.stderr | regex_search("The specified item could not be found in the keychain")
+
+- name: Test Installer Certificate
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    rm -rf /Users/jenkins/installer.pkg /Users/jenkins/installer_signed.pkg
+    # We need to test sign an actual installer
+    curl -L https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u265-b01/OpenJDK8U-jre_x64_mac_hotspot_8u265b01.pkg -o /Users/jenkins/installer.pkg
+    productsign --sign "Developer ID Installer: London Jamocha Community CIC" /Users/jenkins/installer.pkg /Users/jenkins/installer_signed.pkg
+  become_user: jenkins
+  register: installer_cert
+  ignore_errors: true
+  when:
+    - not macos_version | regex_search("10.10")
+
+- name: Get the Installer Certificate from Vendor Secrets
+  copy:
+    src: vendor_files/macos_codesign_certs/installer.p12
+    dest: /Users/jenkins/installer.p12
+  when:
+    - not macos_version | regex_search("10.10")
+    - installer_cert.stderr | regex_search("no identity found")
+
+- name: Install Installer Certificate
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    security import /Users/jenkins/installer.p12 -P "{{ macOS_Codesign_Installer_Password }}" -T /usr/bin/pkgbuild -T /usr/bin/productsign -T /usr/bin/productbuild
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+    - installer_cert.stderr | regex_search("no identity found")
+
+- name: Allow codesign via ssh
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    security set-key-partition-list -S apple-tool:,apple: -s -k "{{ macOS_Jenkins_Password }}" /Users/jenkins/Library/Keychains/login.keychain-db
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+
+- name: Cleanup files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /Users/jenkins/application.p12
+    - /Users/jenkins/installer.p12
+    - /Users/jenkins/test
+    - /Users/jenkins/installer.pkg
+    - /Users/jenkins/installer_signed.pkg
+  ignore_errors: yes

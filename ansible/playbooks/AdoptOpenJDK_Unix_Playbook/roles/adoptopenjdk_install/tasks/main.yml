@@ -11,8 +11,8 @@
   set_fact:
     path: /usr/lib/jvm/jdk8
   when:
+    - ansible_distribution != "MacOSX"
     - jdk_version == 8
-    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
 - name: Set path variable when jdk_version != 8
@@ -20,14 +20,19 @@
     path: /usr/lib/jvm/jdk-{{ jdk_version }}
   when:
     - jdk_version != 8
-    - ansible_os_family != "Darwin"
+    - ansible_distribution != "MacOSX"
+  tags: adoptopenjdk_install
+
+- name: Set path variable (macOS)
+  set_fact:
+    path: "/Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk"
+  when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for x86_64
   set_fact:
     api_architecture: x64
   when:
-    - ansible_os_family != "Darwin"
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk_install
 
@@ -35,7 +40,6 @@
   set_fact:
     api_architecture: arm
   when:
-    - ansible_os_family != "Darwin"
     - ansible_architecture == "armv7l"
   tags: adoptopenjdk_install
 
@@ -43,7 +47,6 @@
   set_fact:
     api_architecture: "{{ ansible_architecture }}"
   when:
-    - ansible_os_family != "Darwin"
     - ansible_architecture != "armv7l" and
       ansible_architecture != "x86_64"
   tags: adoptopenjdk_install
@@ -56,7 +59,7 @@
   stat: path=/usr/lib/jvm
   register: usr_lib_jvm_exists
   when:
-    - ansible_os_family != "Darwin"
+    - ansible_distribution != "MacOSX"
   tags: adoptopenjdk_install
 
 - name: Creating /usr/lib/jvm if not found
@@ -66,16 +69,14 @@
     owner: root
     mode: 0755
   when:
+    - ansible_distribution != "MacOSX"
     - not usr_lib_jvm_exists.stat.exists
-    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
 - name: Check if jdk-{{ jdk_version }} is already installed in the target location
   shell: ls -ld {{ path }}* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk_installed
-  when:
-    - ansible_os_family != "Darwin"
   tags:
     - adoptopenjdk_install
     - skip_ansible_lint
@@ -90,16 +91,34 @@
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
   when:
+    - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
+- name: Install latest release if one not already installed (macOS)
+  get_url:
+    url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /tmp/{{ jdk_version }}-installer.pkg
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+- name: Run installer (macOS)
+  shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Get {{ path }}* full path name
   shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
   when:
+    - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install
 
 - name: Create symlink to major version
@@ -108,8 +127,18 @@
     dest: '{{ path }}'
     state: link
   when:
+    - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-    - ansible_os_family != "Darwin"
+  tags: adoptopenjdk_install
+
+- name: Create symlink to major version
+  file:
+    src: '{{ adoptopenjdk_dir.stdout }}'
+    dest: '{{ path }}'
+    state: link
+  when:
+    - ansible_distribution != "MacOSX"
+    - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
 - name: Chown {{ path }}*
@@ -119,6 +148,6 @@
     owner: root
     recurse: yes
   when:
+    - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-    - ansible_os_family != "Darwin"
   tags: adoptopenjdk_install

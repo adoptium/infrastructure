@@ -1,0 +1,49 @@
+##########################
+# adoptopenjdk_variables #
+# merge of AdoptOpenJDK_Unix_Playbook/group_vars/all/adoptopenjdk_variables.yml
+# with ./adoptopenjdk_variables.yml - written for AIX back when...
+# and renamed group_vars/all/main.yml for automatic loading
+##########################
+# AIX variables
+---
+
+# Domain for setting hostname
+Domain: adoptopenjdk.net
+
+# Sudoers file
+Sudoers_File: /etc/sudoers
+
+# Jenkins User Variables:
+Jenkins_Username: jenkins
+Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub
+
+# Superuser Variables:
+Superuser_Account: Enabled
+# Zeus_Username: zeus
+Zeus_User_SSHKey: /Vendor_Files/keys/zeus.key
+
+# Nagios Variables:
+Nagios_Plugins: Enabled
+# Nagios_Monitoring: Enabled
+# Nagios_Master_IP: 78.47.239.96
+
+# Security Variables:
+Security: Enabled
+
+# JCK Variables:
+jckftp_Username: jckftp
+
+# Jcktestr User Variables:
+Jcktestr_Username: jcktestr
+Jcktestr_User_SSHKey: /Vendor_Files/keys/keybox.key
+
+# Vendor Variables:
+Vendor_File: Disabled
+Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
+
+# Default BootJDK installed
+bootjdk: openj9
+
+# Errata
+Asian_Locales: Disabled
+Slack_Notification: Disabled
