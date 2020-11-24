@@ -17,6 +17,7 @@
   command: dseditgroup -o edit -a {{ Jenkins_Username }} -t staff com.apple.access_ssh
   ignore_errors: yes
   when: ansible_distribution == "MacOSX"
+  tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user's home folder
   file:
