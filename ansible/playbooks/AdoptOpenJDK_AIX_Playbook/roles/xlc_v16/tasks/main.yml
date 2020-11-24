@@ -13,37 +13,38 @@
   when: xlc16.stat.islnk is defined
   tags: xlc16
 
-- block:
-  - name: Chack for Vendor file
-    stat:
-      path: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
-    register: _vendor
-  - name: Transfer and Extract XLC16
-    unarchive:
-      src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
-      dest: /tmp
-      remote_src: no
-    register: _images
-    when: _vendor.stat.exists == true
-    tags: xlc16
+- name: Vendor File processing
+  block:
+    - name: Check for Vendor file
+      stat:
+        path: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+      register: _vendor
+    - name: Transfer and Extract XLC16
+      unarchive:
+        src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+        dest: /tmp
+        remote_src: no
+      register: _images
+      when: _vendor.stat.exists == true
+      tags: xlc16
 
-  - name: Install IBM XLC16 - installp
-    command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
-    register: result.xlc
-    ignore_errors: yes
-    when: _images.skipped == false
-    tags: xlc16
+    - name: Install IBM XLC16 - installp
+      command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+      register: _installp
+      ignore_errors: yes
+      when: _images.skipped == false
+      tags: xlc16
 
-  - debug: msg='Erorrs from the previous installp command normal'
-    when: result.xlc is defined
-    tags: xlc16
+    - debug: msg='Error messages from the installp command can be ignored.'
+      when: _installp is defined
+      tags: xlc16
 
-  - name: Clean XLC16 tmp files
-    file:
-      path: /tmp/usr
-      state: absent
-    when: _images.skipped == false
-    tags: xlc16
+    - name: Clean XLC16 tmp files
+      file:
+        path: /tmp/usr
+        state: absent
+      when: _images.skipped == false
+      tags: xlc16
   when: xlc16.stat.islnk is not defined
 
 - name: TestIBM XLC16
