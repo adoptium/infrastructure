@@ -13,36 +13,38 @@
   when: xlc13.stat.islnk is defined
   tags: xlc13
 
-- block:
-  - name: check for Vendor File
-    stat:
-      path: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
-    register: xlc13_vendor
-  - name: Transfer and Extract XLC13
-    unarchive:
-      src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
-      dest: /tmp
-      remote_src: no
-    when: xlc13_vendor.stat.exists is true
-    register: xlc_images
-    tags: xlc13
+- name: Check for Vendor Files
+  block:
+    - name: Check for Vendor Files
+      stat:
+        path: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+      register: xlc13_vendor
+    - name: Transfer and Extract XLC13
+      unarchive:
+        src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+        dest: /tmp
+        remote_src: no
+      when: xlc13_vendor.stat.exists is true
+      register: xlc_images
+      tags: xlc13
 
-  - name: Install IBM XLC13 - installp
-    command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
-    register: result.xlc
-    ignore_errors: yes
-    when: xlc13_images is defined and xlc13_images.rc == 0
-    tags: xlc13
+    - name: Install IBM XLC13 - installp
+      command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+      register: result.xlc
+      ignore_errors: yes
+      when: xlc13_images is defined and xlc13_images.rc == 0
+      tags: xlc13
 
-  - debug: msg='Errors from the previous installp command normal'
-    when: result.xlc is defined
-    tags: xlc13
+    - debug: msg='Errors from the previous installp command normal'
+      when: result.xlc is defined
+      tags: xlc13
 
-  - name: Clean XLC13 tmp files
-    file:
-      path: /tmp/usr
-      state: absent
-    tags: xlc13
+    - name: Clean XLC13 tmp files
+      file:
+        path: /tmp/usr
+        state: absent
+      tags: xlc13
+      when: xlc13_images is defined
   when: xlc13.stat.islnk is undefined
 
 - name: TestIBM XLC13
