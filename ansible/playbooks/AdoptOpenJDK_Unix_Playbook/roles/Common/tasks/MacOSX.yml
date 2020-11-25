@@ -44,6 +44,8 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
+  tags:
+    - brew_upgrade
 
 - name: Install brew cu
   become: yes
