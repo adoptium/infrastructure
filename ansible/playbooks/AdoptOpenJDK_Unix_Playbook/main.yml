@@ -56,12 +56,12 @@
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
     - role: zulu7                 # JDK8 Build Bootstrap
-      when: 
+      when:
         - ansible_distribution != "MacOSX"
         - ansible_architecture != "riscv64"
     - role: adoptopenjdk_install
       jdk_version: 8
-      when: 
+      when:
         - ansible_distribution != "Alpine"
         - ansible_architecture != "riscv64"
       tags: build_tools
