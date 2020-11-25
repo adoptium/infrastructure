@@ -110,9 +110,12 @@ Sys_Icon="yes"
 # Test: If client $Arch {{ ansible_architecture }} is aarch64 or armv7l then set the Nagios icon to "arm", else use $Distro {{ ansible_distribution }}
 if [[ $Arch = "aarch64" ]] || [[ $Arch = "armv7l" ]] ; then
         Sys_Icon_Picked=arm
+elif [[ $Distro = "MacOSX" ]] ; then
+	Sys_Icon_Picked="apple"
 else
         Sys_Icon_Picked=$Distro
 fi
+
 if [ ! -f $Nagios_Logo_Folder/$Sys_Icon_Picked.gd2 ] ; then													# If there is no matching icon in Nagios's logo folder default to nagios.gd2
 	echo "Logo icon was not found" $Sys_Icon_Picked "Defaulting to nagios icon"
 	Sys_Icon_Picked=nagios.gd2
