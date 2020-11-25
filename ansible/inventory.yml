@@ -127,6 +127,7 @@ hosts:
 
       - gdams:
           debian10-riscv64-1: {ip: gdams.ddns.net}
+          debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
 
       - godaddy:
           centos7-x64-1: {ip: 160.153.244.82, user: adoptopenjdk}

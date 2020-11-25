@@ -16,11 +16,7 @@
   when:
     - ansible_distribution != "CentOS" and ansible_distribution != "RedHat"
     - ansible_distribution != "FreeBSD"
-<<<<<<< HEAD
     - ansible_distribution != "Alpine"
-=======
-    - ansible_architecture != "riscv64"
->>>>>>> ansible: add test-gdams-debian10-riscv64-1 to inventory
   tags: ntp_time
 
 - name: Configure NTP server pools
@@ -30,13 +26,13 @@
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
 
-- name: Start NTP for Ubuntu and SLES 11
+- name: Start NTP for Ubuntu, Debian and SLES 11
   service:
     name: ntp
     state: restarted
     enabled: yes
   when:
-    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
+    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
   tags: ntp_time
 
 - name: Start NTP for RedHat, SLES 12 and CentOS 7

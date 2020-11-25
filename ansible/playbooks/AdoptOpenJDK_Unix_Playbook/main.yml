@@ -42,8 +42,7 @@
     - role: NVidia_Cuda_Toolkit   # OpenJ9
       tags: [build_tools, build_tools_openj9]
     - Superuser                   # AdoptOpenJDK Infrastructure
-    - role: Swap_File
-      when: ansible_architecture != "riscv64"
+    - Swap_File
     - Crontab
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
@@ -75,19 +74,19 @@
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11
-      when: 
+      when:
         - ansible_distribution != "Alpine"
         - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK14 Build Bootstrap
       jdk_version: 13
-      when: 
+      when:
         - ansible_distribution != "Alpine"
         - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK15 Build Bootstrap
       jdk_version: 14
-      when: 
+      when:
         - ansible_distribution != "Alpine"
         - ansible_architecture != "riscv64"
       tags: build_tools

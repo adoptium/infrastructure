@@ -92,6 +92,7 @@ Additional_Build_Tools_aarch64:
 
 Additional_Build_Tools_riscv64:
   - locales
+  - systemd-timesyncd
 
 Additional_Build_Tools_NOT_riscv64:
   - g++-7                         # OpenJ9
