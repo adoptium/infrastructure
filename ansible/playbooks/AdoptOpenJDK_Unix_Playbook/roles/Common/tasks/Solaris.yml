@@ -151,7 +151,7 @@
 - name: Modify PATH
   lineinfile:
     path: /etc/profile
-    line: PATH=/opt/csw/bin/:$PATH
+    line: PATH=$PATH:/opt/csw/bin/
   tags: adoptopenjdk
 
 - name: Set Java 8 as default
