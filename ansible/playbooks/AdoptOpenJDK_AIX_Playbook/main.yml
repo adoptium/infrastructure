@@ -18,17 +18,21 @@
     # AIX base requirements
     - X11
     - openssl
-    # verify/install IBM compilers
-    - xlc_v13
-    - xlc_v16
+
     # AIX configuration
     - aixfs
     - syslogs
 
     # yum based installation of additional software
+    # installs some gnu packages required by ansible modules
     - yum
 
+    # verify/install IBM compilers
+    - xlc_v13
+    - xlc_v16
     # users needed - wait until here to be sure bash is installed
+    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
+    # to the list of legal shells.
     - jenkins_user
     - zeus_user
 
