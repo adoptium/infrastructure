@@ -44,7 +44,7 @@
       tags: [build_tools, build_tools_openj9]
     - Superuser                   # AdoptOpenJDK Infrastructure
     - role: Swap_File
-      when: 
+      when:
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris" # These steps fail on Solaris
     - role: Crontab
