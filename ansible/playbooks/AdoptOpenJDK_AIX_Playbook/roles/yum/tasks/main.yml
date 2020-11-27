@@ -1,0 +1,106 @@
+####################################################
+# Uninstall conflicting packages from base image   #
+# if they were installed via rpm unless yum exists #
+####################################################
+---
+- name: Confirm yum is installed - /usr/bin/yum
+  stat:
+    path: /usr/bin/yum
+  register: yum
+
+# Use set -o pipefail -o to quiet AnsibleLint
+- name: Uninstall conflicting packages
+  shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
+  ignore_errors: True
+  when: yum.stat.islnk is not defined
+  tags:
+    - rpm_remove
+    # TODO: rpm used in place of yum or rpm_key module
+    - skip_ansible_lint
+
+####################################
+# Install yum and update to latest #
+####################################
+- name: Download yum.sh
+  get_url:
+    url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+    validate_certs: False
+    dest: /tmp/
+    mode: 0775
+    timeout: 25
+  when: yum.stat.islnk is not defined
+  tags: yum
+
+- name: Install yum and dependencies
+  command: /tmp/yum.sh
+  register: result.yum
+  ignore_errors: yes
+  when: yum.stat.islnk is not defined
+  tags:
+    - yum
+    #TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Yum update
+  yum:
+    update_cache: yes
+    name: '*'
+    state: latest
+  tags:
+    - yum
+    #TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Install yum package support
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - bash
+    - autoconf
+    - bc
+    - bison
+    - coreutils
+    - cpio
+    - cups-devel
+    - cups-libs
+    - expect
+    - flex
+    - freetype2-devel
+    - fontconfig-devel
+    - gawk
+    - git
+    - grep
+    - libXrender-devel
+    - libffi-devel
+    - make
+    - m4
+    - pcre
+    - pkg-config
+    - popt
+    - sed
+    - sudo
+    - tar
+    - tcl
+    - tk
+    - unzip
+    - wget
+    - xz-libs
+    - zip
+    - zsh
+  tags: yum
+
+##############################################
+# Additional Tools not available through yum #
+##############################################
+- name: Install yum package support
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+    - http://www.bullfreeware.com/download/bin/2328/libiconv-1.14-22.aix6.1.ppc.rpm
+    - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
+    - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
+    - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
+  tags: rpm_install
+
+- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+  ignore_errors: True
+  tags: rpm_install

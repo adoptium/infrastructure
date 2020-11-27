@@ -1,0 +1,49 @@
+###################
+# IBM XL C 16.1.0 #
+###################
+---
+- name: Checking for XLC16 availability
+  stat:
+    path: /opt/IBM/xlc/16.1.0/bin/xlc
+  register: xlc16
+  tags: xlc16
+
+- debug:
+    msg: "xlc16 installed, skipping download and installation"
+  when: xlc16.stat.islnk is defined
+  tags: xlc16
+
+- name: Transfer and Extract XLC16
+  unarchive:
+    src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+    dest: /tmp
+    remote_src: no
+  when: xlc16.stat.islnk is not defined
+  tags: xlc16
+
+- name: Install IBM XLC16 - installp
+  command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
+  register: result.xlc
+  ignore_errors: yes
+  when: xlc16.stat.islnk is not defined
+  tags: xlc16
+
+- debug: msg='Erorrs from the previous installp command normal'
+  when: xlc16.stat.islnk is not defined
+  tags: xlc16
+
+- name: TestIBM XLC16
+  command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
+  register: xlc16_qversion
+  tags: xlc16
+
+- name: Display XLC16 qversion information
+  debug:
+    msg: "{{ xlc16_qversion.stdout }}"
+  tags: xlc16
+
+- name: Clean XLC16 tmp files
+  file:
+    path: /tmp/usr
+    state: absent
+  tags: xlc16

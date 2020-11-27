@@ -1,0 +1,22 @@
+################################
+# AIX filesystem configuration #
+# rewrite into Ansible commands - tbd
+################################
+---
+- name: Download AIX filesystem configuration script
+  get_url:
+    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
+    dest: /tmp/AIX_filesystem_config.sh
+    mode: 0775
+    validate_certs: no
+  tags: filesystem
+
+- name: Execute AIX filesystem configuration script
+  command: /tmp/AIX_filesystem_config.sh
+  tags: filesystem
+
+- name: Remove AIX filesystem configuration script
+  file:
+    state: absent
+    path: /tmp/AIX_filesystem_config.sh
+  tags: filesystem

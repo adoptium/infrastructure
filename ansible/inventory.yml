@@ -10,6 +10,9 @@ hosts:
 
   - infrastructure:
 
+      - aws:
+          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
+
       - digitalocean:
           ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
 
@@ -31,6 +34,10 @@ hosts:
       - digitalocean:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
+
+      - packet_esxi:
+          solaris10u11-x64-1: {ip: 147.75.85.212}
+          solaris10u11-x64-2: {ip: 147.75.85.213}
 
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
@@ -91,16 +98,6 @@ hosts:
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
-  - perf:
-
-      - macstadium:
-          macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
-          macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
-
-      - ibmcloud:
-          centos76-x64-1: {ip: 159.122.231.200}
-          centos76-x64-2: {ip: 159.122.231.202}
-
   - test:
 
       - azure:
@@ -147,6 +144,7 @@ hosts:
           solaris10u11-sparcv9-1: {}
 
       - osuosl:
+          aix71-ppc64-1: {ip: 140.211.9.99}
           aix72-ppc64-1: {ip: 140.211.9.28}
           aix72-ppc64-2: {ip: 140.211.9.36}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}

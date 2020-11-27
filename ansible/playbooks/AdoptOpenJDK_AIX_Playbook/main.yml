@@ -1,0 +1,205 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# --------------- AIX ---------------  #
+########################################
+
+- hosts: all
+  remote_user: root
+  become: yes
+  environment:
+    PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
+    PERL_MB_OPT: "--install_base /opt/freeware"
+    PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
+  vars:
+    swap_size: 4096
+
+  roles:
+    - aixfs
+    - syslogs
+    - X11
+    - xlc_v13
+    - xlc_v16
+    - openssl
+
+    - yum
+
+    - bootjdk7
+    - bootjdk8
+    - bootjdk9
+    - bootjdk10
+    - bootjdk11
+    - bootjdk12
+
+    - ant
+    - ant_contrib
+
+    - jenkins_user
+    - zeus_user
+
+  tasks:
+  ######################################
+  # Add bash to available login shells #
+  ######################################
+    - name: Add bash to available login shells
+      replace:
+        path: /etc/security/login.cfg
+        regexp: 'shells = '
+        replace: 'shells = /bin/bash,'
+      tags: login_shell
+
+    - name: Add bash to available login shells
+      blockinfile:
+        dest: /etc/shells
+        block: |
+          /bin/bash
+      tags: login_shell
+
+    # move to role later
+    - name: Set variables for global environment
+      blockinfile:
+        dest: /etc/environment
+        block: |
+          AIXTHREAD_HRT=true
+          PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
+          PERL5LIB=/opt/freemarker/lib/perl5
+      tags: login_shell
+
+    - name: Add freeware and xlc to PATH for global environment
+      replace:
+        path: /etc/environment
+        regexp: 'PATH=/usr/bin'
+        replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
+      tags: login_shell
+
+  ##############
+  # freemarker #
+  ##############
+    - name: Check for freemarker.jar existence
+      stat:
+        path: /home/{{ Jenkins_Username }}/freemarker.jar
+      register: freemarker
+      tags: freemarker
+
+    - debug:
+        msg: "freemarker.jar found, skipping download"
+      when: not freemarker.stat.exists
+      tags: freemarker
+
+    - name: Download and extract freemarker.jar
+      unarchive:
+        src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+        dest: /tmp/
+        remote_src: yes
+        owner: "{{ Jenkins_Username }}"
+        group: staff
+        mode: 0755
+      when: not freemarker.stat.exists
+      tags: freemarker
+
+    - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+      command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+      when: not freemarker.stat.exists
+      tags: freemarker
+
+    - name: Clean freemarker tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/freemarker-2.3.8
+        - /tmp/freemarker-2.3.8.tar.gz
+      tags: freemarker
+
+  ##################
+  # Nagios plugins #
+  ##################
+    - name: Include Nagios Playbook
+      include_tasks: nagios/nagios_aix.yml
+      when: Nagios_Plugins == "Enabled"
+      tags: nagios
+
+  ###################
+  # NTP Time Server #
+  ###################
+    - name: ensure NTP daemon is enabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
+        replace: '\1'
+      tags: ntp
+
+    - name: ensure NTP daemon is configured
+      copy:
+        content: |
+          server 1.pool.ntp.org
+          server 2.pool.ntp.org
+          server 3.pool.ntp.org
+          driftfile /etc/ntp.drift
+          tracefile /etc/ntp.trace
+        dest: /etc/ntp.conf
+        owner: root
+        group: system
+        mode: 0664
+      tags: ntp
+
+    - name: Stop NTP daemon
+      service: name=xntpd state=stopped
+      changed_when: False
+      tags: ntp
+
+    - name: Start NTP daemon
+      service: name=xntpd state=started
+      changed_when: False
+      tags: ntp
+
+  ####################
+  # Disable sendmail #
+  ####################
+    - name: ensure sendmail is stopped
+      service: name=sendmail state=stopped
+      tags: sendmail
+
+    - name: ensure sendmail is disabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+        replace: '#\1'
+      tags: sendmail
+
+  ############################
+  # Enable full core support #
+  ############################
+    - name: ensure full AIX core files are enabled
+      command: chdev -l sys0 -a fullcore=true
+      changed_when: False
+      tags: fullcore
+
+  #####################
+  # Enable swap space #
+  #####################
+    - name: ensure swap space is of adequate size
+      shell: |
+        swap_line=$(lsps -a | tail -n 1)
+        curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
+        swap_lv=$(echo $swap_line | awk '{print $1}')
+        if [[ $curr_swap_size -lt {{ swap_size }} ]]
+        then
+          echo "Extending swap LV..."
+          extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+        fi
+      register: extendlv_result
+      changed_when: "'Extending' in extendlv_result.stdout"
+      notify:
+        - restart machine
+      tags:
+        - swap
+        # Environment variables don't work as part of command
+        - skip_ansible_lint
+
+  handlers:
+    - name: restart machine
+      shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
+      async: 1
+      poll: 0
+      failed_when: False

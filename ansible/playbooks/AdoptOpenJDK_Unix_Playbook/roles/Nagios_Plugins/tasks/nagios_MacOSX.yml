@@ -1,0 +1,33 @@
+---
+######################################################################################
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on macOS on x86 hardware #
+######################################################################################
+
+###########################################################################
+# License Information:                                                    #
+# Nagios core and its plugins are lincesed under GPL                      #
+# For more information please see: https://www.nagios.com/legal/licenses/ #
+###########################################################################
+
+########################################
+# Install Nagios dependencies packages #
+########################################
+- name: Install additional packages used by Nagios
+  package: "name={{ item }} state=latest"
+  with_items:
+    - nagios-plugins
+
+- name: Create Nagios Plugins folder
+  file:
+    path: /usr/local/nagios/
+    state: directory
+    mode: 0755
+    owner: nagios
+  become: yes
+
+- name: Symlink to plugins
+  file:
+    src: /usr/local/Cellar/nagios-plugins/2.3.3/libexec/sbin
+    dest: /usr/local/nagios/libexec
+    state: link
+  become: yes

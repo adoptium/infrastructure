@@ -1,0 +1,41 @@
+##################################################################
+# Install openssl from IBM installp                              #
+# openssl installp download requiring an IBMid                   #
+# https://www-01.ibm.com/support/docview.wss?uid=isg3T1027135    #
+##################################################################
+---
+- name: Check if openssl is installed
+  shell: openssl version >/dev/null 2>&1
+  register: does_openssl_exist
+  ignore_errors: yes
+  tags: openssl
+
+- name: Transfer Openssl to remote host
+  copy:
+    src: /Vendor_Files/aix/openssl/openssl-1.0.2.1601.tar.Z
+    dest: /tmp/openssl-1.0.2.1601.tar.Z
+  when: does_openssl_exist.rc != 0
+  tags: openssl
+
+# added set -o pipefail to satisify AnsibleLint - not because it helps
+- name: Extract Openssl
+  shell: set -o pipefail | uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
+  when: does_openssl_exist.rc != 0
+  tags: openssl
+
+- name: Install IBM Openssl - installp
+  command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
+  register: result.openssl
+  ignore_errors: yes
+  when: does_openssl_exist.rc != 0
+  tags: openssl
+
+- name: Clean openssl tmp files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /tmp/openssl-1.0.2.1601
+    - /tmp/openssl-1.0.2.1601.tar.Z
+  when: does_openssl_exist.rc != 0
+  tags: openssl

@@ -13,7 +13,7 @@
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
   environment:
-    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/csw/bin/:/usr/local/bin:{{ ansible_env.PATH }}"
 
   #########
   # Roles #
@@ -36,7 +36,8 @@
     - ant                         # Testing
     - Ant-Contrib                 # Testing
     - maven                       # Testing
-    - GIT_Source
+    - role: GIT_Source
+      when: ansible_distribution != "Solaris" # Compile fails on Solaris
     - gmake
     - Docker                      # Testing
     - role: NVidia_Cuda_Toolkit   # OpenJ9
@@ -45,7 +46,9 @@
     - role: Swap_File
       when: ansible_distribution != "MacOSX"
     - role: Crontab
-      when: ansible_distribution != "MacOSX"
+      when: 
+        - ansible_distribution != "MacOSX"
+        - ansible_distribution != "Solaris" # These steps fail on Solaris
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
     - gcc_48
@@ -55,8 +58,10 @@
       when: ansible_distribution == "MacOSX"
       tags: [build_tools, xcode10, adoptopenjdk]
     - role: cmake                 # OpenJ9 / OpenJFX
+      when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
-    - ccache
+    - role: ccache
+      when: ansible_distribution != "Solaris" # Compile fails on Solaris
     - role: nasm                  # OpenJ9
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
@@ -71,23 +76,27 @@
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "MacOSX"
+        - ansible_distribution != "Solaris"
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11
-      when: ansible_distribution != "Alpine"
+      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK14 Build Bootstrap
       jdk_version: 13
-      when: ansible_distribution != "Alpine"
+      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK15 Build Bootstrap
       jdk_version: 14
-      when: ansible_distribution != "Alpine"
+      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
       tags: build_tools
     - OpenSSL102                  # OpenJ9
-    # - Nagios_Plugins              # AdoptOpenJDK Infrastructure
-    # - Nagios_Master_Config        # AdoptOpenJDK Infrastructure
-    # - Nagios_Tunnel               # AdoptOpenJDK Infrastructure
+    - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
+      tags: [nagios_plugins, adoptopenjdk]
+    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
+      tags: [nagios_master_config, adoptopenjdk]
+    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
+      tags: [nagios_tunnel, adoptopenjdk]
     - riscv_cross_compiler        # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security

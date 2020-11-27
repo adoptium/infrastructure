@@ -41,13 +41,13 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
 
   # valid roles - add as necessary
-  'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
+  'type': ('build', 'test', 'infrastructure', 'docker'),
 
   # providers - validated for consistency
   'provider': ('azure', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira')
+        'aws', 'inspira', 'packet_esxi')
 }
 
 INVENTORY_FILENAME = "inventory.yml"

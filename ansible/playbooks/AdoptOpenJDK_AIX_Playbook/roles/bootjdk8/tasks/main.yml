@@ -1,0 +1,43 @@
+##############
+# Boot JDK 8 #
+##############
+---
+- name: Get java8 path information
+  stat:
+    path: /usr/java8_64
+  register: java8
+  tags: java8
+
+- name: Transfer and Extract AdoptOpenJDK 8
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /usr
+    remote_src: yes
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Find java8 directory
+  find:
+    file_type: directory
+    paths: /usr
+    patterns: 'jdk8u*'
+  when: java8.stat.isdir is not defined
+  register: java8_files_matched
+  tags: java8
+
+- name: Symlink to java8_64
+  file:
+    src: "{{ item.path }}"
+    dest: /usr/java8_64
+    state: link
+  with_items:
+    - "{{ java8_files_matched.files }}"
+  when: java8.stat.isdir is not defined
+  tags: java8
+
+- name: Setting Java 8 as default
+  file:
+    src: /usr/java8_64
+    dest: /usr/bin/java
+    state: link
+  tags: java8
