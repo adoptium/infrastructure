@@ -48,7 +48,7 @@
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris" # These steps fail on Solaris
     - role: Crontab
-      when: 
+      when:
         - ansible_distribution != "MacOSX"
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
