@@ -33,7 +33,6 @@
 
 - name: Install yum and dependencies
   command: /tmp/yum.sh
-  register: result.yum
   ignore_errors: yes
   when: yum.stat.islnk is not defined
   tags:
