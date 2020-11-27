@@ -1,0 +1,41 @@
+name: Vagrant Playbook Checker
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/build_solaris.yml
+    - ansible/**
+    branches:         
+    - master
+
+jobs:
+  build-solaris:
+    name: Solaris
+    runs-on: macos-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        brew install ansible
+        brew cask install virtualbox vagrant
+
+    - name: Setup Vagrant VM
+      run: |
+        cd ansible
+        ln -sf Vagrantfile.Solaris10 Vagrantfile
+        rm -f id_rsa.pub id_rsa
+        # Copy the machine's ssh key for the VMs to use, after removing prior files
+        ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
+        vagrant up
+        vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
+        rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+
+    - name: Run Asible Playbook
+      run: |
+        cd ansible
+        ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml

@@ -17,6 +17,7 @@
     - ansible_distribution != "CentOS" and ansible_distribution != "RedHat"
     - ansible_distribution != "FreeBSD"
     - ansible_distribution != "Alpine"
+    - ansible_distribution != "Solaris"
   tags: ntp_time
 
 - name: Configure NTP server pools

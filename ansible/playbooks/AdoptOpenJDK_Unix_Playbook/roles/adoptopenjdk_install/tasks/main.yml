@@ -36,6 +36,14 @@
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk_install
 
+- name: Set api_architecture variable for i386
+  set_fact:
+    api_architecture: x64
+  when:
+    - ansible_os_family != "Darwin"
+    - ansible_architecture == "i386"
+  tags: adoptopenjdk_install
+
 - name: Set api_architecture variable for armv7l
   set_fact:
     api_architecture: arm
@@ -48,7 +56,8 @@
     api_architecture: "{{ ansible_architecture }}"
   when:
     - ansible_architecture != "armv7l" and
-      ansible_architecture != "x86_64"
+      ansible_architecture != "x86_64" and
+      ansible_architecture != "i386"
   tags: adoptopenjdk_install
 
 - debug:
@@ -92,6 +101,7 @@
   until: adoptopenjdk_download is not failed
   when:
     - ansible_distribution != "MacOSX"
+    - ansible_os_family != "Solaris"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
@@ -110,6 +120,24 @@
   shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
   when:
     - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+- name: Install latest release if one not already installed (Solaris)
+  command: wget https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_os_family == "Solaris"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+- name: Extract latest release if one not already installed (Solaris)
+  command: tar -xf /tmp/jdk-{{ jdk_version }}.tar.gz -C /usr/lib/jvm
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_os_family == "Solaris"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 

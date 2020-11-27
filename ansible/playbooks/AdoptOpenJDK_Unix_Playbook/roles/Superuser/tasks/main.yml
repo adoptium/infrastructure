@@ -2,8 +2,27 @@
 #############
 # Superuser #
 #############
+- name: Set Home Folder for Superuser user
+  set_fact:
+    home_folder: /home/zeus
+  tags: [superuser, adoptopenjdk]
+
+- name: Set Home Folder for Superuser user (macoS)
+  set_fact:
+    home_folder: /Users/zeus
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: [superuser, adoptopenjdk]
+
+- name: Set Home Folder for Superuser user (Solaris)
+  set_fact:
+    home_folder: /export/home/zeus
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [superuser, adoptopenjdk]
+
 - name: Create Superuser account - zeus
-  action: user name=zeus state=present shell=/bin/bash
+  action: user name=zeus state=present home={{ home_folder }} shell=/bin/bash
   when: Superuser_Account == "Enabled"
   tags: [superuser, adoptopenjdk]
 
@@ -18,6 +37,23 @@
     - ansible_architecture == "s390x"
     - Superuser_Account == "Enabled"
   tags: [superuser, adoptopenjdk]
+
+- name: Create Superuser user's home folder (Solaris)
+  file:
+    path: /export/home/zeus
+    state: directory
+    owner: "zeus"
+    group: staff
+    mode: 0700
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Set Superuser user's home folder (Solaris)
+  command: usermod -d /export/home/zeus/ zeus
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
 
 - name: Set authorized key for Superuser account
   authorized_key:
@@ -39,14 +75,12 @@
 - name: Superuser account policy - expire date
   command: chage -E -1 zeus
   when:
-    - Superuser_Account == "Enabled" and (ansible_distribution != "MacOSX")
-    - ansible_distribution != "FreeBSD" and (ansible_distribution != "MacOSX")
+    - Superuser_Account == "Enabled" and ansible_distribution != "MacOSX" and ansible_distribution != "FreeBSD" and  ansible_distribution != "Solaris"
 
   tags: [superuser, adoptopenjdk]
 
 - name: Superuser account policy - max days
   command: chage -M -1 zeus
   when:
-    - Superuser_Account == "Enabled" and (ansible_distribution != "MacOSX")
-    - ansible_distribution != "FreeBSD" and (ansible_distribution != "MacOSX")
+    - Superuser_Account == "Enabled" and ansible_distribution != "MacOSX" and ansible_distribution != "FreeBSD" and  ansible_distribution != "Solaris"
   tags: [superuser, adoptopenjdk]

@@ -2,9 +2,27 @@
 ################
 # Jenkins_User #
 ################
+- name: Set Home Folder for Jenkins user
+  set_fact:
+    home_folder: /home/{{ Jenkins_Username }}
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Set Home Folder for Jenkins user (macoS)
+  set_fact:
+    home_folder: /Users/{{ Jenkins_Username }}
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Set Home Folder for Jenkins user (Solaris)
+  set_fact:
+    home_folder: /export/home/{{ Jenkins_Username }}
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Create Jenkins user
-  action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
-  ignore_errors: yes
+  action: user name={{ Jenkins_Username }} state=present home={{ home_folder }} shell=/bin/bash
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user's home folder
@@ -16,6 +34,23 @@
     mode: 0700
   when:
     - ansible_architecture == "s390x"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Create Jenkins user's home folder (Solaris)
+  file:
+    path: /export/home/{{ Jenkins_Username }}
+    state: directory
+    owner: "{{ Jenkins_Username }}"
+    group: staff
+    mode: 0700
+  when:
+    - ansible_distribution == "Solaris"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Set Jenkins user's home folder (Solaris)
+  command: usermod -d /export/home/jenkins/ jenkins
+  when:
+    - ansible_distribution == "Solaris"
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Set authorized key for Jenkins user
@@ -41,7 +76,7 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: (ansible_distribution != "MacOSX")
+  when: ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
 
 - name: Unset expiry on user account for Redhat for root
   command: chage -M -1 -E -1 root
@@ -50,7 +85,7 @@
     - adoptopenjdk
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
-  when: (ansible_distribution != "MacOSX")
+  when: ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
 
 - name: Ensure proper limits are set in /etc/security/limits.conf
   lineinfile:
