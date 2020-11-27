@@ -36,7 +36,7 @@
     - jenkins_user
     - zeus_user
 
-    # additional OSS packages (needing python)
+    # additional OSS packages
     - ant
     - ant_contrib
 
