@@ -44,9 +44,6 @@
 
 - name: Download ant-contrib (macOS) and (Solaris)
   command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  when:
-    - not antcontrib_status.stat.exists
-    - ansible_distribution == "MacOSX"
   retries: 3
   delay: 5
   register: antContrib_download
