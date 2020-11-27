@@ -17,6 +17,7 @@ skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
 testDocker=false
+scriptPath=$(realpath $0)
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -134,7 +135,7 @@ checkVagrantOS()
         if [[ "$newVagrantFiles" = "true" ]]; then
                 cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
         else    
-                cd $WORKSPACE/ansible/
+                cd ${scriptPath%/*}/..
         fi
         vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
         if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
@@ -219,7 +220,7 @@ startVMPlaybook()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
@@ -290,7 +291,7 @@ startVMPlaybookWin()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 
 	# Remove the Hosts files if they're found
