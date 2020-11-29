@@ -115,7 +115,7 @@
 - name: Call gcc-7 for all but arm32 and riscv64
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_7 }}"
-  when: 
+  when:
     - ansible_architecture != "armv7l"
     - ansible_architecture != "riscv64"
   tags: build_tools
