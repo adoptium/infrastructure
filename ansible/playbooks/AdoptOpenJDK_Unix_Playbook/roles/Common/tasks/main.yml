@@ -22,6 +22,7 @@
     - ansible_processor_vcpus is not defined
   tags:
     - cmake
+    - git_source
 
 ##################
 # Set root group #
@@ -37,7 +38,7 @@
   hostname:
     name: "{{ inventory_hostname }}.{{ Domain }}"
   when:
-    - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX"
+    - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
     - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != "localhost"
   tags: hostname,adoptopenjdk
@@ -52,6 +53,16 @@
     - Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
     - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != "localhost"
+  tags: hostname,adoptopenjdk
+
+- name: Set hostname to inventory_hostname (Solaris)
+  shell: "{{ item }}"
+  with_items:
+    - echo "{{ inventory_hostname }}" > /etc/nodename
+    - echo "{{ inventory_hostname }}" > /etc/hostname.e1000g0
+    - uname -S "{{ inventory_hostname }}"
+  when: Domain == "adoptopenjdk.net" and ansible_distribution == "Solaris"
+  register: foo
   tags: hostname,adoptopenjdk
 
 #####################

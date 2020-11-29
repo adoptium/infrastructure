@@ -35,6 +35,10 @@ hosts:
           centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
+      - packet_esxi:
+          solaris10u11-x64-1: {ip: 147.75.85.212}
+          solaris10u11-x64-2: {ip: 147.75.85.213}
+
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
 
@@ -94,16 +98,6 @@ hosts:
 
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
-
-  - perf:
-
-      - macstadium:
-          macos1015-x64-1: {ip: 208.83.1.221, user: Administrator}
-          macos1015-x64-2: {ip: 208.83.1.117, user: Administrator}
-
-      - ibmcloud:
-          centos76-x64-1: {ip: 159.122.231.200}
-          centos76-x64-2: {ip: 159.122.231.202}
 
   - test:
 

@@ -1,0 +1,165 @@
+---
+###########
+# Solaris #
+###########
+
+- name: Set sudoers file
+  set_fact:
+    Sudoers_File: "/etc/opt/csw/sudoers"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Check if pkgutil is installed
+  shell: pkgutil --version
+  ignore_errors: true
+  register: pkgutil_installed
+  tags:
+    - build_tools
+
+- name: Fetch CSWpkgutil.pkg
+  copy:
+    src: files/CSWpkgutil.pkg
+    dest: /tmp/CSWpkgutil.pkg
+    force: yes
+  when: pkgutil_installed.rc != 0
+  tags: build_tools
+
+- name: Install pkgutil
+  shell: |
+    yes | pkgadd -d /tmp/CSWpkgutil.pkg CSWpkgutil
+    /opt/csw/bin/pkgutil -U
+  when: pkgutil_installed.rc != 0
+  tags: build_tools
+
+- name: Install Build Tool Packages
+  pkgutil: "name={{ item }} state=present"
+  with_items: "{{ Build_Tool_Packages }}"
+  tags: build_tools
+
+- name: Check if Solaris Studio 12.3 is installed
+  stat:
+    path: /opt/solarisstudio12.3/bin/
+  register: solaris_studio
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
+- name: Check if Solaris Studio 12.3 is downloaded
+  stat:
+    path: /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
+  register: solaris_studio_downloaded
+  when: not solaris_studio.stat.exists
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
+# Stored in Azure Blob Storage (SAS URL set to expire in 2030)
+- name: Download Solaris Studio 12.3
+  # Original file is at https://www.oracle.com/tools/developerstudio/downloads/solaris-studio-v123-downloads.html
+  command: wget "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}" -O /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
+  when: not solaris_studio.stat.exists and not solaris_studio_downloaded.stat.exists
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
+- name: Extract Solaris Studio 12.3
+  shell: |
+    set -o pipefail
+    bzcat SolarisStudio12.3-solaris-x86-pkg.tar.bz2 | /bin/tar -xf -
+  args:
+    chdir: /tmp
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+  when: not solaris_studio.stat.exists
+
+- name: Install Solaris Studio 12.3
+  shell: ./SolarisStudio12.3-solaris-x86-pkg/solarisstudio.sh --non-interactive
+  args:
+    chdir: /tmp
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+  when: not solaris_studio.stat.exists
+
+- name: Check if cups is installed
+  stat:
+    path: /opt/sfw/cups
+  register: cups_installed
+  tags:
+    - build_tools
+    - cups
+
+- name: Download cups 1.4.4
+  command: wget https://github.com/apple/cups/releases/download/release-1.4.4/cups-1.4.4-source.tar.gz -O /tmp/cups-1.4.4-source.tar.gz
+  when: not cups_installed.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Extract cups 1.4.4
+  shell: tar -xf cups-1.4.4-source.tar.gz
+  args:
+    chdir: /tmp
+  when: not cups_installed.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Compile cups 1.4.4
+  shell: |
+    cd /tmp/cups-1.4.4
+    ./configure --disable-gssapi --disable-ldap --prefix=/opt/sfw/cups
+    gmake
+    gmake install
+  environment:
+    PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
+  when: not cups_installed.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Create symlinks
+  file:
+    src: /opt/csw/bin/g{{ item }}
+    dest: /opt/csw/bin/{{ item }}
+    owner: root
+    group: root
+    state: link
+  with_items:
+    - tar
+    - make
+    - sha256sum
+  tags: build_tools
+
+- name: Install Test Tool Packages
+  pkgutil: "name={{ item }} state=present"
+  with_items: "{{ Test_Tool_Packages }}"
+  tags: test_tools
+
+- name: Disable sendmail alerts
+  command: "{{ item }}"
+  with_items:
+    - svcadm disable sendmail
+    - svcadm disable sendmail-client
+  tags: adoptopenjdk
+
+- name: Modify PATH
+  lineinfile:
+    path: /etc/profile
+    line: PATH=$PATH:/opt/csw/bin/
+  tags: adoptopenjdk
+
+- name: Set Java 8 as default
+  file:
+    src: /opt/csw/java/jdk1.8.0_201/bin/java
+    dest: /usr/bin/java
+    owner: root
+    group: root
+    state: link
+    force: yes
+  tags: build_tools

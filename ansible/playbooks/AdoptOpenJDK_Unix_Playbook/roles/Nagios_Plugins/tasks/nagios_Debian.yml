@@ -1,6 +1,6 @@
 ---
 #################################################################################################
-# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on Ubuntu 14 and 16 on x86 hardware #
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on Debian on x86 hardware #
 #################################################################################################
 
 ###########################################################################
@@ -19,15 +19,9 @@
     pkg:
       - fping
       - nagios-plugins
+      - nagios-plugins-common
       - perl
       - qstat
-
-- name: Install nagios-plugins-common for NOT U20
-  apt:
-    state: latest
-    update_cache: yes
-    pkg: nagios-plugins-common
-  when: (ansible_distribution_major_version != 20)
 
 ##########
 # Layout #
