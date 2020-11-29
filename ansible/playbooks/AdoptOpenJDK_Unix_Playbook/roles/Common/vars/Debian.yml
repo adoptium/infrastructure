@@ -59,7 +59,7 @@ OpenJFX_Build_Tool_Packages:
   - libxxf86vm-dev
   - ruby
 
-gcc_7:                            # On all architectures but arm32
+gcc_7:                            # On all architectures but arm32 and riscv64
   - g++-7                         # OpenJ9
   - gcc-7                         # OpenJ9
 
@@ -93,10 +93,6 @@ Additional_Build_Tools_aarch64:
 Additional_Build_Tools_riscv64:
   - locales
   - systemd-timesyncd
-
-Additional_Build_Tools_NOT_riscv64:
-  - g++-7                         # OpenJ9
-  - gcc-7                         # OpenJ9
 
 Test_Tool_Packages:
   - acl
