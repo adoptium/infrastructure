@@ -78,7 +78,7 @@
     - Domain == "adoptopenjdk.net"
     - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != "localhost"
-  tags: hosts_file
+  tags: hosts_file, adoptopenjdk
 
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
   lineinfile:
@@ -90,7 +90,7 @@
     - Domain != "adoptopenjdk.net"
     - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != "localhost"
-  tags: hosts_file
+  tags: hosts_file, adoptopenjdk
 
 - debug:
     msg: "Inventory_hostname is the same as the ip address or is localhost.
@@ -110,7 +110,7 @@
     line: "127.0.0.1   localhost  localhost.localdomain"
     state: present
     backup: yes
-  tags: hosts_file
+  tags: hosts_file, adoptopenjdk
 
 ########################
 # Include OS variables #
