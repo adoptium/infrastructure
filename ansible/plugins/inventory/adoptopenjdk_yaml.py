@@ -29,6 +29,7 @@ import json
 import os
 import subprocess
 import sys
+from os import path
 
 import yaml
 try:
@@ -50,8 +51,6 @@ valid = {
         'aws', 'inspira', 'packet_esxi')
 }
 
-INVENTORY_FILENAME = "inventory.yml"
-
 def main():
 
     # load config file for special cases
@@ -59,7 +58,9 @@ def main():
     config.read('ansible.cfg')
 
     # load public inventory
-    export = parse_yaml(load_yaml_file(INVENTORY_FILENAME), config)
+    basepath = path.dirname(__file__)
+    inventory_path = path.abspath(path.join(basepath, "..", "..", "inventory.yml"))
+    export = parse_yaml(load_yaml_file(inventory_path), config)
 
     # export in JSON for Ansible
     print(json.dumps(export, sort_keys=True, indent=2))
@@ -87,6 +88,7 @@ def load_yaml_file(file_name):
     """Loads YAML data from a file"""
 
     hosts = {}
+
 
     # get inventory
     with open(file_name, 'r') as stream:
