@@ -15,32 +15,54 @@
     swap_size: 4096
 
   roles:
-    # AIX base requirements
+    # Roles are put into 6 groups
+    ## AIX BOS install requirements
+    ## AIX BOS configuration
+    ## Core OSS (bash, unzip, gtar)
+    ## AIX User Admin
+    ## Additional Software
+    ## OJDK Bootstraps
+
+    # AIX BOS install requirements
+    # These packages are installed using installp - which can enlarge
+    # filesystem space, as needed, on demand
     - X11
     - openssl
 
-    # AIX configuration
-    - aixfs
+    # AIX BOS configuration
     - syslogs
+    # TBD: additional tasks below that need to be promoted to
+    # or migrated into an AIX setup role - in paritcular - 
+    # the tasks that setup the legal shells needed for user configuration
+    # may need to be performed AFTER yum processing - rather than before
 
+    # Core OSS installation
+    ## Note: this may actually already be performed - partially
+    ## depending on how python - to use Ansible - has been prepared
     # yum based installation of additional software
     # installs some gnu packages required by ansible modules
+    # Note: AIX File system configuration must be run now as RPM based software
+    # cannot expand filesystem space on demand
+    - aixfs
     - yum
 
-    # verify/install IBM compilers
-    - xlc_v13
-    - xlc_v16
+    # AIX User Admin
     # users needed - wait until here to be sure bash is installed
     # tbd: Need other actions performed first - mainly adding /usr/bin/bash
     # to the list of legal shells.
     - jenkins_user
     - zeus_user
 
-    # additional OSS packages
+    # Additional Software: both licensed and OSS
+    ## verify/install licensed IBM compilers
+    - xlc_v13
+    - xlc_v16
+
+    ## additional OSS packages
     - ant
     - ant_contrib
 
-    # install/verify boot versions of ojdk
+    # Install OJDK Bootstraps
     - bootjdk7
     - bootjdk8
     - bootjdk9
@@ -49,6 +71,8 @@
     - bootjdk12
 
   tasks:
+  # TBD: as much as possible reorganize the tasks here into a appropriate role
+  # And place it in one of the logical areas described above under roles:
   ######################################
   # Add bash to available login shells #
   ######################################
