@@ -22,13 +22,16 @@
     validate_certs: no
     checksum: sha512:2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163
   when:
-    - ant_installed.rc != 0 and ansible_distribution != "Solaris"
+    - ant_installed.rc != 0
+    - ansible_distribution != "MacOSX"
+    - ansible_distribution != "Solaris"
   tags: ant
 
-- name: Download Apache Ant binaries (Solaris)
+- name: Download Apache Ant binaries (macOS) and (Solaris)
   command: wget https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip -O /tmp/apache-ant-1.10.5-bin.zip
   when:
-    - ant_installed.rc != 0 and ansible_distribution == "Solaris"
+    - ant_installed.rc != 0
+    - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
   tags: ant
 
 - name: Create /usr/local if it doesn't exist

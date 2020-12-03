@@ -23,6 +23,19 @@
 
 - name: Create Jenkins user
   action: user name={{ Jenkins_Username }} state=present home={{ home_folder }} shell=/bin/bash
+  ignore_errors: yes
+  when: ansible_distribution != "MacOSX"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Create Jenkins user (macOS)
+  action: user name={{ Jenkins_Username }} group=staff state=present home={{ home_folder }} shell=/bin/bash
+  when: ansible_distribution == "MacOSX"
+  tags: [jenkins_user, adoptopenjdk]
+
+- name: Enable SSH login for Jenkins user (macOS)
+  command: dseditgroup -o edit -a {{ Jenkins_Username }} -t staff com.apple.access_ssh
+  ignore_errors: yes
+  when: ansible_distribution == "MacOSX"
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user's home folder

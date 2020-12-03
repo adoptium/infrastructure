@@ -44,13 +44,20 @@
       tags: [build_tools, build_tools_openj9]
     - Superuser                   # AdoptOpenJDK Infrastructure
     - role: Swap_File
-      when: ansible_distribution != "Solaris" # These steps fail on Solaris
-    - Crontab
+      when:
+        - ansible_distribution != "MacOSX"
+        - ansible_distribution != "Solaris" # These steps fail on Solaris
+    - role: Crontab
+      when:
+        - ansible_distribution != "MacOSX"
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
+    - role: Xcode10
+      when: ansible_distribution == "MacOSX"
+      tags: [build_tools, xcode10, adoptopenjdk]
     - role: cmake                 # OpenJ9 / OpenJFX
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
