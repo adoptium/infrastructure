@@ -7,7 +7,7 @@
 - name: Get macOS version
   shell: sw_vers -productVersion
   register: macos_version
-  
+
 - name: Display macOS Version
   debug:
     var: macos_version
