@@ -7,7 +7,7 @@ won't necessarily have access to see these links):
 
 - [adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure) - write access to the repository which lets you be an official approver of PRs (triage doesn't)
 - [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - higher level of access for system administrators only
-- [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - The Admin team - can force through changes without   approval etc.
+- [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - The Admin team - can force through changes without approval etc.
 
 ## Commit messages
 
@@ -44,7 +44,7 @@ Assuming you have ansible installed on your UNIX-based machine, clone this
 repository, create an `inventory` text file with the word `localhost`
 and run this from the `ansible` directory:
 
-```
+```sh
 ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
@@ -54,9 +54,9 @@ run natively on Windows
 ## Running the ansible scripts on another machine or machines (including Windows)
 
 On an Ansible Control Node create an inventory file with the list of machines you want to set up, then
-from the `ansible` directory in this repository run somethig like this:
+from the `ansible` directory in this repository run something like this:
 
-```
+```sh
 ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
@@ -68,14 +68,13 @@ To do this you ideally need to be using key-based ssh logins. If you use a
 passphrase on your ssh key use the following to hold the credentials in the
 shell:
 
-```
+```sh
 eval `` `ssh-agent` ``
 ssh-add
 ```
 
 and if using the `-b` option, ensure that your user has access to `sudo`
-without a password to
-the `root` account (often done by adding it to the `wheel` group)
+without a password to the `root` account (often done by adding it to the `wheel` group)
 
 ## Adding a new role to the ansible scripts
 
@@ -91,8 +90,8 @@ can either be skipped if someone doesn't want it, or run on its own if
 desired.
 
 If something is specific to the adoptopenjdk infrastructure (e.g. setting
-hostnames, or configuring things specific to our setup but aren't required
-to be able to run build/test operations) then give the enitries in that role
+host names, or configuring things specific to our setup but aren't required
+to be able to run build/test operations) then give the entries in that role
 an `adoptopenjdk` tag as well. If you need to do something potentially
 adjusting the users' system, use the `dont_remove_system` tag. This is
 occasionally required if, for example, we need a specific version of a tool
@@ -115,7 +114,7 @@ to validate them.
 
 ## Jenkins access
 
-The AdoptOpenJDK Jenkins server at https://ci.adoptopenjdk.net is used for all the
+The AdoptOpenJDK Jenkins server at [https://ci.adoptopenjdk.net](https://ci.adoptopenjdk.net) is used for all the
 builds and testing automation. Since we're as open as possible, general read
 access is enabled. For others, access is controlled via github teams (via
 the Jenkins `Github Authentication Plugin` as follows. (Links here won't work for
@@ -123,7 +122,7 @@ most people as the teams are restricted access)
 
 - [release](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) can run and configure jobs and views
 - [build](https://github.com/orgs/AdoptOpenJDK/teams/build/members) has the access for `release` plus the ability to create new jobs
-- [testing]https://github.com/orgs/AdoptOpenJDK/teams/testing/members has the same access as `build`
+- [testing](https://github.com/orgs/AdoptOpenJDK/teams/testing/members) has the same access as `build`
 - [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure/members) has the same as `build`/`testing` plus can manage agent machines
 - [jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) as you might expect has access to Administer anything
 

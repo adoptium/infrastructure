@@ -6,7 +6,7 @@ labels: 'ansible'
 assignees: ''
 
 ---
-Please put the name of the software product (and affectred platforms if relevant) in the title of this issue
+Please put the name of the software product (and affected platforms if relevant) in the title of this issue
 
 - [ ] Missing install
 - [ ] Bug in ansible playbook
