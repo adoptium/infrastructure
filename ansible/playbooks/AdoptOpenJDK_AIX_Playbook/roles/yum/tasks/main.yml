@@ -102,4 +102,6 @@
 - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
   shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
   ignore_errors: True
-  tags: rpm_install
+  tags:
+    - rpm_install
+    - yum
