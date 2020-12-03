@@ -34,10 +34,13 @@ then a repository admin may override that requirement to push through
 a change if no reviewers are available, but in such cases a comment
 explaining why must be added to the Pull Request.
 
-## Running the ansible scripts on your local machine
+## Running the ansible scripts on local machines
 
-The full documentation for running locally is at [ansible/README.md] but
-assuming you have ansible installed on your UNIX-based machine, clone this
+The full documentation for running locally is at [ansible/README.md].
+
+### Running the ansible scripts on your current machine
+
+Assuming you have ansible installed on your UNIX-based machine, clone this
 repository, create an `inventory` text file with the word `localhost`
 and run this from the `ansible` directory:
 
@@ -45,15 +48,17 @@ and run this from the `ansible` directory:
 ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
-NOTE: For windows machines you cannot use this method as ansible does not
+NOTE: For windows machines you cannot use this method (i.e., as localhost) as ansible does not
 run natively on Windows
 
-## Running the ansible scripts remotely on another machine
+## Running the ansible scripts on another machine or machines (including Windows)
 
-Create an inventory file with the list of machines you want to set up, then
+On an Ansible Control Node create an inventory file with the list of machines you want to set up, then
 from the `ansible` directory in this repository run somethig like this:
 
-`ansible-playbook -i inventory_file --skip-tags=adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
+```
+ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+```
 
 If you don't have ssh logins enabled as root, add `-b -u myusername` to the
 command line which will ssh into the target machine as `myusername` and use
@@ -77,11 +82,11 @@ the `root` account (often done by adding it to the `wheel` group)
 Other than the dependencies on the machines which come from packages shipped
 with the operating system, we generally use individual roles for each piece
 of software which we install on the machines. For the main Unix and Windows
-playbooks each rol has it's own directory and is called from the top level
+playbooks each role has it's own directory and is called from the top level
 `main.yml` playbook. They are fairly easy to add and in most cases you can
 look at an existing one and copy it.
 
-As far as possibly, give each operation within the role a tags so that it
+As far as possibly, give each operation within the role a tag so that it
 can either be skipped if someone doesn't want it, or run on its own if
 desired.
 
