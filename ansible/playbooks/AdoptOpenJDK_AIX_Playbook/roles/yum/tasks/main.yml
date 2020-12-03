@@ -95,7 +95,9 @@
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
-  tags: rpm_install
+  tags:
+    - rpm_install
+    - yum
 
 - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
   shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
