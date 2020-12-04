@@ -35,7 +35,7 @@ jobs:
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
         awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
-    - name: Run Asible Playbook
+    - name: Run Ansible Playbook
       run: |
         cd ansible
         ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
