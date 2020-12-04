@@ -23,20 +23,22 @@
     ## Additional Software
     ## OJDK Bootstraps
 
-    # AIX BOS install requirements
+    # 1. AIX BOS install requirements
+
     # These packages are installed using installp - which can enlarge
     # filesystem space, as needed, on demand
-    - X11
     - openssl
 
-    # AIX BOS configuration
+    # 2. AIX BOS configuration
+
     - syslogs
     # TBD: additional tasks below that need to be promoted to
     # or migrated into an AIX setup role - in paritcular -
     # the tasks that setup the legal shells needed for user configuration
     # may need to be performed AFTER yum processing - rather than before
 
-    # Core OSS installation
+    # 3. Core OSS installation
+
     ## Note: this may actually already be performed - partially
     ## depending on how python - to use Ansible - has been prepared
     # yum based installation of additional software
@@ -46,14 +48,22 @@
     - aixfs
     - yum
 
-    # AIX User Admin
+    # 4. AIX User Admin
+
     # users needed - wait until here to be sure bash is installed
     # tbd: Need other actions performed first - mainly adding /usr/bin/bash
     # to the list of legal shells.
     - jenkins_user
     - zeus_user
 
-    # Additional Software: both licensed and OSS
+    # 5. Additional Software: both licensed and OSS
+
+    # Note: although X11 is AIX BOS software - there is a chance that the
+    # Ansible module unarchive: may be called - and that requires,
+    # at a minimum, gtar and unzip to be available - regardless of need.
+    # Likewise, the xlc files may also need the Ansible unarchive and
+    # need to be evaluated after the CORE OSS software has been installed.
+    - X11
     ## verify/install licensed IBM compilers
     - xlc_v13
     - xlc_v16
@@ -62,7 +72,8 @@
     - ant
     - ant_contrib
 
-    # Install OJDK Bootstraps
+    # 6. Install OJDK Bootstraps
+
     - bootjdk7
     - bootjdk8
     - bootjdk9
