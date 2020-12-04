@@ -82,7 +82,7 @@ All changes should be made to a personal fork of AdoptOpenJDK/infrastructure for
 1. Test it (see below)
 1. Submit a Pull Request
 
-Only reviewers in the [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) team have permission to merge requests for this `openjdk-infrastructure` repo, so please ask one of those team members to review your Pull Request.
+Only reviewers in the [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) team have permission to merge requests for this `openjdk-infrastructure` repo, so please ask one of those team members to review your Pull Request.
 
 ## Using Vagrant to test your Ansible scripts (Ubuntu based)
 
