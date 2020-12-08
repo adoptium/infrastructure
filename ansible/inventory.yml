@@ -41,6 +41,7 @@ hosts:
 
       - godaddy:
           rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
+          ubuntu1604-x64-1: {ip: 160.153.254.64}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
