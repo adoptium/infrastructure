@@ -11,12 +11,14 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 
 * Ubuntu 16.04
 * Ubuntu 18.04
+* Ubuntu 20.04
 * CentOS6
 * CentOS7
 * CentOS8
 * Debian8
-* OpenSUSE12-SP3
+* Debian10
 * FreeBSD12
+* Solaris10
 * Windows Server 2012 R2
 
 These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
@@ -28,7 +30,7 @@ The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 | `--vagrantfile` / `-v` OS        | Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                           |
 | `--all` / `-a`                   | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                                      |
 |                                  |                                                       |                                                                                                     |
-| `--URL` / `-u` Git URL           | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa555/openjdk-infrastructure/tree/myBranch` |
+| `--URL` / `-u` Git URL           | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa/openjdk-infrastructure/tree/myBranch`    |
 | `--new-vagrant-file` / `-nv`     | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`                                                |
 | `--skip-more` / `-sm`            | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`                                                                  |
 | `--clean-workspace` / `-c`       | Delete the old workspace                              | `./vagrantPlaybookCheck.sh -a -c`                                                                   |
@@ -37,7 +39,7 @@ The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 | `--help`                         | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                                  |
 |                                  |                                                       |                                                                                                     |
 | `--build` / `-b`                 | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                              |
-| `--build-repo` / `-br` build URL | Specify the URL of the openjdk-build repo *           | `./vagrantPlaybookCheck.sh -a --build -br https://github.com/sxa555/openjdk-build/tree/myBranch     |
+| `--build-repo` / `-br` build URL | Specify the URL of the openjdk-build repo *           | `./vagrantPlaybookCheck.sh -a --build -br https://github.com/sxa/openjdk-build/tree/myBranch        |
 | `--build-hotspot`                | Specify to build the JDK with the Hotspot JVM *       | `./vagrantPlaybookCheck.sh -a --build --build-hotspot                                               |
 | `--JDK-Version` / `-jdk` jdk     | Specify which JDK to build, if applicable             | `./vagrantPlaybookCheck.sh -a --build --JDK-version jdk11                                           |
 | `--test` / `-t`                  | Run a small test on the built JDK within the VM *     | `./vagrantPlaybookCheck.sh -a --build --test`                                                       |
