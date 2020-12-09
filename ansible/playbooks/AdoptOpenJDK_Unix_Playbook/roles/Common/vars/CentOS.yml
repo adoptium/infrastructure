@@ -26,7 +26,6 @@ Build_Tool_Packages:
   - gmp-devel
   - java-1.8.0-openjdk-devel
   - libcurl-devel
-  - libdwarf-devel                # OpenJ9
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -67,7 +66,7 @@ Additional_Build_Tools_CentOS8:
   - glibc-langpack-zh             # required for creating Chinese locales
 
 Additional_Build_Tools_NOT_CentOS8:
-  - libdwarf-devel
+  - libdwarf-devel                # OpenJ9.  Now in PowerTools repo.
   - lbzip2
   - java-1.7.0-openjdk-devel
   - ntp
