@@ -24,9 +24,7 @@ Build_Tool_Packages:
   - glibc-devel
   - gmp-devel
   - libcurl-devel
-  - libdwarf-devel                # OpenJ9
   - libffi-devel
-  - libmpc-devel
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -47,6 +45,8 @@ Build_Tool_Packages:
   - zip
 
 Additional_Build_Tools_NOT_RHEL8:
+  - libdwarf-devel                # now in CodeReady Linux Builder (CRB) repo
+  - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
   - ntp                           # in RHEL8, ntp package is replaced by chrony
 
 Additional_Build_Tools_RHEL8:
