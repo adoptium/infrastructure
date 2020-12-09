@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+sudo perl -p -i -e 's/mirrorlist.centos.org/vault.centos.org/g' /etc/yum.repos.d/Cent*
 sudo yum -y update
 sudo yum install -y libselinux-python
 sudo yum install -y ansible
