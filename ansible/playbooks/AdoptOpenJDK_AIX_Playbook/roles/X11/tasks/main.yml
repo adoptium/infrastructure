@@ -55,10 +55,12 @@
       stat:
         path: /usr/lpp/X11.base/X11.base.lib
       register: _base
-    - stat:
+    - name: Re-Verify X11 extensions requirements
+      stat:
         path: /usr/lpp/X11/include/X11/extensions
       register: _ext
-    - stat:
+    - name: Re-Verify X11 Frame Buffer requirements
+      stat:
         path: /usr/lpp/X11.vfb
       register: _vfb
     - name: Re-Verify Readiness #1
