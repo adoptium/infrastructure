@@ -25,7 +25,6 @@
 
 - name: Install IBM Openssl - installp
   command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
-  register: result.openssl
   ignore_errors: yes
   when: does_openssl_exist.rc != 0
   tags: openssl
