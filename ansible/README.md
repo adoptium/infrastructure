@@ -88,7 +88,7 @@ ansible_winrm_read_timeout_sec: 630
 
 Additional information about `winrm` variables can be found [here](https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/user_guide/windows_winrm.rst#inventory-options)
 
-You may encounter a python related error
+If running from a mac, you may encounter a python related error
 ```
 objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
 objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
