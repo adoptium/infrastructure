@@ -74,3 +74,4 @@
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
     - shortNames
+    - Dragonwell                  # Dragonwell bootstrap image
