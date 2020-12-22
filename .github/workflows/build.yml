@@ -1,11 +1,11 @@
 name: Docker
 
 on:
-  pull_request:
-    paths:
-    - ansible/**
-    branches:         
-    - master
+#  pull_request:
+#    paths:
+#    - ansible/**
+#    branches:         
+#    - master
   push:
     paths:
     - ansible/**
