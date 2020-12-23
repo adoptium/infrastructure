@@ -104,6 +104,14 @@
     - ansible_distribution_major_version != "8"
   tags: build_tools
 
+- name: Sed change the baseurl for CentOS SCL (CentOS6)
+  shell: |
+    sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+    sed -i -e 's!^#.*baseurl=http://mirror.centos.org/centos/6/!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "6"
+  tags: build_tools
+
 - name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
