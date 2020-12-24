@@ -19,11 +19,15 @@ hosts:
       - packet:
           ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
 
+      - packet:
+          ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
+
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
       - godaddy:
           ubuntu1604-x64-1: {ip: 160.153.247.225, description: git-hg/load relief for jenkins master}
+          ubuntu1604-x64-2: {ip: 160.153.244.137, desciption: bastillion.adoptopenjdk.net}
 
   - build:
 
