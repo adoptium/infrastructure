@@ -60,8 +60,8 @@ hosts:
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.10}
-          aix71-ppc64-2: {ip: 140.211.9.12}
+          aix71-ppc64-1: {ip: 140.211.9.10, description: ojdk01}
+          aix71-ppc64-2: {ip: 140.211.9.12, description: ojdk02}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
 
@@ -145,9 +145,9 @@ hosts:
           solaris10u11-sparcv9-1: {}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.99}
-          aix72-ppc64-1: {ip: 140.211.9.28}
-          aix72-ppc64-2: {ip: 140.211.9.36}
+          aix71-ppc64-1: {ip: 140.211.9.99, description: ojdk05}
+          aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix2-ojdk03.osuosl.org}
+          aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix2-ojdk04.osuosl.org}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
           centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
