@@ -14,12 +14,10 @@ hosts:
           ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
 
       - digitalocean:
-          ubuntu1604-x64-1: {ip: 138.68.167.199, description: api.adoptopenjdk.net}
+          ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
 
       - packet:
           ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
-
-      - packet:
           ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
 
       - ibmcloud:
@@ -40,7 +38,6 @@ hosts:
           win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk}
 
       - digitalocean:
-          centos69-x64-1: {ip: 159.65.95.239}
           centos69-x64-2: {ip: 167.71.130.191}
 
       - packet_esxi:
