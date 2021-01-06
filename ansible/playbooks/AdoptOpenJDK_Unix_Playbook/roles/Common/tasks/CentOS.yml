@@ -85,6 +85,7 @@
     dest: /etc/yum.repos.d/devtools-2.repo
     timeout: 25
     checksum: sha256:a8ebeb4bed624700f727179e6ef771dafe47651131a00a78b342251415646acc
+    validate_certs: no
   when:
     - ansible_distribution_major_version == "6"
   tags: build_tools
