@@ -154,6 +154,21 @@
   tags:
     - kernel_tuning
 
+# As per https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1282
+- name: Enable Core dumps
+  command: ulimit -c unlimited
+  tags:
+    - core_dumps
+
+- name: Allow staff users to generate core dumps
+  file:
+    path: /cores
+    state: directory
+    owner: root
+    group: staff
+  tags:
+    - core_dumps
+
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:
