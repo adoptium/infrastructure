@@ -96,7 +96,7 @@ hosts:
           ubuntu1604-x64-1: {ip: 160.153.235.114, user: adoptopenjdk}
 
       - marist:
-          ubuntu1603-s390x-1: {ip: 148.100.113.58, user: ubuntu}
+          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.77.146, description: D05}
