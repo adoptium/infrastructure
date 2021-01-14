@@ -8,7 +8,7 @@ There's a process to setting up Windows machines and getting them connected to J
 
 3) Login to the Jenkins user on the machine via RDP.
 
-4) On the machine, in a web browser, login to [ci.adoptopenjdk.net](https://ci.adoptopenjdk.net/), create a new node and download/run the `slave-agent.jnlp`.
+4) On the machine, in a web browser, login to [ci.adoptopenjdk.net](https://ci.adoptopenjdk.net/), create a new node and download/run the `slave-agent.jnlp`. [IcedTea-Web](https://adoptopenjdk.net/icedtea-web.html) (or another `javaws` implementation) will need to be installed to run the `.jnlp` file.
 
 5) Install the Jenkins agent as a service, by clicking 'File > Install as a Service'. This will require the Administrator credentials.
 
