@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright 2020 The Original Author(s)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/usr/bin/env bash
-
 # Nagios Plugin to check that inventory.yml / Nagios / Jenkins are in sync
 # This check assumes:
 #  - The inventory is the definitive list we should be comparing to
 #  - This is run on locally on the Nagios Server
+
+set -euxo pipefail
 
 # List of machines that are ignored if they're not in Nagios
 exceptionsList="win sxa gdams will EC2 azurebuildagent aahlenst vagrant master infrastructure esxi aix"
