@@ -198,6 +198,6 @@ hosts:
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}
           rhel7-x64-1: {ip: 169.48.4.136}
-          ubuntu1604-x64-1: {ip: 169.55.150.155}
+          ubuntu1604-x64-1: {ip: 169.48.4.141}
           win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
           win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}
