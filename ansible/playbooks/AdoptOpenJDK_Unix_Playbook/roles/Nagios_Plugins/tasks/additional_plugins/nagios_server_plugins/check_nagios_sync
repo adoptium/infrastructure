@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright 2020 The Original Author(s)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/usr/bin/env bash
-
 # Nagios Plugin to check that machines don't need removing from Nagios
 # This check assumes:
 #  - This is run on locally on the Nagios Server
 #  - The Nagios Server has jq installed
+
+set -euxo pipefail
 
 exceptionList="ci ansible"
 
@@ -64,7 +66,7 @@ IFS=$'\n'$'\t'" "
 
 mkdir -p $HOME/check_inventory_logs
 logPath="$HOME/check_inventory_logs/check_nagios_sync_`date +%H%M_%d%m%Y`"
-rm -rf $logPath
+rm -rf "$HOME/check_inventory_logs/check_nagios_sync_*"
 
 nagiosList=$(ls -la /usr/local/nagios/etc/servers/ | awk '/.cfg/ { print $9 }' | cut -d. -f1)
 jenkinsList=$(curl -s https://ci.adoptopenjdk.net/computer/api/json | jq -r '.computer[] | .displayName')
