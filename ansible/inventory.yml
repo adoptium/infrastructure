@@ -90,7 +90,6 @@ hosts:
 
       - aws:
           ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
-          ubuntu1604-x64-2: {ip: 34.250.61.39, user: ubuntu}
 
       - godaddy:
           ubuntu1604-x64-1: {ip: 160.153.235.114, user: adoptopenjdk}
@@ -113,16 +112,9 @@ hosts:
 
       - aws:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
-          rhel76-armv8-2: {ip: 34.245.159.35, user: ec2-user}
-          rhel76-armv8-3: {ip: 34.246.191.41, user: ec2-user}
-          rhel76-armv8-4: {ip: 54.154.138.147, user: ec2-user}
-          rhel76-armv8-5: {ip: 52.209.17.37, user: ec2-user}
-          rhel76-armv8-6: {ip: 54.229.245.232, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
-          ubuntu2004-x64-1: {ip: 34.241.242.10}
           win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
-          win2019-x64-2: {ip: 34.245.29.235, user: Administrator}
 
       - godaddy:
           centos7-x64-1: {ip: 160.153.244.82, user: adoptopenjdk}
