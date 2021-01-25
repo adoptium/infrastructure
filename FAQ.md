@@ -23,6 +23,7 @@ changing e.g.
 - docs:
 - plugins:
 - inventory:
+- github:
 
 ## Change approvals
 
