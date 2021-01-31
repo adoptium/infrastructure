@@ -14,28 +14,28 @@
   tags: jenkins_user
 
 - name: Create jenkins user
-  command: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }}
-  ignore_errors: yes
-  when: jenkins.stat.isdir is not defined
-  tags: jenkins_user
+  block:
+  - name: Create jenkins user
+    command: mkuser home="/home/{{ Jenkins_Username }}" shell="/usr/bin/ksh" {{ Jenkins_Username }}
+    ignore_errors: yes
+    tags: jenkins_user
 
-- name: Create SSH Key folder for {{ Jenkins_Username }}
-  file:
-    path: /home/{{ Jenkins_Username }}/.ssh
-    owner: "{{ Jenkins_Username }}"
-    group: staff
-    mode: 0700
-    state: directory
-  when: jenkins.stat.isdir is not defined
-  tags: jenkins_user
+  - name: Create SSH Key folder for {{ Jenkins_Username }}
+    file:
+      path: /home/{{ Jenkins_Username }}/.ssh
+      owner: "{{ Jenkins_Username }}"
+      group: staff
+      mode: 0700
+      state: directory
+    tags: jenkins_user
 
-- name: Set authorized key for jenkins user
-  authorized_key:
-    user: "{{ Jenkins_Username }}"
-    state: present
-    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+  - name: Set authorized key for jenkins user
+    authorized_key:
+      user: "{{ Jenkins_Username }}"
+      state: present
+      key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+    tags: jenkins_user
   when: jenkins.stat.isdir is not defined
-  tags: jenkins_user
 
 # Use the system defaults as defined in /etc/environment
 - name: Remove .profile
@@ -48,6 +48,9 @@
   command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
   tags: jenkins_user
 
+- name: Set user role
+  command: chuser roles=rtclk default_roles=rtclk {{ Jenkins_Username }}
+  tags: jenkins_user
 
 - name: Set group capabilites
   command: chgroup adms=root staff
@@ -62,8 +65,6 @@
     - "data=262144"
     - "rss=65536"
     - "stack=65536"
-    - "core_hard=-1"
     - "nofiles=-1"
-    - "nofiles_hard=-1"
   changed_when: False
   tags: jenkins_user
