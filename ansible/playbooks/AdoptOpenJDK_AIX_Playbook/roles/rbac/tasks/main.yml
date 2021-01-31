@@ -1,0 +1,34 @@
+#########################################################################
+# Playbook to create authorization to access realtime clock privelidge
+# The role is assigned to the jenkins user
+#########################################################################
+---
+- name: Check if auth already exists
+  shell: lsauth ojdk.rtclk
+  register: rtclk_exists
+  ignore_errors: yes
+  changed_when: False
+  tags: rbac
+- name: Update RBAC to include new authorizations
+  block:
+  - name: Top-level authorization
+    shell:
+      mkauth dfltmsg="Top-Level authorization for AdoptOpenJava Project" ojdk
+    ignore_errors: yes
+  - name: RealTime Clock Authorization
+    shell:
+      mkauth dfltmsg="OpenJava needs access to PV_PROC_RTCLK for metronome garbage collection policy" ojdk.rtclk
+  - name: RealTime Clock Role
+    shell:
+      mkrole authorizations='ojdk.rtclk' dfltmsg='Realtime Clock user' rtclk
+  - name: Add authorization to ksh
+    shell:
+      setsecattr -c accessauths=ojdk.rtclk innateprivs=PV_PROC_RTCLK inheritprivs=PV_PROC_RTCLK secflags=FSF_EPS /usr/bin/ksh
+  # The following prepares bash - if/when it gets installed at /usr/bin/bash
+  - name: Add authorization to bash
+    shell:
+      setsecattr -c accessauths=ojdk.rtclk innateprivs=PV_PROC_RTCLK inheritprivs=PV_PROC_RTCLK secflags=FSF_EPS /usr/bin/bash
+  - name: Update Security Tables
+    shell: setkst
+  tags: rbac
+  when: rtclk_exists.rc == 2
