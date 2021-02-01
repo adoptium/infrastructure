@@ -8,7 +8,8 @@
   register: jenkins
   tags: jenkins_user
 
-- debug:
+- name: debug1
+  debug:
     msg: "{{ Jenkins_Username }} home directory found, skipping user creation tasks"
   when: jenkins.stat.isdir is defined
   tags: jenkins_user
@@ -28,43 +29,56 @@
       mode: 0700
       state: directory
     tags: jenkins_user
-
-  - name: Set authorized key for jenkins user
-    authorized_key:
-      user: "{{ Jenkins_Username }}"
-      state: present
-      key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
-    tags: jenkins_user
+  - name: Check again for user directory existence
+    stat:
+      path: /home/{{ Jenkins_Username }}
+    register: jenkins2
+  tags: jenkins_user
   when: jenkins.stat.isdir is not defined
 
-# Use the system defaults as defined in /etc/environment
-- name: Remove .profile
-  file:
-    state: absent
-    path: /home/{{ Jenkins_Username }}/.profile
+- name: Set authorized key for jenkins user
+  authorized_key:
+    user: "{{ Jenkins_Username }}"
+    state: present
+    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+  ignore_errors: yes
+  register: jenkins_rsa
+  when: jenkins.stat.isdir is defined or jenkins2.stat.isdir is defined
   tags: jenkins_user
 
-- name: Set user capabilites
-  command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
+- name: warn about failed copy
+  debug:
+    msg: "{{ Jenkins_User_SSHKey }} failed to copy"
+  when: jenkins_rsa.failed == true
   tags: jenkins_user
 
-- name: Set user role
-  command: chuser roles=rtclk default_roles=rtclk {{ Jenkins_Username }}
-  tags: jenkins_user
+- name: Configure Jenkins User
+  block:
+  # Use the system defaults as defined in /etc/environment
+  - name: Remove .profile
+    file:
+      state: absent
+      path: /home/{{ Jenkins_Username }}/.profile
 
-- name: Set group capabilites
-  command: chgroup adms=root staff
-  tags: jenkins_user
+  - name: Set user capabilites
+    command: chuser capabilities=CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE {{ Jenkins_Username }}
 
-- name: ensure adequate limits are set in /etc/security/limits
-  command: chsec -f /etc/security/limits -s {{ Jenkins_Username }} -a {{ item }}
-  with_items:
-    - "fsize=-1"
-    - "core=-1"
-    - "cpu=-1"
-    - "data=262144"
-    - "rss=65536"
-    - "stack=65536"
-    - "nofiles=-1"
-  changed_when: False
+  - name: Set user role
+    command: chuser roles=rtclk default_roles=rtclk {{ Jenkins_Username }}
+
+  - name: Set group capabilites
+    command: chgroup adms=root staff
+
+  - name: ensure adequate limits are set in /etc/security/limits
+    command: chsec -f /etc/security/limits -s {{ Jenkins_Username }} -a {{ item }}
+    with_items:
+      - "fsize=-1"
+      - "core=-1"
+      - "cpu=-1"
+      - "data=262144"
+      - "rss=65536"
+      - "stack=65536"
+      - "nofiles=-1"
+    changed_when: False
   tags: jenkins_user
+  when: jenkins.stat.isdir is defined or jenkins2.stat.isdir is defined
