@@ -23,10 +23,6 @@ hosts:
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
-      - godaddy:
-          ubuntu1604-x64-1: {ip: 160.153.247.225, description: git-hg/load relief for jenkins master}
-          ubuntu1604-x64-2: {ip: 160.153.244.137, desciption: bastillion.adoptopenjdk.net}
-
   - build:
 
       - alibaba:
@@ -43,10 +39,6 @@ hosts:
       - packet_esxi:
           solaris10u11-x64-1: {ip: 147.75.85.212}
           solaris10u11-x64-2: {ip: 147.75.85.213}
-
-      - godaddy:
-          rhel7-x64-1: {ip: 160.153.248.216, user: adoptopenjdk}
-          ubuntu1604-x64-1: {ip: 160.153.254.64}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
@@ -91,9 +83,6 @@ hosts:
       - aws:
           ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
 
-      - godaddy:
-          ubuntu1604-x64-1: {ip: 160.153.235.114, user: adoptopenjdk}
-
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
 
@@ -115,24 +104,6 @@ hosts:
           rhel8-x64-1: {ip: 54.246.216.49}
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
           win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
-
-      - godaddy:
-          centos7-x64-1: {ip: 160.153.244.82, user: adoptopenjdk}
-          centos7-x64-2: {ip: 160.153.246.204, user: adoptopenjdk}
-          centos7-x64-3: {ip: 160.153.246.194, user: adoptopenjdk}
-          centos7-x64-4: {ip: 160.153.244.42, user: adoptopenjdk}
-          debian8-x64-1: {ip: 160.153.246.223, user: adoptopenjdk}
-          debian8-x64-2: {ip: 160.153.246.42, user: adoptopenjdk}
-          debian8-x64-3: {ip: 160.153.246.234, user: adoptopenjdk}
-          debian8-x64-4: {ip: 160.153.246.220, user: adoptopenjdk}
-          ubuntu1604-x64-1: {ip: 160.153.245.145, user: adoptopenjdk}
-          ubuntu1604-x64-2: {ip: 160.153.246.176, user: adoptopenjdk}
-          ubuntu1604-x64-3: {ip: 160.153.246.222, user: adoptopenjdk}
-          ubuntu1604-x64-4: {ip: 160.153.246.214, user: adoptopenjdk}
-          win2016-x64-1: {ip: 160.153.234.27, user: adoptopenjdk}
-          win2016-x64-2: {ip: 160.153.234.5, user: adoptopenjdk}
-          win2016-x64-3: {ip: 160.153.234.8, user: adoptopenjdk}
-          win2016-x64-4: {ip: 160.153.234.22, user: adoptopenjdk}
 
       - ibm:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
