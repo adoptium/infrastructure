@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew install ansible
-        brew cask install virtualbox vagrant
+        brew install --cask virtualbox vagrant
 
     - name: Setup Vagrant VM
       run: |
