@@ -53,6 +53,7 @@
     # users needed - wait until here to be sure bash is installed
     # tbd: Need other actions performed first - mainly adding /usr/bin/bash
     # to the list of legal shells.
+    - rbac
     - jenkins_user
     - zeus_user
 
