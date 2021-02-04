@@ -35,7 +35,7 @@
   roles:
     - Debug
     - role: Get_Vendor_Files
-      tags: [vendor_files, adoptopenjdk]
+      tags: [vendor_files, adoptopenjdk, jenkins]
     - Version
     - Common
     - Windows_Updates

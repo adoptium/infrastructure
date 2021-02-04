@@ -3,24 +3,54 @@
 # VENDOR_FILES
 ##############
 
-- name: check out AdoptOpenJDK/secrets
+- name: Check if local Vendor_Files exists
+  stat: path=/Vendor_Files
+  register: local_vendor_files
+  delegate_to: localhost
+  run_once: true
+
+- name: Check out AdoptOpenJDK/secrets
   git: repo=git@github.com:AdoptOpenJDK/secrets.git dest=vendor_files force=true
   delegate_to: localhost
+  when:
+    - not local_vendor_files.stat.exists
   run_once: true
 
-- name: check if dotgpg is installed
+- name: Check if dotgpg is installed
   shell: command -v dotgpg
   delegate_to: localhost
+  when:
+    - not local_vendor_files.stat.exists
   run_once: true
 
-- name: generate list of vendor_files
+- name: Generate list of remote vendor_files
   command: dotgpg cat {{ item }}
   delegate_to: localhost
-  register: vendor_files
+  register: remote_vendor_files_list
+  when:
+    - not local_vendor_files.stat.exists
   loop: "{{ lookup('fileglob', 'vendor_files/vendor_files/*', wantlist=True) }}"
   run_once: true
 
-- name: set facts from output of dotgpg
+- name: Generate list of local vendor_files
+  command: cat {{ item }}
+  delegate_to: localhost
+  register: local_vendor_files_list
+  when:
+    - local_vendor_files.stat.exists
+  loop: "{{ lookup('fileglob', '/Vendor_Files/*', wantlist=True) }}"
+  run_once: true
+
+- name: Set facts from output of dotgpg
   set_fact: {"{{ item.item | basename | replace('.gpg','') | replace('.','_') }}":"{{ item.stdout }}"}
-  with_items: "{{ vendor_files.results }}"
+  with_items: "{{ remote_vendor_files_list.results }}"
+  when:
+    - not local_vendor_files.stat.exists
+  run_once: true
+
+- name: Set facts from output of local vendor_files
+  set_fact: {"{{ item.item | basename | replace('.','_') }}":"{{ item.stdout }}"}
+  with_items: "{{ local_vendor_files_list.results }}"
+  when:
+    - local_vendor_files.stat.exists
   run_once: true
