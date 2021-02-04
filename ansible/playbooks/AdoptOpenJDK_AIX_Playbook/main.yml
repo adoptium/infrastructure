@@ -54,8 +54,10 @@
     # tbd: Need other actions performed first - mainly adding /usr/bin/bash
     # to the list of legal shells.
     - rbac
-    - jenkins_user
-    - zeus_user
+    - role: jenkins_user
+      tags: adoptopenjdk
+    - role: zeus_user
+      tags: adoptopenjdk
 
     # 5. Additional Software: both licensed and OSS
 
@@ -164,7 +166,7 @@
     - name: Include Nagios Playbook
       include_tasks: nagios/nagios_aix.yml
       when: Nagios_Plugins == "Enabled"
-      tags: nagios
+      tags: [nagios, adoptopenjdk]
 
   ###################
   # NTP Time Server #
