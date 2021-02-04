@@ -129,7 +129,7 @@
 
 - name: Download/install Nvidia CUDA Repo deb - Ubuntu 16 on PPC64LE
   apt:
-    deb: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/ppc64el/cuda-toolkit-9-0_9.0.176-1_ppc64el.deb
+    deb: https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda-repo-ubuntu1604-9-0-local_9.0.176-1_ppc64el-deb
   retries: 3
   delay: 5
   register: nvidia_cuda_toolkit_download
