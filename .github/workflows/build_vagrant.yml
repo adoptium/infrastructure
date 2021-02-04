@@ -3,7 +3,7 @@ name: Vagrant Playbook Checker
 on:
   pull_request:
     paths:
-    - .github/workflows/build_solaris.yml
+    - .github/workflows/build_vagrant.yml
     - ansible/**
     branches:         
     - master
