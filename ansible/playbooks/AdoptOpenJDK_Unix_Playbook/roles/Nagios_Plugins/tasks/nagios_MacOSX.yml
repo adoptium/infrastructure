@@ -14,6 +14,8 @@
 ########################################
 - name: Install additional packages used by Nagios
   package: "name={{ item }} state=latest"
+  become: yes
+  become_user: "{{ ansible_user }}"
   with_items:
     - nagios-plugins
 
@@ -25,9 +27,20 @@
     owner: nagios
   become: yes
 
-- name: Symlink to plugins
+- name: Symlink to plugins (x86_64)
   file:
     src: /usr/local/Cellar/nagios-plugins/2.3.3/libexec/sbin
     dest: /usr/local/nagios/libexec
     state: link
   become: yes
+  when: ansible_architecture == "x86_64"
+
+# Arm64's Homebrew installation prefix is `/opt/homebrew/`, not `/usr/local/`
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1716#issuecomment-764713146
+- name: Symlink to plugins (arm64)
+  file:
+    src: /opt/homebrew/Cellar/nagios-plugins/2.3.3/sbin/
+    dest: /usr/local/nagios/libexec
+    state: link
+  become: yes
+  when: ansible_architecture == "arm64"
