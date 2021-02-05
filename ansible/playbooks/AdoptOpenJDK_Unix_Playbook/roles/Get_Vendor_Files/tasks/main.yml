@@ -8,6 +8,7 @@
   register: local_vendor_files
   delegate_to: localhost
   run_once: true
+  tags: adoptopenjdk
 
 - name: Check out AdoptOpenJDK/secrets
   git: repo=git@github.com:AdoptOpenJDK/secrets.git dest=vendor_files force=true
@@ -15,6 +16,7 @@
   when:
     - not local_vendor_files.stat.exists
   run_once: true
+  tags: adoptopenjdk
 
 - name: Check if dotgpg is installed
   shell: command -v dotgpg
@@ -22,6 +24,7 @@
   when:
     - not local_vendor_files.stat.exists
   run_once: true
+  tags: adoptopenjdk
 
 - name: Generate list of remote vendor_files
   command: dotgpg cat {{ item }}
@@ -31,6 +34,7 @@
     - not local_vendor_files.stat.exists
   loop: "{{ lookup('fileglob', 'vendor_files/vendor_files/*', wantlist=True) }}"
   run_once: true
+  tags: adoptopenjdk
 
 - name: Generate list of local vendor_files
   command: cat {{ item }}
@@ -40,6 +44,7 @@
     - local_vendor_files.stat.exists
   loop: "{{ lookup('fileglob', '/Vendor_Files/*', wantlist=True) }}"
   run_once: true
+  tags: adoptopenjdk
 
 - name: Set facts from output of dotgpg
   set_fact: {"{{ item.item | basename | replace('.gpg','') | replace('.','_') }}":"{{ item.stdout }}"}
@@ -47,6 +52,7 @@
   when:
     - not local_vendor_files.stat.exists
   run_once: true
+  tags: adoptopenjdk
 
 - name: Set facts from output of local vendor_files
   set_fact: {"{{ item.item | basename | replace('.','_') }}":"{{ item.stdout }}"}
@@ -54,3 +60,4 @@
   when:
     - local_vendor_files.stat.exists
   run_once: true
+  tags: adoptopenjdk
