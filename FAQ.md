@@ -140,13 +140,14 @@ To add a new system:
 
 1. Ensure there is an issue documenting its creation somewhere (Can just be an existing issue that you add the hostname too so it can be found later
 2. Obtain system from the appropriate infrastructure provider
-3. Set it up using the appropriate ansible scripts for its purpose
-4. Connect it to jenkins, verify a typical job runs on it if you can and add the tags
-5. Add it to the [inventory.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/65aa9e2a15b7ebb81858f19e6e4048c16d7e8cd6/ansible/inventory.yml)
-   file. If you're adding a new type of machine (`build`, `perf` etc.) then you
-   should also add it to
-   [adoptopenjdk_taml.py](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
-   and, if it will be configured via the standard playbooks, added to the
+3. Add it to bastillion (requires extra privileges) so that all of the appropriate admin keys are deployed to the system (Can be delayed for expediency by putting AWX key into `~root/.ssh/authorized_keys`)
+4. Create a PR to add the machine to [inventory.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/65aa9e2a15b7ebb81858f19e6e4048c16d7e8cd6/ansible/inventory.yml) (See NOTE at end end of the list)
+5. Once merged, run the ansible scripts on it - ideally via AWX (Ensure the project and inventory sources are refreshed, then run the appropriate `Deploy **** playbook` template with a `LIMIT` of the new machine name)
+6. Add it to jenkins, verify a typical job runs on it if you can and add the appropriate tags
+
+NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc.) you should also add it to
+   [adoptopenjdk_yaml.py](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
+   and, if it will be configured via the standard playbooks, add the new type to the
    list at the top of the main playbook files for
    [*IX](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
    [windows](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
