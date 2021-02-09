@@ -61,8 +61,10 @@ checkOS() {
 			osToDestroy="Sol10" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
+		"Windows10" | "Win10" | "W10" )
+			osToDestroy="Win10";;
                 "all" )
-                        osToDestroy="U16 U18 U20 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012" ;;
+                        osToDestroy="U16 U18 U20 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012 Win10" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;

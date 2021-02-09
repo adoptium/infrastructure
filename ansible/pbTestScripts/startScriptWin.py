@@ -11,7 +11,6 @@ def usage():
 
 def run_winrm(vmIP, buildArgs, mode):
     cmd_str = "Start-Process powershell.exe -Verb runAs; cd C:/tmp; sh C:/vagrant/pbTestScripts/"
-    print(mode)
     if mode == 1:
         cmd_str += "buildJDKWin.sh "
     else:
