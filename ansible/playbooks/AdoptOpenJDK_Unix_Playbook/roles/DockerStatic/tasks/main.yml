@@ -30,24 +30,30 @@
 ##############################################################
 # Start the containers                                       #
 # If startallcontainers is skipped, only start three of them #
+# ignore_errors simplest way to ignore if alreayd started    #
 ##############################################################
 
 - name: Start Ubuntu 16.04 container
   command: docker run -p 2222:22 --cpus=2.0 --memory=6G --detach --name U1604_2222 aqa_u1604
   tags: startcontainers
+  ignore_errors: yes
 
 - name: Start Ubuntu 18.04 container
   command: docker run -p 2223:22 --cpus=4.0 --memory=6G --detach --name U1804_2223 aqa_u1804
   tags: startcontainers, startallcontainers
+  ignore_errors: yes
 
 - name: Start Ubuntu 20.04 container
   command: docker run -p 2224:22 --cpus=2.0 --memory=6G --detach --name U2004_2224 aqa_u2004
   tags: startcontainers
+  ignore_errors: yes
 
 - name: Start Ubuntu 20.10 container
   command: docker run -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2010_2225 aqa_u2010
   tags: startcontainers, startallcontainers
+  ignore_errors: yes
 
 - name: Start fedora 33 container
   command: docker run -p 2227:22 --cpus=2.0 --memory=6G --detach --name   f33.2227 aqa_f33  
   tags: startcontainers
+  ignore_errors: yes

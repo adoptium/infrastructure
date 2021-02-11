@@ -23,28 +23,20 @@
     - Providers                   # AdoptOpenJDK Infrastructure
     - Get_Vendor_Files
     - Jenkins_User                # AdoptOpenJDK Infrastructure
-    - Docker                      # Testing
+    - Superuser                   # AdoptOpenJDK Infrastructure
+    - role: Swap_File
+    - role: Crontab
+    - role: NTP_TIME
+    - role: adoptopenjdk_install
+      jdk_version: 11
+   - role: Nagios_Plugins         # AdoptOpenJDK Infrastructure
+      tags: [nagios_plugins, adoptopenjdk]
+    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
+      tags: [nagios_master_config, adoptopenjdk]
+   - role: Nagios_Tunnel          # AdoptOpenJDK Infrastructure
+      tags: [nagios_tunnel, adoptopenjdk]
+    - Security
+    - Vendor
+    - IPv6
+    - Docker
     - DockerStatic
-#    - Superuser                   # AdoptOpenJDK Infrastructure
-#    - role: Swap_File
-#      when:
-#        - ansible_distribution != "MacOSX"
-#        - ansible_distribution != "Solaris" # These steps fail on Solaris
-#    - role: Crontab
-#      when:
-#        - ansible_distribution != "MacOSX"
-#    - role: NTP_TIME
-#      when: ansible_distribution != "MacOSX"
-#    - role: adoptopenjdk_install
-#      jdk_version: 11
-#      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
-#      tags: build_tools
-#   - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
-#      tags: [nagios_plugins, adoptopenjdk]
-#    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
-#      tags: [nagios_master_config, adoptopenjdk]
-#   - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
-#      tags: [nagios_tunnel, adoptopenjdk]
-#    - Security
-#    - Vendor
-#    - IPv6
