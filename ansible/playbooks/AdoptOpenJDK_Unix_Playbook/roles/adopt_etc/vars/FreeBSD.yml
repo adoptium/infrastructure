@@ -1,0 +1,47 @@
+---
+##########
+# FreeBSD #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib
+  - autoconf
+  - bash
+  - cups
+  - fontconfig
+  - freetype2
+  - giflib
+  - git
+  - gmake
+  - gtar
+  - jpeg-turbo
+  - lcms2
+  - libXext
+  - libXi
+  - libX11
+  - libXrandr # JDK12+ compilation
+  - libXrender
+  - libXt
+  - libXtst
+  - openjdk
+  - openjdk8
+  - openjdk11
+  - pkgconf
+  - png
+  - unzip
+  - wget
+  - zip
+
+gcc_compiler:
+  - gcc48
+
+Test_Tool_Packages:
+  - mercurial
+  - perl5
+  - xauth
+  - xorg
+  - xorg-vfbserver
+  - pulseaudio
+
+crontab_Patching: "/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"

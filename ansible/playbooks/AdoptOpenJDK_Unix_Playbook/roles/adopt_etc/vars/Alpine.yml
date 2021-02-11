@@ -1,0 +1,58 @@
+---
+##########
+# Alpine #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alpine-sdk
+  - alsa-lib
+  - alsa-lib-dev
+  - autoconf
+  - bash
+  - bison                         # OpenJ9
+  - cups-dev
+  - cups-libs
+  - flex                          # OpenJ9
+  - fontconfig
+  - fontconfig-dev
+  - freetype
+  - freetype-dev
+  - grep
+  - libdwarf                      # OpenJ9
+  - libdwarf-dev                  # OpenJ9
+  - libx11
+  - libx11-dev
+  - libxext
+  - libxext-dev
+  - libxrandr
+  - libxrandr-dev
+  - libxrender
+  - libxrender-dev
+  - libxt
+  - libxt-dev
+  - libxtst
+  - libxtst-dev
+  - linux-headers
+  - numactl
+  - numactl-dev                   # OpenJ9
+  - unzip
+  - wget
+  - which
+  - xz
+  - zip
+
+Test_Tool_Packages:
+  - unzip
+  - zlib
+  - zlib-dev
+  - perl
+  - perl-dev
+  - libcurl
+  - curl-dev
+  - openssl
+  - openssl-dev
+  - mercurial
+  - xauth
+  - xorg-server
+  - xvfb
