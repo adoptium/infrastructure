@@ -90,7 +90,7 @@
     - adoptopenjdk_install
     - skip_ansible_lint
 
-# Currenlty not checking certs due to a CentOS6 error
+# Currently not checking certs due to a CentOS6 error
 # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1877
 - name: Install latest release if one not already installed
   unarchive:
