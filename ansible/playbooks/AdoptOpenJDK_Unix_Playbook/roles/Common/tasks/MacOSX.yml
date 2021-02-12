@@ -164,6 +164,7 @@
   file:
     path: /cores
     state: directory
+    mode: 0774
     owner: root
     group: staff
   tags:
