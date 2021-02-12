@@ -154,12 +154,6 @@
   tags:
     - kernel_tuning
 
-# As per https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1282
-- name: Enable Core dumps
-  command: ulimit -c unlimited
-  tags:
-    - core_dumps
-
 - name: Allow staff users to generate core dumps
   file:
     path: /cores
