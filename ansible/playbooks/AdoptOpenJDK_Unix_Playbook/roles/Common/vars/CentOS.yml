@@ -86,6 +86,7 @@ Test_Tool_Packages:
   - openssl-devel
   - mercurial
   - perl
+  - perl-Test-Simple
   - xorg-x11-xauth
   - xorg-x11-server-Xorg
   - xorg-x11-server-Xvfb
