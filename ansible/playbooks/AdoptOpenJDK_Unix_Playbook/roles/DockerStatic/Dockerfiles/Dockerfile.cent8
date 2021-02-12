@@ -16,7 +16,7 @@ RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh
-RUN echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAxCd3s79093JrDHyJa4/BJFP7VNfPzKz0Jb2zjN39N90DxNDJPy/asNZrBhvTY2xUdAh7o4aWjcOjUJamqeBfLrmgoXgthNje+44bWl0i/XlFc8ujcx/ya6+dtpcV0+ZiyiDGAEXfiyI+UHFv2xEmNrSNiohPIGJqXbt0BD56aVHC8n3q7hZ5H6S1ZGyWLjlfLLJQojGlAsFFwN5DOkikZCKrCp76UKHtfN39tlypTmGSQO50pKX/oN9UivPfk5EuTaHoo5oGqaqS+at1J50PKkm/danXNZdxwGDV6OK6av3LTOKt8wdBnfSynIstJJYfrRN9/ltJ6EVmPoaycwDp jenkins@ci.adoptopenjdk.net" > /home/jenkins/.ssh/authorized_keys
+RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start

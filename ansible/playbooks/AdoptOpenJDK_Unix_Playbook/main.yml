@@ -23,6 +23,7 @@
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
     - Version
+    - adopt_etc
     - Common
     - Providers                   # AdoptOpenJDK Infrastructure
     - autoconf

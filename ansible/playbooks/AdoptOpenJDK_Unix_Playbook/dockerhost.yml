@@ -20,20 +20,20 @@
   roles:
     - Debug
     - Version
+    - adopt_etc
     - Providers                   # AdoptOpenJDK Infrastructure
     - Get_Vendor_Files
     - Jenkins_User                # AdoptOpenJDK Infrastructure
     - Superuser                   # AdoptOpenJDK Infrastructure
     - role: Swap_File
     - role: Crontab
-    - role: NTP_TIME
     - role: adoptopenjdk_install
       jdk_version: 11
-   - role: Nagios_Plugins         # AdoptOpenJDK Infrastructure
+    - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
       tags: [nagios_master_config, adoptopenjdk]
-   - role: Nagios_Tunnel          # AdoptOpenJDK Infrastructure
+    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
       tags: [nagios_tunnel, adoptopenjdk]
     - Security
     - Vendor

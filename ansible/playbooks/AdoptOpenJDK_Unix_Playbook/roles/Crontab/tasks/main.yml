@@ -2,12 +2,33 @@
 ###########
 # Crontab #
 ###########
-- name: Add cron job to check for updates
-  cron: name="Check for updates everyday at 1am"
-        weekday="*"
-        minute="0"
-        hour="1"
-        user=root
-        job="{{ crontab_Patching }}"
-        state=present
+
+- name: Add cron job to apply OS updates on yum-based systems
+  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
+        job="/usr/bin/yum -y update"
+  when: (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+  tags: crontab
+
+- name: Add cron job to apply OS updates on apt-based systems
+  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
+        job="/usr/bin/apt-get update && /usr/bin/apt-get -y upgrade"
+  when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
+  tags: crontab
+
+- name: Add cron job to apply OS updates on zypper-based systems
+  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
+        job="/usr/bin/zypper refresh && /usr/bin/zypper -n up"
+  when: (ansible_distribution == "SLES" or ansible_distribution == "openSUSE")
+  tags: crontab
+
+- name: Add cron job to apply OS updates on FreeBSD systems
+  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
+        job="/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"
+  when: (ansible_distribution == "FreeBSD")
+  tags: crontab
+
+- name: Add cron job to apply OS updates on Solaris systems
+  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
+        job="/opt/csw/bin/pkgutil --upgrade --yes"
+  when: (ansible_distribution == "Solaris")
   tags: crontab
