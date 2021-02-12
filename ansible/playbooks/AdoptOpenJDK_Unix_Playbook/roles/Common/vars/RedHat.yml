@@ -92,6 +92,7 @@ Test_Tool_Packages:
   - perl
   - perl-Digest-SHA
   - perl-Time-HiRes
+  - perl-Test-Simple
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb
   - zlib-devel
