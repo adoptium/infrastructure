@@ -97,7 +97,7 @@ hosts:
   - test:
 
       - alibaba:
-          ubuntu1804-armv8-1: {ip: 119.8.164.219}
+          ubuntu1804-armv8-1: {ip: 119.8.166.104}
 
       - azure:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
