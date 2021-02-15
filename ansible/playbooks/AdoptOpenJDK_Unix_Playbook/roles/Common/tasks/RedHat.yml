@@ -199,17 +199,20 @@
     name: locales
     state: present
   when:
-    - not (ansible_distribution_major_version == "7")
+    - (ansible_distribution_major_version is version_compare('7', operator='lt'))
   tags: locales
 
-- name: Set locale list command
-  set_fact:
-    locale_list_command: "{% if ansible_distribution_major_version=='7' %}localectl list-locales{% else %}locale -a{% endif %}"
+- name: Install 'glibc-common' package
+  package:
+    name: glibc-common
+    state: present
+  when:
+    - (ansible_distribution_major_version is version_compare('7', operator='ge'))
   tags: locales
 
 # Skipping linting as no alternative to shell can be used (lint error 305)
 - name: Get locale list
-  shell: "{{ locale_list_command }}"
+  shell: locale -a
   register: localeList
   changed_when: False
   tags:
