@@ -13,6 +13,7 @@ mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/openjdk-tests ] && git clone https://github.com/adoptopenjdk/openjdk-tests $HOME/testLocation/openjdk-tests
 $HOME/testLocation/openjdk-tests/get.sh -t $HOME/testLocation/openjdk-tests
 cd $HOME/testLocation/openjdk-tests/TKG || exit 1
-export BUILD_LIST=system
+export BUILD_LIST=functional
 $MAKE_COMMAND compile
-$MAKE_COMMAND _MachineInfo
+# Runs this test to check for prerequisite perl modules
+$MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
