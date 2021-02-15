@@ -121,7 +121,7 @@
     owner: root
     group: root
     mode: 0644
-    checksum: sha256:8ab5599eef0afcac10cbd3e8670873efee20fcceb5fb3526a62edeade603cec7
+    checksum: sha256:38c53be402c717744ed5bd502a87de761f16528e79b033eee8a40da872307376
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
