@@ -24,12 +24,11 @@ jobs:
 
     - name: Remove homebrew/cask-versions
       run: | 
-        brew untap homebrew/cask-versions
-        brew cask uninstall adoptopenjdk8
-        brew cask uninstall adoptopenjdk11
-        brew cask uninstall adoptopenjdk12
-        brew cask uninstall adoptopenjdk13
-        brew cask uninstall adoptopenjdk14
+        brew uninstall --cask adoptopenjdk8
+        brew uninstall --cask adoptopenjdk11
+        brew uninstall --cask adoptopenjdk12
+        brew uninstall --cask adoptopenjdk13
+        brew uninstall --cask adoptopenjdk14
 
     - name: Run Ansible Playbook
       run: |
