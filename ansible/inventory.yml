@@ -28,6 +28,7 @@ hosts:
       - alibaba:
           win2012r2-x64-1: {ip: 8.208.11.212, user: Administrator}
           win2012r2-x64-2: {ip: 8.208.87.18, user: Administrator}
+          ubuntu1804-armv8-1: {ip: 119.8.164.219}
 
       - azure:
           win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk}
@@ -88,11 +89,15 @@ hosts:
 
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.77.146, description: D05}
+          ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
 
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
   - test:
+
+      - alibaba:
+          ubuntu1804-armv8-1: {ip: 119.8.164.219}
 
       - azure:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
