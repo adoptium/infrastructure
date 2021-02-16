@@ -78,7 +78,7 @@
 - name: Install numactl-devel excluding RHEL 7 on s390x
   package: "name=numactl-devel state=latest"
   when:
-    - ! (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
   tags: build_tools
 
 - name: Install additional build tools for RHEL on x86
@@ -198,6 +198,16 @@
   package:
     name: locales
     state: present
+  when:
+    - (ansible_distribution_major_version is version_compare('7', operator='lt'))
+  tags: locales
+
+- name: Install 'glibc-common' package
+  package:
+    name: glibc-common
+    state: present
+  when:
+    - (ansible_distribution_major_version is version_compare('7', operator='ge'))
   tags: locales
 
 # Skipping linting as no alternative to shell can be used (lint error 305)

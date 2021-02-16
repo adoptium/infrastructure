@@ -1,0 +1,38 @@
+---
+###################################################
+# Dragonwell bootstrap image (Currently only an Dragonwell 8 requirement) #
+###################################################
+- name: Test if Dragonwell is already installed
+  win_stat:
+    path: 'C:\openjdk\dragonwell-bootstrap\jdk8u272-ga'
+  register: dragonwell_installed
+  tags: dragonwell
+
+- name: Check if Dragonwell is already downloaded
+  win_stat:
+    path: 'C:\temp\dragonwell.zip'
+  register: dragonwell_download
+  tags: dragonwell
+
+- name: Download Dragonwell
+  win_get_url:
+    url: https://github.com/alibaba/dragonwell8/releases/download/dragonwell-8.5.4_jdk8u272-ga/Alibaba_Dragonwell_8.5.4-GA_Experimental_Windows_x64.zip
+    checksum: 0f04bee12ce1acd70d603759e1c57d8381c08669bdeed743474ce9ecfae51fb3
+    checksum_algorithm: sha256
+    dest: 'C:\temp\dragonwell.zip'
+  when: (not dragonwell_download.stat.exists)
+        and (not dragonwell_installed.stat.exists)
+  tags: dragonwell
+
+- name: Install Dragonwell
+  win_unzip:
+    src: C:\temp\dragonwell.zip
+    dest: C:\openjdk\dragonwell-bootstrap
+  when: (not dragonwell_installed.stat.exists)
+  tags: dragonwell
+
+- name: Clean up Dragonwell
+  win_file:
+    path: C:\temp\dragonwell.zip
+    state: absent
+  tags: dragonwell

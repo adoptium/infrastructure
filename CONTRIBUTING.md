@@ -8,8 +8,8 @@ reproducing issues and more.
 
 ## Mission Statement
 
-To provide **secure**, **consistent**, **repeatable**, and **auditable** 
-infrastructure for the AdoptOpenJDK farm. See our full [Mission Statement]() for more details.
+To provide **secure**, **consistent**, **repeatable**, and **auditable**
+infrastructure for the AdoptOpenJDK farm. See our full [Mission Statement] for more details.
 
 ## Infrastructure Manifesto
 
@@ -34,7 +34,7 @@ Following these guidelines will help us merge your pull requests smoothly:
    pulled in, but also _why_ you'd like them added. Providing clarity on why
    you want changes makes it easier to accept, and provides valuable context to
    review.  If there is a link to an issue in the PR that contains these details
-   that is sufficient. 
+   that is sufficient.
 
 2. Follow the commit guidelines found below.
 
@@ -62,10 +62,10 @@ that the commit message is always going to be rendered in plain text.
 When a commit has related issues or commits, explain the relation in the message
 body. When appropriate, use the keywords described in the following help article
 to automatically close issues.
-https://help.github.com/articles/closing-issues-using-keywords/
+[Closing Issues Using Keywords](https://help.github.com/articles/closing-issues-using-keywords/)
 For example:
 
-```
+```md
 Install OpenSSL in windows playbook
 
 OpenSSL is required to compile java on windows, so the OpenSSL role will
@@ -75,19 +75,18 @@ Fixes: #1234
 ```
 
 All changes should be made to a personal fork of AdoptOpenJDK/infrastructure for making changes.
- 
+
 1. Fork this repository
 1. Create a branch off your fork
 1. Make the change
 1. Test it (see below)
 1. Submit a Pull Request
 
-Only reviewers in the [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) team have permission to merge requests for this `openjdk-infrastructure` repo, 
-so please ask one of those team members to review your Pull Request. 
+Only reviewers in the [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) team have permission to merge requests for this `openjdk-infrastructure` repo, so please ask one of those team members to review your Pull Request.
 
-# Using Vagrant to test your Ansible scripts (Ubuntu based)
+## Using Vagrant to test your Ansible scripts (Ubuntu based)
 
-**TODO** This has bit rotteed somewhat and needs to be looked at again.
+**TODO** This has bit rotted somewhat and needs to be looked at again.
 
 We expect developers to test their Ansible changes in a test environment.  
 A default one for Ubuntu based systems is provided for you via VirtualBox / Vagrant.  
@@ -95,7 +94,7 @@ See the guide below.
 
 [Ansible Scripts Guide](ansible/README.md)
 
-# Docs
+## Docs
 
-Project documentation in permanent form (e.g. Build Farm architecture) is stored 
+Project documentation in permanent form (e.g. Build Farm architecture) is stored
 in the [docs](docs) folder.

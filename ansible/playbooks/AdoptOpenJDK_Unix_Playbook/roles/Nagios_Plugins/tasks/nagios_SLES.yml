@@ -19,7 +19,6 @@
     - gcc
     - make
     - xinetd
-  tags: [nagios_plugins, adoptopenjdk]
 
 ###############
 # Nagios user #
@@ -29,7 +28,6 @@
   shell: |
     echo "nagios ALL = NOPASSWD: /usr/bin/zypper ref" >> /etc/sudoers
     echo "nagios ALL = NOPASSWD: /usr/bin/zypper list-patches" >> /etc/sudoers
-  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 ###################
 # Install plugins #
@@ -41,28 +39,29 @@
     mode: 0440
     timeout: 25
     checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
-  tags: [nagios_plugins, adoptopenjdk]
 
 - name: Extract nagios-plugins
   unarchive:
     src: /tmp/nagios-plugins-2.2.1.tar.gz
     dest: /tmp/
     copy: False
-  tags: [nagios_plugins, adoptopenjdk]
 
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Configure, make and make install nagios-plugins
   shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
-  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 ##############################
 # Install additional plugins #
 ##############################
-- name: Download add-on check_zypper plugin
-  get_url:
-    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
+- name: Copy check_zypper plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_zypper
     dest: /usr/local/nagios/libexec/check_zypper
     mode: 0755
-    checksum: sha256:005f7008c7d817e6de9bd1650fe198ad9fd0ebaade74ce45f1c6a9ae3fd278af
-  tags: [nagios_plugins, adoptopenjdk]
+
+- name: Copy check_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
+    mode: 0755

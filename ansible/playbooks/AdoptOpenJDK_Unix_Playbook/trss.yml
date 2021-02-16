@@ -6,6 +6,9 @@
 - hosts: all
   user: root
   become: yes
+  vars:
+    TRSS_working_dir: "/home/jenkins/openjdk-test-tools/TestResultSummaryService"
+    TRSS_config_path: "/data/db/credentials/trssConf.json"
   tasks:
     - block:
         - name: Load AdoptOpenJDKs variable file
@@ -154,6 +157,12 @@
             name: nginx
             state: restarted
           tags: nginx_conf
+
+        - name: Create forever service for frontend
+          shell: forever-service install TRSSFrontend -e "NODE_ENV=production" -f " --workingDir {{ TRSS_working_dir }}" --script {{ TRSS_working_dir }}/frontend.js  -o " --configFile={{ TRSS_config_path }}"
+
+        - name: Create forever service for backend
+          shell: forever-service install TRSSBackend -e "NODE_ENV=production NODE_OPTIONS=--max_old_space_size=4096 " -f " --workingDir {{ TRSS_working_dir }} " --script {{ TRSS_working_dir }}/backend.js  -o " --configFile={{ TRSS_config_path }}"
 
         - name: Add cron job to check for updates
           cron: name="Check for Updates every Sunday at 5am"

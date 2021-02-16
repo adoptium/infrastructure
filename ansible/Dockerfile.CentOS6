@@ -3,7 +3,9 @@ FROM centos:6.9
 ARG user=jenkins
 
 # Install Python 3
-RUN yum -y update; yum clean all; \
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    yum -y update; yum clean all; \
     yum -y install gcc openssl-devel bzip2-devel sqlite-devel sudo wget; \
     cd /usr/src; \
     wget -q https://www.python.org/ftp/python/3.6.10/Python-3.6.10.tgz; \

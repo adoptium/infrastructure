@@ -88,6 +88,15 @@ ansible_winrm_read_timeout_sec: 630
 
 Additional information about `winrm` variables can be found [here](https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/user_guide/windows_winrm.rst#inventory-options)
 
+If running from a Mac, you may encounter a python related error
+```
+objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
+objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
+ERROR! A worker was found in a dead state
+```
+In which case, running the following should fix it
+`export no_proxy="*"`
+
 ## Which playbook do I run?
 
 Our playbooks are named according to the operating system they are supported for, keep in mind that package availability may differ between operating system releases.
@@ -96,7 +105,7 @@ The main ones are as follows:
 
 - AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
 - AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
-- aix.yml (For AIX systems - not currently split out into individual roles)
+- AdoptOpenJDK_AIX_Playbook/main.yml (For AIX systems)
 - AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
 
 There are also various playbooks used to set up other machines in the

@@ -17,6 +17,7 @@ skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
 testDocker=false
+scriptPath=$(realpath $0)
 
 # Takes all arguments from the script, and determines options
 processArgs()
@@ -73,7 +74,7 @@ usage()
   --clean-workspace | -c         Remove the old work folder if detected
   --URL | -u <GitURL>            The URL of the git repository
   --test | -t                    Runs a quick test on the built JDK
-  --no-halt | -n                 Option to stop the vagrant VMs halting
+  --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
   --skip-more | -sm              Run playbook faster by excluding things not required by buildJDK
   --help | -h                    Displays this help message"
@@ -134,7 +135,7 @@ checkVagrantOS()
         if [[ "$newVagrantFiles" = "true" ]]; then
                 cd ${WORKSPACE}/adoptopenjdkPBTests/${folderName}-${branchName}/ansible
         else    
-                cd $WORKSPACE/ansible/
+                cd ${scriptPath%/*}/..
         fi
         vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
         if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
@@ -219,7 +220,7 @@ startVMPlaybook()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
@@ -237,7 +238,7 @@ startVMPlaybook()
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
 	
 	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 	
 	ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log
 	echo The playbook finished at : `date +%T`
@@ -290,7 +291,7 @@ startVMPlaybookWin()
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf $WORKSPACE/ansible/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 
 	# Remove the Hosts files if they're found

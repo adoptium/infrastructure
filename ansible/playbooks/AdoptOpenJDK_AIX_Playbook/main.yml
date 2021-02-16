@@ -15,14 +15,67 @@
     swap_size: 4096
 
   roles:
-    - aixfs
-    - syslogs
-    - X11
-    - xlc_v13
-    - xlc_v16
+    # Roles are put into 6 groups
+    ## AIX BOS install requirements
+    ## AIX BOS configuration
+    ## Core OSS (bash, unzip, gtar)
+    ## AIX User Admin
+    ## Additional Software
+    ## OJDK Bootstraps
+
+    # 1. AIX BOS install requirements
+
+    # These packages are installed using installp - which can enlarge
+    # filesystem space, as needed, on demand
     - openssl
 
+    # 2. AIX BOS configuration
+
+    - syslogs
+    # TBD: additional tasks below that need to be promoted to
+    # or migrated into an AIX setup role - in paritcular -
+    # the tasks that setup the legal shells needed for user configuration
+    # may need to be performed AFTER yum processing - rather than before
+
+    # 3. Core OSS installation
+
+    ## Note: this may actually already be performed - partially
+    ## depending on how python - to use Ansible - has been prepared
+    # yum based installation of additional software
+    # installs some gnu packages required by ansible modules
+    # Note: AIX File system configuration must be run now as RPM based software
+    # cannot expand filesystem space on demand
+    - aixfs
     - yum
+
+    # 4. AIX User Admin
+
+    # users needed - wait until here to be sure bash is installed
+    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
+    # to the list of legal shells.
+    - rbac
+    - role: jenkins_user
+      tags: adoptopenjdk
+    - role: zeus_user
+      tags: adoptopenjdk
+
+    # 5. Additional Software: both licensed and OSS
+
+    # Note: although X11 is AIX BOS software - there is a chance that the
+    # Ansible module unarchive: may be called - and that requires,
+    # at a minimum, gtar and unzip to be available - regardless of need.
+    # Likewise, the xlc files may also need the Ansible unarchive and
+    # need to be evaluated after the CORE OSS software has been installed.
+    - X11
+    ## verify/install licensed IBM compilers
+    - xlc_v13
+    - xlc_v16
+
+    ## additional OSS packages
+    - ant
+    - ant_contrib
+
+    # 6. Install OJDK Bootstraps
 
     - bootjdk7
     - bootjdk8
@@ -31,13 +84,9 @@
     - bootjdk11
     - bootjdk12
 
-    - ant
-    - ant_contrib
-
-    - jenkins_user
-    - zeus_user
-
   tasks:
+  # TBD: as much as possible reorganize the tasks here into a appropriate role
+  # And place it in one of the logical areas described above under roles:
   ######################################
   # Add bash to available login shells #
   ######################################
@@ -117,7 +166,7 @@
     - name: Include Nagios Playbook
       include_tasks: nagios/nagios_aix.yml
       when: Nagios_Plugins == "Enabled"
-      tags: nagios
+      tags: [nagios, adoptopenjdk]
 
   ###################
   # NTP Time Server #

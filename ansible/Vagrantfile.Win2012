@@ -1,14 +1,22 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Runs powershell as an administator and gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it. Then places a file in the shared folder of the VM that contains the IP address of the VM.
+# Runs Powershell as an administator and does the following:
+#  - Gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it.
+#  - Resizes the disk to ~100GB, in line with the 'disksize.size = 100GB' option in the config below
+
 $script = <<SCRIPT
 Start-Process powershell -Verb runAs
+
+# Windows 2012r2 needs to be forced to use TLS1.2, see: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1858
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 .\\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
 .\\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+
 # Retrieving disk's current size
 $currentDiskSize =(Get-Partition -DriveLetter c | select Size)
 $currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
@@ -21,6 +29,7 @@ if ([long]$currentDiskSize -lt $diskSizeBoundary) {
 }else {
         echo "Disk is already at max size"
 }
+
 Start-Process cmd -Verb runAs
 winrm set winrm/config/service '@{AllowUnencrypted="true"}'
 SCRIPT

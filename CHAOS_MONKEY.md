@@ -1,11 +1,11 @@
-# Can we Chaos Monkey it?
+# Can we Chaos Monkey it
 
-A goal for the project is to be able to tear down any of our build or test hosts 
+A goal for the project is to be able to tear down any of our build or test hosts
 and recreate it completely from our Ansible playbooks.
 
 ## Security and Patching
 
-Ansible must ensure that the underlying O/S is patched as well as any firewalls, 
+Ansible must ensure that the underlying O/S is patched as well as any firewalls,
 VPN and other security configured before making the host available.
 
 ## Core Infrastructure

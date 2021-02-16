@@ -1,0 +1,30 @@
+---
+###########
+# Solaris #
+###########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - autoconf
+  - binutils
+  - coreutils
+  - ccache
+  - ggrep
+  - jdk7
+  - jdk8
+  - pigz
+  - git
+  - sudo
+  - nano
+  - ntp
+  - wget
+  - curl
+  - freetype
+  - gmake
+  - gtar
+  - xz
+
+Test_Tool_Packages:
+  - perl
+
+crontab_Patching: "/opt/csw/bin/pkgutil --upgrade --yes"
