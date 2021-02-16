@@ -7,7 +7,7 @@
     home_folder: /home/{{ Jenkins_Username }}
   tags: [jenkins_user, adoptopenjdk]
 
-- name: Set Home Folder for Jenkins user (macoS)
+- name: Set Home Folder for Jenkins user (macos)
   set_fact:
     home_folder: /Users/{{ Jenkins_Username }}
   when:
