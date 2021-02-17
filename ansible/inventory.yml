@@ -45,9 +45,6 @@ hosts:
           solaris10u11-sparcv9-1: {}
           solaris10u11-sparcv9-2: {}
 
-      - linaro:
-          centos76-armv8-2: {ip: 213.146.141.123, user: centos}
-
       - macstadium:
           macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
