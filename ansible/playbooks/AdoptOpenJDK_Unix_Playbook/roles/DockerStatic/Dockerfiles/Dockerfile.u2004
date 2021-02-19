@@ -1,6 +1,5 @@
 FROM ubuntu:20.04
 
-# Without noninteractive Ubuntu 20.04 waits installing tzdata packae
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -qq -y perl openssh-server unzip 
 # Get java8
@@ -22,7 +21,7 @@ RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
-RUN apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6
+RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6
 # ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
