@@ -1,0 +1,84 @@
+---
+#################################################
+# Build basic test images for each distribution #
+#################################################
+
+- name: Send Dockerfiles to remote machine
+  copy:
+    src: Dockerfiles/
+    dest: /tmp/Dockerfiles/
+
+- name: Collate all Dockerfile names
+  find:
+    paths: "/tmp/Dockerfiles/"
+    patterns: "Dockerfile.*"
+  register: dockerfiles
+
+# Defaulting to x64 in Dockerfiles means no need to special case that one
+# since API architecture = ansible_architecture everywhere else we use this
+- name: Translate architecture name in dockerfiles
+  replace: dest={{ item.path }} regexp="arch=x64" replace="arch={{ ansible_architecture }}"
+  with_items: "{{ dockerfiles.files }}"
+  when: ansible_architecture != "x86_64"
+
+- name: Set jenkins authorized_Key in dockerfiles
+  replace: dest={{ item.path }} regexp="Jenkins_User_SSHKey" replace="{{ Jenkins_User_SSHKey }}"
+  with_items: "{{ dockerfiles.files }}"
+
+- name: Create docker images for each distribution for test
+  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ item }} --memory=8G -f /tmp/Dockerfiles/Dockerfile.{{ item }} /tmp/Dockerfiles
+  with_items:
+    - u1604
+    - u1804
+    - u2004
+    - u2010
+    - f33
+
+##############################################################
+# Start the containers                                       #
+# If startallcontainers is skipped, only start three of them #
+# ignore_errors simplest way to ignore if already started    #
+#                                                            #
+# TODO: Check if started rather than ignore error?           #
+# TODO: Restart if already started? (Use galaxy role?)       #
+# TODO: Use a calculated value instead of 2 core/6Gb         #
+##############################################################
+
+- name: Start Ubuntu 16.04 container if not already started
+  command: docker run --restart unless-stopped -p 2222:22 --cpus=2.0 --memory=6G --detach --name U1604_2222 aqa_u1604
+  tags: startcontainers
+  ignore_errors: yes
+
+- name: Start Ubuntu 18.04 container if not already started
+  command: docker run --restart unless-stopped -p 2223:22 --cpus=4.0 --memory=6G --detach --name U1804_2223 aqa_u1804
+  tags: startcontainers, startallcontainers
+  ignore_errors: yes
+
+- name: Start Ubuntu 20.04 container if not already started
+  command: docker run --restart unless-stopped -p 2224:22 --cpus=2.0 --memory=6G --detach --name U2004_2224 aqa_u2004
+  tags: startcontainers
+  ignore_errors: yes
+
+- name: Start Ubuntu 20.10 container if not already started
+  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2010_2225 aqa_u2010
+  tags: startcontainers, startallcontainers
+  ignore_errors: yes
+
+- name: Start fedora 33 container if not already started
+  command: docker run --restart unless-stopped -p 2227:22 --cpus=2.0 --memory=6G --detach --name   f33.2227 aqa_f33
+  tags: startcontainers
+  ignore_errors: yes
+
+# lineinfile does not work here - similar to the operation in /var/log in adopt_etc
+# lineinfile: path /proc/sys/kernel/core_pattern state: present: regexp: . line: core.%p
+# therefore the following section wil not become live prior to a reboot
+#
+- name: Make core file setting live immediately;
+  command: "echo core.%p > /proc/sys/kernel/core_pattern"
+
+- name: Ensure core files are able to be created within docker containers on reboot
+  lineinfile:
+    path: /etc/sysctl.conf
+    state: present
+    regexp: kernel_core_pattern
+    line: kernel.core_pattern=core.%p

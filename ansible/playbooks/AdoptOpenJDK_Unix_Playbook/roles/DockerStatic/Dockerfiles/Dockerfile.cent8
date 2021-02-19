@@ -1,0 +1,27 @@
+FROM centos:8
+
+RUN dnf -y update && dnf install -y perl openssh-server unzip wget
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+# Get java8
+RUN wget -q 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk' -O /tmp/jdk8.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
+# Install ant
+RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
+RUN wget -q -O /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+RUN ln -s /usr/local/apache-ant-1.10.5/bin/ant /usr/bin/ant
+RUN unzip -q -d /usr/local /tmp/ant.zip
+RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
+# Clear up space
+RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz
+# Set up jenkins user
+RUN useradd -m -d /home/jenkins jenkins
+RUN mkdir /home/jenkins/.ssh
+RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
+RUN chown -R jenkins /home/jenkins/.ssh
+RUN chmod -R og-rwx /home/jenkins/.ssh
+# RUN service ssh start
+CMD ["/usr/sbin/sshd","-D"]
+RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst
+# ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
+EXPOSE 22
+# Start with docker run -p 2222:22 UUID

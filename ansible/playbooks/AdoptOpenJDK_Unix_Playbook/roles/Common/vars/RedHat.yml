@@ -99,5 +99,3 @@ Test_Tool_Packages:
   - perl-devel
   - expat-devel
   - libcurl-devel
-
-crontab_Patching: "/usr/bin/yum -y update && yum clean packages"
