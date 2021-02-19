@@ -37,7 +37,7 @@
 
 - name: Setting Java 8 as default
   file:
-    src: /usr/java8_64
+    src: /usr/java8_64/jre/bin/java
     dest: /usr/bin/java
     state: link
   tags: java8
