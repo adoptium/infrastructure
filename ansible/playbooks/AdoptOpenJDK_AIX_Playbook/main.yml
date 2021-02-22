@@ -84,6 +84,9 @@
     - bootjdk11
     - bootjdk12
 
+    # Create zlib.h and zconf links to /opt/freeware/include/
+    - zlib_links
+
   tasks:
   # TBD: as much as possible reorganize the tasks here into a appropriate role
   # And place it in one of the logical areas described above under roles:

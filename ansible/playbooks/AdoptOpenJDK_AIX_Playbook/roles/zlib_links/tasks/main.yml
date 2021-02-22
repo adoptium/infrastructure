@@ -1,0 +1,31 @@
+#####################
+# zlib_links #
+#####################
+---
+- name: Checking for /opt/freeware/include/zlib.h
+  stat:
+    path: /opt/freeware/include/zlib.h
+  register: zlib
+  tags: zlib
+
+- name: Checking for /opt/freeware/include/zconf.h
+  stat:
+    path: /opt/freeware/include/zconf.h
+  register: zconf
+  tags: zlib
+
+- name: Link /usr/include/zlib.h to /opt/freeware/include/zlib.h
+  file:
+    src: /opt/freeware/include/zlib.h
+    dest: /usr/include/zlib.h
+    state: link
+  when: zlib.stat.exists
+  tags: zlib
+
+- name: Link /usr/include/zconf.h to /opt/freeware/include/zconf.h
+  file:
+    src: /opt/freeware/include/zconf.h
+    dest: /usr/include/zconf.h
+    state: link
+  when: zconf.stat.exists
+  tags: zlib
