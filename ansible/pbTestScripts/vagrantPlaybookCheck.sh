@@ -75,12 +75,12 @@ usage()
   --retainVM | -r                Option to retain the VM and folder after completion
   --build | -b                   Option to enable testing a native build on the VM
   --JDK-Version | -jdk <Version> Specify which JDK to build, if build is specified
-  --build-fork | -f              Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
-  --build-branch | -br           Specify the branch of the fork to build from (Default: master)
+  --build-fork | -bf             Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
+  --build-branch | -bb           Specify the branch of the fork to build from (Default: master)
   --build-hotspot                Build the JDK with Hotspot (Default: OpenJ9)
   --clean-workspace | -c         Remove the old work folder if detected
-  --branch                       Specify the branch of the infrastructure fork (Default: master)
-  --fork                         Specify the fork of openjdk-infrastructure to run the playbook from (Default: adoptopenjdk)
+  --fork | -f                    Specify the fork of openjdk-infrastructure to run the playbook from (Default: adoptopenjdk)
+  --branch | -br                 Specify the branch of the infrastructure fork (Default: master)
   --test | -t                    Runs a quick test on the built JDK
   --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
