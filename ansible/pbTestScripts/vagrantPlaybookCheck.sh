@@ -3,8 +3,10 @@ set -eu
 
 branchName=''
 folderName=''
-gitURL=''
-buildURL=''
+gitFork=''
+gitBranch=''
+buildFork=''
+buildBranch=''
 vagrantOS=''
 retainVM=false
 testNativeBuild=false
@@ -36,8 +38,10 @@ processArgs()
 				jdkToBuild="$1"; shift;;
 			"--retainVM" | "-r" )
 				retainVM=true;;
-			"--URL" | "-u" )
-				gitURL="$1"; shift;;
+			"--fork" | "-f" )
+				gitFork="$1"; shift;;
+			"--branch" | "-br" )
+				gitBranch="$1"; shift;;
 			"--test" | "-t" )
 				runTest=true;;
 			"--no-halt" | "-nh" )
@@ -48,8 +52,10 @@ processArgs()
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
 				fastMode=true;;
-			"--build-repo" | "-br" )
-				buildURL="--URL $1"; shift;;
+			"--build-fork" | "-bf" )
+				buildFork="--fork $1"; shift;;
+			"--build-branch" | "-bb" )
+				buildBranch="--branch $1"; shift;;
 			"--build-hotspot" )
 				buildHotspot="--hotspot";;
 			"--test-docker" )
@@ -69,10 +75,12 @@ usage()
   --retainVM | -r                Option to retain the VM and folder after completion
   --build | -b                   Option to enable testing a native build on the VM
   --JDK-Version | -jdk <Version> Specify which JDK to build, if build is specified
-  --build-repo | -br <GitURL>    Specify the openjdk-build repo to build with
-  --build-hotspot                Build the JDK with Hotspot (Default is OpenJ9)
+  --build-fork | -f              Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
+  --build-branch | -br           Specify the branch of the fork to build from (Default: master)
+  --build-hotspot                Build the JDK with Hotspot (Default: OpenJ9)
   --clean-workspace | -c         Remove the old work folder if detected
-  --URL | -u <GitURL>            The URL of the git repository
+  --branch                       Specify the branch of the infrastructure fork (Default: master)
+  --fork                         Specify the fork of openjdk-infrastructure to run the playbook from (Default: adoptopenjdk)
   --test | -t                    Runs a quick test on the built JDK
   --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
@@ -97,9 +105,13 @@ checkVars()
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
 		WORKSPACE=$HOME
 	fi
-	if [ "$gitURL" == "" ]; then
-		echo "No GitURL specified; Defaulting to adoptopenjdk/openjdk-infrastructure"
-		gitURL=https://github.com/adoptopenjdk/openjdk-infrastructure
+	if [ "$gitBranch" == "" ]; then
+		echo "No branch specified; Defaulting to 'master'"
+		gitBranch="master"
+	fi
+	if [ "$gitFork" == "" ]; then
+		echo "No Fork specified; Defaulting to 'adoptopenjdk'"
+		gitFork="adoptopenjdk"
 	fi
 	if [[ "$retainVM" == false && "$vmHalt" == false ]]; then
 		echo "Must halt the VM to destroy it; Ignoring '--no-halt' option"
@@ -156,57 +168,25 @@ checkVagrantOS()
         fi
 }
 
-splitURL()
-{
-        # IFS stands for Internal Field Seperator and determines the delimiter for splitting.
-        IFS='/' read -r -a array <<< "$gitURL"
-        if [ ${array[@]: -2:1} == 'tree' ]
-        then
-                gitURL=""
-                branchName=${array[@]: -1:1}
-                folderName=${array[@]: -3:1}
-                unset 'array[${#array[@]}-1]'
-                unset 'array[${#array[@]}-1]'
-                for i in "${array[@]}"
-                do
-                        gitURL="$gitURL$i/"
-                done
-        else
-                folderName=${array[@]: -1:1}
-                branchName="master"
-        fi
-}
-
 setupWorkspace()
 {
 	local workFolder=$WORKSPACE/adoptopenjdkPBTests
+	local gitDirectory=${workFolder}/${gitFork}-${gitBranch}
 	mkdir -p ${workFolder}/logFiles
 
-	if [[ "$cleanWorkspace" = true && -d ${workFolder}/${folderName}-${branchName} ]]; then
+	if [[ "$cleanWorkspace" = true && -d ${gitDirectory} ]]; then
 		echo "Cleaning old workspace"
-		rm -rf ${workFolder}/${folderName}-${branchName}
-	elif [[ "$cleanWorkspace" = true && ! -d $workFolder/${folderName}-${branchName} ]]; then
+		rm -rf ${gitDirectory}
+	elif [[ "$cleanWorkspace" = true && ! -d ${gitDirectory} ]]; then
 		echo "No old workspace detected, moving on"
 	fi
 
-        if [ "$branchName" == "master" ]; then
-                echo "Detected as the master branch"
-                if [ ! -d "${workFolder}/${folderName}-master" ]; then
-                        git clone $gitURL ${workFolder}/${folderName}-master
-                else
-                        cd ${workFolder}/${folderName}-master
-                        git pull
-                fi
-        else
-                echo "Branch detected"
-                if [ ! -d "${workFolder}/${folderName}-${branchName}" ]; then
-                        git clone -b $branchName --single-branch $gitURL ${workFolder}/${folderName}-${branchName}
-                else
-                        cd ${workFolder}/${folderName}-${branchName}
-                        git pull
-                fi
+	if [ ! -d "${gitDirectory}" ]; then
+		git clone -b ${gitBranch} --single-branch https://github.com/${gitFork}/openjdk-infrastructure ${gitDirectory}
+	else
+		cd ${gitDirectory}
+		git pull
         fi
-
 }
 
 # Takes the OS as arg 1
@@ -214,9 +194,9 @@ startVMPlaybook()
 {
 	local OS=$1
 	local vagrantPORT=""
-	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log"
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.log"
 
-	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
@@ -248,8 +228,8 @@ startVMPlaybook()
 	fi
 
 	if [[ "$testNativeBuild" = true ]]; then
-		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
-		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildURL $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
+		ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildBranch $buildFork $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
@@ -257,7 +237,7 @@ startVMPlaybook()
 		fi
 
 		if [[ "$runTest" = true ]]; then
-			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.test_log"
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
 			ssh -p ${vagrantPORT} -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh" 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then
@@ -284,10 +264,10 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
-	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.log"
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.log"
 	local vagrantPort=
 
-	cd $WORKSPACE/adoptopenjdkPBTests/$folderName-$branchName/ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
@@ -326,7 +306,7 @@ startVMPlaybookWin()
 	fi
         
 	if [[ "$testNativeBuild" = true ]]; then
-		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.build_log"
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
 
 		# Restarting the VM as the shared folder disappears after the playbook runs due to the restarts in the playbook
 		vagrant halt && vagrant up
@@ -339,7 +319,7 @@ startVMPlaybookWin()
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -a "$buildURL $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
@@ -347,7 +327,7 @@ startVMPlaybookWin()
 		fi
 	
 		if [[ "$runTest" = true ]]; then
-			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/$folderName.$branchName.$OS.test_log"
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
 			
 			# Run a python script to start a test for the built JDK on the Windows VM
 			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -t 2>&1 | tee $testLogPath
@@ -370,12 +350,12 @@ destroyVM()
 	echo === showing global status while pruning:
 	vagrant global-status --prune
 	echo === Determining VM to destroy:
-	VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${folderName}-${branchName}/ { print \\$1 }"`
+	VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${gitFork}-${gitBranch}/ { print \\$1 }"`
 	if [ ! -z "$VM_TO_DESTROY" ]; then
 	  echo === Destroying VM with id $VM_TO_DESTROY
 	  vagrant destroy -f $VM_TO_DESTROY
 	else
-	  echo === NOT DESTROYING ANY VM as no suitable ID was found searching for $OS and ${folderName}-${branchName}
+	  echo === NOT DESTROYING ANY VM as no suitable ID was found searching for $OS and ${gitFork}-${gitBranch}
 	fi
         echo === Final status:
         vagrant global-status --prune
@@ -384,7 +364,6 @@ destroyVM()
 
 processArgs $*
 checkVars
-splitURL
 setupWorkspace
 checkVagrantOS
 
