@@ -14,6 +14,7 @@ RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo; \
     ./configure --enable-optimizations; \
     make install; \
     rm /usr/src/Python-3.6.10.tgz; \
+    pip3 install --upgrade pip; \
     pip3 install ansible
 
 COPY . /ansible
