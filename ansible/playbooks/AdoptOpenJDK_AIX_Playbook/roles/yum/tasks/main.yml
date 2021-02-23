@@ -105,7 +105,7 @@
     - rpm_install
     - yum
 
-# Create zlib.h and zconf.h links
+# Create zlib.h and zconf.h links - See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1952
 
 - name: Checking for /opt/freeware/include/zlib.h
   stat:
