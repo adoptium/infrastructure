@@ -73,7 +73,7 @@
 
 - name: Start Alpine 3.11 container if not already started
   command: docker run --restart unless-stopped -p 2228:22 --cpus=2.0 --memory=6G --detach --name alp311.2228 aqa_alp311
-  tags: startcontainers
+  tags: startcontainers, startallcontainers
   ignore_errors: yes
 
 - name: Start Alpine 3.12 container if not already started
