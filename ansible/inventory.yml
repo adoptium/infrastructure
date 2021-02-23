@@ -87,6 +87,8 @@ hosts:
       - packet:
           ubuntu1604-armv8-1: {ip: 147.75.77.146, description: D05}
           ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
+          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC}
+
 
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
