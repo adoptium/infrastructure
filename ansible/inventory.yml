@@ -33,6 +33,7 @@ hosts:
       - azure:
           win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk}
           win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk}
+          win2016-x64-1: {ip: 51.104.239.17, user: adoptopenjdk}
 
       - digitalocean:
           centos69-x64-2: {ip: 167.71.130.191}
