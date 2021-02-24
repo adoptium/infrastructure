@@ -25,6 +25,7 @@
     - Version
     - adopt_etc
     - Common
+    - Python2.7                   # CentOS6
     - Providers                   # AdoptOpenJDK Infrastructure
     - autoconf
     - curl

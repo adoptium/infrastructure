@@ -101,7 +101,26 @@
   until: adoptopenjdk_download is not failed
   when:
     - ansible_distribution != "MacOSX"
+    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+# CentOS6 needs it's own task so it can use a different python interpreter.
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1877
+- name: Install latest release if not already installed (CentOS6)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  vars:
+    - ansible_python_interpreter: /usr/local/python2/bin/python2.7
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
