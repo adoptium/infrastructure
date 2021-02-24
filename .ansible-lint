@@ -12,3 +12,6 @@ skip_list:
   - '501'  # Become_user requires become to work as expected
   - '601'  # Don't compare to literal True/False
   - '602'  # Don't compare to empty string
+
+exclude_paths:
+  - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926

@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
     - ansible/**
+    - .ansible-lint
     branches:         
     - master
   push:
