@@ -1,6 +1,13 @@
 # Ansible playbooks to download and install dependencies for OpenJDK build and test on various platforms
 
-# Quickstart guide
+This is the entry point for you to work with our Ansible scripts.  Also see:
+
+* [CONTRIBUTING Guide](../CONTRIBUTING.md)
+* [Manual Steps Guide](../MANUAL_STEPS.md)
+* [Setting up QEMU Images Guide](docs/Setup-QEMU-Images.md)
+* [Setting up RISCV-VMs Guide](docs/Setup-RISC-VMs.md)
+
+## Quickstart guide
 
 The ansible playbooks under the `playbook` directory are used to set up all
 of the adoptopenjdk machines to be able to run building and testing of the
@@ -11,7 +18,7 @@ following command (the skipped tags are one that aren't needed on most
 user's machines, but are needed if you're setting up a machine for the
 official AdoptOpenJDK infrastructure):
 
-```
+```bash
 ansible-playbook -i inventory_file --skip-tags adoptopenjdk,jenkins playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
@@ -26,20 +33,23 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 1) Install Ansible 2.4 or later (
 
-    - On RHEL 7.x
+    * On RHEL 7.x
+
     ```bash
     yum install epel-release
     yum install ansible
     ```
 
-    - For Ubuntu
+    * For Ubuntu
+
     ```bash
     sudo apt-add-repository ppa:ansible/ansible
     sudo apt update
     sudo apt install ansible
     ```
 
-    - On another system with `pip` available:
+    * On another system with `pip` available:
+
     ```bash
     sudo pip install ansible
     ```
@@ -47,6 +57,7 @@ Yes, in order to access the package repositories (we will perform either `yum in
 2) Ensure that you have edited the `hosts` in `/etc/ansible/` or in the project root directory. For running locally `hosts` file should contain something as simple as `localhost ansible_connection=local`.
 
 3) Run a playbook to install dependencies, e.g. for Ubuntu 14.x on x86:
+
     ```bash
     ansible-playbook -s playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins
 
@@ -58,9 +69,9 @@ Yes, in order to access the package repositories (we will perform either `yum in
 
 ## How do I run the playbooks on a remote Windows host?
 
-Ansible can't be installed locally on a Windows machine, therefore the playbook has to be ran on a seperate system and then pointed at a Windows Machine.
+Ansible can't be installed locally on a Windows machine, therefore the playbook has to be ran on a separate system and then pointed at a Windows Machine.
 
-This can be done by doing the following: 
+This can be done by doing the following:
 
 1) In `playbooks/AdoptOpenJDK_Windows_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
 2) Alter `playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml` to add `ansible_winrm_transport: credssp`. Uncomment and set `ansible_password` to your admin user's password.
@@ -89,11 +100,13 @@ ansible_winrm_read_timeout_sec: 630
 Additional information about `winrm` variables can be found [here](https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/user_guide/windows_winrm.rst#inventory-options)
 
 If running from a Mac, you may encounter a python related error
-```
+
+```log
 objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
 objc[39516]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
 ERROR! A worker was found in a dead state
 ```
+
 In which case, running the following should fix it
 `export no_proxy="*"`
 
@@ -103,26 +116,28 @@ Our playbooks are named according to the operating system they are supported for
 
 The main ones are as follows:
 
-- AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
-- AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
-- AdoptOpenJDK_AIX_Playbook/main.yml (For AIX systems)
-- AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
+* AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
+* AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
+* AdoptOpenJDK_AIX_Playbook/main.yml (For AIX systems)
+* AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
 
 There are also various playbooks used to set up other machines in the
 adoptopenjdk infrastructure - generally most end users won't need these but
 I'll include them for completeness:
 
-- vagrant.yml (Used to set up an Ubuntu machine to run Vagrant playbook testing)
+* vagrant.yml (Used to set up an Ubuntu machine to run Vagrant playbook testing)
 
 ## Where can I run the playbooks?
 
 On any machine you have SSH access to: in the playbooks here we are using `hosts: local`,
 our playbook will run on the hosts defined in the Ansible install directory's `hosts` file. To run on the local machine,
 we will have the following text in our `/etc/ansible/hosts` file:
-```
+
+```bash
 [local]
 127.0.0.1
 ```
+
 Running `ansible --version` will display your Ansible configuration folder that contains the `hosts` file you can modify
 
 ## Skipping one or more tags via CLI when running Ansible playbooks
@@ -146,8 +161,9 @@ ansible-playbook -i [/path/to/hosts] -b AdoptOpenJDK_Unix_Playbook/main.yml --ex
 ```
 
 Note that when running from inside a `vagrant` instance:
- - the `[/path/to/hosts]` can be replace with `/vagrant/playbooks/hosts`
- - the `[/path/to/id_rsa.pub]` can be replaced with `/home/vagrant/.ssh/id_rsa.pub`
+
+* the `[/path/to/hosts]` can be replace with `/vagrant/playbooks/hosts`
+* the `[/path/to/id_rsa.pub]` can be replaced with `/home/vagrant/.ssh/id_rsa.pub`
 
 This is useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
 
@@ -164,19 +180,21 @@ ansible-playbook -vvvv -b playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 
 A snippet from the man pages of Ansible:
 
->     -v, --verbose
->           verbose mode (-vvv for more, -vvvv to enable connection debugging)
+```log
+   -v, --verbose
+       verbose mode (-vvv for more, -vvvv to enable connection debugging)
+```
 
 ## Expected output of a successful Ansible build
 
 When the above `ansible-playbook` commands succeed, we should get something like this:
 
-```
+```bash
 PLAY RECAP *********************************************************************
 172.28.128.134             : ok=131  changed=96   unreachable=0    failed=0   
 ```
 
-# Running via Vagrant and VirtualBox
+## Running via Vagrant and VirtualBox
 
 We have some automation for running under Vagrant which we use to validate
 playbook changes before they are merged. See the
@@ -190,15 +208,20 @@ Any additional help in setting up Vagrant with Virtualbox can be found [here](ht
 
 To test the ansible scripts, you'll need to install the following programs.
 
-1. Install Homebrew 2.1.7 or later
+1.) Install Homebrew 2.1.7 or later
+
   ```bash
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   ```
-2. Install Vagrant 2.2.5 or later
+
+2.) Install Vagrant 2.2.5 or later
+
   ```bash
   brew cask install vagrant
   ```
-3. Install Virtualbox 6.0.8 or later:
+
+3.) Install Virtualbox 6.0.8 or later:
+
   ```bash
   brew cask install virtualbox
   ```
@@ -209,7 +232,7 @@ Note: `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` is required before runnin
 
 If you're on Ubuntu we have a playbook that can be used to set up your
 machine to run vagrant in [playbooks/vagrant.yml](playbooks/vagrant.yml) but
-it simply installs Vagrant from https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
+it simply installs Vagrant from [Hashicorp](https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb)
 and also [virtualbox from their web site](https://www.virtualbox.org/wiki/Downloads)
 
 ## Executing under vagrant
@@ -237,10 +260,11 @@ cd /vagrant/playbooks
 ```
 
 Note when using our Vagrantfiles:
- - A `hosts` file containing `localhost ansible_connection=local` will already be present in the directory with the playbook scripts (`/vagrant/playbooks`).
- - A public key file `id_rsa.pub` will already be present in the `/home/vagrant/.ssh/` folder
 
-1) Run a playbook to install dependencies, for Linux on x86:
+* A `hosts` file containing `localhost ansible_connection=local` will already be present in the directory with the playbook scripts (`/vagrant/playbooks`).
+* A public key file `id_rsa.pub` will already be present in the `/home/vagrant/.ssh/` folder
+
+Example of running a playbook to install dependencies, for Linux on x86:
 
 `ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
 
@@ -249,6 +273,7 @@ In case one or more tasks fail or should not be run in the local environment, se
 ```bash
 ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"
 ```
+
 ## Using Ansible to modify Vagrant VM remote hosts (linux)
 
 The following method runs the ansible playbooks against a Vagrant VM remotely.
@@ -260,6 +285,7 @@ ssh-keygen -q -f id_rsa -t rsa -N '' # Generate a keypair for use between host a
 
 vagrant up
 ```
+
 After starting the vagrant machine, several files need to be edited to allow ansible to make the connection.
 
 1) In `playbooks/AdoptOpenJDK_Unix_Playbook/main.yml` change `- hosts: {{ groups['Vendor_groups'] ...` to `- hosts: all`
@@ -274,18 +300,19 @@ ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.tmp -u vagrant -b
 
 ## Using Ansible to modify Vagrant VM remote hosts (Windows)
 
-To run the playbook against a Windows Vagrant VM remotely, the follow steps can be taken: 
+To run the playbook against a Windows Vagrant VM remotely, the follow steps can be taken:
 
 ```bash
 vagrant plugin install vagrant-disksize
 
-pip install pywinrm requests-credssp	# Pre-reqs for using winrm
+pip install pywinrm requests-credssp # Pre-reqs for using winrm
 
 ln -sf Vagrantfile.Win2012 Vagrantfile
 
 vagrant up
 ```
-Note: If the machine running this only has 8G of memory, the windows VM may go into an aborted state on bootup. This is due to assigning the VM too much memory.
+
+Note: If the machine running this only has 8G of memory, the windows VM may go into an aborted state on boot. This is due to assigning the VM too much memory.
 To stop this, halve the memory to the VM by changing the following line in the Windows vagrantfile: `v.memory = 5120`
 
 Several files will also need to be edited for Windows:
@@ -316,4 +343,5 @@ To access each vagrant VM, you'll need to be in the correct directory to `vagran
 ```bash
 vagrant ssh 1a2b3c4d
 ```
+
 Use `vagrant-global-status --prune` to find the directory the vagrant VM is in and the ID of the machine.
