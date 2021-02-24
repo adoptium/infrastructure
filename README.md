@@ -4,6 +4,14 @@
 
 [![Build Status](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure.svg?branch=master)](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure)
 
+## Documentation Index
+
+* [Contributing Guide](CONTRIBUTING.md) - Our Contribution Guide.
+* [Onboarding Guide](ONBOARDING.md) - Our guide for onboarding new team members.
+* [Security Guide](SECURITY.md) - Our security policy.
+* [Inventory](ansible/inventory.yml) - Our inventory, [visualized](docs/adoptopenjdk.pdf).
+* [Ansible at AdoptOpenJDK](ansible/README.md) - Our hosts are built using Ansible Playbooks.
+
 ## Mission Statement
 
 To provide infrastructure for the AdoptOpenJDK farm that is:
@@ -22,20 +30,18 @@ our [Contribution
 Guidelines](https://www.github.com/adoptopenjdk/openjdk-infrastructure/CONTRIBUTING.md)
 on how we implement these goals.
 
-## Can we Chaos Monkey it
+## Infrastructure Manifesto
 
-See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
+* We prefer using prebuilt, Galaxy provided Ansible playbooks over NIHing our own
+* We prefer using binaries from official repositories over building our own
+* We prefer explicit comments within the code to explain our reasoning over implicit assumptions
+* We embrace the Chaos Monkey
 
 ## Related Repositories
 
 * [email](https://www.github.com/adoptopenjdk/email/) - A repo containing configuration for our email aliases etc.
 * [secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets.
 * [openjdk-jenkins-helper](https://www.github.com/adoptopenjdk/openjdk-jenkins-helper/) - A repo containing helper scripts for out Jenkins CI.
-
-## Important Documentation
-
-* [hosts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualized](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/adoptopenjdk.pdf).
-* [Ansible at AdoptOpenJDK](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
 
 ## Contributing
 
@@ -46,71 +52,17 @@ submitting Pull Requests.
 
 ## Members
 
-We list members and their organisation affiliation for maximum transparency. Want to add
+We list members and their organisation affiliation in GitHub for maximum transparency. Want to add
 a new member? Please follow our [Onboarding Process](ONBOARDING.md).
 
-`*` Indicates access to the secrets repo
-
-## [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
-
-Team that holds super user access to Infrastructure
-
-* [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
-* [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
-
-## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
-
-Core infrastructure team - granted access to hosts on a case by case basis
-
-* [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-* [@gdams](https://github.com/gdams) - George Adams (Microsoft)
-* [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
-* [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-* [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC) - *
-* [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM) - *
-* [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
-* [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
-* [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat) - *
-* [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
-* [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK) - *
-
-## [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure)
-
-Issues can be assigned to these folks
-
-* [@AdamBrousseau](https://github.com/AdamBrousseau) - Adam Brousseau (IBM)
-* [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
-* [@cwesMills](https://github.com/cwesMills) - Colton Mills (IBM)
-* [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
-* [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
-* [@HusainYusafali](https://github.com/HusainYusufali) - Husain Yusufali (IBM)
-* [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
-* [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
-* [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
-* [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK)
-
-### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
-
-* [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
-* [@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (Red Hat)
-* [@gdams](https://github.com/gdams) - George Adams (Microsoft)
-* [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
-* [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
-* [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
-* [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
-* [@smlambert](https://github.com/smlambert) - Shelley Lambert (Red Hat)
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat)
-* [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat)
-* [@VermaSh](https://github.com/VermaSh) Shubham Verma (IBM)
+* [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - Can manage issues and PRs at GitHub.
+* [infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core) - admin access to openjdk-infrastructure.
+* [infrastructure-secret](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-secret) - higher level of access for system administrators only.
+* [infrastructure-triage](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-triage) - starting team for new joiners.
 
 ### Host Information
 
-Most information about our machines can be found at [Inventory](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml)
+Most information about our machines can be found at [Inventory](ansible/inventory.yml)
 
 ### Maintenance Information
 

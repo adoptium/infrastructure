@@ -1,5 +1,7 @@
 # AdoptOpenJDK - Infrastructure Onboarding Guide
 
+This guide is for adding new folks to the infrastructure team.
+
 ## Tasks before onboarding
 
 - Submit a Pull Request to the [README](README.md) with the proposed user and level of access required.
@@ -13,10 +15,10 @@ Assuming the PR is approved
 
 Add the user to the correct Infrastructure team:
 
-- [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - Super Users
-- [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - Core Infra Team
-- [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure) - Can be assigned Infra Issues
-- [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins) - Super users on Jenkins
+- [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - Can manage issues and PRs at GitHub.
+- [infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core) - admin access to openjdk-infrastructure.
+- [infrastructure-secret](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-secret) - higher level of access for system administrators only.
+- [infrastructure-triage](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-triage) - starting team for new joiners.
 
 ### [Secrets](https://github.com/AdoptOpenJDK/secrets)
 
