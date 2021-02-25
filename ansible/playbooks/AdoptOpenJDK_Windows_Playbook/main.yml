@@ -49,7 +49,6 @@
     - Firefox
     - Strawberry_Perl             # Testing
     - Freemarker                  # OpenJ9
-    - cmake                       # OpenJ9
     - GIT
     - Java7                       # JDK8 build bootstrap
     - Java8                       # JDK9 build bootstrap/ For Gradle
