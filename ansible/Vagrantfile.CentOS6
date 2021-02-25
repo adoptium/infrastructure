@@ -25,7 +25,7 @@ echo "--------------------------------------------------------------------------
 echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains ***"
 cat $VAGRANT_MOUNT/playbooks/hosts
 echo "---------------------------------------------------------------------------------------"
-# Put the host machine's IP into the authorised_keys file on the VM
+# Put the host machine's IP into the authorized_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
 	mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
