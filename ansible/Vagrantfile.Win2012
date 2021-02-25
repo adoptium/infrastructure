@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Runs Powershell as an administator and does the following:
+# Runs Powershell as an administrator and does the following:
 #  - Gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it.
 #  - Resizes the disk to ~100GB, in line with the 'disksize.size = 100GB' option in the config below
 
