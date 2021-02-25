@@ -11,13 +11,10 @@ reproducing issues and more.
 The infrastructure project contains:
 
 1. The [Ansible Playbooks](ansible/playbooks) for bootstrapping the build and test hosts (including a way to test Ansible).
-<<<<<<< HEAD
 1. The [Vagrant files](ansible/) for running our full suite of tests.
 1. The [Dockerfiles](ansible/) are used for:
    1. Running a subset of tests as GitHub actions (on a PR).
    1. Providing the base images for running builds on Docker containers in our build farm.
-=======
->>>>>>> 20e57cd (Overhaul of the Infrastructure docs)
 1. The overriding [Documentation](docs) for the build farm.
 1. Configuration files for linters etc in the root folder.
 
@@ -183,7 +180,6 @@ against a variety of Operating Systems using Vagrant and the scripts in
 [pbTestScripts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible/pbTestScripts)
 to validate them.
 
-<<<<<<< HEAD
 ## Dockerfiles as base images for our builds
 
 We have Dockerfiles that are used to build the base images that our build farm uses for running docker based builds.
@@ -198,8 +194,6 @@ We have Dockerfiles that are used to build the base images that our build farm u
 
 When a change lands into master, the relevant dockerfiles are built using their relevant CI systems and pushed up to Dockerhub where they can be consumed by our jenkins build agents.
 
-=======
->>>>>>> 20e57cd (Overhaul of the Infrastructure docs)
 ## Jenkins access
 
 The AdoptOpenJDK Jenkins server at [https://ci.adoptopenjdk.net](https://ci.adoptopenjdk.net) is used for all the
