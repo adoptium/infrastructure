@@ -11,6 +11,10 @@ reproducing issues and more.
 The infrastructure project contains:
 
 1. The [Ansible Playbooks](ansible/playbooks) for bootstrapping the build and test hosts (including a way to test Ansible).
+1. The [Vagrant files](ansible/) for running our full suite of tests.
+1. The [Dockerfiles](ansible/) are used for:
+   1. Running a subset of tests as GitHub actions (on a PR).
+   1. Providing the base images for running builds on Docker containers in our build farm.
 1. The overriding [Documentation](docs) for the build farm.
 1. Configuration files for linters etc in the root folder.
 
@@ -175,6 +179,18 @@ job first. This job takes a branch from a fork of the
 against a variety of Operating Systems using Vagrant and the scripts in
 [pbTestScripts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible/pbTestScripts)
 to validate them.
+
+## Dockerfiles as base images for our builds
+
+We have Dockerfiles that are used to build the base images that our build farm uses for running docker based builds.
+
+| Dockerfile | Image | Platforms  |
+|---|---|---|
+| [Centos7](./ansible/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux/amd64, linux/arm64, linux/ppc64le  |
+| [Centos6](./ansible/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 |
+| [Alpine3](./ansible/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 |
+| [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 |
+| [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 |
 
 ## Jenkins access
 
