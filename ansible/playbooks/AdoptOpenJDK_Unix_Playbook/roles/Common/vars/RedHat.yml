@@ -99,3 +99,4 @@ Test_Tool_Packages:
   - perl-devel
   - expat-devel
   - libcurl-devel
+  - mercurial

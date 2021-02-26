@@ -70,7 +70,6 @@ checkJDK() {
 		exit 1
 	fi
 	if ((JAVA_TO_BUILD == 8)); then
-		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-7
 		export JAVA_TO_BUILD="jdk8u"
 	elif ((JAVA_TO_BUILD > JDK_GA)); then
 		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-${JDK_GA}
@@ -80,7 +79,6 @@ checkJDK() {
 			export JAVA_TO_BUILD="jdk${JAVA_TO_BUILD}"
 		fi
 	else
-		export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-$((JAVA_TO_BUILD - 1))
 		export JAVA_TO_BUILD="jdk${JAVA_TO_BUILD}u"
 	fi
 }
@@ -95,12 +93,6 @@ cloneRepo() {
 	fi
 }
 # Set defaults
-export JAVA_TO_BUILD=jdk8
-export JDK_BOOT_DIR=/cygdrive/c/openjdk/jdk-7
-export VARIANT=openj9
-export PATH=/usr/bin/:$PATH
-export TARGET_OS=windows
-export ARCHITECTURE=x64
 export JAVA_HOME=/cygdrive/c/openjdk/jdk-8
 
 GIT_FORK=adoptopenjdk
@@ -113,18 +105,17 @@ setJDKVars
 processArgs $*
 cloneRepo
 
-export FILENAME="${JAVA_TO_BUILD}_${VARIANT}_${ARCHITECTURE}"
-echo "DEBUG:
-	TARGET_OS=$TARGET_OS
-	ARCHITECTURE=$ARCHITECTURE
-	JAVA_TO_BUILD=$JAVA_TO_BUILD
-	VARIANT=$VARIANT
-	JDK_BOOT_DIR=$JDK_BOOT_DIR
-	JAVA_HOME=$JAVA_HOME
-	WORKSPACE=$WORKSPACE
-	FORK=$GIT_FORK
-	BRANCH=$GIT_BRANCH
-	FILENAME=$FILENAME"
+echo "buildJDKWin.sh DEBUG:
+	TARGET_OS=${TARGET_OS:-}
+	ARCHITECTURE=${ARCHITECTURE:-}
+	JAVA_TO_BUILD=${JAVA_TO_BUILD:-}
+	VARIANT=${VARIANT:-}
+	JDK_BOOT_DIR=${JDK_BOOT_DIR:-}
+	JAVA_HOME=${JAVA_HOME:-}
+	WORKSPACE=${WORKSPACE:-}
+	FORK=${GIT_FORK:-}
+	BRANCH=${GIT_BRANCH:-}
+	FILENAME=${FILENAME:-}"
 
 echo "Running $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh"
 $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh

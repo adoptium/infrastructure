@@ -15,6 +15,12 @@
   when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
   tags: crontab
 
+- name: Add cron job to apply OS updates on apk-based systems
+  cron: name="Check for updates everyday at 2:32am" weekday="*" minute="32" hour="2" user=root state=present
+        job="/sbin/apk update && /sbin/apk upgrade"
+  when: (ansible_distribution == "Alpine")
+  tags: crontab
+
 - name: Add cron job to apply OS updates on zypper-based systems
   cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
         job="/usr/bin/zypper refresh && /usr/bin/zypper -n up"
