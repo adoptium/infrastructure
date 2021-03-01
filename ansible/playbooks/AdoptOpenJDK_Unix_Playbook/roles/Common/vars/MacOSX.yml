@@ -7,7 +7,6 @@
 
 Build_Tool_Packages:
   - autoconf
-  - ccache
   - cmake # OpenJ9
   - coreutils
   - gnu-sed
@@ -17,6 +16,9 @@ Build_Tool_Packages:
 
 Build_Tool_Packages_NOT_arm64:
   - bash # OpenJ9 needs bash v4 or later
+
+Build_Tool_Packages_NOT_10_12:
+  - ccache # ccache is no longer working on macOS 10.12
 
 Build_Tool_Casks:
   - adoptopenjdk10

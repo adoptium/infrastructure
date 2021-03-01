@@ -100,20 +100,20 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-# RedHat
-- name: Install EPEL repo for RedHat 7
+# RedHat/CentOS
+- name: Install EPEL repo for RedHat/CentOS 7
   yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
   ignore_errors: yes
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "RedHat"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
   tags: docker
 
-- name: Add Docker Repo for RedHat 7 x86_64
+- name: Add Docker Repo for RedHat/CentOS 7 x86_64
   get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
@@ -121,15 +121,15 @@
     owner: root
     group: root
     mode: 0644
-    checksum: sha256:6650718e0fe5202ae7618521f695d43a8bc051c539d7570f0edbfa5b4916f218
+    checksum: sha256:8ab5599eef0afcac10cbd3e8670873efee20fcceb5fb3526a62edeade603cec7
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "RedHat"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
   tags: docker
 
-- name: Add Docker repo for RedHat 7 ppc64le
+- name: Add Docker repo for RedHat/CentOS 7 ppc64le
   yum_repository:
     name: docker
     description: docker YUM repo ppc64le
@@ -138,20 +138,47 @@
     gpgcheck: no
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "RedHat"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
   tags: docker
 
-- name: Import Docker Repo key for RedHat
+- name: Add Docker repo for RedHat/CentOS 7 s390x
+  get_url:
+    url: https://download.docker.com/linux/rhel/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+    checksum: sha256:38c53be402c717744ed5bd502a87de761f16528e79b033eee8a40da872307376
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "s390x"
+  tags: docker
+
+- name: Import Docker Repo key for RedHat/CentOS 7 x86_64
   rpm_key:
     key: https://download.docker.com/linux/centos/gpg
     state: present
   when:
     - docker_installed.rc != 0
-    - ansible_distribution == "RedHat"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
+  tags: docker
+
+- name: Import Docker repo key for RedHat/CentOS 7 s390x
+  rpm_key:
+    key: https://download.docker.com/linux/rhel/gpg
+    state: present
+  when:
+    - docker_installed.rc != 0
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "s390x"
   tags: docker
 
 # SLES
@@ -172,48 +199,7 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-# CentOS
-- name: Install EPEL repo for CentOS 7
-  yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "CentOS"
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  ignore_errors: yes
-  tags: docker
-
-- name: Import Docker Repo key for CentOS 7
-  rpm_key:
-    key: https://download.docker.com/linux/centos/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "CentOS"
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  tags: docker
-
-- name: Add Docker Repo for CentOS 7
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
-    force: yes
-    owner: root
-    group: root
-    mode: 0644
-    checksum: sha256:8ab5599eef0afcac10cbd3e8670873efee20fcceb5fb3526a62edeade603cec7
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "CentOS"
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  tags: docker
-
 # Debian
-
 - name: Add Docker GPG apt Key for Debian ( < 10 )
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
@@ -287,12 +273,12 @@
     # TODO: Package installs should not use latest
     - skip_ansible_lint
 
-- name: Install Docker for Cent/Rhel 7
+- name: Install Docker for CentOS/RHEL 7
   package: "name=docker-ce state=latest"
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags:
     - docker
     # TODO: Package installs should not use latest
@@ -327,14 +313,14 @@
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
   tags: docker
 
-- name: Add Jenkins user to the docker group for SLES 12, cent7, and RHEL7
+- name: Add Jenkins user to the docker group for SLES 12, CentOS7, and RHEL7
   user: name={{ Jenkins_Username }}
     groups=docker
     append=yes
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - ansible_architecture == "x86_64"
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags: docker
 
 - name: Enable and Start Docker Service for Ubuntu and Debian
@@ -347,7 +333,7 @@
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
   tags: docker
 
-- name: Enable and Start Docker Service for SLES 12, cent7, and RHEL7
+- name: Enable and Start Docker Service for SLES 12, CentOS7, and RHEL7
   service:
     name: docker
     state: restarted
@@ -355,5 +341,5 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags: docker

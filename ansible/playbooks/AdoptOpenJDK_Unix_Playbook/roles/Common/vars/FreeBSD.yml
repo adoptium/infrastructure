@@ -43,5 +43,3 @@ Test_Tool_Packages:
   - xorg
   - xorg-vfbserver
   - pulseaudio
-
-crontab_Patching: "/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"

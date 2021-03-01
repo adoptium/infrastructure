@@ -29,6 +29,13 @@
   failed_when: vs2019_error.rc != 0 and vs2019_error.rc != 3010
   tags: MSVS_2019
 
+- name: Install ARM64 components
+  win_shell: Start-Process -FilePath 'C:\temp\vs_community19.exe' -Wait -NoNewWindow -ArgumentList
+    'modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community" --quiet
+    --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
+  when: (not vs2019_installed.stat.exists)
+  tags: MSVS_2019
+
 - name: Register Visual Studio Community 2019 DIA SDK shared libraries
   win_command: 'regsvr32 /s "{{ item }}"'
   with_items:

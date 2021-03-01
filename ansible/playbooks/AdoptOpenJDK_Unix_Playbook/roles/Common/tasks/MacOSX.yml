@@ -4,6 +4,14 @@
 # Updates all packages for macos-based distributions
 #
 
+- name: Get macOS version
+  shell: sw_vers -productVersion
+  register: macos_version
+
+- name: Display macOS Version
+  debug:
+    var: macos_version
+
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Check for xcode-tools
   raw: xcode-select --print-path &> /dev/null
@@ -40,6 +48,8 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
+  tags:
+    - brew_upgrade
 
 - name: Install brew cu
   become: yes
@@ -48,6 +58,12 @@
     name: buo/cask-upgrade
   tags:
     - brew_cu
+
+- name: Add AdoptOpenJDK Java Repo
+  become: yes
+  become_user: "{{ ansible_user }}"
+  homebrew_tap:
+    name: AdoptOpenJDK/openjdk
 
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
@@ -72,6 +88,15 @@
   with_items: "{{ Build_Tool_Packages_NOT_arm64 }}"
   when:
     - ansible_architecture != "arm64"
+  tags: build_tools
+
+- name: Install Build Tool Packages NOT macOS 10.12
+  become: yes
+  become_user: "{{ ansible_user }}"
+  homebrew: "name={{ item }} state=present"
+  with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
+  when:
+    - not macos_version | regex_search("10.12")
   tags: build_tools
 
 - name: Install Build Tool Casks
@@ -128,6 +153,16 @@
   register: kernel
   tags:
     - kernel_tuning
+
+- name: Allow staff users to generate core dumps
+  file:
+    path: /cores
+    state: directory
+    mode: 0774
+    owner: root
+    group: staff
+  tags:
+    - core_dumps
 
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters

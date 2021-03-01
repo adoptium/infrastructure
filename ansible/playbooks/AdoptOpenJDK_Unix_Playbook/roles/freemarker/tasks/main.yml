@@ -21,17 +21,32 @@
     dest: /tmp/
     remote_src: yes
     mode: 0755
-  when: not freemarker.stat.exists
+  when: not freemarker.stat.exists and ansible_distribution != "Solaris"
+  tags: [freemarker, adoptopenjdk]
+
+- name: Download and extract freemarker.jar (Solaris)
+  unarchive:
+    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
+    dest: /tmp/
+    remote_src: yes
+    mode: 0755
+    validate_certs: False
+  when: not freemarker.stat.exists and ansible_distribution == "Solaris"
   tags: [freemarker, adoptopenjdk]
 
 - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
   command: mv /tmp/freemarker-{{ freemarkerVersion }}/lib/freemarker.jar /home/{{ Jenkins_Username }}
-  when: not freemarker.stat.exists and ansible_distribution != "MacOSX"
+  when: not freemarker.stat.exists and ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
   tags: [freemarker, adoptopenjdk]
 
 - name: Move freemarker.jar to /Users/{{ Jenkins_Username }} folder (macOS)
   command: mv /tmp/freemarker-{{ freemarkerVersion }}/lib/freemarker.jar /Users/{{ Jenkins_Username }}
   when: not freemarker.stat.exists and ansible_distribution == "MacOSX"
+  tags: [freemarker, adoptopenjdk]
+
+- name: Move freemarker.jar to /export/home/{{ Jenkins_Username }} folder (Solaris)
+  command: mv /tmp/freemarker-{{ freemarkerVersion }}/lib/freemarker.jar /export/home/{{ Jenkins_Username }}
+  when: not freemarker.stat.exists and ansible_distribution == "Solaris"
   tags: [freemarker, adoptopenjdk]
 
 - name: Remove downloaded packages for freemarker.jar

@@ -170,7 +170,7 @@ setupWorkspace() {
 		echo "Copying new disk image"
 		# Copy disk image and tools from imageLocation to workFolder
 		cp -r $imageLocation/$OS.$ARCHITECTURE/. $workFolder
-		xz -cd "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
+		xz -d "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz
 	else
 		echo "Using old disk image"
 	fi
@@ -224,7 +224,7 @@ done
 			export MACHINE="virt"
 			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=hd"
 			export SSH_CMD="-device virtio-net-device,netdev=net -netdev user,id=net,hostfwd=tcp::$PORTNO-:22"
-			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/qemu/virt/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000";;
+			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/generic/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000";;
 	esac
 	
 	# Run the command, mask output and send to background
@@ -301,6 +301,8 @@ runPlaybook() {
 	fi
 	if [[ "$retainVM" == false ]]; then
 		destroyVM
+		echo "Removing disk image"
+		rm -f ${workFolder}/${OS}.${ARCHITECTURE}.dsk
 	fi
 }
 

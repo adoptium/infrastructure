@@ -23,7 +23,6 @@
 
 - name: Install IBM XLC13 - installp
   command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
-  register: result.xlc
   ignore_errors: yes
   when: xlc13.stat.islnk is not defined
   tags: xlc13
