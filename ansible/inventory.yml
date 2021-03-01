@@ -18,92 +18,92 @@ hosts:
   - infrastructure:
 
       - aws:
-          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, dns: trss.adoptopenjdk.net, description: Test Result Summary Service, chaosmonkey: unknown}
+          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, dns: trss.adoptopenjdk.net, description: Test Result Summary Service}
 
       - digitalocean:
-          ubuntu2004-x64-1: {ip: 178.62.115.224, dns: bastillion.adoptopenjdk.net, description: Bastillion Host, chaosmonkey: unknown}
+          ubuntu2004-x64-1: {ip: 178.62.115.224, dns: bastillion.adoptopenjdk.net, description: Bastillion Host}
 
       - packet:
-          ubuntu1604-x64-1: {ip: 147.75.80.219, dns: ansible.adoptopenjdk.net, description: Ansible server (old), chaosmonkey: unknown}
-          ubuntu2004-x64-1: {ip: 147.75.80.235, dns: awx.adoptopenjdk.net, description: Ansible server (new), chaosmonkey: unknown}
+          ubuntu1604-x64-1: {ip: 147.75.80.219, dns: ansible.adoptopenjdk.net, description: Ansible server (old)}
+          ubuntu2004-x64-1: {ip: 147.75.80.235, dns: awx.adoptopenjdk.net, description: Ansible server (new)}
 
       - ibmcloud:
-          vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck, chaosmonkey: unknown}
+          vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
   - build:
 
       - alibaba:
-          win2012r2-x64-1: {ip: 8.208.11.212, user: Administrator, chaosmonkey: unknown}
-          win2012r2-x64-2: {ip: 8.208.87.18, user: Administrator, chaosmonkey: unknown}
-          ubuntu1804-armv8-1: {ip: 119.8.164.219, chaosmonkey: unknown}
+          win2012r2-x64-1: {ip: 8.208.11.212, user: Administrator}
+          win2012r2-x64-2: {ip: 8.208.87.18, user: Administrator}
+          ubuntu1804-armv8-1: {ip: 119.8.164.219}
 
       - azure:
-          win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk, chaosmonkey: unknown}
-          win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk, chaosmonkey: unknown}
-          win2016-x64-1: {ip: 51.104.239.17, user: adoptopenjdk, chaosmonkey: unknown}
+          win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk}
+          win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk}
+          win2016-x64-1: {ip: 51.104.239.17, user: adoptopenjdk}
 
       - digitalocean:
-          centos69-x64-2: {ip: 167.71.130.191, chaosmonkey: unknown}
+          centos69-x64-2: {ip: 167.71.130.191}
 
       - packet_esxi:
-          solaris10u11-x64-1: {ip: 147.75.85.212, chaosmonkey: unknown}
-          solaris10u11-x64-2: {ip: 147.75.85.213, chaosmonkey: unknown}
+          solaris10u11-x64-1: {ip: 147.75.85.212}
+          solaris10u11-x64-2: {ip: 147.75.85.213}
 
       - inspira:
-          solaris10u11-sparcv9-1: {ip: VPN into bridge, chaosmonkey: unknown}
-          solaris10u11-sparcv9-2: {ip: VPN into bridge, chaosmonkey: unknown}
+          solaris10u11-sparcv9-1: {ip: VPN into bridge}
+          solaris10u11-sparcv9-2: {ip: VPN into bridge}
 
       - macstadium:
-          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator, chaosmonkey: unknown}
-          macos1014-x64-1: {ip: 208.83.1.170, user: Administrator, chaosmonkey: unknown}
-          macos1014-x64-2: {ip: 207.254.28.76, user: Administrator, chaosmonkey: unknown}
+          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
+          macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
+          macos1014-x64-2: {ip: 207.254.28.76, user: Administrator}
 
       - marist:
-          rhel77-s390x-1: {ip: 148.100.86.102, user: linux1, chaosmonkey: unknown}
-          rhel77-s390x-2: {ip: 148.100.245.197, user: linux1, chaosmonkey: unknown}
+          rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
+          rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.10, description: ojdk01, chaosmonkey: unknown}
-          aix71-ppc64-2: {ip: 140.211.9.12, description: ojdk02, chaosmonkey: unknown}
-          centos74-ppc64le-1: {ip: 140.211.168.138, chaosmonkey: unknown}
-          centos74-ppc64le-2: {ip: 140.211.168.117, chaosmonkey: unknown}
+          aix71-ppc64-1: {ip: 140.211.9.10, description: ojdk01}
+          aix71-ppc64-2: {ip: 140.211.9.12, description: ojdk02}
+          centos74-ppc64le-1: {ip: 140.211.168.138}
+          centos74-ppc64le-2: {ip: 140.211.168.117}
 
       - packet:
-          centos74-armv8-1: {ip: 147.75.196.30, description: ThunderX, chaosmonkey: unknown}
-          ubuntu1804-armv8-1: {ip: 139.178.82.234, description: D05, chaosmonkey: unknown}
+          centos74-armv8-1: {ip: 147.75.196.30, description: ThunderX}
+          ubuntu1804-armv8-1: {ip: 139.178.82.234, description: D05}
 
       - scaleway:
-          ubuntu1604-armv7-1: {ip: 212.47.233.28, chaosmonkey: unknown}
-          ubuntu1604-armv7-2: {ip: 212.47.246.7, chaosmonkey: unknown}
-          ubuntu1604-x64-1: {ip: 51.15.46.107, chaosmonkey: unknown}
+          ubuntu1604-armv7-1: {ip: 212.47.233.28}
+          ubuntu1604-armv7-2: {ip: 212.47.246.7}
+          ubuntu1604-x64-1: {ip: 51.15.46.107}
 
       - ibmcloud:
-          win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator, chaosmonkey: unknown}
-          win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator, chaosmonkey: unknown}
+          win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
+          win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
 
       - spearhead:
-          freebsd12-x64-1: {ip: 185.131.222.224, chaosmonkey: unknown}
+          freebsd12-x64-1: {ip: 185.131.222.224}
 
   - docker:
 
       - aws:
-          ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu, chaosmonkey: unknown}
+          ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
 
       - marist:
-          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu, chaosmonkey: unknown}
+          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
 
       - packet:
-          ubuntu1604-armv8-1: {ip: 147.75.77.146, description: D05, chaosmonkey: unknown}
-          ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag, chaosmonkey: unknown}
-          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC, chaosmonkey: unknown}
+          ubuntu1604-armv8-1: {ip: 147.75.77.146, description: D05}
+          ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
+          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC}
 
       - scaleway:
-          ubuntu1604-armv7-1: {ip: 51.158.73.136, chaosmonkey: unknown}
+          ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
   - test:
 
       - alibaba:
-          ubuntu1804-armv8-1: {ip: 119.8.166.104, chaosmonkey: unknown}
+          ubuntu1804-armv8-1: {ip: 119.8.166.104}
 
       - azure:
           win2012r2-x64-1: {ip: 13.68.134.204, user: adoptopenjdk}
@@ -112,60 +112,60 @@ hosts:
           win2019-x64-1: {ip: 20.185.182.137, user: adoptopenjdk}
 
       - aws:
-          rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user, chaosmonkey: unknown}
-          rhel8-x64-1: {ip: 54.246.216.49, chaosmonkey: unknown}
-          ubuntu1804-armv8-1: {ip: 34.243.202.254, chaosmonkey: unknown}
-          win2019-x64-1: {ip: 34.244.74.139, user: Administrator, chaosmonkey: unknown}
+          rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
+          rhel8-x64-1: {ip: 54.246.216.49}
+          ubuntu1804-armv8-1: {ip: 34.243.202.254}
+          win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
 
       - ibm:
-          aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a, chaosmonkey: unknown}
-          aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a, chaosmonkey: unknown}
+          aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
+          aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
 
       - inspira:
-          solaris10u11-sparcv9-1: {ip: VPN into bridge, chaosmonkey: unknown}
+          solaris10u11-sparcv9-1: {ip: VPN into bridge}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.99, description: ojdk05, chaosmonkey: unknown}
-          aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix2-ojdk03.osuosl.org, chaosmonkey: unknown}
-          aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix2-ojdk04.osuosl.org, chaosmonkey: unknown}
-          centos74-ppc64le-1: {ip: 140.211.168.228, user: centos, chaosmonkey: unknown}
-          centos74-ppc64le-2: {ip: 140.211.168.217, user: centos, chaosmonkey: unknown}
-          centos74-ppc64le-4: {ip: 140.211.168.245, user: centos, chaosmonkey: unknown}
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-ppc64le-3: {ip: 140.211.168.248, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu, chaosmonkey: unknown}
+          aix71-ppc64-1: {ip: 140.211.9.99, description: ojdk05}
+          aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix2-ojdk03.osuosl.org}
+          aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix2-ojdk04.osuosl.org}
+          centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
+          centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
+          centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
+          ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
+          ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
+          ubuntu1604-ppc64le-3: {ip: 140.211.168.248, user: ubuntu}
+          ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
+          ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
+          ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
 
       - packet:
-          ubuntu1604-armv8-1: {ip: 147.75.74.50, description: ThunderX, chaosmonkey: unknown}
-          ubuntu1604-armv8-2: {ip: 147.75.193.234, description: ThunderX, chaosmonkey: unknown}
-          ubuntu1604-x64-1: {ip: 147.75.204.239, chaosmonkey: unknown}
-          ubuntu1604-x64-2: {ip: 147.75.100.127, chaosmonkey: unknown}
-          ubuntu1604-x64-3: {ip: 147.75.83.133, chaosmonkey: unknown}
-          win2012r2-x64-1: {ip: 147.75.32.146, user: Admin, chaosmonkey: unknown}
+          ubuntu1604-armv8-1: {ip: 147.75.74.50, description: ThunderX}
+          ubuntu1604-armv8-2: {ip: 147.75.193.234, description: ThunderX}
+          ubuntu1604-x64-1: {ip: 147.75.204.239}
+          ubuntu1604-x64-2: {ip: 147.75.100.127}
+          ubuntu1604-x64-3: {ip: 147.75.83.133}
+          win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
-          macos1010-x64-1: {ip: 74.80.250.151, user: admin, chaosmonkey: unknown}
-          macos1010-x64-2: {ip: 74.80.250.173, user: admin, chaosmonkey: unknown}
+          macos1010-x64-1: {ip: 74.80.250.151, user: admin}
+          macos1010-x64-2: {ip: 74.80.250.173, user: admin}
 
       - macstadium:
-          macos1012-x64-1: {ip: 208.83.1.46, user: administrator, chaosmonkey: unknown}
-          macos1013-x64-1: {ip: 208.83.1.19, user: administrator, chaosmonkey: unknown}
-          macos1014-x64-1: {ip: 207.254.29.43, user: administrator, chaosmonkey: unknown}
-          macos1014-x64-2: {ip: 207.254.29.44, user: administrator, chaosmonkey: unknown}
-          macos1014-x64-3: {ip: 207.254.28.237, user: administrator, chaosmonkey: unknown}
-          macos1015-x64-1: {ip: 207.254.28.171, user: administrator, chaosmonkey: unknown}
-          macos11-arm64-1: {ip: 199.7.163.51, user: Administrator, chaosmonkey: unknown}
-          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator, chaosmonkey: unknown}
+          macos1012-x64-1: {ip: 208.83.1.46, user: administrator}
+          macos1013-x64-1: {ip: 208.83.1.19, user: administrator}
+          macos1014-x64-1: {ip: 207.254.29.43, user: administrator}
+          macos1014-x64-2: {ip: 207.254.29.44, user: administrator}
+          macos1014-x64-3: {ip: 207.254.28.237, user: administrator}
+          macos1015-x64-1: {ip: 207.254.28.171, user: administrator}
+          macos11-arm64-1: {ip: 199.7.163.51, user: Administrator}
+          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}
 
       - marist:
-          sles12-s390x-1: {ip: 148.100.86.128, chaosmonkey: unknown}
-          ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu, chaosmonkey: unknown}
-          ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu, chaosmonkey: unknown}
+          sles12-s390x-1: {ip: 148.100.86.128}
+          ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
+          ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu}
+          ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
+          ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
 
 
       # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
@@ -174,11 +174,11 @@ hosts:
           macos1015-x64-2: {ip: 10.0.40.11, ipv6: 2a02:418:3001:40::11, user: administrator}
 
       - scaleway:
-          ubuntu1604-x64-1: {ip: 51.15.76.107, chaosmonkey: unknown}
+          ubuntu1604-x64-1: {ip: 51.15.76.107}
 
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}
           rhel7-x64-1: {ip: 169.48.4.136}
           ubuntu1604-x64-1: {ip: 169.48.4.141}
-          win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator, chaosmonkey: unknown}
-          win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator, chaosmonkey: unknown}
+          win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
+          win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}
