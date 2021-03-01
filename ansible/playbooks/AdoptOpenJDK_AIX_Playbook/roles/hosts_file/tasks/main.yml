@@ -1,0 +1,47 @@
+#####################
+# Update /etc/hosts #
+#####################
+---
+- name: Update /etc/hosts file - IP FQDN hostname
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    state: present
+  when:
+    - Domain == "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hosts_file, adoptopenjdk
+
+- name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+  when:
+    - Domain != "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hosts_file, adoptopenjdk
+
+- debug:
+    msg: "Inventory_hostname is the same as the ip address or is localhost.
+    The fqdn has not been added to /etc/hosts.
+    The hostname of the machine has not been updated.
+    Manually add the fqdn to /etc/hosts
+    and manually update the hostname in /etc/hostname.
+    Or use the command line argument --extra-vars 'inventory_hostname=<realhostname>',
+    when running the playbook next time"
+  when: (inventory_hostname == ansible_default_ipv4.address) or (inventory_hostname == "localhost")
+  tags: hosts_file, hostname
+
+- name: Update /etc/hosts file - 127.0.0.1
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*)127.0.0.1(.*)$"
+    line: "127.0.0.1   localhost  localhost.localdomain"
+    state: present
+    backup: yes
+  tags: hosts_file, adoptopenjdk
