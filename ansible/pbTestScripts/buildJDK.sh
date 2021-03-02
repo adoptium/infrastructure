@@ -21,8 +21,10 @@ processArgs() {
 				fi
 				checkJDK
 				shift;;
-			"--URL" | "-u" )
-				GIT_URL="$1"; shift;;
+			"--fork" | "-f" )
+				GIT_FORK="$1"; shift;;
+			"--branch" | "-b" )
+				GIT_BRANCH="$1"; shift;;
 			"--hotspot" | "-hs" )
 				VARIANT=hotspot;;
 			"--clean-workspace" | "-c" )
@@ -48,7 +50,8 @@ usage() {
 	
 	Options:
 		--version | -v		Specify the JDK version to build
-		--URL | -u		Specify the github URL to clone openjdk-build from
+		--fork | -f             Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
+		--branch | -b           Specify the branch of the fork to build from (Default: master)
 		--hotspot | -hs		Builds hotspot, default is openj9
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
@@ -73,30 +76,18 @@ checkJDK() {
 }
 
 cloneRepo() {
-	local branch=""
-	IFS='/' read -r -a urlArray <<< "$GIT_URL"
 	if [ -d $WORKSPACE/openjdk-build ]; then
 		echo "Found existing openjdk-build folder"
 		cd $WORKSPACE/openjdk-build && git pull
-	elif [ ${urlArray[@]: -2:1} == 'tree' ]; then
-		GIT_URL=""
-		echo "Branch detected"
-		branch=${urlArray[@]: -1:1}
-		unset 'urlArray[${#urlArray[@]}-1]'
-		unset 'urlArray[${#urlArray[@]}-1]'
-		for urlPart in "${urlArray[@]}"
-		do
-			GIT_URL="$GIT_URL$urlPart/"
-		done
-		git clone -b $branch $GIT_URL $WORKSPACE/openjdk-build
 	else
-		echo "No branch detected"
-		git clone $GIT_URL $WORKSPACE/openjdk-build
+		echo "Cloning new openjdk-build folder"
+		git clone -b ${GIT_BRANCH} --single-branch https://github.com/${GIT_FORK}/openjdk-build $WORKSPACE/openjdk-build
 	fi
 }
 
 # Default values
-GIT_URL="https://github.com/adoptopenjdk/openjdk-build"
+GIT_BRANCH="master"
+GIT_FORK="adoptopenjdk"
 CLEAN_WORKSPACE=false
 JDK_MAX=
 JDK_GA=
@@ -139,7 +130,8 @@ echo "buildJDK.sh DEBUG:
         JDK_BOOT_DIR=${JDK_BOOT_DIR:-}
         JAVA_HOME=${JAVA_HOME:-}
         WORKSPACE=${WORKSPACE:-}
-        GIT_URL=${GIT_URL:-}
+        FORK=${GIT_FORK:-}
+        BRANCH=$GIT_BRANCH:-}
         FILENAME=${FILENAME:-}"
 
 cloneRepo 
