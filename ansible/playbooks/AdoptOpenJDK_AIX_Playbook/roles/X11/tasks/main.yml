@@ -86,6 +86,6 @@
 
 - name: Report X11 Readiness
   debug:
-    msg: "All required X11 components are installed: {{_x11rdy }}"
+    msg: "All required X11 components are installed: {{ _x11rdy }}"
   # when: _x11rdy == false
   tags: x11
