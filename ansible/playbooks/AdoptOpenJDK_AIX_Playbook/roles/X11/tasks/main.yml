@@ -43,12 +43,6 @@
   when: _x11rdy == false
   tags: x11
 
-- name: debug result of last command
-  debug:
-    var: _vendor_copied
-  when: _x11rdy == false and _vendor_copied.failed == true
-  tags: x11
-
 - name: Install from Vendor Files
   block:
     - name: Install IBM X11 Extensions - installp
