@@ -16,13 +16,23 @@
     - ansible_distribution_major_version != "10"
   tags: patch_update
 
+# Required for the apt-key task next
+- name: Ensure gnupg is installed
+  apt:
+    name: gnupg
+    state: present
+  tags: patch_update
+
 - name: Add AdoptOpenJDK GPG key
   apt_key:
     url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     state: present
+  tags: patch_update
 
 - name: Add the adoptopenjdk repository to apt for JDK8
-  apt_repository: repo='deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb jessie main' update_cache=no
+  apt_repository:
+    repo: "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb {{ ansible_distribution_release }} main"
+    update_cache: no
 
 - name: Add the ubuntu toolchain repository to apt
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no

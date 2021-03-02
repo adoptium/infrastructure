@@ -16,32 +16,36 @@
 - name: Allow Nagios to use yum while restricting it to check-update only
   shell: |
     echo "nagios ALL = NOPASSWD: /usr/bin/yum --security check-update" >> /etc/sudoers
-  tags: [nagios_plugins, adoptopenjdk, skip_ansible_lint]
 
 # Can't find nagios-plugins-all on RHEL74/s390x so removing this
-# ###################
-# # Install plugins #
-# ###################
-# - name: Install nagios-plugins-all
-#   yum:
-#     name: nagios-plugins-all
-#     state: latest
-#   when:
-#     - ansible_distribution_major_version != "6"
-#   tags: nagios_plugins
-#
-# ##########
-# # Layout #
-# ##########
-# - name: Creates Nagios folder
-#   file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
-#   tags: nagios_plugins
-#
-# - name: Create symlink to plugins
-#   file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
-#   when:
-#     - ansible_distribution_major_version != "6"
-#   tags: nagios_plugins
+###################
+# Install plugins #
+###################
+- name: Install nagios-plugins-all
+  yum:
+    name: nagios-plugins-all
+    state: latest
+  when:
+    - ansible_distribution_major_version != "6"
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+  tags: nagios_plugins
+
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+  when:
+    - ansible_distribution_major_version != "6"
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+  tags: nagios_plugins
+
+- name: Create symlink to plugins
+  file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
+  when:
+    - ansible_distribution_major_version != "6"
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+  tags: nagios_plugins
 
 #############################
 # Install plugins On RHEL 6 #
@@ -61,7 +65,6 @@
   when:
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
-  tags: [nagios_plugins, adoptopenjdk]
 
 - name: Extract nagios-plugins
   unarchive:
@@ -71,7 +74,6 @@
   when:
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
-  tags: [nagios_plugins, adoptopenjdk]
 
 - name: Configure, make and make install nagios-plugins
   shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
@@ -79,15 +81,18 @@
   when:
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
-  tags: [nagios_plugins, adoptopenjdk]
 
 ##############################
 # Install additional plugins #
 ##############################
-- name: Download add-on check_yum plugin
-  get_url:
-    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/Nagios_Plugins/tasks/additional_plugins/check_yum
+- name: Copy check_yum plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_yum
     dest: /usr/local/nagios/libexec/check_yum
     mode: 0755
-    checksum: sha256:f93372dee2b1aa4ea45f1a2ee30ffa9d5ebc5fe2a44f8d5e69b7f9f38420be7e
-  tags: [nagios_plugins, adoptopenjdk]
+
+- name: Copy check_ntp_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ntp_timesync
+    dest: /usr/local/nagios/libexec/check_ntp_timesync
+    mode: 0755

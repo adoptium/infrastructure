@@ -1,0 +1,45 @@
+#########################################################################
+# Playbook to create authorization to access realtime clock privilidge
+# The role is assigned to the jenkins user
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1803
+# Additional:
+# the suggested fix: https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
+# works on AIX 7.1 TL5 AIX 7.2 TL2
+# AIX 7.1 TL4 requires RBAC instead
+# assumption is that the 'CAP_*' capabilities already in the playbook
+# activate the core privilidge with the need for RBAC additions
+#########################################################################
+---
+- name: Check if auth already exists
+  shell: lsauth ojdk.rtclk
+  register: rtclk_exists
+  ignore_errors: yes
+  changed_when: False
+  tags: rbac
+- name: Update RBAC to include new authorizations
+  block:
+    - name: Top-level authorization
+      shell:
+        mkauth dfltmsg="Top-Level authorization for AdoptOpenJava Project" ojdk
+      ignore_errors: yes
+    - name: RealTime Clock Authorization
+      shell:
+        mkauth dfltmsg="OpenJava needs access to PV_PROC_RTCLK for metronome garbage collection policy" ojdk.rtclk
+    - name: RealTime Clock Role
+      shell:
+        mkrole authorizations='ojdk.rtclk' dfltmsg='Realtime Clock user' rtclk
+  when: rtclk_exists.rc == 2
+  tags: rbac
+# The following prepares bash - if/when it gets installed
+# Tested with bash already installed from AIXToolbox
+- name: Add authorization to shell
+  shell:
+    setsecattr -c accessauths=ojdk.rtclk innateprivs=PV_PROC_RTCLK inheritprivs=PV_PROC_RTCLK secflags=FSF_EPS "{{ item }}"
+  with_items:
+    - /usr/bin/ksh
+    - /opt/freeware/bin/bash_32
+    - /opt/freeware/bin/bash_64
+  tags: rbac
+- name: Update Security Tables
+  shell: setkst
+  tags: rbac

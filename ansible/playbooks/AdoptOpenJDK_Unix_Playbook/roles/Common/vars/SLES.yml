@@ -18,7 +18,6 @@ Build_Tool_Packages:
   - libelf1
   - make
   - pkg-config
-  - systemtap-sdt-devel
   - unzip
   - wget
   - zip
@@ -39,6 +38,7 @@ Additional_Build_Tools_SLES15:
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
+  - systemtap-sdt-devel
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
@@ -77,5 +77,3 @@ Test_Tool_Packages:
   - xorg-x11-server
   - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests
-
-crontab_Patching: "/usr/bin/zypper refresh && /usr/bin/zypper -n up"

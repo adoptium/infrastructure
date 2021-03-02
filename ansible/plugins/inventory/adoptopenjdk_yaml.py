@@ -29,6 +29,7 @@ import json
 import os
 import subprocess
 import sys
+from os import path
 
 import yaml
 try:
@@ -41,16 +42,14 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
 
   # valid roles - add as necessary
-  'type': ('build', 'test', 'infrastructure', 'perf', 'docker'),
+  'type': ('build', 'test', 'infrastructure', 'docker'),
 
   # providers - validated for consistency
-  'provider': ('azure', 'marist', 'osuosl', 'scaleway',
+  'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira')
+        'aws', 'inspira', 'packet_esxi')
 }
-
-INVENTORY_FILENAME = "inventory.yml"
 
 def main():
 
@@ -59,7 +58,9 @@ def main():
     config.read('ansible.cfg')
 
     # load public inventory
-    export = parse_yaml(load_yaml_file(INVENTORY_FILENAME), config)
+    basepath = path.dirname(__file__)
+    inventory_path = path.abspath(path.join(basepath, "..", "..", "inventory.yml"))
+    export = parse_yaml(load_yaml_file(inventory_path), config)
 
     # export in JSON for Ansible
     print(json.dumps(export, sort_keys=True, indent=2))
@@ -87,6 +88,7 @@ def load_yaml_file(file_name):
     """Loads YAML data from a file"""
 
     hosts = {}
+
 
     # get inventory
     with open(file_name, 'r') as stream:
@@ -146,6 +148,8 @@ def parse_yaml(hosts, config):
 
                         if 'user' in metadata:
                             hostvars.update({'ansible_user': metadata['user']})
+                            if 'win' not in hostname:
+                                hostvars.update({'ansible_become': True})
                             del metadata['user']
 
                         if 'password' in metadata:

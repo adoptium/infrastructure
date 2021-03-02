@@ -1,0 +1,47 @@
+---
+#########
+# gcc_9 #
+#########
+
+- name: Check if gcc 9.3 is installed on RHEL/CentOS
+  shell: /usr/local/gcc9/bin/gcc-9.3 --version 2>&1 > /dev/null
+  ignore_errors: yes
+  register: gcc9_installed
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+  tags: gcc_9
+
+# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
+- name: Download AdoptOpenJDK gcc-9.3.0 binary
+  get_url:
+    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc930.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-9.tar.xz'
+    force: no
+    mode: 0644
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+    - gcc9_installed.rc != 0
+  tags: gcc_9
+
+- name: Extract AdoptOpenJDK gcc-9 binary to /usr/local/gcc
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-9.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+    - gcc9_installed.rc != 0
+  tags: gcc_9
+
+- name: Remove downloaded gcc 9 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-9.tar.xz'
+    state: absent
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
+    - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+    - gcc9_installed.rc != 0
+  tags: gcc_9

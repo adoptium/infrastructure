@@ -2,6 +2,8 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+sudo sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+sudo sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-Base.repo
 sudo yum -y update
 sudo yum install -y libselinux-python
 sudo yum install -y ansible

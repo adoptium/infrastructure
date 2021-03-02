@@ -28,14 +28,12 @@
 
 - name: Install IBM X11 Extensions - installp
   command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
-  register: result.x11
   ignore_errors: yes
   when: does_X11_adt_ext_exist.rc != 0
   tags: x11
 
 - name: Install X11.vfb - installp
   command: installp -agXYd /tmp/x11/X11.vfb all
-  register: result.x11.vfb
   ignore_errors: yes
   when: does_x11_exist.rc != 0
   tags: x11

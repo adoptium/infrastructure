@@ -92,7 +92,7 @@
     dest: /Users/jenkins/installer.p12
   when:
     - not macos_version | regex_search("10.10")
-    - installer_cert.stderr | regex_search("no identity found")
+    - installer_cert.stderr | regex_search("no identity found") or installer_cert.stderr | regex_search("Could not find appropriate signing identity for")
 
 - name: Install Installer Certificate
   shell: |
@@ -101,7 +101,7 @@
   become_user: jenkins
   when:
     - not macos_version | regex_search("10.10")
-    - installer_cert.stderr | regex_search("no identity found")
+    - installer_cert.stderr | regex_search("no identity found") or installer_cert.stderr | regex_search("Could not find appropriate signing identity for")
 
 - name: Allow codesign via ssh
   shell: |

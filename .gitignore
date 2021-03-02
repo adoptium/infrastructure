@@ -4,3 +4,4 @@ ansible/playbooks/*.retry
 *.pyc
 ansible/host_vars/*
 **/vendor_files
+.vscode/
