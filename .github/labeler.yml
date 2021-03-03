@@ -2,7 +2,8 @@
 
 # label_name:
 #   - path/to/file_or_folder
-
+ghActions:
+    - .github/workflows/**/*
 doc:
     - docs/*
     - '**/*.md'
