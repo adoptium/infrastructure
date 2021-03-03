@@ -27,7 +27,6 @@
     name: "{{ inventory_hostname }}.{{ Domain }}"
   when:
     - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
-    - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != ansible_host
     - inventory_hostname != "localhost"
   tags: hostname,adoptopenjdk
@@ -40,7 +39,7 @@
     - "dscacheutil -flushcache"
   when:
     - Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
-    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != ansible_host
     - inventory_hostname != "localhost"
   tags: hostname,adoptopenjdk
 
@@ -65,8 +64,8 @@
     state: present
   when:
     - Domain == "adoptopenjdk.net"
-    - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != ansible_host
+    - ansible_host != "127.0.0.1"
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
@@ -78,8 +77,8 @@
     state: present
   when:
     - Domain != "adoptopenjdk.net"
-    - inventory_hostname != ansible_default_ipv4.address
     - inventory_hostname != ansible_host
+    - ansible_host != "127.0.0.1"
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
@@ -91,7 +90,7 @@
     and manually update the hostname in /etc/hostname.
     Or use the command line argument --extra-vars 'inventory_hostname=<realhostname>',
     when running the playbook next time"
-  when: (inventory_hostname == ansible_default_ipv4.address) or (inventory_hostname == "localhost") or (inventory_hostname == ansible_host)
+  when: (inventory_hostname == "localhost") or (inventory_hostname == ansible_host) or (ansible_host == "127.0.0.1")
   tags: hosts_file, hostname
 
 - name: Update /etc/hosts file - 127.0.0.1
