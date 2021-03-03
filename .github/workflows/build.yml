@@ -3,12 +3,12 @@ name: Docker
 on:
   pull_request:
     paths:
-    - ansible/**
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:         
     - master
   push:
     paths:
-    - ansible/**
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:         
     - master
 

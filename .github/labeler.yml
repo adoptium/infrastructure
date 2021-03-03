@@ -1,0 +1,20 @@
+# Config file used by .github/workflows/labeler.yml
+
+# label_name:
+#   - path/to/file_or_folder
+
+doc:
+    - docs/*
+    - '**/*.md'
+Vagrant:
+    - ansible/pbTestScripts/**/*
+    - ansible/Vagrantfile*
+pbTests:
+    - ansible/pbTestScripts/**/*
+docker:
+    - ansible/Dockerfile*
+ansible:
+    - ansible/playbooks/**/*
+    - ansible/plugins/**/*
+    - ansible/inventory.yml
+    - ansible/ansible.cfg
