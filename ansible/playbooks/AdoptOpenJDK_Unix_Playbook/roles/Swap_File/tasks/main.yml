@@ -48,7 +48,7 @@
   tags: swap_file
 
 - name: Set swap file permissions
-  file: 
+  file:
     path: "{{ swap_path }}"
     owner: root
     group: "{{ root_group }}"
@@ -70,7 +70,7 @@
   tags: swap_file
 
 - name: Add swap to fstab
-  mount: 
+  mount:
     src: "{{ swap_path }}"
     fstype: swap
     opts: sw
