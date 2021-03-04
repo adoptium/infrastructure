@@ -2,16 +2,16 @@
 # IBM XL C 16.1.0 #
 ###################
 ---
-- name: Checking for XLC16 availability
+- name: Checking for xlC16 installed as 'licensed' LPP
   stat:
-    path: /opt/IBM/xlc/16.1.0/bin/xlc
+    path: /usr/lpp/xlCcmp.16.1.0.license
   register: xlc16
   tags: xlc16
 
 - name: Announce skip of download and installation
   debug:
     msg: "xlc16 installed, skipping download and installation"
-  when: xlc16.stat.islnk is defined
+  when: xlc16.stat.isdir is defined and xlc.stat.isdir
   tags: xlc16
 
 - name: Vendor File processing
