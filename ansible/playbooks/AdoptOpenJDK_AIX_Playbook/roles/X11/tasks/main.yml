@@ -33,23 +33,23 @@
         and _vfb.stat.exists }}"
   tags: x11
 
-- name: Unpack Vendor Files
-  unarchive:
-    src: /Vendor_Files/aix/OpenGL_X11.tar
-    dest: /tmp/x11
-    remote_src: no
-  ignore_errors: yes
-  register: _vendor_copied
-  when: _x11rdy == false
-  tags: x11
-
 - name: Install from Vendor Files
   block:
+    - name: Unpack Vendor Files
+      unarchive:
+        src: /Vendor_Files/aix/OpenGL_X11.tar
+        dest: /tmp/x11
+        remote_src: no
+      ignore_errors: yes
+      register: _vendor_copied
+      when: _x11rdy == false
+
     - name: Install IBM X11 Extensions - installp
       command:
         installp -e /tmp/x11.log -aXYgd /tmp/x11 X11.adt.ext X11.vfb X11.base.lib
       register: _installp
       ignore_errors: yes
+    when: _vendor_copied.failed is defined and _vendor_copied.failed != true
 
     - name: Remove X11 install files
       file:
@@ -75,11 +75,10 @@
         _x11rdy: "{{ _base.stat.exists
           and _ext.stat.exists
           and _vfb.stat.exists }}"
-  when: _x11rdy == false and _vendor_copied.failed != true
-  tags: x11
+  when: _x11rdy == false
+  tags: [x11, vendor_files]
 
 - name: Report X11 Readiness
   debug:
     msg: "All required X11 components are installed: {{ _x11rdy }}"
-  # when: _x11rdy == false
   tags: x11
