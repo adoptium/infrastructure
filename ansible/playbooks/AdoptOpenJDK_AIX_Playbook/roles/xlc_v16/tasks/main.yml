@@ -11,7 +11,7 @@
 - name: Announce skip of download and installation
   debug:
     msg: "xlc16 installed, skipping download and installation"
-  when: xlc16.stat.isdir is defined and xlc.stat.isdir
+  when: xlc16.stat.isdir is defined and xlc16.stat.isdir
   tags: xlc16
 
 - name: Vendor File processing
