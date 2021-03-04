@@ -35,6 +35,11 @@
 
 - name: Install from Vendor Files
   block:
+    - name: Ensure destination for Vendor Files exists
+      file:
+        state: directory
+        path: /tmp/x11
+
     - name: Unpack Vendor Files
       unarchive:
         src: /Vendor_Files/aix/OpenGL_X11.tar
@@ -42,14 +47,13 @@
         remote_src: no
       ignore_errors: yes
       register: _vendor_copied
-      when: _x11rdy == false
 
     - name: Install IBM X11 Extensions - installp
       command:
         installp -e /tmp/x11.log -aXYgd /tmp/x11 X11.adt.ext X11.vfb X11.base.lib
       register: _installp
       ignore_errors: yes
-    when: _vendor_copied.failed is defined and _vendor_copied.failed != true
+      when: _vendor_copied.failed is defined and _vendor_copied.failed != true
 
     - name: Remove X11 install files
       file:
