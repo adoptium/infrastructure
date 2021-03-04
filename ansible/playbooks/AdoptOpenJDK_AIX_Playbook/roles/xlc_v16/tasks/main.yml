@@ -11,7 +11,7 @@
 - name: Announce skip of download and installation
   debug:
     msg: "xlc16 installed, skipping download and installation"
-  when: xlc16.stat.isdir is defined and xlc16.stat.isdir
+  when: xlc16.stat.exists and xlc16.stat.isdir
   tags: xlc16
 
 - name: Vendor File processing
@@ -37,7 +37,7 @@
       file:
         path: /tmp/usr
         state: absent
-  when: xlc16.stat.isdir is not defined or xlc16.stat.isdir is false
+  when: xlc16.stat.exists is false
   tags: [xlc16, vendor_files]
 
 - name: Query xlC version
