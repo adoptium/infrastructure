@@ -8,24 +8,21 @@
   register: xlc16
   tags: xlc16
 
-- debug:
+- name: Announce skip of download and installation
+  debug:
     msg: "xlc16 installed, skipping download and installation"
   when: xlc16.stat.islnk is defined
   tags: xlc16
 
 - name: Vendor File processing
   block:
-    - name: Check for Vendor file
-      stat:
-        path: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
-      register: _vendor
     - name: Transfer and Extract XLC16
       unarchive:
         src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
         dest: /tmp
         remote_src: no
       register: _images
-      when: _vendor.stat.exists == true
+      ignore_errors: yes
 
     - name: Install IBM XLC16 - installp
       command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
@@ -42,7 +39,7 @@
         state: absent
       when: _images.skipped == false
   when: xlc16.stat.islnk is not defined
-  tags: xlc16
+  tags: [xlc16, vendor_files]
 
 - name: TestIBM XLC16
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
