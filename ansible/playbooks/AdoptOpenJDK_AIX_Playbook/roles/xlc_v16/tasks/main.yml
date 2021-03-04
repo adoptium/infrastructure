@@ -41,7 +41,7 @@
   when: xlc16.stat.islnk is not defined
   tags: [xlc16, vendor_files]
 
-- name: TestIBM XLC16
+- name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
   register: xlc16_qversion
   ignore_errors: yes
@@ -54,7 +54,8 @@
   when: xlc16_qversion.failed == false
   tags: xlc16
 
-- debug:
+- name: Display error message
+  debug:
     msg: "{{ xlc16_qversion.cmd }} returns {{ xlc16_qversion.msg }}"
   when: xlc16_qversion.failed == true
   tags: xlc16
