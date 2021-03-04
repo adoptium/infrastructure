@@ -20,20 +20,25 @@ jobs:
       run: |
         brew install ansible
         brew install --cask virtualbox vagrant
+        vagrant plugin install vagrant-disksize
 
     - name: Setup Vagrant VM
       run: |
         cd ansible
         ln -sf Vagrantfile.Win2016 Vagrantfile
-        rm -f id_rsa.pub id_rsa
-        # Copy the machine's ssh key for the VMs to use, after removing prior files
-        ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
         vagrant up
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.unx
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
-        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+        # Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
+        sed -i'' -e "s/.*ansible_password.*/ansible_password: vagrant/g" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+        # If "credssp" isn't found in adoptopenjdk_variables.yml
+        if ! grep -q "credssp" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml;
+        then
+          # Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
+          echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+        fi
 
     - name: Run Ansible Playbook
       run: |
