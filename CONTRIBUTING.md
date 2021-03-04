@@ -184,13 +184,15 @@ to validate them.
 
 We have Dockerfiles that are used to build the base images that our build farm uses for running docker based builds.
 
-| Dockerfile | Image | Platforms  |
-|---|---|---|
-| [Centos7](./ansible/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux/amd64, linux/arm64, linux/ppc64le  |
-| [Centos6](./ansible/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 |
-| [Alpine3](./ansible/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 |
-| [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 |
-| [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 |
+| Dockerfile | Image | Platforms  | Where is this built? |
+|---|---|---|---|
+| [Centos7](./ansible/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux/amd64, linux/arm64, linux/ppc64le  | [Travis](.travis.yml) |
+| [Centos6](./ansible/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) |
+| [Alpine3](./ansible/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 | [GH Actions](.github/workflows/build.yml) |
+| [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) |
+| [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) |
+
+When a change lands into master, the relevant dockerfiles are built using their relevant CI systems and pushed up to Dockerhub where they can be consumed by our jenkins build agents.
 
 ## Jenkins access
 
