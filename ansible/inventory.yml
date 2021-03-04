@@ -160,6 +160,12 @@ hosts:
           ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
           ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
 
+
+      # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
+      - nine:
+          macos1015-x64-1: {ip: 10.0.40.10, ipv6: 2a02:418:3001:40::10, user: administrator}
+          macos1015-x64-2: {ip: 10.0.40.11, ipv6: 2a02:418:3001:40::11, user: administrator}
+
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}
 
@@ -169,9 +175,3 @@ hosts:
           ubuntu1604-x64-1: {ip: 169.48.4.141}
           win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
           win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}
-
-  - perf:
-
-      - adoptium:
-          macos1015-x64-1: {ip: 10.0.40.10, user: administrator}
-          macos1015-x64-2: {ip: 10.0.40.11, user: administrator}
