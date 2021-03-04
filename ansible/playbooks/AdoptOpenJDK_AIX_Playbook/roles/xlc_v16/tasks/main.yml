@@ -26,26 +26,23 @@
         remote_src: no
       register: _images
       when: _vendor.stat.exists == true
-      tags: xlc16
 
     - name: Install IBM XLC16 - installp
       command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
       register: _installp
       ignore_errors: yes
-      when: _images.skipped == false
-      tags: xlc16
+      when: _images.skipped is defined and _images.skipped == false
 
     - debug: msg='Error messages from the installp command can be ignored.'
       when: _installp is defined
-      tags: xlc16
 
     - name: Clean XLC16 tmp files
       file:
         path: /tmp/usr
         state: absent
       when: _images.skipped == false
-      tags: xlc16
   when: xlc16.stat.islnk is not defined
+  tags: xlc16
 
 - name: TestIBM XLC16
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion

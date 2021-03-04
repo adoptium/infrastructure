@@ -1,0 +1,42 @@
+---
+###################################
+# AdoptOpenJDK - Ansible Playbook #
+###################################
+# Groups can be passed in as a command-line variable in Ansible playbook.
+# It can be defined as 'all' or a specific group which the host belongs to.
+# For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
+#- hosts: "{{ Groups | default('localhost:docker:!*zos*:!*win*:!*aix*') }}"
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - Version
+    - adopt_etc
+    - Providers                   # AdoptOpenJDK Infrastructure
+    - Get_Vendor_Files
+    - Jenkins_User                # AdoptOpenJDK Infrastructure
+    - Superuser                   # AdoptOpenJDK Infrastructure
+    - role: Swap_File
+    - role: Crontab
+    - role: adoptopenjdk_install
+      jdk_version: 11
+    - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
+      tags: [nagios_plugins, adoptopenjdk]
+    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
+      tags: [nagios_master_config, adoptopenjdk]
+    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
+      tags: [nagios_tunnel, adoptopenjdk]
+    - Security
+    - Vendor
+    - IPv6
+    - Docker
+    - DockerStatic

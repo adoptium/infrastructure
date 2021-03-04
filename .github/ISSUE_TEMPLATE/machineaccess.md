@@ -7,11 +7,12 @@ assignees: 'sxa'
 
 ---
 Access level:
+
 - [ ] Non-privileged
 - [ ] jenkins user
 - [ ] root/Administrative
 - [ ] other (Please specify):
 
-System for which access is needed: 
+System for which access is needed:
 
 Please explain why you need this access including whether it is a temporary or permanent request:

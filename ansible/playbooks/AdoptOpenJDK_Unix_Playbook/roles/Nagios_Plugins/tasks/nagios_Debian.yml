@@ -1,0 +1,43 @@
+---
+#################################################################################################
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on Debian on x86 hardware #
+#################################################################################################
+
+###########################################################################
+# License Information:                                                    #
+# Nagios core and its plugins are lincesed under GPL                      #
+# For more information please see: https://www.nagios.com/legal/licenses/ #
+###########################################################################
+
+########################################
+# Install Nagios dependencies packages #
+########################################
+- name: Install Nagios plugins
+  apt:
+    state: latest
+    update_cache: yes
+    pkg:
+      - fping
+      - nagios-plugins
+      - nagios-plugins-common
+      - perl
+      - qstat
+
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+
+- name: Create symlink to plugins
+  file: src=/usr/lib/nagios/plugins dest=/usr/local/nagios/libexec state=link
+
+##############################
+# Install Additional Plugins #
+##############################
+
+- name: Copy check_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
+    dest: /usr/local/nagios/libexec/check_timesync
+    mode: 0755

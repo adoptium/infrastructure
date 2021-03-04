@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# Copyright 2020 The Original Author(s)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Nagios Plugin to check that inventory.yml / Nagios / Jenkins are in sync
+# This check assumes:
+#  - The inventory is the definitive list we should be comparing to
+#  - This is run on locally on the Nagios Server
+
+set -euxo pipefail
+
+# List of machines that are ignored if they're not in Nagios
+exceptionsList="win sxa gdams will EC2 azurebuildagent aahlenst vagrant master infrastructure esxi aix"
+
+export inv=$(wget -qO- https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/inventory.yml) 
+[[ $? != 0 ]] && echo "UNKNOWN- wget failed" && exit 3
+
+# Put EOF at end of inv file
+inv=$inv$'\n'EOF
+
+Inventory_Server_List=
+
+IFS=
+mapfile -t category_array < <( echo $inv | grep -P "^\s{2}-\s" | cut -d- -f2 | tr -d ": -" )
+
+for cat_index in ${!category_array[@]}; do
+  beginPattern=${category_array[$cat_index]} 
+  endPattern=${category_array[$cat_index+1]}
+ 
+  if [[ $endPattern == "" ]]; then
+    endPattern="EOF" 
+  fi
+
+  inv_section=$(echo $inv | awk '/'$beginPattern'/,/'$endPattern'/')
+  mapfile -t prov_array < <( echo $inv_section | grep -P "\s{4}-\s*" | tr -d " :-" )
+
+  for prov_index in ${!prov_array[@]}; do
+    provBegin=${prov_array[$prov_index]}
+    provEnd=${prov_array[$prov_index+1]}
+    if [[ ${prov_array[$prov_index+1]} == "" ]]; then provEnd=$endPattern; fi
+
+    prov_section=$(echo $inv_section | awk '/'$provBegin:'/,/'$provEnd:'/')
+
+    mech_list=$(echo $prov_section | awk '/ip/ { print $1 }' | tr -d ":")
+    IFS=$'\n'
+
+    for machine in $mech_list; do 
+       inventoryList+="$beginPattern-$provBegin-$machine  "
+    done
+    IFS=
+  done
+done
+
+IFS=$'\n'$'\t'" "
+
+mkdir -p $HOME/check_inventory_logs
+logPath="$HOME/check_inventory_logs/check_inventory_`date +%H%M_%d%m%Y`"
+
+nagiosList=$(ls -la /usr/local/nagios/etc/servers/ | awk '/.cfg/ { print $9 }' | cut -d. -f1)
+jenkinsList=$(curl -s https://ci.adoptopenjdk.net/computer/api/json | jq -r '.computer[] | .displayName')
+[[ $? != 0 ]] && echo "UNKNOWN- Curl failed" && exit 3
+
+# ran on the Nagios User, so put it somewhere we know it has write access to
+rm -f $HOME/check_inventory_logs/check_inventory_*
+echo "
+| Inventory List | In Jenkins? | In Nagios? |
+|-|-|-|" >> $logPath
+
+for x in $inventoryList; do
+  exception=False
+  # "infrastructure" machines are called "infra" in Jenkins. Often have other names in Nagios too, so just skip
+  grep -q "infrastructure" <(echo $x) && continue;
+  # Ignore certain machines from Nagios
+  for y in $exceptionsList; do
+     grep -q $y <(echo $x) && exception=True && break
+  done
+
+  in_Jenkins="NO"
+  grep -q $x <(echo $jenkinsList) && in_Jenkins="YES"
+  grep -q $x <(echo $nagiosList) && in_Nagios="YES" || in_Nagios="NO"
+  [[ $exception == "True" ]] && in_Nagios="IGNORED"
+
+  [[ $in_Jenkins == "NO" || $in_Nagios == "NO" ]] && LINE_COLOR='\033[0;31m' || LINE_COLOR='\033[0;32m'
+  echo -e "${LINE_COLOR}| $x | $in_Jenkins | $in_Nagios |" >> $logPath
+done
+
+status="OK"
+exit_code=0
+machine_difference=$(grep "0;31m" $logPath | wc -l)
+
+if ((machine_difference>=5)); then
+  exit_code=2
+  status="CRITICAL"
+elif ((machine_difference>0)); then
+  exit_code=1
+  status="WARNING"
+fi
+
+echo "$status - Machine disparity: $machine_difference" && exit $exit_code

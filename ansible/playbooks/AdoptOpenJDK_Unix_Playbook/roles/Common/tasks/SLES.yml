@@ -9,7 +9,7 @@
 - name: Add Devel-Tools repository (SLES12, x86_64/ppc64le)
   zypper_repository:
     name: devel-tools
-    repo: 'https://download.opensuse.org/repositories/devel:/tools/SLE_12_SP4/'
+    repo: 'https://download.opensuse.org/repositories/devel:/tools/SLE_12_SP5/'
     auto_import_keys: yes
     state: present
   when:

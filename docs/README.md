@@ -1,3 +1,3 @@
-## To edit the infrastructure diagram:
+# To edit the infrastructure diagram
 
-Download yEd Graph Editor: https://www.yworks.com/products/yed
+Download [yEd Graph Editor](https://www.yworks.com/products/yed)

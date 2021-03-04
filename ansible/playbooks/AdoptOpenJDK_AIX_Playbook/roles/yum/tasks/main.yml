@@ -33,7 +33,6 @@
 
 - name: Install yum and dependencies
   command: /tmp/yum.sh
-  register: result.yum
   ignore_errors: yes
   when: yum.stat.islnk is not defined
   tags:
@@ -46,6 +45,7 @@
     update_cache: yes
     name: '*'
     state: latest
+    exclude: cmake*
   tags:
     - yum
     #TODO: Package installs should not use latest
@@ -88,19 +88,68 @@
     - zsh
   tags: yum
 
-##############################################
-# Additional Tools not available through yum #
-##############################################
-- name: Install yum package support
-  yum: name={{ item }} state=present update_cache=yes
-  with_items:
-    - http://www.bullfreeware.com/download/bin/2328/libiconv-1.14-22.aix6.1.ppc.rpm
-    - http://www.bullfreeware.com/download/bin/2591/libunistring-0.9.6-2.aix6.1.ppc.rpm
-    - http://www.bullfreeware.com/download/bin/3944/perl-5.24.0-3.aix6.1.ppc.rpm
-    - http://www.oss4aix.org/download/RPMS/cmake/cmake-3.7.2-1.aix6.1.ppc.rpm
-  tags: rpm_install
+#######################################################
+# Additional Tools not available directly through yum #
+#######################################################
+- name: Confirm cmake prereqs have been installed
+  stat:
+    path: /opt/freeware/etc/rpm/macros.cmake
+  register: cmake_prereqs
+  tags:
+    - rpm_install
+    - yum
+    - cmake
+
+# NOTE: Cannot use yum module here as it will pull in cmake 3.16 which we do not want
+- name: Install cmake 3.14.3 prerequisites if needed (Will generate yum warning)
+  command: rpm -i https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-rpm-macros-3.14.3-1.aix7.1.ppc.rpm  https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-filesystem-3.14.3-1.aix7.1.ppc.rpm
+  tags:
+    - rpm_install
+    - yum
+    - cmake
+  when: not cmake_prereqs.stat.exists
+
+# See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492 for why we are locking this
+- name: Install cmake 3.14.3 (3.16 has problems)
+  yum: name=cmake-3.14.3 state=present update_cache=yes
+  tags:
+    - rpm_install
+    - yum
+    - cmake
 
 - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
   shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
   ignore_errors: True
-  tags: rpm_install
+  tags:
+    - rpm_install
+    - yum
+
+# Create zlib.h and zconf.h links - See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1952
+
+- name: Checking for /opt/freeware/include/zlib.h
+  stat:
+    path: /opt/freeware/include/zlib.h
+  register: zlib
+  tags: yum
+
+- name: Checking for /opt/freeware/include/zconf.h
+  stat:
+    path: /opt/freeware/include/zconf.h
+  register: zconf
+  tags: yum
+
+- name: Link /usr/include/zlib.h to /opt/freeware/include/zlib.h
+  file:
+    src: /opt/freeware/include/zlib.h
+    dest: /usr/include/zlib.h
+    state: link
+  when: zlib.stat.exists
+  tags: yum
+
+- name: Link /usr/include/zconf.h to /opt/freeware/include/zconf.h
+  file:
+    src: /opt/freeware/include/zconf.h
+    dest: /usr/include/zconf.h
+    state: link
+  when: zconf.stat.exists
+  tags: yum

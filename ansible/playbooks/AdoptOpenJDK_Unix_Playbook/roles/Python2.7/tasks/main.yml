@@ -1,0 +1,32 @@
+---
+####################
+# Python Bootstrap #
+####################
+
+# Check if Python is installed, and its version. If Python isn't installed, or it's at a version below 2.7.18, install Python 2.7.18.
+# Currently only for CentOS6. See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1877
+
+- name: Check for Python 2's version
+  shell: python -V 2>&1 | grep -Po '(?<=Python )(.+)'
+  register: python_version
+  ignore_errors: yes
+  when:
+    - (ansible_distribution == "CentOS") and (ansible_distribution_major_version == "6")
+  tags:
+    - python2.7
+
+- name: Install Python2.7 to /usr/local/python2
+  unarchive:
+    src: https://ci.adoptopenjdk.net/userContent/usrlocalPython27.tar.xz
+    dest: /usr/local/
+    remote_src: yes
+    mode: 0755
+  retries: 3
+  delay: 5
+  register: python_download
+  until: python_download is not failed
+  when:
+    - (ansible_distribution == "CentOS") and (ansible_distribution_major_version == "6")
+    - (python_version.rc != 0) or (python_version.rc == 0 and python_version.stdout is version_compare('2.7.18', operator='lt'))
+  tags:
+    - python2.7

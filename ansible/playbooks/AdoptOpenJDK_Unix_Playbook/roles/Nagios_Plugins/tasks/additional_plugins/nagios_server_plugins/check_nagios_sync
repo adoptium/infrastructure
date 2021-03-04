@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+# Copyright 2020 The Original Author(s)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Nagios Plugin to check that machines don't need removing from Nagios
+# This check assumes:
+#  - This is run on locally on the Nagios Server
+#  - The Nagios Server has jq installed
+
+set -euxo pipefail
+
+exceptionList="ci ansible"
+
+export inv=$(wget -qO- https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/inventory.yml) 
+[[ $? != 0 ]] && echo "UNKNOWN- wget failed" && exit 3
+
+# Put EOF at end of inv file
+inv=$inv$'\n'EOF
+
+Inventory_Server_List=
+
+IFS=
+mapfile -t category_array < <( echo $inv | grep -P "^\s{2}-\s" | cut -d- -f2 | tr -d ": -" )
+
+for cat_index in ${!category_array[@]}; do
+  beginPattern=${category_array[$cat_index]} 
+  endPattern=${category_array[$cat_index+1]}
+ 
+  if [[ $endPattern == "" ]]; then
+    endPattern="EOF" 
+  fi
+
+  inv_section=$(echo $inv | awk '/'$beginPattern'/,/'$endPattern'/')
+  mapfile -t prov_array < <( echo $inv_section | grep -P "\s{4}-\s*" | tr -d " :-" )
+
+  for prov_index in ${!prov_array[@]}; do
+    provBegin=${prov_array[$prov_index]}
+    provEnd=${prov_array[$prov_index+1]}
+    if [[ ${prov_array[$prov_index+1]} == "" ]]; then provEnd=$endPattern; fi
+
+    prov_section=$(echo $inv_section | awk '/'$provBegin:'/,/'$provEnd:'/')
+
+    mech_list=$(echo $prov_section | awk '/ip/ { print $1 }' | tr -d ":")
+    IFS=$'\n'
+
+    for machine in $mech_list; do 
+       inventoryList+="$beginPattern-$provBegin-$machine  "
+    done
+    IFS=
+  done
+done
+
+IFS=$'\n'$'\t'" "
+
+mkdir -p $HOME/check_inventory_logs
+logPath="$HOME/check_inventory_logs/check_nagios_sync_`date +%H%M_%d%m%Y`"
+rm -rf "$HOME/check_inventory_logs/check_nagios_sync_*"
+
+nagiosList=$(ls -la /usr/local/nagios/etc/servers/ | awk '/.cfg/ { print $9 }' | cut -d. -f1)
+jenkinsList=$(curl -s https://ci.adoptopenjdk.net/computer/api/json | jq -r '.computer[] | .displayName')
+[[ $? != 0 ]] && echo "UNKNOWN- Curl failed" && exit 3
+
+echo "
+| Nagios List | In Jenkins? | In Inventory? |
+|-|-|-|" >> $logPath
+
+for x in $nagiosList; do
+  grep -q $x <(echo $exceptionList) && continue  
+  
+in_Inv="NO"
+  grep -q $x <(echo $jenkinsList) && in_Jenkins="YES"
+  grep -q $x <(echo $inventoryList) && in_Inv="YES" || in_Inv="NO"
+
+  [[ $in_Jenkins == "NO" || $in_Inv == "NO" ]] && LINE_COLOR='\033[0;31m' || LINE_COLOR='\033[0;32m'
+  echo -e "${LINE_COLOR}| $x | $in_Jenkins | $in_Inv |" >> $logPath
+done
+
+status="OK"
+exit_code=0
+machine_difference=$(grep "0;31m" $logPath | wc -l)
+
+if ((machine_difference>=5)); then
+  exit_code=2
+  status="CRITICAL"
+elif ((machine_difference>0)); then
+  exit_code=1
+  status="WARNING"
+fi
+
+echo "$status - Machine disparity: $machine_difference" && exit $exit_code
