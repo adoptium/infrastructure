@@ -28,6 +28,15 @@
   when:
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not (ansible_distribution_major_version == "8" and ansible_architecture == "x86_64")
+  tags: nagios_plugins
+
+- name: Install nagios-plugins (RHEL8/x64)
+  yum:
+    name: nagios-plugins
+    state: latest
+  when:
+    - ansible_distribution_major_version == "8" and ansible_architecture == "x86_64"
   tags: nagios_plugins
 
 ##########
