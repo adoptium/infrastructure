@@ -76,5 +76,5 @@
     opts: sw
     state: present
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
