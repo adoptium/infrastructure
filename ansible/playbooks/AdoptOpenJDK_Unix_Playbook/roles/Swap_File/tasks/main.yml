@@ -69,8 +69,11 @@
     - not (swap_exists.stat.exists)
   tags: swap_file
 
+# 'path' is apparently required, as is 'src' when 'state: present'
+# See: https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html
 - name: Add swap to fstab
   mount:
+    path: none
     src: "{{ swap_path }}"
     fstype: swap
     opts: sw
