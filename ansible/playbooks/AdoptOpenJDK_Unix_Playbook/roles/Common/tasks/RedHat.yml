@@ -198,6 +198,16 @@
   package:
     name: locales
     state: present
+  when:
+    - (ansible_distribution_major_version is version_compare('7', operator='lt'))
+  tags: locales
+
+- name: Install 'glibc-common' package
+  package:
+    name: glibc-common
+    state: present
+  when:
+    - (ansible_distribution_major_version is version_compare('7', operator='ge'))
   tags: locales
 
 # Skipping linting as no alternative to shell can be used (lint error 305)

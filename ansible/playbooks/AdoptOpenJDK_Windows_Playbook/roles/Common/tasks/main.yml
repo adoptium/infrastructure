@@ -27,8 +27,11 @@
   win_shell: "fsutil behavior set disable8dot3 0;"
   tags: basic_config
 
+# Ignores errors to ensure the playbook can be run on an already setup machine
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1945
 - name: Ensure 'Program Files (x86)' has a shortname
   win_shell: "fsutil file setshortname \"C:\\Program Files (x86)\" \"PROGRA~2\""
   args:
     executable: cmd
+  ignore_errors: yes
   tags: basic_config

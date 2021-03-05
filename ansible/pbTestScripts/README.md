@@ -25,37 +25,34 @@ These machines will then have the playbooks ran on them, with additional options
 
 The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 
-| Option                           | Description                                           | Example                                                                                             |
-|----------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `--vagrantfile` / `-v` OS        | Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                                                           |
-| `--all` / `-a`                   | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                                                      |
-|                                  |                                                       |                                                                                                     |
-| `--URL` / `-u` Git URL           | Specify the URL of the infrastructure repo to clone * | `./vagrantPlaybookCheck.sh -a --URL https://github.com/sxa/openjdk-infrastructure/tree/myBranch`    |
-| `--new-vagrant-file` / `-nv`     | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`                                                |
-| `--skip-more` / `-sm`            | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`                                                                  |
-| `--clean-workspace` / `-c`       | Delete the old workspace                              | `./vagrantPlaybookCheck.sh -a -c`                                                                   |
-| `--retainVM` / `-r`              | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                                                           |
-| `--no-halt` / `-nh`              | Don't halt the Vagrant VMs at the end of the script   | `./vagrantPlaybookCheck.sh -a --retainVM -nh`                                                       |
-| `--help`                         | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                                                                  |
-|                                  |                                                       |                                                                                                     |
-| `--build` / `-b`                 | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                                                              |
-| `--build-repo` / `-br` build URL | Specify the URL of the openjdk-build repo *           | `./vagrantPlaybookCheck.sh -a --build -br https://github.com/sxa/openjdk-build/tree/myBranch        |
-| `--build-hotspot`                | Specify to build the JDK with the Hotspot JVM *       | `./vagrantPlaybookCheck.sh -a --build --build-hotspot                                               |
-| `--JDK-Version` / `-jdk` jdk     | Specify which JDK to build, if applicable             | `./vagrantPlaybookCheck.sh -a --build --JDK-version jdk11                                           |
-| `--test` / `-t`                  | Run a small test on the built JDK within the VM *     | `./vagrantPlaybookCheck.sh -a --build --test`                                                       |
+| Option                                | Description                                           | Example                                                        |
+|---------------------------------------|-------------------------------------------------------|----------------------------------------------------------------|
+| `--vagrantfile` / `-v` OS             | Run against the specified operating system            | `./vagrantPlaybookCheck.sh -v Ubuntu1804`                      |
+| `--all` / `-a`                        | Runs for all OSs                                      | `./vagrantPlaybookCheck.sh -a`                                 |
+|                                       |                                                       |                                                                |
+| `--fork` / `-f` Git fork              | Specify the fork of the infrastructure repo to clone  | `./vagrantPlaybookCheck.sh -a --fork willsparker               |
+| `--branch` / `-br` Git branch         | Specify the branch of the fork to clone               | `./vagrantPlaybookCheck.sh -a --fork willsparker --branch 1941 |
+| `--new-vagrant-file` / `-nv`          | Use the vagrant files from the new URL                | `./vagrantPlaybookCheck.sh -a -nv --URL https://...`           |
+| `--skip-more` / `-sm`                 | For speed/testing skip tags not needed for build test | `./vagrantPlaybookCheck.sh -a -sm`                             |
+| `--clean-workspace` / `-c`            | Delete the old workspace                              | `./vagrantPlaybookCheck.sh -a -c`                              |
+| `--retainVM` / `-r`                   | Retains the VM after running the Playbook             | `./vagrantPlaybookCheck.sh -a --retainVM`                      |
+| `--no-halt` / `-nh`                   | Don't halt the Vagrant VMs at the end of the script   | `./vagrantPlaybookCheck.sh -a --retainVM -nh`                  |
+| `--help`                              | Displays usage                                        | `./vagrantPlaybookCheck.sh --help`                             |
+|                                       |                                                       |                                                                |
+| `--build` / `-b`                      | Build JDK8 on the VM after the playbook               | `./vagrantPlaybookCheck.sh -a --build`                         |
+| `--build-fork` / `-bf` build fork     | Specify the fork of the openjdk-build repo to clone   | `./vagrantPlaybookCheck.sh -a --build --build-fork sxa         |
+| `--build-branch` / `-bb` build branch | Specify the branch of the build fork to clone         | `./vagrantPlaybookCheck.sh -a --build --build-branch master    |
+| `--build-hotspot`                     | Specify to build the JDK with the Hotspot JVM *       | `./vagrantPlaybookCheck.sh -a --build --build-hotspot          |
+| `--JDK-Version` / `-jdk` jdk          | Specify which JDK to build, if applicable             | `./vagrantPlaybookCheck.sh -a --build --JDK-version jdk11      |
+| `--test` / `-t`                       | Run a small test on the built JDK within the VM *     | `./vagrantPlaybookCheck.sh -a --build --test`                  |
 
 Notes:
- - If not specified, the URL will default to `https://github.com/adoptopenjdk/openjdk-infrastructure`
- - If not specified, the build URL will default to `https://github.com/adoptopenjdk/openjdk-build`
+ - The `--fork` and `--branch` arguments default to `adoptopenjdk` and `master`, respectively.
+ - The `--build-fork` and `--build-branch` arguments also default to `adoptopenjdk` and `master`, respectively.
  - By default, the JDK will be built with the OpenJ9 JVM, as it has more dependencies which is a better test for the playbooks.
  - `--test` requires `--build` be enabled, otherwise the script will error.
 
-The script is able to test specific branches of repositories, as well as the master branch, for example:
-* "https://github.com/adoptopenjdk/openjdk-infrastructure" will git clone and test the master branch of adoptopenjdk/openjdk-infrastructure.
-* "https://github.com/adoptopenjdk/openjdk-infrastructure/tree/branch_name" will git clone and test the "branch_name" branch of adoptopenjdk/openjdk-infrastructure
-
-This can also be done on other people's forks of the repository, for example:
-* "https://github.com/username/openjdk-infrastructure/tree/branch_name" will git clone the "branch_name" branch of "username"s fork of the repository 
+The script will first clone the repository specified by the `--fork` and `--branch` options. For example, if `--fork` is 'willsparker' and `--branch` is '1941', the repository being cloned is https://github.com/willsparker/openjdk-infrastructure/tree/1941.
 
 The script will then make a directory in the `$WORKSPACE` location called _adoptopenjdkPBTests_, in which another directory containing the log files, and the Git repository is stored. Following that, the script will run each ansible playbook on their respective VMs, writing the output to the aforementioned log files. If not defined prior to running, `$WORKSPACE` will default to `$HOME`. 
 

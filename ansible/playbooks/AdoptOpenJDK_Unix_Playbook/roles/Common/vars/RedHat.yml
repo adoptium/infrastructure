@@ -92,11 +92,11 @@ Test_Tool_Packages:
   - perl
   - perl-Digest-SHA
   - perl-Time-HiRes
+  - perl-Test-Simple
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb
   - zlib-devel
   - perl-devel
   - expat-devel
   - libcurl-devel
-
-crontab_Patching: "/usr/bin/yum -y update && yum clean packages"
+  - mercurial

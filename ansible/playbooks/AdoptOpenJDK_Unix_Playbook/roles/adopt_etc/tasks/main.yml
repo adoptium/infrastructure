@@ -1,0 +1,117 @@
+---
+########
+# Main #
+########
+
+###########################
+# Overide amd64 to x86_64 #
+###########################
+- name: If ansible_architecture is amd64 set it to x86_64
+  set_fact:
+    ansible_architecture: "x86_64"
+  when:
+    - ansible_architecture == "amd64"
+
+##################
+# Set root group #
+##################
+- name: Set default root group to root
+  set_fact:
+    root_group: "root"
+
+################
+# Set Hostname #
+################
+- name: Set hostname to inventory_hostname
+  hostname:
+    name: "{{ inventory_hostname }}.{{ Domain }}"
+  when:
+    - Domain == "adoptopenjdk.net" and ansible_distribution != "MacOSX" and ansible_distribution != "Solaris"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hostname,adoptopenjdk
+
+- name: Set hostname to inventory_hostname (macOS)
+  command: "{{ item }}"
+  with_items:
+    - "sudo scutil --set HostName {{ inventory_hostname }}.adoptopenjdk.net"
+    - "sudo scutil --set ComputerName {{ inventory_hostname }}.adoptopenjdk.net"
+    - "dscacheutil -flushcache"
+  when:
+    - Domain == "adoptopenjdk.net" and ansible_distribution == "MacOSX"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hostname,adoptopenjdk
+
+- name: Set hostname to inventory_hostname (Solaris)
+  shell: "{{ item }}"
+  with_items:
+    - echo "{{ inventory_hostname }}" > /etc/nodename
+    - echo "{{ inventory_hostname }}" > /etc/hostname.e1000g0
+    - uname -S "{{ inventory_hostname }}"
+  when: Domain == "adoptopenjdk.net" and ansible_distribution == "Solaris"
+  register: foo
+  tags: hostname,adoptopenjdk
+
+#####################
+# Update /etc/hosts #
+#####################
+- name: Update /etc/hosts file - IP FQDN hostname
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    state: present
+  when:
+    - Domain == "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hosts_file, adoptopenjdk
+
+- name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    state: present
+  when:
+    - Domain != "adoptopenjdk.net"
+    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != "localhost"
+  tags: hosts_file, adoptopenjdk
+
+- debug:
+    msg: "Inventory_hostname is the same as the ip address or is localhost.
+    The fqdn has not been added to /etc/hosts.
+    The hostname of the machine has not been updated.
+    Manually add the fqdn to /etc/hosts
+    and manually update the hostname in /etc/hostname.
+    Or use the command line argument --extra-vars 'inventory_hostname=<realhostname>',
+    when running the playbook next time"
+  when: (inventory_hostname == ansible_default_ipv4.address) or (inventory_hostname == "localhost")
+  tags: hosts_file, hostname
+
+- name: Update /etc/hosts file - 127.0.0.1
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*)127.0.0.1(.*)$"
+    line: "127.0.0.1   localhost  localhost.localdomain"
+    state: present
+    backup: yes
+  tags: hosts_file, adoptopenjdk
+
+# This doesn't work as ansible says it can't write to the directory
+# Leaving this here in case someoen can make it work in the future
+#
+#- name: Record playbook completion with time in /var/log/ansiblerun.log
+#  lineinfile:
+#    state: present
+#    create: yes
+#    path: /var/tmp/ansiblerun.log
+#    mode: 0644
+#    line: "{{ ansible_date_time.iso8601_basic_short }} END"
+#  tags: ansiblerunlog
+
+# Version of the above that works
+- name: Record playbook completion with time in /var/log/ansiblerun.log
+  command: echo $(date +%Y%m%dT%H%M%S) >> /var/log/ansiblerun.log

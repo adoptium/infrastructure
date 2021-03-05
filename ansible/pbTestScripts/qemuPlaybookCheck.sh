@@ -170,7 +170,7 @@ setupWorkspace() {
 		echo "Copying new disk image"
 		# Copy disk image and tools from imageLocation to workFolder
 		cp -r $imageLocation/$OS.$ARCHITECTURE/. $workFolder
-		xz -cd "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz > "$workFolder"/"$OS.$ARCHITECTURE".dsk
+		xz -d "$workFolder"/"$OS.$ARCHITECTURE".dsk.xz
 	else
 		echo "Using old disk image"
 	fi
@@ -301,6 +301,8 @@ runPlaybook() {
 	fi
 	if [[ "$retainVM" == false ]]; then
 		destroyVM
+		echo "Removing disk image"
+		rm -f ${workFolder}/${OS}.${ARCHITECTURE}.dsk
 	fi
 }
 

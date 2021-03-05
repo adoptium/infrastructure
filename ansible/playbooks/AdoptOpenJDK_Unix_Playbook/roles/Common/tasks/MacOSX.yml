@@ -154,6 +154,16 @@
   tags:
     - kernel_tuning
 
+- name: Allow staff users to generate core dumps
+  file:
+    path: /cores
+    state: directory
+    mode: 0774
+    owner: root
+    group: staff
+  tags:
+    - core_dumps
+
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:

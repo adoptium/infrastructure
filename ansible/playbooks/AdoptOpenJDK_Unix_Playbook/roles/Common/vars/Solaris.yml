@@ -26,5 +26,3 @@ Build_Tool_Packages:
 
 Test_Tool_Packages:
   - perl
-
-crontab_Patching: "/opt/csw/bin/pkgutil --upgrade --yes"

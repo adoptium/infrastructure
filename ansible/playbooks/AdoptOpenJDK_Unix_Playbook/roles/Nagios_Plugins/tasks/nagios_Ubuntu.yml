@@ -27,7 +27,7 @@
     state: latest
     update_cache: yes
     pkg: nagios-plugins-common
-  when: (ansible_distribution_major_version != 20)
+  when: (ansible_distribution_version is version_compare('20', operator='ge'))
 
 ##########
 # Layout #

@@ -1,0 +1,21 @@
+# Label adding bot, see .github/labeler.yml for config
+
+name: "Pull Request Labeler"
+on:
+  pull_request_target:
+  issues:
+  issue_comment:
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/labeler@main
+      if: ${{ github.event.pull_request }}
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+    - uses: fuxingloh/multi-labeler@v1
+      with:
+        github-token: "${{secrets.GITHUB_TOKEN}}"
+        config-path: .github/regex_labeler.yml

@@ -49,7 +49,6 @@
     - Firefox
     - Strawberry_Perl             # Testing
     - Freemarker                  # OpenJ9
-    - cmake                       # OpenJ9
     - GIT
     - Java7                       # JDK8 build bootstrap
     - Java8                       # JDK9 build bootstrap/ For Gradle
@@ -57,10 +56,8 @@
       jdk_version: 10
     - role: Java_install          # For Gradle
       jdk_version: 11
-    - role: Java_install          # JDK14 build bootstrap
-      jdk_version: 13
-    - role: Java_install          # JDK15 build bootstrap
-      jdk_version: 14
+    - role: Java_install          # JDK16 build bootstrap
+      jdk_version: 15
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
