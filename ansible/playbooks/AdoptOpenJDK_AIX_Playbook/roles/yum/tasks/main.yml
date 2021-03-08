@@ -6,18 +6,19 @@
 - name: Confirm yum is installed - /usr/bin/yum
   stat:
     path: /usr/bin/yum
-  register: yum
+  register: _yum
+  tags: yum
 
 # Use set -o pipefail -o to quiet AnsibleLint
 - name: Uninstall conflicting packages
   shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
   ignore_errors: True
-  when: yum.stat.islnk is not defined
+  when: _yum.stat.islnk is not defined
   tags:
+    - yum
     - rpm_remove
     # TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
-
 ####################################
 # Install yum and update to latest #
 #   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
@@ -54,8 +55,7 @@
     file:
       state: absent
       path: /tmp/yum
-
-  when: yum.stat.islnk is not defined
+  when: _yum.stat.islnk is not defined
   tags:
     - yum
     - vendor_files
