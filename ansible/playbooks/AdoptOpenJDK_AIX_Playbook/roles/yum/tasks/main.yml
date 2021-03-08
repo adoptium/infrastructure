@@ -26,10 +26,10 @@
   block:
   - name: Ensure dest exists
     file:
-    state: directory
-    path: /tmp/yum
+      state: directory
+      path: /tmp/yum
 
-	- name: Transfer and extract X11
+  - name: Transfer rpm.rte
     copy:
       src: /Vendor_Files/aix/yum/rpm.rte
       dest: /tmp/yum
@@ -38,14 +38,22 @@
   - name: Install/update rpm.rte
     command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
 
-	- name: Transfer yum bundle package
-    unarchive:
-      src: /Vendor_Files/aix/yum/yum_bundle.rte
+  - name: Transfer yum bundle package
+    copy:
+      src: /Vendor_Files/aix/yum/yum_bundle.tar
       dest: /tmp/yum
       remote_src: no
 
+  - name: Unpack yum bundle
+    command: tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
+
   - name: Install yum bundle
     command: rpm -i /tmp/yum/*.rpm
+
+  - name: Cleanup /tmp/yum
+    file:
+      state: absent
+      path: /tmp/yum
 
   when: yum.stat.islnk is not defined
   tags:
