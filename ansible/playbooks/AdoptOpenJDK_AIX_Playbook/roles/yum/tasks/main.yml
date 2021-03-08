@@ -50,6 +50,7 @@
   when: yum.stat.islnk is not defined
   tags:
     - yum
+    - vendor_files
 
 - name: Yum update
   yum:
