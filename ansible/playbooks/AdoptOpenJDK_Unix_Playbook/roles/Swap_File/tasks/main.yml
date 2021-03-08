@@ -9,14 +9,6 @@
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
 
-- name: Test if swapfile exists
-  command: grep swap /etc/fstab
-  ignore_errors: yes
-  register: swap_exists
-  tags:
-    - swap_file
-    - skip_ansible_lint
-
 - name: Set Swapfile path - /swapfile
   set_fact:
     swap_path: /swapfile
@@ -29,10 +21,16 @@
     - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
   tags: swap_file
 
+- name: Check if Swapfile exists
+  stat:
+    path: "{{ swap_path }}"
+  register: swap_exists
+  tags: swap_file
+
 - name: Display swapfile Debug Information
   debug:
     msg:
-      - "swap_path: {{ swap_path | default('***Undefined***') }} "
+      - "swap_path: {{ swap_path.stat.exists | default('***Undefined***') }} "
       - "swap_exists: {{ swap_exists.rc | default('***Undefined***') }} "
   tags: swap_file
 
@@ -46,38 +44,40 @@
 - name: Create swap file - via DD
   command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Set swap file permissions
-  file: path="{{ swap_path }}"
-        owner=root
-        group="{{ root_group }}"
-        mode=0600
+  file:
+    path: "{{ swap_path }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0600
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Create swap area device
   command: "mkswap {{ swap_path }}"
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Mount swap file
   command: "swapon {{ swap_path }}"
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
 
+# 'path' is apparently required, as is 'src' when 'state: present'
+# See: https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html
 - name: Add swap to fstab
-  mount: src="{{ swap_path }}"
-    name=none
-    fstype=swap
-    opts=sw
-    passno=0
-    dump=0
-    state=present
+  mount:
+    path: none
+    src: "{{ swap_path }}"
+    fstype: swap
+    opts: sw
+    state: present
   when:
-    - (swap_exists.rc != 0)
+    - not (swap_exists.stat.exists)
   tags: swap_file
