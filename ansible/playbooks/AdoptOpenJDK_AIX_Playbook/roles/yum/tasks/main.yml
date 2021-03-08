@@ -20,25 +20,36 @@
 
 ####################################
 # Install yum and update to latest #
+#   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
 ####################################
-- name: Download yum.sh
-  get_url:
-    url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
-    validate_certs: False
-    dest: /tmp/
-    mode: 0775
-    timeout: 25
-  when: yum.stat.islnk is not defined
-  tags: yum
+- name: Install yum from AIXToolbox
+  block:
+  - name: Ensure dest exists
+    file:
+    state: directory
+    path: /tmp/yum
 
-- name: Install yum and dependencies
-  command: /tmp/yum.sh
-  ignore_errors: yes
+	- name: Transfer and extract X11
+    copy:
+      src: /Vendor_Files/aix/yum/rpm.rte
+      dest: /tmp/yum
+      remote_src: no
+
+  - name: Install/update rpm.rte
+    command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
+
+	- name: Transfer yum bundle package
+    unarchive:
+      src: /Vendor_Files/aix/yum/yum_bundle.rte
+      dest: /tmp/yum
+      remote_src: no
+
+  - name: Install yum bundle
+    command: rpm -i /tmp/yum/*.rpm
+
   when: yum.stat.islnk is not defined
   tags:
     - yum
-    #TODO: Package installs should not use latest
-    - skip_ansible_lint
 
 - name: Yum update
   yum:
