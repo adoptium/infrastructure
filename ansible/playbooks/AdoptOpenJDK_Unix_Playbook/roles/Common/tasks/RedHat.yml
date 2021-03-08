@@ -38,8 +38,8 @@
     packages:
       - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libdwarf-devel-20130207-4.el7.aarch64.rpm
       - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libmpc-devel-1.0.1-3.el7.aarch64.rpm
-      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-common-1.20.4-7.el7.aarch64.rpm
-      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-Xvfb-1.20.4-7.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-common-1.20.4-10.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-Xvfb-1.20.4-10.el7.aarch64.rpm
   when:
     - (ansible_distribution_major_version == "7" and ansible_architecture == "aarch64")
   tags: build_tools, test_tools
@@ -194,20 +194,10 @@
 # Locales #
 ###########
 
-- name: Install 'locales' package
-  package:
-    name: locales
-    state: present
-  when:
-    - (ansible_distribution_major_version is version_compare('7', operator='lt'))
-  tags: locales
-
 - name: Install 'glibc-common' package
   package:
     name: glibc-common
     state: present
-  when:
-    - (ansible_distribution_major_version is version_compare('7', operator='ge'))
   tags: locales
 
 # Skipping linting as no alternative to shell can be used (lint error 305)
