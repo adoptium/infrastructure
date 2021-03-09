@@ -6,24 +6,24 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
-    line: "{{ ansible_host }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    line: "{{ ansible_host }} {{ inventory_hostname }} {{ inventory_hostname }}.{{ Domain }}"
     state: present
   when:
     - Domain == "adoptopenjdk.net"
     - inventory_hostname != ansible_host
-    - inventory_hostname != "localhost"
+    - ansible_host != "127.0.0.1"
   tags: hosts_file, adoptopenjdk
 
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
-    line: "{{ ansible_host }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    line: "{{ ansible_host }} {{ ansible_hostname }} {{ ansible_fqdn }}"
     state: present
   when:
     - Domain != "adoptopenjdk.net"
     - inventory_hostname != ansible_host
-    - inventory_hostname != "localhost"
+    - ansible_host != "127.0.0.1"
   tags: hosts_file, adoptopenjdk
 
 - debug:
