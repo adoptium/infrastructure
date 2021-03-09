@@ -35,15 +35,10 @@
 
 - name: Install from Vendor Files
   block:
-    - name: Ensure destination for Vendor Files exists
-      file:
-        state: directory
-        path: /tmp/x11
-
     - name: Unpack Vendor Files
       unarchive:
         src: /Vendor_Files/aix/OpenGL_X11.tar
-        dest: /tmp/x11
+        dest: /tmp
         remote_src: no
       ignore_errors: yes
       register: _vendor_copied
