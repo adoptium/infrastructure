@@ -46,7 +46,7 @@
     backup: yes
   tags: hosts_file, adoptopenjdk
 
-- name: Update /etc/hosts file - ::1
+- name: Update /etc/hosts file - ipv6 loopback
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*)::1(.*)$"
