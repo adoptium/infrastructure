@@ -6,11 +6,11 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
-    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    line: "{{ ansible_host }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
     state: present
   when:
     - Domain == "adoptopenjdk.net"
-    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != ansible_host
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
@@ -18,11 +18,11 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*){{ ansible_hostname }}(.*)$"
-    line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+    line: "{{ ansible_host }} {{ ansible_fqdn }} {{ ansible_hostname }}"
     state: present
   when:
     - Domain != "adoptopenjdk.net"
-    - inventory_hostname != ansible_default_ipv4.address
+    - inventory_hostname != ansible_host
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
@@ -41,7 +41,16 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^(.*)127.0.0.1(.*)$"
-    line: "127.0.0.1   localhost  localhost.localdomain"
+    line: "127.0.0.1   loopback  localhost"
+    state: present
+    backup: yes
+  tags: hosts_file, adoptopenjdk
+
+- name: Update /etc/hosts file - ::1
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*)::1(.*)$"
+    line: "::1   loopback  localhost"
     state: present
     backup: yes
   tags: hosts_file, adoptopenjdk
