@@ -31,19 +31,21 @@
       path: /tmp/yum
 
   - name: Transfer rpm.rte
-    copy:
-      src: /Vendor_Files/aix/yum/rpm.rte
+    get_url:
+      url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/INSTALLP/ppc/rpm.rte
+      mode: 0644
+      validate_certs: false
       dest: /tmp/yum
-      remote_src: no
 
   - name: Install/update rpm.rte
     command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
 
   - name: Transfer yum bundle package
-    copy:
-      src: /Vendor_Files/aix/yum/yum_bundle.tar
+    get_url:
+      url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum_bundle.tar
+      mode: 0644
+      validate_certs: false
       dest: /tmp/yum
-      remote_src: no
 
   - name: Unpack yum bundle
     command: tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
