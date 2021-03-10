@@ -27,9 +27,12 @@ jobs:
         cd ansible
         ln -sf Vagrantfile.Win2016 Vagrantfile
         vagrant up
-        vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
-        rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.unx
-        echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.unx
+        rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+        # 5986 refers to the winrm_ssl port on the guest
+        # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-672930832
+        vagrantPort=$(vagrant port | awk '/5986/ { print $4 }')
+        echo "[127.0.0.1]:$vagrantPort" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
+        echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
         # Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
         sed -i'' -e "s/.*ansible_password.*/ansible_password: vagrant/g" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
@@ -43,4 +46,4 @@ jobs:
     - name: Run Ansible Playbook
       run: |
         cd ansible
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -b --skip-tags adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
