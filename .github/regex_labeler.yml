@@ -5,7 +5,7 @@ version: v1
 labels:
   - label: "os:macOS"
     matcher:
-      title: "mac"
+      title: "macos"
   - label: "os:aix"
     matcher:
       title: "aix"
