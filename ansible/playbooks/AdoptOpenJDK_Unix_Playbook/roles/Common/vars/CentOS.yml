@@ -38,6 +38,7 @@ Build_Tool_Packages:
   - mesa-libGL-devel
   - mpfr-devel
   - numactl-devel                 # OpenJ9
+  - openssh-clients               # IBM: cloning over SSH
   - openssl-devel
   - perl-DBI
   - perl-devel
