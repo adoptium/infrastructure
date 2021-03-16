@@ -124,7 +124,8 @@ fi
 
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC
 # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2033
-export CONFIGURE_ARGS="--with-native-debug-symbols=none --custom-cacerts false"
+export CONFIGURE_ARGS="--with-native-debug-symbols=none"
+export BUILD_ARGS="--custom-cacerts false"
 
 echo "buildJDK.sh DEBUG:
         TARGET_OS=${TARGET_OS:-}
