@@ -102,6 +102,38 @@ See
 [GIT_Source](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/GIT_Source/tasks/main.yml)
 as an example
 
+## How do I replicate a build failure?
+
+The build triage team will frequently raise issues if they determine that a
+build failure is occurring on a particular system. Assuming it's not a
+"system is offline" issue you may wish to repliacte the build process
+locally. The easiest way to do this is as follows (ideally not as root as
+that can mask problems).
+```
+git clone https://github.com/adoptopenjdk/openjdk-build
+cd openjdk-build/build-farm
+./make-adopt-build-farm.sh jdk11
+```
+(NOTE: `jdk11` is the default if nothing is specified)
+Look at the start of the script for other environment variables that can
+be set control what is built - for example `VARIANT` can be set to `openj9`
+and others instead of the default of `hotspot`. The script uses the
+appropriate environment configuration files under
+`build-form/platform-specific-configurations` to set some options.
+
+## How do I replicate a test failure
+
+In most cases test failures will have a link to the jenkins job where the
+failure occurred. On that job there will be a "Rerun in Grinder" link if you
+need to re-run the whole job (which will run lots of tests and may take a
+while) or within the job you will find individual Grinder re-run links for
+different test subsets. When you click them, you can set the `LABEL` to the
+name of the machine you want to run on if you want to try and replicate it,
+or determine which machines it passes and fails on.
+
+TODO: Section on running individual tests with a suite with `jdk_custom`
+examples
+
 ## Testing changes
 
 If you are making a change which might have a negative effect on the
