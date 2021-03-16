@@ -112,27 +112,77 @@ that can mask problems).
 ```
 git clone https://github.com/adoptopenjdk/openjdk-build
 cd openjdk-build/build-farm
-./make-adopt-build-farm.sh jdk11
+export CONFIGURE_ARGS=--with-native-debug-symbols=none
+export BUILD_ARGS="--custom-cacerts false"
+./make-adopt-build-farm.sh jdk11u
 ```
-(NOTE: `jdk11` is the default if nothing is specified)
-Look at the start of the script for other environment variables that can
-be set control what is built - for example `VARIANT` can be set to `openj9`
-and others instead of the default of `hotspot`. The script uses the
-appropriate environment configuration files under
+
+(NOTE: `jdk11u` is the default if nothing is specified)
+
+The two `export` lines are based on the options in the
+[Build FAQ](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/blob/quickbuild/FAQ.md#how-do-i-build-more-quickly)
+and speed up the process by not building the debug
+symbols and not generating our own certificate bundles.  For most problems,
+neither are needed Look at the start of the script for other environment
+variables that can be set control what is built - for example `VARIANT` can
+be set to `openj9` and others instead of the default of `hotspot`.  The
+script uses the appropriate environment configuration files under
 `build-form/platform-specific-configurations` to set some options.
 
 ## How do I replicate a test failure
 
-In most cases test failures will have a link to the jenkins job where the
-failure occurred. On that job there will be a "Rerun in Grinder" link if you
-need to re-run the whole job (which will run lots of tests and may take a
-while) or within the job you will find individual Grinder re-run links for
-different test subsets. When you click them, you can set the `LABEL` to the
-name of the machine you want to run on if you want to try and replicate it,
-or determine which machines it passes and fails on.
+Many infrastructure issues (generally
+[those tagged as testFail](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues?q=is%3Aopen+is%3Aissue+label%3AtestFail) are raised
+as the result of failing JDK tests which are believed to be problems
+relating to the set up of our machines.  In most cases it is useful to
+re-run jobs using the jenkins
+[Grinder](https://github.com/AdoptOpenJDK/openjdk-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
+jobs which lets you run almost any test on any machine which is connected to
+jenkins.  In most cases `testFail` issues will have a link to the jenkins
+job where the failure occurred.  On that job there will be a "Rerun in
+Grinder" link if you need to re-run the whole job (which will run lots of
+tests and may take a while) or within the job you will find individual
+Grinder re-run links for different test subsets.  When you click them, you
+can set the `LABEL` to the name of the machine you want to run on if you
+want to try and replicate it, or determine which machines it passes and
+fails on.
 
-TODO: Section on running individual tests with a suite with `jdk_custom`
-examples
+For more information on test case diagnosis, there is a full
+[Triage guide](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/Triage.md)
+in the openjdk-tests repository
+
+The values for `TARGET` can be found in thte `<testCaseName>` elements of
+.the various `playlist.xml` files in the test repositories. It can also be
+`jdk_custom` which case you should set the `CUSTOM_TARGET` to the name of
+an individual test for example:
+`test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
+
+If you then need to run manually on the machine itself (outside jenkins)
+then the process is typically like this:
+
+```
+git clone https://github.com/adoptopenjdk/openjdk-tests && cd openjdk-tests
+./get.sh && cd TKG
+export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
+BUILD_LIST=openjdk make compile
+make <target>
+```
+`BUILD_LIST` depends on the suite you want to run, and can be omitted to build
+the tests for everything, but that make take a while and requires `docker`
+to be available.  Note that when building the `system` suite, there must be
+a java in the path to build the mauve tests.  The final make command runs
+the test - it is normally a valid Grinder `TARGET` such as `jdk_net`. There
+is more information on running tests yourself in the
+[tests repository](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
+
+A few examples that test specific pieces of infra-related functionality so useful to be aware of:
+- `BUILD_LIST=functional`, `CUSTOM_TARGET=_MBCS_Tests_pref_ja_JP_linux_0`
+- `BUILD_LIST=system`, `CUSTOM_TARGET=_MachineInfo`
+- `BUILD_LIST=openjdk`, `CUSTOM_TARGET=test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` (`en_US.utf8` locale required)
+- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234)
+
+(For the last one, that makes use of the system.custom target added via
+[this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
 
 ## Testing changes
 
