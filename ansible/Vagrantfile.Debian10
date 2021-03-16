@@ -4,7 +4,11 @@
 $script = <<SCRIPT
 sudo apt-get install tree -y
 sudo apt-get install software-properties-common -y
-sudo apt-get install gpg -y	
+sudo apt-get install gpg -y
+
+# The Debian10 VM needs to upgrade grub-pc, which causes a pop-up, breaking VPC
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1980
+sudo apt-mark hold grub-pc
 sudo apt-get update
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
