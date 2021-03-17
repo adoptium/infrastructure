@@ -1,4 +1,33 @@
-# Config file used by Multi Labeller https://github.com/marketplace/actions/multi-labeler
+# Config file used by .github/workflows/labeler.yml
+
+# This file matches issue/pr contents using regex to labels. See Multi Labeller https://github.com/marketplace/actions/multi-labeler for more information.
+
+# e.g to add the windows label to any issue/pr with a title containing the word windows:
+
+#   - label: "windows"
+#     matcher:
+#       title: "windows"
+
+# You can also regex match body, comments, commits, authors etc:
+
+#   - label: "feat"
+#     sync: true # remove label if match failed, default: false (pull_request/issue only)
+#     matcher:
+#       # Matcher will match on any 7 matcher
+#       title: "^feat:.*"
+#       body: "/feat"
+#       comment: "/feat"
+#       branch: "^feat/.*"
+#       commits: "^feat:.*"
+#       author:
+#         - github-actions
+#         - fuxingloh
+#       files:
+#         any: [ "app/*" ]
+#         all: [ "!app/config/**" ]
+#         count:
+#           gte: 1
+#           lte: 1000
 
 version: v1
 
@@ -50,6 +79,9 @@ labels:
   - label: "provider:scaleway"
     matcher:
       title: "scaleway"
+  - label: "provider:nine"
+    matcher:
+      title: "nine"
 
   - label: "docker"
     matcher:
