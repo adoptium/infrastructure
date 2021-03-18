@@ -25,8 +25,7 @@
   ignore_errors: True
   tags: openssl-1.1.1
 
-- name: Display openssl_version.stdout
-  debug: var=openssl_version.stdout
+- debug: var=openssl_version.stdout
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
