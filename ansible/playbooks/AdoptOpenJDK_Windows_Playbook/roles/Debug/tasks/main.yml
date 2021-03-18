@@ -12,7 +12,7 @@
       - "ansible_architecture: {{ ansible_architecture | default('***Undefined***') }} "
       - "ansible_processor_vcpus: {{ ansible_processor_vcpus | default('***Undefined***') }} "
       - "ansible_processor_cores: {{ ansible_processor_cores | default('***Undefined***') }} "
-      - "ansible_version: {{ ansible_version | default('***Undefined***') }} "
+      - "ansible_version.full: {{ ansible_version.full | default('***Undefined***') }} "
       - "Jenkins_Username: {{ Jenkins_Username | default('***Undefined***') }} "
       - "Nagios_Plugins: {{ Nagios_Plugins | default('***Undefined***') }} "
       - "Superuser_Account: {{ Superuser_Account | default('***Undefined***') }}"
