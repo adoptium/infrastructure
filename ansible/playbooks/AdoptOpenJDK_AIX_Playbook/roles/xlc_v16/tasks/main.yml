@@ -8,7 +8,7 @@
   register: xlc16
   tags: xlc16
 
-- name : "xlc16 installed, skipping download and installation"
+- name: "xlc16 installed, skipping download and installation"
   debug:
     msg: "xlc16 installed, skipping download and installation"
   when: xlc16.stat.islnk is defined
