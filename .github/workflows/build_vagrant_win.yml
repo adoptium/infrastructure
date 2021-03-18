@@ -46,4 +46,4 @@ jobs:
     - name: Run Ansible Playbook
       run: |
         cd ansible
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant -b --skip-tags adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u administrator --skip-tags adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
