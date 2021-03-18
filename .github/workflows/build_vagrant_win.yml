@@ -45,5 +45,6 @@ jobs:
 
     - name: Run Ansible Playbook
       run: |
+        export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
         cd ansible
         ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u administrator --skip-tags adoptopenjdk playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
