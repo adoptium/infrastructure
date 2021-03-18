@@ -8,7 +8,8 @@
   register: xlc16
   tags: xlc16
 
-- debug:
+-name : "xlc16 installed, skipping download and installation"
+  debug:
     msg: "xlc16 installed, skipping download and installation"
   when: xlc16.stat.islnk is defined
   tags: xlc16
@@ -27,7 +28,8 @@
   when: xlc16.stat.islnk is not defined
   tags: xlc16
 
-- debug: msg='Erorrs from the previous installp command normal'
+- name: 'Errors from the previous installp command normal'
+  debug: msg='Errors from the previous installp command normal'
   when: xlc16.stat.islnk is not defined
   tags: xlc16
 

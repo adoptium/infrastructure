@@ -8,7 +8,8 @@
   register: xlc13
   tags: xlc13
 
-- debug:
+- name: "xlc13 installed, skipping download and installation"
+  debug:
     msg: "xlc13 installed, skipping download and installation"
   when: xlc13.stat.islnk is defined
   tags: xlc13
@@ -27,7 +28,8 @@
   when: xlc13.stat.islnk is not defined
   tags: xlc13
 
-- debug: msg='Erorrs from the previous installp command normal'
+- name: 'Errors from the previous installp command normal'
+  debug: msg='Errors from the previous installp command normal'
   when: xlc13.stat.islnk is not defined
   tags: xlc13
 
