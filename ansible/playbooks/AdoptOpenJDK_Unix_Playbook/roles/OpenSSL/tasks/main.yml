@@ -25,7 +25,8 @@
   ignore_errors: True
   tags: openssl-1.1.1
 
-- debug: var=openssl_version.stdout
+- name: Print current OpenSSL version
+  debug: var=openssl_version.stdout
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
@@ -42,7 +43,8 @@
     - openssl_version.stdout == ''
   tags: openssl-1.1.1
 
-- debug: var=converted_openssl_latest_release.stdout
+- name: Print latest OpenSSL release version
+  debug: var=converted_openssl_latest_release.stdout
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
@@ -125,7 +127,8 @@
     - openssl_version.stdout == ''
   tags: openssl-1.1.1
 
-- debug: var=path_commad
+- name: Print OpenSSL path command
+  debug: var=path_commad
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"

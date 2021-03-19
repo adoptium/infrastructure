@@ -82,7 +82,8 @@
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
-- debug:
+- name: Print inventory hostname debug
+  debug:
     msg: "Inventory_hostname is the same as the ip address or is localhost.
     The fqdn has not been added to /etc/hosts.
     The hostname of the machine has not been updated.

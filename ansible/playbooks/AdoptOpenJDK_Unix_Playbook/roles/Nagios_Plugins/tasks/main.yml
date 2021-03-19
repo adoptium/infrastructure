@@ -2,7 +2,6 @@
 ##################
 # Nagios_Plugins #
 ##################
-- debug: msg='Installing Nagios plugins'
 
 - name: If Raspbian on armv7l override ansible_distribution
   set_fact:

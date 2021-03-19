@@ -60,7 +60,8 @@
       ansible_architecture != "i386"
   tags: adoptopenjdk_install
 
-- debug:
+- name: Print api_architecture var
+  debug:
     var: api_architecture
   tags: adoptopenjdk_install
 
