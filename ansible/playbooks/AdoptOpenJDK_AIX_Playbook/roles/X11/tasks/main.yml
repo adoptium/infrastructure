@@ -43,9 +43,12 @@
       ignore_errors: yes
       register: _vendor_copied
 
+# X11.base.lib is not included in the so-called vendor files
+# So no attempt is made to install it.
+# Still reports if it is missing
     - name: Install IBM X11 Extensions - installp
       command:
-        installp -e /tmp/x11.log -aXYgd /tmp/x11 X11.adt.ext X11.vfb X11.base.lib
+        installp -e /tmp/x11.log -aXYgd /tmp/x11 X11.adt.ext X11.vfb
       register: _installp
       ignore_errors: yes
       when: _vendor_copied.failed is defined and _vendor_copied.failed != true
