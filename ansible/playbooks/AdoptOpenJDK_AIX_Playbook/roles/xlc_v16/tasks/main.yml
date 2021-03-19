@@ -30,17 +30,17 @@
       ignore_errors: yes
       when: _vendor_copied.failed is defined and _vendor_copied.failed == false
 
-- name: 'Errors from the previous installp command can be ignored'
-  debug: msg='Errors from the previous installp command can be ignored'
-  when: xlc16.stat.islnk is not defined
-  tags: xlc16
+    - name: 'Errors from the previous installp command can be ignored'
+      debug: msg='Errors from the previous installp command can be ignored'
+      when: xlc16.stat.islnk is not defined
+      tags: xlc16
 
-- name: Clean XLC16 tmp files
-  file:
-    path: /tmp/usr
-    state: absent
-  when: xlc16.stat.exists is false
-  tags: [xlc16, vendor_files]
+    - name: Clean XLC16 tmp files
+      file:
+        path: /tmp/usr
+        state: absent
+      when: xlc16.stat.exists is false
+      tags: [xlc16, vendor_files]
 
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
