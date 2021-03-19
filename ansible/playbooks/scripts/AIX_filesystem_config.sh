@@ -20,9 +20,9 @@ Total_Disk_Size=`getconf DISK_SIZE /dev/hdisk0`    								          # Determine
 Total_Disk_in_GB=`expr $Total_Disk_Size / 1024`    								          # Convert to GB
 Maximum_Processes=`lsattr -E -l sys0 | grep maxuproc | awk '{print $2}'`
 #
-if [[ $Total_Disk_in_GB -lt "79" ]]; then									                  # Disk is too small for script
-	echo "Error: Disk is too small (less than 40GB), manually configuration is required. Exiting..."
-	exit
+if [[ $Total_Disk_in_GB -lt "60" ]]; then									                  # Disk is too small for script
+	echo "Error: Disk is too small (less than 60GB), manually configuration is required. Exiting..."
+	exit 1
 fi
 #
 # Determine the current size of the filesystems
