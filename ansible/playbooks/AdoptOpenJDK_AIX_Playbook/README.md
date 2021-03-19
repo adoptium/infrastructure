@@ -1,6 +1,6 @@
 # Setting up AIX servers
 
--- Work in Progress --
+-- Work in Progress -- (WIP)
 
 1) AIX BASE Requirements
 1a) X11 requirements
@@ -45,7 +45,16 @@ bos.net.tcp.ftp
 
 2) ## WIP ## Ansible playbook instructions
 
-3) Additional Notes
+3) (build without jenkins-agent)
+Rough Steps: WIP
+* login as jenkins (as the user specific requirements, rbac, capabilities, ulimits are already there)
+* git clone https://github.com/AdoptOpenJDK/openjdk-build.git
+* cd openjdk-build/build-farm
+*  ./make-adopt-build-farm.sh
+
+## The build process should just start. If there are errors, they will need to be dealt with.
+
+4) Additional Notes
 One of the roles (rbac) is needed for some special Java functions - metronome and core dump.
 The setup is performed by the AIX role 'rbac'
 
