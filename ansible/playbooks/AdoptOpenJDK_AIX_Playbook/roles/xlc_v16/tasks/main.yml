@@ -39,8 +39,8 @@
       file:
         path: /tmp/usr
         state: absent
-      when: xlc16.stat.exists is false
-      tags: [xlc16, vendor_files]
+  when: xlc16.stat.exists is false
+  tags: [xlc16, vendor_files]
 
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
