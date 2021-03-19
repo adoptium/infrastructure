@@ -136,7 +136,8 @@
       register: freemarker
       tags: freemarker
 
-    - debug:
+    - name: "freemarker.jar found, skipping download"
+      debug:
         msg: "freemarker.jar found, skipping download"
       when: not freemarker.stat.exists
       tags: freemarker

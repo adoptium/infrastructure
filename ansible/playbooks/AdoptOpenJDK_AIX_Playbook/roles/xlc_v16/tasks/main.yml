@@ -8,7 +8,7 @@
   register: xlc16
   tags: xlc16
 
-- name: Announce skip of download and installation
+- name: "xlc16 installed, skipping download and installation"
   debug:
     msg: "xlc16 installed, skipping download and installation"
   when: xlc16.stat.exists and xlc16.stat.isdir
@@ -30,8 +30,10 @@
       ignore_errors: yes
       when: _vendor_copied.failed is defined and _vendor_copied.failed == false
 
-    - debug: msg='Error messages from the installp command can be ignored.'
-      when: _installp is defined
+    - name: 'Errors from the previous installp command can be ignored'
+      debug: msg='Errors from the previous installp command can be ignored'
+      when: xlc16.stat.islnk is not defined
+      tags: xlc16
 
     - name: Clean XLC16 tmp files
       file:
