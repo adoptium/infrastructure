@@ -8,7 +8,8 @@
   register: antcontrib
   tags: ant-contrib
 
-- debug:
+- name: "ant-contrib.jar installed, skipping download"
+  debug:
     msg: "ant-contrib.jar installed, skipping download"
   when: not antcontrib.stat.exists
   tags: ant-contrib

@@ -8,7 +8,8 @@
   register: ant
   tags: ant
 
-- debug:
+- name: "Ant installed, skipping download and installation"
+  debug:
     msg: "Ant installed, skipping download and installation"
   when: ant.stat.islnk is defined
   tags: ant

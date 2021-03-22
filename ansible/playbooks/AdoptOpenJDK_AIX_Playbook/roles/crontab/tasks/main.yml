@@ -1,0 +1,14 @@
+---
+###########
+# crontab #
+###########
+
+- name: Add cron job to remove stale files from /tmp (owned by jenkins)
+  cron: name="Remove stale files from /tmp (jenkins)" weekday="*" minute="10" hour="0" user=root state=present
+        job="/usr/bin/find /tmp -user jenkins ! -type d -mtime +4 | xargs rm -f"
+  tags: crontab
+
+- name: Add cron job to remove stale directories from /tmp (owned by jenkins)
+  cron: name="Remove stale directories from /tmp (jenkins)" weekday="*" minute="10" hour="2" user=root state=present
+        job="/usr/bin/find /tmp -user jenkins -type d -mtime +4 | sort -r | xargs rmdir"
+  tags: crontab

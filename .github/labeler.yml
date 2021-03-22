@@ -1,0 +1,28 @@
+# Config file used by .github/workflows/labeler.yml
+
+# This file matches file/folder changes to labels. See https://github.com/actions/labeler for more information.
+
+# e.g to add the test label to any changes in the /tests directory:
+
+# test:
+#   - tests/*
+
+# label_name:
+#   - path/to/file_or_folder
+ghActions:
+    - .github/workflows/**/*
+doc:
+    - docs/*
+    - '**/*.md'
+Vagrant:
+    - ansible/pbTestScripts/**/*
+    - ansible/Vagrantfile*
+pbTests:
+    - ansible/pbTestScripts/**/*
+docker:
+    - ansible/Dockerfile*
+ansible:
+    - ansible/playbooks/**/*
+    - ansible/plugins/**/*
+    - ansible/inventory.yml
+    - ansible/ansible.cfg

@@ -28,6 +28,15 @@
   when:
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not (ansible_distribution_major_version == "8" and ansible_architecture == "x86_64")
+  tags: nagios_plugins
+
+- name: Install nagios-plugins (RHEL8/x64)
+  yum:
+    name: nagios-plugins
+    state: latest
+  when:
+    - ansible_distribution_major_version == "8" and ansible_architecture == "x86_64"
   tags: nagios_plugins
 
 ##########
@@ -40,11 +49,18 @@
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
   tags: nagios_plugins
 
+- name: Check if plugins folder is where its expected
+  stat:
+    path: /usr/local/nagios/libexec/check_by_ssh
+  register: plugins_folder
+  tags: nagios_plugins
+
 - name: Create symlink to plugins
   file: src=/usr/lib64/nagios/plugins dest=/usr/local/nagios/libexec state=link
   when:
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not plugins_folder.stat.exists
   tags: nagios_plugins
 
 #############################

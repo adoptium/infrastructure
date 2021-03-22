@@ -90,7 +90,6 @@ hosts:
           ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
           ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC}
 
-
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
@@ -160,6 +159,12 @@ hosts:
           ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu}
           ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
           ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
+
+
+      # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
+      - nine:
+          macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
+          macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}

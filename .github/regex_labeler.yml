@@ -1,0 +1,100 @@
+# Config file used by .github/workflows/labeler.yml
+
+# This file matches issue/pr contents using regex to labels. See Multi Labeller https://github.com/marketplace/actions/multi-labeler for more information.
+
+# e.g to add the windows label to any issue/pr with a title containing the word windows:
+
+#   - label: "windows"
+#     matcher:
+#       title: "windows"
+
+# You can also regex match body, comments, commits, authors etc:
+
+#   - label: "feat"
+#     sync: true # remove label if match failed, default: false (pull_request/issue only)
+#     matcher:
+#       # Matcher will match on any 7 matcher
+#       title: "^feat:.*"
+#       body: "/feat"
+#       comment: "/feat"
+#       branch: "^feat/.*"
+#       commits: "^feat:.*"
+#       author:
+#         - github-actions
+#         - fuxingloh
+#       files:
+#         any: [ "app/*" ]
+#         all: [ "!app/config/**" ]
+#         count:
+#           gte: 1
+#           lte: 1000
+
+version: v1
+
+labels:
+  - label: "os:macOS"
+    matcher:
+      title: "macos"
+  - label: "os:aix"
+    matcher:
+      title: "aix"
+  - label: "os:windows"
+    matcher:
+      title: "windows"
+
+  - label: "arch:arm32"
+    matcher:
+      title: "arm32"
+  - label: "arch:arm64"
+    matcher:
+      title: "arm64"
+  - label: "arch:ppc64le (pLinux)"
+    matcher:
+      title: "ppc64le"
+  - label: "arch:s390x (zLinux)"
+    matcher:
+      title: "s390x"
+  - label: "arch:x64"
+    matcher:
+      title: "x64"
+
+  - label: "provider:aws"
+    matcher:
+      title: "aws"
+  - label: "provider:azure"
+    matcher:
+      title: "azure"
+  - label: "provider:ibmcloud"
+    matcher:
+      title: "ibmcloud"
+  - label: "provider:linaro"
+    matcher:
+      title: "linaro"
+  - label: "provider:marist"
+    matcher:
+      title: "marist"
+  - label: "provider:osuosl"
+    matcher:
+      title: "osuosl"
+  - label: "provider:scaleway"
+    matcher:
+      title: "scaleway"
+  - label: "provider:nine"
+    matcher:
+      title: "nine"
+
+  - label: "docker"
+    matcher:
+      title: "docker"
+  - label: "hacktoberfest"
+    matcher:
+      body: "hacktoberfest"
+  - label: "Nagios"
+    matcher:
+      title: "nagios"
+  - label: "openj9"
+    matcher:
+      title: "openj9"
+  - label: "Vagrant"
+    matcher:
+      title: "vagrant"

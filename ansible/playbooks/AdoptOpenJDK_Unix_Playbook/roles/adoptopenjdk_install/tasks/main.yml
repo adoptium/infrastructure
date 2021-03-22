@@ -101,7 +101,7 @@
   until: adoptopenjdk_download is not failed
   when:
     - ansible_distribution != "MacOSX"
-    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
+    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
@@ -120,7 +120,7 @@
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
   when:
-    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
