@@ -26,6 +26,7 @@
     - ansible_host != "127.0.0.1"
   tags: hosts_file, adoptopenjdk
 
+
 - name: Inventory is localhost message
   debug:
     msg: "Inventory_hostname is the same as the ip address or is localhost.
