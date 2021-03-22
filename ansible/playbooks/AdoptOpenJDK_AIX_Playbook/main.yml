@@ -34,6 +34,7 @@
     # 2. AIX BOS configuration
 
     - syslogs
+    - crontab
     # TBD: additional tasks below that need to be promoted to
     # or migrated into an AIX setup role - in paritcular -
     # the tasks that setup the legal shells needed for user configuration
