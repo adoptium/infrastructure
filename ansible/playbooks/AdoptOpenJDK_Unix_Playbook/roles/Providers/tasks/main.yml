@@ -15,14 +15,16 @@
     - adoptopenjdk
     - skip_ansible_lint
 
-- debug:
+- name: Print if no provider is found
+  debug:
     msg: "No provider could be found"
   when: provider_name.stdout | length == 0
   tags:
     - providers
     - adoptopenjdk
 
-- debug:
+- name: Print found provider
+  debug:
     msg: "The provider found is: {{ provider_name.stdout }}"
   when:
     - (provider_name.rc == 0) and (provider_name.stdout | length > 0)
