@@ -192,7 +192,7 @@ We have Dockerfiles that are used to build the base images that our build farm u
 | [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) |
 | [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) |
 
-When a change lands into master, the relevant dockerfiles are built using their relevant CI systems and pushed up to Dockerhub where they can be consumed by our jenkins build agents.
+When a change lands into master, the relevant dockerfiles are built using their relevant CI systems and pushed up to Docker Hub where they can be consumed by our jenkins build agents.
 
 ## Jenkins access
 
