@@ -7,6 +7,7 @@
   stat:
     path: /usr/bin/yum
   register: yum
+  tags: yum
 
 # Use set -o pipefail -o to quiet AnsibleLint
 - name: Uninstall conflicting packages
@@ -17,6 +18,7 @@
     - rpm_remove
     # TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
+    - yum
 
 ####################################
 # Install yum and update to latest #
