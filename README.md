@@ -51,13 +51,16 @@ a new member? Please follow our [Onboarding Process](ONBOARDING.md).
 
 `*` Indicates access to the secrets repo
 
-## [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure)
+## [@infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core)
 
-Team that holds super user access to Infrastructure
+Team that holds super user access to our machines
 
 * [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
 * [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
+* [@sxa](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
+* [@willsparker](https://github.com/Willsparker) - Will Parker
+* [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
+* [@aahlenst](https://github.com/aahlenst) - Andreas Ahlenstorf (ZHAW)
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
