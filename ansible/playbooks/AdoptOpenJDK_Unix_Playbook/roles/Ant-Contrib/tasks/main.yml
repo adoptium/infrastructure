@@ -15,7 +15,8 @@
   when:
   tags: ant-contrib
 
-- debug: var=ant_lib_dir
+- name: "Print ant_lib_dir variable"
+  debug: var=ant_lib_dir
   tags: ant-contrib
 
 - name: Check if ant-contrib is already installed
