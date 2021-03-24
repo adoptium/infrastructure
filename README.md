@@ -139,11 +139,11 @@ The following items are stored in GitHub.
 
 * Source code, System deployment scripts (Ansible), Instructions/How to Information
 
-|  Description | Storage Location | Frequency  |
-|---|---|---|
-| Jenkins (ci) - Configuration and Settings | localhost `/mnt/backup-server/jenkins_backup` | Daily |
-| Nagios - Configuration and Settings | localhost `/root/backups` | Weekly |
-| AWX - Configuration and Settings | not currently backed up | N/A |
+| Name | Description | Storage Location | Frequency | Recovery steps |
+|---|---|---|---|
+| Jenkins (CI) | Configuration and Settings using the [thin backup plugin](https://github.com/jenkinsci/thin-backup-plugin) | localhost `/mnt/backup-server/jenkins_backup` | Daily | An authorised user can go to the [backup page](https://ci.adoptopenjdk.net/thinBackup/) to attempt a restore |
+| Nagios (Monitoring) | Configuration and Settings | localhost `/root/backups` | Weekly | TBD |
+| AWX (Ansible) | Configuration and Settings | not currently backed up | N/A | TBD |
 
 ### Questions
 

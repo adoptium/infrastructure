@@ -106,10 +106,11 @@ as an example
 
 The build triage team will frequently raise issues if they determine that a
 build failure is occurring on a particular system. Assuming it's not a
-"system is offline" issue you may wish to repliacte the build process
+"system is offline" issue you may wish to replicate the build process
 locally. The easiest way to do this is as follows (ideally not as root as
 that can mask problems).
-```
+
+```sh
 git clone https://github.com/adoptopenjdk/openjdk-build
 cd openjdk-build/build-farm
 export CONFIGURE_ARGS=--with-native-debug-symbols=none
@@ -151,7 +152,7 @@ For more information on test case diagnosis, there is a full
 [Triage guide](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/Triage.md)
 in the openjdk-tests repository
 
-The values for `TARGET` can be found in thte `<testCaseName>` elements of
+The values for `TARGET` can be found in the `<testCaseName>` elements of
 .the various `playlist.xml` files in the test repositories. It can also be
 `jdk_custom` which case you should set the `CUSTOM_TARGET` to the name of
 an individual test for example:
@@ -160,13 +161,14 @@ an individual test for example:
 If you then need to run manually on the machine itself (outside jenkins)
 then the process is typically like this:
 
-```
+```sh
 git clone https://github.com/adoptopenjdk/openjdk-tests && cd openjdk-tests
 ./get.sh && cd TKG
 export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
 BUILD_LIST=openjdk make compile
 make <target>
 ```
+
 `BUILD_LIST` depends on the suite you want to run, and can be omitted to build
 the tests for everything, but that make take a while and requires `docker`
 to be available.  Note that when building the `system` suite, there must be
@@ -176,10 +178,11 @@ is more information on running tests yourself in the
 [tests repository](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of:
+
 - `BUILD_LIST=functional`, `CUSTOM_TARGET=_MBCS_Tests_pref_ja_JP_linux_0`
 - `BUILD_LIST=system`, `CUSTOM_TARGET=_MachineInfo`
 - `BUILD_LIST=openjdk`, `CUSTOM_TARGET=test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` (`en_US.utf8` locale required)
-- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234)
+- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in [PR 2234](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
 
 (For the last one, that makes use of the system.custom target added via
 [this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))

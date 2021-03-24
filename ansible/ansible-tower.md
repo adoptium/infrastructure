@@ -1,3 +1,5 @@
+# Ansible Tower
+
 ```bash
 Installing AWX aka Ansible Tower 
 Based on: Ubuntu 14.04 From the Packet.net
@@ -37,7 +39,7 @@ git clone  https://github.com/ansible/awx.git
 cd awx/installer/
 ansible-playbook -i inventory install.yml
 
-# This install.yml will install ansiable-tower using an ansible playbook
+# This install.yml will install ansible-tower using an ansible playbook
 # Once complete, it can take ~20 mins for ansible tower finish upgrading and come on-line
 # You can watch the output running this command:
 docker logs -f awx_task
@@ -132,11 +134,11 @@ chattr +i /etc/resolv.conf
 docker ps
 
 # Find the CONTAINER_ID for ansible/awx_task
-# Enter the containter 
+# Enter the container 
 docker exec -it CONTAINER_ID bash
 
 # Create a folder to work out of
 mkdir /Vendor_Files
 
 # You can place any files we need for Playbooks here
-```
+TBD
