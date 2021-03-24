@@ -1,6 +1,7 @@
 # Manual steps required to run ansible on machines
 
 ## macOS
+
 1. Update Sudoers file:
 
 this requires `NOPASSWD` to be added to the sudoers file to enable elevation
@@ -9,7 +10,8 @@ this requires `NOPASSWD` to be added to the sudoers file to enable elevation
 and change:
 `%admin          ALL = (ALL) ALL`
 to
-```
+
+```bash
 %admin ALL=(ALL) NOPASSWD:ALL
 jenkins ALL=(ALL) NOPASSWD: /usr/bin/xcode-select
 ```
