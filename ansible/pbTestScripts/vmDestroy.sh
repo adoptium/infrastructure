@@ -61,6 +61,8 @@ checkOS() {
 			osToDestroy="Sol10" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
+		"Windows2016" | "Win2016" | "W16" | "w16" )
+                        osToDestroy="W2016";;
                 "all" )
                         osToDestroy="U16 U18 U20 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012" ;;
 		"")
@@ -82,7 +84,8 @@ listOS() {
 		- Debian10
 		- FreeBSD12
 		- Solaris10
-		- Win2012"
+		- Win2012
+		- Win2016"
 	echo
 }
 
