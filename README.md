@@ -55,6 +55,7 @@ a new member? Please follow our [Onboarding Process](ONBOARDING.md).
 
 Team that holds super user access to our machines
 
+* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft) - *
 * [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
 * [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
 * [@sxa](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
