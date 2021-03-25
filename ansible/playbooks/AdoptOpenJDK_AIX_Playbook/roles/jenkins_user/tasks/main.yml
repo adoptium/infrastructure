@@ -75,9 +75,9 @@
         - "fsize=-1"
         - "core=-1"
         - "cpu=-1"
-        - "data=262144"
+        - "data=-1"
         - "rss=65536"
-        - "stack=65536"
+        - "stack=-1"
         - "nofiles=-1"
       changed_when: False
   tags: jenkins_user
