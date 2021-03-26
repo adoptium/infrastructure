@@ -9,22 +9,6 @@ won't necessarily have access to see these links):
 - [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - higher level of access for system administrators only
 - [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - The Admin team - can force through changes without approval etc.
 
-## Commit messages
-
-Wherever possible, prefix the commit message with the area which you are
-changing e.g.
-
-- unixPB:
-- winPB:
-- aixPB:
-- ansible:
-- vagrant:
-- pbTests:
-- docs:
-- plugins:
-- inventory:
-- github:
-
 ## Change approvals
 
 All changes to the repository should be made via GitHub pull requests.
