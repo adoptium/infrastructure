@@ -77,6 +77,28 @@ ssh-add
 and if using the `-b` option, ensure that your user has access to `sudo`
 without a password to the `root` account (often done by adding it to the `wheel` group)
 
+## What about the builds that use the `dockerBuild` tag?
+
+In addition to the static build machines which we have, there are also
+Dockerfiles that are used to build the base images that our build farm uses
+for running docker based builds on some of our platforms - this is what we
+have at the moment:
+
+| Dockerfile | Image | Platforms  | Where is this built? | In use?
+|---|---|---|---|---|
+| [Centos7](./ansible/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux/amd64, linux/arm64 | [Travis](.travis.yml) | Yes
+| [Centos6](./ansible/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
+| [Alpine3](./ansible/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
+| [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
+| [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
+
+When a change lands into master, the relevant dockerfiles are built using
+the appropriate CI system listed in the table above by configuring them with
+the ansible playbooks and pushing them up to Docker Hub where they can be
+consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
+defined on the jenkins build pipelines as configured in the
+[pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+
 ## Adding a new role to the ansible scripts
 
 Other than the dependencies on the machines which come from packages shipped
