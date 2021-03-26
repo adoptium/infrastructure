@@ -28,7 +28,6 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 ## Related Repositories
 
-* [email](https://www.github.com/adoptopenjdk/email/) - A repo containing configuration for our email aliases etc.
 * [secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets.
 * [openjdk-jenkins-helper](https://www.github.com/adoptopenjdk/openjdk-jenkins-helper/) - A repo containing helper scripts for out Jenkins CI.
 
@@ -46,74 +45,48 @@ submitting Pull Requests.
 
 ## Members
 
-We list members and their organisation affiliation for maximum transparency. Want to add
-a new member? Please follow our [Onboarding Process](ONBOARDING.md).
+We list administrative members and their organisation affiliation for maximum transparency.
+Want to add a new member? Please follow our [Onboarding Process](ONBOARDING.md).
+If you want access for yourself, raise an issue in this repository for the
+team to consider it - if you are working on an issue here we will generally
+be happy to add you to the triage team.
 
 `*` Indicates access to the secrets repo
 
 ## [@infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core)
 
-Team that holds super user access to our machines
+Members of this team that holds super user access to our machines to perform maintenance
 
 * [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
 * [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
-* [@sxa](https://github.com/sxa555) - Stewart X Addison (Red Hat) - *
+* [@sxa](https://github.com/sxa) - Stewart X Addison (Red Hat) - *
 * [@willsparker](https://github.com/Willsparker) - Will Parker
 * [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
 * [@aahlenst](https://github.com/aahlenst) - Andreas Ahlenstorf (ZHAW)
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
-Core infrastructure team - granted access to hosts on a case by case basis
+The primary infrastructure team who manage issues and PRs in this
+repository.  People in this team are committers and able to merge pull requests
+in this repository.  In general if you need assistance from a committer,
+please post a message into the `#infrastructure` slack channel where one of
+the committers should be able to help rather than attempting to contact
+someone directly.
 
-* [@ali-ince](https://github.com/ali-ince) - Ali Ince (LJC)
-* [@gdams](https://github.com/gdams) - George Adams (Microsoft)
-* [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM) - *
-* [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-* [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC) - *
-* [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM) - *
-* [@pnstanton](https://github.com/pnstanton) - Peter Stanton (IBM) - *
-* [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (IBM) - *
-* [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat) - *
-* [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
-* [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK) - *
+## [@adoptopenjdk-triage](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-triage)
 
-## [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure)
+This team is the starting point for new members.
 
-Issues can be assigned to these folks
-
-* [@AdamBrousseau](https://github.com/AdamBrousseau) - Adam Brousseau (IBM)
-* [@CJKwork](https://github.com/CJKwork) - Clive Kennedy (IBM)
-* [@cwesMills](https://github.com/cwesMills) - Colton Mills (IBM)
-* [@cwillhelm](https://github.com/cwillhelm) - Connor Willhelm (IBM)
-* [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
-* [@HusainYusafali](https://github.com/HusainYusufali) - Husain Yusufali (IBM)
-* [@jdekonin](https://github.com/jdekonin) - Joe deKoning (IBM)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
-* [@sej-jackson](https://github.com/sej-jackson) - Sej Jackson (IBM)
-* [@vsebe](https://github.com/vsebe) - Violeta Sebe (IBM)
-* [@Willsparker](https://github.com/Willsparker) - William Parker (AdoptOpenJDK)
-
-### [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins)
-
-* [@ali-ince](https://github.com/ali-ince) Ali Ince (LJC)
-* [@andrew-m-leonard](https://github.com/andrew-m-leonard) Andrew M Leonard (Red Hat)
-* [@gdams](https://github.com/gdams) - George Adams (Microsoft)
-* [@geraintwjones](https://github.com/geraintwjones) - Geraint Jones (IBM)
-* [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC)
-* [@karianna](https://github.com/karianna) - Martijn Verburg (Microsoft / LJC)
-* [@mwornast](https://github.com/mwornast) - Marcus Wornast (IBM)
-* [@neomatrix369](https://github.com/neomatrix369) - Mani Sarkar (LJC)
-* [@smlambert](https://github.com/smlambert) - Shelley Lambert (Red Hat)
-* [@sxa555](https://github.com/sxa555) - Stewart X Addison (Red Hat)
-* [@tellison](https://github.com/tellison) - Tim Ellison (Red Hat)
-* [@VermaSh](https://github.com/VermaSh) Shubham Verma (IBM)
+People in this team can take ownership of issues but do not have the
+privileges to merge pull requests.  In general new people in the team will
+go into this group for a while before being granted additional access.
 
 ### Host Information
 
-Most information about our machines can be found at [Inventory](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml)
+Most information about our machines can be found at
+[Inventory](ansible/inventory.yml) This file is important not only as a
+reference for the team, but is used by AWX which we often use to deploy
+ansible playbooks so it is important that it is kept up to date
 
 ### Maintenance Information
 
