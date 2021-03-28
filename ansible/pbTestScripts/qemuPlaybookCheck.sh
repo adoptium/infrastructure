@@ -235,11 +235,12 @@ done
 	  $SSH_CMD \
 	  $DRIVE \
      	  $EXTRA_ARGS \
-	  -nographic) > /dev/null 2>&1 &
+	  -nographic) > "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" 2>&1 &
 
-	echo "Machine is booting; Please be patient"
+	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITEFCTURE}.startlog Please be patient"
 	sleep 120
-	echo "Machine has started"
+	tail "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" | sed ;s/^/CONSOLE > /g'
+	echo "Machine has started, unless the above log shows otherwise ..."
 
 	# Remove old ssh key and create a new one
 	rm -f "$workFolder"/id_rsa*
