@@ -47,9 +47,9 @@ hosts:
           solaris10u11-sparcv9-2: {}
 
       - macstadium:
-          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
           macos1014-x64-2: {ip: 207.254.28.76, user: Administrator}
+          macos1014-x64-3: {ip: 207.254.71.202, user: Administrator}
 
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
