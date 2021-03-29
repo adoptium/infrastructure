@@ -12,6 +12,22 @@
   debug:
     var: macos_version
 
+- name: Configure system-wide Bash profile
+  become: yes
+  copy:
+    src: files/macos/profile
+    dest: /etc/profile
+    owner: root
+    group: wheel
+
+- name: Ensure that directory for system-wide profile extensions is present
+  become: yes
+  file:
+    path: /etc/profile.d
+    owner: root
+    group: wheel
+    state: directory
+
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Check for xcode-tools
   raw: xcode-select --print-path &> /dev/null
@@ -20,16 +36,12 @@
   tags:
     - skip_ansible_lint
 
-- name: Install xcode-tools
-  script: scripts/install-xcode.sh
-  when: xcode.rc > 1
-
 - name: Check if Homebrew is already installed
   stat:
     path: /usr/local/bin/brew
   register: brew
 
-- name: Fix broken fiddle install (Apple Silicone)
+- name: Fix broken fiddle install (Apple Silicon)
   become: yes
   become_user: "{{ ansible_user }}"
   script: scripts/install-fiddle.sh
