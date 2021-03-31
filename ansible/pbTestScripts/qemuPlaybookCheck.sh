@@ -239,7 +239,7 @@ done
 
 	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
 	sleep 120
-	tail "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" | sed ;s/^/CONSOLE > /g'
+	tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
 	echo "Machine has started, unless the above log shows otherwise ..."
 
 	# Remove old ssh key and create a new one
