@@ -237,7 +237,7 @@ done
      	  $EXTRA_ARGS \
 	  -nographic) > "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" 2>&1 &
 
-	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITEFCTURE}.startlog Please be patient"
+	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
 	sleep 120
 	tail "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" | sed ;s/^/CONSOLE > /g'
 	echo "Machine has started, unless the above log shows otherwise ..."
