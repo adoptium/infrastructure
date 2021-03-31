@@ -235,7 +235,7 @@ done
 	  $SSH_CMD \
 	  $DRIVE \
      	  $EXTRA_ARGS \
-	  -nographic) > "$workFolder/${OS}.${ARCHITEFCTURE}.startlog" 2>&1 &
+	  -nographic) > "$workFolder/${OS}.${ARCHITECTURE}.startlog" 2>&1 &
 
 	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
 	sleep 120
