@@ -283,6 +283,11 @@ startVMPlaybookWin()
         # See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	
+	# Rearm the evaluation license for 180 days to stop the VMs shutting down
+	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2056
+	vagrant winrm --shell cmd -c "slmgr.vbs /rearm //b"
+	vagrant reload
+
 	# 5986 refers to the winrm_ssl port on the guest
 	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-672930832
 	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
