@@ -21,7 +21,9 @@
     - skip_ansible_lint
 ####################################
 # Install yum and update to latest #
+# Previous version of this downloaded and executed
 #   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+# These steps perform the same atasks without requiring python (?) to be installed first
 ####################################
 - name: Install yum from AIXToolbox
   block:
