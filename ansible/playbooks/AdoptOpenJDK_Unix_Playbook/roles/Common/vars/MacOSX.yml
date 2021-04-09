@@ -13,8 +13,6 @@ Build_Tool_Packages:
   - gnu-tar
   - nasm # openj9 jdk13+
   - wget
-
-Build_Tool_Packages_NOT_arm64:
   - bash # OpenJ9 needs bash v4 or later
 
 Build_Tool_Packages_NOT_10_12:
@@ -26,8 +24,6 @@ Build_Tool_Casks:
 
 Test_Tool_Packages:
   - mercurial
-
-Test_Tool_Packages_NOT_arm64:
   - pulseaudio
 
 Test_Tool_Casks:
