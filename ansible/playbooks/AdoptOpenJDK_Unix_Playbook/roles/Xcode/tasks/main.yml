@@ -41,7 +41,7 @@
   loop:
     - fastlane # explicitly list fastlane to get latest version
     - xcode-install
-  
+
 - name: Set xcversion location for x86_64
   set_fact:
     xcversion: /usr/local/lib/ruby/gems/2.7.0/bin/xcversion
