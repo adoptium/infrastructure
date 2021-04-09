@@ -320,14 +320,11 @@ startVMPlaybookWin()
 		vagrant halt && vagrant up
 
 		# Restaring the VM may change the port Number
-                vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
-                # The port used by startScriptWin.sh must be the winRM port, not the winRM_ssl port
-                # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-673329953
-                local winRMPort=$(( vagrantPort -1 ))
+		vagrantPort=$(vagrant port |  awk '/5985/ { print $4 }')
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
@@ -338,7 +335,7 @@ startVMPlaybookWin()
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
 			
 			# Run a python script to start a test for the built JDK on the Windows VM
-			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$winRMPort" -t 2>&1 | tee $testLogPath
+			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then 
 				echo TEST FAILED
