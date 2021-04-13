@@ -182,7 +182,7 @@ A snippet from the man pages of Ansible:
 
 When the above `ansible-playbook` commands succeed, we should get something like this:
 
-```sh
+```log
 PLAY RECAP *********************************************************************
 172.28.128.134             : ok=131  changed=96   unreachable=0    failed=0   
 ```

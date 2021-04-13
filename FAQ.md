@@ -159,7 +159,7 @@ For more information on test case diagnosis, there is a full
 in the openjdk-tests repository
 
 The values for `TARGET` can be found in the `<testCaseName>` elements of
-.the various `playlist.xml` files in the test repositories. It can also be
+the various `playlist.xml` files in the test repositories. It can also be
 `jdk_custom` which case you should set the `CUSTOM_TARGET` to the name of
 an individual test for example:
 `test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
