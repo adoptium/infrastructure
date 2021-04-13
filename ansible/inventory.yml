@@ -110,6 +110,10 @@ hosts:
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
           win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
 
+      - gdams:
+          debian10-riscv64-1: {ip: gdams.ddns.net}
+          debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
+
       - ibm:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
           aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
