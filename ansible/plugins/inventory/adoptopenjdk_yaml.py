@@ -48,7 +48,7 @@ valid = {
   'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'packet_esxi', 'nine')
+        'aws', 'inspira', 'packet_esxi', 'nine', 'gdams')
 }
 
 def main():
