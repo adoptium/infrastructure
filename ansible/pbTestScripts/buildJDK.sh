@@ -15,9 +15,9 @@ processArgs() {
 		case "$opt" in
 			"--version" | "-v" )
 				if [ $1 == "jdk" ]; then
-					JAVA_TO_BUILD=$JDK_MAX
+					export JAVA_TO_BUILD=$JDK_MAX
 				else
-					JAVA_TO_BUILD=$(echo $1 | tr -d [:alpha:])
+					export JAVA_TO_BUILD=$(echo $1 | tr -d [:alpha:])
 				fi
 				checkJDK
 				shift;;
@@ -91,6 +91,7 @@ GIT_FORK="adoptopenjdk"
 CLEAN_WORKSPACE=false
 JDK_MAX=
 JDK_GA=
+export VARIANT=openj9
 
 setJDKVars
 processArgs $*
@@ -114,7 +115,7 @@ fi
 
 if [[ "$(uname -m)" == "aarch64" && "$JAVA_TO_BUILD" == "jdk8u" && $VARIANT == "openj9" ]]; then
 	echo "Can't build OpenJ9 JDK8 on AARCH64, Resetting JAVA_TO_BUILD to jdk11u"
-	JAVA_TO_BUILD=jdk11u
+	export JAVA_TO_BUILD=jdk11u
 fi
 
 if [[ "$(uname -m)" == "armv7l" && "$VARIANT" == "openj9" ]]; then
