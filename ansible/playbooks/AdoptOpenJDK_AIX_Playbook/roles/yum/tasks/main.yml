@@ -6,41 +6,67 @@
 - name: Confirm yum is installed - /usr/bin/yum
   stat:
     path: /usr/bin/yum
-  register: yum
+  register: _yum
   tags: yum
 
 # Use set -o pipefail -o to quiet AnsibleLint
 - name: Uninstall conflicting packages
   shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
   ignore_errors: True
-  when: yum.stat.islnk is not defined
+  when: _yum.stat.islnk is not defined
   tags:
+    - yum
     - rpm_remove
     # TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
-    - yum
 
 ####################################
 # Install yum and update to latest #
+# Previous version of this downloaded and executed
+#   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+# These steps below do the same (update rpm.rte, install initial RPM bundle)
+# but require a alturnative python to be installed
+# eg, http://download.aixtools.net/tools/aixtools.python.py36.3.6.12.0.I
+# and ansible.cfg needs 'ansible_python_interpreter = /opt/bin/python3.6'
 ####################################
-- name: Download yum.sh
-  get_url:
-    url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
-    validate_certs: False
-    dest: /tmp/
-    mode: 0775
-    timeout: 25
-  when: yum.stat.islnk is not defined
-  tags: yum
+- name: Install yum from AIXToolbox
+  block:
+    - name: Ensure dest exists
+      file:
+        state: directory
+        path: /tmp/yum
 
-- name: Install yum and dependencies
-  command: /tmp/yum.sh
-  ignore_errors: yes
-  when: yum.stat.islnk is not defined
+    - name: Transfer rpm.rte
+      get_url:
+        url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/INSTALLP/ppc/rpm.rte
+        mode: 0644
+        validate_certs: false
+        dest: /tmp/yum
+
+    - name: Install/update rpm.rte
+      command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
+
+    - name: Transfer yum bundle package
+      get_url:
+        url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum_bundle.tar
+        mode: 0644
+        validate_certs: false
+        dest: /tmp/yum
+
+    - name: Unpack yum bundle
+      command: tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
+
+    - name: Install yum bundle
+      command: rpm -i /tmp/yum/*.rpm
+
+    - name: Cleanup /tmp/yum
+      file:
+        state: absent
+        path: /tmp/yum
+  when: _yum.stat.islnk is not defined
   tags:
     - yum
-    #TODO: Package installs should not use latest
-    - skip_ansible_lint
+    - vendor_files
 
 - name: Yum update
   yum:
