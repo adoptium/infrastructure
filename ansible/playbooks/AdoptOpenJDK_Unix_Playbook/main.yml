@@ -13,7 +13,7 @@
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
   environment:
-    PATH: "/opt/csw/bin/:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/csw/bin/:/usr/local/bin:/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
   #########
   # Roles #

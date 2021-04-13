@@ -7,6 +7,8 @@
 # See https://xcodereleases.com for an Xcode support matrix.
 ---
 - name: Ensure Ruby is installed for xcode-install
+  become: yes
+  become_user: "{{ ansible_user }}"
   homebrew:
     name: ruby@2.7 # no 3.0 yet for fastlane (https://github.com/fastlane/fastlane/issues/17931)
     state: present
@@ -34,35 +36,49 @@
     name: "{{ item }}"
     state: latest
     user_install: no
+  environment:
+    PATH: /usr/local/opt/ruby@2.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
   loop:
     - fastlane # explicitly list fastlane to get latest version
     - xcode-install
 
+- name: Set xcversion location for x86_64
+  set_fact:
+    xcversion: /usr/local/lib/ruby/gems/2.7.0/bin/xcversion
+  when:
+    - ansible_architecture == "x86_64"
+
+- name: Set xcversion location for arm64
+  set_fact:
+    xcversion: xcversion
+  when:
+    - ansible_architecture == "arm64"
+
 # On ARM, we can use 12.x because compiling on ARM requires at least Xcode 12.
 - name: Install Xcode on Apple Silicon Macs
-  shell: "xcversion install 12.4 --retry-download-count=10"
-  when: ansible_architecture is "arm64"
+  shell: "{{ xcversion }} install 12.4 --retry-download-count=10"
+  when: ansible_architecture == "arm64"
   environment:
     XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
     XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
-    SPACESHIP_SKIP_2FA_UPGRADE: 1
+    FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
     FASTLANE_DONT_STORE_PASSWORD: 1
 
 # 10.x is our default version on Intel. It requires 10.14.3+. As a consequence, some test machines
 # with older macOS won't have Xcode installed.
 - name: Install Xcode on Intel Macs
-  shell: "xcversion install 10.3 --retry-download-count=10"
-  when: ansible_architecture is "x86_64" and ansible_distribution_version is version('10.14.3', operator='>=')
+  shell: "{{ xcversion }} install 10.3 --retry-download-count=10"
+  when: ansible_architecture == "x86_64" and ansible_distribution_version is version('10.14.3', operator='>=')
   environment:
     XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
     XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
-    SPACESHIP_SKIP_2FA_UPGRADE: 1
+    FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
     FASTLANE_DONT_STORE_PASSWORD: 1
 
 - name: Cleanup Xcode installation files
-  shell: "xcversion cleanup"
+  shell: "{{ xcversion }} cleanup"
   environment:
     XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
     XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
-    SPACESHIP_SKIP_2FA_UPGRADE: 1
+    FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
     FASTLANE_DONT_STORE_PASSWORD: 1

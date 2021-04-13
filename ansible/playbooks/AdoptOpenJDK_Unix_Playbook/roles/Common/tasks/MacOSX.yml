@@ -36,18 +36,18 @@
   tags:
     - skip_ansible_lint
 
+# Currently required to install packages. This can be removed once it installs on arm64
+- name: Install Rosetta 2
+  command: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+  when:
+    - ansible_architecture == "arm64"
+  tags:
+    - rosetta
+
 - name: Check if Homebrew is already installed
   stat:
     path: /usr/local/bin/brew
   register: brew
-
-- name: Fix broken fiddle install (Apple Silicon)
-  become: yes
-  become_user: "{{ ansible_user }}"
-  script: scripts/install-fiddle.sh
-  when:
-    - ansible_architecture == "arm64"
-    - not brew.stat.exists
 
 - name: Install Homebrew
   become: yes
@@ -82,6 +82,19 @@
   become: yes
   become_user: "{{ ansible_user }}"
   command: /usr/local/bin/brew cu
+  when:
+    - ansible_architecture != "arm64"
+  tags:
+    - brew_cu
+    - skip_ansible_lint
+
+# Skipping linting as no situation where this can't run (lint error 301)
+- name: Update Casks (Arm64)
+  become: yes
+  become_user: "{{ ansible_user }}"
+  command: /opt/homebrew/bin/brew cu
+  when:
+    - ansible_architecture == "arm64"
   tags:
     - brew_cu
     - skip_ansible_lint
@@ -91,15 +104,6 @@
   become_user: "{{ ansible_user }}"
   homebrew: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Packages }}"
-  tags: build_tools
-
-- name: Install Build Tool Packages NOT arm64
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
-  with_items: "{{ Build_Tool_Packages_NOT_arm64 }}"
-  when:
-    - ansible_architecture != "arm64"
   tags: build_tools
 
 - name: Install Build Tool Packages NOT macOS 10.12
@@ -116,8 +120,6 @@
   become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Casks }}"
-  when:
-    - ansible_architecture != "arm64"
   tags: build_tools
 
 - name: Install Test Tool Packages
@@ -127,22 +129,11 @@
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
-- name: Install Test Tool Packages NOT arm64
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
-  with_items: "{{ Test_Tool_Packages_NOT_arm64 }}"
-  when:
-    - ansible_architecture != "arm64"
-  tags: test_tools
-
 - name: Install Test Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
   with_items: "{{ Test_Tool_Casks }}"
-  when:
-    - ansible_architecture != "arm64"
   tags: test_tools
 
 # As per https://github.com/eclipse/openj9/issues/3790
