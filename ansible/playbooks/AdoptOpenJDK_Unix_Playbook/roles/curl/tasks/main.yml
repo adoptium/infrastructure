@@ -12,7 +12,8 @@
     - curl
     - skip_ansible_lint
 
-- debug: var=curl_version.stdout
+- name: Print current version of Curl
+  debug: var=curl_version.stdout
   tags: curl
 
 - name: Set curl latest variable

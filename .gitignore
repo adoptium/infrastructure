@@ -5,3 +5,4 @@ ansible/playbooks/*.retry
 ansible/host_vars/*
 **/vendor_files
 .vscode/
+*.swp

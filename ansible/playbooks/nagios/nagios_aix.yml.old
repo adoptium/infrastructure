@@ -9,7 +9,6 @@
 # For more information please see: https://www.nagios.com/legal/licenses/ #
 ###########################################################################
 
-- debug: msg='Installing Nagios plugins'
 ##########
 # Layout #
 ##########

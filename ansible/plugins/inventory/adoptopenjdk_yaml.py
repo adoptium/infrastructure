@@ -39,7 +39,7 @@ except ImportError:
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9'),
+  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9' , 'riscv64'),
 
   # valid roles - add as necessary
   'type': ('build', 'test', 'infrastructure', 'docker'),
@@ -48,7 +48,7 @@ valid = {
   'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
         'packet', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'packet_esxi', 'nine')
+        'aws', 'inspira', 'packet_esxi', 'nine', 'gdams')
 }
 
 def main():

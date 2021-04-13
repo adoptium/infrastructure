@@ -9,7 +9,7 @@
 # the checksum: line later on to set the checksum
 
 - name: Set desired OpenSSL version
-  set_fact: opensslVersion=1.1.1j
+  set_fact: opensslVersion=1.1.1k
   tags: openssl
 
 #- name: Set OpenSSL SHA256 checksum (This didn't work in the role it's used for some reason - sxa)
@@ -44,7 +44,7 @@
   win_get_url:
     url: https://www.openssl.org/source/openssl-{{ opensslVersion }}.tar.gz
     dest: C:\temp\OpenSSL-{{ opensslVersion }}.tar.gz
-    checksum: aaf2fcb575cdf6491b98ab4829abf78a3dec8402b8b81efc8f23c00d443981bf
+    checksum: 892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5
     checksum_algorithm: sha256
   when: (not openssl32_installed.stat.exists) or (not openssl64_vs2013_installed.stat.exists) or (not openssl64_vs2017_installed.stat.exists) or (not openssl64_vs2019_installed.stat.exists)
   tags: openssl

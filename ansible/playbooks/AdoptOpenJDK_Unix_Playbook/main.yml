@@ -13,7 +13,7 @@
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
   environment:
-    PATH: "/opt/csw/bin/:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/csw/bin/:/usr/local/bin:/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
   #########
   # Roles #
@@ -59,9 +59,9 @@
       tags: [build_tools, build_tools_openj9]
     - role: gcc_9
       tags: [build_tools]
-    - role: Xcode10
+    - role: Xcode
       when: ansible_distribution == "MacOSX"
-      tags: [build_tools, xcode10, adoptopenjdk]
+      tags: [build_tools, xcode, adoptopenjdk]
     - role: cmake                 # OpenJ9 / OpenJFX
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]

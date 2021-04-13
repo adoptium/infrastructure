@@ -47,9 +47,11 @@ hosts:
           solaris10u11-sparcv9-2: {}
 
       - macstadium:
-          macos1010-x64-1: {ip: 207.254.50.138, user: Administrator}
           macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
           macos1014-x64-2: {ip: 207.254.28.76, user: Administrator}
+          macos1014-x64-3: {ip: 207.254.71.202, user: Administrator}
+          macos11-arm64-1: {ip: 207.254.31.15, user: Administrator}
+          macos11-arm64-2: {ip: 207.254.31.16, user: Administrator}
 
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
@@ -110,6 +112,10 @@ hosts:
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
           win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
 
+      - gdams:
+          debian10-riscv64-1: {ip: gdams.ddns.net}
+          debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
+
       - ibm:
           aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
           aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
@@ -150,8 +156,6 @@ hosts:
           macos1014-x64-2: {ip: 207.254.29.44, user: administrator}
           macos1014-x64-3: {ip: 207.254.28.237, user: administrator}
           macos1015-x64-1: {ip: 207.254.28.171, user: administrator}
-          macos11-arm64-1: {ip: 199.7.163.51, user: Administrator}
-          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}
 
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
@@ -163,8 +167,8 @@ hosts:
 
       # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
       - nine:
-          macos1015-x64-1: {ip: 10.0.40.10, ipv6: 2a02:418:3001:40::10, user: administrator}
-          macos1015-x64-2: {ip: 10.0.40.11, ipv6: 2a02:418:3001:40::11, user: administrator}
+          macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
+          macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}

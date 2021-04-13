@@ -15,6 +15,8 @@
     swap_size: 4096
 
   roles:
+    - debug
+
     # Roles are put into 6 groups
     ## AIX BOS install requirements
     ## AIX BOS configuration
@@ -32,6 +34,7 @@
     # 2. AIX BOS configuration
 
     - syslogs
+    - crontab
     # TBD: additional tasks below that need to be promoted to
     # or migrated into an AIX setup role - in paritcular -
     # the tasks that setup the legal shells needed for user configuration
@@ -84,6 +87,10 @@
     - bootjdk11
     - bootjdk12
 
+    # 7. Modify /etc/hosts file to include ipv4 address and fqdn
+
+    - hosts_file
+
   tasks:
   # TBD: as much as possible reorganize the tasks here into a appropriate role
   # And place it in one of the logical areas described above under roles:
@@ -130,7 +137,8 @@
       register: freemarker
       tags: freemarker
 
-    - debug:
+    - name: "freemarker.jar found, skipping download"
+      debug:
         msg: "freemarker.jar found, skipping download"
       when: not freemarker.stat.exists
       tags: freemarker

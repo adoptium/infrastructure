@@ -19,6 +19,7 @@
     - rpm_remove
     # TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
+
 ####################################
 # Install yum and update to latest #
 # Previous version of this downloaded and executed

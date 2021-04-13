@@ -42,7 +42,8 @@
   when: gcc7.stat.exists and CC is not defined
   tags: nasm
 
-- debug:
+- name: Print 'CC' variable
+  debug:
     msg: "VARIABLE CC SET TO {{ CC }}"
   when: CC is defined
   tags: nasm
@@ -54,7 +55,8 @@
   when: CC is defined
   tags: nasm
 
-- debug:
+- name: Print 'nasm_installed' variable
+  debug:
     msg: "VARIABLE nasm_installed SET TO {{ nasm_installed.rc }}"
   when: nasm_installed.rc is defined
   tags: nasm

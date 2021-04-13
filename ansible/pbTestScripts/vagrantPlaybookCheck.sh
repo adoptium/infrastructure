@@ -164,6 +164,11 @@ checkVagrantOS()
                 echo "Reducing the Windows VM memory requirement to 2560Mb."
                 sed -i -e "s/5120/2560/g" Vagrantfile.Win2012
         fi
+        if [[ "$vagrantOS" == "Win2016" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
+                echo "Warning: Windows VM requires 5Gb of free memory to run. On laptops with only 8Gb this can be an issue."
+                echo "Reducing the Windows VM memory requirement to 2560Mb."
+                sed -i -e "s/5120/2560/g" Vagrantfile.Win2016
+        fi
 }
 
 setupWorkspace()
@@ -278,6 +283,11 @@ startVMPlaybookWin()
         # See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	
+	# Rearm the evaluation license for 180 days to stop the VMs shutting down
+	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2056
+	vagrant winrm --shell cmd -c "slmgr.vbs /rearm //b"
+	vagrant reload
+
 	# 5986 refers to the winrm_ssl port on the guest
 	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-672930832
 	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
@@ -368,7 +378,7 @@ checkVagrantOS
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
-	if [[ "$OS" == "Win2012" ]]; then
+	if [[ "$OS" == "Win2012" ]] || [[ "$OS" == "Win2016" ]]; then
 		startVMPlaybookWin $OS
 	else
 		startVMPlaybook $OS

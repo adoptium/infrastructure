@@ -9,21 +9,19 @@ reproducing issues and more.
 ## Mission Statement
 
 To provide **secure**, **consistent**, **repeatable**, and **auditable**
-infrastructure for the AdoptOpenJDK farm. See our full [Mission Statement] for more details.
-
-## Infrastructure Manifesto
-
-* We prefer using prebuilt, Galaxy provided Ansible playbooks over NIHing our own
-* We prefer using binaries from official repositories over building our own
-* We prefer explicit comments within the code to explain our reasoning over implicit assumptions
-* We embrace the Chaos Monkey
+infrastructure for the AdoptOpenJDK farm.
 
 ## Infrastructure As Code
 
 The infrastructure project contains:
 
-1. The [Ansible Playbooks](ansible/playbooks) for bootstrapping the build and test hosts (including a way to test Ansible)
-1. The overriding [Documentation](docs) for the build farm
+1. The [Ansible Playbooks](ansible/playbooks) for bootstrapping the build and test hosts (including a way to test Ansible).
+1. The [Vagrant and QEMU test scripts](ansible/pbTestScripts) for running our full suite of playbook tests.
+1. The [Dockerfiles](ansible/) are used for:
+   1. Running a subset of tests as GitHub actions (on a PR).
+   1. Providing the base images for running builds on Docker containers in our build farm.
+1. The overriding [Documentation](docs) for the build farm.
+1. Configuration files for linters etc in the root folder.
 
 ## Submitting a contribution to AdoptOpenJDK/infrastructure
 
@@ -82,19 +80,45 @@ All changes should be made to a personal fork of AdoptOpenJDK/infrastructure for
 1. Test it (see below)
 1. Submit a Pull Request
 
-Only reviewers in the [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) team have permission to merge requests for this `openjdk-infrastructure` repo, so please ask one of those team members to review your Pull Request.
+Only reviewers in the
+[infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
+team have permission to merge requests for this repo, so if you feel your PR
+is not getting enough attention, let one the team know via the
+`#infrastructure` slack channel
 
 ## Using Vagrant to test your Ansible scripts (Ubuntu based)
 
-**TODO** This has bit rotted somewhat and needs to be looked at again.
+We have some information on running virtual machines to test the playbooks
+in the
+[ansible directory README](ansible/README.md#running-via-vagrant-and-virtualbox)
+and we also have the
+[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/)
+and [QemuPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/QEMUPlaybookCheck/)
+jobs which you can submit your pull request to in order to validate it on a
+clean machine.
 
-We expect developers to test their Ansible changes in a test environment.  
-A default one for Ubuntu based systems is provided for you via VirtualBox / Vagrant.  
-See the guide below.
+We expect developers to test their Ansible changes in a test environment
+whether through vagrant or elsewhere in order to ensure there are as few
+problems as possible.
 
 [Ansible Scripts Guide](ansible/README.md)
 
-## Docs
+## Commit messages
+
+Wherever possible, prefix the commit message with the area which you are changing e.g.
+
+- unixPB:
+- winPB:
+- aixPB:
+- ansible:
+- vagrant:
+- pbTests:
+- docs:
+- plugins:
+- inventory:
+- github:
+
+## Further Docs
 
 Project documentation in permanent form (e.g. Build Farm architecture) is stored
 in the [docs](docs) folder.

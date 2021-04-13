@@ -2,47 +2,61 @@
 # IBM XL C 16.1.0 #
 ###################
 ---
-- name: Checking for XLC16 availability
+- name: Checking for xlC16 installed as 'licensed' LPP
   stat:
-    path: /opt/IBM/xlc/16.1.0/bin/xlc
+    path: /usr/lpp/xlCcmp.16.1.0.license
   register: xlc16
   tags: xlc16
 
-- debug:
+- name: "xlc16 installed, skipping download and installation"
+  debug:
     msg: "xlc16 installed, skipping download and installation"
-  when: xlc16.stat.islnk is defined
+  when: xlc16.stat.exists and xlc16.stat.isdir
   tags: xlc16
 
-- name: Transfer and Extract XLC16
-  unarchive:
-    src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
-    dest: /tmp
-    remote_src: no
-  when: xlc16.stat.islnk is not defined
-  tags: xlc16
+- name: Vendor File processing
+  block:
+    - name: Transfer and Extract XLC16
+      unarchive:
+        src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
+        dest: /tmp
+        remote_src: no
+      register: _vendor_copied
+      ignore_errors: yes
 
-- name: Install IBM XLC16 - installp
-  command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
-  ignore_errors: yes
-  when: xlc16.stat.islnk is not defined
-  tags: xlc16
+    - name: Install IBM XLC16 - installp
+      command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/usr/sys/inst.images all
+      register: _installp
+      ignore_errors: yes
+      when: _vendor_copied.failed is defined and _vendor_copied.failed == false
 
-- debug: msg='Erorrs from the previous installp command normal'
-  when: xlc16.stat.islnk is not defined
-  tags: xlc16
+    - name: 'Errors from the previous installp command can be ignored'
+      debug: msg='Errors from the previous installp command can be ignored'
+      when: xlc16.stat.islnk is not defined
+      tags: xlc16
 
-- name: TestIBM XLC16
+    - name: Clean XLC16 tmp files
+      file:
+        path: /tmp/usr
+        state: absent
+  when: xlc16.stat.exists is false
+  tags: [xlc16, vendor_files]
+
+- name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
   register: xlc16_qversion
+  ignore_errors: yes
+  changed_when: false
   tags: xlc16
 
 - name: Display XLC16 qversion information
   debug:
     msg: "{{ xlc16_qversion.stdout }}"
+  when: xlc16_qversion.failed == false
   tags: xlc16
 
-- name: Clean XLC16 tmp files
-  file:
-    path: /tmp/usr
-    state: absent
+- name: Display error message
+  debug:
+    msg: "{{ xlc16_qversion.cmd }} returns {{ xlc16_qversion.msg }}"
+  when: xlc16_qversion.failed == true
   tags: xlc16
