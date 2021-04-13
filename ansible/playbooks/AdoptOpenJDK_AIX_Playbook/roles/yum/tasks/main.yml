@@ -23,7 +23,10 @@
 # Install yum and update to latest #
 # Previous version of this downloaded and executed
 #   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
-# These steps perform the same atasks without requiring python (?) to be installed first
+# These steps below do the same (update rpm.rte, install initial RPM bundle)
+# but require a alturnative python to be installed
+# eg, http://download.aixtools.net/tools/aixtools.python.py36.3.6.12.0.I
+# and ansible.cfg needs 'ansible_python_interpreter = /opt/bin/python3.6'
 ####################################
 - name: Install yum from AIXToolbox
   block:
