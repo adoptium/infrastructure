@@ -319,7 +319,7 @@ startVMPlaybookWin()
 		# Restarting the VM as the shared folder disappears after the playbook runs due to the restarts in the playbook
 		vagrant halt && vagrant up
 
-		# Restaring the VM may change the port Number
+		# Restarting the VM may change the port number
 		vagrantPort=$(vagrant port |  awk '/5985/ { print $4 }')
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
