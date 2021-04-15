@@ -22,14 +22,6 @@ jobs:
     - name: Install dependencies
       run: brew install ansible
 
-    - name: Remove homebrew/cask-versions
-      run: | 
-        brew uninstall --cask adoptopenjdk8
-        brew uninstall --cask adoptopenjdk11
-        brew uninstall --cask adoptopenjdk12
-        brew uninstall --cask adoptopenjdk13
-        brew uninstall --cask adoptopenjdk14
-
     - name: Run Ansible Playbook
       run: |
         echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
