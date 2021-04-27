@@ -35,3 +35,33 @@
     executable: cmd
   ignore_errors: yes
   tags: basic_config
+
+# Some providers of machines set invalid hostnames with a hyphen at the end.
+# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2133
+- name: Check hostname doesn't end in '-'
+  win_shell: "hostname | Where {$_ -Match '\\-$'}"
+  args:
+    executable: powershell
+  register: hostname_output
+  tags: basic_config
+
+- name: Print new hostname
+  debug:
+    msg: "{{ hostname_output.stdout | replace('-','') | trim }}"
+  when:
+    - not (hostname_output.stdout == "")
+  tags: basic_config
+
+- name: Remove stray '-' from hostname
+  win_shell: Rename-Computer -NewName "{{ hostname_output.stdout | replace('-','') | trim }}"
+  args:
+    executable: powershell
+  when:
+    - not (hostname_output.stdout == "")
+  tags: basic_config
+
+- name: Reboot machine for hostname changes to take effect
+  win_reboot:
+    reboot_timeout: 1800
+  when: not (hostname_output.stdout == "")
+  tags: basic_config
