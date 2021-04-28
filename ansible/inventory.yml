@@ -95,6 +95,16 @@ hosts:
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
+  - dockerhost:
+
+      - equinix:
+          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC 2.8GHz 24 core, 64Gb}
+          ubuntu2004-x64-2: {ip: 147.75.79.143, description: Xeon GOLD 5120 28 core, 380Gb}
+          ubuntu1604-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+
+      - osuosl:
+          ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
+
   - test:
 
       - alibaba:
