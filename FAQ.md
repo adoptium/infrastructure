@@ -269,7 +269,7 @@ playbook (Also available via AWX).
 
 Once the static docker containers have been created they are connected into
 jenkins with a `test-docker-` prefix. Ideally the description of the machine
-in jenkins should list which host it's on, but can you also look up the
+in jenkins should list which host it's on, but you can also look up the
 IP address of the `test-docker-` system in the inventory.yml file to find
 out the host. The inventory file does NOT contain any of the `test-docker-`
 systems as they do not have the playbooks run against them. Normally
