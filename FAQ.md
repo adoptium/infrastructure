@@ -239,3 +239,47 @@ NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc
    list at the top of the main playbook files for
    [*IX](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
    [windows](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
+
+## "DockerStatic" test systems
+
+The [DockerStatic role](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/tasks/main.yml)
+was first implemented in [this PR](https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1925)
+and extended through
+[this issue](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1809) and is intended to allow us to make more
+efficient use of larger machines.  The role uses a set of Dockerfiles, one
+per distribution, which can be used to generate a set of docker machines
+that are started, exposed on an ssh port, and connected to jenkins.  They
+only contain the minimum required to run test jobs and cannot be used for
+builds.  These containers serve several purposes:
+
+1. We have some quite large machines, and this lets us split them up without full virtualisation
+2. It allows us to increase the number of distributions we test on
+3. We can run multiple tests in parallel on the host with isolation not available when multiple executors are used
+
+The DockerStatic role sets up several containers each with a different
+distribution and exposed on a specific port.  It also (at the time of
+writing) sets them up to be restricted to two cores and 6Gb of RAM which is
+adequate for most tests.  On larger machines it may be appropriate to modify
+those values, and we should look at whether we can reasonably autodetect or
+parameterize those values. Potentially we could also scale up and create
+more than one of each OS on a given host. To set up a host for running these
+you can use the
+[dockerhost.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml)
+playbook (Also available via AWX).
+
+Once the static docker containers have been created they are connected into
+jenkins with a `test-docker-` prefix. Ideally the description of the machine
+in jenkins should list which host it's on, but you can also look up the
+IP address of the `test-docker-` system in the inventory.yml file to find
+out the host. The inventory file does NOT contain any of the `test-docker-`
+systems as they do not have the playbooks run against them. Normally
+machines used for this purpose will be prefixed `test-dockerhost-` to
+identify them and split them out so they do not have the full playbooks
+executed against them in order to keep the host system "clean". In some
+cases they may be used as `dockerBuild` hosts too.
+
+### DockerHost TODO:
+1. Set up patching cycle
+2. Identify ways to redeploy when needed to pick up updates
+3. Allow dockerhost.yml playbook to adjust core file settings
+4. Add mechanism to deploy differently based on host machine size
