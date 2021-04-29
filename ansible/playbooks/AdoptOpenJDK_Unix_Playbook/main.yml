@@ -74,7 +74,9 @@
       when: ansible_distribution != "MacOSX"
     - role: adoptopenjdk_install
       jdk_version: 8
-      when: ansible_distribution != "Alpine"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
@@ -82,14 +84,21 @@
         - ansible_distribution != "Alpine"
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11
-      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK16 Build Bootstrap
       jdk_version: 15
-      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - OpenSSL102                  # OpenJ9
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure

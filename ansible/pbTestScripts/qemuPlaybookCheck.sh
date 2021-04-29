@@ -263,6 +263,8 @@ runPlaybook() {
 
 	# RISCV requires this be specified
 	if [[ $ARCHITECTURE == "RISCV" ]]; then
+		# To fix the outdated repositories of the image
+		ssh -p $PORTNO -i "$workFolder"/id_rsa linux@localhost "sudo apt-get update --fix-missing"
 		extraAnsibleArgs="-e ansible_python_interpreter=/usr/bin/python3"
 	fi
 
