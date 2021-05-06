@@ -97,13 +97,20 @@ setJDKVars
 processArgs $*
 
 # Only build Hotspot on FreeBSD
-if [[ $(uname) == "FreeBSD" ]]; then
+if [[ "$(uname)" == "FreeBSD" ]]; then
         echo "Running on FreeBSD"
         export TARGET_OS=FreeBSD
         export VARIANT=hotspot
         export JAVA_TO_BUILD=jdk11u
         export JDK_BOOT_DIR=/usr/local/openjdk11
         export JAVA_HOME=/usr/local/openjdk8
+elif [[ "$(uname)" == "SunOS" ]]; then
+	echo "Running on Solaris/SunOS"
+	export TARGET_OS=solaris
+	echo "We only build Solaris on JDK8/HS"
+	export VARIANT=hotspot
+	export JAVA_TO_BUILD=jdk8u
+	export JAVA_HOME=/usr/lib/jvm/jdk8
 fi
 
 # Required as Debian Buster doesn't have gcc-4.8 available
