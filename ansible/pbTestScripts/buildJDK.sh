@@ -75,6 +75,27 @@ checkJDK() {
 	fi
 }
 
+# This method is required as there isn't a standardised JDK-7 for all platforms.
+# Some may be "zulu7", some may be 'java-1.7.0', or 'openjdk-7-jdk`
+findJDK7() {
+	local jdkPath=""
+	local pathSuffix="java-1.7.0 java-7-openjdk-amd64 zulu7 jdk-7"
+	for path in $pathSuffix
+	do
+		jdkPath=$(find /usr/lib/jvm/ -name $path)
+		if [[ $jdkPath != "" ]]; then
+			break
+		fi
+	done
+
+	# Last Resort: Use JDK8 to build JDK8
+	if [[ $jdkPath == "" ]]; then
+		jdkPath="/usr/lib/jvm/jdk8"
+	fi
+	
+	export JDK7_BOOT_DIR=$jdkPath
+}
+
 cloneRepo() {
 	if [ -d $WORKSPACE/openjdk-build ]; then
 		echo "Found existing openjdk-build folder"
@@ -128,6 +149,10 @@ fi
 if [[ "$(uname -m)" == "armv7l" && "$VARIANT" == "openj9" ]]; then
 	echo "OpenJ9 VM does not support armv7l - resetting VARIANT to hotspot"
 	export VARIANT=hotspot
+fi
+
+if [[ "$JAVA_TO_BUILD" == "jdk8u" ]]; then
+	findJDK7	
 fi
 
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC

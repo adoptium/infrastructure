@@ -245,7 +245,8 @@ startVMPlaybook()
 
 	if [[ "$testNativeBuild" = true ]]; then
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
-		ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./buildJDK.sh $buildBranch $buildFork $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
+
+		ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && bash buildJDK.sh $buildBranch $buildFork $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
@@ -254,7 +255,7 @@ startVMPlaybook()
 
 		if [[ "$runTest" = true ]]; then
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
-			ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && ./testJDK.sh" 2>&1 | tee $testLogPath
+			ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && bash testJDK.sh" 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then
 				echo TEST FAILED

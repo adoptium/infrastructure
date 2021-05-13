@@ -42,8 +42,6 @@
     - WMF_5.1
     - Jenkins                     # AdoptOpenJDK infrastructure
     - CodesignCert
-    - MSVS_2010
-    - VS2010_SP1
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
     - Firefox
