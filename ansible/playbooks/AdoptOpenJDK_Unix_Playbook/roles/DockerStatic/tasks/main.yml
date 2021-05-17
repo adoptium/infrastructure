@@ -31,7 +31,6 @@
     - u1604
     - u1804
     - u2004
-    - u2010
     - u2104
     - f33
     - alp311
@@ -63,13 +62,8 @@
   tags: startcontainers
   ignore_errors: yes
 
-- name: Start Ubuntu 20.10 container if not already started
-  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2010_2225 aqa_u2010
-  tags: startcontainers, startallcontainers
-  ignore_errors: yes
-
 - name: Start Ubuntu 21.04 container if not already started
-  command: docker run --restart unless-stopped -p 2226:22 --cpus=4.0 --memory=6G --detach --name U2104_2226 aqa_u2104
+  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2104_2226 aqa_u2104
   tags: startcontainers, startallcontainers
   ignore_errors: yes
 
