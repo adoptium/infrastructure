@@ -89,15 +89,15 @@ usage()
 checkVars()
 {
 	if [ "$vagrantOS" == "" ]; then
-                usage
+		usage
 		echo "ERROR: No Vagrant OS specified - Use -h for help, -a for all or -v with one of the following:"
 		ls -1 ../Vagrantfile.* | cut -d. -f4
-                exit 1
+		exit 1
 	fi
 	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
-                echo "Unable to test an unbuilt JDK. Please specify both '--build' and '--test'"
-                exit 1
-        fi
+		echo "Unable to test an unbuilt JDK. Ignoring '--test' argument."
+		runTest=false
+	fi
 	#Sets WORKSPACE to home if WORKSPACE is empty or undefined. 
 	if [ ! -n "${WORKSPACE:-}" ]; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
