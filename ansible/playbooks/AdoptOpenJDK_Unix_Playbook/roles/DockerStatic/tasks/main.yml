@@ -63,7 +63,7 @@
   ignore_errors: yes
 
 - name: Start Ubuntu 21.04 container if not already started
-  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2104_2226 aqa_u2104
+  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2104_2225 aqa_u2104
   tags: startcontainers, startallcontainers
   ignore_errors: yes
 
