@@ -44,10 +44,10 @@ pipeline {
 } 
 
 def dockerBuild(architecture) {
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    sh label: '', script: "docker build -t adoptopenjdk/centos7_build_image:linux-$architecture -f ansible/Dockerfile.CentOS7 ."
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-        git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
-        sh label: '', script: "docker build -t adoptopenjdk/centos7_build_image:linux-$architecture -f ansible/Dockerfile.CentOS7 ."
         sh label: '', script: "docker push adoptopenjdk/centos7_build_image:linux-$architecture"
     }
 }
