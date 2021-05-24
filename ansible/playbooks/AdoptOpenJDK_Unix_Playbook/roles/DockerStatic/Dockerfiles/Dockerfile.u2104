@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM ubuntu:21.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -qq -y perl openssh-server unzip
@@ -25,4 +25,4 @@ RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 
 RUN locale-gen en_US.utf8
 # ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
 EXPOSE 22
-# Start with docker run -p 2222:22 UUID
+# Start with docker run -p 2225:22 UUID
