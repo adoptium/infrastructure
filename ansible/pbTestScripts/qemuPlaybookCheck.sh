@@ -237,11 +237,29 @@ done
      	  $EXTRA_ARGS \
 	  -nographic) > "$workFolder/${OS}.${ARCHITECTURE}.startlog" 2>&1 &
 
-	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
-	sleep 180
-	tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
-	echo "Machine has started, unless the above log shows otherwise ..."
+	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog"
+	echo "Please be patient - this can take up to 300 seconds"
 
+	SECONDS=0
+	while [ true ];
+	do
+		if tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | grep -q login; then
+			echo "VM Booted after $SECONDS seconds"
+			break;
+		fi
+		if [ $SECONDS -gt 300 ]; then
+			echo -e "Timeout Reached. See log below:\n"
+			tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
+			echo
+			if [[ "$retainVM" == false ]]; then
+				destroyVM
+				echo "Removing disk image"
+				rm -f ${workFolder}/${OS}.${ARCHITECTURE}.dsk
+			fi
+			exit 127
+		fi
+		sleep 10
+	done
 	# Remove old ssh key and create a new one
 	rm -f "$workFolder"/id_rsa*
 	ssh-keygen -q -f "$workFolder"/id_rsa -t rsa -N ''
