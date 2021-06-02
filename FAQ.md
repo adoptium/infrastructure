@@ -239,3 +239,23 @@ NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc
    list at the top of the main playbook files for
    [*IX](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
    [windows](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
+
+## Temporary access to a machine
+
+In some occasions non-infrastruture team members may wish to access a
+machine in order to reporoduce a test case failure, particularly if they do
+not have access to a machine of any given platform, or if the problem
+appears to be specific to a particular machine or cloud provider. In this
+case, the following procedure should be followed. Example commands are
+suitable for most UNIX-based platforms:
+
+1. User should raise a request for access using
+   [this template](https://github.com/adoptium/infrastructure/issues/new?assignees=sxa&labels=Temp+Infra+Access&template=machineaccess.md&title=Access+request+for+%3Cyour+username%3E)
+   (in general, "Non-privilieged" is the correct option to choose
+2. Infrastructure team member doing the following steps should assign the issue to themselves
+3. For non-privilieged users, create an account with a GECOS field referencing the requester and issue number e.g. `useradd -m -c "Stewart Addison 1234" sxa`
+4. Add the user's key to `.ssh/authorized_keys` on the machine with the user's public ssh key in it
+5. Add a comment to the issue with the username and IP address details
+6. The issue should be left open until the user is finished with the machine (if it has been a while, ask them in the issue)
+7. Once user is finished, remove the ID (`userdel -r username`)
+8. Close the issue
