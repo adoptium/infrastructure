@@ -31,10 +31,11 @@
     - u1604
     - u1804
     - u2004
-    - u2010
+    - u2104
     - f33
     - alp311
     - alp312
+    - alp313
 
 ##############################################################
 # Start the containers                                       #
@@ -61,8 +62,8 @@
   tags: startcontainers
   ignore_errors: yes
 
-- name: Start Ubuntu 20.10 container if not already started
-  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2010_2225 aqa_u2010
+- name: Start Ubuntu 21.04 container if not already started
+  command: docker run --restart unless-stopped -p 2225:22 --cpus=4.0 --memory=6G --detach --name U2104_2225 aqa_u2104
   tags: startcontainers, startallcontainers
   ignore_errors: yes
 
@@ -80,6 +81,12 @@
   command: docker run --restart unless-stopped -p 2229:22 --cpus=2.0 --memory=6G --detach --name alp312.2228 aqa_alp312
   tags: startcontainers
   ignore_errors: yes
+
+- name: Start Alpine 3.13 container if not already started
+  command: docker run --restart unless-stopped -p 2230:22 --cpus=2.0 --memory=6G --detach --name alp313.2230 aqa_alp313
+  tags: startcontainers
+  ignore_errors: yes
+
 
 # lineinfile does not work here - similar to the operation in /var/log in adopt_etc
 # lineinfile: path /proc/sys/kernel/core_pattern state: present: regexp: . line: core.%p

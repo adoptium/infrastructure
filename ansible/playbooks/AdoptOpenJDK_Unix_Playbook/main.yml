@@ -91,7 +91,6 @@
       jdk_version: 15
       when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
       tags: build_tools
-    - OpenSSL102                  # OpenJ9
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
