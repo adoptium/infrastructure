@@ -138,7 +138,7 @@
 - name: Download freetype (sparcv9)
   command: wget https://www.ibiblio.org/pub/packages/solaris/sparc/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg -O /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
   when:
-    - when: ansible_architecture == "sun4v"
+    - ansible_architecture == "sun4v"
     - not freetype_installed.stat.exists
   tags:
     - build_tools
@@ -147,7 +147,7 @@
 - name: Install freetype (sparcv9)
   shell: yes a | /opt/csw/bin/pkgutil -iy /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
   when:
-    - when: ansible_architecture == "sun4v"
+    - ansible_architecture == "sun4v"
     - not freetype_installed.stat.exists
   tags:
     - build_tools
@@ -186,6 +186,36 @@
   environment:
     PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
   when: not cups_installed.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Check if cups-1.5.4-source is present (sparcv9)
+  stat:
+    path: /usr/local/cups-1.5.4-src
+  register: cups_src
+  tags:
+    - build_tools
+    - cups
+
+- name: Download cups-1.5.4-source (sparcv9)
+  command: wget https://github.com/apple/cups/releases/download/release-1.5.4/cups-1.5.4-source.tar.gz -O /tmp/cups-1.5.4-source.tar.gz
+  when:
+    - ansible_architecture == "sun4v"
+    - not cups_src.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Extract cups-1.5.4-source
+  shell: |
+    gzip -cd /tmp/cups-1.5.4-source.tar.gz | tar xpf -
+    mv /usr/local/cups-1.5.4 /usr/local/cups-1.5.4-src
+  args:
+    chdir: /usr/local/
+  when:
+    - ansible_architecture == "sun4v"
+    - not cups_src.stat.exists
   tags:
     - build_tools
     - cups
