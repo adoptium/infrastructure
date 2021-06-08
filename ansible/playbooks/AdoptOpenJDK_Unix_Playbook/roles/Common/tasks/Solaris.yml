@@ -49,6 +49,13 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
+- name: Install additional build tools for x64
+  pkgutil: "name={{ item }} state=present"
+  with_items: "{{ Additional_Build_Tools_x64 }}"
+  when:
+    - ansible_architecture == "i386"
+  tags: build_tools
+
 - name: Setting Solaris Studio variables (x64)
   set_fact:
     SolarisStudioArch: "x86"
@@ -118,6 +125,33 @@
     - solaris_studio
     - adoptopenjdk
   when: not solaris_studio.stat.exists
+
+- name: Check if freetype is installed (sparcv9)
+  stat:
+    path: /usr/local/include/freetype2
+  register: freetype_installed
+  when: ansible_architecture == "sun4v"
+  tags:
+    - build_tools
+    - freetype
+
+- name: Download freetype (sparcv9)
+  command: wget https://www.ibiblio.org/pub/packages/solaris/sparc/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg -O /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
+  when:
+    - when: ansible_architecture == "sun4v"
+    - not freetype_installed.stat.exists
+  tags:
+    - build_tools
+    - freetype
+
+- name: Install freetype (sparcv9)
+  shell: yes a | /opt/csw/bin/pkgutil -iy /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
+  when:
+    - when: ansible_architecture == "sun4v"
+    - not freetype_installed.stat.exists
+  tags:
+    - build_tools
+    - freetype
 
 - name: Check if cups is installed
   stat:

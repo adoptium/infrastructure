@@ -8,10 +8,6 @@
 
 hosts:
 
-  - tck:
-      - siteox:
-          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 21222}
-
   - infrastructure:
 
       - aws:
