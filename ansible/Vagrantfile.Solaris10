@@ -2,10 +2,16 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
-sudo /opt/csw/bin/pkgutil -y -i python 
+sudo /opt/csw/bin/pkgutil -y -i python
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+
+# Install compiler if found on host system
+if [ -r /vagrant/SolarisStudio12.3-solaris-x86-pkg ]; then
+	sudo /opt/csw/bin/pkgutil -y -i jdk8
+	sudo /vagrant/SolarisStudio12.3-solaris-x86-pkg/solarisstudio.sh --non-interactive --javahome /opt/csw/java/jdk/jdk8/
 fi
 yes | sudo pkgrm CSWpkgutil
 SCRIPT

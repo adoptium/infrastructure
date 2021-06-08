@@ -11,7 +11,7 @@ hosts:
   - infrastructure:
 
       - aws:
-          ubuntu1604-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
+          ubuntu1804-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
@@ -66,6 +66,7 @@ hosts:
       - equinix:
           centos74-armv8-1: {ip: 147.75.196.30, description: ThunderX}
           ubuntu1804-armv8-1: {ip: 139.178.82.234, description: D05}
+          centos8-armv8-1: {ip: 139.178.86.243, description: Altra}
 
       - scaleway:
           ubuntu1604-armv7-1: {ip: 212.47.233.28}
@@ -95,6 +96,16 @@ hosts:
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
+  - dockerhost:
+
+      - equinix:
+          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC 2.8GHz 24 core, 64Gb}
+          ubuntu2004-x64-2: {ip: 147.75.79.143, description: Xeon GOLD 5120 28 core, 380Gb}
+          ubuntu1604-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+
+      - osuosl:
+          ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
+
   - test:
 
       - alibaba:
@@ -110,7 +121,6 @@ hosts:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
-          win2019-x64-1: {ip: 34.244.74.139, user: Administrator}
 
       - gdams:
           debian10-riscv64-1: {ip: gdams.ddns.net}
@@ -129,20 +139,17 @@ hosts:
           aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix2-ojdk04.osuosl.org}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
-          centos74-ppc64le-4: {ip: 140.211.168.245, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
           ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
-          ubuntu1604-ppc64le-3: {ip: 140.211.168.248, user: ubuntu}
-          ubuntu1604-ppc64le-4: {ip: 140.211.168.239, user: ubuntu}
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
+          ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
 
       - equinix:
           ubuntu1604-armv8-1: {ip: 147.75.74.50, description: ThunderX}
           ubuntu1604-armv8-2: {ip: 147.75.193.234, description: ThunderX}
           ubuntu1604-x64-1: {ip: 147.75.204.239}
           ubuntu1604-x64-2: {ip: 147.75.100.127}
-          ubuntu1604-x64-3: {ip: 147.75.83.133}
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
@@ -162,9 +169,9 @@ hosts:
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
           ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
-          ubuntu1604-s390x-2: {ip: 148.100.113.25, user: ubuntu}
-          ubuntu1604-s390x-3: {ip: 148.100.113.30, user: ubuntu}
-          ubuntu1604-s390x-4: {ip: 148.100.113.46, user: ubuntu}
+          ubuntu1804-s390x-1: {ip: 148.100.113.30, user: ubuntu}
+          ubuntu1804-s390x-2: {ip: 148.100.113.46, user: ubuntu}
+          ubuntu1804-s390x-3: {ip: 148.100.113.25, user: ubuntu}
 
 
       # Nine machines are behind a firewall. Please contact @sxa or @gdams for access

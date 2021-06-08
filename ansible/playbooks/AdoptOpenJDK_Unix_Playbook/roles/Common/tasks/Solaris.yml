@@ -102,7 +102,7 @@
     - cups
 
 - name: Extract cups 1.4.4
-  shell: tar -xf cups-1.4.4-source.tar.gz
+  shell: gzip -cd cups-1.4.4-source.tar.gz | tar xpf -
   args:
     chdir: /tmp
   when: not cups_installed.stat.exists

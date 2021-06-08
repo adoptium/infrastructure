@@ -1,10 +1,38 @@
-# Contributing to AdoptOpenJDK/infrastructure
+# Contributing to infrastructure
 
-Thank you for your interest in AdoptOpenJDK/infrastructure!
+Thanks for your interest in this project.
 
-We welcome and encourage all kinds of contributions to the project, not only
-code. This includes bug reports, user experience feedback, assistance in
-reproducing issues and more.
+## Project description
+
+This repo contains all information about machine maintenance and configurations
+
+* https://github.com/adoptium/infrastructure
+
+## Developer resources
+
+The project maintains the following source code repositories
+
+* https://github.com/adoptium/infrastructure
+
+## Eclipse Contributor Agreement
+
+Before your contribution can be accepted by the project team contributors must
+electronically sign the Eclipse Contributor Agreement (ECA).
+
+* http://www.eclipse.org/legal/ECA.php
+
+Commits that are provided by non-committers must have a Signed-off-by field in
+the footer indicating that the author is aware of the terms by which the
+contribution has been provided to the project. The non-committer must
+additionally have an Eclipse Foundation account and must have a signed Eclipse
+Contributor Agreement (ECA) on file.
+
+For more information, please see the Eclipse Committer Handbook:
+https://www.eclipse.org/projects/handbook/#resources-commit
+
+## Contact
+
+Contact the Eclipse Foundation Webdev team via webdev@eclipse-foundation.org.
 
 ## Mission Statement
 

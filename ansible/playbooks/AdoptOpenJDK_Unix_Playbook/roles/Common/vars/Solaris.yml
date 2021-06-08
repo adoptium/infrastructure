@@ -23,6 +23,7 @@ Build_Tool_Packages:
   - gmake
   - gtar
   - xz
+  - zip
 
 Test_Tool_Packages:
   - perl
