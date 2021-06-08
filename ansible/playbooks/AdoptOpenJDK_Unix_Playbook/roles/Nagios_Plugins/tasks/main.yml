@@ -13,11 +13,59 @@
   ###############
   # Nagios user #
   ###############
+
+- name: Set Home Folder for Nagios user
+  set_fact:
+    home_folder: /home/nagios
+
+- name: Set Home Folder for Nagios user (macos)
+  set_fact:
+    home_folder: /Users/nagios
+  when:
+    - ansible_distribution == "MacOSX"
+
+- name: Set Home Folder for Nagios user (Solaris)
+  set_fact:
+    home_folder: /export/home/nagios
+  when:
+    - ansible_distribution == "Solaris"
+
 - name: Create Nagios user
-  action: user name=nagios state=present shell=/bin/bash
+  action: user name=nagios state=present home={{ home_folder }} shell=/bin/bash
   ignore_errors: yes
   when:
     - Nagios_Plugins == "Enabled"
+    - ansible_distribution != "MacOSX"
+
+- name: Create Nagios user (macOS)
+  action: user name=nagios group=staff state=present home={{ home_folder }} shell=/bin/bash
+  when:
+    - Nagios_Plugins == "Enabled"
+    - ansible_distribution == "MacOSX"
+
+- name: Enable SSH login for Nagios user (macOS)
+  command: dseditgroup -o edit -a nagios -t staff com.apple.access_ssh
+  ignore_errors: yes
+  when:
+    - Nagios_Plugins == "Enabled"
+    - ansible_distribution == "MacOSX"
+
+- name: Create Nagios user's home folder (Solaris)
+  file:
+    path: /export/home/nagios
+    state: directory
+    owner: nagios
+    group: staff
+    mode: 0700
+  when:
+    - Nagios_Plugins == "Enabled"
+    - ansible_distribution == "Solaris"
+
+- name: Set Nagios user's home folder (Solaris)
+  command: usermod -d /export/home/nagios/ nagios
+  when:
+    - Nagios_Plugins == "Enabled"
+    - ansible_distribution == "Solaris"
 
 - name: Set authorized key for Nagios user
   authorized_key:
@@ -46,3 +94,10 @@
     checksum: sha256:47666dce9d11d5908c3e775d229dcbdcd11ce13fd5ea576859987eccbdfc3efa
   when:
     - Nagios_Plugins == "Enabled"
+    - ansible_distribution != "Solaris"
+
+- name: Download add-on check_mem plugin (Solaris)
+  command: wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl -O /usr/local/nagios/libexec/check_mem
+  when:
+    - Nagios_Plugins == "Enabled"
+    - ansible_distribution == "Solaris"

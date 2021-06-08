@@ -8,6 +8,10 @@
 
 hosts:
 
+  - tck:
+      - siteox:
+          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 21222}
+
   - infrastructure:
 
       - aws:
@@ -72,6 +76,9 @@ hosts:
           ubuntu1604-armv7-1: {ip: 212.47.233.28}
           ubuntu1604-armv7-2: {ip: 212.47.246.7}
           ubuntu1604-x64-1: {ip: 51.15.46.107}
+
+      - siteox:
+          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
       - ibmcloud:
           win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
@@ -181,6 +188,9 @@ hosts:
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.76.107}
+
+      - siteox:
+          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
 
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}
