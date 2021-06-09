@@ -126,6 +126,7 @@
     - adoptopenjdk
   when: not solaris_studio.stat.exists
 
+# The freetype provided by pkgutil isn't detected by the openjdk configure stage. Use the one provided below instead
 - name: Check if freetype is installed (sparcv9)
   stat:
     path: /usr/local/include/freetype2
