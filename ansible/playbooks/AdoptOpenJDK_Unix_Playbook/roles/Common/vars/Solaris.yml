@@ -19,11 +19,13 @@ Build_Tool_Packages:
   - ntp
   - wget
   - curl
-  - freetype
   - gmake
   - gtar
   - xz
   - zip
+
+Additional_Build_Tools_x64:
+  - freetype
 
 Test_Tool_Packages:
   - perl

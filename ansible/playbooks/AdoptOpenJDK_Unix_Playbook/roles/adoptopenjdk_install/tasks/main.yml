@@ -41,6 +41,13 @@
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk_install
 
+- name: Set api_architecture variable for sun4v
+  set_fact:
+    api_architecture: sparcv9
+  when:
+    - ansible_architecture == "sun4v"
+  tags: adoptopenjdk_install
+
 - name: Set api_architecture variable for i386
   set_fact:
     api_architecture: x64
