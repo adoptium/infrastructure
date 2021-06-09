@@ -191,7 +191,7 @@
     - build_tools
     - cups
 
-# On Sparc we (for an unknown reason) have to provide the source as an additional configure arguement. I only ever managed to get configure to successfully work with the combination of both CUPS versions
+# On Sparc we (for an unknown reason) have to provide the source as an additional configure argument. I only ever managed to get configure to successfully work with the combination of both CUPS versions
 - name: Check if cups-1.5.4-source is present (sparcv9)
   stat:
     path: /usr/local/cups-1.5.4-src
