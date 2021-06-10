@@ -19,7 +19,11 @@ jobs:
     - name: Install dependencies
       run: |
         brew install ansible
-        brew install --cask virtualbox vagrant
+        brew install --cask virtualbox
+        # Pin vagrant at 2.2.15 until https://github.com/hashicorp/vagrant/issues/12408 has been fixed
+        brew uninstall vagrant
+        wget https://raw.githubusercontent.com/Homebrew/homebrew-cask/d81815ea27a778a312fa0e2bbef0d78f9767f45b/Casks/vagrant.rb
+        brew install --cask ./vagrant.rb
 
     - name: Setup Vagrant VM
       run: |
