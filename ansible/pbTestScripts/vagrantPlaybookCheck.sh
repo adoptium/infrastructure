@@ -91,7 +91,7 @@ checkVars()
 	if [ "$vagrantOS" == "" ]; then
 		usage
 		echo "ERROR: No Vagrant OS specified - Use -h for help, -a for all or -v with one of the following:"
-		ls -1 ../Vagrantfile.* | cut -d. -f4
+		ls -1 ../vagrant/Vagrantfile.* | cut -d. -f4
 		exit 1
 	fi
 	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
@@ -143,9 +143,9 @@ checkVagrantOS()
 {
         local vagrantOSList
         if [[ "$newVagrantFiles" = "true" ]]; then
-                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
+                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible/vagrant
         else    
-                cd ${scriptPath%/*}/..
+                cd ${scriptPath%/*}/../vagrant
         fi
         vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
         if [[ -f "Vagrantfile.${vagrantOS}" ]]; then
