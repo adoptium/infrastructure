@@ -202,9 +202,9 @@ startVMPlaybook()
 
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
-	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
@@ -286,9 +286,9 @@ startVMPlaybookWin()
 
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
-	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf Vagrantfile.$OS Vagrantfile
 	else
-	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../Vagrantfile.$OS Vagrantfile
 	fi
 
 	# Remove the Hosts files if they're found
