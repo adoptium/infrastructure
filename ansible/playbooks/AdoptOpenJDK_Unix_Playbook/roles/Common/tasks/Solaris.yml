@@ -56,11 +56,22 @@
     - ansible_architecture == "i386"
   tags: build_tools
 
+- name: Check if Solaris Studio 12.3 is installed
+  stat:
+    path: /opt/solarisstudio12.3/bin/
+  register: solaris_studio
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
 - name: Setting Solaris Studio variables (x64)
   set_fact:
     SolarisStudioArch: "x86"
     DownloadURL: "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}"
-  when: ansible_architecture == "i386"
+  when:
+    - not solaris_studio.stat.exists
+    - ansible_architecture == "i386"
   tags:
     - build_tools
     - solaris_studio
@@ -70,16 +81,9 @@
   set_fact:
     SolarisStudioArch: "sparc"
     DownloadURL: "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiosparc/SolarisStudio12.3-solaris-sparc-pkg.tar.bz2?{{ SolarisStudio12_solaris_sparc_SAS_TOKEN }}"
-  when: ansible_architecture == "sun4v"
-  tags:
-    - build_tools
-    - solaris_studio
-    - adoptopenjdk
-
-- name: Check if Solaris Studio 12.3 is installed
-  stat:
-    path: /opt/solarisstudio12.3/bin/
-  register: solaris_studio
+  when:
+    - not solaris_studio.stat.exists
+    - ansible_architecture == "sun4v"
   tags:
     - build_tools
     - solaris_studio
@@ -234,6 +238,17 @@
     - make
     - sha256sum
   tags: build_tools
+
+# Fixes: GConf Error: Failed to launch configuration server: Failed to execute child process "/usr/lib/sparcv9/gconfd-2" (No such file or directory)
+- name: Create symlinks gconfd-2
+  file:
+    src: /usr/lib/gconfd-2
+    dest: /usr/lib/sparcv9/gconfd-2
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_architecture == "sun4v"
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"
