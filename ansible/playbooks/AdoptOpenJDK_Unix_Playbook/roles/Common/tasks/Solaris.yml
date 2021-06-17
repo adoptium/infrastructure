@@ -240,7 +240,7 @@
   tags: build_tools
 
 # Fixes: GConf Error: Failed to launch configuration server: Failed to execute child process "/usr/lib/sparcv9/gconfd-2" (No such file or directory)
-- name: Create symlinks gconfd-2 
+- name: Create symlinks gconfd-2
   file:
     src: /usr/lib/gconfd-2
     dest: /usr/lib/sparcv9/gconfd-2
