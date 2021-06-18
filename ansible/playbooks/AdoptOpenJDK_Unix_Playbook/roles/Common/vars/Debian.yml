@@ -59,7 +59,7 @@ OpenJFX_Build_Tool_Packages:
   - libxxf86vm-dev
   - ruby
 
-gcc_7:                            # On all architectures but arm32
+gcc_7:                            # On all architectures but arm32 and riscv64
   - g++-7                         # OpenJ9
   - gcc-7                         # OpenJ9
 
@@ -90,9 +90,11 @@ Additional_Build_Tools_s390x:
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
+Additional_Build_Tools_riscv64:
+  - systemd-timesyncd
+
 Test_Tool_Packages:
   - acl
-  - mercurial
   - perl
   - xauth
   - xorg
@@ -102,3 +104,4 @@ Test_Tool_Packages:
 
 Test_Tool_Packages_x86_64:
   - pulseaudio
+  - mercurial
