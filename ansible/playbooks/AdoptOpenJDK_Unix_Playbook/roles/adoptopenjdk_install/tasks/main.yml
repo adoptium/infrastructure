@@ -29,11 +29,23 @@
   when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 
+- name: Set api_architecture variable
+  set_fact:
+    api_architecture: "{{ ansible_architecture }}"
+  tags: adoptopenjdk_install
+
 - name: Set api_architecture variable for x86_64
   set_fact:
     api_architecture: x64
   when:
     - ansible_architecture == "x86_64"
+  tags: adoptopenjdk_install
+
+- name: Set api_architecture variable for sun4v
+  set_fact:
+    api_architecture: sparcv9
+  when:
+    - ansible_architecture == "sun4v"
   tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for i386
@@ -44,20 +56,20 @@
     - ansible_architecture == "i386"
   tags: adoptopenjdk_install
 
+# Download x64 binaries until we have arm64 binaries available
+- name: Set api_architecture variable for macOS Arm64
+  set_fact:
+    api_architecture: x64
+  when:
+    - ansible_os_family == "Darwin"
+    - ansible_architecture == "arm64"
+  tags: adoptopenjdk_install
+
 - name: Set api_architecture variable for armv7l
   set_fact:
     api_architecture: arm
   when:
     - ansible_architecture == "armv7l"
-  tags: adoptopenjdk_install
-
-- name: Set api_architecture variable for everything else
-  set_fact:
-    api_architecture: "{{ ansible_architecture }}"
-  when:
-    - ansible_architecture != "armv7l" and
-      ansible_architecture != "x86_64" and
-      ansible_architecture != "i386"
   tags: adoptopenjdk_install
 
 - name: Print api_architecture var

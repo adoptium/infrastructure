@@ -103,6 +103,14 @@
     - not macos_version | regex_search("10.10")
     - installer_cert.stderr | regex_search("no identity found") or installer_cert.stderr | regex_search("Could not find appropriate signing identity for")
 
+- name: Disable keychain timeout
+  shell: |
+    security unlock-keychain -p `cat ~/.password` login.keychain-db
+    security set-keychain-settings /Users/jenkins/Library/Keychains/login.keychain-db
+  become_user: jenkins
+  when:
+    - not macos_version | regex_search("10.10")
+
 - name: Allow codesign via ssh
   shell: |
     security unlock-keychain -p `cat ~/.password` login.keychain-db

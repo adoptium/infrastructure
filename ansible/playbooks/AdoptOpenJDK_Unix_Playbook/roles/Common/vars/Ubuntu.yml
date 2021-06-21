@@ -97,6 +97,10 @@ Additional_Build_Tools_s390x:
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
+Additional_Build_Tools_armv7l:
+  - gcc-7                         # Needed as pre-built version causes crashes
+  - g++-7                         # Needed as pre-built version causes crashes
+
 Test_Tool_Packages:
   - acl
   - mercurial

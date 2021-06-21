@@ -3,7 +3,7 @@
 ARCHITECTURE=""
 OS=""
 skipFullSetup=""
-gitURL="https://github.com/adoptopenjdk/openjdk-infrastructure"
+gitFork="adoptopenjdk"
 gitBranch="master"
 PORTNO=10022
 if [ "$EXECUTOR_NUMBER" ]; then
@@ -13,7 +13,7 @@ current_dir=false
 cleanWorkspace=false
 retainVM=false
 buildJDK=false
-buildURL="https://github.com/adoptopenjdk/openjdk-build"
+buildFork="adoptopenjdk"
 buildBranch="master"
 buildVariant=""
 testJDK=false
@@ -30,8 +30,8 @@ processArgs() {
 				ARCHITECTURE="$1"; shift;;			
 			"--build" | "-b" )
 				buildJDK=true;;
-			"--build-repo" | "-br" )
-				buildURL="$1"; shift;;
+			"--build-fork" | "-bf" )
+				buildFork="$1"; shift;;
 			"--build-branch" | "-bb" )
 				buildBranch="$1"; shift;;
 			"--build-hotspot" | "-hs" )
@@ -46,8 +46,8 @@ processArgs() {
 				retainVM=true;;
 			"--test" | "-t" )
 				testJDK=true;;
-			"--infra-repo" | "-ir" )
-				gitURL="$1"; shift;;
+			"--infra-fork" | "-if" )
+				gitFork="$1"; shift;;
 			"--infra-branch" | "-ib" )
 				gitBranch=$1; shift;;
 			"--skip-more" | "-sm" )
@@ -65,13 +65,13 @@ usage() {
 	echo "Usage: ./qemu_test_script.sh (<options>) -a <architecture> -o <os>
 		--architecture | -a		Specifies the architecture to build the OS on
 		--build | -b			Build a JDK on the qemu VM
-		--build-repo | -br		Which openjdk-build to retrieve the build scripts from
+		--build-fork | -bf		Which openjdk-build to retrieve the build scripts from
 		--build-branch | -bb		Specify the branch of the build-repo (default: master)
 		--build-hotspot | -hs			Build a JDK with a Hotspot JVM instead of an OpenJ9 one
 		--currentDir | -c		Set Workspace to directory of this script
 		--clean-workspace | -cw		Removes the old work folder (including logs)
 		--help | -h 			Shows this help message
-		--infra-repo | -ir		Which openjdk-infrastructure to retrieve the playbooks (default: www.github.com/adoptopenjdk/openjdk-infrastructure)
+		--infra-fork | -if		Which openjdk-infrastructure to retrieve the playbooks (default: adoptopenjdk)
 		--infra-branch | -ib		Specify the branch of the infra-repo (default: master)
 		--jdk-version | -v		Specify which JDK to build if '-b' is used (default: jdk8u)
 		--retainVM | -r			Retain the VM once running the playbook
@@ -240,11 +240,12 @@ done
 	  $SSH_CMD \
 	  $DRIVE \
      	  $EXTRA_ARGS \
-	  -nographic) > /dev/null 2>&1 &
+	  -nographic) > "$workFolder/${OS}.${ARCHITECTURE}.startlog" 2>&1 &
 
-	echo "Machine is booting; Please be patient"
-	sleep 120
-	echo "Machine has started"
+	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
+	sleep 180
+	tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
+	echo "Machine has started, unless the above log shows otherwise ..."
 
 	# Remove old ssh key and create a new one
 	rm -f "$workFolder"/id_rsa*
@@ -263,9 +264,12 @@ runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 	local pbLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.log"
 	local extraAnsibleArgs=""
+        local gitURL="https://github.com/$gitFork/openjdk-infrastructure"
 
 	# RISCV requires this be specified
 	if [[ $ARCHITECTURE == "RISCV" ]]; then
+		# To fix the outdated repositories of the image
+		ssh -p $PORTNO -i "$workFolder"/id_rsa linux@localhost "sudo apt-get update --fix-missing"
 		extraAnsibleArgs="-e ansible_python_interpreter=/usr/bin/python3"
 	fi
 
@@ -285,8 +289,9 @@ runPlaybook() {
 
 	if [[ "$buildJDK" == true ]]; then
 		local buildLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.build_log"
+		local buildRepoArgs="-f $buildFork -b $buildBranch"
 		
-		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone -b "$gitBranch" "$gitURL" \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh --version $jdkToBuild $buildVariant --URL $buildURL/tree/$buildBranch" 2>&1 | tee "$buildLogPath"
+		ssh linux@localhost -p "$PORTNO" -i "$workFolder"/id_rsa "git clone -b "$gitBranch" "$gitURL" \$HOME/openjdk-infrastructure && \$HOME/openjdk-infrastructure/ansible/pbTestScripts/buildJDK.sh --version $jdkToBuild $buildVariant $buildRepoArgs" 2>&1 | tee "$buildLogPath"
 		if grep -q '] Error' "$buildLogPath" || grep -q 'configure: error' "$buildLogPath"; then
 			echo BUILD FAILED
 			destroyVM

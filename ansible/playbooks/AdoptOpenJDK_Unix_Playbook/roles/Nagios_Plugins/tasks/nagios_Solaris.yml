@@ -1,0 +1,19 @@
+---
+########################################################################
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on Solaris #
+########################################################################
+
+###################
+# Install plugins #
+###################
+- name: Install nagios_plugins
+  pkgutil: "name=nagios_plugins state=present"
+
+##########
+# Layout #
+##########
+- name: Creates Nagios folder
+  file: path=/usr/local/nagios/ state=directory mode=0755 owner=nagios
+
+- name: Create symlink to plugins
+  file: src=/opt/csw/libexec/nagios-plugins dest=/usr/local/nagios/libexec state=link

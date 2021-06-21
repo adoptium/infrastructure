@@ -16,11 +16,11 @@ doc:
     - '**/*.md'
 Vagrant:
     - ansible/pbTestScripts/**/*
-    - ansible/Vagrantfile*
+    - ansible/vagrant/Vagrantfile*
 pbTests:
     - ansible/pbTestScripts/**/*
 docker:
-    - ansible/Dockerfile*
+    - ansible/docker/Dockerfile*
 ansible:
     - ansible/playbooks/**/*
     - ansible/plugins/**/*

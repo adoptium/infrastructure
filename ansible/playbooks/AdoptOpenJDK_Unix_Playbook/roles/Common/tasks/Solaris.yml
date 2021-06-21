@@ -15,24 +15,45 @@
   tags:
     - build_tools
 
-- name: Fetch CSWpkgutil.pkg
+- name: Fetch CSWpkgutil.pkg (x64)
   copy:
     src: files/CSWpkgutil.pkg
     dest: /tmp/CSWpkgutil.pkg
     force: yes
-  when: pkgutil_installed.rc != 0
+  when:
+    - pkgutil_installed.rc != 0
+    - ansible_architecture == "i386"
   tags: build_tools
 
-- name: Install pkgutil
+- name: Install pkgutil (x64)
   shell: |
     yes | pkgadd -d /tmp/CSWpkgutil.pkg CSWpkgutil
     /opt/csw/bin/pkgutil -U
-  when: pkgutil_installed.rc != 0
+  when:
+    - pkgutil_installed.rc != 0
+    - ansible_architecture == "i386"
+  tags: build_tools
+
+# The ansible copy command does not work at this point because it can't find source in the default shell
+- name: Install pkgutil (sparcv9)
+  shell: |
+    yes | pkgadd -d http://get.opencsw.org/now CSWpkgutil
+    /opt/csw/bin/pkgutil -U
+  when:
+    - pkgutil_installed.rc != 0
+    - ansible_architecture == "sun4v"
   tags: build_tools
 
 - name: Install Build Tool Packages
   pkgutil: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Packages }}"
+  tags: build_tools
+
+- name: Install additional build tools for x64
+  pkgutil: "name={{ item }} state=present"
+  with_items: "{{ Additional_Build_Tools_x64 }}"
+  when:
+    - ansible_architecture == "i386"
   tags: build_tools
 
 - name: Check if Solaris Studio 12.3 is installed
@@ -44,9 +65,33 @@
     - solaris_studio
     - adoptopenjdk
 
+- name: Setting Solaris Studio variables (x64)
+  set_fact:
+    SolarisStudioArch: "x86"
+    DownloadURL: "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}"
+  when:
+    - not solaris_studio.stat.exists
+    - ansible_architecture == "i386"
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
+- name: Setting Solaris Studio variables (sparcv9)
+  set_fact:
+    SolarisStudioArch: "sparc"
+    DownloadURL: "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiosparc/SolarisStudio12.3-solaris-sparc-pkg.tar.bz2?{{ SolarisStudio12_solaris_sparc_SAS_TOKEN }}"
+  when:
+    - not solaris_studio.stat.exists
+    - ansible_architecture == "sun4v"
+  tags:
+    - build_tools
+    - solaris_studio
+    - adoptopenjdk
+
 - name: Check if Solaris Studio 12.3 is downloaded
   stat:
-    path: /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
+    path: "/tmp/SolarisStudio12.3-solaris-{{ SolarisStudioArch }}-pkg.tar.bz2"
   register: solaris_studio_downloaded
   when: not solaris_studio.stat.exists
   tags:
@@ -57,7 +102,7 @@
 # Stored in Azure Blob Storage (SAS URL set to expire in 2030)
 - name: Download Solaris Studio 12.3
   # Original file is at https://www.oracle.com/tools/developerstudio/downloads/solaris-studio-v123-downloads.html
-  command: wget "https://ansiblestorageadopt.blob.core.windows.net/solarisstudiox64/SolarisStudio12.3-solaris-x86-pkg.tar.bz2?{{ SolarisStudio12_solaris_x86_SAS_TOKEN }}" -O /tmp/SolarisStudio12.3-solaris-x86-pkg.tar.bz2
+  command: wget "{{ DownloadURL }}" -O /tmp/SolarisStudio12.3-solaris-{{ SolarisStudioArch }}-pkg.tar.bz2
   when: not solaris_studio.stat.exists and not solaris_studio_downloaded.stat.exists
   tags:
     - build_tools
@@ -66,8 +111,7 @@
 
 - name: Extract Solaris Studio 12.3
   shell: |
-    set -o pipefail
-    bzcat SolarisStudio12.3-solaris-x86-pkg.tar.bz2 | /bin/tar -xf -
+    bzcat SolarisStudio12.3-solaris-{{ SolarisStudioArch }}-pkg.tar.bz2 | /bin/tar -xf -
   args:
     chdir: /tmp
   tags:
@@ -77,7 +121,7 @@
   when: not solaris_studio.stat.exists
 
 - name: Install Solaris Studio 12.3
-  shell: ./SolarisStudio12.3-solaris-x86-pkg/solarisstudio.sh --non-interactive
+  shell: ./SolarisStudio12.3-solaris-{{ SolarisStudioArch }}-pkg/solarisstudio.sh --non-interactive
   args:
     chdir: /tmp
   tags:
@@ -85,6 +129,34 @@
     - solaris_studio
     - adoptopenjdk
   when: not solaris_studio.stat.exists
+
+# The freetype provided by pkgutil isn't detected by the openjdk configure stage. Use the one provided below instead
+- name: Check if freetype is installed (sparcv9)
+  stat:
+    path: /usr/local/include/freetype2
+  register: freetype_installed
+  when: ansible_architecture == "sun4v"
+  tags:
+    - build_tools
+    - freetype
+
+- name: Download freetype (sparcv9)
+  command: wget https://www.ibiblio.org/pub/packages/solaris/sparc/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg -O /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
+  when:
+    - ansible_architecture == "sun4v"
+    - not freetype_installed.stat.exists
+  tags:
+    - build_tools
+    - freetype
+
+- name: Install freetype (sparcv9)
+  shell: yes a | /opt/csw/bin/pkgutil -iy /tmp/freetype.2.4.9.SPARC.64bit.Solaris.10.pkg
+  when:
+    - ansible_architecture == "sun4v"
+    - not freetype_installed.stat.exists
+  tags:
+    - build_tools
+    - freetype
 
 - name: Check if cups is installed
   stat:
@@ -102,7 +174,7 @@
     - cups
 
 - name: Extract cups 1.4.4
-  shell: tar -xf cups-1.4.4-source.tar.gz
+  shell: gzip -cd cups-1.4.4-source.tar.gz | tar xpf -
   args:
     chdir: /tmp
   when: not cups_installed.stat.exists
@@ -123,6 +195,37 @@
     - build_tools
     - cups
 
+# On Sparc we (for an unknown reason) have to provide the source as an additional configure argument. I only ever managed to get configure to successfully work with the combination of both CUPS versions
+- name: Check if cups-1.5.4-source is present (sparcv9)
+  stat:
+    path: /usr/local/cups-1.5.4-src
+  register: cups_src
+  tags:
+    - build_tools
+    - cups
+
+- name: Download cups-1.5.4-source (sparcv9)
+  command: wget https://github.com/apple/cups/releases/download/release-1.5.4/cups-1.5.4-source.tar.gz -O /tmp/cups-1.5.4-source.tar.gz
+  when:
+    - ansible_architecture == "sun4v"
+    - not cups_src.stat.exists
+  tags:
+    - build_tools
+    - cups
+
+- name: Extract cups-1.5.4-source
+  shell: |
+    gzip -cd /tmp/cups-1.5.4-source.tar.gz | tar xpf -
+    mv /usr/local/cups-1.5.4 /usr/local/cups-1.5.4-src
+  args:
+    chdir: /usr/local/
+  when:
+    - ansible_architecture == "sun4v"
+    - not cups_src.stat.exists
+  tags:
+    - build_tools
+    - cups
+
 - name: Create symlinks
   file:
     src: /opt/csw/bin/g{{ item }}
@@ -135,6 +238,17 @@
     - make
     - sha256sum
   tags: build_tools
+
+# Fixes: GConf Error: Failed to launch configuration server: Failed to execute child process "/usr/lib/sparcv9/gconfd-2" (No such file or directory)
+- name: Create symlinks gconfd-2
+  file:
+    src: /usr/lib/gconfd-2
+    dest: /usr/lib/sparcv9/gconfd-2
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_architecture == "sun4v"
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"

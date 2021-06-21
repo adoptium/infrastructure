@@ -3,12 +3,6 @@
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on AIX #
 ####################################################################
 
-###########################################################################
-# License Information:                                                    #
-# Nagios core and its plugins are lincesed under GPL                      #
-# For more information please see: https://www.nagios.com/legal/licenses/ #
-###########################################################################
-
 - debug: msg='Installing Nagios plugins'
 ##########
 # Layout #

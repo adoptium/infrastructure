@@ -46,6 +46,7 @@ Build_Tool_Packages:
   - perl-GD
   - perl-libwww-perl
   - perl-Time-HiRes
+  - pigz
   - systemtap-sdt-devel
   - unzip
   - wget

@@ -86,7 +86,7 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
-    - ansible_distribution_major_version != "20"
+    - not (ansible_distribution_major_version >= "20")
   tags: build_tools
 
 - name: Install additional build tools for x86
@@ -117,6 +117,13 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
+- name: Install additional build tools for x86
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_armv7l }}"
+  when:
+    - ansible_architecture == "armv7l"
+  tags: build_tools
+
 #########################
 # Additional Test Tools #
 #########################
@@ -132,6 +139,13 @@
   with_items: "{{ Additional_Packages_Ubuntu16 }}"
   when:
     - ansible_distribution_major_version == "16"
+
+- name: Install additional Packages specific to Ubuntu 16 (Not armv7l)
+  package: "name={{ item }} state=latest"
+  with_items: openjdk-7-jdk
+  when:
+    - ansible_distribution_major_version == "16"
+    - ansible_architecture != "armv7l"
 
 - name: Install additional Packages specific to Ubuntu 18
   package: "name={{ item }} state=latest"

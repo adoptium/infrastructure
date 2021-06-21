@@ -12,6 +12,7 @@ Build_Tool_Packages:
   - ggrep
   - jdk7
   - jdk8
+  - openssh # needed to clone from GitHub via ssh - https://github.com/adoptium/infrastructure/pull/2220
   - pigz
   - git
   - sudo
@@ -19,10 +20,13 @@ Build_Tool_Packages:
   - ntp
   - wget
   - curl
-  - freetype
   - gmake
   - gtar
   - xz
+  - zip
+
+Additional_Build_Tools_x64:
+  - freetype
 
 Test_Tool_Packages:
   - perl
