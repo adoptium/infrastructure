@@ -56,4 +56,4 @@ jobs:
       run: |
         cd ansible
         export ANSIBLE_CONFIG=./ansible.cfg
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,MSVS_2019,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -b --skip-tags adoptopenjdk,jenkins,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
