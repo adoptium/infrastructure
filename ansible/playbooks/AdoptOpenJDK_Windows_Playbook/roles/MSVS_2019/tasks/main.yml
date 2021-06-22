@@ -48,4 +48,6 @@
     reboot_timeout: 1800
     shutdown_timeout: 1800
   when: (not vs2019_installed.stat.exists)
-  tags: MSVS_2019
+  tags:
+    - MSVS_2019
+    - reboot

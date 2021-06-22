@@ -41,4 +41,6 @@
     reboot_timeout: 1800
     shutdown_timeout: 1800
   when: (not vs2017_installed.stat.exists)
-  tags: MSVS_2017
+  tags:
+    - MSVS_2017
+    - reboot
