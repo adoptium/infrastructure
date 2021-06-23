@@ -143,7 +143,7 @@ checkVagrantOS()
 {
         local vagrantOSList
         if [[ "$newVagrantFiles" = "true" ]]; then
-                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
+                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible/vagrant
         else    
                 cd ${scriptPath%/*}/..
         fi
