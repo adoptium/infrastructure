@@ -10,6 +10,7 @@
   tags: ntp_time
 
 - name: Ensure systemd-timesyncd service is disabled
+  ignore_errors: true
   service:
     name: systemd-timesyncd
     enabled: no
