@@ -10,9 +10,9 @@ else
 fi
 
 mkdir -p $HOME/testLocation
-[ ! -d $HOME/testLocation/openjdk-tests ] && git clone https://github.com/adoptopenjdk/openjdk-tests $HOME/testLocation/openjdk-tests
-$HOME/testLocation/openjdk-tests/get.sh -t $HOME/testLocation/openjdk-tests
-cd $HOME/testLocation/openjdk-tests/TKG || exit 1
+[ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
+$HOME/testLocation/aqa-tests/get.sh -t $HOME/testLocation/aqa-tests
+cd $HOME/testLocation/aqa-tests/TKG || exit 1
 export BUILD_LIST=functional
 $MAKE_COMMAND compile
 # Runs this test to check for prerequisite perl modules
