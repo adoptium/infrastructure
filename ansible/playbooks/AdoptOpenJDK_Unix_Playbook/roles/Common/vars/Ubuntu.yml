@@ -15,6 +15,7 @@ Build_Tool_Packages:
   - g++
   - gcc
   - gettext
+  - git
   - libasound2-dev
   - libcups2-dev
   - libcurl4-openssl-dev
@@ -100,6 +101,10 @@ Additional_Build_Tools_aarch64:
 Additional_Build_Tools_armv7l:
   - gcc-7                         # Needed as pre-built version causes crashes
   - g++-7                         # Needed as pre-built version causes crashes
+
+Additional_Build_Tools_Ubuntu20+:
+  - cmake
+  - ccache
 
 Test_Tool_Packages:
   - acl
