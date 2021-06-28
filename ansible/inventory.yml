@@ -96,6 +96,9 @@ hosts:
       - scaleway:
           ubuntu1604-armv7-1: {ip: 51.158.73.136}
 
+      - skytap:
+          ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
+
   - dockerhost:
 
       - equinix:
@@ -182,6 +185,9 @@ hosts:
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
+
+      - skytap:
+          ubuntu2004-ppc64le-1: {ip: 20.61.136.210}
 
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}

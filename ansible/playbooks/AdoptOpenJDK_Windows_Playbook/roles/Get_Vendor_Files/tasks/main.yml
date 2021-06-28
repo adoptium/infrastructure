@@ -24,7 +24,7 @@
   run_once: true
 
 - name: Generate list of remote vendor_files
-  command: dotgpg cat {{ item }}
+  raw: dotgpg cat {{ item }}
   delegate_to: localhost
   register: remote_vendor_files_list
   when:
