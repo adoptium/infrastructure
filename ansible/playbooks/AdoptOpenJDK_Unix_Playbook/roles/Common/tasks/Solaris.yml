@@ -15,33 +15,13 @@
   tags:
     - build_tools
 
-- name: Fetch CSWpkgutil.pkg (x64)
-  copy:
-    src: files/CSWpkgutil.pkg
-    dest: /tmp/CSWpkgutil.pkg
-    force: yes
-  when:
-    - pkgutil_installed.rc != 0
-    - ansible_architecture == "i386"
-  tags: build_tools
-
-- name: Install pkgutil (x64)
-  shell: |
-    yes | pkgadd -d /tmp/CSWpkgutil.pkg CSWpkgutil
-    /opt/csw/bin/pkgutil -U
-  when:
-    - pkgutil_installed.rc != 0
-    - ansible_architecture == "i386"
-  tags: build_tools
-
 # The ansible copy command does not work at this point because it can't find source in the default shell
-- name: Install pkgutil (sparcv9)
+- name: Install pkgutil
   shell: |
     yes | pkgadd -d http://get.opencsw.org/now CSWpkgutil
     /opt/csw/bin/pkgutil -U
   when:
     - pkgutil_installed.rc != 0
-    - ansible_architecture == "sun4v"
   tags: build_tools
 
 - name: Install Build Tool Packages
