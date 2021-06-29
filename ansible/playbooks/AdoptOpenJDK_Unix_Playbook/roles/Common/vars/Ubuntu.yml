@@ -102,7 +102,7 @@ Additional_Build_Tools_armv7l:
   - gcc-7                         # Needed as pre-built version causes crashes
   - g++-7                         # Needed as pre-built version causes crashes
 
-Additional_Build_Tools_Ubuntu20+:
+Additional_Build_Tools_Ubuntu20:
   - cmake
   - ccache
 
