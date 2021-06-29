@@ -9,6 +9,7 @@
 
 - name: Check if ccache is already installed
   shell: ccache --version >/dev/null
+  ignore_errors: yes
   register: ccache_status
   tags: ccache
 
