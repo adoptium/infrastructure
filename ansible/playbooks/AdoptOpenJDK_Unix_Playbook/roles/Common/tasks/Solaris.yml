@@ -229,6 +229,16 @@
     state: link
   when:
     - ansible_architecture == "sun4v"
+ 
+- name: Create symlinks gconfd-2
+  file:
+    src: /usr/lib/gconfd-2
+    dest: /usr/lib/amd64/gconfd-2
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_architecture == "i386"
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"
