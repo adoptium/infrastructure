@@ -229,7 +229,7 @@
     state: link
   when:
     - ansible_architecture == "sun4v"
- 
+
 - name: Create symlinks gconfd-2
   file:
     src: /usr/lib/gconfd-2
