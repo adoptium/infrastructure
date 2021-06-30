@@ -220,7 +220,12 @@
   tags: build_tools
 
 # Fixes: GConf Error: Failed to launch configuration server: Failed to execute child process "/usr/lib/sparcv9/gconfd-2" (No such file or directory)
-- name: Create symlinks gconfd-2
+- name: Check if cups is installed
+  stat:
+    path: /opt/csw/libexec/gconfd-2
+  register: gconfd-2_installed
+    
+- name: Create symlinks gconfd-2 (sparcv9)
   file:
     src: /usr/lib/gconfd-2
     dest: /usr/lib/sparcv9/gconfd-2
@@ -230,7 +235,7 @@
   when:
     - ansible_architecture == "sun4v"
 
-- name: Create symlinks gconfd-2
+- name: Create symlinks gconfd-2 (x64)
   file:
     src: /usr/lib/gconfd-2
     dest: /usr/lib/amd64/gconfd-2
@@ -239,6 +244,18 @@
     state: link
   when:
     - ansible_architecture == "i386"
+    - not cups_installed.stat.exists
+
+- name: Create symlinks gconfd-2 (x64)
+  file:
+    src: /opt/csw/libexec/gconfd-2
+    dest: /usr/lib/amd64/gconfd-2
+    owner: root
+    group: root
+    state: link
+  when:
+    - ansible_architecture == "i386"
+    - cups_installed.stat.exists
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"
