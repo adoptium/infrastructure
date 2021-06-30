@@ -220,7 +220,7 @@
   tags: build_tools
 
 # Fixes: GConf Error: Failed to launch configuration server: Failed to execute child process "/usr/lib/sparcv9/gconfd-2" (No such file or directory)
-- name: Check if cups is installed
+- name: Check if gconfd-2 is in /opt/csw/libexec/
   stat:
     path: /opt/csw/libexec/gconfd-2
   register: gconfd-2_installed
