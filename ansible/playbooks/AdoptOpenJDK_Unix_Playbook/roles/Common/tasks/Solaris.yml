@@ -244,7 +244,7 @@
     state: link
   when:
     - ansible_architecture == "i386"
-    - not cups_installed.stat.exists
+    - not gconfd-2_installed.stat.exists
 
 - name: Create symlinks gconfd-2 (x64)
   file:
@@ -255,7 +255,7 @@
     state: link
   when:
     - ansible_architecture == "i386"
-    - cups_installed.stat.exists
+    - gconfd-2_installed.stat.exists
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"
