@@ -1,0 +1,39 @@
+###########
+# BootJDK #
+###########
+---
+- name: Check for jdk {{ jdk }} availability
+  stat:
+    path: /usr/java{{ jdk }}_64
+  register: java_installed
+
+- name: Transfer and Extract AdoptOpenJDK {{ jdk }}
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /usr
+    remote_src: yes
+  when: java_installed.stat.isdir is not defined
+
+- name: Find java {{ jdk }} directory
+  find:
+    file_type: directory
+    paths: /usr
+    patterns: 'jdk-{{ jdk }}*'
+  when: java_installed.stat.isdir is not defined
+  register: java_directory
+
+- name: Symlink to java{{ jdk }}_64
+  file:
+    src: "{{ item.path }}"
+    dest: /usr/java{{ jdk }}_64
+    state: link
+  with_items:
+    - "{{ java_directory.files }}"
+  when: java_installed.stat.isdir is not defined
+
+- name: Setting Java 8 as default
+  file:
+    src: /usr/java8_64/jre/bin/java
+    dest: /usr/bin/java
+    state: link
+  when: jdk == 8
