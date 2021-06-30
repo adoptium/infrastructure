@@ -8,15 +8,15 @@
   tags: ccache
 
 - name: Check if ccache is already installed
-  stat:
-    path: /usr/local/bin/ccache
+  shell: ccache --version >/dev/null
+  ignore_errors: yes
   register: ccache_status
   tags: ccache
 
 - name: Download ccache.tar.gz
   command: wget -O /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v{{ ccacheVersion }}/ccache-{{ ccacheVersion }}.tar.gz
     warn=False
-  when: ccache_status.stat.isdir is not defined
+  when: ccache_status.rc != 0
   tags: ccache
 
 - name: Extract ccache
@@ -24,20 +24,20 @@
     src: /tmp/ccache.tar.gz
     dest: /tmp
     copy: False
-  when: ccache_status.stat.isdir is not defined
+  when: ccache_status.rc != 0
   tags: ccache
 
 - name: Running ./configure & make for CCACHE
   shell: cd /tmp/ccache-{{ ccacheVersion }} && ./configure && make clean && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - ccache_status.stat.isdir is not defined
+    - ccache_status.rc != 0
     - ansible_distribution != "FreeBSD"
   tags: ccache
 
 - name: Running ./configure & make for CCACHE for FreeBSD
   shell: cd /tmp/ccache-{{ ccacheVersion }} && ./configure && make -j {{ ansible_processor_vcpus }} && gmake install
   when:
-    - ccache_status.stat.isdir is not defined
+    - ccache_status.rc != 0
     - ansible_distribution == "FreeBSD"
   tags: ccache
 

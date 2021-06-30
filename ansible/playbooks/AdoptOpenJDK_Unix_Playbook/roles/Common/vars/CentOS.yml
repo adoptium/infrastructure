@@ -61,12 +61,16 @@ gcc48_devtoolset_compiler:
 
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
+  - cacche
 
 Additional_Build_Tools_CentOS8:
   - glibc-locale-source
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
   - glibc-langpack-zh             # required for creating Chinese locales
+  - git
+  - cmake
+  - ccache
 
 Additional_Build_Tools_NOT_CentOS8:
   - lbzip2
