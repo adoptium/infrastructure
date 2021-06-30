@@ -223,7 +223,7 @@
 - name: Check if gconfd-2 is in /opt/csw/libexec/
   stat:
     path: /opt/csw/libexec/gconfd-2
-  register: gconfd-2_installed
+  register: gconfd_2_installed
 
 - name: Create symlinks gconfd-2 (sparcv9)
   file:
@@ -244,7 +244,7 @@
     state: link
   when:
     - ansible_architecture == "i386"
-    - not gconfd-2_installed.stat.exists
+    - not gconfd_2_installed.stat.exists
 
 - name: Create symlinks gconfd-2 (x64)
   file:
@@ -255,7 +255,7 @@
     state: link
   when:
     - ansible_architecture == "i386"
-    - gconfd-2_installed.stat.exists
+    - gconfd_2_installed.stat.exists
 
 - name: Install Test Tool Packages
   pkgutil: "name={{ item }} state=present"
