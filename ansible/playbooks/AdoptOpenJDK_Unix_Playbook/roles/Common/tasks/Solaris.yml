@@ -224,7 +224,7 @@
   stat:
     path: /opt/csw/libexec/gconfd-2
   register: gconfd-2_installed
-    
+
 - name: Create symlinks gconfd-2 (sparcv9)
   file:
     src: /usr/lib/gconfd-2
