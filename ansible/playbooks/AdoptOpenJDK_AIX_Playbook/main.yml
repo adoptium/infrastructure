@@ -93,10 +93,6 @@
     - role: bootjdk
       jdk: 16
       tags: bootjdk16
-    # - bootjdk8
-    # - bootjdk10
-    # - bootjdk11
-    # - bootjdk16
 
     # 7. Modify /etc/hosts file to include ipv4 address and fqdn
 
