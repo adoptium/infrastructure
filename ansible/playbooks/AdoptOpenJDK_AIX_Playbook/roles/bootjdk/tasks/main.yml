@@ -20,7 +20,7 @@
     file_type: directory
     paths: /usr
     patterns: 'jdk8u*'
-  when: 
+  when:
     - java_installed.stat.isdir is not defined
     - jdk == 8
   register: java8_directory
@@ -30,7 +30,7 @@
     file_type: directory
     paths: /usr
     patterns: 'jdk-{{ jdk }}*'
-  when: 
+  when:
     - java_installed.stat.isdir is not defined
     - jdk != 8
   register: java_directory
@@ -43,7 +43,7 @@
     state: link
   with_items:
     - "{{ java8_directory.files }}"
-  when: 
+  when:
     - java_installed.stat.isdir is not defined
     - jdk == 8
 
@@ -54,7 +54,7 @@
     state: link
   with_items:
     - "{{ java_directory.files }}"
-  when: 
+  when:
     - java_installed.stat.isdir is not defined
     - jdk != 8
 
