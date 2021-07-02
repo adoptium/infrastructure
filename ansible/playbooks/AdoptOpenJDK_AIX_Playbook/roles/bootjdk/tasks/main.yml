@@ -14,13 +14,38 @@
     remote_src: yes
   when: java_installed.stat.isdir is not defined
 
-- name: Find java {{ jdk }} directory
+# jdk8 directories do not have a hyphen
+- name: Find java 8 directory
+  find:
+    file_type: directory
+    paths: /usr
+    patterns: 'jdk8u*'
+  when: 
+    - java_installed.stat.isdir is not defined
+    - jdk == 8
+  register: java8_directory
+
+- name: Find java directory
   find:
     file_type: directory
     paths: /usr
     patterns: 'jdk-{{ jdk }}*'
-  when: java_installed.stat.isdir is not defined
+  when: 
+    - java_installed.stat.isdir is not defined
+    - jdk != 8
   register: java_directory
+
+# For jdk8
+- name: Symlink to java8_64
+  file:
+    src: "{{ item.path }}"
+    dest: /usr/java8_64
+    state: link
+  with_items:
+    - "{{ java8_directory.files }}"
+  when: 
+    - java_installed.stat.isdir is not defined
+    - jdk == 8
 
 - name: Symlink to java{{ jdk }}_64
   file:
@@ -29,7 +54,9 @@
     state: link
   with_items:
     - "{{ java_directory.files }}"
-  when: java_installed.stat.isdir is not defined
+  when: 
+    - java_installed.stat.isdir is not defined
+    - jdk != 8
 
 - name: Setting Java 8 as default
   file:

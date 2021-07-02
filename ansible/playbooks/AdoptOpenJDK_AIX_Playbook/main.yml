@@ -81,16 +81,16 @@
     # 6. Install OJDK Bootstraps
 
     - bootjdk7
-    - bootjdk
+    - role: bootjdk
       jdk: 8
       tags: bootjdk8
-    - bootjdk
+    - role: bootjdk
       jdk: 10
       tags: bootjdk10
-    - bootjdk
+    - role: bootjdk
       jdk: 11
       tags: bootjdk11
-    - bootjdk
+    - role: bootjdk
       jdk: 16
       tags: bootjdk16
     # - bootjdk8
