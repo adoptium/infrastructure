@@ -1,12 +1,8 @@
 # Infrastructure
 
-## Build Status
-
-[![Build Status](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure.svg?branch=master)](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure)
-
 ## Mission Statement
 
-To provide infrastructure for the AdoptOpenJDK farm that is:
+To provide infrastructure for the Adoptium farm that is:
 
 * **Secure** - Infrastructure is private by default and access is granted in a
 time and access control limited manner.
@@ -81,6 +77,11 @@ This team is the starting point for new members.
 People in this team can take ownership of issues but do not have the
 privileges to merge pull requests.  In general new people in the team will
 go into this group for a while before being granted additional access.
+
+## Infrastructure Providers
+The Adoptium project is proud to receive contributions from many companies, both in the form of monetary contributions in exchange for membership or in-kind contributions for required resources. The Infrastructure collaborates with the following companies who contribute various kinds of cloud and physical hardware to the Adoptium project.
+
+![infra_providers](https://user-images.githubusercontent.com/20224954/121200193-74b4e480-c86b-11eb-8ec1-5c183501a1cd.png)
 
 ### Host Information
 
