@@ -61,7 +61,7 @@ gcc48_devtoolset_compiler:
 
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
-  - cacche
+  - ccache
 
 Additional_Build_Tools_CentOS8:
   - glibc-locale-source
