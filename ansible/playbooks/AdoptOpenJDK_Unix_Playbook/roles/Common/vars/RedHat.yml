@@ -25,6 +25,7 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - libatomic                     # Needed for RISC-V cross compilation
   - libcurl-devel
   - libffi-devel
   - libpng-devel

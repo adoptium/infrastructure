@@ -27,6 +27,7 @@ Build_Tool_Packages:
   - glibc-devel
   - gmp-devel
   - java-1.8.0-openjdk-devel
+  - libatomic                     # Needed for RISC-V cross compilation
   - libcurl-devel
   - libpng-devel
   - libXext-devel
