@@ -147,12 +147,6 @@
   when:
     - ansible_distribution_major_version == "16"
 
-- name: Install additional Packages specific to Ubuntu 16 (Not armv7l)
-  package: "name=openjdk-7-jdk state=latest"
-  when:
-    - ansible_distribution_major_version == "16"
-    - ansible_architecture != "armv7l"
-
 - name: Install additional Packages specific to Ubuntu 18
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Packages_Ubuntu18 }}"
