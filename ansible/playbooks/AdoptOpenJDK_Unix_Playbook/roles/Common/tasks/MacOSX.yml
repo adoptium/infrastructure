@@ -136,6 +136,20 @@
   with_items: "{{ Test_Tool_Casks }}"
   tags: test_tools
 
+# Used for JCK printer tests
+- name: Check if PDFwriter is installed
+  stat:
+    path: /Users/Shared/PDFwriter/
+  register: pdfwriter
+
+- name: Download PDFwriter
+  command: wget https://github.com/rodyager/RWTS-PDFwriter/releases/download/v1.0.1/RWTS-PDFwriter.pkg
+  when: not pdfwriter.stat.exists
+
+- name: Install PDFwriter
+  command: installer -pkg ./RWTS-PDFwriter.pkg -target /
+  when: not pdfwriter.stat.exists
+
 # As per https://github.com/eclipse/openj9/issues/3790
 - name: Creating /etc/sysctl.conf for kernel tunings
   file:
