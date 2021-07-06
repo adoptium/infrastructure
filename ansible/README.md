@@ -186,10 +186,6 @@ are run on jenkins in the
 
 Any additional help in setting up Vagrant with Virtualbox can be found [here](https://www.vagrantup.com/intro/getting-started/index.html)
 
-## Vagrant setup guide - Windows
-
-To test the ansible scripts, you'll need to install Vagrant and Virtualbox from [here](https://www.vagrantup.com/intro/getting-started/index.html)
-
 ## Vagrant setup guide - macOS
 
 To test the ansible scripts, you'll need to install the following programs.
@@ -215,6 +211,10 @@ If you're on Ubuntu we have a playbook that can be used to set up your
 machine to run vagrant in [playbooks/vagrant.yml](playbooks/vagrant.yml) but
 it simply installs Vagrant from https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
 and also [virtualbox from their web site](https://www.virtualbox.org/wiki/Downloads)
+
+## Vagrant setup guide - Windows
+
+To test the ansible scripts, you'll need to install Vagrant and Virtualbox from [here](https://www.vagrantup.com/intro/getting-started/index.html)
 
 ## Executing under vagrant
 
@@ -267,7 +267,12 @@ vagrant ssh # Uses default ssh login, user=vagrant, password=vagrant
 ```
 3) Install Ansible 2.4 or later (see beginning of the README)
 
-You should now be able to run a playbook using Vagrant.
+You should now be able to navigate to the correct directory using:
+
+```bash
+cd /vagrant/playbooks
+```
+and run a playbook using Vagrant.
 
 ## Using Ansible to modify Vagrant VM remote hosts (linux)
 
