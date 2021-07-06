@@ -68,7 +68,7 @@
     - ansible_host != "127.0.0.1"
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
-  
+
 - name: Update /etc/hosts file - IP FQDN hostname
   lineinfile:
     dest: /etc/hosts
