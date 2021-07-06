@@ -216,7 +216,7 @@ and also [virtualbox from their web site](https://www.virtualbox.org/wiki/Downlo
 
 To test the ansible scripts, you'll need to install Vagrant and Virtualbox from [here](https://www.vagrantup.com/intro/getting-started/index.html)
 
-## Executing under vagrant
+## Executing under vagrant (Linux/MacOS X)
 
 To test the ansible scripts you can set up a Virtual Machine isolated from your own host system.
 Several `Vagrantfile`s have been provided and the usual `vagrant` commands should get it up and running.
@@ -256,16 +256,25 @@ ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zul
 
 ## Executing under vagrant (Windows)
 
-Ansible cannot be installed on a Windows machine, so you should boot a Linux VM using Vagrant and install it there instead:
-1) Copy a Linux Vagrantfile from  the `openjdk-infrastructure/ansible/vagrant` directory into the `openjdk-infrastructure/ansible` directory, and save it without an extension.
-2) Within the `openjdk-infrastructure/ansible` directory:
+Ansible cannot be installed on a Windows machine, so you should boot a Linux VM using Vagrant and install it there instead.
+
+Within the `openjdk-infrastructure/ansible` directory:
+
+1) Copy a Linux Vagrantfile from  the `openjdk-infrastructure/ansible/vagrant` directory into the `openjdk-infrastructure/ansible` directory, and save it without an extension, for example:
+
+```bash
+copy .\vagrant\Vagrantfile.CentOS7 .
+
+ren Vagrantfile.CentOS7 Vagrantfile
+```
+2) Start up and use the VM:
 
 ```bash
 vagrant up
 
 vagrant ssh # Uses default ssh login, user=vagrant, password=vagrant
 ```
-3) Install Ansible 2.4 or later (see beginning of the README)
+3) Install Ansible 2.4 or later (see beginning of the README).
 
 You should now be able to navigate to the correct directory using:
 
