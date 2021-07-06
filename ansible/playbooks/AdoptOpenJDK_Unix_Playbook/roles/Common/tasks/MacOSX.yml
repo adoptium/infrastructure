@@ -129,26 +129,29 @@
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
-- name: Install Test Tool Casks
+- name: Install JCK Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
   homebrew_cask: "name={{ item }} state=present"
-  with_items: "{{ Test_Tool_Casks }}"
-  tags: test_tools
+  with_items: "{{ JCK_Tool_Casks }}"
+  tags: jck_tools
 
 # Used for JCK printer tests
 - name: Check if PDFwriter is installed
   stat:
     path: /Users/Shared/PDFwriter/
   register: pdfwriter
+  tags: jck_tools
 
 - name: Download PDFwriter
   command: wget https://github.com/rodyager/RWTS-PDFwriter/releases/download/v1.0.1/RWTS-PDFwriter.pkg
   when: not pdfwriter.stat.exists
+  tags: jck_tools
 
 - name: Install PDFwriter
   command: installer -pkg ./RWTS-PDFwriter.pkg -target /
   when: not pdfwriter.stat.exists
+  tags: jck_tools
 
 # As per https://github.com/eclipse/openj9/issues/3790
 - name: Creating /etc/sysctl.conf for kernel tunings
