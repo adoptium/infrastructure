@@ -243,6 +243,13 @@ startVMPlaybook()
 		exit 1
 	fi
 
+	if [ "$OS" == "Solaris10" ]; then
+		# Remove IP from known_hosts as the playbook installs an
+		# alternate sshd which regenerates the host key infra#2244
+		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
+		ssh_args="$ssh_args -o StrictHostKeyChecking=no"
+	fi
+
 	if [[ "$testNativeBuild" = true ]]; then
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
 
