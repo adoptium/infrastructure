@@ -8,33 +8,33 @@
   gather_facts: yes
   tasks:
     - block:
-      - name: Load AdoptOpenJDKs variable file
-        include_vars: group_vars/all/adoptopenjdk_variables.yml
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
 
-      - name: Set hostname to jckservices.adoptium.net
-        hostname:
-          name: jckservices.adoptium.net
-        tags: hostname
+        - name: Set hostname to jckservices.adoptium.net
+          hostname:
+            name: jckservices.adoptium.net
+          tags: hostname
 
-      - name: OS update -- apt-get upgrade
-        apt: upgrade=safe update_cache=yes
-        tags: patch_update
+        - name: OS update -- apt-get upgrade
+          apt: upgrade=safe update_cache=yes
+          tags: patch_update
 
-      - name: Install JCK prerequisistes
-        apt: pkg={{ item }} state=latest
-        with_items:
-          - ant
-          - ftpd
-          - gcc
-          - tomcat9
-          - unzip
-        tags: dependencies
+        - name: Install JCK prerequisistes
+          apt: pkg={{ item }} state=latest
+          with_items:
+            - ant
+            - ftpd
+            - gcc
+            - tomcat9
+            - unzip
+          tags: dependencies
 
-      - name: Start tomcat9 service
-        service:
-          name: tomcat9
-          state: started
-        tags: tomcat
+        - name: Start tomcat9 service
+          service:
+            name: tomcat9
+            state: started
+          tags: tomcat
 
   #########
   # Roles #
