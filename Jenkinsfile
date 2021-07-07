@@ -79,7 +79,7 @@ def dockerManifest() {
             export TARGET="adoptopenjdk/ubuntu1604_build_image"
             ARMV7L=$TARGET:linux-armv7l
             docker manifest create $TARGET $ARMV7L
-            docker manifest annotate $TARGET $ARMV7L --arch armv7l --os linux
+            docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
             docker manifest push $TARGET
         '''
     }
