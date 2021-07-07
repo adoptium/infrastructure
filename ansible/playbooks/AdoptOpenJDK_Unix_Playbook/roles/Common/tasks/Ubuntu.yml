@@ -117,13 +117,6 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
-- name: Install additional build tools for x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_armv7l }}"
-  when:
-    - ansible_architecture == "armv7l"
-  tags: build_tools
-
 - name: Install additional build tools for Ubuntu 20 +
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_Ubuntu20 }}"
