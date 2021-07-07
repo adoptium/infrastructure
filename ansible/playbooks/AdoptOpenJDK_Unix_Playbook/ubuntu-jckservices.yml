@@ -1,0 +1,50 @@
+---
+###############################################
+# AdoptOpenJDK Ansible JCK svcs Playbook for: #
+# -------- Ubuntu 20 (tested on x64) -------- #
+###############################################
+
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - block:
+      - name: Load AdoptOpenJDKs variable file
+        include_vars: group_vars/all/adoptopenjdk_variables.yml
+
+      - name: Set hostname to jckservices.adoptium.net
+        hostname:
+          name: jckservices.adoptium.net
+        tags: hostname
+
+      - name: OS update -- apt-get upgrade
+        apt: upgrade=safe update_cache=yes
+        tags: patch_update
+
+      - name: Install JCK prerequisistes
+        apt: pkg={{ item }} state=latest
+        with_items:
+          - ant
+          - ftpd
+          - gcc
+          - tomcat9
+          - unzip
+        tags: dependencies
+
+      - name: Start tomcat9 service
+        service:
+          name: tomcat9
+          state: started
+        tags: tomcat
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - Debug
+    - role: Get_Vendor_Files
+      tags: [vendor_files, adoptopenjdk, jenkins_user]
+    - role: FTP_User
+      tags: ftp_user
+    - role: Kerberos
+      tags: kerberos
+    - Crontab

@@ -1,0 +1,14 @@
+---
+############
+# FTP User #
+############
+- name: Create FTP user with password
+  action: user name="{{ jckftp_Username }}" shell=/bin/false password="{{ jckftp_Passwd }}" state=present
+
+- name: Create file for FTP access
+  copy:
+    content: ""
+    dest: "/home/{{ jckftp_Username }}/filename.txt"
+    force: no
+    owner: "{{ jckftp_Username }}"
+    mode: 0755
