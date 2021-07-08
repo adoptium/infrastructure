@@ -36,7 +36,7 @@
 - name: Setup iptables
   iptables:
     chain: INPUT
-    source: {{item}}
+    source: "{{ items }}"
     jump: ACCEPT
   with_items:
     # List comes from https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml
