@@ -16,26 +16,6 @@
             name: jckservices.adoptium.net
           tags: hostname
 
-        - name: OS update -- apt-get upgrade
-          apt: upgrade=safe update_cache=yes
-          tags: patch_update
-
-        - name: Install JCK prerequisistes
-          apt: pkg={{ item }} state=latest
-          with_items:
-            - ant
-            - ftpd
-            - gcc
-            - tomcat9
-            - unzip
-          tags: dependencies
-
-        - name: Start tomcat9 service
-          service:
-            name: tomcat9
-            state: started
-          tags: tomcat
-
   #########
   # Roles #
   #########
@@ -43,10 +23,12 @@
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins_user]
-    - role: FTP_User
-      tags: ftp_user
+    - role: vsftpd
+      tags: ftp_server
     - role: Kerberos
       tags: kerberos
+    - role: Tomcat
+      tags: tomcat
     - role: jckservices_iptables
       tags: iptables
     - Crontab

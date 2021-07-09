@@ -9,8 +9,13 @@
 
 - name: Setup iptables
   iptables:
+    chain: OUTPUT
+    jump: ACCEPT
+
+- name: Setup iptables
+  iptables:
     chain: INPUT
-    ctstate: ESTABLISHED,RELATED
+    ctstate: NEW,ESTABLISHED,RELATED
     jump: ACCEPT
 
 - name: Setup iptables
@@ -19,24 +24,33 @@
     protocol: icmp
     jump: ACCEPT
 
-- name: Setup iptables 22
+- name: Setup iptables allow 22
   iptables:
     chain: INPUT
     protocol: tcp
     destination_port: 22
     jump: ACCEPT
 
-- name: Setup iptables 80
+- name: Setup iptables allow 80
   iptables:
     chain: INPUT
     protocol: tcp
     destination_port: 80
     jump: ACCEPT
 
-- name: Setup iptables
+- name: Forward port 80 to 8080
+  iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    destination_port: 80
+    jump: REDIRECT
+    to_ports: 8080
+
+- name: Setup iptables to only allow JCK hosts
   iptables:
     chain: INPUT
-    source: "{{ items }}"
+    source: "{{ item }}"
     jump: ACCEPT
   with_items:
     # List comes from https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml
@@ -57,6 +71,7 @@
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
     - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
+
 
 - name: Setup iptables
   iptables:
