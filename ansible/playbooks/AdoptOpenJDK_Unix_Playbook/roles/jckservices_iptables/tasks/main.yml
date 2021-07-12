@@ -15,7 +15,7 @@
 - name: Setup iptables
   iptables:
     chain: INPUT
-    ctstate: NEW,ESTABLISHED,RELATED
+    ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
 
 - name: Setup iptables
@@ -29,6 +29,13 @@
     chain: INPUT
     protocol: tcp
     destination_port: 22
+    jump: ACCEPT
+
+- name: Setup iptables allow 53
+  iptables:
+    chain: INPUT
+    protocol: udp
+    destination_port: 53
     jump: ACCEPT
 
 - name: Setup iptables allow 80
@@ -71,7 +78,6 @@
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
     - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
-
 
 - name: Setup iptables
   iptables:
