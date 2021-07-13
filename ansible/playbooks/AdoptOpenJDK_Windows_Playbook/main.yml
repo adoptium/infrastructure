@@ -73,3 +73,5 @@
     - WiX                         # For creating installers
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
+    - role: Thunderbird
+      tags: [Thunderbird, jck, adoptopenjdk]
