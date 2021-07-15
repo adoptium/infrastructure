@@ -60,7 +60,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
-  when: macos_version.stdout.split('.')[1] > "13"
+  when: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }} is version('10.13', '>')"
   tags:
     - brew_upgrade
 
