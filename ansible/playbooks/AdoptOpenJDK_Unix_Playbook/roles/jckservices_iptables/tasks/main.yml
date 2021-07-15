@@ -7,6 +7,9 @@
   tags:
     - skip_ansible_lint
 
+- name: Clear iptables rules
+  shell: iptables -X && iptables -F
+
 - name: Setup iptables
   iptables:
     chain: OUTPUT
@@ -78,6 +81,8 @@
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
     - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
+    - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
+    - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
 
 - name: Setup iptables
   iptables:
