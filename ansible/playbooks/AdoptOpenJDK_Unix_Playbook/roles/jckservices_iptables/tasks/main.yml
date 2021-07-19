@@ -48,15 +48,6 @@
     destination_port: 80
     jump: ACCEPT
 
-- name: Forward port 80 to 8080
-  iptables:
-    table: nat
-    chain: PREROUTING
-    protocol: tcp
-    destination_port: 80
-    jump: REDIRECT
-    to_ports: 8080
-
 - name: Setup iptables to only allow JCK hosts
   iptables:
     chain: INPUT
