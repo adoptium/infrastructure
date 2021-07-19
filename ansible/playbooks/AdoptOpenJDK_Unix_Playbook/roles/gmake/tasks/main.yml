@@ -7,7 +7,7 @@
 # Check if make is installed in /usr/local/bin/make on CentOS/RHEL on ppc64le,
 # s390x, x86_64, on SLES12 on x86_64 and on Ubuntu14 on x86_64
 # Proceed with downloading and installing make
-# Addresses https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/499
+# Addresses https://github.com/adoptium/infrastructure/issues/499
 # For RHEL 8, use gmake 4.2.1 already installed.
 
 - name: Set make version
@@ -88,7 +88,7 @@
 
 
 # Disabiling updates to system 'make' to ensure the symlink above doesn't break.
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1106
+# See https://github.com/adoptium/infrastructure/issues/1106
 - name: Check if /etc/yum.conf exists
   stat:
     path: /etc/yum.conf

@@ -1,9 +1,9 @@
 #########################################################################
 # Playbook to create authorization to access realtime clock privilidge
 # The role is assigned to the jenkins user
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1803
+# See: https://github.com/adoptium/infrastructure/issues/1803
 # Additional:
-# the suggested fix: https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
+# the suggested fix: https://github.com/adoptium/infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
 # works on AIX 7.1 TL5 AIX 7.2 TL2
 # AIX 7.1 TL4 requires RBAC instead
 # assumption is that the 'CAP_*' capabilities already in the playbook

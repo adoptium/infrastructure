@@ -24,7 +24,7 @@ set -euxo pipefail
 # List of machines that are ignored if they're not in Nagios
 exceptionsList="win sxa gdams will EC2 azurebuildagent aahlenst vagrant master infrastructure esxi aix"
 
-export inv=$(wget -qO- https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/inventory.yml) 
+export inv=$(wget -qO- https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml) 
 [[ $? != 0 ]] && echo "UNKNOWN- wget failed" && exit 3
 
 # Put EOF at end of inv file

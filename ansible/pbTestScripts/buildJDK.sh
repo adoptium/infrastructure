@@ -135,7 +135,7 @@ elif [[ "$(uname)" == "SunOS" ]]; then
 fi
 
 # Required as Debian Buster doesn't have gcc-4.8 available
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1321#discussion_r426625178
+# See https://github.com/adoptium/infrastructure/pull/1321#discussion_r426625178
 if grep 'buster' /etc/*-release >/dev/null 2>&1; then
 	export CC=/usr/bin/gcc-7
 	export CXX=/usr/bin/g++-7
@@ -156,7 +156,7 @@ if [[ "$JAVA_TO_BUILD" == "jdk8u" ]]; then
 fi
 
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2033
+# See: https://github.com/adoptium/infrastructure/issues/2033
 export CONFIGURE_ARGS="--with-native-debug-symbols=none"
 export BUILD_ARGS="--custom-cacerts false"
 

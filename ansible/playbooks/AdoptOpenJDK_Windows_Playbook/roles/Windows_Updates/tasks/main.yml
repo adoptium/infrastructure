@@ -4,7 +4,7 @@
 ###################
 
 # The following tasks have ignore_errors enabled as some Windows Providers can have issues updating due to the Administrator managed updates
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1469
+# See https://github.com/adoptium/infrastructure/issues/1469
 - name: Download and Install Windows Updates
   win_updates:
   register: update_result
