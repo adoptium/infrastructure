@@ -64,7 +64,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
-  when: macos_version_number is version('10.13', '>')"
+  when: "macos_version_number is version('10.13', '>')"
   tags:
     - brew_upgrade
 
