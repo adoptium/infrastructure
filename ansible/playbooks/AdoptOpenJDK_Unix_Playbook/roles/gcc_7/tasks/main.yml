@@ -52,7 +52,7 @@
   tags: gcc_7
 
 # Stops buildng ccache from source when unnecessary
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1472
+# See: https://github.com/adoptium/infrastructure/issues/1472
 - name: Check if ccache is at /usr/local/bin/ccache
   stat:
     path: /usr/local/bin/ccache

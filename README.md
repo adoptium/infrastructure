@@ -29,8 +29,8 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 ## Important Documentation
 
-* [hosts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualized](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/adoptopenjdk.pdf).
-* [Ansible at AdoptOpenJDK](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
+* [hosts](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualized](https://github.com/adoptium/infrastructure/blob/master/docs/adoptopenjdk.pdf).
+* [Ansible at AdoptOpenJDK](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
 
 ## Contributing
 

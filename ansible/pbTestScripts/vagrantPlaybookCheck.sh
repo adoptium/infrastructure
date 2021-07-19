@@ -158,7 +158,7 @@ checkVagrantOS()
                 exit 1
         fi
         # The Windows VM is setup to use 5GB of memory, which can be an issue on machines with only 8GB installed.
-        # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1532#issue-481189847
+        # See: https://github.com/adoptium/infrastructure/pull/1532#issue-481189847
         if [[ "$vagrantOS" == "Win2012" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
                 echo "Warning: Windows VM requires 5Gb of free memory to run. On laptops with only 8Gb this can be an issue."
                 echo "Reducing the Windows VM memory requirement to 2560Mb."
@@ -211,7 +211,7 @@ startVMPlaybook()
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 
 	# Add '-o KexAlgorithms=diffie-hellman-group1-sha1' to the Ansible ssh commands, for Solaris10
-	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1938
+	# See: https://github.com/adoptium/infrastructure/issues/1938
 	if [ "$OS" == "Solaris10" ]; then
 		sed -i 's/.*ControlPersist=60s.*/& -o KexAlgorithms=diffie-hellman-group1-sha1/g' ansible.cfg
 		# Pre install Solaris Compiler on VM
@@ -222,7 +222,7 @@ startVMPlaybook()
 	fi
 
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
-	# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
+	# See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
 
@@ -301,16 +301,16 @@ startVMPlaybookWin()
 	# Remove the Hosts files if they're found
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.*
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
-        # See https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1287#issuecomment-625142917
+        # See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	
 	# Rearm the evaluation license for 180 days to stop the VMs shutting down
-	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2056
+	# See: https://github.com/adoptium/infrastructure/issues/2056
 	vagrant winrm --shell cmd -c "slmgr.vbs /rearm //b"
 	vagrant reload
 
 	# 5986 refers to the winrm_ssl port on the guest
-	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1504#issuecomment-672930832
+	# See: https://github.com/adoptium/infrastructure/issues/1504#issuecomment-672930832
 	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
 	echo "[127.0.0.1]:$vagrantPort" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
@@ -344,7 +344,7 @@ startVMPlaybookWin()
 		vagrantPort=$(vagrant port |  awk '/5985/ { print $4 }')
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
-		# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1296
+		# See: https://github.com/adoptium/infrastructure/issues/1296
 		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then

@@ -105,7 +105,7 @@ occasionally required if, for example, we need a specific version of a tool
 on the machine that is later than the default, and want to ensure that the
 old version does not get invoked by default on the adoptopenjdk machines.
 See
-[GIT_Source](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/GIT_Source/tasks/main.yml)
+[GIT_Source](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/GIT_Source/tasks/main.yml)
 as an example
 
 ## How do I replicate a build failure?
@@ -138,7 +138,7 @@ script uses the appropriate environment configuration files under
 ## How do I replicate a test failure
 
 Many infrastructure issues (generally
-[those tagged as testFail](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues?q=is%3Aopen+is%3Aissue+label%3AtestFail) are raised
+[those tagged as testFail](https://github.com/adoptium/infrastructure/issues?q=is%3Aopen+is%3Aissue+label%3AtestFail) are raised
 as the result of failing JDK tests which are believed to be problems
 relating to the set up of our machines.  In most cases it is useful to
 re-run jobs using the jenkins
@@ -198,7 +198,7 @@ playbooks on other platforms, be sure to run it through the
 job first. This job takes a branch from a fork of the
 `openjdk-infrastructure` repository as a parameter and runs the playbooks
 against a variety of Operating Systems using Vagrant and the scripts in
-[pbTestScripts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible/pbTestScripts)
+[pbTestScripts](https://github.com/adoptium/infrastructure/tree/master/ansible/pbTestScripts)
 to validate them.
 
 ## Jenkins access
@@ -229,23 +229,23 @@ To add a new system:
 1. Ensure there is an issue documenting its creation somewhere (Can just be an existing issue that you add the hostname too so it can be found later
 2. Obtain system from the appropriate infrastructure provider
 3. Add it to bastillion (requires extra privileges) so that all of the appropriate admin keys are deployed to the system (Can be delayed for expediency by putting AWX key into `~root/.ssh/authorized_keys`)
-4. Create a PR to add the machine to [inventory.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
+4. Create a PR to add the machine to [inventory.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
 5. Once merged, run the ansible scripts on it - ideally via AWX (Ensure the project and inventory sources are refreshed, then run the appropriate `Deploy **** playbook` template with a `LIMIT` of the new machine name)
 6. Add it to jenkins, verify a typical job runs on it if you can and add the appropriate tags
 
 NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc.) you should also add it to
-   [adoptopenjdk_yaml.py](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
+   [adoptopenjdk_yaml.py](https://github.com/adoptium/infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
    and, if it will be configured via the standard playbooks, add the new type to the
    list at the top of the main playbook files for
-   [*IX](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
-   [windows](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
+   [*IX](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
+   [windows](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
 
 ## "DockerStatic" test systems
 
-The [DockerStatic role](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/tasks/main.yml)
-was first implemented in [this PR](https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1925)
+The [DockerStatic role](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/tasks/main.yml)
+was first implemented in [this PR](https://github.com/adoptium/infrastructure/pull/1925)
 and extended through
-[this issue](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1809) and is intended to allow us to make more
+[this issue](https://github.com/adoptium/infrastructure/issues/1809) and is intended to allow us to make more
 efficient use of larger machines.  The role uses a set of Dockerfiles, one
 per distribution, which can be used to generate a set of docker machines
 that are started, exposed on an ssh port, and connected to jenkins.  They
@@ -264,7 +264,7 @@ those values, and we should look at whether we can reasonably autodetect or
 parameterize those values. Potentially we could also scale up and create
 more than one of each OS on a given host. To set up a host for running these
 you can use the
-[dockerhost.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml)
+[dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml)
 playbook (Also available via AWX).
 
 Once the static docker containers have been created they are connected into

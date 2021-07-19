@@ -8,7 +8,7 @@
 $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 
-# Windows 2012r2 needs to be forced to use TLS1.2, see: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1858
+# Windows 2012r2 needs to be forced to use TLS1.2, see: https://github.com/adoptium/infrastructure/issues/1858
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1

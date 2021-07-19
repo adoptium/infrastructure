@@ -25,7 +25,7 @@
 
 - name: Download Nagios_RemoteTunnel.sh script
   get_url:
-    url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/Supporting_Scripts/Nagios_Ansible_Config_tool/Nagios_RemoteTunnel.sh
+    url: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/playbooks/Supporting_Scripts/Nagios_Ansible_Config_tool/Nagios_RemoteTunnel.sh
     dest: /home/nagios/Nagios_RemoteTunnel.sh
     mode: 0755
     checksum: sha256:f2bfb91818fe04ba4f4498c27b5d622f3111e5823d14df0b30a7b8ef9d4dc56f

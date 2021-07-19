@@ -290,7 +290,7 @@ runPlaybook() {
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 	
 	# Increase timeout as to stop privilege timeout issues
-	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1516#issue-470063061
+	# See: https://github.com/adoptium/infrastructure/pull/1516#issue-470063061
 	awk '{print}/^\[defaults\]$/{print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b ${extraAnsibleArgs} --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$pbLogPath"

@@ -226,7 +226,7 @@ Normally you will be running ansible on your development machine, and using it
 to modify remote hosts.
 
 **NOTE** The `/vagrant/` directory maps to the directory on your host that you launched the `VagrantFile` from
-e.g. `~/workspace/AdoptOpenJDK/openjdk-infrastructure/ansible`
+e.g. `~/workspace/adoptium/infrastructure/ansible`
 
 Within the `openjdk-infrastructure/ansible` directory:
 
@@ -248,7 +248,7 @@ Note when using our Vagrantfiles:
 
 `ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags=adoptopenjdk,jenkins`
 
-In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
+In case one or more tasks fail or should not be run in the local environment, see [Skipping one or more tags via CLI when running Ansible playbooks](https://github.com/adoptium/infrastructure/tree/master/ansible#skipping-one-or-more-tags-via-cli-when-running-ansible-playbooks) for further details. Ideally, the below can be run for smooth execution in the `vagrant` box:
 
 ```bash
 ansible-playbook -b AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="install_zulu,jenkins_authorized_key,nagios_add_key,add_zeus_user_key"

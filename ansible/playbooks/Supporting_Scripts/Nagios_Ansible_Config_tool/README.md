@@ -17,4 +17,4 @@ The script expects 6 command line arguments to be passed to it from Ansible, in 
 {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname }} {{ ansible_host }} {{ provider }} {{ ansible_port }}
 ```
 
-https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1670 is being used to track replacing the tool with a purely Ansible approach to setting up Nagios monitoring
+https://github.com/adoptium/infrastructure/issues/1670 is being used to track replacing the tool with a purely Ansible approach to setting up Nagios monitoring

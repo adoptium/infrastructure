@@ -6,7 +6,7 @@
 
 Assuming the PR is approved
 
-- Create Pull Request to add user to [Infrastructure](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/README.md#infrastructure).
+- Create Pull Request to add user to [Infrastructure](https://github.com/adoptium/infrastructure/blob/master/README.md#infrastructure).
 - Ideally request users public GPG key as well as their public SSH key.
 
 ## GitHub

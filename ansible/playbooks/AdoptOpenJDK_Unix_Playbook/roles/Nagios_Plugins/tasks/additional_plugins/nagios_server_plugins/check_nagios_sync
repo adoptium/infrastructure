@@ -23,7 +23,7 @@ set -euxo pipefail
 
 exceptionList="ci ansible"
 
-export inv=$(wget -qO- https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/inventory.yml) 
+export inv=$(wget -qO- https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml) 
 [[ $? != 0 ]] && echo "UNKNOWN- wget failed" && exit 3
 
 # Put EOF at end of inv file
