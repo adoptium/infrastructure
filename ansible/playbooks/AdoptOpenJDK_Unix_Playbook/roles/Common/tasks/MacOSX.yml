@@ -8,9 +8,13 @@
   shell: sw_vers -productVersion
   register: macos_version
 
+- name: Set macos version 
+  set_fact:
+    macos_version_number: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }}"
+
 - name: Display macOS Version
   debug:
-    var: macos_version
+    var: macos_version_number
 
 - name: Configure system-wide Bash profile
   become: yes
@@ -60,7 +64,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
-  when: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }} is version('10.13', '>')"
+  when: macos_version_number is version('10.13', '>')"
   tags:
     - brew_upgrade
 
@@ -113,7 +117,7 @@
   homebrew: "name={{ item }} state=present"
   with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
-    - not (macos_version.stdout | regex_search("10.12"))
+    - not (macos_version_number | regex_search("10.12"))
   tags: build_tools
 
 - name: Install Build Tool Casks
