@@ -8,7 +8,7 @@
   shell: sw_vers -productVersion
   register: macos_version
 
-- name: Set macos version 
+- name: Set macos version
   set_fact:
     macos_version_number: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }}"
 
