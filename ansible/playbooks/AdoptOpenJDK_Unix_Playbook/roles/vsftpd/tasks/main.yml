@@ -27,7 +27,7 @@
 
 - name: Create file for FTP access
   copy:
-    content: "This is a line of text in a file"
+    content: ""
     dest: "/home/{{ jckftp_Username }}/ftp/filename.txt"
     force: no
     owner: "{{ jckftp_Username }}"
