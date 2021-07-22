@@ -1,0 +1,26 @@
+---
+################
+# Tomcat Setup #
+################
+- name: Install tomcat9
+  apt: pkg=tomcat9 state=latest
+  tags: dependencies
+
+- name: Copy index.html
+  copy:
+    src: files/index.html
+    dest: /var/lib/tomcat9/webapps/ROOT/index.html
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Change port to 80
+  lineinfile:
+    path: /etc/tomcat9/server.xml
+    regexp: '<Connector port="8080" protocol="HTTP\/1.1"'
+    line: <Connector port="80" protocol="HTTP/1.1"
+
+- name: Start tomcat9 service
+  service:
+    name: tomcat9
+    state: restarted
