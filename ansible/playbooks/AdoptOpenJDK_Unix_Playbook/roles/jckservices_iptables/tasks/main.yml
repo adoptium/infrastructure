@@ -48,6 +48,12 @@
     destination_port: 80
     jump: ACCEPT
 
+- name: Allow Azure private network (10.1.x.x)
+  ansible.builtin.iptables:
+    chain: INPUT
+    src_range: 10.1.0.1-10.1.0.254
+    jump: ACCEPT
+
 - name: Setup iptables to only allow JCK hosts
   iptables:
     chain: INPUT
