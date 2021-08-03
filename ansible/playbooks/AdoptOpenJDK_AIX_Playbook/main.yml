@@ -92,9 +92,12 @@
   ######################################
   # Add bash to available login shells #
   ######################################
-    - name: Add bash, ksh and /bin/false to available login shells
-      command: chsec -f /etc/security/login.cfg -s usw -a shells=/usr/bin/bash,/usr/bin/ksh,/bin/false
-      tags:
+    - name: Add bash to available login shells
+      replace:
+        path: /etc/security/login.cfg
+        regexp: 'shells = '
+        replace: 'shells = /bin/bash,'
+      tags: 
         - login_shell
         - adoptopenjdk
 
