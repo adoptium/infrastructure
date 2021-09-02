@@ -177,6 +177,18 @@ setupWorkspace()
 	local gitDirectory=${workFolder}/${gitFork}-${gitBranch}
 	mkdir -p ${workFolder}/logFiles
 
+	isRepoInfra=$(curl https://api.github.com/repos/$gitFork/infrastructure | grep "Not Found")
+	isRepoOpenjdk=$(curl https://api.github.com/repos/$gitFork/openjdk-infrastructure | grep "Not Found")
+
+	if [[ -z "$isRepoInfra" ]]; then
+		gitRepo="https://github.com/${gitFork}/infrastructure"
+	elif [[ -z "$isRepoOpenjdk" ]]; then
+		gitRepo="https://github.com/${gitFork}/openjdk-infrastructure"
+	else
+		echo "Fork not found"
+		exit 1
+	fi
+
 	if [[ "$cleanWorkspace" = true && -d ${gitDirectory} ]]; then
 		echo "Cleaning old workspace"
 		rm -rf ${gitDirectory}
@@ -185,7 +197,7 @@ setupWorkspace()
 	fi
 
 	if [ ! -d "${gitDirectory}" ]; then
-		git clone -b ${gitBranch} --single-branch https://github.com/${gitFork}/openjdk-infrastructure ${gitDirectory}
+		git clone -b ${gitBranch} --single-branch ${gitRepo} ${gitDirectory}
 	else
 		cd ${gitDirectory}
 		git pull
