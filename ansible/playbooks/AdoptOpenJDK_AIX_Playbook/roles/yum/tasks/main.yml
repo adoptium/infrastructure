@@ -68,6 +68,18 @@
     - yum
     - vendor_files
 
+- name: Ensure AIX_Toolbox repo is enabled
+  shell: yum-config-manager --enable AIX_Toolbox
+  tags: yum
+
+- name: Ensure AIX_Toolbox_noarch repo is enabled
+  shell: yum-config-manager --enable AIX_Toolbox_noarch
+  tags: yum
+
+- name: Ensure AIX_Toolbox_71 repo is enabled
+  shell: yum-config-manager --enable AIX_Toolbox_71
+  tags: yum
+
 - name: Yum update
   yum:
     update_cache: yes
