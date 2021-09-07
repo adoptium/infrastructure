@@ -2,7 +2,7 @@ FROM alpine:3.12
 
 # Install OpenJDK 8 from Alpine because AdoptOpenJDK is 16+, only (February, 2021).
 RUN apk --update add bash shadow openssh-server openssh-client unzip wget openjdk8 git curl make gcc perl xvfb \
-        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib
+        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
 # Install ant and ant-contrib.

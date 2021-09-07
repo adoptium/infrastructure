@@ -81,6 +81,13 @@
     state: present
   tags: [jenkins_user, adoptopenjdk]
 
+- name: Change ownership of jenkins' ~/.ssh/known_hosts
+  file:
+    path: "{{ home_folder }}/.ssh/known_hosts"
+    owner: "{{ Jenkins_Username }}"
+    mode: 0644
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Add Jenkins user to the audio group
   user: name={{ Jenkins_Username }}
     groups=audio
