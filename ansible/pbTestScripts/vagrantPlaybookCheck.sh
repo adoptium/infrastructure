@@ -177,8 +177,8 @@ setupWorkspace()
 	local gitDirectory=${workFolder}/${gitFork}-${gitBranch}
 	mkdir -p ${workFolder}/logFiles
 
-	isRepoInfra=$(curl https://api.github.com/repos/$gitFork/infrastructure | grep "Not Found")
-	isRepoOpenjdk=$(curl https://api.github.com/repos/$gitFork/openjdk-infrastructure | grep "Not Found")
+	local isRepoInfra=$(curl https://api.github.com/repos/$gitFork/infrastructure | grep "Not Found")
+	local isRepoOpenjdk=$(curl https://api.github.com/repos/$gitFork/openjdk-infrastructure | grep "Not Found")
 
 	if [[ -z "$isRepoInfra" ]]; then
 		gitRepo="https://github.com/${gitFork}/infrastructure"
