@@ -98,7 +98,7 @@ cloneRepo() {
 		elif [[ -z "$isRepoOpenjdk" ]]; then
 			GIT_REPO="https://github.com/${GIT_FORK}/openjdk-build"
 		else
-			echo "Fork not found"
+			echo "Repository not found - the fork must be named temurin-build or openjdk-build"
 			exit 1
 		fi
 
