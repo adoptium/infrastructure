@@ -185,7 +185,7 @@ setupWorkspace()
 	elif [[ -z "$isRepoOpenjdk" ]]; then
 		gitRepo="https://github.com/${gitFork}/openjdk-infrastructure"
 	else
-		echo "Fork not found"
+		echo "Repository not found - the fork must be named openjdk-infrastructure or infrastructure"
 		exit 1
 	fi
 
