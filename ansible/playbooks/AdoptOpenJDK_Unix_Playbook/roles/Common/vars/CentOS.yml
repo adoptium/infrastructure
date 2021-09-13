@@ -71,6 +71,7 @@ Additional_Build_Tools_CentOS8:
   - git
   - cmake
   - ccache
+  - fakeroot
 
 Additional_Build_Tools_NOT_CentOS8:
   - lbzip2
