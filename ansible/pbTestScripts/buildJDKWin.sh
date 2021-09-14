@@ -89,7 +89,20 @@ cloneRepo() {
 		cd $WORKSPACE/openjdk-build && git pull
 	else
 		echo "Cloning new openjdk-build directory"
-		git clone -b ${GIT_BRANCH} --single-branch https://github.com/${GIT_FORK}/openjdk-build $WORKSPACE/openjdk-build
+
+		local isRepoTemurin=$(curl https://api.github.com/repos/$GIT_FORK/temurin-build | grep "Not Found")
+		local isRepoOpenjdk=$(curl https://api.github.com/repos/$GIT_FORK/openjdk-build | grep "Not Found")
+
+		if [[ -z "$isRepoTemurin" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/temurin-build"
+		elif [[ -z "$isRepoOpenjdk" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/openjdk-build"
+		else
+			echo "Repository not found - the fork must be named temurin-build or openjdk-build"
+			exit 1
+		fi
+
+		git clone -b ${GIT_BRANCH} --single-branch $GIT_REPO $WORKSPACE/openjdk-build
 	fi
 }
 # Set defaults
