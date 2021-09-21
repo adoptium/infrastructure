@@ -47,6 +47,29 @@
     - not zulu8_installed.stat.exists
   tags: build_tools
 
+- name: Check if zulu-11 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu11
+  register: zulu11_installed
+  tags: build_tools
+
+- name: Install latest zulu-11 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu11.50.19-ca-jdk11.0.12-linux_musl_x64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu11_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-11
+  file:
+    src: /usr/lib/jvm/zulu11.50.19-ca-jdk11.0.12-linux_musl_x64
+    dest: /usr/lib/jvm/zulu11
+    state: link
+  when:
+    - not zulu11_installed.stat.exists
+  tags: build_tools
+
 - name: Check if zulu-14 is already installed in the target location
   stat: path=/usr/lib/jvm/zulu14
   register: zulu14_installed
