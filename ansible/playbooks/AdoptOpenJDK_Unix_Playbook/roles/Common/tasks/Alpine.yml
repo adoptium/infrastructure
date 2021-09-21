@@ -46,7 +46,7 @@
   when:
     - not zulu8_installed.stat.exists
   tags: build_tools
-  
+
 - name: Check if zulu-11 is already installed in the target location
   stat: path=/usr/lib/jvm/zulu11
   register: zulu11_installed
