@@ -52,7 +52,7 @@
   register: zulu11_installed
   tags: build_tools
 
-- name: Install latest zulu-1 release if not already installed
+- name: Install latest zulu-11 release if not already installed
   unarchive:
     src: https://cdn.azul.com/zulu/bin/zulu11.50.19-ca-jdk11.0.12-linux_musl_x64.tar.gz
     dest: /usr/lib/jvm/
