@@ -81,6 +81,7 @@
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
     - 139.178.86.125 # jck-equinix-ubuntu2004-aarch64-1
+    - 207.254.28.13 # esmv4-macos11-arm64
 
 - name: Setup iptables
   iptables:
