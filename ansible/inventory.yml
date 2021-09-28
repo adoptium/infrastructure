@@ -172,6 +172,9 @@ hosts:
 
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
+          sles15-s390x-1: {ip: 148.100.84.159, user: linux1, description: test machine in marist cloud}
+          rhel7-s390x-1: {ip: 148.100.84.26, user: linux1, description: test machine in marist cloud}
+          rhel8-s390x-1: {ip: 148.100.84.52, user: linux1, description: test machine in marist cloud}
           ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
           ubuntu1804-s390x-1: {ip: 148.100.113.30, user: ubuntu}
           ubuntu1804-s390x-2: {ip: 148.100.113.46, user: ubuntu}
