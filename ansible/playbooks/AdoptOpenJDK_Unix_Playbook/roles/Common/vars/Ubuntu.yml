@@ -114,6 +114,7 @@ Test_Tool_Packages:
   - unzip
   - libexpat1-dev
   - libcurl4-openssl-dev
+  - fakeroot
 
 Test_Tool_Packages_x86_64:
   - pulseaudio
