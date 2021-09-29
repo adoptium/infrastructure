@@ -109,7 +109,6 @@
     - gawk
     - git
     - grep
-    - libXrender-devel
     - libffi-devel
     - make
     - m4
@@ -120,12 +119,27 @@
     - sudo
     - tar
     - tcl
-    - tk
     - unzip
     - wget
     - xz-libs
     - zip
     - zsh
+  tags: yum
+
+- name: Remove packages - in case installed historically, or by accident
+  yum: name={{ item }} state=absent
+  with_items:
+    - libXrender-devel
+    - libXrender
+    - libXft
+    - tk
+    - renderproto
+  tags: yum
+
+- name: Remove, if exists, reference to libXrender-devel include files
+      directory:
+        state: absent
+        path: /opt/freeware/include/X11/extensions
   tags: yum
 
 #######################################################
