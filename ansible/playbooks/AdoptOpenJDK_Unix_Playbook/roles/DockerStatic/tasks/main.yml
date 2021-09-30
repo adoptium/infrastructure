@@ -36,6 +36,7 @@
     - alp311
     - alp312
     - alp313
+    - alp314
 
 ##############################################################
 # Start the containers                                       #
@@ -84,6 +85,11 @@
 
 - name: Start Alpine 3.13 container if not already started
   command: docker run --restart unless-stopped -p 2230:22 --cpus=2.0 --memory=6G --detach --name alp313.2230 aqa_alp313
+  tags: startcontainers
+  ignore_errors: yes
+
+- name: Start Alpine 3.14 container if not already started
+  command: docker run --restart unless-stopped -p 2231:22 --cpus=2.0 --memory=6G --detach --name alp314.2231 aqa_alp314
   tags: startcontainers
   ignore_errors: yes
 
