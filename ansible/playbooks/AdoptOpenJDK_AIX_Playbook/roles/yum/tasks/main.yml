@@ -134,13 +134,17 @@
     - libXft
     - tk
     - renderproto
-  tags: yum
+  tags:
+    - yum
+    - adoptopenjdk
 
 - name: Remove, if exists, reference to libXrender-devel include files
   file:
     state: absent
     path: /opt/freeware/include/X11/extensions
-  tags: yum
+  tags:
+    - yum
+    - adoptopenjdk
 
 #######################################################
 # Additional Tools not available directly through yum #
