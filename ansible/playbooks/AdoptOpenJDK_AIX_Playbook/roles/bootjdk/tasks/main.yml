@@ -19,7 +19,7 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ea/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr
     remote_src: yes
-  when: 
+  when:
     - java_installed.stat.isdir is not defined
     - jdk == 17
 
