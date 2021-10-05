@@ -107,6 +107,7 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
+    - role: adoptopenjdk_install # JDK18 Build Bootstrap
       jdk_version: 17
       when:
         - ansible_distribution != "Alpine"
