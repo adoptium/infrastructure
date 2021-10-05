@@ -13,12 +13,7 @@
   tags: autoconf-2.69
 
 - name: Download Autoconf v2.69
-  get_url:
-    url: https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
-    dest: /tmp/autoconf-2.69.tar.gz
-    force: no
-    mode: 0755
-    checksum: sha256:954bd69b391edc12d6a4a51a2dd1476543da5c6bbf05a95b59dc0dd6fd4c2969
+  shell: curl -o /tmp/autoconf-2.69.tar.gz https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
