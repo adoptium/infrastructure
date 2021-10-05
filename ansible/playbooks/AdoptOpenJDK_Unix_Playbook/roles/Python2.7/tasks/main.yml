@@ -16,11 +16,7 @@
     - python2.7
 
 - name: Install Python2.7 to /usr/local/python2
-  unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/usrlocalPython27.tar.xz
-    dest: /usr/local/
-    remote_src: yes
-    mode: 0755
+  shell: curl https://ci.adoptopenjdk.net/userContent/usrlocalPython27.tar.xz | (cd /usr/local && tar xpfJ -)
   retries: 3
   delay: 5
   register: python_download
