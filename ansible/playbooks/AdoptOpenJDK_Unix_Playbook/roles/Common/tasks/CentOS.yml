@@ -79,24 +79,6 @@
     - ! (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
   tags: build_tools
 
-- name: Add devtools-2 to yum repo list for gcc 4.8
-  get_url:
-    url: https://people.centos.org/tru/devtools-2/devtools-2.repo
-    dest: /etc/yum.repos.d/devtools-2.repo
-    timeout: 25
-    checksum: sha256:a8ebeb4bed624700f727179e6ef771dafe47651131a00a78b342251415646acc
-  when:
-    - ansible_distribution_major_version == "6"
-  tags: build_tools
-
-- name: Install gcc4.8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc48_devtoolset_compiler }}"
-  when:
-    - ansible_distribution_major_version == "6"
-  tags: build_tools
-
-
 - name: Install CentOS SCL x86_64 repo for gcc7.3
   package: "name=centos-release-scl state=latest"
   when:
@@ -117,42 +99,6 @@
   with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
   when:
     - ansible_architecture == "x86_64"
-  tags: build_tools
-
-- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/gcc to gcc
-  file:
-    src: /opt/rh/devtoolset-2/root/usr/bin/gcc
-    dest: /usr/bin/gcc
-    force: true
-    owner: root
-    group: root
-    state: link
-  when:
-    - ansible_distribution_major_version == "6"
-  tags: build_tools
-
-- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/g++ to g++
-  file:
-    src: /opt/rh/devtoolset-2/root/usr/bin/g++
-    dest: /usr/bin/g++
-    force: true
-    owner: root
-    group: root
-    state: link
-  when:
-    - ansible_distribution_major_version == "6"
-  tags: build_tools
-
-- name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/c++ to c++
-  file:
-    src: /opt/rh/devtoolset-2/root/usr/bin/c++
-    dest: /usr/bin/c++
-    force: true
-    owner: root
-    group: root
-    state: link
-  when:
-    - ansible_distribution_major_version == "6"
   tags: build_tools
 
 ##############################
