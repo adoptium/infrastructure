@@ -12,7 +12,9 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr
     remote_src: yes
-  when: java_installed.stat.isdir is not defined and jdk != 17
+  when:
+    - java_installed.stat.isdir is not defined
+    - jdk != 17
 
 - name: Transfer and Extract AdoptOpenJDK {{ jdk }}
   unarchive:
