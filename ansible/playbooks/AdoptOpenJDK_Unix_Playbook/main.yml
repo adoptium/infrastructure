@@ -107,6 +107,13 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
+    - role: adoptopenjdk_install # JDK18 Build Bootstrap
+      jdk_version: 17
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
+      tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure

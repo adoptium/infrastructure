@@ -58,6 +58,8 @@
       jdk_version: 15
     - role: Java_install          # JDK17 build bootstrap
       jdk_version: 16
+    - role: Java_install
+      jdk_version: 17
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
