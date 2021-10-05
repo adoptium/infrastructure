@@ -19,7 +19,9 @@
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ea/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr
     remote_src: yes
-  when: java_installed.stat.isdir is not defined and jdk == 17
+  when: 
+    - java_installed.stat.isdir is not defined
+    - jdk == 17
 
 # jdk8 directories do not have a hyphen
 - name: Find java 8 directory
