@@ -27,7 +27,6 @@
     - Common
     - Python2.7                   # CentOS6
     - Providers                   # AdoptOpenJDK Infrastructure
-    - autoconf
     - curl
     - Jenkins_User                # AdoptOpenJDK Infrastructure
     - role: freemarker            # OpenJ9
