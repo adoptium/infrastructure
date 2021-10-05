@@ -1,0 +1,8 @@
+###############################
+# Ensure maxuproc is set to 512                           
+# Required as of https://github.com/adoptium/infrastructure/issues/2334  
+###############################
+---
+- name: Ensure maxuproc is set to 512
+  command: chdev -l sys0 -a maxuproc=512
+  tags: kernelsettings

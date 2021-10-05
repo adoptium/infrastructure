@@ -50,7 +50,7 @@
     # cannot expand filesystem space on demand
 
     # - aixfs
-    - maxuproc
+    - kernelsettings
     - yum
 
     # 4. AIX User Admin
