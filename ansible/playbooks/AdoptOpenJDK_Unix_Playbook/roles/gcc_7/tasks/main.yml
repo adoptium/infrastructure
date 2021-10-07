@@ -22,11 +22,7 @@
 
 # Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-7.5.0 binary
-  get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar{{ gccsuffix }}
-    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar{{ gccsuffix }}'
-    force: no
-    mode: 0644
+  shell: curl -o /tmp/ansible-adoptopenjdk-gcc-7.tar{{ gccsuffix }} https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar{{ gccsuffix }}
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
     - gcc7_installed.rc != 0
