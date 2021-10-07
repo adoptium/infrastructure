@@ -26,10 +26,7 @@
   tags: goodmake_source
 
 - name: Download make {{ makeVersion }} source
-  get_url:
-    url: https://ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
-    dest: /tmp/make-{{ makeVersion }}.tar.gz
-    mode: 0440
+  shell: curl  -o /tmp/make-{{ makeVersion }}.tar.gz https://ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
