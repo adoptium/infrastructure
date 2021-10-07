@@ -18,7 +18,7 @@
 
 - name: Check if the fedora sysroot folder is in place
   stat:
-    path: /opt/fedora28_riscv_root
+    path: /opt/fedora28_riscv_root/usr/lib64/libcrypto.so.1.1
   register: fedora_folder
   when:
     - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "6"
@@ -53,7 +53,7 @@
 
 - name: Retrieve and Unpack the fedora sysroot folder
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot.tar.xz
+    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot_ssl110gdev.tar.xz
     dest: /opt/
     remote_src: yes
   when:
