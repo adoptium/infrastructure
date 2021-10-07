@@ -122,12 +122,7 @@
 # CentOS6 needs it's own task so it can use a different python interpreter.
 # See: https://github.com/adoptium/infrastructure/issues/1877
 - name: Install latest release if not already installed (CentOS6)
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr/lib/jvm
-    remote_src: yes
-  vars:
-    - ansible_python_interpreter: /usr/local/python2/bin/python2.7
+  shell: curl https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk | tar xpfz - -C /usr/lib/jvm
   retries: 3
   delay: 5
   register: adoptopenjdk_download
