@@ -102,6 +102,6 @@
     group: admin
     state: link
   when:
-    - ansible_distribution != "MacOSX"
+    - ansible_distribution == "MacOSX"
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
