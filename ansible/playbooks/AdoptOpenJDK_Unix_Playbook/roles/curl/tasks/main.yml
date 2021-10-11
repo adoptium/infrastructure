@@ -28,7 +28,7 @@
 
 - name: Download curl {{ curl_latest }}
   get_url:
-    url: https://curl.se/download/curl-{{ curl_latest }}.tar.gz
+    url: https://github.com/curl/curl/releases/download/curl-7_79_1/curl-{{ curl_latest }}.tar.gz
     dest: /tmp/
     mode: 0440
     timeout: 25
@@ -54,7 +54,7 @@
   tags: curl
 
 - name: Build and install curl {{ curl_latest }} in /usr/local
-  shell: cd /tmp/curl-{{ curl_latest }} && ./configure --prefix=/usr/local/curl-{{ curl_latest }} && make && make install
+  shell: cd /tmp/curl-{{ curl_latest }} && ./configure --prefix=/usr/local/curl-{{ curl_latest }} --with-openssl && make && make install
   when:
     - ansible_distribution != "MacOSX"
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
