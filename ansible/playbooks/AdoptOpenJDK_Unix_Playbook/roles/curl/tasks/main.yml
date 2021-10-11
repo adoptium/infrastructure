@@ -85,23 +85,47 @@
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
-- name: Install curl version {{ curl_latest }}+ for MacOS
+- name: Get macOS version
+  shell: sw_vers -productVersion
+  register: macos_version
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: curl
+
+- name: Set macos version
+  set_fact:
+    macos_version_number: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }}"
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: curl
+
+- name: Install latest version of curl for MacOS
   homebrew:
     name: curl
     state: latest
   when:
     - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
-- name: Create /usr/local/bin/curl symlink
+- name: Find install directory MacOS
+  shell: ls -la /usr/local/Cellar/curl/7.*/bin/curl | awk '{print $9}'
+  register: curl_install_dir
+  when:
+    - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
+  tags: curl
+
+- name: Create /usr/local/bin/curl symlink MacOS
   file:
-    src: /usr/local/Cellar/curl/{{ curl_latest }}/bin/curl
+    src: '{{ curl_install_dir.stdout }}'
     dest: /usr/local/bin/curl
     owner: administrator
     group: admin
     state: link
   when:
     - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
