@@ -5,13 +5,15 @@ on:
     paths:
     - .github/workflows/build.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
-    branches:         
+    - ansible/docker/**
+    branches:
     - master
   push:
     paths:
     - .github/workflows/build.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
-    branches:         
+    - ansible/docker/**
+    branches:
     - master
 
 jobs:
