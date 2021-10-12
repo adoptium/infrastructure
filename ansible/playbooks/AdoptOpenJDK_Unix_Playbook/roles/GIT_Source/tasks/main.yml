@@ -53,24 +53,6 @@
     - ansible_distribution != "FreeBSD"
   tags: git_source
 
-- name: Ensure curl-devel is installed on RHEL 6 before compiling git
-  package: "name=curl-devel state=latest"
-  when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
-  tags:
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-    - git_source
-
-- name: Ensure libcurl-devel is installed on CentOS 6 before compiling git
-  package: "name=libcurl-devel state=latest"
-  when:
-    - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
-  tags:
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-    - git_source
-
 - name: Find Curl directory
   shell: ls -ld /usr/local/curl-* | awk '{print $9}'
   register: curl_install_dir
