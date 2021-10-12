@@ -30,8 +30,9 @@ jobs:
         ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
         vagrant up
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
+        ipAddress=$(ipconfig getifaddr en0)
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-        echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        echo "[${ipAddress}]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
         awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
