@@ -24,6 +24,8 @@
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
     - Version
     - adopt_etc
+    - role: CentOS6-Cent7SSL
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6" and ansible_architecture == "x86_64")
     - Common
     - Python2.7                   # CentOS6
     - Providers                   # AdoptOpenJDK Infrastructure
