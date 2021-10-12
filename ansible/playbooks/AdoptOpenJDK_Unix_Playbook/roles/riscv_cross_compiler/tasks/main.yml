@@ -53,7 +53,7 @@
 
 - name: Retrieve and Unpack the fedora sysroot folder
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot.tar.xz
+    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot_ssl110gdev.tar.xz
     dest: /opt/
     remote_src: yes
   when:
