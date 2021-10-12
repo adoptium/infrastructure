@@ -53,16 +53,15 @@
     - ansible_distribution != "FreeBSD"
   tags: git_source
 
-- name: Ensure curl-devel is installed on RHEL 6 before compiling git
-  package: "name=curl-devel state=latest"
+- name: Find Curl directory
+  shell: ls -ld /usr/local/curl-* | awk '{print $9}'
+  register: curl_install_dir
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
-  tags:
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
+    - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
+  tags: git_source
 
 - name: Compile and install git from source on RHEL/CentOS6
-  shell: cd /tmp/git-2.15.0 && ./configure --with-curl=/usr/local/curl-7.61.1 --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && make install
+  shell: cd /tmp/git-2.15.0 && ./configure --with-curl={{ curl_install_dir.stdout }} --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
