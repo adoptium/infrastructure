@@ -82,6 +82,8 @@
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
     - 139.178.86.125 # jck-equinix-ubuntu2004-aarch64-1
     - 207.254.28.13 # esmv4-macos11-arm64
+    - 104.209.208.15 # g9vjl-win2019-x64
+    - 52.152.182.5 # h6jkd-win2019-x64
 
 - name: Setup iptables
   iptables:
