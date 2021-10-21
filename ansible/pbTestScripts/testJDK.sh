@@ -11,7 +11,9 @@ fi
 
 mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
-$HOME/testLocation/aqa-tests/get.sh -t $HOME/testLocation/aqa-tests
+# cd to aqa-tests as required by https://github.com/adoptium/aqa-tests/issues/2691#issue-932959102
+cd $HOME/testLocation/aqa-tests
+$HOME/testLocation/aqa-tests/get.sh
 cd $HOME/testLocation/aqa-tests/TKG || exit 1
 export BUILD_LIST=functional
 $MAKE_COMMAND compile
