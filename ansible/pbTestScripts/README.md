@@ -45,6 +45,8 @@ The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 | `--build-hotspot`                     | Specify to build the JDK with the Hotspot JVM *       | `./vagrantPlaybookCheck.sh -a --build --build-hotspot          |
 | `--JDK-Version` / `-jdk` jdk          | Specify which JDK to build, if applicable             | `./vagrantPlaybookCheck.sh -a --build --JDK-version jdk11      |
 | `--test` / `-t`                       | Run a small test on the built JDK within the VM *     | `./vagrantPlaybookCheck.sh -a --build --test`                  |
+|                                       |                                                       |                                                                |
+| `-V`,`-VV`,`-VVV`,`-VVVV`             | Add various verbosity levels to ansible-playbook cmd  | `./vagrantPlaybookCheck.sh -a --build -VVV`                    |
 
 Notes:
  - The `--fork` and `--branch` arguments default to `adoptopenjdk` and `master`, respectively.
