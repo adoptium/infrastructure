@@ -19,6 +19,7 @@ buildVariant=""
 testJDK=false
 # Default to building jdk8u
 jdkToBuild="jdk8u"
+verbosity=""
 
 # Parse Arguments
 processArgs() {
@@ -56,6 +57,8 @@ processArgs() {
 				OS="$1"; shift;;
 			"--jdk-version" | "-v" )
 				jdkToBuild="$1"; shift;;
+			"-V" | "-VV" | "-VVV" | "-VVVV" )
+				verbosity=$(echo $opt | tr '[:upper:]' '[:lower:]');;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
 		esac
 	done
@@ -67,7 +70,7 @@ usage() {
 		--build | -b			Build a JDK on the qemu VM
 		--build-fork | -bf		Which openjdk-build to retrieve the build scripts from
 		--build-branch | -bb		Specify the branch of the build-repo (default: master)
-		--build-hotspot | -hs			Build a JDK with a Hotspot JVM instead of an OpenJ9 one
+		--build-hotspot | -hs		Build a JDK with a Hotspot JVM instead of an OpenJ9 one
 		--currentDir | -c		Set Workspace to directory of this script
 		--clean-workspace | -cw		Removes the old work folder (including logs)
 		--help | -h 			Shows this help message
@@ -78,6 +81,7 @@ usage() {
 		--operating-system | -o 	Combined with --architecture runs a VM with the desired architecture and OS combo.
 		--skip-more | -sm		Skip non-essential roles from the playbook
 		--test | -t			Test the built JDK
+		-V				Apply verbose option to 'ansible-playbook', up to '-VVVV'
 		"	
 	showArchList
 }
@@ -276,14 +280,14 @@ done
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 	local pbLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.log"
-	local extraAnsibleArgs=""
+	local extraAnsibleArgs="$verbosity"
         local gitURL="https://github.com/$gitFork/openjdk-infrastructure"
 
 	# RISCV requires this be specified
 	if [[ $ARCHITECTURE == "RISCV" ]]; then
 		# To fix the outdated repositories of the image
 		ssh -p $PORTNO -i "$workFolder"/id_rsa linux@localhost "sudo apt-get update --fix-missing"
-		extraAnsibleArgs="-e ansible_python_interpreter=/usr/bin/python3"
+		extraAnsibleArgs="$extraAnsibleArgs -e ansible_python_interpreter=/usr/bin/python3"
 	fi
 
 	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone -b "$gitBranch" "$gitURL" "$workFolder"/openjdk-infrastructure
