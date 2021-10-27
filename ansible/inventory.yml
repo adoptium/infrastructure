@@ -153,7 +153,7 @@ hosts:
 
       - packet:
           ubuntu1604-x64-1: {ip: 147.75.204.239}
-          ubuntu1604-x64-2: {ip: 147.75.100.127}
+          ubuntu2004-x64-2: {ip: 147.75.100.127}
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
