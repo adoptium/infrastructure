@@ -53,17 +53,11 @@
   shell: cd /root/rpmbuild/SPECS && rpmbuild -bb openssl.spec
   when: cacertsold.rc == 0
 
-- name: Install new OpenSSL 1.0.2k libs and development package ...
-  yum:
-    name:
-      - /root/rpmbuild/RPMS/x86_64/openssl-libs-1.0.2k-21.el6.x86_64.rpm
-      - /root/rpmbuild/RPMS/x86_64/openssl-devel-1.0.2k-21.el6.x86_64.rpm
+- name: Install new OpenSSL 1.0.2k, libs and development package ...
+  shell: "rpm -U openssl-1.0.2k-21.el6.x86_64.rpm openssl-libs-1.0.2k-21.el6.x86_64.rpm openssl-devel-1.0.2k-21.el6.x86_64.rpm"
+  args:
+    chdir: /root/rpmbuild/RPMS/x86_64/
   when: cacertsold.rc == 0
-
-# This shouldn't be necessary but it doesn't update if I include in previous step
-- name: Install new OpenSSL 1.0.2k main package ...
-  yum:
-    name: /root/rpmbuild/RPMS/x86_64/openssl-1.0.2k-21.el6.x86_64.rpm
 
 - name: Install prereqs for building ca-certificate bundle ...
   yum:
@@ -90,7 +84,7 @@
   when: cacertsold.rc == 0
 
 - name: Verify checksum for CentOS7 ca-certificates  download ...
-  shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^dc2cf4f9f51313e8fe6df3bd5e7c30926a99c2ad861a2bbfa4fd6210c00daaf6
+  shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^86fe6df26e7612e63a70e435786f2eb6587cb00e6f9927aea113797afacebb57
   when: cacertsold.rc == 0
 
 - name: Extract certdata.txt from CentOS7 ca-certificates SRPM ...
