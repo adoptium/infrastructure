@@ -81,7 +81,7 @@ go into this group for a while before being granted additional access.
 ## Infrastructure Providers
 The Adoptium project is proud to receive contributions from many companies, both in the form of monetary contributions in exchange for membership or in-kind contributions for required resources. The Infrastructure collaborates with the following companies who contribute various kinds of cloud and physical hardware to the Adoptium project.
 
-![Infra Sponsors Page](https://user-images.githubusercontent.com/20224954/141326927-beec088c-56ed-4097-9508-61d2612ddf35.png)
+![Infra Sponsors Page](https://user-images.githubusercontent.com/20224954/141327230-04524d09-ebd2-4e07-9c74-6c9ae9bdfc11.png)
 
 ### Host Information
 
