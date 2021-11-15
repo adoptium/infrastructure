@@ -64,6 +64,6 @@ If specified, the VMs will then be tested by building JDK8 - if all dependencies
 
 If the VMs were chosen *not* to be destroyed, they can be later by running the _vmDestroy.sh_ script, which takes the `Vagrant OS` as an argument. If found, every Vagrant VM with this OS will be destroyed, therefore the user will be asked to confirm they want this. The `--force` option will skip this prompt.
 
-Vagrant boxes can be updated by their provider from time to time. To ensure the current vagrant boxes used on the system are up to date, _updateBoxes.sh_ can be used. This will check and update all current vagrant boxes for the user. Outdated box versions will be removed if the `-r` option, is used. A prompt will ask the user to confirm the removal of a box, and option `-rf` will skip this prompt.
+Vagrant boxes can be updated by their provider from time to time, and using outdated versions can occasionally [cause issues](https://github.com/adoptium/infrastructure/issues/2375#issue-1043540735). To ensure the current vagrant boxes used on the system are up to date, _updateBoxes.sh_ can be used. This will check and update all current vagrant boxes for the user. Outdated box versions will be removed if the `-r` option, is used. A prompt will ask the user to confirm the removal of a box, and option `-rf` will skip this prompt. 
 
 The additional scripts in the _pbTestScripts_ folder are called from `vagrantPlaybookCheck.sh`

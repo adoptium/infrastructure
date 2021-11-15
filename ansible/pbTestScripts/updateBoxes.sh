@@ -7,10 +7,10 @@ Usage(){
   echo "
 Usage: ./updateBoxes.sh [options]
 
-Bash script to update vagrant boxes and remove old versions.
+Bash script to update vagrant boxes and remove old versions. Running with no parameters will query the system for outdated boxes and update them, but will retain the old boxes.
 
 Options:
-  --remove | -r[f]	Remove outdated boxes. ('-rf' will force remove outdated boxes)
+  --remove | -r[f]	Remove outdated boxes. ('-rf' will make this non-interactive)
   --help | -h		Show this help message.
   "
 }
@@ -41,7 +41,7 @@ if [[ -z "$VBList" ]]; then
 else
   for x in $VBList
   do
-    vagrant box update --box $x
+    vagrant box update --box "$x"
   done
 fi
 
