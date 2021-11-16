@@ -42,7 +42,7 @@ else
   for x in $VBList
   do
     # Ignore Debian8 for now; See: https://adoptium.slack.com/archives/C53GHCXL4/p1637069847046900
-    if [[ $x != "roboxes/debian8" ]]; then 
+    if [[ "$x" != "roboxes/debian8" ]]; then 
       vagrant box update --box "$x"
     fi
   done
