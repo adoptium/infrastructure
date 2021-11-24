@@ -66,7 +66,6 @@ gcc_compiler:
   - gcc-4.8
 
 Additional_Packages_Ubuntu16:
-  - xserver-xorg-legacy                 # Not actually sure if this is still needed
   - libgstreamer0.10-dev                # OpenJFX prereq
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - libmpfr4
@@ -107,7 +106,6 @@ Test_Tool_Packages:
   - mercurial
   - perl
   - xauth
-  - xorg
   - xvfb
   - binfmt-support
   - qemu-user-static
