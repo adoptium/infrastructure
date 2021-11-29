@@ -23,6 +23,8 @@ RUN mkdir /home/jenkins/.ssh
 RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins:jenkins /home/jenkins/.ssh
 RUN chmod -R "g=,o=" /home/jenkins/.ssh
+RUN echo "/sbin/apk update && /sbin/apk upgrade" >> /etc/periodic/daily/updatepackages
+RUN chmod +x /etc/periodic/daily/updatepackages
 
 # Remove temporary files.
 RUN rm -rf /tmp/ant* /tmp/ant-contrib*
