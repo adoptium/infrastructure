@@ -110,6 +110,21 @@
     force: yes
   tags: patch_update
 
+- name: Remove expired cert \"DST Root CA X3\"
+  block:
+    - name: Deselect certificate from ca-certificates.conf
+      replace:
+        path: /etc/ca-certificates.conf
+        replace: "!DST_Root_CA_X3.crt"
+        regexp: "^(.*)?/DST_Root_CA_X3.crt"
+        backup: yes
+
+    - name: Refresh ca-certificates
+      command: "update-ca-certificates --fresh"
+
+  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
+  tags: patch_update
+
 ############################
 # Build Packages and tools #
 ############################
