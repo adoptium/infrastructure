@@ -36,6 +36,7 @@ Build_Tool_Packages:
   - linux-headers
   - numactl
   - numactl-dev                   # OpenJ9
+  - sed
   - unzip
   - wget
   - which
