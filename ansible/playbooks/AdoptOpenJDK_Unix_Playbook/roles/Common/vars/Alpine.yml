@@ -36,6 +36,7 @@ Build_Tool_Packages:
   - linux-headers
   - numactl
   - numactl-dev                   # OpenJ9
+  - sed                           # JDK8u requires GNU sed
   - unzip
   - wget
   - which
