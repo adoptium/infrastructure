@@ -1,0 +1,26 @@
+#########################################################################
+# Playbook to setup basic AIX hardening
+  # Deactivate inetd - to stop all services such as telnet, ftp, rexecd
+  # remove cas_agent, if installed. Not needed in modern systems
+#########################################################################
+---
+- name: Disable inetd on boot
+  shell: /usr/sbin/chrctcp -S -d inetd
+  ignore_errors: yes
+  changed_when: False
+  tags: aixsec
+
+- name: Update RBAC to include new authorizations
+  block:
+    - name: Look for CAS Agent
+      shell:
+        lslpp -L cas.agent
+      ignore_errors: yes
+      changed_when: false
+      register: cas
+    - name: Uninstall CAS Agent
+      shell:
+        installp -ug cas.agent
+      when: cas.rc == 0
+      ignore_errors: yes
+  tags: aixsec

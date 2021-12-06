@@ -33,6 +33,7 @@
 
     # 2. AIX BOS configuration
 
+    - security
     - syslogs
     - crontab
     # TBD: additional tasks below that need to be promoted to
