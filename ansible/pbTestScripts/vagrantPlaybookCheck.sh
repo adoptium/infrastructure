@@ -226,17 +226,6 @@ startVMPlaybook()
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 
-	# Add '-o KexAlgorithms=diffie-hellman-group1-sha1' to the Ansible ssh commands, for Solaris10
-	# See: https://github.com/adoptium/infrastructure/issues/1938
-	if [ "$OS" == "Solaris10" ]; then
-		sed -i 's/.*ControlPersist=60s.*/& -o KexAlgorithms=diffie-hellman-group1-sha1/g' ansible.cfg
-		# Pre install Solaris Compiler on VM
-		if [ -r /tmp/SolarisStudio12.3-solaris-x86-pkg ]; then
-			cp -r /tmp/SolarisStudio12.3-solaris-x86-pkg .
-		fi 
-		ssh_args="-o KexAlgorithms=diffie-hellman-group1-sha1"
-	fi
-
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
 	# See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
