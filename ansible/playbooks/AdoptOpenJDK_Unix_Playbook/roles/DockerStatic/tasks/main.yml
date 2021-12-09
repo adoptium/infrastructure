@@ -107,3 +107,11 @@
     state: present
     regexp: kernel_core_pattern
     line: kernel.core_pattern=core.%p
+
+- name: Copy updatepackages.sh script to remote cron.daily directory
+  copy:
+    src: scripts/updatepackages.sh
+    dest: /etc/cron.daily/updatepackages.sh
+    owner: root
+    group: root
+    mode: +x
