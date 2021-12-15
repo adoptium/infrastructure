@@ -3,8 +3,8 @@ set -eu
 
 setJDKVars() {
 	wget -q https://api.adoptopenjdk.net/v3/info/available_releases
-	JDK_MAX=$(awk -F: '/tip_version/{gsub("[, ]","",$2); print$2}' < available_releases)
-	JDK_GA=$(awk -F: '/most_recent_feature_release/{gsub("[, ]","",$2); print$2}' < available_releases)
+	JDK_MAX=$(awk -F: '/tip_version/{print$2}' < available_releases | tr -d ,)
+	JDK_GA=$(awk -F: '/most_recent_feature_release/{print$2}' < available_releases | tr -d ,)
 	rm available_releases
 }
 
