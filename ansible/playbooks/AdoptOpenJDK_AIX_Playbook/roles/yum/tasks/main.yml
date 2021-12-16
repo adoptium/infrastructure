@@ -95,7 +95,7 @@
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     - bash
-    - autoconf
+    - autoconf-2.69-1
     - bc
     - bison
     - coreutils
@@ -212,10 +212,10 @@
   when: zconf.stat.exists
   tags: yum
 
-- name: Exclude freetype2 from updating past 2.8-1
+- name: Exclude packages from updating
   lineinfile:
     dest: /opt/freeware/etc/yum/yum.conf
     firstmatch: yes
     insertafter: 'plugins=1'
-    line: 'exclude=freetype2*'
+    line: 'exclude=freetype2* autoconf'
   tags: yum
