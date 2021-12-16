@@ -95,7 +95,7 @@
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     - bash
-    - autoconf
+    - autoconf-2.69-1
     - bc
     - bison
     - coreutils
@@ -104,7 +104,7 @@
     - cups-libs
     - expect
     - flex
-    - freetype2-devel
+    - freetype2-devel-2.8-1
     - fontconfig-devel
     - gawk
     - git
@@ -210,4 +210,12 @@
     dest: /usr/include/zconf.h
     state: link
   when: zconf.stat.exists
+  tags: yum
+
+- name: Exclude packages from updating
+  lineinfile:
+    dest: /opt/freeware/etc/yum/yum.conf
+    firstmatch: yes
+    insertafter: 'plugins=1'
+    line: 'exclude=freetype2* autoconf'
   tags: yum
