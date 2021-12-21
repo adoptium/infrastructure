@@ -6,7 +6,7 @@ if [[ $(uname) == "FreeBSD" ]]; then
 	cp -r $HOME/openjdk-build/workspace/build/src/build/*/jdk* $HOME
 	export TEST_JDK_HOME=$HOME/jdk
 else
-	export TEST_JDK_HOME=$(ls -1d "$HOME/openjdk-build/workspace/build/src/build/*/images/jdk*" |grep -v ".*jre.*"|grep -v ".*-image")
+	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |grep -v ".*jre.*"|grep -v ".*-image")
 	echo SXA: TEST_JDK_HOME = "$TEST_JDK_HOME"
 	ls -ld $HOME/openjdk-build/workspace/build/src/build/*/images/*
 fi
