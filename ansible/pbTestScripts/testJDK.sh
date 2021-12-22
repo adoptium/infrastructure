@@ -9,6 +9,12 @@ else
 	export TEST_JDK_HOME=$(find $HOME/openjdk-build/workspace/build/src/build/*/images/ -maxdepth 1 -type d -name "jdk*"|grep -v ".*jre.*"|grep -v ".*-image")
 fi
 
+# Special case for Solaris. See: https://github.com/adoptium/infrastructure/pull/2405#issuecomment-999498345
+if [[ $(uname) == "SunOS" ]]; then
+	export PATH="/opt/csw/bin:${PATH}"
+fi
+
+
 mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
 # cd to aqa-tests as required by https://github.com/adoptium/aqa-tests/issues/2691#issue-932959102
