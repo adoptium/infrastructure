@@ -13,7 +13,7 @@ fi
 
 # Special case for Solaris. See: https://github.com/adoptium/infrastructure/pull/2405#issuecomment-999498345
 if [[ $(uname) == "SunOS" ]]; then
-	export PATH="/opt/csw/bin:${PATH}"
+	export PATH="/opt/csw/bin:/usr/local/bin:${PATH}"
 fi
 
 
@@ -23,7 +23,16 @@ mkdir -p $HOME/testLocation
 cd $HOME/testLocation/aqa-tests
 $HOME/testLocation/aqa-tests/get.sh
 cd $HOME/testLocation/aqa-tests/TKG || exit 1
-export BUILD_LIST=functional
-$MAKE_COMMAND compile
-# Runs this test to check for prerequisite perl modules
-$MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
+
+# Solaris runs a different test to Linux.
+# See: https://adoptium.slack.com/archives/C53GHCXL4/p1641311568115100?thread_ts=1641296204.114900&cid=C53GHCXL4
+if [[ $(uname) == "SunOS" ]]; then
+	export BUILD_LIST=openjdk
+	$MAKE_COMMAND compile
+	$MAKE_COMMAND _jdk_math
+else
+	# Runs this test to check for prerequisite perl modules
+	export BUILD_LIST=functional
+	$MAKE_COMMAND compile
+	$MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
+fi
