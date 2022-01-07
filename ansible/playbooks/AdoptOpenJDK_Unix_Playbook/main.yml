@@ -59,7 +59,9 @@
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
-    - role: gcc_9
+    - role: gcc_9                 # Dragonwell
+      tags: [build_tools]
+    - role: gcc_10                # JDK17+
       tags: [build_tools]
     - role: Xcode
       when: ansible_distribution == "MacOSX"
@@ -109,7 +111,7 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install # JDK18 Build Bootstrap
+    - role: adoptopenjdk_install  # JDK18 Build Bootstrap
       jdk_version: 17
       when:
         - ansible_distribution != "Alpine"
