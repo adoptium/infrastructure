@@ -10,6 +10,7 @@
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+  changed_when: false
   tags: gcc_9
 
 # Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file

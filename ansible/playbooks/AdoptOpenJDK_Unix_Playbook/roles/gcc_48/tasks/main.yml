@@ -6,6 +6,7 @@
   shell: /usr/bin/gcc-4.8 >/dev/null 2>&1
   ignore_errors: yes
   register: gcc_installed
+  changed_when: false
   tags:
     - gcc-4.8
     # TODO: write a condition when NOT to run this step
