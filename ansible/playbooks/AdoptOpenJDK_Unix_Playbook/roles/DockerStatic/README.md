@@ -1,5 +1,7 @@
 # Docker Static containers
 
+A vernose description of our static docker container system can be found in the repoository's [FAQ](https://github.com/adoptium/infrastructure/blob/master/FAQ.md#dockerstatic-test-systems)
+
 ## The purpose of this role
 The DockerStatic ansible role provides allows us to automate the setup of our dockerhost machines using the [dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml) playbook.
 
