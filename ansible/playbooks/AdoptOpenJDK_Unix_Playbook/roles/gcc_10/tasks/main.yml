@@ -8,6 +8,7 @@
   ignore_errors: yes
   register: gcc10_installed
   when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+  changed_when: False
   tags: gcc_10
 
 # Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
