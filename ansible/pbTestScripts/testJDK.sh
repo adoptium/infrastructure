@@ -6,8 +6,11 @@ if [[ $(uname) == "FreeBSD" ]]; then
 	cp -r $HOME/openjdk-build/workspace/build/src/build/*/jdk* $HOME
 	export TEST_JDK_HOME=$HOME/jdk
 else
-	export TEST_JDK_HOME=$(find $HOME/openjdk-build/workspace/build/src/build/*/images/ -maxdepth 1 -type d -name "jdk*"|grep -v ".*jre.*"|grep -v ".*-image")
+	ls -ld $HOME/openjdk-build/workspace/build/src/build/*/images/jdk*
+ 	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |egrep -v 'jre|-image|static-libs'
 fi
+
+echo DEBUG: TEST_JDK_HOME = $TEST_JDK_HOME
 
 mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
