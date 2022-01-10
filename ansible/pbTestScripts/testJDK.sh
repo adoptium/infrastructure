@@ -7,7 +7,7 @@ if [[ "$(uname)" == "FreeBSD" ]]; then
 	export TEST_JDK_HOME=$HOME/jdk
 else
 	ls -ld $HOME/openjdk-build/workspace/build/src/build/*/images/jdk*
- 	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |egrep -v 'jre|-image|static-libs'
+ 	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |egrep -v 'jre|-image|static-libs')
 fi
 
 echo DEBUG: TEST_JDK_HOME = $TEST_JDK_HOME
