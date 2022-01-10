@@ -29,3 +29,9 @@ If you would like to setup an individual container on one of these machines, fol
 
 * Finally, go to https://ci.adoptopenjdk.net/computer/new and create a new jenkins node for this container.
 
+**NOTE**
+If you are creating a new container with the intention of replacing a container with an older OS, follow the above steps to create the new container. Then:
+
+* Stop the old container, `docker stop {{ old container }}` 
+
+* Instead of creating a new node in Jenkins, simply modify the name and PORT number of the replaced node's entry in Jenkins accordingly
