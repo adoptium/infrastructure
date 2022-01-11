@@ -1,0 +1,43 @@
+---
+##########
+# gcc_10 #
+##########
+
+- name: Check if gcc 10.3 is installed on RHEL/CentOS/Ubuntu16
+  shell: /usr/local/gcc10/bin/gcc-10.3 --version 2>&1 > /dev/null
+  ignore_errors: yes
+  register: gcc10_installed
+  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+  changed_when: False
+  tags: gcc_10
+
+# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
+- name: Download AdoptOpenJDK gcc-10.3 binary
+  get_url:
+    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc103.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-10.tar.xz'
+    force: no
+    mode: 0644
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc10_installed.rc != 0
+  tags: gcc_10
+
+- name: Extract AdoptOpenJDK gcc-10 binary to /usr/local/gcc10
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-10.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc10_installed.rc != 0
+  tags: gcc_10
+
+- name: Remove downloaded gcc 10 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-10.tar.xz'
+    state: absent
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc10_installed.rc != 0
+  tags: gcc_10

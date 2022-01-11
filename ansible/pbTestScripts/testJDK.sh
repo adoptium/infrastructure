@@ -6,16 +6,16 @@ if [[ "$(uname)" == "FreeBSD" ]]; then
 	cp -r $HOME/openjdk-build/workspace/build/src/build/*/jdk* $HOME
 	export TEST_JDK_HOME=$HOME/jdk
 else
-	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |grep -v ".*jre.*"|grep -v ".*-image")
-	echo SXA: TEST_JDK_HOME = "$TEST_JDK_HOME"
-	ls -ld $HOME/openjdk-build/workspace/build/src/build/*/images/*
+	ls -ld $HOME/openjdk-build/workspace/build/src/build/*/images/jdk*
+ 	export TEST_JDK_HOME=$(ls -1d $HOME/openjdk-build/workspace/build/src/build/*/images/jdk* |egrep -v 'jre|-image|static-libs')
 fi
+
+echo DEBUG: TEST_JDK_HOME = $TEST_JDK_HOME
 
 # Special case for Solaris. See: https://github.com/adoptium/infrastructure/pull/2405#issuecomment-999498345
 if [[ "$(uname)" == "SunOS" ]]; then
 	export PATH="/opt/csw/bin:/usr/local/bin:${PATH}"
 fi
-
 
 mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
