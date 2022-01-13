@@ -37,3 +37,8 @@ If you are creating a new container with the intention of replacing a container 
 * Stop the old container, `docker stop {{ old container }}` 
 
 * Instead of creating a new node in Jenkins, simply modify the name and PORT number of the replaced node's entry in Jenkins accordingly
+
+## Patching
+
+* The static containers are patched daily using this [script](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) which runs on a daily cron job on each of the dockerhost machines.
+* The script goes into each container and updates every installed package using the container's package manager, yum, apk, apt etc.
