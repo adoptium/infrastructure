@@ -278,6 +278,8 @@ identify them and split them out so they do not have the full playbooks
 executed against them in order to keep the host system "clean". In some
 cases they may be used as `dockerBuild` hosts too.
 
+Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/blob/dockerstatic.docs/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
+
 ### DockerHost TODO:
 1. Set up patching cycle
 2. Identify ways to redeploy when needed to pick up updates
