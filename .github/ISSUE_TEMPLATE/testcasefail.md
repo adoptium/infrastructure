@@ -12,7 +12,7 @@ answer the following questions:
 
 - test suite/name (e.g, BUILD_LIST, TARGET, CUSTOM_TARGET)?
 - a link into recent https://ci.adoptopenjdk.net/view/Test_functional/ runs.
-- Grinder re-run to the test with the failure, if available?
+- **Hyperlink** to the Grinder re-run of the test with the failure, if available.
 - Is there an existing issue elsewhere covering this?
 - Which machine(s) does it work on?
 - Which machine(s) does it fail on?
