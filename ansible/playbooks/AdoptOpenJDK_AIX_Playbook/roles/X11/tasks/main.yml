@@ -16,7 +16,7 @@
   block:
   - name: Verify X11 base library
     stat:
-      path: /usr/lpp/X11.base/X11.base.lib
+      path: /usr/lib/libX11.a
     register: _base
   - name: Verify X11 extensions requirements
     stat:
@@ -28,7 +28,7 @@
     register: _vfb
   - name: Verify Readiness #1
     set_fact:
-      _x11rdy: "{{ _base.stat.exists
+      _x11rdy: "{{ _base.stat.islnk
         and _ext.stat.exists
         and _vfb.stat.exists }}"
   tags: x11
@@ -79,7 +79,7 @@
 
     - name: Re-Verify X11 base requirements
       stat:
-        path: /usr/lpp/X11.base/X11.base.lib
+        file: /usr/lib/libX11.a
       register: _base
 
     - name: Verify X11 extensions requirements
@@ -93,12 +93,18 @@
       register: _vfb
     - name: Set X11 Readiness
       set_fact:
-        _x11rdy: "{{ _base.stat.exists and _ext.stat.exists
+        _x11rdy: "{{ _base.stat.islnk and _ext.stat.exists
           and _vfb.stat.exists }}"
   when: _x11rdy == false
   tags: [x11, vendor_files]
 
-- name: Report X11 Readiness
+- name: Debug X11 Readiness
+  debug:
+    msg: "X11.base.lib: {{ _base.stat.islnk }}\nX11.extensions: {{ _ext.stat.exists }}\nX11.vfb: {{ _vfb.stat.exists }}"
+  when: _x11rdy == false
+  tags: x11
+
+- name: Halt when X11 Not Ready
   fail: msg="Not all required X11 components are installed!"
   when: _x11rdy == false
   tags: x11
