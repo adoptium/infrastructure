@@ -99,6 +99,6 @@
   tags: [x11, vendor_files]
 
 - name: Report X11 Readiness
-  debug:
-    msg: "All required X11 components are installed: {{ _x11rdy }}"
+  fail: msg="Not all required X11 components are installed!"
+  when: _x11rdy == false
   tags: x11
