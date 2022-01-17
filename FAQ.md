@@ -38,11 +38,35 @@ run natively on Windows
 
 ## Running the ansible scripts on another machine or machines (including Windows)
 
-On an Ansible Control Node create an inventory file with the list of machines you want to set up, then
-from the `ansible` directory in this repository run something like this:
+On an Ansible Control Node create your own `ansible.cfg` and `inventory` files.
+Your _ansible.cfg_ file can contain an entry pointing at your _inventory_ file.
+The machines you list in the inventory will _all_ be processed (hosts: all).
+
+One way to enable root logins via ssh is to add somnething like this to your _inventory_ file:
+
+```
+# Variables for all hosts
+# Use 'root' user with authentification provided by a 'local' key
+# You may need to edit the keyname used, e.g., ~/.ssh/ed_ecdsa
+[:vars]
+ansible_ssh_user=root
+ansible_ssh_private_key=~/.ssh/id_rsa
+```
+
+Pointing at a configured _default_ inventory is done n _ansible.cfg_ using a line such as:
+```
+inventory=${HOME}/adoptium/inventory.001
+```
+
+And - directing `ansible` to your config file is as simple as:
+```sh
+export ANSIBLE_CONFIG=${HOME/adoptium/ansible.cfg
+```
+
+While in the `ansible` directory in this repository run something like this:
 
 ```sh
-ansible-playbook -b -i inventory_file --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook [-b] [-i inventory_file] --skip-tags adoptopenjdk,jenkins_user playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 
 If you don't have ssh logins enabled as root, add `-b -u myusername` to the
@@ -60,6 +84,7 @@ ssh-add
 
 and if using the `-b` option, ensure that your user has access to `sudo`
 without a password to the `root` account (often done by adding it to the `wheel` group)
+
 
 ## What about the builds that use the `dockerBuild` tag?
 
