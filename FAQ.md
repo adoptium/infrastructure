@@ -160,6 +160,30 @@ be set to `openj9` and others instead of the default of `hotspot`.  The
 script uses the appropriate environment configuration files under
 `build-form/platform-specific-configurations` to set some options.
 
+## How should I report a test failure
+A **test failure** report is a github issue with the **testFail** tag applied. Most cases are discovered via
+CI testing. And, as the following paragraph iterates - having the test fail using the jenkins
+[Grinder](https://github.com/AdoptOpenJDK/openjdk-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
+is the best way to get some ready-made URL's to use when you create a new **testFail** issue.
+
+A copy/paste of the specific failed jenkins run has limited useability.
+While very useful while the jenkins report is available (i.e., noone has to run the test and wait to see
+the output) there is one immense problem with _ONLY_ that URL for others to see what you have seen - as these
+_test results_ expire and get deleted.
+
+For a good report it is imperative that you also copy/paste a so-called re-run URL. 
+There are several kinds of **RE-RUN** URLS.
+- re-run in Grinder: this can re-run the test using identical parameters as before _and_ maybe on a different host,
+but still one of the same kind.
+- re-run in Grinder on the same machine. Self-explanatory.
+- a re-run URL from within the so-called **Console Output**.
+
+To find these failed-test **re-run URLS** search for the string `parambuild` or `<Jenkins URL>`.
+This will take you to the start of the failed tests URLs that the jenkins job generates. This section ends with
+a lengthy URL prefixed by the text: `rebuild the failed tests in one link:`.
+This is the _excellent re-run URL_ to add to the description of the failed test - as anyone can re-run this
+and focus on what went wrong - OR - verify all have been fixed - because the now ALL pass.
+
 ## How do I replicate a test failure
 
 Many infrastructure issues (generally
