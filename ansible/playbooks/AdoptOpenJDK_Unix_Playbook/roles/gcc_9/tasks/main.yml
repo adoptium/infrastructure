@@ -20,6 +20,7 @@
     dest: '/tmp/ansible-adoptopenjdk-gcc-9.tar.xz'
     force: no
     mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
