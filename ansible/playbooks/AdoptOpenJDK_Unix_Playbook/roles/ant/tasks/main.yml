@@ -9,6 +9,7 @@
   shell: ls /usr/local/apache-ant-1.10.5 >/dev/null 2>&1
   ignore_errors: yes
   register: ant_installed
+  changed_when: false
   tags:
     - ant
     - skip_ansible_lint

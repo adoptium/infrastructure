@@ -11,6 +11,7 @@
   shell: cmake >/dev/null 2>&1
   ignore_errors: yes
   register: cmake_installed
+  changed_when: false
   tags:
     - cmake
     - skip_ansible_lint
@@ -19,6 +20,7 @@
   shell: set -o pipefail | cmake --version 2>/dev/null | grep version | awk '{print $3}'
   when: cmake_installed.rc == 0
   register: cmake_version
+  changed_when: false
   tags: cmake
 
 - name: Download cmake

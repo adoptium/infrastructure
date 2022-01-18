@@ -9,6 +9,7 @@
 - name: Check for Python 2's version
   shell: python -V 2>&1 | grep -Po '(?<=Python )(.+)'
   register: python_version
+  changed_when: false
   ignore_errors: yes
   when:
     - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and (ansible_distribution_major_version == "6")

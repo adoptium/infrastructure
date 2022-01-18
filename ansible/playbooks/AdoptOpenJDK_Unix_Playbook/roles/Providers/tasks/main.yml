@@ -10,6 +10,7 @@
   shell: set -o pipefail | hostname | cut -d- -f2
   ignore_errors: yes
   register: provider_name
+  changed_when: false
   tags:
     - providers
     - adoptopenjdk

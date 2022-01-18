@@ -18,6 +18,7 @@
   shell: /usr/local/bin/make --version >/dev/null
   ignore_errors: yes
   register: goodmake_installed
+  changed_when: false
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and

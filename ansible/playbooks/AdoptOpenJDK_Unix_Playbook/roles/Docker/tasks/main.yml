@@ -6,6 +6,7 @@
   shell: docker >/dev/null 2>&1
   ignore_errors: yes
   register: docker_installed
+  changed_when: false
   tags:
     - docker
     # TODO: write a condition when NOT to run this step

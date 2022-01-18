@@ -99,6 +99,7 @@
   shell: ls -ld {{ path }}* >/dev/null 2>&1
   ignore_errors: yes
   register: adoptopenjdk_installed
+  changed_when: false
   tags:
     - adoptopenjdk_install
     - skip_ansible_lint
@@ -176,6 +177,7 @@
 - name: Get {{ path }}* full path name
   shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
+  changed_when: false
   when:
     - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0

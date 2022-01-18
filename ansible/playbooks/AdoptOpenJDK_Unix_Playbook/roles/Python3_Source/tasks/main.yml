@@ -6,6 +6,7 @@
   shell: python3 --version >/dev/null
   ignore_errors: yes
   register: python3_installed
+  changed_when: false
   tags:
     - python3_source
 

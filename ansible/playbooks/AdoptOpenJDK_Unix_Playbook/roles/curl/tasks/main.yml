@@ -8,6 +8,7 @@
 - name: Check curl version
   shell: curl --version | head -n1 | awk '{print $2}'
   register: curl_version
+  changed_when: false
   tags:
     - curl
     - skip_ansible_lint
@@ -88,6 +89,7 @@
 - name: Get macOS version
   shell: sw_vers -productVersion
   register: macos_version
+  changed_when: false
   when:
     - ansible_distribution == "MacOSX"
   tags: curl
@@ -112,6 +114,7 @@
 - name: Find install directory MacOS
   shell: ls -la /usr/local/Cellar/curl/7.*/bin/curl | awk '{print $9}'
   register: curl_install_dir
+  changed_when: false
   when:
     - ansible_distribution == "MacOSX"
     - "macos_version_number is version('10.13', '>')"

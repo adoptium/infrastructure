@@ -9,6 +9,7 @@
 - name: Check version of ca-certificates package on the system ...
   shell: rpm -q ca-certificates | grep -E 'ca-certificates.2020|ca-certificates.201' warn=no
   register: cacertsold
+  changed_when: false
   ignore_errors: true
 
 - name: Install prereqs for building openssl
@@ -30,6 +31,7 @@
 - name: Verify checksum for CentOS7 OpenSSL 1.0.2k SRPM
   shell: sha256sum  openssl-1.0.2k-21.el7_9.src.rpm | grep ^6dd850b2be01ff85c500428461019566984d91d7ad8d0002885d33ea37546da4
   when: cacertsold.rc == 0
+  changed_when: false
 
 # Invoking rpm as ansible yum module skips due to non-source RPM presence
 - name: Install CentOS7 OpenSSL 1.0.2k SRPM ...
@@ -73,6 +75,7 @@
 - name: Verify checksum for CentOS6 ca-certificates download ...
   shell: sha256sum ca-certificates-2020.2.41-65.1.el6_10.src.rpm | grep ^85326e70da937c09d342612190d23d3501a2a46954d2e197f9d343bf060ca000
   when: cacertsold.rc == 0
+  changed_when: false
 
 # Invoking rpm as ansible yum module skips due to non-source RPM presence
 - name: Install CentOS6 ca-certificates SRPM ...
@@ -86,6 +89,7 @@
 - name: Verify checksum for CentOS7 ca-certificates  download ...
   shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^86fe6df26e7612e63a70e435786f2eb6587cb00e6f9927aea113797afacebb57
   when: cacertsold.rc == 0
+  changed_when: false
 
 - name: Extract certdata.txt from CentOS7 ca-certificates SRPM ...
   shell: rpm2cpio ca-certificates-2021.2.50-72.el7_9.src.rpm | (cd /root/rpmbuild/SOURCES && cpio -idmv certdata.txt)

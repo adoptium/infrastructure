@@ -11,6 +11,7 @@
   shell: ccache --version >/dev/null
   ignore_errors: yes
   register: ccache_status
+  changed_when: false
   tags: ccache
 
 - name: Download ccache.tar.gz
