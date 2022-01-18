@@ -46,6 +46,10 @@
     - name: Install/update rpm.rte
       command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
 
+    # This is needed so that yum can find dependencies supplied by AIX BOS
+    - name: Update RPM database to include AIX BOS support
+      command: /usr/sbin/updtvpkg
+
     - name: Transfer yum bundle package
       get_url:
         url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum_bundle.tar
@@ -64,40 +68,33 @@
         state: absent
         path: /tmp/yum
 
+    - name: Update yum installation
+      yum:
+        update_cache: yes
+        name: '*'
+        state: latest
+
+    - name: Install yum-utils
+      yum: name=yum-utils state=present
+      tags:
+        - yum
+
+    - name: Ensure AIX_Toolbox repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox
+      tags: yum
+
+    - name: Ensure AIX_Toolbox_noarch repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox_noarch
+      tags: yum
+
+    - name: Ensure AIX_Toolbox_71 repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox_71
+      tags: yum
   when: _yum.stat.islnk is not defined
   tags:
     - yum
-    - vendor_files
 
-- name: Install yum-utils
-  yum: name=yum-utils state=present update_cache=yes
-  tags:
-    - yum
-
-- name: Ensure AIX_Toolbox repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox
-  tags: yum
-
-- name: Ensure AIX_Toolbox_noarch repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox_noarch
-  tags: yum
-
-- name: Ensure AIX_Toolbox_71 repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox_71
-  tags: yum
-
-- name: Yum update
-  yum:
-    update_cache: yes
-    name: '*'
-    state: latest
-    exclude: cmake*
-  tags:
-    - yum
-    #TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Install yum package support
+- name: Install OSS dev run-time-env using yum
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     - bash
@@ -218,10 +215,24 @@
   when: zconf.stat.exists
   tags: yum
 
-- name: Exclude packages from updating
+- name: Exclude packages from yum (main)
   lineinfile:
     dest: /opt/freeware/etc/yum/yum.conf
     firstmatch: yes
     insertafter: 'plugins=1'
-    line: 'exclude=freetype2* autoconf'
+    line: 'exclude=autoconf cmake* freetype2*'
   tags: yum
+
+- name: Update AIXToolbox to latest using yum
+  yum:
+    update_cache: yes
+    name: '*'
+    state: latest
+    exclude:
+      autoconf*
+      cmake*
+      freetype2*
+  tags:
+    - yum
+    #TODO: Package installs should not use latest
+    - skip_ansible_lint
