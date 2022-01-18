@@ -34,7 +34,7 @@
 
   - name: Compute X11 Readiness
     set_fact:
-      _x11rdy: "{{ _base.stat.exists and (_base.stat._islnk is defined)
+      _x11rdy: "{{ ((_base.stat.islnk is defined) and _base.stat.islnk)
         and _ext.stat.exists
         and _vfb.stat.exists }}"
 
