@@ -4,6 +4,7 @@
 #####################
 - name: Display Debug Information
   debug:
+    verbosity: 1
     msg:
       - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
       - "ansible_hostname: {{ ansible_hostname | default('***Undefined***') }}"
@@ -23,4 +24,3 @@
       - "Superuser_Account: {{ Superuser_Account | default('***Undefined***') }}"
       - "Vendor_File: {{ Vendor_File | default('***Undefined***') }}"
       - "Nagios_Plugins: {{ Nagios_Plugins | default('***Undefined***') }} "
-  tags: debug

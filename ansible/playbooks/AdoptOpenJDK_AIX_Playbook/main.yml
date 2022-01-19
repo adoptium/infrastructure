@@ -12,7 +12,7 @@
     PERL_MB_OPT: "--install_base /opt/freeware"
     PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
   vars:
-    swap_size: 4096
+    swap_size: 2048
 
   roles:
     - debug
@@ -40,29 +40,7 @@
     # the tasks that setup the legal shells needed for user configuration
     # may need to be performed AFTER yum processing - rather than before
 
-    # 3. Core OSS installation
-
-    ## Note: this may actually already be performed - partially
-    ## depending on how python - to use Ansible - has been prepared
-    # yum based installation of additional software
-    # installs some gnu packages required by ansible modules
-    # Note: AIX File system configuration must be run now as RPM based software
-    # cannot expand filesystem space on demand
-    - aixfs
-    - yum
-
-    # 4. AIX User Admin
-
-    # users needed - wait until here to be sure bash is installed
-    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
-    # to the list of legal shells.
-    - rbac
-    - role: jenkins_user
-      tags: adoptopenjdk
-    - role: zeus_user
-      tags: adoptopenjdk
-
-    # 5. Additional Software: both licensed and OSS
+    # 3. Additional Software: both licensed and OSS
 
     # Note: although X11 is AIX BOS software - there is a chance that the
     # Ansible module unarchive: may be called - and that requires,
@@ -74,13 +52,38 @@
     - xlc_v13
     - xlc_v16
 
+    # 4. Core OSS installation
+
+    ## Note: this may actually already be performed - partially
+    ## depending on how python - to use Ansible - has been prepared
+    # yum based installation of additional software
+    # installs some gnu packages required by ansible modules
+    # Note: AIX File system configuration must be run now as RPM based software
+    # cannot expand filesystem space on demand
+    ### Disabling call of aixfs as it breaks more than it fixes
+    # - aixfs
+    - yum
+
     ## additional OSS packages
     - ant
     - ant_contrib
 
+    # 5. AIX User Admin
+
+    # users needed - wait until here to be sure bash is installed
+    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
+    # to the list of legal shells.
+    - rbac
+    - role: jenkins_user
+      tags: adoptopenjdk
+    - role: zeus_user
+      tags: adoptopenjdk
+
     # 6. Install OJDK Bootstraps
 
-    - bootjdk7
+    # Disabling bootjdk7 - as likely extinct.
+    # In any case, bootfile to install is not publically available
+    # - bootjdk7
     - role: bootjdk
       jdk: 8
       tags: bootjdk8
@@ -145,13 +148,17 @@
       stat:
         path: /home/{{ Jenkins_Username }}/freemarker.jar
       register: freemarker
-      tags: freemarker
+      tags:
+        - freemarker
+        - jenkins_user
 
     - name: "freemarker.jar found, skipping download"
       debug:
         msg: "freemarker.jar found, skipping download"
       when: not freemarker.stat.exists
-      tags: freemarker
+      tags:
+        - freemarker
+        - jenkins_user
 
     - name: Download and extract freemarker.jar
       unarchive:
@@ -162,12 +169,16 @@
         group: staff
         mode: 0755
       when: not freemarker.stat.exists
-      tags: freemarker
+      tags:
+        - freemarker
+        - jenkins_user
 
     - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
       command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
       when: not freemarker.stat.exists
-      tags: freemarker
+      tags:
+        - freemarker
+        - jenkins_user
 
     - name: Clean freemarker tmp files
       file:
