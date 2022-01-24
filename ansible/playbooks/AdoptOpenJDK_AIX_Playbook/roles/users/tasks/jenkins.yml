@@ -1,0 +1,18 @@
+################
+# Jenkins user #
+################
+---
+- name: Set authorized key for jenkins user
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+  ignore_errors: yes
+  delegate_to: localhost
+  register: jenkins_rsa
+
+- name: warn about failed copy
+  debug:
+    msg: "{{ Jenkins_User_SSHKey }} failed to copy"
+  when: jenkins_rsa.failed == true
+  tags: jenkins_user

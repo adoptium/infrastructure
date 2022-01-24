@@ -2,7 +2,7 @@
 #####################
 # Debug Information #
 #####################
-- name: Display Debug Information
+- name: Display Debug Information (-v)
   debug:
     verbosity: 1
     msg:

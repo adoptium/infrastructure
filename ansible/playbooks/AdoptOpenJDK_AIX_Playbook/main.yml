@@ -14,8 +14,15 @@
   vars:
     swap_size: 2048
 
+  pre_tasks:
+  - name: Make Adoptium group
+    group:
+      name: adoptium
+      state: present
+
   roles:
-    - debug
+    - role: debug
+      tags: debug
 
     # Roles are put into 6 groups
     ## AIX BOS install requirements
@@ -30,6 +37,7 @@
     # These packages are installed using installp - which can enlarge
     # filesystem space, as needed, on demand
     - openssl
+    - security
 
     # 2. AIX BOS configuration
 
@@ -73,11 +81,14 @@
     # users needed - wait until here to be sure bash is installed
     # tbd: Need other actions performed first - mainly adding /usr/bin/bash
     # to the list of legal shells.
-    - rbac
-    - role: jenkins_user
-      tags: adoptopenjdk
-    - role: zeus_user
-      tags: adoptopenjdk
+    - role: rbac
+      tags:
+      - adoptopenjdk
+      - users
+    - role: users
+      tags:
+      - adoptopenjdk
+      - users
 
     # 6. Install OJDK Bootstraps
 
@@ -144,58 +155,48 @@
   ##############
   # freemarker #
   ##############
-    - name: Check for freemarker.jar existence
-      stat:
-        path: /home/{{ Jenkins_Username }}/freemarker.jar
-      register: freemarker
-      tags:
-        - freemarker
-        - jenkins_user
+    - name: Add freemarker to jenkins
+      block:
+      - name: Check for freemarker.jar existence
+        stat:
+          path: /home/{{ Jenkins_Username }}/freemarker.jar
+        register: freemarker
+        tags:
+          - freemarker
 
-    - name: "freemarker.jar found, skipping download"
-      debug:
-        msg: "freemarker.jar found, skipping download"
-      when: not freemarker.stat.exists
-      tags:
-        - freemarker
-        - jenkins_user
+      - name: "freemarker.jar found, skipping download"
+        debug:
+          msg: "freemarker.jar found, skipping download"
+        when: not freemarker.stat.exists
+        tags:
+          - freemarker
 
-    - name: Download and extract freemarker.jar
-      unarchive:
-        src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
-        dest: /tmp/
-        remote_src: yes
-        owner: "{{ Jenkins_Username }}"
-        group: staff
-        mode: 0755
-      when: not freemarker.stat.exists
-      tags:
-        - freemarker
-        - jenkins_user
+      - name: Download and extract freemarker.jar
+        unarchive:
+          src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
+          dest: /tmp/
+          remote_src: yes
+          owner: "{{ Jenkins_Username }}"
+          group: staff
+          mode: 0755
+        when: not freemarker.stat.exists
+        tags:
+          - freemarker
 
-    - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-      command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-      when: not freemarker.stat.exists
-      tags:
-        - freemarker
-        - jenkins_user
+      - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+        command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
+        when: not freemarker.stat.exists
+        tags:
+          - freemarker
 
-    - name: Clean freemarker tmp files
-      file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - /tmp/freemarker-2.3.8
-        - /tmp/freemarker-2.3.8.tar.gz
+      - name: Clean freemarker tmp files
+        file:
+          path: "{{ item }}"
+          state: absent
+        with_items:
+          - /tmp/freemarker-2.3.8
+          - /tmp/freemarker-2.3.8.tar.gz
       tags: freemarker
-
-  ##################
-  # Nagios plugins #
-  ##################
-    - name: Include Nagios Playbook
-      include_tasks: nagios/nagios_aix.yml
-      when: Nagios_Plugins == "Enabled"
-      tags: [nagios, adoptopenjdk]
 
   ###################
   # NTP Time Server #
