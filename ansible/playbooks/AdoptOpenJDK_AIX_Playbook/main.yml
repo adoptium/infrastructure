@@ -68,8 +68,7 @@
     # installs some gnu packages required by ansible modules
     # Note: AIX File system configuration must be run now as RPM based software
     # cannot expand filesystem space on demand
-    ### Disabling call of aixfs as it breaks more than it fixes
-    # - aixfs
+    - aixfs
     - yum
 
     ## additional OSS packages
