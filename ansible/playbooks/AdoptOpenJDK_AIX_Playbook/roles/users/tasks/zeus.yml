@@ -17,19 +17,19 @@
 
 - name: "Customize {{ username }}"
   block:
-  - name: Add key
-    authorized_key:
-      user: zeus
-      state: present
-      key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
-    delegate_to: localhost
-    ignore_errors: true
+    - name: Add key
+      authorized_key:
+        user: zeus
+        state: present
+        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+      delegate_to: localhost
+      ignore_errors: true
 
-  - name: Grant zeus sudo powers
-    lineinfile:
-      dest: /etc/sudoers
-      state: present
-      regexp: '^zeus'
-      line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-    ignore_errors: True
+    - name: Grant zeus sudo powers
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^zeus'
+        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+      ignore_errors: True
   when: auth_key is defined and auth_key.failed == False

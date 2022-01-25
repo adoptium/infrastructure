@@ -11,9 +11,9 @@
   fail:
     msg: "OpenSSL is required. Version 1.0.2p (1.0.2.1601) or later"
   when: not (openssl_bin.stat.exists and openssl_bin.stat.executable)
-  
+
 - name: Get openssl version
-  command: openssl version 
+  command: openssl version
   register: openssl_version
 
 - name: Check Version legitimacy

@@ -1,7 +1,7 @@
 #########################################################################
 # Playbook to setup basic AIX hardening
-  # Deactivate inetd - to stop all services such as telnet, ftp, rexecd
-  # remove cas_agent, if installed. Not needed in modern systems
+# - Deactivate inetd - to stop all services such as telnet, ftp, rexecd
+# - remove cas_agent, if installed. Not needed in modern systems
 #########################################################################
 ---
 - name: Remove obsolete agent (for Director, FSM based system management)

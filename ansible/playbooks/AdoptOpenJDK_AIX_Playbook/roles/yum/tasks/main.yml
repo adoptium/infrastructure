@@ -203,6 +203,7 @@
 
 ##############################################################################
 # Update Packages (not locked) to latest level
+#  TODO: Package installs should not use latest (skip_ansible_lint tag)
 ##############################################################################
 - name: Update AIXToolbox to latest using yum
   yum:
@@ -215,7 +216,6 @@
       freetype2*
   tags:
     - yum
-    #TODO: Package installs should not use latest
     - skip_ansible_lint
 
 ##############################################################################
