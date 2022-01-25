@@ -42,6 +42,7 @@
 
 # Not in user module - set default account attributes
 # ALWAYS done, just in case.
+# As tasks are included HERE {{ username }} is different for each iteration
 - name: "Set/reset {{ username }} attributes"
   include_tasks: user_attributes.yml
   loop:

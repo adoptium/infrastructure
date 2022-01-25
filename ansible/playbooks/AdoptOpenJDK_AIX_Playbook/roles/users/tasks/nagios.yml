@@ -2,12 +2,6 @@
 # AdoptOpenJDK - Ansible Playbook to install Nagios plugins on AIX #
 ####################################################################
 ---
-- debug:
-    msg: 'Processing Nagios plugins'
-    verbosity: 1
-##################
-# Install Nagios #
-##################
 - name: Check for Nagios at /opt/nagios/libexec
   stat:
     path: /opt/nagios/libexec

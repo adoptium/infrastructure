@@ -7,7 +7,8 @@
     path: /usr/bin/openssl
   register: openssl_bin
 
-- fail:
+- name: "Fail: OpenSSL 1.0.2p or later required"
+  fail:
     msg: "OpenSSL is required. Version 1.0.2p (1.0.2.1601) or later"
   when: not (openssl_bin.stat.exists and openssl_bin.stat.executable)
   
@@ -20,7 +21,8 @@
     rdy: openssl_version.split(' ')[1] >= '1.0.2p'
   when: openssl_version is defined
 
-- fail:
+- name: "Fail: OpenSSL 1.0.2p or later required"
+  fail:
     msg:
       - "OpenSSL Version 1.0.2p (1.0.2.1601) or later is required."
       - "current OpenSSL: {{ openssl_version.stdout }}"

@@ -1,0 +1,24 @@
+########################################################################
+# This task is included to permit processing a list of commands        #
+########################################################################
+- name: "Tagged Block for setting security attributes on {{ rbac_cmd }}"
+  block:
+    - name: "Verify file {{ rbac_cmd }} exists"
+      stat:
+        path: "{{ rbac_cmd }}"
+      register: _exists
+
+    - name: "Add authorization to command {{ rbac_cmd }}"
+      block:
+      - name: "Add authorization to command {{ rbac_cmd }}"
+        shell:
+          setsecattr -c accessauths=ojdk.rtclk
+            innateprivs=PV_PROC_RTCLK
+            inheritprivs=PV_PROC_RTCLK
+            secflags=FSF_EPS
+            "{{ rbac_cmd }}"
+
+      - name: Update Security Tables
+        shell: setkst
+      when: _exists.stat.exists and _exists.stat.isreg
+  tags: rbac
