@@ -1,4 +1,4 @@
-# openjdk-infrastructure guide to frequent modifications and usage
+# Adoptium -infrastructure guide to frequent modifications and usage
 
 ## Access control in the repository
 
@@ -106,7 +106,7 @@ the appropriate CI system listed in the table above by configuring them with
 the ansible playbooks and pushing them up to Docker Hub where they can be
 consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
 defined on the jenkins build pipelines as configured in the
-[pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+[pipeline_config files](https://github.com/adoptium/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
 
 ## Adding a new role to the ansible scripts
 
@@ -141,8 +141,8 @@ build failure is occurring on a particular system. Assuming it's not a
 locally. The easiest way to do this is as follows (ideally not as root as
 that can mask problems).
 ```
-git clone https://github.com/adoptopenjdk/openjdk-build
-cd openjdk-build/build-farm
+git clone https://github.com/adoptium/temurin-build.git
+cd temurin-build/build-farm
 export CONFIGURE_ARGS=--with-native-debug-symbols=none
 export BUILD_ARGS="--custom-cacerts false"
 ./make-adopt-build-farm.sh jdk11u
@@ -151,7 +151,7 @@ export BUILD_ARGS="--custom-cacerts false"
 (NOTE: `jdk11u` is the default if nothing is specified)
 
 The two `export` lines are based on the options in the
-[Build FAQ](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/blob/quickbuild/FAQ.md#how-do-i-build-more-quickly)
+[Build FAQ](https://github.com/adoptium/ci-jenkins-pipelines/blob/quickbuild/FAQ.md#how-do-i-build-more-quickly)
 and speed up the process by not building the debug
 symbols and not generating our own certificate bundles.  For most problems,
 neither are needed Look at the start of the script for other environment
@@ -163,7 +163,7 @@ script uses the appropriate environment configuration files under
 ## How should I report a test failure
 A **test failure** report is a github issue with the **testFail** tag applied. Most cases are discovered via
 CI testing. And, as the following paragraph iterates - having the test fail using the jenkins
-[Grinder](https://github.com/AdoptOpenJDK/openjdk-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
+[Grinder](https://github.com/adoptium/aqua-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
 is the best way to get some ready-made URL's to use when you create a new **testFail** issue.
 
 A copy/paste of the specific failed jenkins run has limited useability.
@@ -191,7 +191,7 @@ Many infrastructure issues (generally
 as the result of failing JDK tests which are believed to be problems
 relating to the set up of our machines.  In most cases it is useful to
 re-run jobs using the jenkins
-[Grinder](https://github.com/AdoptOpenJDK/openjdk-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
+[Grinder](https://github.com/adoptium/aqua-tests/wiki/How-to-Run-a-Grinder-Build-on-Jenkins)
 jobs which lets you run almost any test on any machine which is connected to
 jenkins.  In most cases `testFail` issues will have a link to the jenkins
 job where the failure occurred.  On that job there will be a "Rerun in
@@ -203,7 +203,7 @@ want to try and replicate it, or determine which machines it passes and
 fails on.
 
 For more information on test case diagnosis, there is a full
-[Triage guide](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/Triage.md)
+[Triage guide](https://github.com/adoptium/aqua-tests/blob/master/doc/Triage.md)
 in the openjdk-tests repository
 
 The values for `TARGET` can be found in thte `<testCaseName>` elements of
@@ -228,16 +228,16 @@ to be available.  Note that when building the `system` suite, there must be
 a java in the path to build the mauve tests.  The final make command runs
 the test - it is normally a valid Grinder `TARGET` such as `jdk_net`. There
 is more information on running tests yourself in the
-[tests repository](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
+[tests repository](https://github.com/adoptium/aqua-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of:
 - `BUILD_LIST=functional`, `CUSTOM_TARGET=_MBCS_Tests_pref_ja_JP_linux_0`
 - `BUILD_LIST=system`, `CUSTOM_TARGET=_MachineInfo`
 - `BUILD_LIST=openjdk`, `CUSTOM_TARGET=test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` (`en_US.utf8` locale required)
-- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234)
+- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in https://github.com/adoptium/aqua-tests/pull/2234)
 
 (For the last one, that makes use of the system.custom target added via
-[this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
+[this PR](https://github.com/adoptium/aqua-tests/pull/2234))
 
 ## Testing changes
 
