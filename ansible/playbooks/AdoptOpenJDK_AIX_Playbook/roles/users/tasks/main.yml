@@ -15,8 +15,8 @@
   user:
     name: "{{ username }}"
     shell: /usr/bin/ksh
-    group: adoptium
-    groups: adoptium,staff
+    group: staff
+    groups: staff
     append: yes
     generate_ssh_key: yes
     ssh_key_bits: 4096

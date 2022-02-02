@@ -14,12 +14,6 @@
   vars:
     swap_size: 2048
 
-  pre_tasks:
-    - name: Make Adoptium group
-      group:
-        name: adoptium
-        state: present
-
   roles:
     - role: debug
       tags: debug
