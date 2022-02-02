@@ -20,7 +20,7 @@
       unarchive:
         src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
         dest: /tmp/
-        remote_src: yes
+        remote_src: true
       when: not antcontrib.stat.exists
 
     - name: Move ant-contrib.jar to lib folder

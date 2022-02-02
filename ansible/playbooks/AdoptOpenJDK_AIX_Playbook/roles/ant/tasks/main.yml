@@ -19,7 +19,7 @@
       unarchive:
         src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
         dest: /opt
-        remote_src: yes
+        remote_src: true
       when: ant.stat.islnk is not defined
 
     - name: Create symlink for ant

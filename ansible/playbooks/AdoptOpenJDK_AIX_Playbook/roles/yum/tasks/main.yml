@@ -13,7 +13,7 @@
 # Use set -o pipefail -o to quiet AnsibleLint
 - name: Remove conflicting packages before install yum
   shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
-  ignore_errors: True
+  ignore_errors: true
   when: _yum.stat.islnk is not defined
   tags:
     - yum
@@ -80,7 +80,7 @@
   block:
     - name: Update YUM
       yum:
-        update_cache: yes
+        update_cache: true
         name: '*'
         state: latest
 
@@ -169,7 +169,7 @@
 
 - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
   shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
-  ignore_errors: True
+  failed_when: false
   tags:
     - rpm_install
     - yum
@@ -193,7 +193,7 @@
 - name: Exclude packages from yum (main)
   lineinfile:
     dest: /opt/freeware/etc/yum/yum.conf
-    firstmatch: yes
+    firstmatch: true
     insertafter: 'plugins=1'
     line: 'exclude=autoconf cmake* freetype2*'
   tags:
@@ -207,7 +207,7 @@
 ##############################################################################
 - name: Update AIXToolbox to latest using yum
   yum:
-    update_cache: yes
+    update_cache: true
     name: '*'
     state: latest
     exclude:

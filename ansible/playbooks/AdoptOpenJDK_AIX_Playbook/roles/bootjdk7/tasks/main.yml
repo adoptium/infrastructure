@@ -13,7 +13,7 @@
     unarchive:
       src: /Vendor_Files/aix/openjdk-7u-aix.tar
       dest: /usr
-      remote_src: no
+      remote_src: false
     when: java7.stat.isdir is not defined
 
   - name: Check again for Java7 availability

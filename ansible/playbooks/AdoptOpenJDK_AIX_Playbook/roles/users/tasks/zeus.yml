@@ -12,7 +12,7 @@
     path: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
   register: auth_key
   delegate_to: localhost
-  ignore_errors: yes
+  failed_when: false
   when: sudoers.stat.exists and sudoers.stat.isreg and Superuser_Account == "Enabled"
 
 - name: "Customize {{ username }}"
@@ -23,7 +23,7 @@
         state: present
         key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
       delegate_to: localhost
-      ignore_errors: true
+      failed_when: false
 
     - name: Grant zeus sudo powers
       lineinfile:
@@ -31,5 +31,5 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-      ignore_errors: True
+      failed_when: false
   when: auth_key is defined and auth_key.failed == False

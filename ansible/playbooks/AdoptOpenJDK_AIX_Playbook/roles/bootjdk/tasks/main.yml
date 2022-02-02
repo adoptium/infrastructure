@@ -11,7 +11,7 @@
   unarchive:
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr
-    remote_src: yes
+    remote_src: true
   when:
     - java_installed.stat.isdir is not defined
     - jdk != 17
@@ -20,7 +20,7 @@
   unarchive:
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ea/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: /usr
-    remote_src: yes
+    remote_src: true
   when:
     - java_installed.stat.isdir is not defined
     - jdk == 17

@@ -18,7 +18,7 @@
         src: /tmp/nagios.tar.gz
         dest: /opt
         mode: 0755
-        remote_src: True
+        remote_src: true
 
     - name: Cleanup Install files
       file:
@@ -45,5 +45,5 @@
     user: nagios
     state: present
     key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
-    ignore_errors: True
+    failed_when: false
   when: Nagios_User_SSHKey is defined

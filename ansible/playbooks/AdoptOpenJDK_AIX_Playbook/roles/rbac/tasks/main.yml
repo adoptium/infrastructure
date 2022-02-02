@@ -14,7 +14,7 @@
   shell: lsauth ojdk.rtclk
   register: rtclk_exists
   failed_when: rtclk_exists.rc != 0 and rtclk_exists.rc != 2
-  changed_when: False
+  changed_when: false
   tags: rbac
 
 - name: Update RBAC to include new authorizations

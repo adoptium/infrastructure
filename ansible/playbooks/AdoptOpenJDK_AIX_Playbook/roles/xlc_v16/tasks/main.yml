@@ -20,14 +20,14 @@
       unarchive:
         src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
         dest: /tmp
-        remote_src: no
+        remote_src: false
       register: _vendor_copied
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Install IBM XLC16 - installp
       command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/usr/sys/inst.images all
       register: _installp
-      ignore_errors: yes
+      ignore_errors: true
       when: _vendor_copied.failed is defined and _vendor_copied.failed == false
 
     - name: 'Errors from the previous installp command can be ignored'
@@ -45,7 +45,7 @@
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
   register: xlc16_qversion
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: false
   tags: xlc16
 

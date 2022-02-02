@@ -7,7 +7,7 @@
     user: "{{ username }}"
     state: present
     key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
-  ignore_errors: yes
+  failed_when: false
   delegate_to: localhost
   register: jenkins_rsa
   tags: jenkins_user

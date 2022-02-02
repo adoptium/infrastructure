@@ -4,7 +4,7 @@
 ---
 - name: Ensure /etc/syslog.conf entries are present
   blockinfile:
-    backup: yes
+    backup: true
     dest: /etc/syslog.conf
     block: |
       *.debug;*.emerg;*.alert;*.crit;*.warning /var/log/messages rotate size 1000k files 4
@@ -21,15 +21,15 @@
     - /var/log/syslog
     - /var/adm/messages
     - /var/log/messages
-  changed_when: False
+  changed_when: false
   tags: syslog
 
 - name: Reload syslogd
   service: name=syslogd state=reloaded
-  changed_when: False
+  changed_when: false
   tags: syslog
 
 - name: Ensure full core files are enabled
   command: chdev -l sys0 -a fullcore=true
-  changed_when: False
+  changed_when: false
   tags: syslog
