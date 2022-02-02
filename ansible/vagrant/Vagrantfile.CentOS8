@@ -4,7 +4,7 @@
 $script = <<SCRIPT
 # CentOS8 is EOL, need to replace AppStream / BaseOS yum repos
 # See https://github.com/adoptium/infrastructure/issues/2462
-for RepoName in BaseOS AppStream
+for RepoName in BaseOS AppStream PowerTools
 do
   sudo sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Linux-${RepoName}.repo
   sudo sed -i -e '$ a baseurl=http://vault.centos.org/\$contentdir/\$releasever/'"${RepoName}"'/\$basearch/os/' /etc/yum.repos.d/CentOS-Linux-${RepoName}.repo
