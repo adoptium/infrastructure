@@ -86,9 +86,6 @@
     # 6. Install OJDK Bootstraps
 
     - bootjdk7
-      tags:
-        - bootjdk7
-        - adoptopenjdk
     - role: bootjdk
       jdk: 8
       tags:

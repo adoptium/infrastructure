@@ -2,28 +2,33 @@
 # Boot JDK 7 #
 ##############
 ---
-- name: Check Java7 installation
-  stat:
-    path: /usr/j2sdk-image
-  register: java7
+- name: Install BOOTJDK7 images
+  block:
+  - name: Check Java7 installation
+    stat:
+      path: /usr/j2sdk-image
+    register: java7
 
-- name: Transfer and Extract Java7
-  unarchive:
-    src: /Vendor_Files/aix/openjdk-7u-aix.tar
-    dest: /usr
-    remote_src: no
-  when: java7.stat.isdir is not defined
+  - name: Transfer and Extract Java7
+    unarchive:
+      src: /Vendor_Files/aix/openjdk-7u-aix.tar
+      dest: /usr
+      remote_src: no
+    when: java7.stat.isdir is not defined
 
-- name: Check again for Java7 availability
-  stat:
-    path: /usr/j2sdk-image
-  register: java7
-  when: java7.stat.isdir is not defined
+  - name: Check again for Java7 availability
+    stat:
+      path: /usr/j2sdk-image
+    register: java7
+    when: java7.stat.isdir is not defined
 
-- name: Mention explicit need for Vendor_Files to get java7
-  debug:
-    msg:
-      - "must have access to /Vendor_Files/aix/openjdk-7u-aix.tar"
-      - "to install java7 at /usr/j2sdk-image"
-    verbosity: 0
-  when: java7.stat.isdir is not defined
+  - name: Mention explicit need for Vendor_Files to get java7
+    debug:
+      msg:
+        - "must have access to /Vendor_Files/aix/openjdk-7u-aix.tar"
+        - "to install java7 at /usr/j2sdk-image"
+      verbosity: 0
+    when: java7.stat.isdir is not defined
+  tags:
+    - bootjdk7
+    - adoptopenjdk
