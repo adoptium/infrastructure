@@ -3,11 +3,11 @@
 # The role is assigned to the jenkins user
 # See: https://github.com/adoptium/infrastructure/issues/1803
 # Additional:
-# the suggested fix: https://github.com/adoptium/infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
-# works on AIX 7.1 TL5 AIX 7.2 TL2
-# AIX 7.1 TL4 requires RBAC instead
-# assumption is that the 'CAP_*' capabilities already in the playbook
-# activate the core privilidge with the need for RBAC additions
+# the original fix: https://github.com/adoptium/infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
+# works on AIX 7.1 TL5 AIX 7.2 TL2, but not on AIX 7.1 TL4 (capabilities not working there).
+# AIX 7.1 TL4 and later work with RBAC
+# See also: https://github.com/adoptium/infrastructure/issues/1918
+# See also: https://github.com/adoptium/infrastructure/pull/2052 (not merged)
 #########################################################################
 ---
 - name: Check if auth already exists
@@ -29,9 +29,14 @@
         mkauth dfltmsg="PV_PROC_RTCLK for metronome garbage collection policy" ojdk.rtclk
       register: _rtclk
       failed_when: _rtclk.rc != 0 and _rtclk.rc != 17
+    - name: CORE DUMP Authorization
+      shell:
+        mkauth dfltmsg="PV_PROC_CORE for to allow process core dumps" ojdk.proccore
+      register: _rtcore
+      failed_when: _rtclk.rc != 0 and _rtclk.rc != 17
     - name: RealTime Clock Role
       shell:
-        mkrole authorizations='ojdk.rtclk' dfltmsg='Realtime Clock user' rtclk
+        mkrole authorizations='ojdk.rtclk,ojdk.proccore' dfltmsg='Adoptium Role for testing' rtclk
     - name: Update Security Tables
       shell: setkst
   when: rtclk_exists.rc == 2

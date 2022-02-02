@@ -10,6 +10,7 @@
   ignore_errors: yes
   delegate_to: localhost
   register: jenkins_rsa
+  tags: jenkins_user
 
 - name: warn about failed copy
   debug:

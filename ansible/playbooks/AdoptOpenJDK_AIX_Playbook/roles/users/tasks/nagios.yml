@@ -46,5 +46,4 @@
     state: present
     key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
     ignore_errors: True
-
   when: Nagios_User_SSHKey is defined

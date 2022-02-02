@@ -1,5 +1,7 @@
 ########################################################################
 # This task is included to permit processing a list of commands        #
+# See: https://github.com/adoptium/infrastructure/issues/1918
+# and https://github.com/adoptium/infrastructure/issues/1803
 ########################################################################
 ---
 - name: "Tagged Block for setting security attributes on {{ rbac_cmd }}"
@@ -13,9 +15,9 @@
       block:
         - name: "Add authorization to command {{ rbac_cmd }}"
           shell:
-            setsecattr -c accessauths=ojdk.rtclk
-              innateprivs=PV_PROC_RTCLK
-              inheritprivs=PV_PROC_RTCLK
+            setsecattr -c accessauths=ojdk.rtclk,ojdk.proccore
+              innateprivs=PV_PROC_RTCLK,PV_PROC_CORE
+              inheritprivs=PV_PROC_RTCLK,PV_PROC_CORE
               secflags=FSF_EPS
               "{{ rbac_cmd }}"
 

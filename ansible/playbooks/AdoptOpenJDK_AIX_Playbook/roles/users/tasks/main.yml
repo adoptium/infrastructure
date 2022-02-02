@@ -50,14 +50,15 @@
   loop_control:
     loop_var: username
 
-# Since task_file existence cannot be determined in the role task file,
-# all included user tasks must exist.
+# Since task_file existence cannot be determined in the role's
+# tasks directory, all included user tasks must exist.
 # A template customization is supplied in tasks/customization.template:
 # to simplify task file creation (touch also works)
-# or use --skip-tags usr-custom to skip this task
+# or use --skip-tags user-custom to skip this task for all users
 - name: "Perform customization"
   include_tasks: "{{ username }}.yml"
   loop:
     "{{ users }}"
   loop_control:
     loop_var: username
+  tag: user-custom
