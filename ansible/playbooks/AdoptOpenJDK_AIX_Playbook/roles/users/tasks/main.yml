@@ -12,29 +12,7 @@
 # note: the append: element is needed to get the user: mod to report 'ok'
 # versus 'changed'
 - name: "Create account"
-  user:
-    name: "{{ username }}"
-    shell: /usr/bin/ksh
-    group: staff
-    groups: staff
-    append: true
-    generate_ssh_key: true
-    ssh_key_bits: 4096
-    ssh_key_file: .ssh/id_rsa
-    home: "/home/{{ username }}"
-    # create_home: true
-    state: present
-    comment: "Adoptium Build Farm account"
-  loop:
-    "{{ users }}"
-  loop_control:
-    loop_var: username
-
-# May update this to copy a template profile
-- name: Remove .profile
-  file:
-    path: /home/{{ username }}/.profile
-    state: absent
+  include_tasks: create_user.yml
   loop:
     "{{ users }}"
   loop_control:
