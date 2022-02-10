@@ -5,5 +5,8 @@
 ---
 users:
   - "{{ Jenkins_Username | default('jenkins') }}"
+
+# prefer to keep this users outside of a generic role (for now)
+skipusers:
   - zeus
   - nagios
