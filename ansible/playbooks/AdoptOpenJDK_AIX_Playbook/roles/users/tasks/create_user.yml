@@ -13,11 +13,11 @@
     # create_home: true
     state: present
     comment: "Adoptium Build Farm account"
-    register: newuser
+  register: newuser
 
 # May update/change this to copy a template profile
 - name: Remove .profile
   file:
     path: /home/{{ username }}/.profile
     state: absent
-  when newuser is defined and newuser.changed
+  when: newuser is defined and newuser.changed
