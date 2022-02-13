@@ -1,4 +1,5 @@
 # Task to create accounts
+---
 - name: "Create {{ username }} account"
   user:
     name: "{{ username }}"
