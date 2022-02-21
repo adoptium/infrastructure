@@ -1,0 +1,67 @@
+# Role to manage users for Adoptium Build Farm
+# Role can be called with an argument - to override the default userlist
+# by default, vars are included from role/vars/main.yml and
+# role/default/main.yml
+# by default, ssh keys are generated during creation, which also creates ~/.ssh
+# these new keys can be overwritten by other keys, if so desired/needed.
+#
+# No tags here: the role is tagged in main.yml
+# sub-tasks must be tagged there as 'include_tasks' do not
+# execute the included_tasks - only lists them.
+---
+# note: the append: element is needed to get the user: mod to report 'ok'
+# versus 'changed'
+- name: "Create account"
+  include_tasks: create_user.yml
+  loop:
+    "{{ users }}"
+  loop_control:
+    loop_var: username
+
+# Not in user module - set default account attributes
+# ALWAYS done, just in case.
+# As tasks are included HERE {{ username }} is different for each iteration
+- name: "Set/reset {{ username }} attributes"
+  include_tasks: user_attributes.yml
+  loop:
+    "{{ users }}"
+  loop_control:
+    loop_var: username
+
+# Since task_file existence cannot be determined in the role's
+# tasks directory, all included user tasks must exist.
+# A template customization is supplied in tasks/customization.template:
+# to simplify task file creation (touch also works)
+- name: "Perform customization"
+  include_tasks: "{{ username }}.yml"
+  loop:
+    "{{ users }}"
+  loop_control:
+    loop_var: username
+
+# zeus and nagios are not getting user_attributes so "in-lining" their management
+- name: Zeus account management
+  block:
+    - name: Assign username variable
+      set_fact:
+        username: zeus
+    - name: create account
+      include_tasks: create_user.yml
+    - name: Perform customization for zeus
+      include_tasks: "{{ username }}.yml"
+  tags:
+    - zeus_user
+    - adoptopenjdk
+
+- name: Nagios account management
+  block:
+    - name: Assign username variable
+      set_fact:
+        username: nagios
+    - name: create account
+      include_tasks: create_user.yml
+    - name: Perform customization for zeus
+      include_tasks: "{{ username }}.yml"
+  tags:
+    - nagios
+    - adoptopenjdk

@@ -1,0 +1,49 @@
+####################################################################
+# AdoptOpenJDK - Ansible Playbook to install Nagios plugins on AIX #
+####################################################################
+---
+- name: Check for Nagios at /opt/nagios/libexec
+  stat:
+    path: /opt/nagios/libexec
+  register: nagios_lib
+
+- name: Install nagios libexec
+  block:
+    - name: Transfer over Nagios Image
+      copy:
+        src: nagios.tar.gz
+        dest: /tmp
+    - name: Install Nagios Image
+      unarchive:
+        src: /tmp/nagios.tar.gz
+        dest: /opt
+        mode: 0755
+        remote_src: true
+
+    - name: Cleanup Install files
+      file:
+        path: /tmp/nagios.tar.gz
+        state: absent
+
+    # This symbolic link is needed to support current scripts
+    # AIX: don't ask me why/when - discourages use of /usr/local
+    - name: Create symbolic link /usr/local/nagios - ensure /usr/local exists
+      file:
+        path: /usr/local
+        state: directory
+        mode: '0755'
+    - name: Create symbolic link /usr/local/nagios to /opt/nagios
+      file:
+        src: /opt/nagios
+        dest: /usr/local/nagios
+        state: link
+
+  when: nagios_lib.stat.exists == False
+
+- name: Add {{ username }} key
+  authorized_key:
+    user: nagios
+    state: present
+    key: "{{ lookup('file', '{{ Nagios_User_SSHKey }}') }}"
+    failed_when: false
+  when: Nagios_User_SSHKey is defined

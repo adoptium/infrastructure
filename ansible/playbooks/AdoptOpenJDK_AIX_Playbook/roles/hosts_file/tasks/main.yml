@@ -45,7 +45,7 @@
     regexp: "^(.*)127.0.0.1(.*)$"
     line: "127.0.0.1   loopback  localhost"
     state: present
-    backup: yes
+    backup: true
   tags: hosts_file, adoptopenjdk
 
 - name: Update /etc/hosts file - ipv6 loopback
@@ -54,5 +54,5 @@
     regexp: "^(.*)::1(.*)$"
     line: "::1   loopback  localhost"
     state: present
-    backup: yes
+    backup: true
   tags: hosts_file, adoptopenjdk

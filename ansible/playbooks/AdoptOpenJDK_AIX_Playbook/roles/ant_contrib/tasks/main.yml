@@ -1,37 +1,39 @@
 ###############
 # ant-contrib #
 ###############
+# Like - ant - needs assurance that unarchive will work
+# so, also tagged as yum
 ---
-- name: Checking for ant-contrib availability
-  stat:
-    path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
-  register: antcontrib
-  tags: ant-contrib
+- name: Process ant-contrib
+  block:
+    - name: Checking for ant-contrib availability
+      stat:
+        path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
+      register: antcontrib
 
-- name: "ant-contrib.jar installed, skipping download"
-  debug:
-    msg: "ant-contrib.jar installed, skipping download"
-  when: not antcontrib.stat.exists
-  tags: ant-contrib
+    - name: "ant-contrib.jar installed, skipping download"
+      debug:
+        msg: "ant-contrib.jar installed, skipping download"
+      when: not antcontrib.stat.exists
 
-- name: Download and extract ant-contrib
-  unarchive:
-    src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
-    dest: /tmp/
-    remote_src: yes
-  when: not antcontrib.stat.exists
-  tags: ant-contrib
+    - name: Download and extract ant-contrib
+      unarchive:
+        src: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+        dest: /tmp/
+        remote_src: true
+      when: not antcontrib.stat.exists
 
-- name: Move ant-contrib.jar to lib folder
-  command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
-  when: not antcontrib.stat.exists
-  tags: ant-contrib
+    - name: Move ant-contrib.jar to lib folder
+      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
+      when: not antcontrib.stat.exists
 
-- name: Clean ant-contrib tmp files
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /tmp/ant-contrib
-    - /tmp/ant-contrib-1.0b2-bin.tar.gz
-  tags: ant-contrib
+    - name: Clean ant-contrib tmp files
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/ant-contrib
+        - /tmp/ant-contrib-1.0b2-bin.tar.gz
+  tags:
+    - ant-contrib
+    - yum
