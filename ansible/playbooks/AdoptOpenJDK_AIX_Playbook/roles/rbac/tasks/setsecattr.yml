@@ -1,7 +1,7 @@
 ########################################################################
 # This task is included to permit processing a list of commands        #
-# See: https://github.com/adoptium/infrastructure/issues/1918
-# and https://github.com/adoptium/infrastructure/issues/1803
+# See: https://github.com/adoptium/infrastructure/issues/1918          #
+# and https://github.com/adoptium/infrastructure/issues/1803           #
 ########################################################################
 ---
 - name: "Tagged Block for setting security attributes on {{ rbac_cmd }}"

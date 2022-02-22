@@ -1,0 +1,112 @@
+###########
+# BootJDK #
+###########
+---
+- name: Install OpenJDK from adoptopenjdk
+  block:
+    - name: Verify space in /usr
+      include_tasks: chfs.yml
+
+    - name: Check for jdk {{ jdk }} availability
+      stat:
+        path: /usr/java{{ jdk }}_64
+      register: java_installed
+
+    - name: "{{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
+      unarchive:
+        src: "{{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
+        dest: /usr
+        remote_src: true
+      when:
+        - jdk != '17' and java_installed.stat.isdir is not defined
+      register: openjdk
+      failed_when: "openjdk.failed
+        and 'HTTP Error 404: Not Found' not in openjdk.msg"
+
+    - name: "{{ baseurl }}/{{ jdk }}/ea/{{ os_img }}/{{ impl }}/{{ project }}"
+      unarchive:
+        src: "{{ baseurl }}/{{ jdk }}/ea/{{ os_img }}/{{ impl }}/{{ project }}"
+        dest: /usr
+        remote_src: true
+      when:
+        - jdk == '17' and java_installed.stat.isdir is not defined
+      register: openjdkea
+      failed_when: "openjdkea.failed
+        and 'HTTP Error 404: Not Found' not in openjdkea.msg"
+
+    - name: Report HTTP 404 message
+      debug:
+        msg: "{{ openjdk.msg }}"
+        verbosity: 0
+      when:
+        - openjdk.msg is defined and jdk != 17
+
+    - name: Report HTTP 404 message
+      debug:
+        msg: "{{ openjdkea.msg }}"
+        verbosity: 0
+      when:
+        - openjdkea.msg is defined and jdk == 17
+
+    # jdk8 directories do not have a hyphen
+    - name: Find java 8 directory
+      find:
+        file_type: directory
+        paths: /usr
+        patterns: 'jdk8u*'
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk == '8'
+      register: java8_directory
+
+    - name: Find java directory
+      find:
+        file_type: directory
+        paths: /usr
+        patterns: 'jdk-{{ jdk }}*'
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk != '8'
+      register: java_directory
+
+    # For jdk8
+    - name: Symlink to java8_64
+      file:
+        src: "{{ item.path }}"
+        dest: /usr/java8_64
+        state: link
+      with_items:
+        - "{{ java8_directory.files }}"
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk == '8'
+
+    - name: Symlink to java{{ jdk }}_64
+      file:
+        src: "{{ item.path }}"
+        dest: /usr/java{{ jdk }}_64
+        state: link
+      with_items:
+        - "{{ java_directory.files }}"
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk != '8'
+  # Defaults for BootJDK API
+  # AdoptOpenJDK changes to Adoptium:
+  # - impl: openj9 -> hotspot
+  # - vendor: adoptopenjdk -> eclipse
+  # - url:  https://api.adoptopenjdk.net/v3/* -> https://api.adoptium.net/v3/*
+  # HOWEVER!
+  # Since versions 10 and 16 are not available as 'eclipse' aka adoptium.net
+  # versions - the playbook shall continue to use adoptopenjdk.net
+  # and adoptopenjdk as URL and vendor
+  # In short, only jvm_impl (impl) changes!
+  vars:
+    - os_img: "aix/ppc64/jdk"
+    - heap: "normal"
+    - impl: "hotspot"
+    - new_baseurl: "https://api.adoptium.net/v3/binary/latest"
+    - new_vendor: "eclipse"
+    - baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
+    - vendor: "adoptopenjdk"
+    - project: "{{heap}}/{{vendor}}?project=jdk"

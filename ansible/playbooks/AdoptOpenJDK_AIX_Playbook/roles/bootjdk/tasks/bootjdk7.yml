@@ -1,0 +1,26 @@
+##############
+# Boot JDK 7 #
+##############
+---
+- name: Check Java7 installation
+  stat:
+    path: /usr/j2sdk-image
+  register: java7
+
+- name: Transfer and Extract Java7
+  unarchive:
+    src: /Vendor_Files/aix/openjdk-7u-aix.tar
+    dest: /usr
+    remote_src: false
+  when: java7.stat.isdir is not defined
+  register: vf
+  failed_when: "vf.failed
+    and 'Could not find or access' not in vf.msg"
+
+- name: Mention access requirements
+  debug:
+    msg:
+      - Need access to /Vendor_Files/aix/openjdk-7u-aix.tar for java7
+      - "{{ vf.msg.split('\n') }}"
+    verbosity: 0
+  when: vf.changed == false and vf.skipped is not defined
