@@ -10,10 +10,13 @@
   register: _yum
   tags: yum
 
-# Use set -o pipefail -o to quiet AnsibleLint
+# Using set -o pipefail -o to quiet AnsibleLint breaks execution on AIX
+# Use skip_ansible_lint tag instead
 - name: Remove conflicting packages before install yum
-  shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
-  ignore_errors: true
+  shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl")
+  register: _cleanup
+  changed_when: "'no packages given for erase' not in _cleanup.stderr"
+  failed_when: _cleanup.changed and _cleanup.rc != 0
   when: _yum.stat.islnk is not defined
   tags:
     - yum
@@ -24,24 +27,21 @@
 ##############################################################################
 # Install yum and update to latest #
 # Previous version of this downloaded and executed
-#   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+#  ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+# PRIOR to using any ansible (no python available).
 # These steps below do the same (update rpm.rte, install initial RPM bundle)
 # but require a alturnative python to be installed
 # eg, http://download.aixtools.net/tools/aixtools.python.py36.3.6.12.0.I
 # and ansible.cfg needs 'ansible_python_interpreter = /opt/bin/python3.6'
+# The playbook stops at 'yum update' because ansible sees yum needs the
+# new python installed via yum. During the second pass this block is skipped.
 ##############################################################################
-- name: Install yum from AIXToolbox
+- name: "Install yum bundle from AIXToolbox (block #1)"
   block:
     - name: Ensure dest exists
       file:
         state: directory
         path: /tmp/yum
-
-    - name: Assign URL strings
-      set_fact:
-        yum_downloads:
-          - "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/INSTALLP/ppc/rpm.rte"
-          - "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum_bundle.tar"
 
     - name: Download rpm.rte and yum bundle
       get_url:
@@ -51,6 +51,11 @@
         dest: /tmp/yum
       with_items:
         "{{ yum_downloads }}"
+      vars:
+        baseurl: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox"
+        yum_downloads:
+          - "{{ baseurl }}/INSTALLP/ppc/rpm.rte"
+          - "{{ baseurl }}/ezinstall/ppc/yum_bundle.tar"
 
     - name: Install/update rpm.rte
       command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
@@ -62,22 +67,22 @@
     - name: Unpack yum bundle
       command:
         cmd: /usr/bin/tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
-        # Bootstrapping these tools - neither zip nor gtar is not available
+        # Neither zip nor gtar is not available, disable warning about unpack:
         warn: false
 
     - name: Install yum bundle
       command: rpm -i /tmp/yum/*.rpm
-
-    - name: Cleanup /tmp/yum
-      file:
-        state: absent
-        path: /tmp/yum
   when: _yum.stat.islnk is not defined
   tags:
     - yum
 
-- name: Update yum installation
+- name: "Update yum installation (Block #2)"
   block:
+    - name: Remove /tmp/yum, if present
+      file:
+        state: absent
+        path: /tmp/yum
+
     - name: Update YUM
       yum:
         update_cache: true
@@ -162,9 +167,15 @@
     - yum
     - cmake
 ##############################################################################
-# TASK [yum : Install cmake 3.14.3 (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)]
-# fatal: [x077]: FAILED! => {"changed": false, "msg": "No package matching 'cmake-3.14.3' found available, installed or updated", "rc": 126, "results": ["No package matching 'cmake-3.14.3' found available, installed or updated"]}
-## If you get this message - you need to remove 'cmake*' from /opt/freeware/etc/yum/yum.conf
+# TASK [yum : Install cmake 3.14.3
+#   (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)]
+# fatal: [x077]: FAILED! =>
+#   {"changed": false, "msg": "No package matching 'cmake-3.14.3' found available,
+#   installed or updated", "rc": 126,
+#   "results": ["No package matching 'cmake-3.14.3' found available,
+#   installed or updated"}
+## If you get this message - you need to remove 'cmake*' from
+#   /opt/freeware/etc/yum/yum.conf
 ##############################################################################
 
 - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
