@@ -44,6 +44,8 @@
     - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
   tags: ant-contrib
 
+# Use wget instead of ansible's get_url for Centos 6 https://github.com/adoptium/infrastructure/issues/2486
+
 - name: Download ant-contrib (CentOS 6)
   command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
   retries: 3
