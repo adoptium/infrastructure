@@ -41,6 +41,32 @@
     - not antcontrib_status.stat.exists
     - ansible_distribution != "MacOSX"
     - ansible_distribution != "Solaris"
+    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
+  tags: ant-contrib
+
+# Use wget instead of ansible's get_url for Centos 6 https://github.com/adoptium/infrastructure/issues/2486
+
+- name: Download ant-contrib (CentOS 6)
+  command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+  retries: 3
+  delay: 5
+  register: antContrib_download
+  until: antContrib_download is not failed
+  when:
+    - not antcontrib_status.stat.exists
+    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+  tags: ant-contrib
+
+- name: Verify sha256 checksum of download (CentOS 6)
+  stat:
+    path: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+    checksum_algorithm: sha256
+    get_checksum: yes
+  register: antcontrib_checksum
+  failed_when: antcontrib_checksum.stat.checksum != 'c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf'
+  when:
+    - not antcontrib_status.stat.exists
+    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
   tags: ant-contrib
 
 - name: Download ant-contrib (macOS) and (Solaris)
