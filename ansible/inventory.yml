@@ -161,6 +161,8 @@ hosts:
       - macincloud:
           macos1010-x64-1: {ip: 74.80.250.151, user: admin, description: TBD}
           macos1010-x64-2: {ip: 74.80.250.173, user: admin, description: TBD}
+          macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
+          macos1201-x64-2: {ip: 216.39.74.140, user: admin, description: DXT440}
 
       - macstadium:
           macos1012-x64-1: {ip: 208.83.1.46, user: administrator}
