@@ -288,6 +288,7 @@
   package: "name=docker-ce state=latest"
   when:
     - docker_installed.rc != 0
+    - ansible_architecture != "riscv64"
     - (ansible_distribution == "Debian" and ansible_distribution_major_version|int <10)
   tags:
     - docker
@@ -298,6 +299,7 @@
   package: "name=docker.io state=latest"
   when:
     - docker_installed.rc != 0
+    - ansible_architecture != "riscv64"
     - (ansible_distribution == "Debian" and ansible_distribution_major_version|int >=10)
   tags:
     - docker
@@ -311,7 +313,9 @@
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
-  tags: docker
+  tags:
+    - docker
+    - jenkins
 
 - name: Add Jenkins user to the docker group for SLES 12, CentOS7, and RHEL7
   user: name={{ Jenkins_Username }}
@@ -321,7 +325,9 @@
     - docker_installed.rc != 0
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
     - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
-  tags: docker
+  tags:
+    - docker
+    - jenkins
 
 - name: Enable and Start Docker Service for Ubuntu and Debian
   service:
@@ -330,6 +336,7 @@
     enabled: yes
   when:
     - docker_installed.rc != 0
+    - ansible_architecture != "riscv64"
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
   tags: docker
 

@@ -12,7 +12,7 @@
 - name: Add the openjdk repository to apt for openjdk7
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
-    - ansible_architecture != "armv7l"
+    - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
     - ansible_distribution_major_version != "10"
   tags: patch_update
 
@@ -33,11 +33,14 @@
   apt_repository:
     repo: "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb {{ ansible_distribution_release }} main"
     update_cache: no
+  when:
+    - (ansible_architecture != "riscv64")
+  tags: patch_update
 
 - name: Add the ubuntu toolchain repository to apt
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
   when:
-    - ansible_architecture != "armv7l"
+    - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
     - ansible_distribution_major_version != "10"
   tags: patch_update
 
@@ -51,7 +54,7 @@
     - /etc/apt/sources.list.d/ppa_openjdk_r_ppa_jessie.list
     - /etc/apt/sources.list.d/ppa_ubuntu_toolchain_r_test_jessie.list
   when:
-    - ansible_architecture != "armv7l"
+    - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
     - ansible_distribution_major_version == "8"
   tags: patch_update
 
@@ -107,6 +110,21 @@
     force: yes
   tags: patch_update
 
+- name: Remove expired cert \"DST Root CA X3\"
+  block:
+    - name: Deselect certificate from ca-certificates.conf
+      replace:
+        path: /etc/ca-certificates.conf
+        replace: "!DST_Root_CA_X3.crt"
+        regexp: "^(.*)?/DST_Root_CA_X3.crt"
+        backup: yes
+
+    - name: Refresh ca-certificates
+      command: "update-ca-certificates --fresh"
+
+  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
+  tags: patch_update
+
 ############################
 # Build Packages and tools #
 ############################
@@ -119,7 +137,9 @@
 - name: Call gcc-7 for all but arm32
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_7 }}"
-  when: ansible_architecture != "armv7l"
+  when:
+    - ansible_architecture != "armv7l"
+    - ansible_architecture != "riscv64"
   tags: build_tools
 
 - name: Call Build Packages and Tools Task for OpenJFX
@@ -132,6 +152,7 @@
   with_items: "{{ gcc_compiler }}"
   when:
     - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
+    - ansible_architecture != "riscv64"
     - ansible_distribution_major_version != "10"
   tags: build_tools
 
@@ -170,6 +191,13 @@
   with_items: "{{ Additional_Build_Tools_aarch64 }}"
   when:
     - ansible_architecture == "aarch64"
+  tags: build_tools
+
+- name: Install additional build tools for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
   tags: build_tools
 
 #########################

@@ -20,14 +20,14 @@
       unarchive:
         src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
         dest: /tmp
-        remote_src: no
-      ignore_errors: yes
+        remote_src: false
+      ignore_errors: true
       register: _vendor_copied
 
     - name: Install IBM XLC13 - installp
       command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
       register: _installp
-      ignore_errors: yes
+      ignore_errors: true
       when: _vendor_copied.failed != true
 
     - name: Remind that installp error messages may be ignored
@@ -45,7 +45,7 @@
 - name: TestIBM XLC13
   command: /opt/IBM/xlC/13.1.3/bin/xlc -qversion
   register: xlc13_qversion
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: false
   tags: xlc13
 

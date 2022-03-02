@@ -5,7 +5,7 @@
 # Groups can be passed in as a command-line variable in Ansible playbook.
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
-- hosts: "{{ Groups | default('localhost:build:test:perf:!*zos*:!*win*:!*aix*') }}"
+- hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
     - block:
@@ -24,6 +24,8 @@
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
     - Version
     - adopt_etc
+    - role: CentOS6-Cent7SSL
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6" and ansible_architecture == "x86_64")
     - Common
     - Python2.7                   # CentOS6
     - Providers                   # AdoptOpenJDK Infrastructure
@@ -57,7 +59,9 @@
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
-    - role: gcc_9
+    - role: gcc_9                 # Dragonwell
+      tags: [build_tools]
+    - role: gcc_10                # JDK17+
       tags: [build_tools]
     - role: Xcode
       when: ansible_distribution == "MacOSX"
@@ -74,7 +78,9 @@
       when: ansible_distribution != "MacOSX"
     - role: adoptopenjdk_install
       jdk_version: 8
-      when: ansible_distribution != "Alpine"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
@@ -82,14 +88,35 @@
         - ansible_distribution != "Alpine"
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install
       jdk_version: 11
-      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK16 Build Bootstrap
       jdk_version: 15
-      when: ansible_distribution != "Alpine" and ansible_distribution != "Solaris"
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK17 Build Bootstrap
+      jdk_version: 16
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK18 Build Bootstrap
+      jdk_version: 17
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]

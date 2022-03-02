@@ -70,11 +70,11 @@ have at the moment:
 
 | Dockerfile | Image | Platforms  | Where is this built? | In use?
 |---|---|---|---|---|
-| [Centos7](./ansible/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux/amd64, linux/arm64 | [Travis](.travis.yml) | Yes
-| [Centos6](./ansible/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
-| [Alpine3](./ansible/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
-| [Windows2016_Base](./ansible/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
-| [Windows2016_VS2017](./ansible/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
+| [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on x64, arm64, ppc64le, armv7l | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
+| [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
+| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
+| [Windows2016_Base](./ansible/docker/Dockerfile.Windows2016_Base) | [`adoptopenjdk/windows2016_build_image:base`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
+| [Windows2016_VS2017](./ansible/docker/Dockerfile.Windows2016_VS2017) | [`adoptopenjdk/windows2016_build_image:vs2017`](https://hub.docker.com/r/adoptopenjdk/windows2016_build_image)| windows/amd64 | [GH Actions](.github/workflows/build_windows.yml) | No
 
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
@@ -105,7 +105,7 @@ occasionally required if, for example, we need a specific version of a tool
 on the machine that is later than the default, and want to ensure that the
 old version does not get invoked by default on the adoptopenjdk machines.
 See
-[GIT_Source](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/GIT_Source/tasks/main.yml)
+[GIT_Source](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/GIT_Source/tasks/main.yml)
 as an example
 
 ## How do I replicate a build failure?
@@ -138,7 +138,7 @@ script uses the appropriate environment configuration files under
 ## How do I replicate a test failure
 
 Many infrastructure issues (generally
-[those tagged as testFail](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues?q=is%3Aopen+is%3Aissue+label%3AtestFail) are raised
+[those tagged as testFail](https://github.com/adoptium/infrastructure/issues?q=is%3Aopen+is%3Aissue+label%3AtestFail) are raised
 as the result of failing JDK tests which are believed to be problems
 relating to the set up of our machines.  In most cases it is useful to
 re-run jobs using the jenkins
@@ -198,7 +198,7 @@ playbooks on other platforms, be sure to run it through the
 job first. This job takes a branch from a fork of the
 `openjdk-infrastructure` repository as a parameter and runs the playbooks
 against a variety of Operating Systems using Vagrant and the scripts in
-[pbTestScripts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/tree/master/ansible/pbTestScripts)
+[pbTestScripts](https://github.com/adoptium/infrastructure/tree/master/ansible/pbTestScripts)
 to validate them.
 
 ## Jenkins access
@@ -229,23 +229,23 @@ To add a new system:
 1. Ensure there is an issue documenting its creation somewhere (Can just be an existing issue that you add the hostname too so it can be found later
 2. Obtain system from the appropriate infrastructure provider
 3. Add it to bastillion (requires extra privileges) so that all of the appropriate admin keys are deployed to the system (Can be delayed for expediency by putting AWX key into `~root/.ssh/authorized_keys`)
-4. Create a PR to add the machine to [inventory.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
+4. Create a PR to add the machine to [inventory.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
 5. Once merged, run the ansible scripts on it - ideally via AWX (Ensure the project and inventory sources are refreshed, then run the appropriate `Deploy **** playbook` template with a `LIMIT` of the new machine name)
 6. Add it to jenkins, verify a typical job runs on it if you can and add the appropriate tags
 
 NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc.) you should also add it to
-   [adoptopenjdk_yaml.py](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
+   [adoptopenjdk_yaml.py](https://github.com/adoptium/infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)
    and, if it will be configured via the standard playbooks, add the new type to the
    list at the top of the main playbook files for
-   [*IX](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
-   [windows](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
+   [*IX](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml#L8) and
+   [windows](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml#L20)
 
 ## "DockerStatic" test systems
 
-The [DockerStatic role](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/tasks/main.yml)
-was first implemented in [this PR](https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1925)
+The [DockerStatic role](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/tasks/main.yml)
+was first implemented in [this PR](https://github.com/adoptium/infrastructure/pull/1925)
 and extended through
-[this issue](https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1809) and is intended to allow us to make more
+[this issue](https://github.com/adoptium/infrastructure/issues/1809) and is intended to allow us to make more
 efficient use of larger machines.  The role uses a set of Dockerfiles, one
 per distribution, which can be used to generate a set of docker machines
 that are started, exposed on an ssh port, and connected to jenkins.  They
@@ -264,7 +264,7 @@ those values, and we should look at whether we can reasonably autodetect or
 parameterize those values. Potentially we could also scale up and create
 more than one of each OS on a given host. To set up a host for running these
 you can use the
-[dockerhost.yml](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml)
+[dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml)
 playbook (Also available via AWX).
 
 Once the static docker containers have been created they are connected into
@@ -277,6 +277,8 @@ machines used for this purpose will be prefixed `test-dockerhost-` to
 identify them and split them out so they do not have the full playbooks
 executed against them in order to keep the host system "clean". In some
 cases they may be used as `dockerBuild` hosts too.
+
+Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/blob/dockerstatic.docs/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
 
 ### DockerHost TODO:
 1. Set up patching cycle

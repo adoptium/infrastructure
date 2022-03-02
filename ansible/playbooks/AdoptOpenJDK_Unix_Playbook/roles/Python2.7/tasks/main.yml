@@ -4,7 +4,7 @@
 ####################
 
 # Check if Python is installed, and its version. If Python isn't installed, or it's at a version below 2.7.18, install Python 2.7.18.
-# Currently only for CentOS6. See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1877
+# Currently only for CentOS6. See: https://github.com/adoptium/infrastructure/issues/1877
 
 - name: Check for Python 2's version
   shell: python -V 2>&1 | grep -Po '(?<=Python )(.+)'

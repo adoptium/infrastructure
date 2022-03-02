@@ -42,13 +42,13 @@ valid = {
   'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9' , 'riscv64'),
 
   # valid roles - add as necessary
-  'type': ('build', 'docker', 'dockerhost', 'infrastructure', 'test'),
+  'type': ('build', 'docker', 'dockerhost', 'infrastructure', 'test', 'jck'),
 
   # providers - validated for consistency
   'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
-        'macstadium', 'macincloud', 'ibmcloud', 'spearhead',
+        'macstadium', 'macincloud', 'ibmcloud', 'spearhead', 'siteox',
         'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'equinix_esxi', 'nine', 'gdams')
+        'aws', 'inspira', 'equinix_esxi', 'nine', 'gdams', 'skytap')
 }
 
 def main():

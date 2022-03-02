@@ -19,6 +19,7 @@ buildVariant=""
 testJDK=false
 # Default to building jdk8u
 jdkToBuild="jdk8u"
+verbosity=""
 
 # Parse Arguments
 processArgs() {
@@ -56,6 +57,8 @@ processArgs() {
 				OS="$1"; shift;;
 			"--jdk-version" | "-v" )
 				jdkToBuild="$1"; shift;;
+			"-V" | "-VV" | "-VVV" | "-VVVV" )
+				verbosity=$(echo $opt | tr '[:upper:]' '[:lower:]');;
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
 		esac
 	done
@@ -67,7 +70,7 @@ usage() {
 		--build | -b			Build a JDK on the qemu VM
 		--build-fork | -bf		Which openjdk-build to retrieve the build scripts from
 		--build-branch | -bb		Specify the branch of the build-repo (default: master)
-		--build-hotspot | -hs			Build a JDK with a Hotspot JVM instead of an OpenJ9 one
+		--build-hotspot | -hs		Build a JDK with a Hotspot JVM instead of an OpenJ9 one
 		--currentDir | -c		Set Workspace to directory of this script
 		--clean-workspace | -cw		Removes the old work folder (including logs)
 		--help | -h 			Shows this help message
@@ -78,6 +81,7 @@ usage() {
 		--operating-system | -o 	Combined with --architecture runs a VM with the desired architecture and OS combo.
 		--skip-more | -sm		Skip non-essential roles from the playbook
 		--test | -t			Test the built JDK
+		-V				Apply verbose option to 'ansible-playbook', up to '-VVVV'
 		"	
 	showArchList
 }
@@ -237,11 +241,29 @@ done
      	  $EXTRA_ARGS \
 	  -nographic) > "$workFolder/${OS}.${ARCHITECTURE}.startlog" 2>&1 &
 
-	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog Please be patient"
-	sleep 180
-	tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
-	echo "Machine has started, unless the above log shows otherwise ..."
+	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog"
+	echo "Please be patient - this can take up to 300 seconds"
 
+	SECONDS=0
+	while [ true ];
+	do
+		if tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | grep -q login; then
+			echo "VM Booted after $SECONDS seconds"
+			break;
+		fi
+		if [ $SECONDS -gt 300 ]; then
+			echo -e "Timeout Reached. See log below:\n"
+			tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
+			echo
+			if [[ "$retainVM" == false ]]; then
+				destroyVM
+				echo "Removing disk image"
+				rm -f ${workFolder}/${OS}.${ARCHITECTURE}.dsk
+			fi
+			exit 127
+		fi
+		sleep 10
+	done
 	# Remove old ssh key and create a new one
 	rm -f "$workFolder"/id_rsa*
 	ssh-keygen -q -f "$workFolder"/id_rsa -t rsa -N ''
@@ -258,19 +280,21 @@ done
 runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 	local pbLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.log"
-	local extraAnsibleArgs=""
+	local extraAnsibleArgs="$verbosity"
         local gitURL="https://github.com/$gitFork/openjdk-infrastructure"
 
 	# RISCV requires this be specified
 	if [[ $ARCHITECTURE == "RISCV" ]]; then
-		extraAnsibleArgs="-e ansible_python_interpreter=/usr/bin/python3"
+		# To fix the outdated repositories of the image
+		ssh -p $PORTNO -i "$workFolder"/id_rsa linux@localhost "sudo apt-get update --fix-missing"
+		extraAnsibleArgs="$extraAnsibleArgs -e ansible_python_interpreter=/usr/bin/python3"
 	fi
 
 	[[ ! -d "$workFolder/openjdk-infrastructure"  ]] && git clone -b "$gitBranch" "$gitURL" "$workFolder"/openjdk-infrastructure
 	cd "$workFolder"/openjdk-infrastructure/ansible || exit 1;
 	
 	# Increase timeout as to stop privilege timeout issues
-	# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1516#issue-470063061
+	# See: https://github.com/adoptium/infrastructure/pull/1516#issue-470063061
 	awk '{print}/^\[defaults\]$/{print "timeout = 30"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
 	ansible-playbook -i "localhost:$PORTNO," --private-key "$workFolder"/id_rsa -u linux -b ${extraAnsibleArgs} --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee "$pbLogPath"

@@ -30,7 +30,7 @@
   when: ansible_architecture == "x86_64"
 
 # Arm64's Homebrew installation prefix is `/opt/homebrew/`, not `/usr/local/`
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1716#issuecomment-764713146
+# See: https://github.com/adoptium/infrastructure/issues/1716#issuecomment-764713146
 - name: Symlink to plugins (arm64)
   file:
     src: /opt/homebrew/Cellar/nagios-plugins/2.3.3/sbin/

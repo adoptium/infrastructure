@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - bison                         # OpenJ9
   - bzip2
   - cpio
+  - curl
   - cups-devel
   - elfutils-libelf-devel
   - flex                          # OpenJ9
@@ -54,9 +55,13 @@ Additional_Build_Tools_RHEL8:
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
   - glibc-langpack-zh             # required for creating Chinese locales
+  - git
+  - cmake
+  - ccache
 
 Additional_Build_Tools_RHEL7:
   - libstdc++-static
+  - ccache
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libstdc++

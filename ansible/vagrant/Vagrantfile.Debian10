@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo apt-get install tree -y
+sudo apt-get install software-properties-common -y
+sudo apt-get install gpg -y
+
+# The Debian10 VM needs to upgrade grub-pc, which causes a pop-up, breaking VPC
+# See: https://github.com/adoptium/infrastructure/issues/1980
+sudo apt-mark hold grub-pc
+sudo apt-get update
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkD10 do |adoptopenjdkD10|
+    adoptopenjdkD10.vm.box = "debian/buster64"
+    adoptopenjdkD10.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkD10.vm.hostname = "adoptopenjdkD10"
+    adoptopenjdkD10.vm.network :private_network, type: "dhcp"
+    adoptopenjdkD10.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 2560
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  end
+end

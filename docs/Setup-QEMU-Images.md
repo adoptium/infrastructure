@@ -30,7 +30,7 @@ This is executed on the host machine. The QEMU VM using this disk image must not
 
 ### Password-less `sudo`
 
-This is only applicable once `sudo` is installed. This is required to allow for the `linux` user to use `sudo` without requiring a password to be input, so [qemuPlaybookCheck.sh](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/pbTestScripts/qemuPlaybookCheck.sh) can use the `-b` option in `ansible-playbook` without user interaction.
+This is only applicable once `sudo` is installed. This is required to allow for the `linux` user to use `sudo` without requiring a password to be input, so [qemuPlaybookCheck.sh](https://github.com/adoptium/infrastructure/blob/master/ansible/pbTestScripts/qemuPlaybookCheck.sh) can use the `-b` option in `ansible-playbook` without user interaction.
 
 ```bash
 sudo sh -c "echo 'linux ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
@@ -220,7 +220,7 @@ qemu-system-arm -M virt -m 2G \
 
 ### RISC-V Images
 
-For information on how to setup several different kind of RISC-V VMs, see [https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/Setup-RISCV-VMs.md)
+For information on how to setup several different kind of RISC-V VMs, see [https://github.com/adoptium/infrastructure/blob/master/docs/Setup-RISCV-VMs.md](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-RISCV-VMs.md)
 
 Of the three that are listed in that document, only the Debian Bullseye RISC-V VM is used in QPC.
 The document also gives a broader overview of QEMU, for instance; how to build `QEMU 5.0.0` on an Ubuntu Host machine, explanation for the `qemu-system-$arch` command options and how to add additional disks to a QEMU VM.

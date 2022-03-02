@@ -69,6 +69,19 @@
     - inventory_hostname != "localhost"
   tags: hosts_file, adoptopenjdk
 
+- name: Update /etc/hosts file - IP FQDN hostname
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^(.*){{ ansible_hostname }}(.*)$"
+    line: "{{ ansible_default_ipv4.address }} {{ inventory_hostname }}.{{ Domain }} {{ inventory_hostname }}"
+    state: present
+  when:
+    - Domain == "adoptopenjdk.net"
+    - inventory_hostname != ansible_host
+    - ansible_host != "127.0.0.1"
+    - inventory_hostname != "localhost"
+  tags: hosts_file, adoptopenjdk
+
 - name: Update /etc/hosts file - IP FQDN hostname (Domain != "adoptopenjdk.net")
   lineinfile:
     dest: /etc/hosts

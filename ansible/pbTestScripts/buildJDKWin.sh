@@ -3,8 +3,8 @@ set -eu
 
 setJDKVars() {
 	wget -q https://api.adoptopenjdk.net/v3/info/available_releases
-	JDK_MAX=$(awk -F: '/tip_version/{gsub("[, ]","",$2); print$2}' < available_releases)
-	JDK_GA=$(awk -F: '/most_recent_feature_release/{gsub("[, ]","",$2); print$2}' < available_releases)
+	JDK_MAX=$(awk -F: '/tip_version/{print$2}' < available_releases | tr -d ,)
+	JDK_GA=$(awk -F: '/most_recent_feature_release/{print$2}' < available_releases | tr -d ,)
 	rm available_releases
 }
 
@@ -89,7 +89,20 @@ cloneRepo() {
 		cd $WORKSPACE/openjdk-build && git pull
 	else
 		echo "Cloning new openjdk-build directory"
-		git clone -b ${GIT_BRANCH} --single-branch https://github.com/${GIT_FORK}/openjdk-build $WORKSPACE/openjdk-build
+
+		local isRepoTemurin=$(curl https://api.github.com/repos/$GIT_FORK/temurin-build | grep "Not Found")
+		local isRepoOpenjdk=$(curl https://api.github.com/repos/$GIT_FORK/openjdk-build | grep "Not Found")
+
+		if [[ -z "$isRepoTemurin" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/temurin-build"
+		elif [[ -z "$isRepoOpenjdk" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/openjdk-build"
+		else
+			echo "Repository not found - the fork must be named temurin-build or openjdk-build"
+			exit 1
+		fi
+
+		git clone -b ${GIT_BRANCH} --single-branch $GIT_REPO $WORKSPACE/openjdk-build
 	fi
 }
 # Set defaults

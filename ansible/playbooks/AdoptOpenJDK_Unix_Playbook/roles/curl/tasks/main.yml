@@ -3,7 +3,7 @@
 # CURL #
 ########
 
-# curl 7.20 and newer is required
+# curl 7.58.0 and newer is required as of https://github.com/adoptium/temurin-build/issues/2751
 
 - name: Check curl version
   shell: curl --version | head -n1 | awk '{print $2}'
@@ -16,25 +16,31 @@
   debug: var=curl_version.stdout
   tags: curl
 
+- name: Set curl oldest variable
+  set_fact:
+    curl_oldest: 7.58.0
+  tags: curl
+
 - name: Set curl latest variable
   set_fact:
-    curl_latest: 7.61.1
+    curl_latest: 7.79.1
   tags: curl
 
 - name: Download curl {{ curl_latest }}
   get_url:
-    url: https://github.com/curl/curl/releases/download/curl-7_61_1/curl-7.61.1.tar.gz
+    url: https://github.com/curl/curl/releases/download/curl-7_79_1/curl-{{ curl_latest }}.tar.gz
     dest: /tmp/
     mode: 0440
     timeout: 25
     validate_certs: no
-    checksum: sha256:eaa812e9a871ea10dbe8e1d3f8f12a64a8e3e62aeab18cb23742e2f1727458ae
+    checksum: sha256:370b11201349816287fb0ccc995e420277fbfcaf76206e309b3f60f0eda090c2
   retries: 3
   delay: 5
   register: curl_download
   until: curl_download is not failed
   when:
-    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
+    - ansible_distribution != "MacOSX"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
 - name: Extract curl
@@ -43,13 +49,15 @@
     dest: /tmp/
     copy: False
   when:
-    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
+    - ansible_distribution != "MacOSX"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
 - name: Build and install curl {{ curl_latest }} in /usr/local
-  shell: cd /tmp/curl-{{ curl_latest }} && ./configure --prefix=/usr/local/curl-{{ curl_latest }} && make && make install
+  shell: cd /tmp/curl-{{ curl_latest }} && ./configure --prefix=/usr/local/curl-{{ curl_latest }} --with-openssl && make && make install
   when:
-    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
+    - ansible_distribution != "MacOSX"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
 - name: Create /usr/local/bin/curl symlink
@@ -60,7 +68,8 @@
     group: root
     state: link
   when:
-    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
+    - ansible_distribution != "MacOSX"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
 - name: Remove downloaded packages for curl {{ curl_latest }}
@@ -72,5 +81,51 @@
     - /tmp/curl-{{ curl_latest }}
   ignore_errors: yes
   when:
-    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare('7.20.0', operator='lt', strict=True))))
+    - ansible_distribution != "MacOSX"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
+  tags: curl
+
+- name: Get macOS version
+  shell: sw_vers -productVersion
+  register: macos_version
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: curl
+
+- name: Set macos version
+  set_fact:
+    macos_version_number: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }}"
+  when:
+    - ansible_distribution == "MacOSX"
+  tags: curl
+
+- name: Install latest version of curl for MacOS
+  homebrew:
+    name: curl
+    state: latest
+  when:
+    - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
+  tags: curl
+
+- name: Find install directory MacOS
+  shell: ls -la /usr/local/Cellar/curl/7.*/bin/curl | awk '{print $9}'
+  register: curl_install_dir
+  when:
+    - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
+  tags: curl
+
+- name: Create /usr/local/bin/curl symlink MacOS
+  file:
+    src: '{{ curl_install_dir.stdout }}'
+    dest: /usr/local/bin/curl
+    owner: administrator
+    group: admin
+    state: link
+  when:
+    - ansible_distribution == "MacOSX"
+    - "macos_version_number is version('10.13', '>')"
+    - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl

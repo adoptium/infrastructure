@@ -3,28 +3,36 @@ pipeline {
     stages {
         stage('Docker Build') {
             parallel { 
-                stage('Linux x64') {
+                stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
                     } 
                     steps {
-                        dockerBuild('amd64')
+                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
                     }
                 }
-                stage('Linux aarch64') {
+                stage('CentOS7 aarch64') {
                     agent {
                         label "dockerBuild&&linux&&aarch64"
                     }
                     steps {
-                        dockerBuild('arm64')
+                        dockerBuild('arm64', 'centos7', 'Dockerfile.CentOS7')
                     }
                 }
-                stage('Linux ppc64le') {
+                stage('CentOS7 ppc64le') {
                     agent {
                         label "dockerBuild&&linux&&ppc64le"
                     }
                     steps {
-                        dockerBuild('ppc64le')
+                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('Ubuntu16.04 armv7l') {
+                    agent {
+                        label "docker&&linux&&armv7l"
+                    }
+                    steps {
+                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
                     }
                 }
             }
@@ -43,12 +51,13 @@ pipeline {
     } 
 } 
 
-def dockerBuild(architecture) {
+def dockerBuild(architecture, distro, dockerfile) {
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
-    sh label: '', script: "docker build -t adoptopenjdk/centos7_build_image:linux-$architecture -f ansible/Dockerfile.CentOS7 ."
+    dockerImage = docker.build("adoptopenjdk/${distro}_build_image:linux-$architecture",
+        "-f ansible/docker/$dockerfile .")
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-        sh label: '', script: "docker push adoptopenjdk/centos7_build_image:linux-$architecture"
+        dockerImage.push()
     }
 }
 
@@ -57,6 +66,7 @@ def dockerManifest() {
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
         git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
         sh '''
+            # Centos7
             export TARGET="adoptopenjdk/centos7_build_image"
             AMD64=$TARGET:linux-amd64
             ARM64=$TARGET:linux-arm64
@@ -65,6 +75,12 @@ def dockerManifest() {
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
             docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+            docker manifest push $TARGET
+            # Ubuntu1604
+            export TARGET="adoptopenjdk/ubuntu1604_build_image"
+            ARMV7L=$TARGET:linux-armv7l
+            docker manifest create $TARGET $ARMV7L
+            docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
             docker manifest push $TARGET
         '''
     }

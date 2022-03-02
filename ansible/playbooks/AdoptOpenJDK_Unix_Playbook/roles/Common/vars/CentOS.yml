@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - bison                         # OpenJ9
   - bzip2
   - cpio
+  - curl
   - cups-devel
   - elfutils-libelf-devel
   - file
@@ -61,12 +62,16 @@ gcc48_devtoolset_compiler:
 
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
+  - ccache
 
 Additional_Build_Tools_CentOS8:
   - glibc-locale-source
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
   - glibc-langpack-zh             # required for creating Chinese locales
+  - git
+  - cmake
+  - ccache
 
 Additional_Build_Tools_NOT_CentOS8:
   - lbzip2
@@ -92,3 +97,4 @@ Test_Tool_Packages:
   - xorg-x11-xauth
   - xorg-x11-server-Xorg
   - xorg-x11-server-Xvfb
+  - fakeroot

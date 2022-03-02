@@ -11,7 +11,7 @@
 # *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it (WINRM)***
 # Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
 # Run powershell as the Administrator
-# If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1858
+# If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/adoptium/infrastructure/issues/1858
 # wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
 # .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 # .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
@@ -56,6 +56,10 @@
       jdk_version: 11
     - role: Java_install          # JDK16 build bootstrap
       jdk_version: 15
+    - role: Java_install          # JDK17 build bootstrap
+      jdk_version: 16
+    - role: Java_install
+      jdk_version: 17
     - ANT                         # Testing
     - MSVS_2013
     - MSVS_2017                   # OpenJ9
@@ -71,3 +75,5 @@
     - WiX                         # For creating installers
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
+    - role: Thunderbird
+      tags: [Thunderbird, jck, adoptopenjdk]

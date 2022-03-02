@@ -3,8 +3,8 @@ set -eu
 
 setJDKVars() {
 	wget -q https://api.adoptopenjdk.net/v3/info/available_releases
-	JDK_MAX=$(awk -F: '/tip_version/{gsub("[, ]","",$2); print$2}' < available_releases)
-	JDK_GA=$(awk -F: '/most_recent_feature_release/{gsub("[, ]","",$2); print$2}' < available_releases)
+	JDK_MAX=$(awk -F: '/tip_version/{print$2}' < available_releases | tr -d ,)
+	JDK_GA=$(awk -F: '/most_recent_feature_release/{print$2}' < available_releases | tr -d ,)
 	rm available_releases
 }
 
@@ -101,8 +101,21 @@ cloneRepo() {
 		echo "Found existing openjdk-build folder"
 		cd $WORKSPACE/openjdk-build && git pull
 	else
-		echo "Cloning new openjdk-build folder"
-		git clone -b ${GIT_BRANCH} --single-branch https://github.com/${GIT_FORK}/openjdk-build $WORKSPACE/openjdk-build
+		echo "Cloning new openjdk-build/temurin-build folder"
+
+		local isRepoTemurin=$(curl https://api.github.com/repos/$GIT_FORK/temurin-build | grep "Not Found")
+		local isRepoOpenjdk=$(curl https://api.github.com/repos/$GIT_FORK/openjdk-build | grep "Not Found")
+
+		if [[ -z "$isRepoTemurin" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/temurin-build"
+		elif [[ -z "$isRepoOpenjdk" ]]; then
+			GIT_REPO="https://github.com/${GIT_FORK}/openjdk-build"
+		else
+			echo "Repository not found - the fork must be named temurin-build or openjdk-build"
+			exit 1
+		fi
+
+		git clone -b ${GIT_BRANCH} --single-branch $GIT_REPO $WORKSPACE/openjdk-build
 	fi
 }
 
@@ -135,7 +148,7 @@ elif [[ "$(uname)" == "SunOS" ]]; then
 fi
 
 # Required as Debian Buster doesn't have gcc-4.8 available
-# See https://github.com/AdoptOpenJDK/openjdk-infrastructure/pull/1321#discussion_r426625178
+# See https://github.com/adoptium/infrastructure/pull/1321#discussion_r426625178
 if grep 'buster' /etc/*-release >/dev/null 2>&1; then
 	export CC=/usr/bin/gcc-7
 	export CXX=/usr/bin/g++-7
@@ -156,7 +169,7 @@ if [[ "$JAVA_TO_BUILD" == "jdk8u" ]]; then
 fi
 
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/2033
+# See: https://github.com/adoptium/infrastructure/issues/2033
 export CONFIGURE_ARGS="--with-native-debug-symbols=none"
 export BUILD_ARGS="--custom-cacerts false"
 

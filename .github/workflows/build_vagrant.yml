@@ -11,7 +11,7 @@ on:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: macos-latest
+    runs-on: macos-10.15
     steps:
 
     - uses: actions/checkout@v2
@@ -19,12 +19,12 @@ jobs:
     - name: Install dependencies
       run: |
         brew install ansible
-        brew install --cask virtualbox vagrant
+        brew install --cask virtualbox
 
     - name: Setup Vagrant VM
       run: |
         cd ansible
-        ln -sf Vagrantfile.Solaris10 Vagrantfile
+        ln -sf vagrant/Vagrantfile.Solaris10 Vagrantfile
         rm -f id_rsa.pub id_rsa
         # Copy the machine's ssh key for the VMs to use, after removing prior files
         ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''

@@ -1,0 +1,40 @@
+FROM ubuntu:16.04
+
+ARG user=jenkins
+
+RUN apt-get update
+RUN apt-get -y install python git curl
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py -o get-pip.py
+RUN python2 get-pip.py
+
+# Prereqs for cryptography module. Ubuntu 16 has cryptography
+# 1.2.3 in its repos. v3 won't build with ssl102
+RUN apt-get -y install python-dev libffi-dev libssl-dev
+RUN apt-get -y install gcc
+RUN pip install cryptography==2.9.2
+
+RUN pip install ansible
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,ntp_time"
+
+RUN rm -rf /ansible
+
+RUN groupadd -g 1000 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
+RUN mv /bin/uname /bin/uname.real && echo "/bin/uname.real \$@ | sed 's/aarch64/armv7l/g'" > /bin/uname && chmod 755 /bin/uname
+
+ENV \
+    JDK7_BOOT_DIR="/usr/lib/jvm/jdk8" \
+    JDK8_BOOT_DIR="/usr/lib/jvm/jdk8" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+    JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
+    JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"

@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo /opt/csw/bin/pkgutil -y -i python
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+
+yes | sudo pkgrm CSWpkgutil
+
+# Configure host/hostname, to stop "Unable to resolve host" issue with 'sudo'
+sudo bash -c "echo '127.0.0.1 adoptopenjdkSol10' >> /etc/hosts"
+sudo bash -c "echo 'adoptopenjdkSol10' > /etc/hostname"
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkSol10 do |adoptopenjdkSol10|
+    adoptopenjdkSol10.vm.box = "solaris10"
+    adoptopenjdkSol10.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkSol10.vm.network :private_network, type: "dhcp"
+    adoptopenjdkSol10.vm.provision "shell", inline: $script, privileged: false
+    adoptopenjdkSol10.vm.boot_timeout = 600
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 5120
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  end
+end

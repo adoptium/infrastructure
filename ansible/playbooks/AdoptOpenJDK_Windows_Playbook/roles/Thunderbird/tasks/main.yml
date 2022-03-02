@@ -1,0 +1,32 @@
+---
+###############
+# Thunderbird #
+###############
+
+- name: Test if Thunderbird is already installed
+  win_stat:
+    path: 'C:\Program Files\Mozilla Thunderbird\thunderbird.exe'
+  register: thunderbird_installed
+
+- name: Check if Thunderbird is already downloaded
+  win_stat:
+    path: 'C:\temp\thunderbird.exe'
+  register: thunderbird_download
+
+- name: Download Thunderbird
+  win_get_url:
+    url: https://ftp.mozilla.org/pub/thunderbird/releases/78.11.0/win64/en-GB/Thunderbird%20Setup%2078.11.0.exe
+    dest: 'C:\temp\thunderbird.exe'
+    checksum: 58479f60339aadef41210f522d380dc13fe2611690e2942e141fd5361393c7da
+    checksum_algorithm: sha256
+  when: (not thunderbird_download.stat.exists) and (not thunderbird_installed.stat.exists)
+
+- name: Install Thunderbird
+  raw: C:\temp\thunderbird.exe -ms
+  when: (not thunderbird_installed.stat.exists)
+
+- name: Set Thunderbird as default
+  win_regedit:
+    path: HKCU:\Software\Clients\Mail
+    name: Default
+    data: Mozilla Thunderbird

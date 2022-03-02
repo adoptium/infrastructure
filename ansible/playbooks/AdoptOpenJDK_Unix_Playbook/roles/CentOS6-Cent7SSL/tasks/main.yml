@@ -1,0 +1,109 @@
+---
+##################################################################
+# Install OpenSSL 1.0.2 and certificates bundle from CentOS7     #
+# Need for CentOS6 to accept LetsEncrypt certs via Python/wget   #
+# Based on https://forums.centos.org/viewtopic.php?f=13&p=328731 #
+# Ref: https://github.com/adoptium/infrastructure/issues/2342    #
+##################################################################
+
+- name: Check version of ca-certificates package on the system ...
+  shell: rpm -q ca-certificates | grep -E 'ca-certificates.2020|ca-certificates.201' warn=no
+  register: cacertsold
+  ignore_errors: true
+
+- name: Install prereqs for building openssl
+  yum:
+    name:
+      - krb5-devel
+      - zlib-devel
+      - lksctp-tools-devel
+      - util-linux # Only for /usr/bin/rename
+      - make
+      - gcc
+      - rpm-build
+    state: present
+  when: cacertsold.rc == 0
+
+- name: Download CentOS7 OpenSSL 1.0.2k SRPM ...
+  shell: curl -O https://vault.centos.org/7.9.2009/updates/Source/SPackages/openssl-1.0.2k-21.el7_9.src.rpm warn=False
+
+- name: Verify checksum for CentOS7 OpenSSL 1.0.2k SRPM
+  shell: sha256sum  openssl-1.0.2k-21.el7_9.src.rpm | grep ^6dd850b2be01ff85c500428461019566984d91d7ad8d0002885d33ea37546da4
+  when: cacertsold.rc == 0
+
+# Invoking rpm as ansible yum module skips due to non-source RPM presence
+- name: Install CentOS7 OpenSSL 1.0.2k SRPM ...
+  shell: rpm -ivh openssl-1.0.2k-21.el7_9.src.rpm
+  when: cacertsold.rc == 0
+
+# Not using ansible operations as the don't take wildcards hence warn=False
+# Could explicitly list the ones I know match it I guess
+- name: Apply CentOS patches to OpenSSL Source (Part 1) ...
+  shell: sed -i 's/secure_getenv(/getenv(/g' /root/rpmbuild/SOURCES/*patch warn=False
+  when: cacertsold.rc == 0
+
+- name: Apply CentOS patches to OpenSSL Source (Part 2) ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/openssl.spec
+    regexp: '%patch68 -p1 -b .secure-getenv'
+    line: '#%patch68 -p1 -b .secure-getenv'
+  when: cacertsold.rc == 0
+
+- name: Build OpenSSL 1.0.2k with rpmbuild ...
+  shell: cd /root/rpmbuild/SPECS && rpmbuild -bb openssl.spec
+  when: cacertsold.rc == 0
+
+- name: Install new OpenSSL 1.0.2k, libs and development package ...
+  shell: "rpm -U openssl-1.0.2k-21.el6.x86_64.rpm openssl-libs-1.0.2k-21.el6.x86_64.rpm openssl-devel-1.0.2k-21.el6.x86_64.rpm"
+  args:
+    chdir: /root/rpmbuild/RPMS/x86_64/
+  when: cacertsold.rc == 0
+
+- name: Install prereqs for building ca-certificate bundle ...
+  yum:
+    name:
+      - asciidoc
+      - java-1.6.0-openjdk      # Explicit build dep of ca-certificates SRPM
+    state: present
+  when: cacertsold.rc == 0
+
+- name: Download CentOS6 ca-certificates SRPM ...
+  shell: curl -O https://vault.centos.org/6.10/updates/Source/SPackages/ca-certificates-2020.2.41-65.1.el6_10.src.rpm
+
+- name: Verify checksum for CentOS6 ca-certificates download ...
+  shell: sha256sum ca-certificates-2020.2.41-65.1.el6_10.src.rpm | grep ^85326e70da937c09d342612190d23d3501a2a46954d2e197f9d343bf060ca000
+  when: cacertsold.rc == 0
+
+# Invoking rpm as ansible yum module skips due to non-source RPM presence
+- name: Install CentOS6 ca-certificates SRPM ...
+  shell: rpm -ivh ca-certificates-2020.2.41-65.1.el6_10.src.rpm warn=False
+  when: cacertsold.rc == 0
+
+- name: Download new CentOS7 ca-certificates SRPM ...
+  shell: curl -o ca-certificates-2021.2.50-72.el7_9.src.rpm https://vault.centos.org/7.9.2009/updates/Source/SPackages/ca-certificates-2021.2.50-72.el7_9.src.rpm
+  when: cacertsold.rc == 0
+
+- name: Verify checksum for CentOS7 ca-certificates  download ...
+  shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^86fe6df26e7612e63a70e435786f2eb6587cb00e6f9927aea113797afacebb57
+  when: cacertsold.rc == 0
+
+- name: Extract certdata.txt from CentOS7 ca-certificates SRPM ...
+  shell: rpm2cpio ca-certificates-2021.2.50-72.el7_9.src.rpm | (cd /root/rpmbuild/SOURCES && cpio -idmv certdata.txt)
+  when: cacertsold.rc == 0
+
+- name: Edit version number in the ca-certificates spec ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/ca-certificates.spec
+    regexp: 'Version: 2020.2.41'
+    line: 'Version: 2021.2.50'
+  when: cacertsold.rc == 0
+
+- name: Rebuild later ca-certificates (2021.2.50-72.el7_9) with rpmbuild ...
+  shell: cd /root/rpmbuild/SPECS && rpmbuild -bb ca-certificates.spec
+  when: cacertsold.rc == 0
+
+- name: Install CentOS6 ca-certificates SRPM ...
+  yum:
+    name: /root/rpmbuild/RPMS/noarch/ca-certificates-2021.2.50-65.1.el6.noarch.rpm
+    state: present
+  when: cacertsold.rc == 0

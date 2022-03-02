@@ -41,6 +41,13 @@
     - ansible_architecture == "x86_64"
   tags: adoptopenjdk_install
 
+- name: Set api_architecture variable for sun4v
+  set_fact:
+    api_architecture: sparcv9
+  when:
+    - ansible_architecture == "sun4v"
+  tags: adoptopenjdk_install
+
 - name: Set api_architecture variable for i386
   set_fact:
     api_architecture: x64
@@ -113,7 +120,7 @@
   tags: adoptopenjdk_install
 
 # CentOS6 needs it's own task so it can use a different python interpreter.
-# See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1877
+# See: https://github.com/adoptium/infrastructure/issues/1877
 - name: Install latest release if not already installed (CentOS6)
   unarchive:
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk

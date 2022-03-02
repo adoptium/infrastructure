@@ -15,6 +15,7 @@ Build_Tool_Packages:
   - g++
   - gcc
   - gettext
+  - git
   - libasound2-dev
   - libcups2-dev
   - libcurl4-openssl-dev
@@ -97,6 +98,10 @@ Additional_Build_Tools_s390x:
 Additional_Build_Tools_aarch64:
   - libpng-dev
 
+Additional_Build_Tools_Ubuntu20:
+  - cmake
+  - ccache
+
 Test_Tool_Packages:
   - acl
   - mercurial
@@ -109,6 +114,7 @@ Test_Tool_Packages:
   - unzip
   - libexpat1-dev
   - libcurl4-openssl-dev
+  - fakeroot
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

@@ -1,0 +1,34 @@
+FROM centos:6.9
+
+ARG user=jenkins
+
+# Install Python 3
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    yum -y update; yum clean all; \
+    yum -y install gcc openssl-devel bzip2-devel sqlite-devel sudo wget python3 epel-release; \
+    yum -y install ansible
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --tags="riscv"
+
+RUN rm -rf /ansible; yum remove -y ansible; yum clean all
+
+RUN groupadd -g 1000 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
+
+ENV \
+    JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk.x86_64" \
+    JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk.x86_64" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+    JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
+    JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"

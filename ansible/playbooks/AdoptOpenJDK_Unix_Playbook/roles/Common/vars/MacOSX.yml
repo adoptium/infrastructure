@@ -27,5 +27,6 @@ Test_Tool_Packages:
   - mercurial
   - pulseaudio
 
-Test_Tool_Casks:
-  - xquartz
+JCK_Tool_Casks:
+  - blackhole-2ch # Used to emulate a line in feed for JCK tests
+  - thunderbird # Used to run JCK email tests

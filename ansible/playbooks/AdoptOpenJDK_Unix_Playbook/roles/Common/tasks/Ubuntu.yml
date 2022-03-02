@@ -117,6 +117,13 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
+- name: Install additional build tools for Ubuntu 20 +
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_Ubuntu20 }}"
+  when:
+    - ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "20"
+  tags: build_tools
+
 #########################
 # Additional Test Tools #
 #########################

@@ -36,6 +36,7 @@
     - alp311
     - alp312
     - alp313
+    - alp314
 
 ##############################################################
 # Start the containers                                       #
@@ -87,6 +88,11 @@
   tags: startcontainers
   ignore_errors: yes
 
+- name: Start Alpine 3.14 container if not already started
+  command: docker run --restart unless-stopped -p 2231:22 --cpus=2.0 --memory=6G --detach --name alp314.2231 aqa_alp314
+  tags: startcontainers
+  ignore_errors: yes
+
 
 # lineinfile does not work here - similar to the operation in /var/log in adopt_etc
 # lineinfile: path /proc/sys/kernel/core_pattern state: present: regexp: . line: core.%p
@@ -101,3 +107,11 @@
     state: present
     regexp: kernel_core_pattern
     line: kernel.core_pattern=core.%p
+
+- name: Copy updatepackages.sh script to remote cron.daily directory
+  copy:
+    src: scripts/updatepackages.sh
+    dest: /etc/cron.daily/updatepackages.sh
+    owner: root
+    group: root
+    mode: +x

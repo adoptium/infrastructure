@@ -35,7 +35,7 @@
 
         - name: Download AIX filesystem configuration script
           get_url:
-            url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
+            url: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
             dest: /tmp/AIX_filesystem_config.sh
             mode: 0775
             validate_certs: no
@@ -74,7 +74,7 @@
 
         - name: Download AIX ramdisk script
           get_url:
-            url: https://raw.githubusercontent.com/AdoptOpenJDK/openjdk-infrastructure/master/ansible/playbooks/scripts/AIX_ramdisk.ksh
+            url: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/playbooks/scripts/AIX_ramdisk.ksh
             dest: /usr/local/bin/AIX_ramdisk.ksh
             mode: 0775
             validate_certs: no

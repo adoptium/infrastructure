@@ -1,12 +1,8 @@
 # Infrastructure
 
-## Build Status
-
-[![Build Status](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure.svg?branch=master)](https://travis-ci.org/AdoptOpenJDK/openjdk-infrastructure)
-
 ## Mission Statement
 
-To provide infrastructure for the AdoptOpenJDK farm that is:
+To provide infrastructure for the Adoptium farm that is:
 
 * **Secure** - Infrastructure is private by default and access is granted in a
 time and access control limited manner.
@@ -33,8 +29,8 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 ## Important Documentation
 
-* [hosts](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualized](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/docs/adoptopenjdk.pdf).
-* [Ansible at AdoptOpenJDK](https://github.com/AdoptOpenJDK/openjdk-infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
+* [hosts](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) - Our inventory, [visualized](https://github.com/adoptium/infrastructure/blob/master/docs/adoptopenjdk.pdf).
+* [Ansible at AdoptOpenJDK](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
 
 ## Contributing
 
@@ -81,6 +77,11 @@ This team is the starting point for new members.
 People in this team can take ownership of issues but do not have the
 privileges to merge pull requests.  In general new people in the team will
 go into this group for a while before being granted additional access.
+
+## Infrastructure Providers
+The Adoptium project is proud to receive contributions from many companies, both in the form of monetary contributions in exchange for membership or in-kind contributions for required resources. The Infrastructure collaborates with the following companies who contribute various kinds of cloud and physical hardware to the Adoptium project.
+
+![Infra Sponsors Page](https://user-images.githubusercontent.com/20224954/141327230-04524d09-ebd2-4e07-9c74-6c9ae9bdfc11.png)
 
 ### Host Information
 
