@@ -129,3 +129,5 @@
     - Security
     - Vendor
     - IPv6
+    - role: disable_gui
+      tags: adoptopenjdk
