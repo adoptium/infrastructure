@@ -155,6 +155,18 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
+# Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for adoptopenjdk directory
+# https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
+
+- name: Create adoptopenjdk symlink to temurin directory
+  file:
+    src: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
+    dest: /Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
 - name: Install latest release if one not already installed (Solaris)
   command: wget https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
   register: adoptopenjdk_download
