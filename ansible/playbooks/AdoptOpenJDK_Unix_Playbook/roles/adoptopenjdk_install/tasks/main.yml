@@ -162,6 +162,9 @@
   file:
     src: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
     dest: /Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk
+    state: link
+    owner: root
+    group: wheel
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
