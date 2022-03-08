@@ -158,7 +158,16 @@
 # Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for adoptopenjdk directory
 # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
 
-- name: Create adoptopenjdk symlink to temurin directory
+- name: Check if JDK was installed to a temurin directory (MacOS)
+  stat:
+    path: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
+  register: temurin_dir
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+- name: Create adoptopenjdk symlink to temurin directory (MacOS)
   file:
     src: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
     dest: /Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk
@@ -168,6 +177,7 @@
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
+    - temurin_dir.stat.isdir is true
   tags: adoptopenjdk_install
 
 - name: Install latest release if one not already installed (Solaris)
