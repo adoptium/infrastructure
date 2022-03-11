@@ -11,8 +11,6 @@
     PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
     PERL_MB_OPT: "--install_base /opt/freeware"
     PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
-  vars:
-    swap_size: 2048
 
   roles:
     - role: debug
@@ -85,32 +83,10 @@
 
     # 6. Install OJDK Bootstraps
 
-    - bootjdk7
     - role: bootjdk
-      jdk: 8
       tags:
-        - bootjdk8
         - adoptopenjdk
-    - role: bootjdk
-      jdk: 10
-      tags:
-        - bootjdk10
-        - adoptopenjdk
-    - role: bootjdk
-      jdk: 11
-      tags:
-        - bootjdk11
-        - adoptopenjdk
-    - role: bootjdk
-      jdk: 16
-      tags:
-        - bootjdk16
-        - adoptopenjdk
-    - role: bootjdk
-      jdk: 17
-      tags:
-        - bootjdk17
-        - adoptopenjdk
+        - bootjdk
 
     # 7. Modify /etc/hosts file to include ipv4 address and fqdn
 
@@ -263,28 +239,24 @@
     #####################
     # Enable swap space #
     #####################
-    - name: ensure swap space is of adequate size
+    - name: Verify paging space is at reasonable value
+      vars:
+        swap_lv: hd6
+        target_ps: 2048
       shell: |
-        swap_line=$(lsps -a | tail -n 1)
-        curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
-        swap_lv=$(echo $swap_line | awk '{print $1}')
-        if [[ $curr_swap_size -lt {{ swap_size }} ]]
+        pp_size=$(lsvg rootvg | grep "PP SIZE" | awk ' { print $6 } ')
+        current_ps=$(lsps -s | tail -1 | awk -FM ' { print $1 } ')
+        if [[ $current_ps -lt {{ target_ps }} ]]
         then
-          echo "Extending swap LV..."
-          extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+          # echo "Extending swap space {{ swap_lv }}"
+          chps -s $(expr \( {{ target_ps }} - $current_ps \) / $pp_size) {{ swap_lv }}
+        elif [[ $current_ps -gt {{ target_ps }} ]]
+        then
+          # echo "Shrinking swap space {{ swap_lv }}"
+          chps -d $(expr \( $current_ps - {{ target_ps }} \) / $pp_size) {{ swap_lv }}
         fi
-      register: extendlv_result
-      changed_when: "'Extending' in extendlv_result.stdout"
-      notify:
-        - restart machine
+      register: chps
+      changed_when: chps.stdout != ""
       tags:
         - swap
-        # Environment variables don't work as part of command
         - skip_ansible_lint
-
-  handlers:
-    - name: restart machine
-      shell: echo 'shutdown -r now "Ansible updates."' | at now + 1 minutes
-      async: 1
-      poll: 0
-      failed_when: false
