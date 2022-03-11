@@ -82,3 +82,6 @@
     XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
     FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
     FASTLANE_DONT_STORE_PASSWORD: 1
+
+- name: Set Xcode switch path to "/Applications/Xcode.app"
+  shell: sudo xcode-select --switch "/Applications/Xcode.app"
