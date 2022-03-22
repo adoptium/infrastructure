@@ -25,7 +25,7 @@
 
 - name: Set path variable (macOS)
   set_fact:
-    path: "/Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk"
+    path: "/Library/Java/JavaVirtualMachines/jdk-{{ jdk_version }}"
   when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 
@@ -155,29 +155,30 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
-# Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for adoptopenjdk directory
+# Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
 # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
 
-- name: Check if JDK was installed to a temurin directory (MacOS)
-  stat:
-    path: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
-  register: temurin_dir
+- name: Find bootjdk install directory (MacOS)
+  shell: ls -ld /Library/Java/JavaVirtualMachines/*-{{ jdk_version }}.jdk/ | awk '{print $9}'
+  register: bootjdk_install_dir
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
-- name: Create adoptopenjdk symlink to temurin directory (MacOS)
+- name: Create jdk symlink to bootjdk install directory (MacOS)
   file:
-    src: /Library/Java/JavaVirtualMachines/temurin-{{ jdk_version }}.jdk
-    dest: /Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk
+    src: '{{ bootjdk_install_dir.stdout }}'
+    dest: '{{ path }}'
     state: link
     owner: root
     group: wheel
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
-    - temurin_dir.stat.isdir is true
   tags: adoptopenjdk_install
 
 - name: Install latest release if one not already installed (Solaris)
