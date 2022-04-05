@@ -3,6 +3,20 @@
 # Build basic test images for each distribution #
 #################################################
 
+- name: Enable ipv6 on Dockerhost
+  lineinfile:
+    path: /etc/docker/daemon.json
+    line: '{ "ipv6": true, "fixed-cidr-v6": "fd00::/80" }'
+    insertafter: EOF
+    create: yes
+  register: restart_docker
+
+- name: Restart docker
+  service:
+    name: docker
+    state: restarted
+  when: restart_docker.changed is true
+
 - name: Send Dockerfiles to remote machine
   copy:
     src: Dockerfiles/
