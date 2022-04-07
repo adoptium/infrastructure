@@ -10,9 +10,9 @@
   set_fact:
     apple_variables: yes
   when:
-   - Apple_ID_User is defined
-   - Apple_ID_Password is defined
-   - FASTLANE_SESSION is defined
+    - Apple_ID_User is defined
+    - Apple_ID_Password is defined
+    - FASTLANE_SESSION is defined
 
 - debug:
     msg: "Apple ID variables are not defined. Xcode will need to be installed manually.
