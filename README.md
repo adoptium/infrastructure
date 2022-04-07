@@ -36,7 +36,7 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 Please visit our `#infrastructure` [Slack Channel](https://www.adoptopenjdk.net/slack.html) and say hello.
 Please read our [Contribution
-Guidelines](https://www.github.com/adoptopenjdk/openjdk-infrastructure/CONTRIBUTING.md) before
+Guidelines](https://github.com/adoptium/infrastructure/blob/master/CONTRIBUTING.md) before
 submitting Pull Requests.
 
 ## Members

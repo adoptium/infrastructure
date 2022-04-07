@@ -116,8 +116,8 @@ build failure is occurring on a particular system. Assuming it's not a
 locally. The easiest way to do this is as follows (ideally not as root as
 that can mask problems).
 ```
-git clone https://github.com/adoptopenjdk/openjdk-build
-cd openjdk-build/build-farm
+git clone https://github.com/adoptium/temurin-build
+cd termurin-build/build-farm
 export CONFIGURE_ARGS=--with-native-debug-symbols=none
 export BUILD_ARGS="--custom-cacerts false"
 ./make-adopt-build-farm.sh jdk11u
@@ -167,10 +167,10 @@ If you then need to run manually on the machine itself (outside jenkins)
 then the process is typically like this:
 
 ```
-git clone https://github.com/adoptopenjdk/openjdk-tests && cd openjdk-tests
+git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
 ./get.sh && cd TKG
 export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
-BUILD_LIST=openjdk make compile
+export BUILD_LIST=openjdk
 make <target>
 ```
 `BUILD_LIST` depends on the suite you want to run, and can be omitted to build
@@ -194,9 +194,9 @@ A few examples that test specific pieces of infra-related functionality so usefu
 
 If you are making a change which might have a negative effect on the
 playbooks on other platforms, be sure to run it through the
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/work%20in%20progress/job/VagrantPlaybookCheck/)
+[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/job/VagrantPlaybookCheck/)
 job first. This job takes a branch from a fork of the
-`openjdk-infrastructure` repository as a parameter and runs the playbooks
+`adoptium/infrastructure` repository as a parameter and runs the playbooks
 against a variety of Operating Systems using Vagrant and the scripts in
 [pbTestScripts](https://github.com/adoptium/infrastructure/tree/master/ansible/pbTestScripts)
 to validate them.
@@ -211,7 +211,7 @@ most people as the teams are restricted access)
 
 - [release](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) can run and configure jobs and views
 - [build](https://github.com/orgs/AdoptOpenJDK/teams/build/members) has the access for `release` plus the ability to create new jobs
-- [testing](https://github.com/orgs/AdoptOpenJDK/teams/testing/members) has the same access as `build`
+- [test](https://github.com/orgs/AdoptOpenJDK/teams/test/members) has the same access as `build`
 - [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure/members) has the same as `build`/`testing` plus can manage agent machines
 - [jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) as you might expect has access to Administer anything
 
@@ -278,7 +278,7 @@ identify them and split them out so they do not have the full playbooks
 executed against them in order to keep the host system "clean". In some
 cases they may be used as `dockerBuild` hosts too.
 
-Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/blob/dockerstatic.docs/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
+Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
 
 ### DockerHost TODO:
 1. Set up patching cycle
