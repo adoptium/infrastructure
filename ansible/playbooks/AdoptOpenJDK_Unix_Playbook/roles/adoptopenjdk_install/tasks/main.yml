@@ -159,7 +159,11 @@
 # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
 
 - name: Find bootjdk install directory (MacOS)
-  shell: ls -ld /Library/Java/JavaVirtualMachines/*-{{ jdk_version }}.jdk/ | awk '{print $9}'
+  find:
+    paths: /Library/Java/JavaVirtualMachines
+    patterns: "^adoptopenjdk-{{ jdk_version }}.jdk|^temurin-{{ jdk_version }}.jdk"
+    use_regex: yes
+    file_type: directory
   register: bootjdk_install_dir
   when:
     - ansible_distribution == "MacOSX"
@@ -168,7 +172,7 @@
 
 - name: Create jdk symlink to bootjdk install directory (MacOS)
   file:
-    src: '{{ bootjdk_install_dir.stdout }}'
+    src: '{{ bootjdk_install_dir.files[0].path }}'
     dest: '{{ path }}'
     state: link
     owner: root
