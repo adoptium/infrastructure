@@ -1,0 +1,6 @@
+---
+- name: Restart docker service
+  service:
+    name: docker
+    state: restarted
+  when: restart_docker.changed is true
