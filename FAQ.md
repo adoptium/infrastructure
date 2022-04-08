@@ -117,7 +117,7 @@ locally. The easiest way to do this is as follows (ideally not as root as
 that can mask problems).
 ```
 git clone https://github.com/adoptium/temurin-build
-cd termurin-build/build-farm
+cd temurin-build/build-farm
 export CONFIGURE_ARGS=--with-native-debug-symbols=none
 export BUILD_ARGS="--custom-cacerts false"
 ./make-adopt-build-farm.sh jdk11u
