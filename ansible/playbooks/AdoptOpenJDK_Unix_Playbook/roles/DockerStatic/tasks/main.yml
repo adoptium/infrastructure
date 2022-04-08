@@ -10,12 +10,8 @@
     insertafter: EOF
     create: yes
   register: restart_docker
-
-- name: Restart docker
-  service:
-    name: docker
-    state: restarted
-  when: restart_docker.changed is true
+  notify:
+    - Restart docker service
 
 - name: Send Dockerfiles to remote machine
   copy:
