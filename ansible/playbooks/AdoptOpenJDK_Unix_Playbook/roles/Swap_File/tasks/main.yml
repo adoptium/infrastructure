@@ -50,7 +50,7 @@
       - "swap_exists: {{ swap_exists.rc | default('***Undefined***') }} "
   tags: swap_file
 
-- name: Disable dphys-swapfile where applicableCreate
+- name: Disable dphys-swapfile where applicable
   command: "dphys-swapfile uninstall"
   ignore_errors: yes
   when:
