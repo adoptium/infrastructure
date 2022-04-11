@@ -8,7 +8,10 @@
 # Already installed/exists: When swap_root.rc or swap_tmp.rc equals 0
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
-## Test
+
+# Set Filesystem Check Fact, In Case No Root Filesystem
+- set_fact: btrfs_fs_found="false"
+
 - name: Check and set fact if / mount point exists and is BTRFS
   set_fact:
     btrfs_fs_found: true
