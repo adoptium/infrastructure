@@ -14,7 +14,8 @@
     - Apple_ID_Password is defined
     - FASTLANE_SESSION is defined
 
-- debug:
+- name: Display Information when apple_variables is not defined
+  debug:
     msg: "Apple ID variables are not defined. Xcode will need to be installed manually.
           Ensure that Apple_ID_User, Apple_ID_Password and FASTLANE_SESSION are defined. Skipping Xcode installation"
   when: apple_variables is not defined
