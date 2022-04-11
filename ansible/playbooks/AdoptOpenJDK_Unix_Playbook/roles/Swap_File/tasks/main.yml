@@ -8,7 +8,7 @@
 # Already installed/exists: When swap_root.rc or swap_tmp.rc equals 0
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
-
+## Test
 - name: Check and set fact if / mount point exists and is BTRFS
   set_fact:
     btrfs_fs_found: true
@@ -20,6 +20,10 @@
     btrfs_fs_found: false
   when: (item.mount == '/') and (item.fstype != 'btrfs')
   loop: "{{ ansible_facts.mounts }}"
+
+- name: Print Root FS Type
+  debug:
+    msg: "FS Type = {{ btrfs_fs_found }}"
 
 - name: Set Swapfile path - /swapfile
   set_fact:
@@ -46,35 +50,38 @@
       - "swap_exists: {{ swap_exists.rc | default('***Undefined***') }} "
   tags: swap_file
 
-- name: Disable dphys-swapfile where applicable
+- name: Disable dphys-swapfile where applicableCreate
   command: "dphys-swapfile uninstall"
   ignore_errors: yes
   when:
     - ansible_architecture == "armv7l"
   tags: swap_file
 
-- name: Create swap file - via DD
-  command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
+- name: Touch Swapfile For BTRFS
+  copy:
+    content: ""
+    dest: "{{ swap_path }}"
+    force: no
   when:
-    - not (swap_exists.stat.exists and btrfs_fs_found != "true")
+    (btrfs_fs_found == True) and not (swap_exists.stat.exists )
   tags: swap_file
 
-- name: Create Swapfile For BTRFS File Systems
-  command: "touch {{ swap_path }}"
+- name: Create swap file - via DD ( For Non BTRFS )
+  command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
-    - not (swap_exists.stat.exists) and (btrfs_fs_found == true)
+    (btrfs_fs_found == False) and not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Add Attribute For BTRFS File System
   command: "chattr +C {{ swap_path }}"
   when:
-    - not (swap_exists.stat.exists) and (btrfs_fs_found == true)
+    - ( btrfs_fs_found == true ) and not (swap_exists.stat.exists)
   tags: swap_file
 
-- name: Create swap file - via DD
+- name: Create swap file - via DD ( For BTRFS )
   command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
-    - not (swap_exists.stat.exists and btrfs_fs_found != true)
+    (btrfs_fs_found == True) and not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Set swap file permissions
