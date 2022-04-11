@@ -11,6 +11,7 @@ The DockerStatic ansible role provides allows us to automate the setup of our do
 * [docker-packet-ubuntu2004-armv8-1](https://ci.adoptopenjdk.net/computer/docker-packet-ubuntu2004-armv8-1/)
 * [dockerhost-equinix-ubuntu2004-armv8-1](https://ci.adoptopenjdk.net/computer/dockerhost-equinix-ubuntu2004-armv8-1/)
 
+
 ## Setting up a new DockerStatic container
 
 If you would like to setup an individual container on one of these machines, follow these instructions:

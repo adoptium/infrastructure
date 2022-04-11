@@ -43,6 +43,8 @@
     - u2004
     - u2104
     - f33
+    - f34
+    - f35
     - alp311
     - alp312
     - alp313
@@ -83,13 +85,23 @@
   tags: startcontainers
   ignore_errors: yes
 
+- name: Start fedora 34 container if not already started
+  command: docker run --restart unless-stopped -p 2232:22 --cpus=2.0 --memory=6G --detach --name   f34.2232 aqa_f34
+  tags: startcontainers
+  ignore_errors: yes
+
+- name: Start fedora 35 container if not already started
+  command: docker run --restart unless-stopped -p 2233:22 --cpus=2.0 --memory=6G --detach --name   f34.2233 aqa_f35
+  tags: startcontainers
+  ignore_errors: yes
+
 - name: Start Alpine 3.11 container if not already started
   command: docker run --restart unless-stopped -p 2228:22 --cpus=2.0 --memory=6G --detach --name alp311.2228 aqa_alp311
   tags: startcontainers, startallcontainers
   ignore_errors: yes
 
 - name: Start Alpine 3.12 container if not already started
-  command: docker run --restart unless-stopped -p 2229:22 --cpus=2.0 --memory=6G --detach --name alp312.2228 aqa_alp312
+  command: docker run --restart unless-stopped -p 2229:22 --cpus=2.0 --memory=6G --detach --name alp312.2229 aqa_alp312
   tags: startcontainers
   ignore_errors: yes
 
