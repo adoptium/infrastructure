@@ -10,23 +10,28 @@
 # Assume swap path of /swapfile override where applicable
 
 - name: Intialise btrfs variable
-- set_fact: btrfs_fs_found="false"
+  set_fact:
+    btrfs_fs_found: false
+  tags: swap_file
 
 - name: Check and set fact if / mount point exists and is BTRFS
   set_fact:
     btrfs_fs_found: true
   when: (item.mount == '/') and (item.fstype == 'btrfs')
   loop: "{{ ansible_facts.mounts }}"
+  tags: swap_file
 
 - name: Check and set fact if / mount point exists and is NOT BTRFS
   set_fact:
     btrfs_fs_found: false
   when: (item.mount == '/') and (item.fstype != 'btrfs')
   loop: "{{ ansible_facts.mounts }}"
+  tags: swap_file
 
 - name: Print Root FS Type
   debug:
     msg: "FS Type = {{ btrfs_fs_found }}"
+  tags: swap_file
 
 - name: Set Swapfile path - /swapfile
   set_fact:
