@@ -55,6 +55,7 @@ Additional_Build_Tools_FEDORA35:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
+  - libstdc++-static              # a dependency required for executing a 32-bit C binary
   - libdwarf-devel                # now in CodeReady Linux Builder (CRB) repo
   - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
   - glibc-locale-source
