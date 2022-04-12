@@ -9,7 +9,7 @@
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
 
-# Set Filesystem Check Fact, In Case No Root Filesystem
+- name: Intialise btrfs variable
 - set_fact: btrfs_fs_found="false"
 
 - name: Check and set fact if / mount point exists and is BTRFS
