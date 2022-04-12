@@ -25,7 +25,7 @@
 
 - name: Set path variable (macOS)
   set_fact:
-    path: "/Library/Java/JavaVirtualMachines/adoptopenjdk-{{ jdk_version }}.jdk"
+    path: "/Library/Java/JavaVirtualMachines/jdk-{{ jdk_version }}"
   when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 
@@ -150,6 +150,36 @@
 
 - name: Run installer (macOS)
   shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+# Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
+# https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
+
+- name: Find bootjdk install directory (MacOS)
+  find:
+    paths: /Library/Java/JavaVirtualMachines
+    patterns: "^adoptopenjdk-{{ jdk_version }}.jdk|^temurin-{{ jdk_version }}.jdk"
+    use_regex: yes
+    file_type: directory
+  register: bootjdk_install_dir
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
+- name: Create jdk symlink to bootjdk install directory (MacOS)
+  file:
+    src: '{{ bootjdk_install_dir.files[0].path }}'
+    dest: '{{ path }}'
+    state: link
+    owner: root
+    group: wheel
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
