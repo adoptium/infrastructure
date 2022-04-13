@@ -1,0 +1,128 @@
+---
+##########
+# RedHat #
+##########
+
+# Command Build Tool Packages
+Build_Tool_Packages:
+  - alsa-lib-devel
+  - autoconf
+  - bind-utils
+  - bison                         # OpenJ9
+  - bzip2
+  - ca-certificates
+  - cpio
+  - curl
+  - cups-devel
+  - elfutils-libelf-devel
+  - flex                          # OpenJ9
+  - fontconfig-devel
+  - freetype-devel
+  - gcc
+  - gcc-c++
+  - gettext
+  - glibc
+  - glibc-common
+  - glibc-devel
+  - gmp-devel
+  - libcurl-devel
+  - libffi-devel
+  - libpng-devel
+  - libXext-devel
+  - libXi-devel                   # JDK12+ compilation
+  - libXrandr-devel               # JDK12+ compilation
+  - libXrender-devel
+  - libXt-devel
+  - libXtst-devel
+  - make
+  - mesa-libGL-devel
+  - mpfr-devel
+  - openssl-devel
+  - perl-devel
+  - pkgconfig
+  - systemtap-sdt-devel
+  - unzip
+  - wget
+  - xz
+  - zip
+
+Additional_Build_Tools_NOT_RHEL8:
+  - libdwarf-devel                # now in CodeReady Linux Builder (CRB) repo
+  - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
+  - ntp
+
+Additional_Build_Tools_FEDORA35:
+  - glibc.i686                    # a dependency required for executing a 32-bit C binary
+  - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
+  - libstdc++.i686                # a dependency required for executing a 32-bit C binary
+  - libstdc++-static              # a dependency required for executing a 32-bit C binary
+  - libdwarf-devel                # now in CodeReady Linux Builder (CRB) repo
+  - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
+  - glibc-locale-source
+  - glibc-langpack-ja             # required for creating Japanese locales
+  - glibc-langpack-ko             # required for creating Korean locales
+  - glibc-langpack-zh             # required for creating Chinese locales
+  - git
+  - cmake
+  - ccache
+  - chrony
+  - openssl
+
+Additional_Build_Tools_RHEL8:
+  - glibc-locale-source
+  - glibc-langpack-ja             # required for creating Japanese locales
+  - glibc-langpack-ko             # required for creating Korean locales
+  - glibc-langpack-zh             # required for creating Chinese locales
+  - git
+  - cmake
+  - ccache
+
+Additional_Build_Tools_RHEL7:
+  - libstdc++-static
+  - ccache
+
+Additional_Build_Tools_RHEL7_PPC64LE:
+  - libstdc++
+
+Additional_Build_Tools_RHEL_x86:
+  - glibc.i686                    # a dependency required for executing a 32-bit C binary
+  - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
+  - libstdc++.i686                # a dependency required for executing a 32-bit C binary
+
+Additional_Build_Tools_RHEL_ppc64:
+  - glibc.ppc                     # a dependency required for executing a 32-bit C binary
+  - glibc-devel.ppc               # a dependency required for executing a 32-bit C binary
+  - libstdc++.ppc                 # a dependency required for executing a 32-bit C binary
+
+Additional_Build_Tools_RHEL_s390x:
+  - glibc.s390                    # a dependency required for executing a 32-bit C binary
+  - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
+  - libstdc++.s390                # a dependency required for executing a 32-bit C binary
+
+Java_RHEL8:
+  - java-1.8.0-openjdk-devel
+
+Java_FED35:
+  - java-1.8.0-openjdk-devel
+
+Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
+  - java-1.7.0-openjdk-devel
+  - java-1.8.0-openjdk-devel
+
+Java_RHEL6_PPC64:
+  - java-1.7.0-ibm-devel
+  - java-1.8.0-ibm-devel
+
+Test_Tool_Packages:
+  - acl
+  - perl
+  - perl-Digest-SHA
+  - perl-Time-HiRes
+  - perl-Test-Simple
+  - xorg-x11-xauth
+  - xorg-x11-server-Xvfb
+  - zlib-devel
+  - perl-devel
+  - expat-devel
+  - libcurl-devel
+  - mercurial
