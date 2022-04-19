@@ -85,7 +85,7 @@
 
 - name: Create symlink to point at zulu-11
   file:
-    src: /usr/lib/jvm/zulu11.54.25-ca-jdk11.0.14-linux_musl_x64
+    src: /usr/lib/jvm/zulu11.54.25-ca-jdk11.0.14.1-linux_musl_x64
     dest: /usr/lib/jvm/zulu11
     state: link
   when:
