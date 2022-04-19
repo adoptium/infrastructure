@@ -29,4 +29,4 @@ ENV \
     JDK17_BOOT_DIR="/usr/lib/jvm/zulu17" \
     JDK18_BOOT_DIR="/usr/lib/jvm/zulu18" \
     JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu18" \
-    JAVA_HOME="/usr/lib/jvm/zulu18"
+    JAVA_HOME="/usr/lib/jvm/zulu8"
