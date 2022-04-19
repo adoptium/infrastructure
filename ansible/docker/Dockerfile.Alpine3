@@ -25,5 +25,8 @@ ENV \
     JDK11_BOOT_DIR="/usr/lib/jvm/zulu11" \
     JDK14_BOOT_DIR="/usr/lib/jvm/zulu14" \
     JDK15_BOOT_DIR="/usr/lib/jvm/zulu15" \
-    JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu15" \
-    JAVA_HOME="/usr/lib/jvm/zulu8"
+    JDK16_BOOT_DIR="/usr/lib/jvm/zulu16" \
+    JDK17_BOOT_DIR="/usr/lib/jvm/zulu17" \
+    JDK18_BOOT_DIR="/usr/lib/jvm/zulu18" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu18" \
+    JAVA_HOME="/usr/lib/jvm/zulu18"
