@@ -15,7 +15,7 @@ _infrastructure as code_.
 
 The end result should be **immutable** hosts, which can be destroyed and reproduced from Ansible playbooks. See
 our [Contribution
-Guidelines](https://www.github.com/adoptopenjdk/openjdk-infrastructure/CONTRIBUTING.md)
+Guidelines](https://github.com/adoptium/infrastructure/blob/master/CONTRIBUTING.md)
 on how we implement these goals.
 
 ## Can we Chaos Monkey it
