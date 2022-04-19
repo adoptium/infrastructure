@@ -137,3 +137,73 @@
   when:
     - not zulu15_installed.stat.exists
   tags: build_tools
+
+
+- name: Check if zulu-16 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu16
+  register: zulu16_installed
+  tags: build_tools
+
+- name: Install latest zulu-16 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu16.32.15-ca-jdk16.0.2-linux_musl_aarch64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu16_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-16
+  file:
+    src: /usr/lib/jvm/zulu16.32.15-ca-jdk16.0.2-linux_musl_aarch64
+    dest: /usr/lib/jvm/zulu16
+    state: link
+  when:
+    - not zulu16_installed.stat.exists
+  tags: build_tools
+
+- name: Check if zulu-17 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu17
+  register: zulu17_installed
+  tags: build_tools
+
+- name: Install latest zulu-17 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu17_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-17
+  file:
+    src: /usr/lib/jvm/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64
+    dest: /usr/lib/jvm/zulu17
+    state: link
+  when:
+    - not zulu17_installed.stat.exists
+  tags: build_tools
+
+- name: Check if zulu-18 is already installed in the target location
+  stat: path=/usr/lib/jvm/zulu18
+  register: zulu18_installed
+  tags: build_tools
+
+- name: Install latest zulu-18 release if not already installed
+  unarchive:
+    src: https://cdn.azul.com/zulu/bin/zulu18.28.13-ca-jdk18.0.0-linux_musl_aarch64.tar.gz
+    dest: /usr/lib/jvm/
+    remote_src: yes
+  when:
+    - not zulu18_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at zulu-18
+  file:
+    src: /usr/lib/jvm/zulu18.28.13-ca-jdk18.0.0-linux_musl_aarch64
+    dest: /usr/lib/jvm/zulu18
+    state: link
+  when:
+    - not zulu18_installed.stat.exists
+  tags: build_tools
