@@ -4,7 +4,7 @@ RUN apk update \
     && apk upgrade \
     && apk add ansible
 
-USER jenkins
+ARG user=jenkins
 
 COPY . /ansible
 
