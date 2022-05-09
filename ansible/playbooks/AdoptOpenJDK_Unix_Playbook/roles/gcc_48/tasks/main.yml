@@ -4,7 +4,7 @@
 ##########
 - name: Check if gcc-4.8 is installed on x86_64 RedHat 6
   shell: /usr/bin/gcc-4.8 >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: gcc_installed
   changed_when: false
   tags:
@@ -127,5 +127,5 @@
   with_items:
     - /tmp/gcc-4.8.5
     - /tmp/gcc-4.8.5.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: gcc-4.8

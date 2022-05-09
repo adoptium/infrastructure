@@ -6,7 +6,7 @@
 - name: Test if Nagios_RemoteTunnel.sh already exists
   stat:
     path: /home/nagios/Nagios_RemoteTunnel.sh
-  ignore_errors: yes
+  failed_when: false
   register: tunnel_script_result
 
 - name: Place Adopt_Tunnel_User.key in nagios users ssh folder

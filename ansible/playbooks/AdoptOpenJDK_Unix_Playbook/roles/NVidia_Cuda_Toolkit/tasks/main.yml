@@ -57,7 +57,7 @@
 
 - name: Apply NVidia CUDA repo RPM - RHEL/CentOS 7 on PPC64LE
   yum: name=/tmp/cuda-repo-rhel7-9.ppc64le.rpm state=installed
-  ignore_errors: True
+  failed_when: false
   when:
     - cuda_installed.stat.isdir is not defined
     - ( ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
@@ -165,5 +165,5 @@
     - /tmp/cuda9_linux-run
     - /tmp/cuda-repo-rhel7-9.ppc64le.rpm
     - /tmp/dkms.noarch.rpm
-  ignore_errors: yes
+  failed_when: false
   tags: nvidia_cuda_toolkit

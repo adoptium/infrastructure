@@ -78,7 +78,7 @@
 
         - name: Create Jenkins user
           action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
-          ignore_errors: yes
+          failed_when: false
           tags: jenkins_user
 
         - name: Install NPM packages globally

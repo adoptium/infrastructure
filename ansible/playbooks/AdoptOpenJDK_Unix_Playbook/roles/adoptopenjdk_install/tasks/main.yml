@@ -97,7 +97,7 @@
 
 - name: Check if jdk-{{ jdk_version }} is already installed in the target location
   shell: ls -ld {{ path }}* >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: adoptopenjdk_installed
   tags:
     - adoptopenjdk_install

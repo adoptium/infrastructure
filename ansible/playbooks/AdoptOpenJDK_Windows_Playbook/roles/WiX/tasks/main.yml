@@ -30,7 +30,7 @@
   win_file:
     path: 'C:\temp\wix.exe'
     state: absent
-  ignore_errors: yes
+  failed_when: false
   tags: Wix
 
 - name: Test if Windows 10 SDK is already installed
