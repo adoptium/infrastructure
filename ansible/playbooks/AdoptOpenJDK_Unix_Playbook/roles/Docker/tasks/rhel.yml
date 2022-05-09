@@ -1,3 +1,4 @@
+---
 ##############
 # Below enable different YUM repo not EPEL
 ##############
@@ -29,7 +30,7 @@
     enabled: yes
     gpgcheck: no
   when:
-     - ansible_architecture == "s390x"
+    - ansible_architecture == "s390x"
 
 - name: Import Docker Repo key for RHEL/CentOS7 x86_64
   rpm_key:
@@ -44,4 +45,3 @@
     state: present
   when:
     - ansible_architecture == "s390x"
-

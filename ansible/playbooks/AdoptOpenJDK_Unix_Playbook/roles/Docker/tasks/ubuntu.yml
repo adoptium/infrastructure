@@ -1,3 +1,4 @@
+---
 - name: Add Docker GPG apt Key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
@@ -40,7 +41,7 @@
     - ansible_architecture == "armv7l"
 
 - name: Install Docker prerequisites for Ubuntu
-  apt: 
+  apt:
     pkg={{ item }}
     state=latest
     update_cache=yes
@@ -71,4 +72,3 @@
 - name: Run apt-get update
   apt:
     update_cache: yes
-

@@ -1,3 +1,4 @@
+---
 - name: Add Docker Repo for SLES12
   community.general.zypper_repository:
     name: docker
@@ -6,7 +7,7 @@
     auto_import_keys: yes
 
 - name: Install Docker on SLES12
-  zypper: 
+  zypper:
     pkg: "{{ item }}"
     state: latest
     update_cache: yes
@@ -20,4 +21,3 @@
   tags:
     # TODO: Package installs should not use latest
     - skip_ansible_lint
-
