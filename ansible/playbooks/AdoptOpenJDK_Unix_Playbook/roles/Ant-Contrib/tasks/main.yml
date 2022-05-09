@@ -100,5 +100,5 @@
   with_items:
     - /tmp/ant-contrib
     - /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: ant-contrib
