@@ -2,10 +2,10 @@
 ##########
 # Docker #
 ##########
-- name: Test if docker is already installed
-  shell: docker >/dev/null 2>&1
+- name: Check if docker already exsit
+  command: docker --version
   failed_when: false
-  register: docker_installed
+  register: docker_version
   tags:
     - docker
     # TODO: write a condition when NOT to run this step
@@ -350,3 +350,69 @@
     - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
     - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
   tags: docker
+=======
+- name: Install Docker Engineer
+  when: docker_version.failed  # when no docker version set
+  tags: docker
+  block:
+    ################
+    # Pre Install  #
+    ################
+    - name: Prepare for RHEL7/CentOS7
+      include_tasks: rhel.yml
+      when:
+        - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == "7"
+
+    - name: Prepare for Ubuntu
+      include_tasks: ubuntu.yml
+      when:
+        - ansible_distribution == "Ubuntu"
+    
+    - name: Prepare for Debian ( < 10 ) / Raspbian
+      include_tasks: debian.yml
+      when:
+        - ansible_distribution == "Debian"
+
+    ##################
+    # Install Docker #
+    ##################
+    - name: Install docker based on OS (Ubuntu, RHEL7, CentOS7, Debian)
+      ansible.builtin.package:
+        name:
+          - docker-ce
+          - containerd.io
+          - docker-ce-cli
+          - docker-compose-plugin
+        state: latest   # TODO: Package installs should not use latest
+        use: auto       # automatic select package manager to use yum, apt and so on
+
+    - name: Install for SLES12 # zypper does not support in package module
+      include_tasks: sles.yml
+      when:
+        -  ansible_distribution == "SLES" and ansible_distribution_major_version == "12"
+
+    ################
+    # Post Install #
+    ################
+    - name: Add Jenkins user to the docker group for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+      ansible.builtin.user:
+        name: "{{ Jenkins_Username }}"
+        groups: docker
+        append: yes
+        state: present
+      when:
+        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
+        - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x") and (ansible_architecture != "riscv64")
+      tags:
+        - jenkins
+
+    - name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+      when:
+        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
+        - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x") and (ansible_architecture != "riscv64")
+>>>>>>> 4b995a4... ansible: refactory docker role

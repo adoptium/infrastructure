@@ -1,0 +1,46 @@
+##############
+# Below enable different YUM repo not EPEL
+##############
+- name: Add Docker Repo for RHEL/CentOS7 x86_64
+  yum_repository:
+    name: docker
+    description: docker YUM repo x86_64
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_architecture == "x86_64"
+
+- name: Add Docker repo for RHEL/CentOS 7 ppc64le
+  yum_repository:
+    name: docker
+    description: docker YUM repo ppc64le
+    baseurl: http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_architecture == "ppc64le"
+
+- name: Add Docker repo for RHEL/CentOS7 s390x
+  yum_repository:
+    name: docker
+    description: docker YUM repo s390x
+    baseurl: https://download.docker.com/linux/rhel/docker-ce.repo
+    enabled: yes
+    gpgcheck: no
+  when:
+     - ansible_architecture == "s390x"
+
+- name: Import Docker Repo key for RHEL/CentOS7 x86_64
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+  when:
+    - ansible_architecture == "x86_64"
+
+- name: Import Docker repo key for RHEL/CentOS7 s390x
+  rpm_key:
+    key: https://download.docker.com/linux/rhel/gpg
+    state: present
+  when:
+    - ansible_architecture == "s390x"
