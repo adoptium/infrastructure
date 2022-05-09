@@ -38,7 +38,7 @@
     # Install Docker #
     ##################
     - name: Install docker based on OS (Ubuntu, RHEL7, CentOS7, Debian)
-      ansible.builtin.package:
+      package:
         name:
           - docker-ce
           - containerd.io
@@ -57,7 +57,7 @@
     # Post Install #
     ################
     - name: Add Jenkins user to the docker group for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
-      ansible.builtin.user:
+      user:
         name: "{{ Jenkins_Username }}"
         groups: docker
         append: yes
