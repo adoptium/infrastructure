@@ -24,7 +24,7 @@
     - not usr_lib_jvm_exists.stat.exists
   tags: build_tools
 
-- name: Install JDK for aarch64
+- name: Install JDK for x64
   when: ansible_architecture == "x86_64"
   block:
     - name: Check if zulu-7 is already installed in the target location
