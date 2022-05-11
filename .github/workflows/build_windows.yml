@@ -41,7 +41,7 @@ jobs:
         tags: adoptopenjdk/windows2016_build_image:base:latest
         cache-from: type=registry,ref=adoptopenjdk/windows2016_build_image:base:latest
         cache-to: type=inline
-        push: true
+        push: ${{ github.ref == 'refs/heads/master' }}
 
     - name: Docker Build & Push Windows 2016 VS2017 Image to Docker Hub
       uses: docker/build-push-action@v2
@@ -50,4 +50,4 @@ jobs:
         tags: adoptopenjdk/windows2016_build_image:vs2017
         cache-from: type=registry,ref=adoptopenjdk/windows2016_build_image:vs2017
         cache-to: type=inline
-        push: true
+        push: ${{ github.ref == 'refs/heads/master' }}
