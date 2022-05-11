@@ -17,9 +17,9 @@ on:
     - master
 
 jobs:
-  build-and-push-windows2016:
-    name: Windows 2016
-    runs-on: windows-2016
+  build-and-push-windows2019:
+    name: Windows 2019
+    runs-on: windows-2019
     steps:
 
     - uses: actions/checkout@v2
