@@ -109,4 +109,4 @@
     - new_vendor: "eclipse"
     - baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
     - vendor: "adoptopenjdk"
-    - project: "{{heap}}/{{vendor}}?project=jdk"
+    - project: "{{ heap }}/{{ vendor }}?project=jdk"

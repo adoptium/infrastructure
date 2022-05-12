@@ -8,7 +8,8 @@
   remote_user: root
   become: yes
   tasks:
-    - block:
+    - name: Ubuntu JCK config
+      block:
         - name: Load AdoptOpenJDKs variable file
           include_vars: adoptopenjdk_variables.yml
         - name: If we ARE running on Power set var accordingly
