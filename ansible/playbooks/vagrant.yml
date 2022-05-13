@@ -10,7 +10,7 @@
   become: yes
 
   tasks:
-    - nam: Vagrant playbook
+    - name: Vagrant playbook
       block:
         - name: Print facts
           debug:
