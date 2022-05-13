@@ -3,7 +3,7 @@ FROM fedora:34
 RUN yum -y update && yum install -y perl openssh-server unzip wget
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Get java8
-RUN wget -q 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk' -O /tmp/jdk8.tar.gz
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
 # Install ant 1.10.12
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.12-bin.zip'

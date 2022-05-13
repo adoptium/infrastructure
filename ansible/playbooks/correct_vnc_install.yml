@@ -8,7 +8,8 @@
   remote_user: root
   become: yes
   tasks:
-    - block:
+    - name: Correct VNC Install
+      block:
         - name: If we're running on Power set var accordingly
           set_fact:
             isPower: "Y"
