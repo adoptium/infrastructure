@@ -144,6 +144,46 @@
 - name: Install JDK for aarch64
   when: ansible_architecture == "aarch64"
   block:
+    - name: Install java 8 from Alpine repositories
+      package: "name=openjdk8 state=installed"
+      tags: build_tools
+
+    # Using zulu8 path name for compatibility with the build dockerfile
+    # ENV statements until we replace this with a Temurin 8
+    - name: Check if zulu 8 symlink is in place (TEMPORARY)
+      stat: path=/usr/lib/jvm/zulu8
+      register: zulu8_installed
+      tags: build_tools
+
+    - name: Create symlink to point at openjdk8
+      file:
+        src: /usr/lib/jvm/java-8-openjdk
+        dest: /usr/lib/jvm/zulu8
+        state: link
+      when:
+        - not zulu8_installed.stat.exists
+      tags: build_tools
+
+    - name: Install java 11 from Alpine repositories
+      package: "name=openjdk11 state=installed"
+      tags: build_tools
+
+    # Using zulu11 path name for compatibility with the build dockerfile
+    # ENV statements until we replace this with a Temurin 8
+    - name: Check if zulu 11 symlink is in place (TEMPORARY)
+      stat: path=/usr/lib/jvm/zulu11
+      register: zulu11_installed
+      tags: build_tools
+
+    - name: Create symlink to point at openjdk11
+      file:
+        src: /usr/lib/jvm/java-11-openjdk
+        dest: /usr/lib/jvm/zulu11
+        state: link
+      when:
+        - not zulu8_installed.stat.exists
+      tags: build_tools
+
     - name: Check if zulu-16 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu16
       register: zulu16_installed
