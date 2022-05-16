@@ -72,8 +72,7 @@ have at the moment:
 |---|---|---|---|---|
 | [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
-| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 | [GH Actions](.github/workflows/build.yml) | Yes
-| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/arm64 | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
+| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
 
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
