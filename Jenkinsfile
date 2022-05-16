@@ -100,6 +100,8 @@ def dockerManifest() {
             docker manifest push $TARGET
             # Alpine3
             export TARGET="adoptopenjdk/alpine3_build_image"
+            AMD64=$TARGET:linux-amd64
+            ARM64=$TARGET:linux-arm64
             docker manifest create $TARGET $AMD64 $ARM64
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
