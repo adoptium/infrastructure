@@ -1,9 +1,15 @@
 FROM redhat/ubi8
 # Install Base Requirements
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN dnf -y update && dnf install -y perl openssh-server unzip wget epel-release
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+# Install Additional Repos
+RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm' -O /tmp/gpgkey.rpm
+RUN rpm -i '/tmp/gpgkey.rpm'
+RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-3.el8.noarch.rpm' -O /tmp/centosrepos.rpm
+RUN rpm -i '/tmp/centosrepos.rpm'
 # Install java8 via WGET
-RUN wget -q 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk' -O /tmp/jdk8.tar.gz 
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
 # Install ant via WGET
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
@@ -15,7 +21,7 @@ RUN ln -s /usr/local/apache-ant-1.10.5/bin/ant /usr/bin/ant
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 # Housekeep Downloaded Archives
-RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz
+RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/gpgkey.rpm
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh
