@@ -14,15 +14,11 @@ RUN set -eux; \
  rm -rf /ansible; apk del ansible
 
 ENV \
-    JDK7_BOOT_DIR="/usr/lib/jvm/zulu8" \ 
-    JDK8_BOOT_DIR="/usr/lib/jvm/zulu8" \
-    JDK10_BOOT_DIR="/usr/lib/jvm/zulu11" \
-    JDK11_BOOT_DIR="/usr/lib/jvm/zulu11" \
-    JDK14_BOOT_DIR="/usr/lib/jvm/zulu14" \
-    JDK15_BOOT_DIR="/usr/lib/jvm/zulu15" \
-    JDK16_BOOT_DIR="/usr/lib/jvm/zulu16" \
-    JDK17_BOOT_DIR="/usr/lib/jvm/zulu17" \
-    JDK18_BOOT_DIR="/usr/lib/jvm/zulu18" \
-    JDK19_BOOT_DIR="/usr/lib/jvm/zulu18" \
-    JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu18" \
-    JAVA_HOME="/usr/lib/jvm/zulu8"
+    JDK7_BOOT_DIR="/usr/lib/jvm/jdk-7" \ 
+    JDK8_BOOT_DIR="/usr/lib/jvm/jdk-8" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+    JDK16_BOOT_DIR="/usr/lib/jvm/jdk-16" \
+    JDK17_BOOT_DIR="/usr/lib/jvm/jdk-17" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-17" \
+    JAVA_HOME="/usr/lib/jvm/jdk-8"
