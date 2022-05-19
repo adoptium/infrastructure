@@ -86,7 +86,6 @@
       jdk_version: 10
       when:
         - ansible_distribution != "Alpine"
-        - not (ansible_distribution == "MacOSX" and ansible_architecture == "arm64")
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
