@@ -91,6 +91,7 @@
     - 20.85.163.130 # aini7-win2019-x64
     - 20.85.163.152 # eil4z-win2019-x64
     - 52.142.17.172 # et2ae-win2019-x64
+    - 207.254.28.99 # noh7B-macos12-arm64
 
 - name: Setup iptables
   iptables:
