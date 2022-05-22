@@ -2,7 +2,7 @@
 ##########
 # Docker #
 ##########
-- name: Check if docker already exsit
+- name: Check if docker already exists
   command: docker version
   failed_when: false
   register: docker_version
