@@ -5,7 +5,7 @@
 
 - name: Check if gcc 10.3 is installed on RHEL/CentOS/Ubuntu16
   shell: /usr/local/gcc10/bin/gcc-10.3 --version 2>&1 > /dev/null
-  ignore_errors: yes
+  failed_when: false
   register: gcc10_installed
   when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
   changed_when: False

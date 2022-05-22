@@ -9,7 +9,7 @@
 - name: Check version of ca-certificates package on the system ...
   shell: rpm -q ca-certificates | grep -E 'ca-certificates.2020|ca-certificates.201' warn=no
   register: cacertsold
-  ignore_errors: true
+  failed_when: false
 
 - name: Install prereqs for building openssl
   yum:

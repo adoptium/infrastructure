@@ -16,7 +16,7 @@
 
 - name: Test if self-built make {{ makeVersion }} is available
   shell: /usr/local/bin/make --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: goodmake_installed
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
@@ -83,7 +83,7 @@
   with_items:
     - /tmp/make-{{ makeVersion }}
     - /tmp/make-{{ makeVersion }}.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: goodmake_source
 
 

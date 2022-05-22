@@ -9,7 +9,7 @@
 
 - name: Check if ccache is already installed
   shell: ccache --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: ccache_status
   tags: ccache
 
@@ -48,5 +48,5 @@
   with_items:
     - /tmp/ccache.tar.gz
     - /tmp/ccache-{{ ccacheVersion }}
-  ignore_errors: yes
+  failed_when: false
   tags: ccache

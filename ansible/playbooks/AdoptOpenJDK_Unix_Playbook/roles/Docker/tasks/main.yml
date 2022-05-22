@@ -4,7 +4,7 @@
 ##########
 - name: Test if docker is already installed
   shell: docker >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: docker_installed
   tags:
     - docker
@@ -105,7 +105,7 @@
   yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
-  ignore_errors: yes
+  failed_when: false
   when:
     - docker_installed.rc != 0
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")

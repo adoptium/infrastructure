@@ -50,7 +50,7 @@
 
 - name: Test if nasm is installed on path
   shell: nasm --version >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: nasm_installed
   when: CC is defined
   tags: nasm
@@ -96,5 +96,5 @@
   with_items:
     - /tmp/nasm-2.13.03
     - /tmp/nasm-2.13.03.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: nasm

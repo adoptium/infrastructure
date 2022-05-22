@@ -22,12 +22,12 @@
         dest: /tmp
         remote_src: false
       register: _vendor_copied
-      ignore_errors: true
+      failed_when: false
 
     - name: Install IBM XLC16 - installp
       command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/usr/sys/inst.images all
       register: _installp
-      ignore_errors: true
+      failed_when: false
       when: _vendor_copied.failed is defined and _vendor_copied.failed == false
 
     - name: 'Errors from the previous installp command can be ignored'
@@ -45,7 +45,7 @@
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
   register: xlc16_qversion
-  ignore_errors: true
+  failed_when: false
   changed_when: false
   tags: xlc16
 

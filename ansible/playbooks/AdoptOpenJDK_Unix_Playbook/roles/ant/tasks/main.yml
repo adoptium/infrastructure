@@ -7,7 +7,7 @@
 
 - name: Check if Apache Ant is already installed in custom location /usr/local
   shell: ls /usr/local/apache-ant-1.10.5 >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: ant_installed
   tags:
     - ant
@@ -74,7 +74,7 @@
     - /tmp/apache-ant-1.10.5-bin.zip
   when:
     - ant_installed.rc != 0
-  ignore_errors: yes
+  failed_when: false
   tags: ant
 
 - name: Remove the older Ant package via yum

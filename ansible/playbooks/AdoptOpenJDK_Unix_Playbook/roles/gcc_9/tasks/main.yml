@@ -5,7 +5,7 @@
 
 - name: Check if gcc 9.3 is installed on RHEL/CentOS
   shell: /usr/local/gcc9/bin/gcc-9.3 --version 2>&1 > /dev/null
-  ignore_errors: yes
+  failed_when: false
   register: gcc9_installed
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
