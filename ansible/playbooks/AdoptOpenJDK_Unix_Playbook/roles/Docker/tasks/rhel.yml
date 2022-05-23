@@ -16,7 +16,7 @@
   yum_repository:
     name: docker
     description: docker YUM repo ppc64le
-    baseurl: http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
+    baseurl: https://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
     enabled: yes
     gpgcheck: no
   when:

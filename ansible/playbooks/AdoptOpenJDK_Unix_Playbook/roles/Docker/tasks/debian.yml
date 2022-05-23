@@ -40,7 +40,6 @@
     - gnupg
     - lsb-release
   tags:
-    # TODO: Package installs should not use latest
     - skip_ansible_lint
 
 - name: Run apt-get update
