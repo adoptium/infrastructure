@@ -64,7 +64,7 @@
     - ansible_os_family == "Darwin"
     - ansible_architecture == "arm64"
     - jdk_version < 17
-    - jdk_version !=11
+    - jdk_version != 11
   tags: adoptopenjdk_install
 
 - name: Set aarch64 api_architecture variable for macOS Arm64
