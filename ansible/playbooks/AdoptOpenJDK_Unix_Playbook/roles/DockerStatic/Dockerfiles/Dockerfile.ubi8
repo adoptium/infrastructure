@@ -31,6 +31,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot
+RUN yum install -y coreutils --allowerasing
 # ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
