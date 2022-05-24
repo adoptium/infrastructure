@@ -63,7 +63,8 @@
   when:
     - ansible_os_family == "Darwin"
     - ansible_architecture == "arm64"
-    - jdk_version != 11 or jdk_version != 17 or jdk_version != 18
+    - jdk_version < 17
+    - jdk_version !=11
   tags: adoptopenjdk_install
 
 - name: Set aarch64 api_architecture variable for macOS Arm64
@@ -72,7 +73,7 @@
   when:
     - ansible_os_family == "Darwin"
     - ansible_architecture == "arm64"
-    - jdk_version == 11 or jdk_version == 17 or jdk_version == 18
+    - jdk_version >= 17 or jdk_version == 11
   tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for armv7l
