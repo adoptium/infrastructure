@@ -169,7 +169,8 @@ git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
 ./get.sh && cd TKG
 export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
 export BUILD_LIST=openjdk
-make <target>
+make compiler
+make _<target>
 ```
 `BUILD_LIST` depends on the suite you want to run, and can be omitted to build
 the tests for everything, but that make take a while and requires `docker`
@@ -179,14 +180,19 @@ the test - it is normally a valid Grinder `TARGET` such as `jdk_net`. There
 is more information on running tests yourself in the
 [tests repository](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
 
-A few examples that test specific pieces of infra-related functionality so useful to be aware of:
-- `BUILD_LIST=functional`, `CUSTOM_TARGET=_MBCS_Tests_pref_ja_JP_linux_0`
-- `BUILD_LIST=system`, `CUSTOM_TARGET=_MachineInfo`
-- `BUILD_LIST=openjdk`, `CUSTOM_TARGET=test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` (`en_US.utf8` locale required)
-- `BUILD_LIST=system`, `TARGET=system.custom` `CUSTOM_TARGET=-test=MixedLoadTest -test-args="timeLimit=5m"` (`system_custom` was added in https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234)
+A few examples that test specific pieces of infra-related functionality so useful to be aware of.
+These are the parameters to pass into a Grinder job in jenkins. If using
+these from the command line as per the example above, the `TARGET` name
+should have an underscore `_` prepended to it.
 
-(For the last one, that makes use of the system.custom target added via
-[this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
+| `BUILD_LIST` | `TARGET` | `CUSTOM_TARGET` | What does it test? |
+| --- | --- | --- | --- |
+| `system` | `MachineInfo` | | Basic test that JVM can retrieve system info |
+| `functional` | `MBCS_Tests_pref_ja_JP_linux_0` |  | MBCS packages and perl modules |
+| `openjdk` | `jdk_custom` | `java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` | en_US.UTF8 locale required
+| `openjdk` | `jdk_custom` | `java/lang/ProcessHandle/InfoTest.java.InfoTest` | [Fails if 'sleep' invokes another process](https://github.com/adoptium/infrastructure/pull/2557#issuecomment-1135009749)
+| `openjdk` | `jdk_custom` | `javax/imageio/plugins/shared/ImageWriterCompressionTest.java` | Requires fontconfig on linux |
+| `system` | `system_custom` | `-test=MixedLoadTest -test-args=timeLimit=10m` | Run a longer systemtest |
 
 ## Testing changes
 
