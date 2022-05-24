@@ -57,12 +57,23 @@
   tags: adoptopenjdk_install
 
 # Download x64 binaries until we have arm64 binaries available
-- name: Set api_architecture variable for macOS Arm64
+- name: Set x64 api_architecture variable for macOS Arm64
   set_fact:
     api_architecture: x64
   when:
     - ansible_os_family == "Darwin"
     - ansible_architecture == "arm64"
+    - jdk_version < 17
+    - jdk_version != 11
+  tags: adoptopenjdk_install
+
+- name: Set aarch64 api_architecture variable for macOS Arm64
+  set_fact:
+    api_architecture: aarch64
+  when:
+    - ansible_os_family == "Darwin"
+    - ansible_architecture == "arm64"
+    - jdk_version >= 17 or jdk_version == 11
   tags: adoptopenjdk_install
 
 - name: Set api_architecture variable for armv7l
