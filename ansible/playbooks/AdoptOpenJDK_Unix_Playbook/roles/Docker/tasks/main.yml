@@ -29,7 +29,7 @@
       when:
         - ansible_distribution == "Ubuntu"
 
-    - name: Prepare for Debian ( < 10 ) / Raspbian
+    - name: Prepare for Debian / Raspbian
       include_tasks: debian.yml
       when:
         - ansible_distribution == "Debian"
@@ -43,7 +43,6 @@
           - docker-ce
           - containerd.io
           - docker-ce-cli
-          - docker-compose-plugin
         state: latest   # TODO: Package installs should not use latest
         use: auto       # automatic select package manager to use yum, apt and so on
       when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version == "7")) or (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
@@ -68,11 +67,11 @@
       tags:
         - jenkins
 
-    - name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
-      service:
-        name: docker
-        state: restarted
-        enabled: yes
-      when:
-        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
-        - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x") and (ansible_architecture != "riscv64")
+- name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+  service:
+    name: docker
+    state: restarted
+    enabled: yes
+  when:
+    - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x") and (ansible_architecture != "riscv64")
