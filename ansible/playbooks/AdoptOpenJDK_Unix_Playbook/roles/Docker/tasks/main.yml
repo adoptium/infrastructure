@@ -29,7 +29,7 @@
       when:
         - ansible_distribution == "Ubuntu"
 
-    - name: Prepare for Debian ( < 10 ) / Raspbian
+    - name: Prepare for Debian / Raspbian
       include_tasks: debian.yml
       when:
         - ansible_distribution == "Debian"
