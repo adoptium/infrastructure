@@ -41,7 +41,7 @@
 
 - name: Install Docker prerequisites for Debian ( < 10 )
   apt:
-    pkg=: "{ item }}"
+    pkg: "{ item }}"
     state: latest
   with_items:
     - apt-transport-https
