@@ -3,6 +3,8 @@
 # OpenSSL is required (and redistributed) by OpenJ9 #
 #####################################################
 
+# This role is no longer needed as of https://github.com/adoptium/infrastructure/issues/2554
+
 # The version number and associated sha256sum (For the file at
 # https://www.openssl.org/source/openssl-{{ opensslVersion }}.tar.gz
 # should be all you need when upgrading the version of openssl. See
