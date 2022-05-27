@@ -18,6 +18,7 @@
     dest: '/tmp/ansible-adoptopenjdk-gcc-10.tar.xz'
     force: no
     mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
     - gcc10_installed.rc != 0
