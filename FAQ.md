@@ -1,7 +1,6 @@
 # openjdk-infrastructure guide to frequent modifications and usage
 
 ## Access control in the repository
-
 The three github teams relevant to this repository are as follows (Note, you
 won't necessarily have access to see these links):
 
@@ -110,10 +109,11 @@ as an example
 
 The build triage team will frequently raise issues if they determine that a
 build failure is occurring on a particular system. Assuming it's not a
-"system is offline" issue you may wish to repliacte the build process
+"system is offline" issue you may wish to replicate the build process
 locally. The easiest way to do this is as follows (ideally not as root as
 that can mask problems).
-```
+
+```sh
 git clone https://github.com/adoptium/temurin-build
 cd temurin-build/build-farm
 export CONFIGURE_ARGS=--with-native-debug-symbols=none
@@ -155,7 +155,7 @@ For more information on test case diagnosis, there is a full
 [Triage guide](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/Triage.md)
 in the openjdk-tests repository
 
-The values for `TARGET` can be found in thte `<testCaseName>` elements of
+The values for `TARGET` can be found in the `<testCaseName>` elements of
 .the various `playlist.xml` files in the test repositories. It can also be
 `jdk_custom` which case you should set the `CUSTOM_TARGET` to the name of
 an individual test for example:
@@ -164,13 +164,14 @@ an individual test for example:
 If you then need to run manually on the machine itself (outside jenkins)
 then the process is typically like this:
 
-```
+```sh
 git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
 ./get.sh && cd TKG
 export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
 export BUILD_LIST=openjdk
 make <target>
 ```
+
 `BUILD_LIST` depends on the suite you want to run, and can be omitted to build
 the tests for everything, but that make take a while and requires `docker`
 to be available.  Note that when building the `system` suite, there must be
@@ -180,6 +181,7 @@ is more information on running tests yourself in the
 [tests repository](https://github.com/AdoptOpenJDK/openjdk-tests/blob/master/doc/userGuide.md#local-testing-via-make-targets-on-the-commandline)
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of:
+
 - `BUILD_LIST=functional`, `CUSTOM_TARGET=_MBCS_Tests_pref_ja_JP_linux_0`
 - `BUILD_LIST=system`, `CUSTOM_TARGET=_MachineInfo`
 - `BUILD_LIST=openjdk`, `CUSTOM_TARGET=test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` (`en_US.utf8` locale required)
@@ -278,7 +280,8 @@ cases they may be used as `dockerBuild` hosts too.
 
 Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
 
-### DockerHost TODO:
+### DockerHost TODO
+
 1. Set up patching cycle
 2. Identify ways to redeploy when needed to pick up updates
 3. Allow dockerhost.yml playbook to adjust core file settings
@@ -286,8 +289,8 @@ Instructions on how to create a static docker container can be found [here](http
 
 ## Temporary access to a machine
 
-In some occasions non-infrastruture team members may wish to access a
-machine in order to reporoduce a test case failure, particularly if they do
+In some occasions non-infrastructure team members may wish to access a
+machine in order to reproduce a test case failure, particularly if they do
 not have access to a machine of any given platform, or if the problem
 appears to be specific to a particular machine or cloud provider. In this
 case, the following procedure should be followed. Example commands are
@@ -295,9 +298,9 @@ suitable for most UNIX-based platforms:
 
 1. User should raise a request for access using
    [this template](https://github.com/adoptium/infrastructure/issues/new?assignees=sxa&labels=Temp+Infra+Access&template=machineaccess.md&title=Access+request+for+%3Cyour+username%3E)
-   (in general, "Non-privilieged" is the correct option to choose
+   (in general, "Non-privileged" is the correct option to choose
 2. Infrastructure team member doing the following steps should assign the issue to themselves
-3. For non-privilieged users, create an account with a GECOS field referencing the requester and issue number e.g. `useradd -m -c "Stewart Addison 1234" sxa`
+3. For non-privileged users, create an account with a GECOS field referencing the requester and issue number e.g. `useradd -m -c "Stewart Addison 1234" sxa`
 4. Add the user's key to `.ssh/authorized_keys` on the machine with the user's public ssh key in it
 5. Add a comment to the issue with the username and IP address details
 6. The issue should be left open until the user is finished with the machine (if it has been a while, ask them in the issue)

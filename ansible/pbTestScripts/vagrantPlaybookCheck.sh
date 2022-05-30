@@ -171,11 +171,6 @@ checkVagrantOS()
                 echo "Reducing the Windows VM memory requirement to 2560Mb."
                 sed -i -e "s/5120/2560/g" Vagrantfile.Win2012
         fi
-        if [[ "$vagrantOS" == "Win2016" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
-                echo "Warning: Windows VM requires 5Gb of free memory to run. On laptops with only 8Gb this can be an issue."
-                echo "Reducing the Windows VM memory requirement to 2560Mb."
-                sed -i -e "s/5120/2560/g" Vagrantfile.Win2016
-        fi
 }
 
 setupWorkspace()
@@ -404,7 +399,7 @@ checkVagrantOS
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
-	if [[ "$OS" == "Win2012" ]] || [[ "$OS" == "Win2016" ]]; then
+	if [[ "$OS" == "Win2012" ]] ; then
 		startVMPlaybookWin $OS
 	else
 		startVMPlaybook $OS
