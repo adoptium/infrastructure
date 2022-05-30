@@ -140,7 +140,7 @@
   register: adoptopenjdk_download
   until: adoptopenjdk_download is not failed
   when:
-    - ansible_distribution == "Alpine" 
+    - ansible_distribution == "Alpine"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
