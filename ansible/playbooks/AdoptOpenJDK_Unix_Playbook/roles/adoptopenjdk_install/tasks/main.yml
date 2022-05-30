@@ -168,7 +168,7 @@
     - jdk_version != 10
   tags: adoptopenjdk_install
 
-- name: Download binary when installer is not available (MacOS)
+- name: Download tarball when installer is not available (MacOS)
   unarchive:
     src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     remote_src: yes
