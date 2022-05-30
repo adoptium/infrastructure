@@ -130,6 +130,20 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
 
+- name: Install latest release if one not already installed (alpine-linux)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/alpine-linux/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    dest: /usr/lib/jvm
+    remote_src: yes
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_distribution == "Alpine" 
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+
 # CentOS6 needs it's own task so it can use a different python interpreter.
 # See: https://github.com/adoptium/infrastructure/issues/1877
 - name: Install latest release if not already installed (CentOS6)
