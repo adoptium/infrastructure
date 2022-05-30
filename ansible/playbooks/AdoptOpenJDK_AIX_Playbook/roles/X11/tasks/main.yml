@@ -1,104 +1,50 @@
 #########################################################################
-# Install X11 extensions                                                #
-# x11.base.lib installp download requiring an IBMid                     #
-# https://www.ibm.com/support/pages/fileset-information-x11baselib      #
-# x11.adt.ext installp download requiring an IBMid                      #
-# https://www.ibm.com/support/pages/fileset-information-x11adtext       #
-# x11.vfb installp download requiring an IBMid                          #
-# https://www.ibm.com/support/pages/fileset-information-x11vfb          #
+# X11 filesets are needed to support OSS and OpenJDK                    #
+# Historically Adoptium added missing files via files copied from the   #
+# Ansible master - to the remote AIX machine, and installed them.       #
+#                                                                       #
+# No longer!                                                            #
+# The filesets are licensed and need to be supplied via the (cloud)     #
+# platform provider.                                                    #
+#                                                                       #
+# Hence: the playbook verifies readiness, and stops on failure of       #
+# X11.base - as this is required for AIXToolbox installation            #
 #########################################################################
 ---
 # Rather than run lslpp - use stat on the lpp directories
-# /usr/lpp/X11.base/X11.base.lib      X11.base.lib
+# /usr/lib/libX11.a                   X11.base.lib
 # /usr/lpp/X11/include/X11/extensions X11.adt.ext
 # /usr/lpp/X11.vfb                    X11.vfb
-- name: Verify X11 software
+- name: Examine X11 base requirements
   block:
-  - name: Verify X11 base library
+  - name: Verify X11.base
     stat:
-      path: /usr/lpp/X11.base/X11.base.lib
+      path: /usr/lib/libX11.a
     register: _base
-  - name: Verify X11 extensions requirements
+
+  - name: Verify X11 extensions
     stat:
       path: /usr/lpp/X11/include/X11/extensions
     register: _ext
+
   - name: Verify X11 Frame Buffer Requirements
     stat:
       path: /usr/lpp/X11.vfb
     register: _vfb
-  - name: Verify Readiness #1
+
+  - name: Compute X11 Readiness
     set_fact:
-      _x11rdy: "{{ _base.stat.exists
+      _x11rdy: "{{ ((_base.stat.islnk is defined) and _base.stat.islnk)
         and _ext.stat.exists
         and _vfb.stat.exists }}"
   tags: x11
 
-- name: Install from Vendor Files
-  block:
-    - name: Unpack Vendor Files
-      unarchive:
-        src: /Vendor_Files/aix/OpenGL_X11.tar
-        dest: /tmp
-        remote_src: no
-      ignore_errors: yes
-      register: _vendor_copied
+- name: Halt when X11.base Not Ready
+  fail: msg="X11.base is required for AIXToolbox OSS needed later! Cannot proceed."
+  when: _base.stat.exists == false or _base.stat.islnk == false
+  tags: x11
 
-# The table of contents (.toc) might not be accurate. To be sure it is based
-# on the contents of /tmp/x11 - remove it, and installp will regenerate
-# X11.base.lib is not included in the so-called vendor files
-# So no attempt is made to install it.
-# Still reports if it is missing
-    - name: Install IBM X11 Extensions - installp
-      block:
-        - name: Remove .toc to force update
-          file:
-            path: /tmp/x11/.toc
-            state: absent
-
-        - name: Remove any previous log
-          file:
-            path: /tmp/x11.log
-            state: absent
-
-        - name: Install missing X11 requirements
-          command:
-            installp -d /tmp/x11 -e /tmp/x11.log -aXY X11.adt.ext X11.vfb
-          register: _installp
-          ignore_errors: yes
-
-        - name: Give stderr message and move on
-          debug:
-            msg: "{{ _installp.stderr.split('\n') }}"
-          when: _installp.rc != 0
-      when: _vendor_copied.failed is defined and _vendor_copied.failed != true
-
-    - name: Remove X11 install files
-      file:
-        path: /tmp/x11
-        state: absent
-
-    - name: Re-Verify X11 base requirements
-      stat:
-        path: /usr/lpp/X11.base/X11.base.lib
-      register: _base
-
-    - name: Verify X11 extensions requirements
-      stat:
-        path: /usr/lpp/X11/include/X11/extensions
-      register: _ext
-
-    - name: Verify X11 Frame Buffer Requirements
-      stat:
-        path: /usr/lpp/X11.vfb
-      register: _vfb
-    - name: Set X11 Readiness
-      set_fact:
-        _x11rdy: "{{ _base.stat.exists and _ext.stat.exists
-          and _vfb.stat.exists }}"
+- name: Warn that X11 Not Complete - some tests will fail
+  debug: msg="Not all required X11 components are installed!"
   when: _x11rdy == false
-  tags: [x11, vendor_files]
-
-- name: Report X11 Readiness
-  debug:
-    msg: "All required X11 components are installed: {{ _x11rdy }}"
   tags: x11

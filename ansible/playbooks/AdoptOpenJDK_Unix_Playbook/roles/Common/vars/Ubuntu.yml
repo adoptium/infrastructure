@@ -9,6 +9,7 @@ Build_Tool_Packages:
   - autoconf
   - bison                         # OpenJ9
   - build-essential
+  - ca-certificates
   - cpio
   - curl
   - flex                          # Openj9

@@ -1,0 +1,7 @@
+# Default rbac_cmds - positioned here to ease command-line precedence
+# adding -e rbac_cmds="['path1', ..., 'pathn']" will override
+---
+rbac_cmds:
+  - /usr/bin/ksh
+  - /opt/freeware/bin/bash_32
+  - /opt/freeware/bin/bash_64

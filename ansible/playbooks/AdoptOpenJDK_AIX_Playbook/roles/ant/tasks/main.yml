@@ -1,28 +1,30 @@
 ###############
 #     ant     #
 ###############
+# Needs yum tag - so when yum is skipped, unarchive does not fail
 ---
-- name: Checking for Ant availability
-  stat:
-    path: /usr/bin/ant
-  register: ant
-  tags: ant
+- name: Ant package processing
+  block:
+    - name: Checking for Ant availability
+      stat:
+        path: /usr/bin/ant
+      register: ant
 
-- name: "Ant installed, skipping download and installation"
-  debug:
-    msg: "Ant installed, skipping download and installation"
-  when: ant.stat.islnk is defined
-  tags: ant
+    - name: "Ant installed, skipping download and installation"
+      debug:
+        msg: "Ant installed, skipping download and installation"
+      when: ant.stat.islnk is defined
 
-- name: Download and extract ant
-  unarchive:
-    src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
-    dest: /opt
-    remote_src: yes
-  when: ant.stat.islnk is not defined
-  tags: ant
+    - name: Download and extract ant
+      unarchive:
+        src: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
+        dest: /opt
+        remote_src: true
+      when: ant.stat.islnk is not defined
 
-- name: Create symlink for ant
-  file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
-  when: ant.stat.islnk is not defined
-  tags: ant
+    - name: Create symlink for ant
+      file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
+      when: ant.stat.islnk is not defined
+  tags:
+    - ant
+    - yum

@@ -110,6 +110,9 @@ checkVars()
 	if [ "$gitBranch" == "" ]; then
 		echo "No branch specified; Defaulting to 'master'"
 		gitBranch="master"
+	else # to replace '/' in branch name to '-', avoiding log file name issue
+		newGitBranch="${gitBranch////-}"
+
 	fi
 	if [ "$gitFork" == "" ]; then
 		echo "No Fork specified; Defaulting to 'adoptopenjdk'"
@@ -147,7 +150,7 @@ checkVagrantOS()
 {
         local vagrantOSList
         if [[ "$newVagrantFiles" = "true" ]]; then
-                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible/vagrant
+                cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible/vagrant
         else    
                 cd ${scriptPath%/*}/../vagrant
         fi
@@ -173,7 +176,7 @@ checkVagrantOS()
 setupWorkspace()
 {
 	local workFolder=$WORKSPACE/adoptopenjdkPBTests
-	local gitDirectory=${workFolder}/${gitFork}-${gitBranch}
+	local gitDirectory=${workFolder}/${gitFork}-${newGitBranch}
 	mkdir -p ${workFolder}/logFiles
 
 	local isRepoInfra=$(curl https://api.github.com/repos/$gitFork/infrastructure | grep "Not Found")
@@ -196,7 +199,7 @@ setupWorkspace()
 	fi
 
 	if [ ! -d "${gitDirectory}" ]; then
-		git clone -b ${gitBranch} --single-branch ${gitRepo} ${gitDirectory}
+		git clone -b ${gitBranch} --single-branch ${gitRepo} ${gitDirectory} # keep using original branch name
 	else
 		cd ${gitDirectory}
 		git pull
@@ -208,10 +211,10 @@ startVMPlaybook()
 {
 	local OS=$1
 	local vagrantPORT=""
-	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.log"
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.log"
 	local ssh_args=""
 
-	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
 	else
@@ -236,7 +239,7 @@ startVMPlaybook()
 	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 	
-	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$gitBranch.$OS.log
+	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
 		echo PLAYBOOK FAILED 
@@ -251,7 +254,7 @@ startVMPlaybook()
 	fi
 
 	if [[ "$testNativeBuild" = true ]]; then
-		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.build_log"
 
 		ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && bash buildJDK.sh $buildBranch $buildFork $jdkToBuild $buildHotspot" 2>&1 | tee $buildLogPath
 		echo The build finished at : `date +%T`
@@ -261,7 +264,7 @@ startVMPlaybook()
 		fi
 
 		if [[ "$runTest" = true ]]; then
-			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
 			ssh -p ${vagrantPORT} $ssh_args -i $PWD/id_rsa vagrant@127.0.0.1 "cd /vagrant/pbTestScripts && bash testJDK.sh" 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then
@@ -288,10 +291,10 @@ startVMPlaybook()
 startVMPlaybookWin()
 {
 	local OS=$1
-	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.log"
+	local pbLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.log"
 	local vagrantPort=
 
-	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${gitBranch}/ansible
+	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
 	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
 	else
@@ -335,7 +338,7 @@ startVMPlaybookWin()
 	fi
         
 	if [[ "$testNativeBuild" = true ]]; then
-		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.build_log"
+		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.build_log"
 
 		# Restarting the VM as the shared folder disappears after the playbook runs due to the restarts in the playbook
 		vagrant halt && vagrant up
@@ -353,7 +356,7 @@ startVMPlaybookWin()
 		fi
 	
 		if [[ "$runTest" = true ]]; then
-			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${gitBranch}.$OS.test_log"
+			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
 			
 			# Run a python script to start a test for the built JDK on the Windows VM
 			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath

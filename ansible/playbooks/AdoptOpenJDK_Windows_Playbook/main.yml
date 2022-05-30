@@ -69,7 +69,6 @@
     - Clang_64bit                 # OpenJ9
     - Clang_32bit                 # OpenJ9
     - nasm                        # OpenJ9
-    - OpenSSL                     # OpenJ9
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers

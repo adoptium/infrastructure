@@ -1,0 +1,12 @@
+# Put this in a playbook to be included to simplify nested loops
+# {{ username }} comes from the calling playbook
+---
+- name: "Set/reset {{ username }} account attributes"
+  command:
+    cmd: /usr/bin/chuser
+      "{{ limits.attr }}={{ limits.value | default('-1') }}"
+      "{{ username }}"
+  loop:
+    "{{ user_attrs }}"
+  loop_control:
+    loop_var: limits

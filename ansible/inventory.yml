@@ -19,7 +19,7 @@ hosts:
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
 
-      - packet:
+      - equinix:
           ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
           ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
 
@@ -42,7 +42,7 @@ hosts:
       - digitalocean:
           centos69-x64-2: {ip: 167.71.130.191}
 
-      - packet_esxi:
+      - equinix_esxi:
           solaris10u11-x64-1: {ip: 147.75.85.212}
           solaris10u11-x64-2: {ip: 147.75.85.213}
 
@@ -53,7 +53,6 @@ hosts:
       - macstadium:
           macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
           macos1014-x64-2: {ip: 207.254.28.76, user: Administrator}
-          macos1014-x64-3: {ip: 207.254.71.202, user: Administrator}
           macos11-arm64-1: {ip: 207.254.31.15, user: Administrator}
           macos11-arm64-2: {ip: 207.254.31.16, user: Administrator}
 
@@ -62,12 +61,12 @@ hosts:
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.10, description: p8-aix1-adopt01.osuosl.org}
-          aix71-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org}
+          aix71-ppc64-1: {ip: 140.211.9.10, description: p8-aix1-adopt01.osuosl.org, 7100-04-04-1717}
+          aix71-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org, 7100-04-04-1717}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
 
-      - packet:
+      - equinix:
           centos8-armv8-1: {ip: 139.178.86.243, description: Altra}
 
       - scaleway:
@@ -91,7 +90,7 @@ hosts:
       - marist:
           ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
 
-      - packet:
+      - equinix:
           ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
           ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC}
 
@@ -129,22 +128,18 @@ hosts:
           debian10-riscv64-1: {ip: gdams.ddns.net}
           debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
 
-      - ibm:
-          aix71-ppc64-1: {ip: 129.33.196.209, user: b9s010a}
-          aix71-ppc64-2: {ip: 129.33.196.210, user: b9s010a}
-
       - inspira:
           solaris10u11-sparcv9-1: {}
 
       - osuosl:
-          aix71-ppc64-1: {ip: 140.211.9.99, description: p9-aix1-adopt05.osuosl.org}
-          aix715-ppc64-2: {ip: 140.211.9.100, description: p9-aix1-adopt06.osuosl.org}
-          aix715-ppc64-3: {ip: 140.211.9.168, description: p8-java1-adopt07.osuosl.org}
-          aix715-ppc64-4: {ip: 140.211.9.169, description: p8-java1-adopt08.osuosl.org}
-          aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org}
-          aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix1-adopt04.osuosl.org}
-          aix724-ppc64-3: {ip: 140.211.9.163, description: p8-java1-adopt09.osuosl.org}
-          aix724-ppc64-4: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org}
+          aix715-ppc64-1: {ip: 140.211.9.99, description: p9-aix1-adopt05.osuosl.org, 7100-05-06-2028}
+          aix715-ppc64-2: {ip: 140.211.9.100, description: p9-aix1-adopt06.osuosl.org, 7100-05-06-2028}
+          aix715-ppc64-3: {ip: 140.211.9.168, description: p8-java1-adopt07.osuosl.org, 7100-05-06-2028}
+          aix715-ppc64-4: {ip: 140.211.9.169, description: p8-java1-adopt08.osuosl.org, 7100-05-06-2028}
+          aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org, 7200-04-02-2028}
+          aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix1-adopt04.osuosl.org, 7200-02-05-1938}
+          aix72-ppc64-3: {ip: 140.211.9.163, description: p8-java1-adopt09.osuosl.org, 7X00-TL-SP-YYWW}
+          aix72-ppc64-4: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org, 7X00-TL-SP-YYWW}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
@@ -153,21 +148,20 @@ hosts:
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
 
-      - packet:
+      - equinix:
           ubuntu1604-x64-1: {ip: 147.75.204.239}
           ubuntu2004-x64-2: {ip: 147.75.100.127}
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
 
       - macincloud:
-          macos1010-x64-1: {ip: 74.80.250.151, user: admin, description: TBD}
-          macos1010-x64-2: {ip: 74.80.250.173, user: admin, description: TBD}
+          macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
+          macos1201-x64-2: {ip: 216.39.74.140, user: admin, description: DXT440}
 
       - macstadium:
-          macos1012-x64-1: {ip: 208.83.1.46, user: administrator}
-          macos1013-x64-1: {ip: 208.83.1.19, user: administrator}
           macos1014-x64-1: {ip: 207.254.29.43, user: administrator}
           macos1014-x64-2: {ip: 207.254.29.44, user: administrator}
           macos1014-x64-3: {ip: 207.254.28.237, user: administrator}
+          macos1014-x64-4: {ip: 207.254.71.202, user: Administrator}
           macos1015-x64-1: {ip: 207.254.28.171, user: administrator}
           macos11-arm64-1: {ip: 199.7.163.51, user: Administrator}
           macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}

@@ -1,0 +1,38 @@
+#####################
+# superuser account #
+#####################
+---
+- name: Check for sudo installation
+  stat:
+    path: /etc/sudoers
+  register: sudoers
+
+- name: "Check for {{ username }} authorization keyfile"
+  delegate_to: localhost
+  become: false
+  stat:
+    path: "{{ Zeus_User_SSHKey }}"
+  register: pubkey
+  when: sudoers.stat.exists and sudoers.stat.isreg and Superuser_Account == "Enabled"
+
+- name: "Customize {{ username }}"
+  block:
+    - name: Add key
+      authorized_key:
+        user: zeus
+        state: present
+        key: "{{ lookup('file', '{{ Zeus_User_SSHKey }}') }}"
+      register: zeus_pubkey
+
+    - name: Grant zeus sudo powers
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^zeus'
+        line: 'zeus ALL=(ALL) NOPASSWD: ALL'
+  when: pubkey is defined and pubkey.stat.exists
+
+- name: warn about missing authorization for zeus
+  debug:
+    msg: "{{ Zeus_User_SSHKey }} not included in authorizedkeys"
+  when: Superuser_Account == "Enabled" and zeus_pubkey.skipped

@@ -3,16 +3,20 @@
 # if they were installed via rpm unless yum exists #
 ####################################################
 ---
-- name: Confirm yum is installed - /usr/bin/yum
+
+- name: Check if yum is installed - /usr/bin/yum
   stat:
     path: /usr/bin/yum
   register: _yum
   tags: yum
 
-# Use set -o pipefail -o to quiet AnsibleLint
-- name: Uninstall conflicting packages
-  shell: set -o pipefail | rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
-  ignore_errors: True
+# Using set -o pipefail -o to quiet AnsibleLint breaks execution on AIX
+# Use skip_ansible_lint tag instead
+- name: Remove conflicting packages before install yum
+  shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl")
+  register: _cleanup
+  changed_when: "'no packages given for erase' not in _cleanup.stderr"
+  failed_when: _cleanup.changed and _cleanup.rc != 0
   when: _yum.stat.islnk is not defined
   tags:
     - yum
@@ -20,78 +24,91 @@
     # TODO: rpm used in place of yum or rpm_key module
     - skip_ansible_lint
 
-####################################
+##############################################################################
 # Install yum and update to latest #
 # Previous version of this downloaded and executed
-#   url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+#  ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum.sh
+# PRIOR to using any ansible (no python available).
 # These steps below do the same (update rpm.rte, install initial RPM bundle)
 # but require a alturnative python to be installed
 # eg, http://download.aixtools.net/tools/aixtools.python.py36.3.6.12.0.I
 # and ansible.cfg needs 'ansible_python_interpreter = /opt/bin/python3.6'
-####################################
-- name: Install yum from AIXToolbox
+# The playbook stops at 'yum update' because ansible sees yum needs the
+# new python installed via yum. During the second pass this block is skipped.
+##############################################################################
+- name: "Install yum bundle from AIXToolbox (block #1)"
   block:
     - name: Ensure dest exists
       file:
         state: directory
         path: /tmp/yum
 
-    - name: Transfer rpm.rte
+    - name: Download rpm.rte and yum bundle
       get_url:
-        url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/INSTALLP/ppc/rpm.rte
+        url: "{{ item }}"
         mode: 0644
         validate_certs: false
         dest: /tmp/yum
+      with_items:
+        "{{ yum_downloads }}"
+      vars:
+        baseurl: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox"
+        yum_downloads:
+          - "{{ baseurl }}/INSTALLP/ppc/rpm.rte"
+          - "{{ baseurl }}/ezinstall/ppc/yum_bundle.tar"
 
     - name: Install/update rpm.rte
       command: installp -aYgd /tmp/yum/rpm.rte rpm.rte
 
-    - name: Transfer yum bundle package
-      get_url:
-        url: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/yum_bundle.tar
-        mode: 0644
-        validate_certs: false
-        dest: /tmp/yum
+    # This is needed so that yum can find dependencies supplied by AIX BOS
+    - name: Update RPM database to include AIX BOS support
+      command: /usr/sbin/updtvpkg
 
     - name: Unpack yum bundle
-      command: tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
+      command:
+        cmd: /usr/bin/tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
+        # Neither zip nor gtar is not available, disable warning about unpack:
+        warn: false
 
     - name: Install yum bundle
       command: rpm -i /tmp/yum/*.rpm
-
-    - name: Cleanup /tmp/yum
-      file:
-        state: absent
-        path: /tmp/yum
   when: _yum.stat.islnk is not defined
   tags:
     - yum
-    - vendor_files
 
-- name: Ensure AIX_Toolbox repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox
-  tags: yum
+- name: "Update yum installation (Block #2)"
+  block:
+    - name: Remove /tmp/yum, if present
+      file:
+        state: absent
+        path: /tmp/yum
 
-- name: Ensure AIX_Toolbox_noarch repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox_noarch
-  tags: yum
+    - name: Update YUM
+      yum:
+        update_cache: true
+        name: '*'
+        state: latest
 
-- name: Ensure AIX_Toolbox_71 repo is enabled
-  shell: yum-config-manager --enable AIX_Toolbox_71
-  tags: yum
+    - name: Install yum-utils
+      yum: name=yum-utils state=present
 
-- name: Yum update
-  yum:
-    update_cache: yes
-    name: '*'
-    state: latest
-    exclude: cmake*
+    - name: Ensure AIX_Toolbox repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox
+
+    - name: Ensure AIX_Toolbox_noarch repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox_noarch
+
+    - name: Ensure AIX_Toolbox_71 repo is enabled
+      shell: yum-config-manager --enable AIX_Toolbox_71
   tags:
     - yum
-    #TODO: Package installs should not use latest
-    - skip_ansible_lint
 
-- name: Install yum package support
+##############################################################################
+# YUM AIXToolbox integration is installed
+# Proceed with additional packages
+##############################################################################
+
+- name: Install OSS dev run-time-env using yum
   yum: name={{ item }} state=present update_cache=yes
   with_items:
     - bash
@@ -126,6 +143,96 @@
     - zsh
   tags: yum
 
+##########################################################################
+# Adoptium builds do not work properly with the latest cmake @AIXToolbox #
+##########################################################################
+# NOTE: Cannot use yum module here as it will pull in cmake 3.16 which we do not want
+- name: Install cmake 3.14.3 prerequisites
+  command:
+    cmd: rpm -i "{{ item }}"
+    creates: /opt/freeware/etc/rpm/macros.cmake
+  with_items:
+    - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-filesystem-3.14.3-1.aix7.1.ppc.rpm
+    - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-rpm-macros-3.14.3-1.aix7.1.ppc.rpm
+  tags:
+    - rpm_install
+    - yum
+    - cmake
+
+# See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492 for why we are locking this
+- name: Install cmake 3.14.3 (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)
+  yum: name=cmake-3.14.3 state=present update_cache=yes
+  tags:
+    - rpm_install
+    - yum
+    - cmake
+##############################################################################
+# TASK [yum : Install cmake 3.14.3
+#   (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)]
+# fatal: [x077]: FAILED! =>
+#   {"changed": false, "msg": "No package matching 'cmake-3.14.3' found available,
+#   installed or updated", "rc": 126,
+#   "results": ["No package matching 'cmake-3.14.3' found available,
+#   installed or updated"}
+## If you get this message - you need to remove 'cmake*' from
+#   /opt/freeware/etc/yum/yum.conf
+##############################################################################
+
+- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+  failed_when: false
+  tags:
+    - rpm_install
+    - yum
+
+# Create zlib.h and zconf.h links - See https://github.com/adoptium/infrastructure/issues/1952
+- name: copy zlib.h and zconf.h (See https://github.com/adoptium/infrastructure/issues/1952)
+  copy:
+    src: "/opt/freeware/include/{{ item }}"
+    dest: "/usr/include/"
+    force: true
+    remote_src: true
+  with_items:
+    - zconf.h
+    - zlib.h
+  tags:
+    - yum
+
+##############################################################################
+# Prevent accidental updates to 'locked' packages
+##############################################################################
+- name: Exclude packages from yum (main)
+  lineinfile:
+    dest: /opt/freeware/etc/yum/yum.conf
+    firstmatch: true
+    insertafter: 'plugins=1'
+    line: 'exclude=autoconf cmake* freetype2*'
+  tags:
+    - yum
+    - cmake
+    - freetype2
+
+##############################################################################
+# Update Packages (not locked) to latest level
+#  TODO: Package installs should not use latest (skip_ansible_lint tag)
+##############################################################################
+- name: Update AIXToolbox to latest using yum
+  yum:
+    update_cache: true
+    name: '*'
+    state: latest
+    exclude:
+      autoconf*
+      cmake*
+      freetype2*
+  tags:
+    - yum
+    - skip_ansible_lint
+
+##############################################################################
+# Remove OSS Packages that triage has shown to make builds non-portable
+##############################################################################
+
 - name: Remove packages - in case installed historically, or by accident
   yum: name={{ item }} state=absent
   with_items:
@@ -145,77 +252,3 @@
   tags:
     - yum
     - adoptopenjdk
-
-#######################################################
-# Additional Tools not available directly through yum #
-#######################################################
-- name: Confirm cmake prereqs have been installed
-  stat:
-    path: /opt/freeware/etc/rpm/macros.cmake
-  register: cmake_prereqs
-  tags:
-    - rpm_install
-    - yum
-    - cmake
-
-# NOTE: Cannot use yum module here as it will pull in cmake 3.16 which we do not want
-- name: Install cmake 3.14.3 prerequisites if needed (Will generate yum warning)
-  command: rpm -i https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-rpm-macros-3.14.3-1.aix7.1.ppc.rpm  https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-filesystem-3.14.3-1.aix7.1.ppc.rpm
-  tags:
-    - rpm_install
-    - yum
-    - cmake
-  when: not cmake_prereqs.stat.exists
-
-# See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492 for why we are locking this
-- name: Install cmake 3.14.3 (3.16 has problems)
-  yum: name=cmake-3.14.3 state=present update_cache=yes
-  tags:
-    - rpm_install
-    - yum
-    - cmake
-
-- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
-  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
-  ignore_errors: True
-  tags:
-    - rpm_install
-    - yum
-
-# Create zlib.h and zconf.h links - See https://github.com/adoptium/infrastructure/issues/1952
-
-- name: Checking for /opt/freeware/include/zlib.h
-  stat:
-    path: /opt/freeware/include/zlib.h
-  register: zlib
-  tags: yum
-
-- name: Checking for /opt/freeware/include/zconf.h
-  stat:
-    path: /opt/freeware/include/zconf.h
-  register: zconf
-  tags: yum
-
-- name: Link /usr/include/zlib.h to /opt/freeware/include/zlib.h
-  file:
-    src: /opt/freeware/include/zlib.h
-    dest: /usr/include/zlib.h
-    state: link
-  when: zlib.stat.exists
-  tags: yum
-
-- name: Link /usr/include/zconf.h to /opt/freeware/include/zconf.h
-  file:
-    src: /opt/freeware/include/zconf.h
-    dest: /usr/include/zconf.h
-    state: link
-  when: zconf.stat.exists
-  tags: yum
-
-- name: Exclude packages from updating
-  lineinfile:
-    dest: /opt/freeware/etc/yum/yum.conf
-    firstmatch: yes
-    insertafter: 'plugins=1'
-    line: 'exclude=freetype2* autoconf'
-  tags: yum

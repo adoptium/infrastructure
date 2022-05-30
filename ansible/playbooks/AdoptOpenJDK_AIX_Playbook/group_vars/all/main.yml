@@ -41,9 +41,6 @@ Jcktestr_User_SSHKey: /Vendor_Files/keys/keybox.key
 Vendor_File: Disabled
 Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 
-# Default BootJDK installed
-bootjdk: openj9
-
 # Errata
 Asian_Locales: Disabled
 Slack_Notification: Disabled

@@ -1,0 +1,27 @@
+################
+# Jenkins user #
+################
+---
+- name: Check localhost for authorized key for jenkins user
+  delegate_to: localhost
+  become: false
+  stat:
+    path: "{{ Jenkins_User_SSHKey }}"
+  register: pubkey
+
+- name: Set authorized key for jenkins user
+  authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
+  when: pubkey is defined and pubkey.stat.exists
+  delegate_to: localhost
+  register: jenkins_pubkey
+  tags: jenkins_user
+
+- name: warn about missing authorization for jenkins
+  debug:
+    msg: "{{ Jenkins_User_SSHKey }} not included in authorizedkeys"
+  when: jenkins_pubkey is defined and
+    (jenkins_pubkey.skipped == true or jenkins_pubkey.failed == true)
+  tags: jenkins_user

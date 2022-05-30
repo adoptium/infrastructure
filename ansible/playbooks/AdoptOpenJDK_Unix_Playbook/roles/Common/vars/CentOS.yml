@@ -10,6 +10,7 @@ Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
   - bzip2
+  - ca-certificates
   - cpio
   - curl
   - cups-devel

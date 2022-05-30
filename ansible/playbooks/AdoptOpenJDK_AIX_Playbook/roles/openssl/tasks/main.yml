@@ -1,40 +1,32 @@
 ##################################################################
-# Install openssl from IBM installp                              #
-# openssl installp download requiring an IBMid                   #
-# https://www-01.ibm.com/support/docview.wss?uid=isg3T1027135    #
+# Verify openssl from IBM                                        #
 ##################################################################
 ---
 - name: Check if openssl is installed
-  shell: openssl version >/dev/null 2>&1
-  register: does_openssl_exist
-  ignore_errors: yes
-  tags: openssl
+  stat:
+    path: /usr/bin/openssl
+  register: openssl_bin
 
-- name: Transfer Openssl to remote host
-  copy:
-    src: /Vendor_Files/aix/openssl/openssl-1.0.2.1601.tar.Z
-    dest: /tmp/openssl-1.0.2.1601.tar.Z
-  when: does_openssl_exist.rc != 0
-  tags: openssl
+- name: "Fail: OpenSSL 1.0.2p or later required"
+  fail:
+    msg:
+      - "OpenSSL is required. Version 1.0.2p (1.0.2.1601) or later"
+      - "Please ask your AIX OS provider to install it on this host"
+  when: not (openssl_bin.stat.exists and openssl_bin.stat.executable)
 
-# added set -o pipefail to satisify AnsibleLint - not because it helps
-- name: Extract Openssl
-  shell: set -o pipefail | uncompress /tmp/openssl-1.0.2.1601.tar.Z | tar xf - -C /tmp/
-  when: does_openssl_exist.rc != 0
-  tags: openssl
+- name: Get openssl version
+  command: openssl version
+  register: openssl_version
 
-- name: Install IBM Openssl - installp
-  command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
-  ignore_errors: yes
-  when: does_openssl_exist.rc != 0
-  tags: openssl
+- name: Check Version legitimacy
+  set_fact:
+    rdy: openssl_version.split(' ')[1] >= '1.0.2p'
+  when: openssl_version is defined
 
-- name: Clean openssl tmp files
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /tmp/openssl-1.0.2.1601
-    - /tmp/openssl-1.0.2.1601.tar.Z
-  when: does_openssl_exist.rc != 0
-  tags: openssl
+- name: "Fail: OpenSSL 1.0.2p or later required"
+  fail:
+    msg:
+      - "OpenSSL Version 1.0.2p (1.0.2.1601) or later is required."
+      - "Please ask your AIX OS provider to install it on this host"
+      - "current OpenSSL: {{ openssl_version.stdout }}"
+  when: rdy is undefined or not rdy

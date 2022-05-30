@@ -23,7 +23,7 @@
         - name: Check if bash is installed
           shell: bash --version >/dev/null 2>&1
           register: does_bash_exist
-          ignore_errors: yes
+          failed_when: false
         - name: install bash
           yum: name=bash state=present update_cache=yes
           when: does_bash_exist.rc != 0
@@ -89,7 +89,7 @@
         - name: Check if openssl is installed
           shell: openssl version >/dev/null 2>&1
           register: does_openssl_exist
-          ignore_errors: yes
+          failed_when: false
           tags: openssl
 
         - name: Transfer Openssl to remote host
@@ -107,7 +107,7 @@
         - name: Install IBM Openssl - installp
           command: installp -aXYgd /tmp/openssl-1.0.2.1601 openssl.base
           register: result.openssl
-          ignore_errors: yes
+          failed_when: false
           when: does_openssl_exist.rc != 0
           tags: openssl
 
@@ -132,7 +132,7 @@
 
         - name: Uninstall conflicting packages
           shell: rpm -e --nodeps $(rpm -qa | grep -E "cloud-init|perl|openssl") 2>/dev/null
-          ignore_errors: True
+          failed_when: false
           when: yum.stat.islnk is not defined
           tags:
             - rpm_remove
@@ -155,7 +155,7 @@
         - name: Install yum and dependencies
           command: /tmp/yum.sh
           register: result.yum
-          ignore_errors: yes
+          failed_when: false
           when: yum.stat.islnk is not defined
           tags:
             - yum
@@ -222,7 +222,7 @@
 
         - name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
           shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
-          ignore_errors: True
+          failed_when: false
           tags: rpm_install
 
       ##############
@@ -442,13 +442,13 @@
         - name: Check if X11.adt.ext is installed
           shell: lslpp -l X11.adt.ext >/dev/null 2>&1
           register: does_X11_adt_ext_exist
-          ignore_errors: yes
+          failed_when: false
           tags: x11
 
         - name: Check if X11.vfb is installed
           shell: lslpp -l X11.vfb >/dev/null 2>&1
           register: does_x11_exist
-          ignore_errors: yes
+          failed_when: false
           tags: x11
 
         - name: Transfer and extract X11
@@ -462,14 +462,14 @@
         - name: Install IBM X11 Extensions - installp
           command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
           register: result.x11
-          ignore_errors: yes
+          failed_when: false
           when: does_X11_adt_ext_exist.rc != 0
           tags: x11
 
         - name: Install X11.vfb - installp
           command: installp -agXYd /tmp/x11/X11.vfb all
           register: result.x11.vfb
-          ignore_errors: yes
+          failed_when: false
           when: does_x11_exist.rc != 0
           tags: x11
 
@@ -505,7 +505,7 @@
         - name: Install IBM XLC13 - installp
           command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
           register: result.xlc
-          ignore_errors: yes
+          failed_when: false
           when: xlc13.stat.islnk is not defined
           tags: xlc13
 
@@ -584,7 +584,7 @@
         - name: Install IBM XLC16 - installp
           command: installp -aXYg -e /tmp/usr/install.log -d /tmp/usr/sys/inst.images all
           register: result.xlc
-          ignore_errors: yes
+          failed_when: false
           when: xlc16.stat.islnk is not defined
           tags: xlc16
 
@@ -755,7 +755,7 @@
 
         - name: Create jenkins user
           command: mkuser home="/home/{{ Jenkins_Username }}" shell="/bin/bash" {{ Jenkins_Username }}
-          ignore_errors: yes
+          failed_when: false
           when: jenkins.stat.isdir is not defined
           tags: jenkins_user
 
@@ -860,7 +860,7 @@
       #####################
         - name: Setup zeus user
           command: mkuser home="/home/zeus" shell="/usr/bin/ksh" zeus
-          ignore_errors: yes
+          failed_when: false
           when: Superuser_Account == "Enabled"
           tags: superuser
 

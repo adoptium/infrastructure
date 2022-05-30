@@ -6,7 +6,7 @@ containerIds=$(docker ps -q)
 for container in $containerIds
 do
     OS=$(docker exec -it $container sh -c "cat /etc/os-release" | head -n 1)
-    if [[ $OS =~ "CentOS" || $OS =~ "Fedora" ]]; then
+    if [[ $OS =~ "CentOS" || $OS =~ "Fedora" || $OS=~ "Red Hat Enterprise Linux" ]]; then
         installCommand="yum -y update"
     elif [[ $OS =~ "Ubuntu" ]]; then
         installCommand="apt-get update && apt-get -y upgrade"

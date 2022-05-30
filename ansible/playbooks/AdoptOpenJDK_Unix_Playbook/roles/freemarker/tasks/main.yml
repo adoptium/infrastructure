@@ -56,5 +56,5 @@
   with_items:
     - /tmp/freemarker-{{ freemarkerVersion }}
     - /tmp/freemarker-{{ freemarkerVersion }}.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: [freemarker, adoptopenjdk]

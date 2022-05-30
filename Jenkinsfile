@@ -35,6 +35,22 @@ pipeline {
                         dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
                     }
                 }
+                stage('Alpine3 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    }
+                    steps {
+                        dockerBuild('amd64', 'alpine3', 'Dockerfile.Alpine3')
+                    }
+                }
+                stage('Alpine3 aarch64') {
+                    agent {
+                        label "dockerBuild&&linux&&aarch64"
+                    }
+                    steps {
+                        dockerBuild('arm64', 'alpine3', 'Dockerfile.Alpine3')
+                    }
+                }
             }
         }
         stage('Docker Manifest') {
@@ -81,6 +97,14 @@ def dockerManifest() {
             ARMV7L=$TARGET:linux-armv7l
             docker manifest create $TARGET $ARMV7L
             docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
+            docker manifest push $TARGET
+            # Alpine3
+            export TARGET="adoptopenjdk/alpine3_build_image"
+            AMD64=$TARGET:linux-amd64
+            ARM64=$TARGET:linux-arm64
+            docker manifest create $TARGET $AMD64 $ARM64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
             docker manifest push $TARGET
         '''
     }
