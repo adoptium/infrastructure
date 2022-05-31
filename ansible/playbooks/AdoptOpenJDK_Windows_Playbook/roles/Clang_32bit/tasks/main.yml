@@ -47,5 +47,5 @@
   win_file:
     path: 'c:\temp\LLVM-7.0.0-win32.zip'
     state: absent
-  ignore_errors: yes
+  failed_when: false
   tags: clang_32bit

@@ -37,7 +37,7 @@
 
 - name: Enable SSH login for Superuser user (macOS)
   command: dseditgroup -o edit -a zeus -t staff com.apple.access_ssh
-  ignore_errors: yes
+  failed_when: false
   when:
     - Superuser_Account == "Enabled"
     - ansible_distribution == "MacOSX"

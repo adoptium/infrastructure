@@ -68,13 +68,13 @@
 
         - name: Check if jdk8 is already installed in the target location
           shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: adoptopenjdk_installed
           tags: java
 
         - name: Check if there is a default java
           shell: java -version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: default_java
           tags: java
 
@@ -114,7 +114,7 @@
 
         - name: Check if Ansible is installed
           shell: which ansible >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: ansible_installed
           tags: ansible
 
@@ -137,7 +137,7 @@
 
         - name: Check if Git is installed
           shell: git --version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: git_installed
           tags:
             - skip_ansible_lint
@@ -200,7 +200,7 @@
 
         - name: Check if Vagrant is installed
           shell: which vagrant >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: vagrant_installed
           tags: vagrant
 
@@ -239,7 +239,7 @@
 
         - name: Check if Virtualbox is installed
           shell: which virtualbox >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: virtualbox_installed
           tags: VBox
 
@@ -272,7 +272,7 @@
 
         - name: Check to see if QEMU is installed
           shell: qemu-system-s390x --version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: qemu_installed
           tags: QEMU
 

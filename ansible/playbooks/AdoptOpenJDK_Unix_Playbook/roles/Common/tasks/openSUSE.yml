@@ -106,7 +106,7 @@
 
 - name: Check if jdk-8 is already installed in the target location
   shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: adoptopenjdk_installed
   tags:
     - java8_SUSE

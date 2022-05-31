@@ -29,7 +29,7 @@
 ###############
 - name: Setup Nagios user
   command: mkuser home="/home/nagios" shell="/usr/bin/ksh" nagios
-  ignore_errors: yes
+  failed_when: false
   tags:
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint

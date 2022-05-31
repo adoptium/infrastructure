@@ -10,7 +10,7 @@
 
 - name: Test if git is installed on path
   shell: git --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: git_installed
   tags:
     - git_source

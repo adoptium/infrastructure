@@ -1,0 +1,53 @@
+---
+##############
+# Below enable different YUM repo not EPEL
+##############
+#################CentOS####################################
+- name: Check OS to set variable rhel or centos
+  set_fact:
+    OS: "{{ 'rhel' if (ansible_distribution == 'RedHat') else (ansible_distribution | lower) }}"
+
+- name: Import Docker Repo key
+  rpm_key:
+    key: https://download.docker.com/linux/{{ OS }}/gpg
+    state: present
+
+- name: Add Docker Repo
+  yum_repository:
+    name: docker
+    description: docker repository
+    baseurl: "https://download.docker.com/linux/{{ OS }}/$releasever/$basearch/stable"
+    enabled: true
+    gpgcheck: false
+  when:
+    - ansible_architecture == "x86_64"
+
+############special handle for architecture###################
+- name: Add Docker repo for ppc64le on RHEL7/Centos7
+  yum_repository:
+    name: docker
+    description: docker YUM repo ppc64le
+    baseurl: https://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
+    enabled: true
+    gpgcheck: false
+  when:
+    - ansible_architecture == "ppc64le"
+    - ansible_distribution_major_version == "7"
+
+- name: Add Docker repo for s390x on RHEL7
+  yum_repository:
+    name: docker
+    description: docker YUM repo s390x
+    baseurl: https://download.docker.com/linux/rhel/docker-ce.repo
+    enabled: true
+    gpgcheck: false
+  when:
+    - ansible_architecture == "s390x"
+
+- name: Import Docker repo key for s390x on RHEL7
+  rpm_key:
+    key: https://download.docker.com/linux/rhel/gpg
+    state: present
+  when:
+    - ansible_architecture == "s390x"
+    - ansible_distribution_major_version == "7"

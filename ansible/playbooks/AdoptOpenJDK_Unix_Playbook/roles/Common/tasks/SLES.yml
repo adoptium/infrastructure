@@ -108,7 +108,7 @@
 
 - name: Running ./configure & make for Zlib on Linux x86-64 or PPC64LE
   shell: cd /tmp/zlib-1.2.11 && ./configure && make -j {{ ansible_processor_vcpus }} && make install
-  become: yes
+  become: true
   when:
     - zlib_status.stat.islnk is not defined
   tags: zlib
@@ -194,7 +194,7 @@
   with_items:
     - /tmp/ibm-java.bin
     - /tmp/ibm-java.response.properties
-  ignore_errors: yes
+  failed_when: false
   tags: java8_SLES11
 
 #########
@@ -236,7 +236,7 @@
 
 - name: Running ./configure & make for expat on Linux x86-64
   shell: cd /tmp/expat-2.2.5 && ./configure && make -j {{ ansible_processor_vcpus }} && sudo make install
-  become: yes
+  become: true
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")
     - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")

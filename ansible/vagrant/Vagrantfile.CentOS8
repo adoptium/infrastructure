@@ -9,9 +9,10 @@ do
   sudo sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Linux-${RepoName}.repo
   sudo sed -i -e '$ a baseurl=http://vault.centos.org/\$contentdir/\$releasever/'"${RepoName}"'/\$basearch/os/' /etc/yum.repos.d/CentOS-Linux-${RepoName}.repo
 done
-
-sudo yum -y update
-sudo yum install -y libselinux-python
+sudo yum -y update --exclude epel-release
+# Fix Up The EPEL Repositories Following CentOS8 EOL
+sudo sed -i 's|^metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-$releasever&arch=$basearch&infra=$infra&content=$contentdir|baseurl=https://dl.fedoraproject.org/pub/archive/epel/8.5.2022-05-10/Everything/x86_64/|' /etc/yum.repos.d/epel.repo
+sudo yum install -y libselinux-python3
 sudo yum install -y ansible
 sudo mkdir /ansible
 sudo cp /etc/ansible/ansible.cfg /ansible
@@ -32,7 +33,9 @@ echo "*** '$VAGRANT_MOUNT/playbooks/hosts' file for ansible-playbook contains **
 cat $VAGRANT_MOUNT/playbooks/hosts
 echo "---------------------------------------------------------------------------------------"
 # Put the host machine's IP into the authorised_keys file on the VM
-[ -r /vagrant/id_rsa.pub ] && mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x

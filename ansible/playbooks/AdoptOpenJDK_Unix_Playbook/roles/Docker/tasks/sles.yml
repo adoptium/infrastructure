@@ -1,0 +1,22 @@
+---
+- name: Add Docker Repo for SLES12
+  community.general.zypper_repository:
+    name: docker
+    repo: https://download.docker.com/linux/sles/docker-ce.repo
+    state: present
+    auto_import_keys: yes
+
+- name: Install Docker on SLES12
+  zypper:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+  when:
+    - ansible_architecture == "x86_64"
+  tags:
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
