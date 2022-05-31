@@ -169,7 +169,7 @@ git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
 ./get.sh && cd TKG
 export TEST_JDK_HOME=<path to JDK which you want to use for the tests>
 export BUILD_LIST=openjdk
-make compiler
+make compile
 make _<target>
 ```
 `BUILD_LIST` depends on the suite you want to run, and can be omitted to build
