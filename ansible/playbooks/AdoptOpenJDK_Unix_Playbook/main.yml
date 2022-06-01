@@ -79,7 +79,6 @@
     - role: adoptopenjdk_install
       jdk_version: 8
       when:
-        - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
         - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
@@ -92,7 +91,6 @@
     - role: adoptopenjdk_install
       jdk_version: 11
       when:
-        - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
@@ -113,7 +111,6 @@
     - role: adoptopenjdk_install  # JDK18 Build Bootstrap
       jdk_version: 17
       when:
-        - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
