@@ -91,7 +91,6 @@
             name: "{{ Jenkins_Username }}"
             shell: /bin/bash
             stat: present
-            uid: 1040
           failed_when: false
           tags: jenkins_user
 
