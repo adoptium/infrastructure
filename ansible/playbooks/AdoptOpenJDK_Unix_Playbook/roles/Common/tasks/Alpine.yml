@@ -100,7 +100,7 @@
   when: ansible_architecture == "aarch64"
   block:
     - name: Check if Temurin jdk8 is installed
-      stat: 
+      stat:
         path: /usr/lib/jvm/jdk8
       register: adoptopenjdk_installed
 
@@ -131,7 +131,7 @@
         - adoptopenjdk_installed.rc != 0
 
     - name: Check if Temurin jdk11 is installed
-      stat: 
+      stat:
         path: /usr/lib/jvm/jdk-11
       register: adoptopenjdk_installed
 
@@ -182,7 +182,7 @@
         - not zulu16_installed.stat.exists
 
     - name: Check if Temurin jdk17 is installed
-      stat: 
+      stat:
         path: /usr/lib/jvm/jdk-17
       register: adoptopenjdk_installed
 
