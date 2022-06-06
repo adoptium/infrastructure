@@ -8,6 +8,11 @@ on:
     branches:         
     - master
 
+# Cancel existing runs if user makes another push.
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-solaris:
     name: Solaris
@@ -24,6 +29,8 @@ jobs:
     - name: Setup Vagrant VM
       run: |
         cd ansible
+        # Temporary fix as the Adopt vagrant vm image is not available on the GitHub Actions executors
+        sed -i e "s/solaris10/tnarik\/solaris10-minimal/g" ansible/vagrant/Vagrantfile.Solaris10
         ln -sf vagrant/Vagrantfile.Solaris10 Vagrantfile
         rm -f id_rsa.pub id_rsa
         # Copy the machine's ssh key for the VMs to use, after removing prior files
@@ -33,8 +40,6 @@ jobs:
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-        # Temporary fix as the Adopt vagrant vm image is not available on the GitHub Actions executors
-        sed -i e "s/solaris10/tnarik\/solaris10-minimal/g" ansible/vagrant/Vagrantfile.Solaris10
         awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
     - name: Run Ansible Playbook
