@@ -48,8 +48,8 @@ jobs:
         sudo apt install -y ansible
 
     - name: Setup Hosts file
+      working-directory: ansible
       run: |
-        cd ansible
         rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
         cat <<EOF > playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
         [windows]
@@ -62,8 +62,8 @@ jobs:
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 
     - name: Run Ansible Playbook
+      working-directory: ansible
       run: |
-        cd ansible
         export ANSIBLE_CONFIG=./ansible.cfg
         # Skip MSVS_2013 until https://github.com/adoptium/infrastructure/issues/2178 is fixed
         ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
