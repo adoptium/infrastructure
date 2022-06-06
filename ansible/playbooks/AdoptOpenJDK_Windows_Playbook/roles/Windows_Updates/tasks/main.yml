@@ -16,4 +16,6 @@
     reboot_timeout: 3600
   failed_when: false
   when: update_result.reboot_required
-  tags: Windows_Updates
+  tags:
+    - Windows_Updates
+    - reboot
