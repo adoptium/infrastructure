@@ -104,9 +104,10 @@
         path: /usr/lib/jvm/jdk8
       register: adoptopenjdk_installed
 
+# Temp. Change to GA binary once theyre available
     - name: Install Temurin jdk8 nightly
       unarchive:
-        src: https://ci.adoptopenjdk.net/job/build-scripts/job/jobs/job/jdk8u/job/jdk8u-alpine-linux-aarch64-temurin/lastSuccessfulBuild/artifact/workspace/target/OpenJDK8U-jdk_aarch64_alpine-linux_hotspot_2022-05-30-18-05.tar.gz
+        src: https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u-2022-05-28-05-51-beta/OpenJDK8U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-18-05.tar.gz
         dest: /usr/lib/jvm
         remote_src: yes
       retries: 3
@@ -117,7 +118,7 @@
         - adoptopenjdk_installed.rc != 0
 
     - name: Get Temurin jdk8 full path name
-      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-8.* 2>/dev/null | awk '{print $9}'
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8u.* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk_dir
       when:
         - adoptopenjdk_installed.rc != 0
@@ -137,7 +138,7 @@
 
     - name: Install Temurin jdk-11 nightly
       unarchive:
-        src: https://ci.adoptopenjdk.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-alpine-linux-aarch64-temurin/lastSuccessfulBuild/artifact/workspace/target/OpenJDK11U-jdk_aarch64_alpine-linux_hotspot_2022-05-26-18-05.tar.gz
+        src: https://github.com/adoptium/temurin11-binaries/releases/download/jdk11u-2022-05-27-20-05-beta/OpenJDK11U-jdk_aarch64_alpine-linux_hotspot_2022-05-26-18-05.tar.gz
         dest: /usr/lib/jvm
         remote_src: yes
       retries: 3
@@ -147,6 +148,7 @@
       when:
         - adoptopenjdk_installed.rc != 0
 
+# Temp. Change to GA binary once theyre available
     - name: Get Temurin jdk-11 full path name
       shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-11.* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk_dir
@@ -181,6 +183,7 @@
       when:
         - not zulu16_installed.stat.exists
 
+# Temp. Change to GA binary once theyre available
     - name: Check if Temurin jdk17 is installed
       stat:
         path: /usr/lib/jvm/jdk-17
@@ -188,7 +191,7 @@
 
     - name: Install Temurin jdk-17 nightly
       unarchive:
-        src: https://ci.adoptopenjdk.net/job/build-scripts/job/jobs/job/jdk17u/job/jdk17u-alpine-linux-aarch64-temurin/lastSuccessfulBuild/artifact/workspace/target/OpenJDK17U-jdk_aarch64_alpine-linux_hotspot_2022-05-31-23-30.tar.gz
+        src: https://github.com/adoptium/temurin17-binaries/releases/download/jdk17u-2022-05-27-19-32-beta/OpenJDK17U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-17-01.tar.gz
         dest: /usr/lib/jvm
         remote_src: yes
       retries: 3
