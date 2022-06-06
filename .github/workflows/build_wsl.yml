@@ -12,10 +12,19 @@ on:
     branches:         
     - master
 
+# Cancel existing runs if user makes another push.
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-wsl:
-    name: Windows 2019
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+    name: Windows
+    runs-on: ${{ matrix.os }}
     steps:
 
     - name: Setup WinRM and Password
