@@ -23,6 +23,10 @@ hosts:
           ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
           ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
 
+      - hetzner:
+          ubuntu1604-x64-1: {ip: 78.47.239.96, description: nagios.adoptopenjdk.net}
+          ubuntu2004-x64-1: {ip: 78.47.239.97, description: ci.adoptopenjdk.net}
+
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
