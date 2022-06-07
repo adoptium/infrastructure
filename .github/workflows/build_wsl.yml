@@ -41,15 +41,11 @@ jobs:
     - uses: actions/checkout@v3
 
     - uses: Vampire/setup-wsl@v1
-      with:
-        distribution: Alpine
-        additional-packages:
-          bash
-          ansible
 
-    - name: Install pywinrm
+    - name: Install dependencies
       run: |
-        pip install pywinrm
+        sudo apt-get update
+        sudo apt install -y ansible
 
     - name: Setup Hosts file
       working-directory: ansible
