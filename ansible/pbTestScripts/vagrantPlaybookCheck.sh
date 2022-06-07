@@ -396,7 +396,7 @@ destroyVM()
 	fi
 }
 
-trap destroyVM EXIT
+trap destroyVM $OS EXIT
 
 processArgs $*
 checkVars
