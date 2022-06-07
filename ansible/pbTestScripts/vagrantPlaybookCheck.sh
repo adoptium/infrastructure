@@ -372,6 +372,7 @@ startVMPlaybookWin()
 destroyVM()
 {
 	if [[ "$retainVM" == false ]]; then
+		echo "Destroying the VM"
 		local OS=$1
 		echo "Destroying the $OS Machine"
 		echo === `date +%T`: showing global status before pruning:
