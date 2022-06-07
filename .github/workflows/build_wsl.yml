@@ -2,7 +2,7 @@ name: Windows Playbook Checker
 
 defaults:
   run:
-    shell: wsl-sh {0}
+    shell: wsl-bash {0}
 
 on:
   pull_request:
@@ -43,9 +43,13 @@ jobs:
     - uses: Vampire/setup-wsl@v1
       with:
         distribution: Alpine
+        additional-packages:
+          bash
+          ansible
 
-    - name: Install dependencies
-      run: apk add ansible
+    - name: Install pywinrm
+      run: |
+        pip install pywinrm
 
     - name: Setup Hosts file
       working-directory: ansible
