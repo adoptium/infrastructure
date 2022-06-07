@@ -14,9 +14,9 @@
 
 - name: Enable shortnames in Registry
   win_regedit:
-    path: HKU:\SYSTEM\CurrentControlSet\Control\Filesystem
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\Filesystem
     name: NtfsDisable8dot3NameCreation
-    data: 1
+    data: 2
     type: dword
 
 - name: Enable shortnames on drive C:/
