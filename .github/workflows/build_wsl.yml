@@ -2,7 +2,7 @@ name: Windows Playbook Checker
 
 defaults:
   run:
-    shell: wsl-bash {0}
+    shell: wsl-sh {0}
 
 on:
   pull_request:
