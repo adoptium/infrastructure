@@ -396,7 +396,7 @@ destroyVM()
 	fi
 }
 
-trap destroyVM $OS EXIT
+trap destroyVM $vagrantOS EXIT
 
 processArgs $*
 checkVars
