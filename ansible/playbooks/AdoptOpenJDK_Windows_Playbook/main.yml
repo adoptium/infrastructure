@@ -36,42 +36,42 @@
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins]
-    # - Version
-    # - Common
-    # - Windows_Updates
-    # - WMF_5.1
-    # - Jenkins                     # AdoptOpenJDK infrastructure
-    # - CodesignCert
-    # - 7-Zip                       # Mostly extracting other prereqs :-)
-    # - cygwin
-    # - Firefox
-    # - Strawberry_Perl             # Testing
-    # - Freemarker                  # OpenJ9
-    # - GIT
-    # - Java7                       # JDK8 build bootstrap
-    # - Java8                       # JDK9 build bootstrap/ For Gradle
-    # - role: Java_install          # JDK11 build bootstrap
-    #   jdk_version: 10
-    # - role: Java_install          # For Gradle
-    #   jdk_version: 11
-    # - role: Java_install          # JDK16 build bootstrap
-    #   jdk_version: 15
-    # - role: Java_install          # JDK17 build bootstrap
-    #   jdk_version: 16
-    # - role: Java_install
-    #   jdk_version: 17
-    # - ANT                         # Testing
-    # - MSVS_2013
-    # - MSVS_2017                   # OpenJ9
-    # - MSVS_2019                   # OpenJ9
-    # - NVidia_Cuda_Toolkit         # OpenJ9
-    # - NTP_TIME
-    # - Clang_64bit                 # OpenJ9
-    # - Clang_32bit                 # OpenJ9
-    # - nasm                        # OpenJ9
-    # - Rust                        # IcedTea-Web
-    # - IcedTea-Web                 # For Jenkins webstart
-    # - WiX                         # For creating installers
+    - Version
+    - Common
+    - Windows_Updates
+    - WMF_5.1
+    - Jenkins                     # AdoptOpenJDK infrastructure
+    - CodesignCert
+    - 7-Zip                       # Mostly extracting other prereqs :-)
+    - cygwin
+    - Firefox
+    - Strawberry_Perl             # Testing
+    - Freemarker                  # OpenJ9
+    - GIT
+    - Java7                       # JDK8 build bootstrap
+    - Java8                       # JDK9 build bootstrap/ For Gradle
+    - role: Java_install          # JDK11 build bootstrap
+      jdk_version: 10
+    - role: Java_install          # For Gradle
+      jdk_version: 11
+    - role: Java_install          # JDK16 build bootstrap
+      jdk_version: 15
+    - role: Java_install          # JDK17 build bootstrap
+      jdk_version: 16
+    - role: Java_install
+      jdk_version: 17
+    - ANT                         # Testing
+    - MSVS_2013
+    - MSVS_2017                   # OpenJ9
+    - MSVS_2019                   # OpenJ9
+    - NVidia_Cuda_Toolkit         # OpenJ9
+    - NTP_TIME
+    - Clang_64bit                 # OpenJ9
+    - Clang_32bit                 # OpenJ9
+    - nasm                        # OpenJ9
+    - Rust                        # IcedTea-Web
+    - IcedTea-Web                 # For Jenkins webstart
+    - WiX                         # For creating installers
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
     - role: Thunderbird
