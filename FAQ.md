@@ -1,4 +1,4 @@
-# openjdk-infrastructure guide to frequent modifications and usage
+# Infrastructure guide to frequent modifications and usage
 
 ## Access control in the repository
 The three github teams relevant to this repository are as follows (Note, you
@@ -17,6 +17,18 @@ circumstances such as a clear breakage that has a simple fix available
 then a repository admin may override that requirement to push through
 a change if no reviewers are available, but in such cases a comment
 explaining why must be added to the Pull Request.
+
+## GitHub actions CI jobs
+
+Most Ansible changes are tested automatically with a series of CI jobs:
+
+| Platform | Workflow File | Notes
+|---|---|---|
+| Centos 6 | [build.yml](./.github/workflows/build.yml) | |
+| Alpine 3 | [build.yml](./.github/workflows/build.yml) | |
+| macOS 10.15 | [build_mac.yml](./.github/workflows/build_mac.yml) | |
+| Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
+| Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 
 ## Running the ansible scripts on local machines
 

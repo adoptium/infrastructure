@@ -6,14 +6,14 @@ $shortName=$Args[1]
 $string=(cmd /c dir /x "C:\Program Files (x86)" | grep "$dirName")
 
 # Skip the directory if it doesn't exist
-If ($string -eq $null){
-	echo "Directory not found - skipping"
+If ($null -eq $string){
+	Write-Output "Directory not found - skipping"
 	exit
 }
 
 $result=($string.split(" ")[17])
 
 If ($result -eq ""){
-	echo "Setting Shortname"
+	Write-Output "Setting Shortname"
 	fsutil file setshortname "C:\Program Files (x86)\$dirName" $shortName
 }
