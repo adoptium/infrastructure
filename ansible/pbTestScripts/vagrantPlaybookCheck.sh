@@ -372,30 +372,32 @@ startVMPlaybookWin()
 destroyVM()
 {
 	if [[ "$retainVM" == false ]]; then
-		local OS=$1
-		echo "Destroying the $OS Machine"
-		echo === `date +%T`: showing global status before pruning:
-		vagrant global-status
-		free
-		echo === showing global status while pruning:
-		vagrant global-status --prune
-		echo === Determining VM to destroy:
-		VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${gitFork}-${gitBranch}/ { print \\$1 }"`
-		if [ ! -z "$VM_TO_DESTROY" ]; then
-		echo === Destroying VM with id $VM_TO_DESTROY
-		vagrant destroy -f $VM_TO_DESTROY
-		else
-		echo === NOT DESTROYING ANY VM as no suitable ID was found searching for $OS and ${gitFork}-${gitBranch}
-		fi
+		for OS in $vagrantOS
+		do
+			echo "Destroying the $OS Machine"
+			echo === `date +%T`: showing global status before pruning:
+			vagrant global-status
+			free
+			echo === showing global status while pruning:
+			vagrant global-status --prune
+			echo === Determining VM to destroy:
+			VM_TO_DESTROY=`vagrant global-status --prune | grep $OS | awk "/${gitFork}-${gitBranch}/ { print \\$1 }"`
+			if [ ! -z "$VM_TO_DESTROY" ]; then
+				echo === Destroying VM with id $VM_TO_DESTROY
+				vagrant destroy -f $VM_TO_DESTROY
+			else
+				echo === NOT DESTROYING ANY VM as no suitable ID was found searching for $OS and ${gitFork}-${gitBranch}
+			fi
 			echo === Final status:
 			vagrant global-status --prune
 			free
+		done
 	else
 		echo "You have chosen to retain the VM. It will not be destroyed"
 	fi
 }
 
-trap 'destroyVM $vagrantOS' EXIT
+trap 'destroyVM' EXIT
 
 processArgs $*
 checkVars
@@ -413,5 +415,5 @@ do
   	if [[ "$vmHalt" == true ]]; then
                 vagrant halt 
 	fi
-	destroyVM $OS
 done
+destroyVM
