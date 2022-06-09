@@ -8,7 +8,17 @@
 - name: Query to see if shortnames are enabled
   win_shell: "fsutil 8dot3name query C: | grep enabled"
   register: enabled_shortnames
-  ignore_errors: true
+  failed_when: false
+  tags:
+    - shortnames
+
+- name: Enable shortnames in Registry
+  win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\Filesystem
+    name: NtfsDisable8dot3NameCreation
+    data: 2
+    type: dword
+  when: (not enabled_shortnames.stdout)
   tags:
     - shortnames
 

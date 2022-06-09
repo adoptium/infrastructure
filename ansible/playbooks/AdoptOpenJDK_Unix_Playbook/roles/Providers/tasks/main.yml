@@ -8,7 +8,7 @@
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Determine the provider by the hostname
   shell: set -o pipefail | hostname | cut -d- -f2
-  ignore_errors: yes
+  failed_when: false
   register: provider_name
   changed_when: false
   tags:

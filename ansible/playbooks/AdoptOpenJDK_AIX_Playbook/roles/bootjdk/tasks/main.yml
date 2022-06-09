@@ -2,76 +2,26 @@
 # BootJDK #
 ###########
 ---
-- name: Check for jdk {{ jdk }} availability
-  stat:
-    path: /usr/java{{ jdk }}_64
-  register: java_installed
+- name: Verify space in /usr
+  include_tasks: chfs.yml
+- name: Install protected OpenJDK versions
+  include_tasks: bootjdk7.yml
 
-- name: Transfer and Extract AdoptOpenJDK {{ jdk }}
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ga/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr
-    remote_src: yes
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk != 17
+- name: Install Additional OpenJDK versions
+  include_tasks: openjdk.yml
+  loop: "{{ jdk_versions }}"
+  loop_control:
+    loop_var: jdk
+  vars:
+    jdk_versions:
+      - '8'
+      - '10'
+      - '11'
+      - '16'
+      - '17'
 
-- name: Transfer and Extract AdoptOpenJDK {{ jdk }}
-  unarchive:
-    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk }}/ea/aix/ppc64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: /usr
-    remote_src: yes
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk == 17
-
-# jdk8 directories do not have a hyphen
-- name: Find java 8 directory
-  find:
-    file_type: directory
-    paths: /usr
-    patterns: 'jdk8u*'
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk == 8
-  register: java8_directory
-
-- name: Find java directory
-  find:
-    file_type: directory
-    paths: /usr
-    patterns: 'jdk-{{ jdk }}*'
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk != 8
-  register: java_directory
-
-# For jdk8
-- name: Symlink to java8_64
-  file:
-    src: "{{ item.path }}"
-    dest: /usr/java8_64
-    state: link
-  with_items:
-    - "{{ java8_directory.files }}"
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk == 8
-
-- name: Symlink to java{{ jdk }}_64
-  file:
-    src: "{{ item.path }}"
-    dest: /usr/java{{ jdk }}_64
-    state: link
-  with_items:
-    - "{{ java_directory.files }}"
-  when:
-    - java_installed.stat.isdir is not defined
-    - jdk != 8
-
-- name: Setting Java 8 as default
+- name: Set /usr/java8_64 as default
   file:
     src: /usr/java8_64/jre/bin/java
     dest: /usr/bin/java
     state: link
-  when: jdk == 8

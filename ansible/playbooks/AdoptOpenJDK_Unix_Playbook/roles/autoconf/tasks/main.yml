@@ -66,7 +66,7 @@
   with_items:
     - /tmp/autoconf-2.69.tar.gz
     - /tmp/autoconf-2.69
-  ignore_errors: yes
+  failed_when: false
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"

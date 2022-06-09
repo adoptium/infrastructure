@@ -59,7 +59,7 @@
     name: ssh
     state: restarted
     enabled: yes
-  ignore_errors: yes
+  failed_when: false
   when:
     - Security == "Enabled"
     - ansible_distribution != "Solaris"
@@ -77,7 +77,7 @@
     name: sshd
     state: restarted
     enabled: yes
-  ignore_errors: yes
+  failed_when: false
   when:
     - Security == "Enabled"
     - ansible_distribution != "Solaris"
@@ -88,7 +88,7 @@
 ##################
 - name: Account policy - expire date
   command: chage -E -1 "{{ item }}"
-  ignore_errors: yes
+  failed_when: false
   with_items:
     - root
     - "{{ Jenkins_Username }}"
@@ -101,7 +101,7 @@
 
 - name: Account policy - max days
   command: chage -M -1 "{{ item }}"
-  ignore_errors: yes
+  failed_when: false
   with_items:
     - root
     - "{{ Jenkins_Username }}"

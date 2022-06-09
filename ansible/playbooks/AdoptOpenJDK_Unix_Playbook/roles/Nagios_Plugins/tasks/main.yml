@@ -32,7 +32,7 @@
 
 - name: Create Nagios user
   action: user name=nagios state=present home={{ home_folder }} shell=/bin/bash
-  ignore_errors: yes
+  failed_when: false
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution != "MacOSX"
@@ -45,7 +45,7 @@
 
 - name: Enable SSH login for Nagios user (macOS)
   command: dseditgroup -o edit -a nagios -t staff com.apple.access_ssh
-  ignore_errors: yes
+  failed_when: false
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution == "MacOSX"

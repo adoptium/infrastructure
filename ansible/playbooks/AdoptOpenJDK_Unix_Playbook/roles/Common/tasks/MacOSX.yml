@@ -4,6 +4,12 @@
 # Updates all packages for macos-based distributions
 #
 
+# Issue https://github.com/adoptium/infrastructure/issues/1902
+- name: Ensure ansible version is greater than 2.11
+  fail:
+    msg: "The version of Ansible you are using needs to be greater than 2.11"
+  when: ansible_version.full is version('2.11', '<=')
+
 - name: Get macOS version
   shell: sw_vers -productVersion
   register: macos_version
@@ -37,7 +43,7 @@
 - name: Check for xcode-tools
   raw: xcode-select --print-path &> /dev/null
   register: xcode
-  ignore_errors: yes
+  failed_when: false
   tags:
     - skip_ansible_lint
 

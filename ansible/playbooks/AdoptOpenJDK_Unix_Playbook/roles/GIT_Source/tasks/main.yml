@@ -10,7 +10,7 @@
 
 - name: Test if git is installed on path
   shell: git --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: git_installed
   changed_when: false
   tags:
@@ -122,5 +122,5 @@
   with_items:
     - /tmp/git-2.15.0
     - /tmp/git-2.15.0.tar.xz
-  ignore_errors: yes
+  failed_when: false
   tags: git_source

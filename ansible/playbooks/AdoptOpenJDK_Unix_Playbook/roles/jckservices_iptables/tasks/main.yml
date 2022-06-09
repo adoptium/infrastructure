@@ -75,6 +75,7 @@
     - 213.146.141.66 # jck-linaru-ubuntu2004-aarch64-2
     - 20.61.136.211 # jck-skytap-aix71-ppc64-1
     - 20.61.136.213 # jck-skytap-aix71-ppc64-2
+    - 20.61.136.254 # jck-skytap-aix71-ppc64-3
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
     - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
@@ -84,6 +85,13 @@
     - 207.254.28.13 # esmv4-macos11-arm64
     - 104.209.208.15 # g9vjl-win2019-x64
     - 52.152.182.5 # h6jkd-win2019-x64
+    - 20.124.37.13 # wmk6e-win2019-x64
+    - 13.90.76.153 # p1ba9-win2019-x64
+    - 20.120.63.86 # oohi1-win2019-x64
+    - 20.85.163.130 # aini7-win2019-x64
+    - 20.85.163.152 # eil4z-win2019-x64
+    - 52.142.17.172 # et2ae-win2019-x64
+    - 207.254.28.99 # noh7B-macos12-arm64
 
 - name: Setup iptables
   iptables:

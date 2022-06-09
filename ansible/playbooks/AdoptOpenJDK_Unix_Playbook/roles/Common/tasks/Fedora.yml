@@ -1,0 +1,236 @@
+---
+##########
+# Fedora #
+##########
+
+#########################################
+# Configure Repos and Update the system #
+#########################################
+# No Additional Repos Required on typical base Fedora 35 Install
+
+
+- name: YUM upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags: patch_update
+
+# TODO: We should find a better way of doing this in the future, for some reason these deps aren't in the aarch64 rhel 7 repos.
+- name: Install missing Rhel7 aarch64 deps from Centos Mirror
+  yum: "name={{ packages }} state=present"
+  vars:
+    packages:
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libdwarf-devel-20130207-4.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/libmpc-devel-1.0.1-3.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-common-1.20.4-10.el7.aarch64.rpm
+      - http://mirror.centos.org/altarch/7/os/aarch64/Packages/xorg-x11-server-Xvfb-1.20.4-10.el7.aarch64.rpm
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture == "aarch64")
+  tags: build_tools, test_tools
+
+############################
+# Build Packages and tools #
+############################
+- name: Call Build Packages and Tools Task
+  include_tasks: build_packages_and_tools.yml
+
+##########################
+# Additional build tools #
+##########################
+- name: Install additional build tools if NOT RHEL 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
+  when:
+    - (ansible_distribution_major_version != "8" and ansible_distribution != "Fedora")
+  tags: build_tools
+
+- name: Install additional build tools for RHEL 7
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL7 }}"
+  when:
+    - (ansible_distribution_major_version == "7" and ansible_architecture != "aarch64")
+  tags: build_tools
+
+- name: Install additional build tools for RHEL 7 on ppc64le
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL7_PPC64LE }}"
+  when:
+    - ansible_distribution_major_version == "7"
+    - ansible_architecture == "ppc64le"
+  tags: build_tools
+
+- name: Install numactl-devel excluding RHEL 7 on s390x
+  package: "name=numactl-devel state=latest"
+  when:
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on x86
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
+  when:
+    - ansible_architecture == "x86_64"
+    - not (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora" )
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on ppc64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_ppc64 }}"
+  when:
+    - ansible_architecture == "ppc64"
+  tags: build_tools
+
+- name: Install additional build tools for RHEL on s390x
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL_s390x }}"
+  when:
+    - ansible_architecture == "s390x"
+  tags: build_tools
+
+- name: Install additional build tools for RHEL 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL8 }}"
+  when:
+    - (ansible_distribution_major_version == "8")
+  tags: build_tools
+
+- name: Install additional build tools for FEDORA 35
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_FEDORA35 }}"
+  when:
+    - (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora")
+  tags: build_tools
+
+#################
+# xorg Packages #
+#################
+- name: Install xorg-x11-server-Xorg if host is x86_64
+  yum: name=xorg-x11-server-Xorg state=installed
+  when: (ansible_architecture == "x86_64")
+  tags: test_tools
+
+- name: Install xorg-x11-server-common if host is s390x
+  yum: name=xorg-x11-server-common state=installed
+  when: (ansible_architecture == "s390x")
+  tags: test_tools
+
+################
+# Install Java #
+################
+- name: Install Java (Not RedHat 6 on ppc64)
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
+  when:
+    - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+    - not (ansible_distribution_major_version == "8")
+    - not (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora")
+
+- name: Install Java when RedHat 6 on ppc64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_RHEL6_PPC64 }}"
+  when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+
+- name: Install Java when RedHat 8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_RHEL8 }}"
+  when: (ansible_distribution_major_version == "8")
+
+- name: Install Java when Fedora 35
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Java_FED35 }}"
+  when: (ansible_distribution_major_version == "35" and ansible_distribution != "Fedora")
+
+####################
+# Set default Java #
+####################
+
+- name: Find Default JRE
+  stat:
+    path: /usr/lib/jvm/jre-1.8.0
+  register: jre_path
+  tags: default_java
+
+- name: Find Default JDK
+  stat:
+    path: /usr/lib/jvm/java-1.8.0
+  register: jdk_path
+  tags: default_java
+
+- name: Set Default JRE (RHEL 6)
+  alternatives:
+    name: java
+    path: "/usr/lib/jvm/jre-1.8.0-openjdk.{{ ansible_architecture }}/bin/java"
+  when:
+    - ansible_distribution_major_version == "6"
+  tags: default_java
+
+- name: Set Default JRE (RHEL 7 and later)
+  alternatives:
+    name: java
+    path: "{{ jre_path.stat.lnk_source }}/bin/java"
+  when:
+    - ansible_distribution_major_version > "6"
+  tags: default_java
+
+- name: Set Default JDK (RHEL 6)
+  alternatives:
+    name: javac
+    path: "/usr/lib/jvm/java-1.8.0-openjdk.{{ ansible_architecture }}/bin/javac"
+  when:
+    - ansible_distribution_major_version == "6"
+  tags: default_java
+
+- name: Set Default JDK (RHEL 7 and later)
+  alternatives:
+    name: javac
+    path: "{{ jdk_path.stat.lnk_source }}/bin/javac"
+  when:
+    - ansible_distribution_major_version > "6"
+  tags: default_java
+
+###########
+# Locales #
+###########
+
+- name: Install 'glibc-common' package
+  package:
+    name: glibc-common
+    state: present
+  tags: locales
+
+# Skipping linting as no alternative to shell can be used (lint error 305)
+- name: Get locale list
+  shell: locale -a
+  register: localeList
+  changed_when: False
+  tags:
+    - locales
+    - skip_ansible_lint
+
+- name: Create Japanese locale
+  locale_gen:
+    name: ja_JP.UTF-8
+    state: present
+  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  tags: locales
+
+- name: Create Korean locale
+  locale_gen:
+    name: ko_KR.UTF-8
+    state: present
+  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  tags: locales
+
+- name: Create Chinese locale
+  locale_gen:
+    name: zh_CN.UTF-8
+    state: present
+  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  tags: locales
+
+- name: Create Taiwanese locale
+  locale_gen:
+    name: zh_TW.UTF-8
+    state: present
+  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  tags: locales

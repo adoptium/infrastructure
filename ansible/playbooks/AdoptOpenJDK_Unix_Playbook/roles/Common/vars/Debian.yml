@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - build-essential
   - cpio
   - curl
+  - ca-certificates
   - flex                          # OpenJ9
   - g++
   - gcc

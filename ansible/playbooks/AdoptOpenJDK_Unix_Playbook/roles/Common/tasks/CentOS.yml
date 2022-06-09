@@ -17,7 +17,7 @@
 
 - name: Enable EPEL release for CentOS8
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_architecture != "s390x"
     - ansible_distribution_major_version == "8"
@@ -28,7 +28,7 @@
     path: /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
     regexp: 'enabled=0'
     replace: "enabled=1"
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_distribution_major_version == "8"
   tags: patch_update

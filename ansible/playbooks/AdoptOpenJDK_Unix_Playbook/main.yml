@@ -86,7 +86,6 @@
       jdk_version: 10
       when:
         - ansible_distribution != "Alpine"
-        - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
@@ -129,3 +128,5 @@
     - Security
     - Vendor
     - IPv6
+    - role: disable_gui
+      tags: adoptopenjdk

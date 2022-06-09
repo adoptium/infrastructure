@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -qq -y perl openssh-server unzip
 # Get java8
-RUN wget -q 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk' -O /tmp/jdk8.tar.gz
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
 # Install ant
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'

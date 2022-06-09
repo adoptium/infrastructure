@@ -6,16 +6,15 @@
 
 - hosts: all
   remote_user: root
-  become: yes
+  become: true
   environment:
     PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
     PERL_MB_OPT: "--install_base /opt/freeware"
     PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
-  vars:
-    swap_size: 4096
 
   roles:
-    - debug
+    - role: debug
+      tags: debug
 
     # Roles are put into 6 groups
     ## AIX BOS install requirements
@@ -30,6 +29,7 @@
     # These packages are installed using installp - which can enlarge
     # filesystem space, as needed, on demand
     - openssl
+    - security
 
     # 2. AIX BOS configuration
 
@@ -40,29 +40,7 @@
     # the tasks that setup the legal shells needed for user configuration
     # may need to be performed AFTER yum processing - rather than before
 
-    # 3. Core OSS installation
-
-    ## Note: this may actually already be performed - partially
-    ## depending on how python - to use Ansible - has been prepared
-    # yum based installation of additional software
-    # installs some gnu packages required by ansible modules
-    # Note: AIX File system configuration must be run now as RPM based software
-    # cannot expand filesystem space on demand
-    - aixfs
-    - yum
-
-    # 4. AIX User Admin
-
-    # users needed - wait until here to be sure bash is installed
-    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
-    # to the list of legal shells.
-    - rbac
-    - role: jenkins_user
-      tags: adoptopenjdk
-    - role: zeus_user
-      tags: adoptopenjdk
-
-    # 5. Additional Software: both licensed and OSS
+    # 3. Additional Software: both licensed and OSS
 
     # Note: although X11 is AIX BOS software - there is a chance that the
     # Ansible module unarchive: may be called - and that requires,
@@ -74,39 +52,52 @@
     - xlc_v13
     - xlc_v16
 
+    # 4. Core OSS installation
+
+    ## Note: this may actually already be performed - partially
+    ## depending on how python - to use Ansible - has been prepared
+    # yum based installation of additional software
+    # installs some gnu packages required by ansible modules
+    # Note: AIX File system configuration must be run now as RPM based software
+    # cannot expand filesystem space on demand
+    - aixfs
+    - yum
+
     ## additional OSS packages
     - ant
     - ant_contrib
 
+    # 5. AIX User Admin
+
+    # users needed - wait until here to be sure bash is installed
+    # tbd: Need other actions performed first - mainly adding /usr/bin/bash
+    # to the list of legal shells.
+    - role: rbac
+      tags:
+        - adoptopenjdk
+        - users
+    - role: users
+      tags:
+        - adoptopenjdk
+        - users
+
     # 6. Install OJDK Bootstraps
 
-    - bootjdk7
     - role: bootjdk
-      jdk: 8
-      tags: bootjdk8
-    - role: bootjdk
-      jdk: 10
-      tags: bootjdk10
-    - role: bootjdk
-      jdk: 11
-      tags: bootjdk11
-    - role: bootjdk
-      jdk: 16
-      tags: bootjdk16
-    - role: bootjdk
-      jdk: 17
-      tags: bootjdk17
+      tags:
+        - adoptopenjdk
+        - bootjdk
 
     # 7. Modify /etc/hosts file to include ipv4 address and fqdn
 
     - hosts_file
 
   tasks:
-  # TBD: as much as possible reorganize the tasks here into a appropriate role
-  # And place it in one of the logical areas described above under roles:
-  ######################################
-  # Add bash to available login shells #
-  ######################################
+    # TBD: as much as possible reorganize the tasks here into a appropriate role
+    # And place it in one of the logical areas described above under roles:
+    ######################################
+    # Add bash to available login shells #
+    ######################################
     - name: Add bash to available login shells
       replace:
         path: /etc/security/login.cfg
@@ -138,57 +129,60 @@
         replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
       tags: login_shell
 
-  ##############
-  # freemarker #
-  ##############
-    - name: Check for freemarker.jar existence
-      stat:
-        path: /home/{{ Jenkins_Username }}/freemarker.jar
-      register: freemarker
+    ##############
+    # freemarker #
+    ##############
+    - name: Add freemarker to jenkins
+      block:
+        - name: Check for freemarker.jar existence
+          stat:
+            path: /home/{{ Jenkins_Username }}/freemarker.jar
+          register: freemarker
+          tags:
+            - freemarker
+
+        - name: "freemarker.jar found, skipping download"
+          debug:
+            msg: "freemarker.jar found, skipping download"
+          when: not freemarker.stat.exists
+          tags:
+            - freemarker
+
+        - name: Download and extract freemarker.jar
+          unarchive:
+            src: "https://sourceforge.net/{{ urldir }}/{{ urlfile }}"
+            dest: /tmp/
+            remote_src: true
+            owner: "{{ Jenkins_Username }}"
+            group: staff
+            mode: 0755
+          when: not freemarker.stat.exists
+          tags:
+            - freemarker
+          vars:
+            - urldir: projects/freemarker/files/freemarker/2.3.8
+            - urlfile: freemarker-2.3.8.tar.gz
+
+        - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+          command:
+            cmd: mv /tmp/freemarker-2.3.8/lib/freemarker.jar
+              /home/{{ Jenkins_Username }}
+          when: not freemarker.stat.exists
+          tags:
+            - freemarker
+
+        - name: Clean freemarker tmp files
+          file:
+            path: "{{ item }}"
+            state: absent
+          with_items:
+            - /tmp/freemarker-2.3.8
+            - /tmp/freemarker-2.3.8.tar.gz
       tags: freemarker
 
-    - name: "freemarker.jar found, skipping download"
-      debug:
-        msg: "freemarker.jar found, skipping download"
-      when: not freemarker.stat.exists
-      tags: freemarker
-
-    - name: Download and extract freemarker.jar
-      unarchive:
-        src: https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
-        dest: /tmp/
-        remote_src: yes
-        owner: "{{ Jenkins_Username }}"
-        group: staff
-        mode: 0755
-      when: not freemarker.stat.exists
-      tags: freemarker
-
-    - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-      command: mv /tmp/freemarker-2.3.8/lib/freemarker.jar /home/{{ Jenkins_Username }}
-      when: not freemarker.stat.exists
-      tags: freemarker
-
-    - name: Clean freemarker tmp files
-      file:
-        path: "{{ item }}"
-        state: absent
-      with_items:
-        - /tmp/freemarker-2.3.8
-        - /tmp/freemarker-2.3.8.tar.gz
-      tags: freemarker
-
-  ##################
-  # Nagios plugins #
-  ##################
-    - name: Include Nagios Playbook
-      include_tasks: nagios/nagios_aix.yml
-      when: Nagios_Plugins == "Enabled"
-      tags: [nagios, adoptopenjdk]
-
-  ###################
-  # NTP Time Server #
-  ###################
+    ###################
+    # NTP Time Server #
+    ###################
     - name: ensure NTP daemon is enabled
       replace:
         dest: /etc/rc.tcpip
@@ -212,17 +206,17 @@
 
     - name: Stop NTP daemon
       service: name=xntpd state=stopped
-      changed_when: False
+      changed_when: false
       tags: ntp
 
     - name: Start NTP daemon
       service: name=xntpd state=started
-      changed_when: False
+      changed_when: false
       tags: ntp
 
-  ####################
-  # Disable sendmail #
-  ####################
+    ####################
+    # Disable sendmail #
+    ####################
     - name: ensure sendmail is stopped
       service: name=sendmail state=stopped
       tags: sendmail
@@ -234,39 +228,35 @@
         replace: '#\1'
       tags: sendmail
 
-  ############################
-  # Enable full core support #
-  ############################
+    ############################
+    # Enable full core support #
+    ############################
     - name: ensure full AIX core files are enabled
       command: chdev -l sys0 -a fullcore=true
-      changed_when: False
+      changed_when: false
       tags: fullcore
 
-  #####################
-  # Enable swap space #
-  #####################
-    - name: ensure swap space is of adequate size
+    #####################
+    # Enable swap space #
+    #####################
+    - name: Verify paging space is at reasonable value
+      vars:
+        swap_lv: hd6
+        target_ps: 2048
       shell: |
-        swap_line=$(lsps -a | tail -n 1)
-        curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
-        swap_lv=$(echo $swap_line | awk '{print $1}')
-        if [[ $curr_swap_size -lt {{ swap_size }} ]]
+        pp_size=$(lsvg rootvg | grep "PP SIZE" | awk ' { print $6 } ')
+        current_ps=$(lsps -s | tail -1 | awk -FM ' { print $1 } ')
+        if [[ $current_ps -lt {{ target_ps }} ]]
         then
-          echo "Extending swap LV..."
-          extendlv $swap_lv $(expr {{ swap_size }} - $curr_swap_size)M
+          # echo "Extending swap space {{ swap_lv }}"
+          chps -s $(expr \( {{ target_ps }} - $current_ps \) / $pp_size) {{ swap_lv }}
+        elif [[ $current_ps -gt {{ target_ps }} ]]
+        then
+          # echo "Shrinking swap space {{ swap_lv }}"
+          chps -d $(expr \( $current_ps - {{ target_ps }} \) / $pp_size) {{ swap_lv }}
         fi
-      register: extendlv_result
-      changed_when: "'Extending' in extendlv_result.stdout"
-      notify:
-        - restart machine
+      register: chps
+      changed_when: chps.stdout != ""
       tags:
         - swap
-        # Environment variables don't work as part of command
         - skip_ansible_lint
-
-  handlers:
-    - name: restart machine
-      shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
-      async: 1
-      poll: 0
-      failed_when: False

@@ -3,43 +3,52 @@
 # The role is assigned to the jenkins user
 # See: https://github.com/adoptium/infrastructure/issues/1803
 # Additional:
-# the suggested fix: https://github.com/adoptium/infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
-# works on AIX 7.1 TL5 AIX 7.2 TL2
-# AIX 7.1 TL4 requires RBAC instead
-# assumption is that the 'CAP_*' capabilities already in the playbook
-# activate the core privilidge with the need for RBAC additions
+# the original fix: https://github.com/adoptium/infrastructure/blob/9a9a5872980943eb3fd824c6dcb9dc85aacab515/ansible/playbooks/aix.yml#L787
+# works on AIX 7.1 TL5 AIX 7.2 TL2, but not on AIX 7.1 TL4 (capabilities not working there).
+# AIX 7.1 TL4 and later work with RBAC
+# See also: https://github.com/adoptium/infrastructure/issues/1918
+# See also: https://github.com/adoptium/infrastructure/pull/2052 (not merged)
 #########################################################################
 ---
 - name: Check if auth already exists
   shell: lsauth ojdk.rtclk
   register: rtclk_exists
-  ignore_errors: yes
-  changed_when: False
+  failed_when: rtclk_exists.rc != 0 and rtclk_exists.rc != 2
+  changed_when: false
   tags: rbac
+
 - name: Update RBAC to include new authorizations
   block:
     - name: Top-level authorization
       shell:
         mkauth dfltmsg="Top-Level authorization for AdoptOpenJava Project" ojdk
-      ignore_errors: yes
+      register: _ojdk
+      failed_when: _ojdk.rc != 0 and _ojdk.rc != 17
     - name: RealTime Clock Authorization
       shell:
-        mkauth dfltmsg="OpenJava needs access to PV_PROC_RTCLK for metronome garbage collection policy" ojdk.rtclk
+        mkauth dfltmsg="PV_PROC_RTCLK for metronome garbage collection policy" ojdk.rtclk
+      register: _rtclk
+      failed_when: _rtclk.rc != 0 and _rtclk.rc != 17
+    - name: CORE DUMP Authorization
+      shell:
+        mkauth dfltmsg="PV_PROC_CORE for to allow process core dumps" ojdk.proccore
+      register: _rtcore
+      failed_when: _rtclk.rc != 0 and _rtclk.rc != 17
     - name: RealTime Clock Role
       shell:
-        mkrole authorizations='ojdk.rtclk' dfltmsg='Realtime Clock user' rtclk
+        mkrole authorizations='ojdk.rtclk,ojdk.proccore' dfltmsg='Adoptium Role for testing' rtclk
+    - name: Update Security Tables
+      shell: setkst
   when: rtclk_exists.rc == 2
   tags: rbac
-# The following prepares bash - if/when it gets installed
-# Tested with bash already installed from AIXToolbox
-- name: Add authorization to shell
-  shell:
-    setsecattr -c accessauths=ojdk.rtclk innateprivs=PV_PROC_RTCLK inheritprivs=PV_PROC_RTCLK secflags=FSF_EPS "{{ item }}"
-  with_items:
-    - /usr/bin/ksh
-    - /opt/freeware/bin/bash_32
-    - /opt/freeware/bin/bash_64
-  tags: rbac
-- name: Update Security Tables
-  shell: setkst
+
+# Assign security attributes to commands in list
+# The tag here is not passed to the included_task, the tag skips
+# or causes the tasks to be included.
+- name: Add authorization to commands in list
+  include_tasks: setsecattr.yml
+  loop:
+    "{{ rbac_cmds }}"
+  loop_control:
+    loop_var: rbac_cmd
   tags: rbac
