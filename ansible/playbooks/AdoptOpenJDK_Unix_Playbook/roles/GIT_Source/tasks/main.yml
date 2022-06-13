@@ -12,6 +12,7 @@
   shell: git --version >/dev/null
   failed_when: false
   register: git_installed
+  changed_when: false
   tags:
     - git_source
     # Emits 'git used in place of git module'
@@ -21,6 +22,7 @@
   shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
   when: git_installed.rc == 0
   register: git_version
+  changed_when: false
   tags:
     - git_source
     # Emits 'git used in place of git module'
@@ -56,6 +58,7 @@
 - name: Find Curl directory
   shell: ls -ld /usr/local/curl-* | awk '{print $9}'
   register: curl_install_dir
+  changed_when: false
   when:
     - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
   tags: git_source
