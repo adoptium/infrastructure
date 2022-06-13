@@ -102,7 +102,7 @@
     - name: Check if Temurin jdk8 is installed
       stat:
         path: /usr/lib/jvm/jdk8
-      register: adoptopenjdk_installed
+      register: adoptopenjdk8_installed
 
 # Temp. Change to GA binary once theyre available
     - name: Install Temurin jdk8 nightly
@@ -115,53 +115,37 @@
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk8_installed.rc != 0
 
     - name: Get Temurin jdk8 full path name
       shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8u.* 2>/dev/null | awk '{print $9}'
-      register: adoptopenjdk_dir
+      register: adoptopenjdk8_dir
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk8_installed.rc != 0
 
     - name: Create symlink to major version
       file:
-        src: '{{ adoptopenjdk_dir.stdout }}'
+        src: '{{ adoptopenjdk8_dir.stdout }}'
         dest: /usr/lib/jvm/jdk8
         state: link
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk8_installed.rc != 0
 
-    - name: Check if Temurin jdk11 is installed
-      stat:
-        path: /usr/lib/jvm/jdk-11
-      register: adoptopenjdk_installed
+# Temp: install a non temurin binary until GA or when the jdk-11 alpine aarch64 build job becomes more stable (whichever comes first)
+# https://github.com/adoptium/temurin-build/issues/2961
+    - name: Check if jdk-11 is already installed in the target location
+      stat: path=/usr/lib/jvm/jdk-11
+      register: adoptopenjdk11_installed
 
-    - name: Install Temurin jdk-11 nightly
-      unarchive:
-        src: https://github.com/adoptium/temurin11-binaries/releases/download/jdk11u-2022-05-27-20-05-beta/OpenJDK11U-jdk_aarch64_alpine-linux_hotspot_2022-05-26-18-05.tar.gz
-        dest: /usr/lib/jvm
-        remote_src: yes
-      retries: 3
-      delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
-      when:
-        - adoptopenjdk_installed.rc != 0
+    - name: Install java 11 from Alpine repositories
+      package: "name=openjdk11 state=installed"
+      when: not adoptopenjdk11_installed.stat.exists
 
-# Temp. Change to GA binary once theyre available
-    - name: Get Temurin jdk-11 full path name
-      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-11.* 2>/dev/null | awk '{print $9}'
-      register: adoptopenjdk_dir
-      when:
-        - adoptopenjdk_installed.rc != 0
-
-    - name: Create symlink to major version
+    - name: Create symlink to point at openjdk11
       file:
-        src: '{{ adoptopenjdk_dir.stdout }}'
+        src: /usr/lib/jvm/java-11-openjdk
         dest: /usr/lib/jvm/jdk-11
-        state: link
-      when:
-        - adoptopenjdk_installed.rc != 0
+      when: not adoptopenjdk11_installed.stat.exists
 
     - name: Check if zulu-16 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu16
@@ -187,7 +171,7 @@
     - name: Check if Temurin jdk17 is installed
       stat:
         path: /usr/lib/jvm/jdk-17
-      register: adoptopenjdk_installed
+      register: adoptopenjdk17_installed
 
     - name: Install Temurin jdk-17 nightly
       unarchive:
@@ -199,21 +183,21 @@
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk17_installed.rc != 0
 
     - name: Get Temurin jdk-17 full path name
       shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-17.* 2>/dev/null | awk '{print $9}'
-      register: adoptopenjdk_dir
+      register: adoptopenjdk17_dir
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk17_installed.rc != 0
 
     - name: Create symlink to major version
       file:
-        src: '{{ adoptopenjdk_dir.stdout }}'
-        dest: /usr/lib/jvm/jdk-11
+        src: '{{ adoptopenjdk17_dir.stdout }}'
+        dest: /usr/lib/jvm/jdk-17
         state: link
       when:
-        - adoptopenjdk_installed.rc != 0
+        - adoptopenjdk17_installed.rc != 0
 
     - name: Check if zulu-18 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu18
