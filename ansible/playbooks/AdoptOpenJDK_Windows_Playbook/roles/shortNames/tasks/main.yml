@@ -12,6 +12,16 @@
   tags:
     - shortnames
 
+- name: Enable shortnames in Registry
+  win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\Filesystem
+    name: NtfsDisable8dot3NameCreation
+    data: 2
+    type: dword
+  when: (not enabled_shortnames.stdout)
+  tags:
+    - shortnames
+
 - name: Enable shortnames on drive C:/
   win_shell: "fsutil 8dot3name set C: 0"
   when: (not enabled_shortnames.stdout)

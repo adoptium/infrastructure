@@ -63,6 +63,8 @@
       tags: [build_tools]
     - role: gcc_10                # JDK17+
       tags: [build_tools]
+    - role: gcc_11                # JDK19+
+      tags: [build_tools]
     - role: Xcode
       when: ansible_distribution == "MacOSX"
       tags: [build_tools, xcode, adoptopenjdk]
@@ -86,7 +88,6 @@
       jdk_version: 10
       when:
         - ansible_distribution != "Alpine"
-        - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools

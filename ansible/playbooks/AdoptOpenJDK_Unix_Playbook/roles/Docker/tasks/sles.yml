@@ -15,7 +15,6 @@
     - docker-ce
     - docker-ce-cli
     - containerd.io
-    - docker-compose-plugin
   when:
     - ansible_architecture == "x86_64"
   tags:

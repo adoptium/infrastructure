@@ -107,7 +107,7 @@
   tags: adoptopenjdk_install
 
 - name: Check if jdk-{{ jdk_version }} is already installed in the target location
-  shell: ls -ld {{ path }}* >/dev/null 2>&1
+  shell: ls -ld {{ path }} >/dev/null 2>&1
   failed_when: false
   register: adoptopenjdk_installed
   tags:
@@ -157,6 +157,7 @@
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
+    - jdk_version != 10
   tags: adoptopenjdk_install
 
 - name: Run installer (macOS)
@@ -164,6 +165,24 @@
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
+    - jdk_version != 10
+  tags: adoptopenjdk_install
+
+- name: Download tarball when installer is not available (MacOS)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    remote_src: yes
+    dest: /Library/Java/JavaVirtualMachines/
+  become: yes
+  become_user: root
+  retries: 3
+  delay: 5
+  register: adoptopenjdk_download
+  until: adoptopenjdk_download is not failed
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+    - jdk_version == 10
   tags: adoptopenjdk_install
 
 # Boot JDK will be installed in temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
@@ -172,7 +191,7 @@
 - name: Find bootjdk install directory (MacOS)
   find:
     paths: /Library/Java/JavaVirtualMachines
-    patterns: "^adoptopenjdk-{{ jdk_version }}.jdk|^temurin-{{ jdk_version }}.jdk"
+    patterns: "^adoptopenjdk-{{ jdk_version }}.jdk|^temurin-{{ jdk_version }}.jdk|^jdk-{{ jdk_version }}.*"
     use_regex: yes
     file_type: directory
   register: bootjdk_install_dir
