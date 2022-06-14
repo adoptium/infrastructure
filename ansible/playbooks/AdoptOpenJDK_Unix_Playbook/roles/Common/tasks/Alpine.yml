@@ -104,7 +104,7 @@
         path: /usr/lib/jvm/jdk8
       register: adoptopenjdk8_installed
 
-# Temp. Change to GA binary once theyre available
+# Temp. Change to GA binary once they're available
     - name: Install Temurin jdk8 nightly
       unarchive:
         src: https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u-2022-05-28-05-51-beta/OpenJDK8U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-18-05.tar.gz
@@ -115,13 +115,13 @@
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
       when:
-        - adoptopenjdk8_installed.rc != 0
+        - not adoptopenjdk8_installed.stat.exists
 
     - name: Get Temurin jdk8 full path name
-      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8u.* 2>/dev/null | awk '{print $9}'
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8u* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk8_dir
       when:
-        - adoptopenjdk8_installed.rc != 0
+        - not adoptopenjdk8_installed.stat.exists
 
     - name: Create symlink to major version
       file:
@@ -129,7 +129,7 @@
         dest: /usr/lib/jvm/jdk8
         state: link
       when:
-        - adoptopenjdk8_installed.rc != 0
+        - not adoptopenjdk8_installed.stat.exists
 
 # Temp: install a non temurin binary until GA or when the jdk-11 alpine aarch64 build job becomes more stable (whichever comes first)
 # https://github.com/adoptium/temurin-build/issues/2961
@@ -145,6 +145,7 @@
       file:
         src: /usr/lib/jvm/java-11-openjdk
         dest: /usr/lib/jvm/jdk-11
+        state: link
       when: not adoptopenjdk11_installed.stat.exists
 
     - name: Check if zulu-16 is already installed in the target location
@@ -183,13 +184,13 @@
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
       when:
-        - adoptopenjdk17_installed.rc != 0
+        - not adoptopenjdk17_installed.stat.exists
 
     - name: Get Temurin jdk-17 full path name
       shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-17.* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk17_dir
       when:
-        - adoptopenjdk17_installed.rc != 0
+        - not adoptopenjdk17_installed.stat.exists
 
     - name: Create symlink to major version
       file:
@@ -197,7 +198,7 @@
         dest: /usr/lib/jvm/jdk-17
         state: link
       when:
-        - adoptopenjdk17_installed.rc != 0
+        - not adoptopenjdk17_installed.stat.exists
 
     - name: Check if zulu-18 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu18
