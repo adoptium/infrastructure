@@ -192,7 +192,10 @@
 - name: Find bootjdk install directory (MacOS)
   find:
     paths: /Library/Java/JavaVirtualMachines
-    patterns: "^adoptopenjdk-{{ jdk_version }}.jdk | ^temurin-{{ jdk_version }}.jdk | ^jdk-{{ jdk_version }}.*"
+    patterns:
+      - "^adoptopenjdk-{{ jdk_version }}.jdk"
+      - "^temurin-{{ jdk_version }}.jdk"
+      - "^jdk-{{ jdk_version }}.*"
     use_regex: yes
     file_type: directory
   register: bootjdk_install_dir
