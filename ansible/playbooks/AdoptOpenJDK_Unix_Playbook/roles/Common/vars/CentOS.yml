@@ -88,7 +88,7 @@ Additional_Build_Tools_CentOS8_Stream:
   - libmpc-devel
 
 Additional_Build_Tools_NOT_CentOS8_Stream:
-  - libdwarf                # OpenJ9
+  - libdwarf-devel                # OpenJ9
 
 Test_Tool_Packages:
   - gcc
