@@ -50,51 +50,6 @@
         - not zulu7_installed.stat.exists
       tags: build_tools
 
-    - name: Check if zulu-8 is already installed in the target location
-      stat: path=/usr/lib/jvm/zulu8
-      register: zulu8_installed
-      tags: build_tools
-    - name: Install latest zulu-8 release if not already installed
-      unarchive:
-        src: https://cdn.azul.com/zulu/bin/zulu8.58.0.13-ca-jdk8.0.312-linux_musl_x64.tar.gz
-        dest: /usr/lib/jvm/
-        remote_src: yes
-      when:
-        - not zulu8_installed.stat.exists
-      tags: build_tools
-
-    - name: Create symlink to point at zulu-8
-      file:
-        src: /usr/lib/jvm/zulu8.58.0.13-ca-jdk8.0.312-linux_musl_x64
-        dest: /usr/lib/jvm/zulu8
-        state: link
-      when:
-        - not zulu8_installed.stat.exists
-      tags: build_tools
-
-    - name: Check if zulu-11 is already installed in the target location
-      stat: path=/usr/lib/jvm/zulu11
-      register: zulu11_installed
-      tags: build_tools
-
-    - name: Install latest zulu-11 release if not already installed
-      unarchive:
-        src: https://cdn.azul.com/zulu/bin/zulu11.54.25-ca-jdk11.0.14.1-linux_musl_x64.tar.gz
-        dest: /usr/lib/jvm/
-        remote_src: yes
-      when:
-        - not zulu11_installed.stat.exists
-      tags: build_tools
-
-    - name: Create symlink to point at zulu-11
-      file:
-        src: /usr/lib/jvm/zulu11.54.25-ca-jdk11.0.14.1-linux_musl_x64
-        dest: /usr/lib/jvm/zulu11
-        state: link
-      when:
-        - not zulu11_installed.stat.exists
-      tags: build_tools
-
     - name: Check if zulu-14 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu14
       register: zulu14_installed
@@ -144,50 +99,57 @@
 - name: Install JDK for aarch64
   when: ansible_architecture == "aarch64"
   block:
-    - name: Install java 8 from Alpine repositories
-      package: "name=openjdk8 state=installed"
-      tags: build_tools
+    - name: Check if Temurin jdk8 is installed
+      stat:
+        path: /usr/lib/jvm/jdk8
+      register: adoptopenjdk8_installed
 
-    # Using zulu8 path name for compatibility with the build dockerfile
-    # ENV statements until we replace this with a Temurin 8
-    - name: Check if zulu 8 symlink is in place (TEMPORARY)
-      stat: path=/usr/lib/jvm/zulu8
-      register: zulu8_installed
-      tags: build_tools
+# Temp. Change to GA binary once theyre available
+    - name: Install Temurin jdk8 nightly
+      unarchive:
+        src: https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u-2022-05-28-05-51-beta/OpenJDK8U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-18-05.tar.gz
+        dest: /usr/lib/jvm
+        remote_src: yes
+      retries: 3
+      delay: 5
+      register: adoptopenjdk_download
+      until: adoptopenjdk_download is not failed
+      when:
+        - adoptopenjdk8_installed.rc != 0
 
-    - name: Create symlink to point at openjdk8
+    - name: Get Temurin jdk8 full path name
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8u.* 2>/dev/null | awk '{print $9}'
+      register: adoptopenjdk8_dir
+      when:
+        - adoptopenjdk8_installed.rc != 0
+
+    - name: Create symlink to major version
       file:
-        src: /usr/lib/jvm/java-8-openjdk
-        dest: /usr/lib/jvm/zulu8
+        src: '{{ adoptopenjdk8_dir.stdout }}'
+        dest: /usr/lib/jvm/jdk8
         state: link
       when:
-        - not zulu8_installed.stat.exists
-      tags: build_tools
+        - adoptopenjdk8_installed.rc != 0
+
+# Temp: install a non temurin binary until GA or when the jdk-11 alpine aarch64 build job becomes more stable (whichever comes first)
+# https://github.com/adoptium/temurin-build/issues/2961
+    - name: Check if jdk-11 is already installed in the target location
+      stat: path=/usr/lib/jvm/jdk-11
+      register: adoptopenjdk11_installed
 
     - name: Install java 11 from Alpine repositories
       package: "name=openjdk11 state=installed"
-      tags: build_tools
-
-    # Using zulu11 path name for compatibility with the build dockerfile
-    # ENV statements until we replace this with a Temurin 8
-    - name: Check if zulu 11 symlink is in place (TEMPORARY)
-      stat: path=/usr/lib/jvm/zulu11
-      register: zulu11_installed
-      tags: build_tools
+      when: not adoptopenjdk11_installed.stat.exists
 
     - name: Create symlink to point at openjdk11
       file:
         src: /usr/lib/jvm/java-11-openjdk
-        dest: /usr/lib/jvm/zulu11
-        state: link
-      when:
-        - not zulu8_installed.stat.exists
-      tags: build_tools
+        dest: /usr/lib/jvm/jdk-11
+      when: not adoptopenjdk11_installed.stat.exists
 
     - name: Check if zulu-16 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu16
       register: zulu16_installed
-      tags: build_tools
 
     - name: Install latest zulu-16 release if not already installed
       unarchive:
@@ -196,7 +158,6 @@
         remote_src: yes
       when:
         - not zulu16_installed.stat.exists
-      tags: build_tools
 
     - name: Create symlink to point at zulu-16
       file:
@@ -205,35 +166,42 @@
         state: link
       when:
         - not zulu16_installed.stat.exists
-      tags: build_tools
 
-    - name: Check if zulu-17 is already installed in the target location
-      stat: path=/usr/lib/jvm/zulu17
-      register: zulu17_installed
-      tags: build_tools
+# Temp. Change to GA binary once theyre available
+    - name: Check if Temurin jdk17 is installed
+      stat:
+        path: /usr/lib/jvm/jdk-17
+      register: adoptopenjdk17_installed
 
-    - name: Install latest zulu-17 release if not already installed
+    - name: Install Temurin jdk-17 nightly
       unarchive:
-        src: https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64.tar.gz
-        dest: /usr/lib/jvm/
+        src: https://github.com/adoptium/temurin17-binaries/releases/download/jdk17u-2022-05-27-19-32-beta/OpenJDK17U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-17-01.tar.gz
+        dest: /usr/lib/jvm
         remote_src: yes
+      retries: 3
+      delay: 5
+      register: adoptopenjdk_download
+      until: adoptopenjdk_download is not failed
       when:
-        - not zulu17_installed.stat.exists
-      tags: build_tools
+        - adoptopenjdk17_installed.rc != 0
 
-    - name: Create symlink to point at zulu-17
+    - name: Get Temurin jdk-17 full path name
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-17.* 2>/dev/null | awk '{print $9}'
+      register: adoptopenjdk17_dir
+      when:
+        - adoptopenjdk17_installed.rc != 0
+
+    - name: Create symlink to major version
       file:
-        src: /usr/lib/jvm/zulu17.32.13-ca-jdk17.0.2-linux_musl_aarch64
-        dest: /usr/lib/jvm/zulu17
+        src: '{{ adoptopenjdk17_dir.stdout }}'
+        dest: /usr/lib/jvm/jdk-17
         state: link
       when:
-        - not zulu17_installed.stat.exists
-      tags: build_tools
+        - adoptopenjdk17_installed.rc != 0
 
     - name: Check if zulu-18 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu18
       register: zulu18_installed
-      tags: build_tools
 
     - name: Install latest zulu-18 release if not already installed
       unarchive:
@@ -242,7 +210,6 @@
         remote_src: yes
       when:
         - not zulu18_installed.stat.exists
-      tags: build_tools
 
     - name: Create symlink to point at zulu-18
       file:
@@ -251,4 +218,4 @@
         state: link
       when:
         - not zulu18_installed.stat.exists
-      tags: build_tools
+  tags: build_tools
