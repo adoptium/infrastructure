@@ -12,6 +12,7 @@
   shell: pkgutil --version
   failed_when: false
   register: pkgutil_installed
+  changed_when: false
   tags:
     - build_tools
 

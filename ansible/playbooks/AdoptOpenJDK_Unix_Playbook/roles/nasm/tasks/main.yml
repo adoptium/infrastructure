@@ -52,6 +52,7 @@
   shell: nasm --version >/dev/null 2>&1
   failed_when: false
   register: nasm_installed
+  changed_when: false
   when: CC is defined
   tags: nasm
 
@@ -66,6 +67,7 @@
   when:
     - (nasm_installed.rc is defined) and (nasm_installed.rc == 0 )
   register: nasm
+  changed_when: false
   tags: nasm
 
 - name: Download nasm sources

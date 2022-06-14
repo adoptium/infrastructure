@@ -22,6 +22,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
   register: openssl_version
+  changed_when: false
   failed_when: false
   tags: openssl-1.1.1
 
@@ -37,6 +38,7 @@
 - name: Convert openssl_latest_release variable
   shell: echo {{ openssl_latest_release }} | sed 's/\./_/g'
   register: converted_openssl_latest_release
+  changed_when: false
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"

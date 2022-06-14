@@ -11,6 +11,7 @@
 - name: Get number of cores on FreeBSD
   shell: sysctl hw.ncpu | awk '{print $2}'
   register: freebsd_cores
+  changed_when: false
   tags:
     - skip_ansible_lint
 

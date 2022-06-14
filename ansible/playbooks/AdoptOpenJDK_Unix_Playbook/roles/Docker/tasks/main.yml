@@ -2,9 +2,11 @@
 ##########
 # Docker #
 ##########
+
 - name: Check if docker already exists
   command: docker version
   failed_when: false
+  changed_when: false
   register: docker_version
   tags:
     - docker
