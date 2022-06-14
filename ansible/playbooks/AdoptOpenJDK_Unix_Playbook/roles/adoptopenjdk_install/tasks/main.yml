@@ -139,7 +139,7 @@
     dest: /usr/lib/jvm
     remote_src: yes
   vars:
-    - ansible_python_interpreter: /usr/local/python2/bin/python2.7
+    ansible_python_interpreter: /usr/local/python2/bin/python2.7
   retries: 3
   delay: 5
   register: adoptopenjdk_download

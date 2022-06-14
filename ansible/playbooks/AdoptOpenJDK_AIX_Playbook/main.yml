@@ -160,8 +160,8 @@
           tags:
             - freemarker
           vars:
-            - urldir: projects/freemarker/files/freemarker/2.3.8
-            - urlfile: freemarker-2.3.8.tar.gz
+            urldir: projects/freemarker/files/freemarker/2.3.8
+            urlfile: freemarker-2.3.8.tar.gz
 
         - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
           command:

@@ -78,7 +78,7 @@
         XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
         XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
         FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
-        FASTLANE_DONT_STORE_PASSWORD: 1
+        FASTLANE_DONT_STORE_PASSWORD: "1"
 
     # 10.x is our default version on Intel. It requires 10.14.3+. As a consequence, some test machines
     # with older macOS won't have Xcode installed.
@@ -89,7 +89,7 @@
         XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
         XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
         FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
-        FASTLANE_DONT_STORE_PASSWORD: 1
+        FASTLANE_DONT_STORE_PASSWORD: "1"
 
     - name: Cleanup Xcode installation files
       shell: "{{ xcversion }} cleanup"
@@ -97,7 +97,7 @@
         XCODE_INSTALL_USER: "{{ Apple_ID_User }}"
         XCODE_INSTALL_PASSWORD: "{{ Apple_ID_Password }}"
         FASTLANE_SESSION: "{{ FASTLANE_SESSION }}"
-        FASTLANE_DONT_STORE_PASSWORD: 1
+        FASTLANE_DONT_STORE_PASSWORD: "1"
 
     - name: Set Xcode switch path to "/Applications/Xcode.app"
       shell: sudo xcode-select --switch "/Applications/Xcode.app"
