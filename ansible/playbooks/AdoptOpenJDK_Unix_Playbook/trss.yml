@@ -94,6 +94,12 @@
           failed_when: false
           tags: jenkins_user
 
+        - name: Install java runtime for jenkins agent
+          apt:
+            name: openjdk-17-jre-headless
+            state: present
+          tags: jenkins_user
+
         # Skipping linting as we want the latest checkouts (lint error 401)
         - name: Git clone aqa-test-tools.git
           git:
