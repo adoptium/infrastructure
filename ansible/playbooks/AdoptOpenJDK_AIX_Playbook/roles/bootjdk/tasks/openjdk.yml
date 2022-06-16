@@ -102,11 +102,11 @@
   # and adoptopenjdk as URL and vendor
   # In short, only jvm_impl (impl) changes!
   vars:
-    - os_img: "aix/ppc64/jdk"
-    - heap: "normal"
-    - impl: "hotspot"
-    - new_baseurl: "https://api.adoptium.net/v3/binary/latest"
-    - new_vendor: "eclipse"
-    - baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
-    - vendor: "adoptopenjdk"
-    - project: "{{ heap }}/{{ vendor }}?project=jdk"
+    os_img: "aix/ppc64/jdk"
+    heap: "normal"
+    impl: "hotspot"
+    new_baseurl: "https://api.adoptium.net/v3/binary/latest"
+    new_vendor: "eclipse"
+    baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
+    vendor: "adoptopenjdk"
+    project: "{{ heap }}/{{ vendor }}?project=jdk"
