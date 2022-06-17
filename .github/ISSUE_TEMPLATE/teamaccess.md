@@ -6,11 +6,11 @@ labels: ''
 assignees: 'sxa'
 
 ---
-Team requested:
+Team requested - delete those which are not appicable :
 
-- [ ] infrastructure-triage
-- [ ] infrastructure
-- [ ] infrastructure-core
-- [ ] infrastructure-secret
+- infrastructure-triage
+- infrastructure
+- infrastructure-core
+- infrastructure-secret
 
 Please explain why you need this access:

@@ -6,7 +6,8 @@ labels: 'Temp Infra Access'
 assignees: 'sxa'
 
 ---
-Access level:
+Required access level (Delete as appropriate). Note that you should only
+request the minimum level that is required to solve your problem
 
 - [ ] Non-privileged
 - [ ] jenkins user

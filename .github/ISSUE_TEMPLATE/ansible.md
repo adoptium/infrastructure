@@ -8,8 +8,10 @@ assignees: ''
 ---
 Please put the name of the software product (and affected platforms if relevant) in the title of this issue
 
-- [ ] Missing install
-- [ ] Bug in ansible playbook
-- [ ] Request for new playbook addition
+Delete as appropriate from this list:
+
+- Missing install
+- Bug in ansible playbook
+- Request for new playbook addition
 
 Details:
