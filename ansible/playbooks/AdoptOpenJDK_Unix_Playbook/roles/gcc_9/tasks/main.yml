@@ -13,7 +13,6 @@
   changed_when: false
   tags: gcc_9
 
-# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-9.3.0 binary
   get_url:
     url: https://ci.adoptopenjdk.net/userContent/gcc/gcc930.{{ ansible_architecture }}.tar.xz
