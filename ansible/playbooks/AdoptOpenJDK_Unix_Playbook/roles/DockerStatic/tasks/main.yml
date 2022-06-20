@@ -223,7 +223,7 @@
 - name: Start UBI8 container if not already started
   command: docker run --restart unless-stopped -p 2235:22 --cpus=2.0 --memory=6G --detach --name ubi8.2235 aqa_ubi8
   tags: startcontainers
-  ignore_errors: yes
+  failed_when: false
 
 # lineinfile does not work here - similar to the operation in /var/log in adopt_etc
 # lineinfile: path /proc/sys/kernel/core_pattern state: present: regexp: . line: core.%p

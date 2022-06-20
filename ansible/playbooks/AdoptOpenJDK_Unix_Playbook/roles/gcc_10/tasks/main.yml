@@ -11,7 +11,6 @@
   changed_when: False
   tags: gcc_10
 
-# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-10.3 binary
   get_url:
     url: https://ci.adoptopenjdk.net/userContent/gcc/gcc103.{{ ansible_architecture }}.tar.xz

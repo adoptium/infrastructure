@@ -72,8 +72,10 @@
 - name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
   service:
     name: docker
-    state: restarted
+    state: started
     enabled: yes
   when:
     - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
     - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x") and (ansible_architecture != "riscv64")
+  tags:
+    - docker

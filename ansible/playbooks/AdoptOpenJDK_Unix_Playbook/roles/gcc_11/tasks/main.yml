@@ -11,13 +11,13 @@
   changed_when: False
   tags: gcc_11
 
-# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download Adoptium gcc-11.2 binary
   get_url:
     url: https://ci.adoptopenjdk.net/userContent/gcc/gcc112.{{ ansible_architecture }}.tar.xz
     dest: '/tmp/ansible-adoptopenjdk-gcc-11.tar.xz'
     force: no
     mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
     - gcc11_installed.rc != 0

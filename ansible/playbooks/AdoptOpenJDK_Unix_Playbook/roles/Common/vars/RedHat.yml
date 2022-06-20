@@ -58,11 +58,9 @@ Additional_Build_Tools_RHEL8:
   - glibc-langpack-zh             # required for creating Chinese locales
   - git
   - cmake
-  - ccache
 
 Additional_Build_Tools_RHEL7:
   - libstdc++-static
-  - ccache
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libstdc++
