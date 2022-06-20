@@ -43,8 +43,6 @@
       package:
         name:
           - docker-ce
-          - containerd.io
-          - docker-ce-cli
         state: latest   # TODO: Package installs should not use latest
         use: auto       # automatic select package manager to use yum, apt and so on
       when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version == "7")) or (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
