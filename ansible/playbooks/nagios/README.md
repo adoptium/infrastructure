@@ -34,13 +34,14 @@ This file is a simple ansible inventory file used for creating the nagios server
 This is the playbook for installing the nagios server from scratch, it depends on the other 2 files contained within this directory
 
     - vars_setup_server.yml - contains a list of variable defaults for a typical installation.
-    - secrets_setup_server.yml - is an ansible vault containing the default nagios admin password
+    - secrets_setup_server.yml - is an ansible vault containing the default nagios admin password, and the slack webhook URL.
 
     This was created by encrypting a plain text file, as per the example below :
 
-    ansible-vault encrypt secrets_setup_server.yml, where the contents of the unencrypted file look like below (password is an example)
+    ansible-vault encrypt secrets_setup_server.yml
 
-    nagios_admin_pass: password123
+    nagios_admin_pass: xxxxxxxxxx
+    slack_webhook: xxxxxxxxxx
 
 Usage Guide :
 

@@ -3,7 +3,6 @@
 WEBHOST_NAGIOS="nagios.adoptopenjdk.net"
 SLACK_CHANNEL="#infrastructure-bot"
 SLACK_BOTNAME="nagios"
-WEBHOOK_URL="https://hooks.slack.com/services/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" #Get it from Slack Incoming WebHooks setup instruction
 
 #Set the message icon based on Nagios service state
 if [ "$NAGIOS_SERVICESTATE" = "OK" ]
