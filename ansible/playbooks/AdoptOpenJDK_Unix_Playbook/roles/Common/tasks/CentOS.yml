@@ -6,6 +6,12 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+
+## Check If System Is Centos Stream
+- name: Check For Centos8 Stream
+  shell: cat /etc/centos-release
+  register: relfile_contents
+
 - name: Enable EPEL release (not CentOS8)
   yum:
     name: epel-release
@@ -69,6 +75,31 @@
 - name: Install additional build tools for NOT CentOS8
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_NOT_CentOS8 }}"
+  when:
+    - ansible_distribution_major_version != "8"
+  tags: build_tools
+
+- name: Install Libdwarf.h for CentOS8 Stream
+  shell: dnf --enablerepo=powertools install libdwarf-devel -y
+  when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
+  tags: build_tools
+
+- name: Install additional build tools for CentOS 8 Stream
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_CentOS8_Stream }}"
+  when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
+  tags: build_tools
+
+- name: Install additional build tools for CentOS8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
+  when:
+    - (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') == -1)
+  tags: build_tools
+
+- name: Install additional build tools for NOT CentOS8 Stream
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
   when:
     - ansible_distribution_major_version != "8"
   tags: build_tools
