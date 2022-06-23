@@ -1,23 +1,20 @@
-Based off the installation guide: https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html
-And Off This GitRepo : https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios ( Thanks Will! )
-
-IMPORTANT!
+**IMPORTANT!**
 
 Currently the Nagios server installation playbook has only been developed and tested on Ubuntu 22.04. Changes will be required if you wish to install a Nagios Server on a different host O/S/
 
 Ensure to update the ansible.cfg and nagios_inventory.yml files before running this playbook.
 
-Repository Contents:
+**Repository Contents:**
 
 README.MD (This File)
 
 1) ./VagrantFiles/
 
-  This directory contains vagrantfiles that can be used to create a test server for running the Nagios_Server playbook on.
+  This directory contains a vagrantfile that can be used to create a test server for running the Nagios_Server playbook on.
 
-  NB: If using the Ubuntu 2204 Vagrantfile, its recommended to use a minimum Vagrant version of 2.2.19-1
+  **NB: For the Ubuntu 2204 Vagrantfile, its recommended to use a minimum Vagrant version of 2.2.19-1**
 
-2) ./roles/
+2) ./roles/*
 
 This directory houses the ansible roles used in the creation of the nagios server.
 
@@ -40,10 +37,13 @@ This is the playbook for installing the nagios server from scratch, it depends o
 
     ansible-vault encrypt secrets_setup_server.yml, where the contents of the unencrypted file look like below (password is an example)
 
-    nagios_admin_pass: password123
+    ```nagios_admin_pass: password123```
 
 Usage Guide :
 
 1) Either directly on the nagios server host (ansible must be installed), or alternatively from an ansible machine with connection to the nagios server to be.
 
     ansible-playbook -b play_setup_server.yml --ask-vault-pass
+
+Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html): 
+And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) : 
