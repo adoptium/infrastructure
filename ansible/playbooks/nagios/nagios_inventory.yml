@@ -1,0 +1,8 @@
+# Put The Below Line In Place For Vagrant Based Testing
+#localhost ansible_connection=local
+
+[Nagios_Server]
+192.168.50.3
+# Replaced Above Line With Below For Vagrant Server Install
+# Revert After Instaling Server
+#localhost

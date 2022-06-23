@@ -1,0 +1,14 @@
+---
+- name: Check Nagios Slack Notification Script Installation
+  stat:
+    path: /usr/local/nagios/bin/slack_nagios.pl
+  register: nagios_plugins_installation
+
+- name: Copy The Slack Notification Perl Script Into Place
+  copy:
+    src: scripts/slack_nagios.pl
+    dest: /usr/local/nagios/bin/slack_nagios.pl
+    owner: root
+    group: root
+    mode: '0755'
+    backup: yes
