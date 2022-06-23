@@ -37,9 +37,9 @@ This is the playbook for installing the nagios server from scratch, it depends o
 
     ansible-vault encrypt secrets_setup_server.yml, where the contents of the unencrypted file look like below (password is an example)
 
-    ```nagios_admin_pass: password123```
+    nagios_admin_pass: password123
 
-Usage Guide :
+**Usage Guide :**
 
 1) Either directly on the nagios server host (ansible must be installed), or alternatively from an ansible machine with connection to the nagios server to be.
 
