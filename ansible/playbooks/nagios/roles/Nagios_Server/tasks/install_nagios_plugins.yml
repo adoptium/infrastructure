@@ -1,0 +1,40 @@
+---
+- name: Check Nagios Plugins Installation
+  stat:
+    path: /usr/local/nagios/libexec/check_ssh
+  register: nagios_plugins_installation
+
+- name: Install dependencies for building Nagios Plugins {{ nagios_plugins_version }}
+  package:
+    name: "{{ pkg_name }}"
+    state: latest
+  become: yes
+  loop: "{{ plugin_pkg_list }}"
+  loop_control:
+    loop_var: pkg_name
+  when: not nagios_plugins_installation.stat.exists
+
+- name: Download + Unpack Nagios Plugins {{ nagios_plugins_version }} source
+  unarchive:
+    src: "https://github.com/nagios-plugins/nagios-plugins/releases/download/release-{{ nagios_plugins_version }}/nagios-plugins-{{ nagios_plugins_version }}.tar.gz"
+    remote_src: yes
+    dest: "/tmp"
+  when: not nagios_plugins_installation.stat.exists
+
+  # 'Creates' argument keeps the playbook idempotent.
+- name: Run './configure' on source.
+  command:
+    cmd: "./configure"
+    chdir: "/tmp/nagios-plugins-{{ nagios_plugins_version }}/"
+    creates: "/tmp/nagios-plugins-{{ nagios_plugins_version }}/Makefile"
+  when: not nagios_plugins_installation.stat.exists
+
+# The 'when' field should make this idempotent.
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/nagios-plugins-{{ nagios_plugins_version }}"
+    target: install
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not nagios_plugins_installation.stat.exists
