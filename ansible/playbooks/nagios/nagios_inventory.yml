@@ -4,5 +4,5 @@
 Nagios_Server:
   hosts:
    #192.168.50.3:
-   localhost:
-     ansible_connection: local
+    localhost:
+      ansible_connection: local
