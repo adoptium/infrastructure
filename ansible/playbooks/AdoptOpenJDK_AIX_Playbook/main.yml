@@ -132,53 +132,53 @@
     ##############
     # freemarker #
     ##############
-    - name: Add freemarker to jenkins
-      block:
-        - name: Check for freemarker.jar existence
-          stat:
-            path: /home/{{ Jenkins_Username }}/freemarker.jar
-          register: freemarker
-          tags:
-            - freemarker
+    # - name: Add freemarker to jenkins
+    #   block:
+    #     - name: Check for freemarker.jar existence
+    #       stat:
+    #         path: /home/{{ Jenkins_Username }}/freemarker.jar
+    #       register: freemarker
+    #       tags:
+    #         - freemarker
 
-        - name: "freemarker.jar found, skipping download"
-          debug:
-            msg: "freemarker.jar found, skipping download"
-          when: not freemarker.stat.exists
-          tags:
-            - freemarker
+    #     - name: "freemarker.jar found, skipping download"
+    #       debug:
+    #         msg: "freemarker.jar found, skipping download"
+    #       when: not freemarker.stat.exists
+    #       tags:
+    #         - freemarker
 
-        - name: Download and extract freemarker.jar
-          unarchive:
-            src: "https://sourceforge.net/{{ urldir }}/{{ urlfile }}"
-            dest: /tmp/
-            remote_src: true
-            owner: "{{ Jenkins_Username }}"
-            group: staff
-            mode: 0755
-          when: not freemarker.stat.exists
-          tags:
-            - freemarker
-          vars:
-            urldir: projects/freemarker/files/freemarker/2.3.8
-            urlfile: freemarker-2.3.8.tar.gz
+    #     - name: Download and extract freemarker.jar
+    #       unarchive:
+    #         src: "https://sourceforge.net/{{ urldir }}/{{ urlfile }}"
+    #         dest: /tmp/
+    #         remote_src: true
+    #         owner: "{{ Jenkins_Username }}"
+    #         group: staff
+    #         mode: 0755
+    #       when: not freemarker.stat.exists
+    #       tags:
+    #         - freemarker
+    #       vars:
+    #         urldir: projects/freemarker/files/freemarker/2.3.8
+    #         urlfile: freemarker-2.3.8.tar.gz
 
-        - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
-          command:
-            cmd: mv /tmp/freemarker-2.3.8/lib/freemarker.jar
-              /home/{{ Jenkins_Username }}
-          when: not freemarker.stat.exists
-          tags:
-            - freemarker
+    #     - name: Move freemarker.jar to /home/{{ Jenkins_Username }} folder
+    #       command:
+    #         cmd: mv /tmp/freemarker-2.3.8/lib/freemarker.jar
+    #           /home/{{ Jenkins_Username }}
+    #       when: not freemarker.stat.exists
+    #       tags:
+    #         - freemarker
 
-        - name: Clean freemarker tmp files
-          file:
-            path: "{{ item }}"
-            state: absent
-          with_items:
-            - /tmp/freemarker-2.3.8
-            - /tmp/freemarker-2.3.8.tar.gz
-      tags: freemarker
+    #     - name: Clean freemarker tmp files
+    #       file:
+    #         path: "{{ item }}"
+    #         state: absent
+    #       with_items:
+    #         - /tmp/freemarker-2.3.8
+    #         - /tmp/freemarker-2.3.8.tar.gz
+    #   tags: freemarker
 
     ###################
     # NTP Time Server #
