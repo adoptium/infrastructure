@@ -35,16 +35,16 @@ plugin_pkg_list:
   - gettext
 
 nagiospnp_pkg_list:
-    - rrdtool
-    - librrdp-perl
-    - php-gd
-    - php-xml
+  - rrdtool
+  - librrdp-perl
+  - php-gd
+  - php-xml
 
 nagiosgraph_pkg_list:
-   - libcgi-pm-perl
-   - librrds-perl
-   - libgd-gd2-perl
-   - libnagios-object-perl
+  - libcgi-pm-perl
+  - librrds-perl
+  - libgd-gd2-perl
+  - libnagios-object-perl
 
 extra_configure_args: "--with-httpd-conf=/etc/apache2/sites-enabled"
 apache_user: "www-data"

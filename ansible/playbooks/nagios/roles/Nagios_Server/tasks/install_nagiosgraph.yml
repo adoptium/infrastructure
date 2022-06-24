@@ -1,4 +1,4 @@
-# ---
+---
 ## Manual Installation Of Nagios Graph As per
 ## https://sourceforge.net/p/nagiosgraph/git/ci/master/tree/INSTALL
 
@@ -99,8 +99,8 @@
     remote_src: yes
     mode: '0775'
   with_items:
-   - /usr/local/nagios/nagiosgraph/share/nagiosgraph.css
-   - /usr/local/nagios/nagiosgraph/share/nagiosgraph.js
+    - /usr/local/nagios/nagiosgraph/share/nagiosgraph.css
+    - /usr/local/nagios/nagiosgraph/share/nagiosgraph.js
 
 - name: Add Nagios Graph Configuration Block To Nagios Config
   blockinfile:
