@@ -87,7 +87,7 @@
     path: /usr/local/pnp4nagios/lib/kohana/system/libraries/Input.php
     regexp: '// magic_quotes_runtime is enabled'
     insertbefore: '// register_globals is enabled'
-    line : "}"
+    line: "}"
   become: yes
   when: not pnp4nagios_plugins_installation.stat.exists
 
