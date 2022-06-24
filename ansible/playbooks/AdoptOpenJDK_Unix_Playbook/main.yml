@@ -32,8 +32,8 @@
     - autoconf
     - curl
     - Jenkins_User                # AdoptOpenJDK Infrastructure
-    - role: freemarker            # OpenJ9
-      tags: [build_tools, build_tools_openj9]
+#  - role: freemarker            # OpenJ9
+#      tags: [build_tools, build_tools_openj9]
     - role: macos_codesign
       tags: [adoptopenjdk, codesign]
       when: ansible_distribution == "MacOSX"
