@@ -29,4 +29,4 @@ CMD ["/usr/sbin/sshd","-D"]
 RUN apt-get install git curl make gcc gnupg xvfb libxrender-dev libxi-dev libxtst-dev fontconfig fakeroot -y
 # ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
 EXPOSE 22
-# Start with docker run -p 2222:22 UUID
+# Start with docker run -p 2211:22 UUID
