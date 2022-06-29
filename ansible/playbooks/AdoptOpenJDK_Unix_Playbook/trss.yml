@@ -23,23 +23,24 @@
           apt: upgrade=safe update_cache=yes
           tags: patch_update
 
-        # Prepare for node.js
-        - name: Download Node v12.16.1 tarball and extract Node tarball
-          unarchive:
-            src: https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz
-            dest: /usr/local/lib/
-            remote_src: yes
+        # install nodejs 16.x(current LTS) since ubuntu18 has GLIBC_2.27, nodejs 18 need GLIBC_2.28
+        - name: Add nodejs apt key
+          apt_key:
+            url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+            state: present
           tags: node_install
 
-        - name: Create symlinks for node, npm and npx from node install directory to /usr/local/bin/
-          file:
-            src: /usr/local/lib/node-v12.16.1-linux-x64/bin/{{ item }}
-            dest: /usr/local/bin/{{ item }}
-            state: link
-          with_items:
-            - node
-            - npm
-            - npx
+        - name: Add nodejs 16.x ppa
+          apt_repository:
+            repo: deb [arch=amd64] https://deb.nodesource.com/node_16.x bionic main
+            update_cache: yes
+          tags: node_install
+
+        - name: Install nodejs
+          apt:
+            update_cache: yes
+            name: nodejs
+            state: present
           tags: node_install
 
         - name: Install NPM packages globally
