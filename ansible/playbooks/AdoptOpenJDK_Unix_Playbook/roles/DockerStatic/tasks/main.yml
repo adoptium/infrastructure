@@ -50,6 +50,7 @@
     - alp313
     - alp314
     - ubi8
+    - deb11
 
 ##############################################################
 # Start the containers                                       #
@@ -222,6 +223,11 @@
 
 - name: Start UBI8 container if not already started
   command: docker run --restart unless-stopped -p 2235:22 --cpus=2.0 --memory=6G --detach --name ubi8.2235 aqa_ubi8
+  tags: startcontainers
+  failed_when: false
+
+- name: Start Deb11 container if not already started
+  command: docker run --restart unless-stopped -p 2211:22 --cpus=2.0 --memory=6G --detach --name deb11.2211 aqa_deb11
   tags: startcontainers
   failed_when: false
 
