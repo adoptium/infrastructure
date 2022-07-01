@@ -12,7 +12,7 @@ answer the following questions:
 
 - test suite/name (e.g, BUILD_LIST, TARGET, CUSTOM_TARGET)?
 - a link into recent `Test_` job on https://ci.adoptopenjdk.net which showed the failure
-- **Hyperlink** to the Grinder re-run of the test with the failure, if available.
+- **Hyperlink** to re-run in Grinder: 
 - Is there an existing issue elsewhere covering this?
 - Which machine(s) does it work on?
 - Which machine(s) does it fail on?
