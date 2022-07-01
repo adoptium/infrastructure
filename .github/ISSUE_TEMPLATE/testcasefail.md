@@ -11,7 +11,7 @@ To make it easy for the infrastructure team to repeat and diagnose, please
 answer the following questions:
 
 - test suite/name (e.g, BUILD_LIST, TARGET, CUSTOM_TARGET)?
-- a link into recent https://ci.adoptopenjdk.net/view/Test_functional/ runs.
+- a link into recent `Test_` job on https://ci.adoptopenjdk.net which showed the failure
 - **Hyperlink** to the Grinder re-run of the test with the failure, if available.
 - Is there an existing issue elsewhere covering this?
 - Which machine(s) does it work on?
