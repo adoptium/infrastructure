@@ -1,6 +1,6 @@
 FROM fedora:34
 
-RUN yum -y update && yum install -y perl openssh-server unzip wget
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Get java8
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
