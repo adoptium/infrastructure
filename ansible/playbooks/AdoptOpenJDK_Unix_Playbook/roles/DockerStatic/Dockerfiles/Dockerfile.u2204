@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -qq -y perl openssh-server unzip
+RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip
 
 # Get java8
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
