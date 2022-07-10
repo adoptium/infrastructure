@@ -28,7 +28,7 @@
 1. You should then be able to click the console screen in the left corner which should display the `GNU GRUB` loader.
 1. `Oracle Solaris` should boot by default or you can hit the enter button.
 1. Type `1` and then enter (Oracle Solaris Interactive default)
-1. Select the keyboard layout (in my case `UK-English`) and then hit `F2`.
+1. Select the keyboard layout (in my case `UK-English`) and then hit `F2` (Or `Escape` then `2` as an alternative.
 1. Press Enter in the screen test shell.
 1. Select a language (in my case `0`), then hit Enter.
 1. Click `F2` for the next few screen using the default settings until you get to the hostname.
