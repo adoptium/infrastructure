@@ -33,7 +33,7 @@
 1. Select a language (in my case `0`), then hit Enter.
 1. Click `F2` for the next few screen using the default settings until you get to the hostname.
 1. Set the hostname to match what you set the machine name is ESXi to be and then hit `F2`.
-1. Set the IP address. The current block of IP's that we have is `147.75.85.208/29`.
+1. Set the IP address. The current block of IP's that we have is `147.75.85.208/29` (8 addresses) See the [inventory.yml](https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml) and the [temurin-compliance inventory](https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml) to find out which of those are already in use.
 1. The system is part of a subnet so select `Yes` at the next screen.
 1. Set the subnet mask as `255.255.255.248`.
 1. Select `No` to IPv6 support.
