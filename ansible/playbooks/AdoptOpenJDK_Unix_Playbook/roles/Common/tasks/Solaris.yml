@@ -318,8 +318,8 @@
   shell: |
     cd /tmp/git-2.31.0
     ./configure --with-curl=/opt/csw/lib/libcurl.so --with-openssl=/opt/csw/lib/libssl.so --with-expat
-    make -j4
-    make prefix=/opt/csw install
+    gmake -j4
+    gmake prefix=/opt/csw install
   environment:
     PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
   become: yes
