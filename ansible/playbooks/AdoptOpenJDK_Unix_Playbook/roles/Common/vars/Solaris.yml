@@ -24,6 +24,7 @@ Build_Tool_Packages:
   - gtar
   - xz
   - zip
+  - tcl
 
 Additional_Build_Tools_x64:
   - freetype
