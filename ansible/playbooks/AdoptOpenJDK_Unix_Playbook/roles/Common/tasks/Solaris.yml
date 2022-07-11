@@ -285,3 +285,43 @@
     state: link
     force: yes
   tags: build_tools
+
+- name: Download git 2.31.0 Source
+  command: wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz -O /tmp/git-2.31.0.tar.gz
+  tags:
+    - build_tools
+
+- name: Extract git 2.31.0 source
+  shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
+  args:
+    chdir: /tmp
+  tags:
+    - build_tools
+
+- name: Create Git Temporary Compilation Library directory
+  file:
+    path: /tmp/git-2.31.0/libexec/git-core
+    state: directory
+  tags:
+    - build_tools
+
+- name: Copy Existing Git Remote HTTPS Library Into Compile Area
+  copy:
+    src: "/opt/csw/libexec/git-core/git-remote-https"
+    dest: "/tmp/git-2.31.0/libexec/git-core/"
+    remote_src: yes
+    mode: 0775
+  tags:
+    - build_tools
+
+- name: Compile & Install Git 2.31.0
+  shell: |
+    cd /tmp/git-2.31.0
+    ./configure --with-curl=/opt/csw/lib/libcurl.so --with-openssl=/opt/csw/lib/libssl.so --with-expat
+    make -j4
+    make prefix=/opt/csw install
+  environment:
+    PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
+  become: yes
+  tags:
+    - build_tools
