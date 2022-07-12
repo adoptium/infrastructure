@@ -76,6 +76,7 @@
     - 20.61.136.211 # jck-skytap-aix71-ppc64-1
     - 20.61.136.213 # jck-skytap-aix71-ppc64-2
     - 20.61.136.254 # jck-skytap-aix71-ppc64-3
+    - 20.61.222.79 # jck-skytap-aix72-ppc64-1
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
     - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
