@@ -342,7 +342,6 @@
     gmake install
   environment:
     PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
-  become: yes
   when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
   tags:
     - build_tools
