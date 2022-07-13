@@ -302,11 +302,13 @@
   tags:
     - build_tools
 
-- name: Download git 2.31.0 Source
-  command: wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz -O /tmp/git-2.31.0.tar.gz
+- name: Download git source
+  get_url:
+    url: http://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz
+    dest: /tmp/git-2.31.0.tar.gz
+    mode: 0440
+    checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
   when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
-  tags:
-    - build_tools
 
 - name: Extract git 2.31.0 source
   shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
