@@ -25,6 +25,7 @@ Build_Tool_Packages:
   - xz
   - zip
   - tcl
+  - python27
 
 Additional_Build_Tools_x64:
   - freetype
