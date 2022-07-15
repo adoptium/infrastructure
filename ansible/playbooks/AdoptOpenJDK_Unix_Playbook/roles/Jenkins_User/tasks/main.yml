@@ -23,7 +23,7 @@
 
 - name: Create Jenkins  account group for SLES15/s390x
   ansible.builtin.group:
-    name: {{ Jenkins_Username }}
+    name: "{{ Jenkins_Username }}"
     state: present
   when:
     - (ansible_distribution_major_version == "15" and ansible_architecture == "s390x")
