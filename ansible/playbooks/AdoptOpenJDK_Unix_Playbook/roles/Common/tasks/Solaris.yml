@@ -352,3 +352,13 @@
   when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
   tags:
     - build_tools
+
+- name: Copy New Git Remote HTTPS Library Into Runtime Area
+  copy:
+    src: "/tmp/git-2.31.0/libexec/git-core/git-remote-https"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+    mode: 0775
+  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  tags:
+    - build_tools
