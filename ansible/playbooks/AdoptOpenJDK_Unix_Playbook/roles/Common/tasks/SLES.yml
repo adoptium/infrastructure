@@ -30,7 +30,7 @@
 - name: Add Devel-Tools repository (SLES15)
   zypper_repository:
     name: devel-tools
-    repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15/"
+    repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15_SP3/"
     auto_import_keys: yes
     state: present
   when:
