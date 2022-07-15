@@ -91,7 +91,7 @@
     url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
     dest: /usr/local/nagios/libexec/check_mem
     mode: 0755
-    checksum: sha256:0b72dbc68d67292a3eb164679af5bac03d97f95b49dc68cf337fdc46f8f58a0c
+    checksum: sha256:3cbedeb5e390a0e8f96b10d17be4eddc0384f1d9f838c1fef71cda2c57619e53
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution != "Solaris"
