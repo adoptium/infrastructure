@@ -21,7 +21,7 @@
     - ansible_distribution == "Solaris"
   tags: [jenkins_user, adoptopenjdk]
 
-- name: Create Jenkins  account group for SLES15/s390x
+- name: Create Jenkins account group for SLES15/s390x
   ansible.builtin.group:
     name: "{{ Jenkins_Username }}"
     state: present
