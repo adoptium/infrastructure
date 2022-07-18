@@ -43,7 +43,7 @@
     - ansible_distribution == "MacOSX"
   tags: [superuser, adoptopenjdk]
 
-- name: Create Superuser account group for SLES15/s390x
+- name: Create Superuser account group for SLES15
   ansible.builtin.group:
     name: zeus
     state: present
