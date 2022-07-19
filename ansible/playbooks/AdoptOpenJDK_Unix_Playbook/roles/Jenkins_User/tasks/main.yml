@@ -22,7 +22,7 @@
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins account group for SLES
-  ansible.builtin.group:
+  group:
     name: "{{ Jenkins_Username }}"
     state: present
   when:
