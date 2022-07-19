@@ -21,8 +21,8 @@
     - ansible_distribution == "Solaris"
   tags: [superuser, adoptopenjdk]
 
-- name: Create Superuser account group for SLES15
-  ansible.builtin.group:
+- name: Create Superuser account group for SLES
+  group:
     name: zeus
     state: present
   when:
