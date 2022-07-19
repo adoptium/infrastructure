@@ -21,12 +21,12 @@
     - ansible_distribution == "Solaris"
   tags: [jenkins_user, adoptopenjdk]
 
-- name: Create Jenkins account group for SLES15/s390x
+- name: Create Jenkins account group for SLES
   ansible.builtin.group:
     name: "{{ Jenkins_Username }}"
     state: present
   when:
-    - (ansible_distribution_major_version == "15" and ansible_architecture == "s390x")
+    - ansible_distribution == "SLES"
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user
