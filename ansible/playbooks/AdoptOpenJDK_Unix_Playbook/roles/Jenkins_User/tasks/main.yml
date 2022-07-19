@@ -23,10 +23,9 @@
 
 - name: Create Jenkins account group for SLES
   ansible.builtin.group:
-    name: "{{ Jenkins_Username }}"
+  name: "{{ Jenkins_Username }}"
     state: present
-  when:
-    - ansible_distribution == "SLES"
+  when: ansible_distribution == "SLES"
   tags: [jenkins_user, adoptopenjdk]
 
 - name: Create Jenkins user
