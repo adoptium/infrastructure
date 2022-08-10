@@ -1,0 +1,6 @@
+FROM registry.suse.com/suse/sles12sp5:latest
+
+RUN zypper ar https://download.opensuse.org/repositories/YaST:/SLE-12:/SP5/SLE_12_SP4/ sles12sp5
+RUN zyper ar http://download.opensuse.org/distribution/12.3/repo/oss/ sles12oss
+RUN zypper refresh
+RUN zypper update && zypper -y install wget perl openssh-server unzip zip
