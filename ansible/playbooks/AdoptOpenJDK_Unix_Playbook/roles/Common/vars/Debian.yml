@@ -98,7 +98,6 @@ Test_Tool_Packages:
   - acl
   - perl
   - xauth
-  - xorg
   - xvfb
   - binfmt-support
   - qemu-user-static
