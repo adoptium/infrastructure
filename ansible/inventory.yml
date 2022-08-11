@@ -63,7 +63,7 @@ hosts:
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
-          rhel79-s390x-1: {ip: 148.100.74.54, user: linux1}
+          rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
           rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
 
       - osuosl:
@@ -187,7 +187,7 @@ hosts:
           rhel7-s390x-2: {ip: 148.100.74.92}
           rhel8-s390x-2: {ip: 148.100.74.154}
           sles12-s390x-2: {ip: 148.100.74.193}
-          sles15-s390x-2: {ip: 148.100.74.154}
+          sles15-s390x-2: {ip: 148.100.74.2}
           ubuntu1804-s390x-4: {ip: 148.100.75.181}
           ubuntu2004-s390x-1: {ip: 148.100.74.240}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
