@@ -28,7 +28,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 
 #No such service: ssh
 # RUN service ssh start 
-CMD ["/usr/sbin/sshd","-D"]
+CMD ["/bin/bash"]
 
 RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server
 # RUN locale-gen en_US.utf8
