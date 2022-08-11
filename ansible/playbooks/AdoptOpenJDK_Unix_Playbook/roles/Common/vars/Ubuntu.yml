@@ -65,6 +65,8 @@ OpenJFX_Build_Tool_Packages:
 gcc_compiler:
   - g++-4.8
   - gcc-4.8
+  - gcc-7
+  - g++-7
 
 Additional_Packages_Ubuntu16:
   - xserver-xorg-legacy                 # Not actually sure if this is still needed
@@ -72,6 +74,8 @@ Additional_Packages_Ubuntu16:
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - libmpfr4
   - libmpfr4-dbg
+  - gcc-7                               # Our own one doesn't seem to work on Ubuntu16
+  - g++-7                               # Our own one doesn't seem to work on Ubuntu16
 
 Additional_Packages_Ubuntu18:
   - libgstreamer1.0-dev                 # OpenJFX prereq
