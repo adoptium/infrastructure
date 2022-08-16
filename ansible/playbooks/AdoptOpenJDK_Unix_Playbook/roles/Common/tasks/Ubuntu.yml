@@ -22,18 +22,6 @@
   when: ansible_architecture == "aarch64"
   tags: patch_update
 
-- name: Add the openjdk repository to apt
-  apt_repository: repo='ppa:openjdk-r/ppa'
-  when:
-    - ansible_architecture != "armv7l"
-  tags: patch_update
-
-- name: Add the ubuntu toolchain repository to apt
-  apt_repository: repo='ppa:ubuntu-toolchain-r/test'
-  when:
-    - ansible_architecture != "armv7l"
-  tags: patch_update
-
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
     url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
