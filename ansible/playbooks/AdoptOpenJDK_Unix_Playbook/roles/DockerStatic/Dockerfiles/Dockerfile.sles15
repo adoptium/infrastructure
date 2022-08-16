@@ -1,5 +1,6 @@
-FROM opensuse/leap
+FROM registry.suse.com/suse/sle15
 
+RUN zypper addrepo https://download.opensuse.org/distribution/leap/15.4/repo/oss/ "Main Repository" && zypper --gpg-auto-import-keys refresh
 RUN zypper update -y && zypper install -y perl openssh-server unzip zip wget tar gzip
 
 RUN wget 'https://api.adoptium.net/v3/binary/latest/11/ga/linux/s390x/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk11.tar.gz
@@ -26,11 +27,11 @@ RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 
-#No such service: ssh
-# RUN service ssh start 
-CMD ["/bin/bash"]
+RUN ssh-keygen -A
+
+CMD ["/usr/sbin/sshd", "-D"]
 
 RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server
-# RUN locale-gen en_US.utf8
 
-#Need to install locales and xvfb. Locales may already be installed. Using xorg-x11-server for xvfb
+EXPOSE 22
+# Start with docker run -p 22XX:22 UUID
