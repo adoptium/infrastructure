@@ -15,6 +15,11 @@
   register: macos_version
   changed_when: false
 
+- name: fix brew link error
+  become: yes
+  become_user: "{{ ansible_user }}"
+  shell: sudo chown -R "{{ ansible_user }}":admin /usr/local/Cellar
+
 - name: Set macos version
   set_fact:
     macos_version_number: "{{ macos_version.stdout.split('.')[0] }}.{{ macos_version.stdout.split('.')[1] }}"
@@ -118,7 +123,7 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
-- name: Install Build Tool Packages NOT macOS 10.12
+- name: Install Build Tool Packages (NOT for macOS 10.12)
   become: yes
   become_user: "{{ ansible_user }}"
   homebrew: "name={{ item }} state=present"
