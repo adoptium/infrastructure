@@ -123,10 +123,19 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
+- name: check if ccache already instealld
+  shell: ansible-playbook --version
+  register: infomation
+
+- name: print info
+  debug:
+    msg: "{{ infomation }}"
+
 - name: Install Build Tool Packages (NOT for macOS 10.12)
-  become: yes
+  become: yes.github/workflows/build_mac.yml
   become_user: "{{ ansible_user }}"
   homebrew: "name={{ item }} state=present"
+  failed_when: false
   with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
     - not (macos_version_number | regex_search("10.12"))
