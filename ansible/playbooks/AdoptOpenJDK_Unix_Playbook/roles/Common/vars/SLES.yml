@@ -39,6 +39,7 @@ Additional_Build_Tools_SLES15:
   - libXt-devel
   - libXtst-devel
   - systemtap-sdt-devel
+  - cron
   - python-xml
 
 Additional_Build_Tools_SLES12:
