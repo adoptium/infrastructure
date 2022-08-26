@@ -183,7 +183,7 @@
     - not java8_installed.stat.exists
   tags: java8_SLES11
 
-- name: chmod +x /tmp/ibm-java.bin
+- name: Chmod +x /tmp/ibm-java.bin
   file:
     path: /tmp/ibm-java.bin
     state: file
