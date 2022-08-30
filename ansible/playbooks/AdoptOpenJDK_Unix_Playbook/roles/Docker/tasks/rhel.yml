@@ -24,7 +24,7 @@
   yum_repository:
     name: docker
     description: docker YUM repo s390x
-    baseurl: https://download.docker.com/linux/{{ OS }}/{{ ansible_distribution_major_version }}/s390x/stable/
+    baseurl: https://download.docker.com/linux/rhel/{{ ansible_distribution_major_version }}/s390x/stable/
     enabled: true
     gpgcheck: false
   when:
