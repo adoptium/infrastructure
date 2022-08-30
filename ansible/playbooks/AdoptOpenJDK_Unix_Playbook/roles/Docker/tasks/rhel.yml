@@ -10,7 +10,7 @@
     key: https://download.docker.com/linux/rhel/gpg
     state: present
 
-- name: Add Docker Repo x86-64/ppc64le 
+- name: Add Docker Repo x86-64/ppc64le
   yum_repository:
     name: docker
     description: docker repository
