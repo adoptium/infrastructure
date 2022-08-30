@@ -4,6 +4,12 @@
 ##############
 #################CentOS####################################
 
+# Same key for the Centos Repo
+- name: Import Docker Repo key
+  rpm_key:
+    key: https://download.docker.com/linux/rhel/gpg
+    state: present
+
 - name: Add Docker Repo x86-64/ppc64le 
   yum_repository:
     name: docker
@@ -23,9 +29,3 @@
     gpgcheck: false
   when:
     - ansible_architecture == "s390x"
-
-# Same key for the Centos Repo
-- name: Import Docker Repo key
-  rpm_key:
-    key: https://download.docker.com/linux/rhel/gpg
-    state: present
