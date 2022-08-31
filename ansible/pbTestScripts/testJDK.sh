@@ -28,6 +28,7 @@ cd $HOME/testLocation/aqa-tests/TKG || exit 1
 # See: https://adoptium.slack.com/archives/C53GHCXL4/p1641311568115100?thread_ts=1641296204.114900&cid=C53GHCXL4
 if [[ "$(uname)" == "SunOS" ]]; then
 	export BUILD_LIST=system
+	export PATH=/usr/local/bin:$PATH
 	$MAKE_COMMAND compile
 	$MAKE_COMMAND _MachineInfo
 else
