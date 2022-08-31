@@ -6,7 +6,7 @@ labels: ''
 assignees: 'sxa'
 
 ---
-Team requested - delete those which are not appicable :
+Team requested - delete those which are not applicable :
 
 - infrastructure-triage
 - infrastructure
