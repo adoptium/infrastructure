@@ -7,7 +7,9 @@
 Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
+  - bzip2
   - cpio
+  - cronie
   - curl
   - flex
   - gcc
