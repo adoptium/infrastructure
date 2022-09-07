@@ -23,11 +23,11 @@ Vagrant.configure("2") do |config|
     adoptopenjdkSol10.vm.synced_folder ".", "/vagrant"
     adoptopenjdkSol10.vm.network :private_network, type: "dhcp"
     adoptopenjdkSol10.vm.provision "shell", inline: $script, privileged: false
-    adoptopenjdkSol10.vm.boot_timeout = 600
+    adoptopenjdkSol10.vm.boot_timeout = 900
   end
   config.vm.provider "virtualbox" do |v|
     v.gui = false
     v.memory = 5120
-    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "60"]
   end
 end
