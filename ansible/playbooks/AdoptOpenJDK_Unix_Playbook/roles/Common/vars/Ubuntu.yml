@@ -63,8 +63,8 @@ OpenJFX_Build_Tool_Packages:
   - ruby
 
 gcc_compiler:
-  - g++-4.8
-  - gcc-4.8
+  - g++
+  - gcc
 
 Additional_Packages_Ubuntu16:
   - libgstreamer0.10-dev                # OpenJFX prereq

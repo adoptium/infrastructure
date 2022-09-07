@@ -28,12 +28,6 @@
     - ansible_architecture != "armv7l"
   tags: patch_update
 
-- name: Add the ubuntu toolchain repository to apt
-  apt_repository: repo='ppa:ubuntu-toolchain-r/test'
-  when:
-    - ansible_architecture != "armv7l"
-  tags: patch_update
-
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
     url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
@@ -81,12 +75,9 @@
   with_items: "{{ OpenJFX_Build_Tool_Packages }}"
   tags: [build_tools, build_tools_jfx]
 
-- name: Install GCC G++ on supported platforms
+- name: Install default GCC/G++ on supported platforms
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_compiler }}"
-  when:
-    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
-    - not (ansible_distribution_major_version >= "20")
   tags: build_tools
 
 - name: Install additional build tools for x86
