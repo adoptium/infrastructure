@@ -19,7 +19,7 @@ SCRIPT
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdkSol10 do |adoptopenjdkSol10|
-    adoptopenjdkSol10.vm.box = "solaris10"
+    adoptopenjdkSol10.vm.box = "tnarik/solaris10-minimal"
     adoptopenjdkSol10.vm.synced_folder ".", "/vagrant"
     adoptopenjdkSol10.vm.network :private_network, type: "dhcp"
     adoptopenjdkSol10.vm.provision "shell", inline: $script, privileged: false
