@@ -11,7 +11,7 @@ on:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
 
     - uses: actions/checkout@v2
@@ -19,7 +19,6 @@ jobs:
     - name: Install dependencies
       run: |
         brew install ansible
-        brew install --cask virtualbox
 
     - name: Setup Vagrant VM
       run: |
@@ -32,8 +31,10 @@ jobs:
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        [ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
+        ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 60"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
     - name: Run Ansible Playbook
       run: |
