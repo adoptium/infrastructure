@@ -44,7 +44,7 @@
     - patch_update
     - skip_ansible_lint
 
-- name: zypper upgrade all packages
+- name: Zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
 

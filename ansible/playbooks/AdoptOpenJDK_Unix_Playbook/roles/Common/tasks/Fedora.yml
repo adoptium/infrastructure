@@ -211,26 +211,26 @@
   locale_gen:
     name: ja_JP.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  when: localeList.stdout | lower is not search("ja_jp\.utf8")
   tags: locales
 
 - name: Create Korean locale
   locale_gen:
     name: ko_KR.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  when: localeList.stdout | lower is not search("ko_kr\.utf8")
   tags: locales
 
 - name: Create Chinese locale
   locale_gen:
     name: zh_CN.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  when: localeList.stdout | lower is not search("zh_cn\.utf8")
   tags: locales
 
 - name: Create Taiwanese locale
   locale_gen:
     name: zh_TW.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  when: localeList.stdout | lower is not search("zh_tw\.utf8")
   tags: locales

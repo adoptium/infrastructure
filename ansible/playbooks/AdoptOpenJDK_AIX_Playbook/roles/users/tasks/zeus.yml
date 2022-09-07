@@ -32,7 +32,7 @@
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
   when: pubkey is defined and pubkey.stat.exists
 
-- name: warn about missing authorization for zeus
+- name: Warn about missing authorization for zeus
   debug:
     msg: "{{ Zeus_User_SSHKey }} not included in authorizedkeys"
   when: Superuser_Account == "Enabled" and zeus_pubkey.skipped

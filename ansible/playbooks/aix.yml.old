@@ -4,7 +4,8 @@
 # --------------- AIX ---------------  #
 ########################################
 
-- hosts: all
+- name: AIX old play
+  hosts: all
   remote_user: root
   become: yes
   environment:
@@ -24,7 +25,7 @@
           shell: bash --version >/dev/null 2>&1
           register: does_bash_exist
           failed_when: false
-        - name: install bash
+        - name: Install bash
           yum: name=bash state=present update_cache=yes
           when: does_bash_exist.rc != 0
 
@@ -928,11 +929,11 @@
       ####################
       # Disable sendmail #
       ####################
-        - name: ensure sendmail is stopped
+        - name: Ensure sendmail is stopped
           service: name=sendmail state=stopped
           tags: sendmail
 
-        - name: ensure sendmail is disabled
+        - name: Ensure sendmail is disabled
           replace:
             dest: /etc/rc.tcpip
             regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
@@ -942,7 +943,7 @@
       ############################
       # Enable full core support #
       ############################
-        - name: ensure full AIX core files are enabled
+        - name: Ensure full AIX core files are enabled
           command: chdev -l sys0 -a fullcore=true
           changed_when: False
           tags: fullcore
@@ -950,7 +951,7 @@
       #####################
       # Enable swap space #
       #####################
-        - name: ensure swap space is of adequate size
+        - name: Ensure swap space is of adequate size
           shell: |
             swap_line=$(lsps -a | tail -n 1)
             curr_swap_size=$(echo $swap_line | awk '{print $4}' | awk -FM '{print $1}')
@@ -970,7 +971,7 @@
             - skip_ansible_lint
 
   handlers:
-    - name: restart machine
+    - name: Restart machine
       shell: echo 'shutdown -r now "Triggered by Ansible updates."' | at now + 1 minutes
       async: 1
       poll: 0

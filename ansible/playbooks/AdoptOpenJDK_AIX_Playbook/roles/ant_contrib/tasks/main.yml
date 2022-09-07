@@ -11,7 +11,7 @@
         path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
       register: antcontrib
 
-    - name: "ant-contrib.jar installed, skipping download"
+    - name: "Ant-contrib.jar installed, skipping download"
       debug:
         msg: "ant-contrib.jar installed, skipping download"
       when: not antcontrib.stat.exists

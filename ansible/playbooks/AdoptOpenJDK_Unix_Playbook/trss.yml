@@ -116,10 +116,10 @@
             owner: "{{ Jenkins_Username }}"
             group: "{{ Jenkins_Username }}"
 
-        - name: npm ci && npm run build of test-result-summary-client
+        - name: Npm ci && npm run build of test-result-summary-client
           shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/ && npm ci && npm run build
 
-        - name: npm ci of TestResultSummaryService
+        - name: Npm ci of TestResultSummaryService
           shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/TestResultSummaryService/ && npm ci
 
         # Prepare Nginx
