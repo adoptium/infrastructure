@@ -47,13 +47,13 @@
 
 - name: Print new hostname
   debug:
-    msg: "{{ hostname_output.stdout | replace('-','') | trim }}"
+    msg: "{{ hostname_output.stdout | replace('-', '') | trim }}"
   when:
     - not (hostname_output.stdout == "")
   tags: basic_config
 
 - name: Remove stray '-' from hostname
-  win_shell: Rename-Computer -NewName "{{ hostname_output.stdout | replace('-','') | trim }}"
+  win_shell: Rename-Computer -NewName "{{ hostname_output.stdout | replace('-', '') | trim }}"
   args:
     executable: powershell
   when:

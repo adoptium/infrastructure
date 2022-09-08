@@ -141,7 +141,7 @@
     #       tags:
     #         - freemarker
 
-    #     - name: "freemarker.jar found, skipping download"
+    #     - name: "Debug: freemarker.jar found, skipping download"
     #       debug:
     #         msg: "freemarker.jar found, skipping download"
     #       when: not freemarker.stat.exists
@@ -183,14 +183,14 @@
     ###################
     # NTP Time Server #
     ###################
-    - name: ensure NTP daemon is enabled
+    - name: Ensure NTP daemon is enabled
       replace:
         dest: /etc/rc.tcpip
         regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
         replace: '\1'
       tags: ntp
 
-    - name: ensure NTP daemon is configured
+    - name: Ensure NTP daemon is configured
       copy:
         content: |
           server 1.pool.ntp.org
@@ -217,11 +217,11 @@
     ####################
     # Disable sendmail #
     ####################
-    - name: ensure sendmail is stopped
+    - name: Ensure sendmail is stopped
       service: name=sendmail state=stopped
       tags: sendmail
 
-    - name: ensure sendmail is disabled
+    - name: Ensure sendmail is disabled
       replace:
         dest: /etc/rc.tcpip
         regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
@@ -231,7 +231,7 @@
     ############################
     # Enable full core support #
     ############################
-    - name: ensure full AIX core files are enabled
+    - name: Ensure full AIX core files are enabled
       command: chdev -l sys0 -a fullcore=true
       changed_when: false
       tags: fullcore

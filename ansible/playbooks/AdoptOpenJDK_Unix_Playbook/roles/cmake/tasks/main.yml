@@ -32,7 +32,7 @@
     validate_certs: no
     checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
     - (ansible_distribution != "openSUSE")
   tags: cmake
@@ -43,7 +43,7 @@
     dest: /tmp
     copy: False
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
     - (ansible_distribution != "openSUSE")
   tags: cmake
@@ -52,7 +52,7 @@
 - name: Running ./configure & make for cmake
   shell: cd /tmp/cmake-{{ cmakeVersion }} && PATH=/opt/gcc-4.8.5/bin:$PATH && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
     - (ansible_distribution != "openSUSE")
   tags: cmake

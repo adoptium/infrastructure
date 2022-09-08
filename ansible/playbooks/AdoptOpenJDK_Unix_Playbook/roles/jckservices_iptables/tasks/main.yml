@@ -99,5 +99,5 @@
     chain: INPUT
     jump: REJECT
 
-- name: iptables_permanent
+- name: Set iptables_permanent
   shell: iptables-save > /etc/iptables/rules.v4
