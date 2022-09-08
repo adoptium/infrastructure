@@ -24,7 +24,7 @@
       include_tasks: rhel.yml
       when:
         - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
-        - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8"
+        - ansible_distribution_major_version >= "7"
 
     - name: Prepare for Ubuntu
       include_tasks: ubuntu.yml
@@ -45,7 +45,7 @@
           - docker-ce
         state: latest   # TODO: Package installs should not use latest
         use: auto       # automatic select package manager to use yum, apt and so on
-      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")) or (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
 
     - name: Install for SLES12 # zypper does not support in package module
       include_tasks: sles.yml
