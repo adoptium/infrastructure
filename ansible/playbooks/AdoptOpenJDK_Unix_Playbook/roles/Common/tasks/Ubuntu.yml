@@ -22,10 +22,11 @@
   when: ansible_architecture == "aarch64"
   tags: patch_update
 
-- name: Add the openjdk repository to apt
-  apt_repository: repo='ppa:openjdk-r/ppa'
+- name: Add the ubuntu toolchain repository to apt for gcc-7 on Ubuntu 16.04
+  apt_repository: repo='ppa:ubuntu-toolchain-r/test'
   when:
     - ansible_architecture != "armv7l"
+    - ansible_distribution_major_version == "16"
   tags: patch_update
 
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
@@ -40,21 +41,6 @@
   apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
   when:
     - ansible_architecture == "x86_64"
-  tags: patch_update
-
-- name: Add additional repositories for BeagleBone
-  apt_repository: repo={{ item }}
-  with_items:
-    - deb https://deb.debian.org/debian/ stable main contrib non-free
-    - deb-src https://deb.debian.org/debian/ stable main contrib non-free
-    - deb https://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb-src https://deb.debian.org/debian/ stable-updates main contrib non-free
-    - deb https://deb.debian.org/debian-security stable/updates main
-    - deb-src https://deb.debian.org/debian-security stable/updates main
-    - deb http://ftp.debian.org/debian stretch-backports main
-    - deb-src http://ftp.debian.org/debian stretch-backports main
-  when:
-    - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
   tags: patch_update
 
 - name: Run apt-get upgrade

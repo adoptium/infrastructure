@@ -37,7 +37,7 @@
     - ansible_distribution_major_version == "15"
   tags: patch_update
 
-- name: zypper upgrade all packages
+- name: Zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
 
@@ -55,6 +55,20 @@
   with_items: "{{ Additional_Build_Tools_SLES15 }}"
   when:
     - ansible_distribution_major_version == "15"
+  tags: build_tools
+
+- name: Install additional build tools for SLES 15 NOT SP2
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES15_NOT_SP2 }}"
+  when:
+    - (ansible_distribution_major_version == "15" and ansible_distribution_version != "15.2")
+  tags: build_tools
+
+- name: Install Earlier SystemTap On SLES15 SP2
+  zypper: name={{ item }} state=installed
+  with_items: "{{ Additional_Build_Tools_SLES15_SP2 }}"
+  when:
+    - (ansible_distribution_major_version == "15" and ansible_distribution_version == "15.2")
   tags: build_tools
 
 - name: Install additional build tools for SLES 12
@@ -169,7 +183,7 @@
     - not java8_installed.stat.exists
   tags: java8_SLES11
 
-- name: chmod +x /tmp/ibm-java.bin
+- name: Chmod +x /tmp/ibm-java.bin
   file:
     path: /tmp/ibm-java.bin
     state: file

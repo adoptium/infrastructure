@@ -7,7 +7,9 @@
 Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
+  - bzip2
   - cpio
+  - cronie
   - curl
   - flex
   - gcc
@@ -38,8 +40,14 @@ Additional_Build_Tools_SLES15:
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
-  - systemtap-sdt-devel
+  - cron
   - python-xml
+
+Additional_Build_Tools_SLES15_SP2:
+  - systemtap=4.2-3.3.1
+
+Additional_Build_Tools_SLES15_NOT_SP2:
+  - systemtap-sdt-devel
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
