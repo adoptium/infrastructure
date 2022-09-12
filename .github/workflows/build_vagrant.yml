@@ -20,6 +20,18 @@ jobs:
       run: |
         brew install ansible
 
+    - name: Install Solaris 10 Box If Not Present
+      run: |
+        if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
+        then
+          echo "Box Exists - Do Nothing"
+        else
+          echo "No Box - Download From Jenkins And Import"
+          wget -nv https://ci.adoptopenjdk.net/userContent/vagrant/Solaris10.box.gz
+          gunzip Solaris10.box.gz
+          vagrant box add --name="solaris10" ./Solaris10.box
+        fi
+
     - name: Setup Vagrant VM
       run: |
         cd ansible
