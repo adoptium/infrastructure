@@ -20,7 +20,7 @@ jobs:
       run: |
         brew install ansible
 
-    - name: Install Solaris 10 Box If Not Present
+    - name: Install Solaris 10 Box If Not Already Present
       run: |
         if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
         then
