@@ -20,6 +20,27 @@ jobs:
       run: |
         brew install ansible
 
+    - name: Install Solaris 10 Box If Not Already Present
+      run: |
+        if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
+        then
+          echo "Box Exists - Do Nothing"
+        else
+          echo "No Box - Download From Jenkins And Import"
+          wget https://ci.adoptopenjdk.net/userContent/vagrant/Solaris10.box.gz
+          CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
+          if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
+          then
+            echo "Checksum OK"
+            gunzip Solaris10.box.gz
+            vagrant box add --name="solaris10" ./Solaris10.box
+            rm Solaris10.box
+          else
+            echo "Sum Bad"
+            exit 99;
+          fi
+        fi
+
     - name: Setup Vagrant VM
       run: |
         cd ansible
