@@ -5,17 +5,6 @@ nagios_version: 4.4.7
 # Nagios_Plugins version
 nagios_plugins_version: 2.3.3
 
-# The targets that the make cmd runs against.
-# Remove / Add things as necessary, however this may
-# require additional manual setup.
-# Viable Options:
-#   - all
-#   - install-groups-users
-#   - install
-#   - install-daemoninit
-#   - install-commandmode
-#   - install-config
-#   - install-webconf
 make_list:
     - all
     - install-groups-users
@@ -37,3 +26,4 @@ task_list:
     - configure_nagios_core
     - install_nagios_scripts
     - configure_nagios_commands
+    - configure_nagios_server_monitoring

@@ -1,15 +1,5 @@
 ---
 
-# Commented Out For Default Server Installation
-# - name: Copy The Nagios Commands Config File Into Place
-#   copy:
-#     src: scripts/commands.cfg
-#     dest: /usr/local/nagios/etc/objects/commands.cfg
-#     owner: root
-#     group: root
-#     mode: '0755'
-#     backup: yes
-
 - name: Restart Nagios
   service:
     name: nagios

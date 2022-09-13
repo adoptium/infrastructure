@@ -31,3 +31,7 @@
 - name: Configure Nagios-Commands
   include_tasks: configure_nagios_commands.yml
   when: '"configure_nagios_commands" in task_list'
+
+- name: Configure Nagios-Server-Monitoring
+  include_tasks: configure_nagios_server_monitoring.yml
+  when: '"configure_nagios_server_monitoring" in task_list'

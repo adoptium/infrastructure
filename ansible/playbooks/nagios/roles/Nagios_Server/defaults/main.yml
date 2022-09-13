@@ -28,3 +28,4 @@ task_list:
     - configure_nagios_core
     - install_nagios_scripts
     - configure_nagios_commands
+    - configure_nagios_server_monitoring

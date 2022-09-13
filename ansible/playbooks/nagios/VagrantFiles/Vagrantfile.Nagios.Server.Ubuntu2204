@@ -2,13 +2,13 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+# Repair "==> default: stdin: is not a tty" message
+sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
+sudo dpkg-reconfigure debconf -f noninteractive -p critical
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
-# Repair "==> default: stdin: is not a tty" message
-sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
-sudo dpkg-reconfigure debconf -f noninteractive -p critical
 # Update OS
 sudo apt-get update
 sudo apt-get install ansible -y
@@ -26,9 +26,8 @@ Vagrant.configure("2") do |config|
     nagios_server.vm.box = "generic/ubuntu2204"
     nagios_server.vm.synced_folder ".", "/vagrant"
     nagios_server.vm.hostname = "Nagios.Server"
-    nagios_server.vm.network :private_network, ip: '192.168.50.55'
+    nagios_server.vm.network :private_network, type: "dhcp"
     nagios_server.vm.provision "shell", inline: $script, privileged: false
-    # nagios_server.vm.provision "shell", inline: $script2, privileged: false
   end
 
   config.vm.provider "virtualbox" do |v|
