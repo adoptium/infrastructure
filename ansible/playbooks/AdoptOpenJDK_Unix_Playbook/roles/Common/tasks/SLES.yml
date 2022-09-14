@@ -80,7 +80,7 @@
 
 - name: Install additional build tools for SLES 12 SP5
   package: "name={{ item }} state=latest"
-  with_items: "{{ AAdditional_Build_Tools_SLES12_SP5 }}"
+  with_items: "{{ Additional_Build_Tools_SLES12_SP5 }}"
   when:
     - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
   tags: build_tools
