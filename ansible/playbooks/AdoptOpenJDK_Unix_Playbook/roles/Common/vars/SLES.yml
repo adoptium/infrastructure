@@ -64,7 +64,7 @@ Additional_Build_Tools_SLES12:
   - perl-CPAN-Meta
 
 Additional_Build_Tools_SLES12_SP5:
-  - git-core=2.26.2-27.57.1
+  - curl-devel    ## Required To Install Git From Source
 
 Additional_Build_Tools_SLES12_NOT_SP5:
   - git-core
