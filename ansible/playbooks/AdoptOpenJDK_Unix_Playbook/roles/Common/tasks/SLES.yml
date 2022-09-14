@@ -118,7 +118,7 @@
     dest: /tmp/git-2.31.0.tar.gz
     mode: 0440
     checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
-   when:
+  when:
     - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and ((git_csw_installed.rc != 0) or (git_csw_installed.rc == 0 and git_csw_version.stdout is version_compare('2.31', operator='lt')))
 
 # - name: Extract git 2.31.0 source
