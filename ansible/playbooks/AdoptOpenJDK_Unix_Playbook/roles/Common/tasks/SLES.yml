@@ -104,10 +104,10 @@
 
 - name: Test if git is installed at the correct version
   shell: /usr/local/bin/git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
-  when: git_installed.rc == 0
   register: git_version
   changed_when: false
   when:
+    - git_installed.rc == 0 and
     - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
   tags:
     - build_tools
