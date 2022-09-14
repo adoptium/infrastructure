@@ -122,15 +122,27 @@
     - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
       (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
 
-# - name: Extract git 2.31.0 source
-#   shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
-#   args:
-#     chdir: /tmp
-#   when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
-#   tags:
-#     - build_tools
+- name: Extract git 2.31.0 source
+  shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
+  args:
+    chdir: /tmp
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
+      (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
 
-
+- name: Compile Git 2.31.0
+  shell: |
+    cd /tmp/git-2.31.0
+    ./configure
+    gmake -j4
+    gmake install
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
+      (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
 
 - name: Install additional build tools for SLES 11
   package: "name={{ item }} state=latest"
