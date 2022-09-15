@@ -1,3 +1,4 @@
+---
 # Updates $HOME/ansible.log with the date and time of latest ansible playbook run
 
 - name: Set variables (Linux)
