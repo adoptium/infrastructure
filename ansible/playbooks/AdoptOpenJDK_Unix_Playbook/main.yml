@@ -15,6 +15,14 @@
   environment:
     PATH: "/opt/csw/bin/:/usr/local/bin:/opt/homebrew/bin:{{ ansible_env.PATH }}"
 
+  pre_tasks:
+    - name: Logs
+      lineinfile:
+        create: yes
+        path: /home/jenkins/ansible.log
+        insertafter: EOF
+        line: "{{ ansible_date_time.date }} -- {{ ansible_date_time.time }}"
+
   #########
   # Roles #
   #########
