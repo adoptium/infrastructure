@@ -38,4 +38,4 @@
     line: "{{ ansible_date_time.date }} -- {{ ansible_date_time.time }}"
   become: yes
   become_user: root
-  when: home_exists.stat.isdir
+  when: home_exists.stat.exists
