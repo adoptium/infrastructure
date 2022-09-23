@@ -28,15 +28,6 @@
     path: "{{ home_path }}"
   register: home_exists
 
-- name: pwd
-  shell: pwd
-  register: debugmsg
-  delegate_to: localhost
-
-- name: debug
-  debug:
-    msg: "{{ debugmsg }}"
-
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: output
