@@ -28,6 +28,21 @@
     path: "{{ home_path }}"
   register: home_exists
 
+- name: pwd
+  shell: pwd
+  register: debugmsg
+  delegate_to: localhost
+
+- name: debug
+  debug:
+    msg: "{{ debugmsg }}"
+
+- name: Get Latest git commit SHA
+  shell: git rev-parse HEAD
+  register: output
+  delegate_to: localhost
+  when: home_exists.stat.exists
+
 - name: Update Log File
   lineinfile:
     owner: "{{ Jenkins_Username }}"
@@ -35,7 +50,7 @@
     create: yes
     path: "{{ home_path }}/ansible.log"
     insertafter: EOF
-    line: "{{ ansible_date_time.date }} -- {{ ansible_date_time.time }}"
+    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ output.stdout }}"
   become: yes
   become_user: root
   when: home_exists.stat.exists
