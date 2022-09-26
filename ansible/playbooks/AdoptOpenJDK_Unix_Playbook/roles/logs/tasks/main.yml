@@ -1,47 +1,34 @@
 ---
 # Updates $HOME/ansible.log with the date and time of latest ansible playbook run
 
-- name: Set variables (Linux)
+- name: Set Log path
   set_fact:
-    home_path: /home/{{ Jenkins_Username }}
-    user_group: "{{ Jenkins_Username }}"
-  when:
-    - ansible_distribution != "MacOSX"
-    - ansible_distribution != "Solaris"
+    log_path: /var/log
 
 - name: Set variables (MacOS)
   set_fact:
-    home_path: /Users/{{ Jenkins_Username }}
     user_group: "staff"
   when:
     - ansible_distribution == "MacOSX"
 
-- name: Set variables (Solaris)
+- name: Set variables (Not MacOS)
   set_fact:
-    home_path: /export/home/{{ Jenkins_Username }}
-    user_group: "{{ Jenkins_Username }}"
+    user_group: "root"
   when:
-    - ansible_distribution == "Solaris"
-
-- name: Check if Jenkins user exists
-  stat:
-    path: "{{ home_path }}"
-  register: home_exists
+    - ansible_distribution != "MacOSX"
 
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: output
   delegate_to: localhost
-  when: home_exists.stat.exists
 
 - name: Update Log File
   lineinfile:
-    owner: "{{ Jenkins_Username }}"
+    owner: root
     group: "{{ user_group }}"
     create: yes
-    path: "{{ home_path }}/ansible.log"
+    path: "{{ log_path }}/ansible.log"
     insertafter: EOF
     line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ output.stdout }}"
   become: yes
   become_user: root
-  when: home_exists.stat.exists
