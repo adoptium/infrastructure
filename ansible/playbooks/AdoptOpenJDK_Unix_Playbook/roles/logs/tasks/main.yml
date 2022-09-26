@@ -30,6 +30,7 @@
   shell: git rev-parse HEAD
   register: output
   delegate_to: localhost
+  ignore_errors: yes
 
 - name: Update Log File
   lineinfile:
