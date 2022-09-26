@@ -17,15 +17,6 @@
   when:
     - ansible_distribution != "MacOSX"
 
-- name: Get PWD
-  shell: pwd
-  register: pwd_output
-  delegate_to: localhost
-
-- name: debug
-  debug:
-    msg: "{{ pwd_output }}"
-
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: output
