@@ -43,7 +43,7 @@ jobs:
         cache-to: type=inline
         push: ${{ github.ref == 'refs/heads/master' }}
       env:
-        - git_sha: $GITHUB_SHA
+        git_sha: ${{ github.sha }}
 
   build-and-push-alpine3:
     name: Alpine3
@@ -64,4 +64,4 @@ jobs:
         cache-to: type=inline
         push: false
       env:
-        - git_sha: $GITHUB_SHA
+        git_sha: ${{ github.sha }}
