@@ -42,8 +42,8 @@ jobs:
         cache-from: type=registry,ref=adoptopenjdk/centos6_build_image:latest
         cache-to: type=inline
         push: ${{ github.ref == 'refs/heads/master' }}
-      args:
-        - ${{ github.sha }}
+      env:
+        - git_sha: ${{ github.sha }}
 
   build-and-push-alpine3:
     name: Alpine3
