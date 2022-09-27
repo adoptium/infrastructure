@@ -17,6 +17,34 @@
   when:
     - ansible_distribution != "MacOSX"
 
+- name: List directory /infrastructure
+  shell: ls -la /infrastructure
+  register: ls_inf
+  delegate_to: localhost
+
+- name: List directory /
+  shell: ls -la /
+  register: ls_root_dir
+  delegate_to: localhost
+
+- name: List directory /infrastructure/ansible
+  shell: ls -la /infrastructure/ansible
+  register: ls_root_dir
+  delegate_to: localhost
+
+- name: List PWD
+  shell: pwd
+  register: pwd_output
+  delegate_to: localhost
+
+- name: Debug 
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "{{ ls_inf.stdout }}"
+    - "{{ ls_root_dir.stdout }}"
+    - "{{ pwd_output.stdout }}"
+
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: git_output
