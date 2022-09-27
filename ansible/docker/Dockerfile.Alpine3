@@ -1,5 +1,7 @@
 FROM alpine:3.15
 
+ARG git_sha
+
 RUN apk update \
     && apk upgrade \
     && apk add ansible

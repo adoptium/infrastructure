@@ -1,5 +1,6 @@
 FROM centos:6.9
 
+ARG git_sha
 ARG user=jenkins
 
 # Install Python 3

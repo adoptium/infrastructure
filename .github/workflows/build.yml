@@ -38,12 +38,11 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         file: ./ansible/docker/Dockerfile.CentOS6
+        build-args: git_sha=${{ github.sha }}
         tags: adoptopenjdk/centos6_build_image:latest
         cache-from: type=registry,ref=adoptopenjdk/centos6_build_image:latest
         cache-to: type=inline
         push: ${{ github.ref == 'refs/heads/master' }}
-      env:
-        git_sha: ${{ github.sha }}
 
   build-and-push-alpine3:
     name: Alpine3
@@ -59,9 +58,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         file: ./ansible/docker/Dockerfile.Alpine3
+        build-args: git_sha=${{ github.sha }}
         tags: adoptopenjdk/alpine3_build_image:latest
         cache-from: type=registry,ref=adoptopenjdk/alpine3_build_image:latest
         cache-to: type=inline
         push: false
-      env:
-        git_sha: ${{ github.sha }}
