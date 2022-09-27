@@ -63,5 +63,5 @@ jobs:
         cache-from: type=registry,ref=adoptopenjdk/alpine3_build_image:latest
         cache-to: type=inline
         push: false
-      args:
-        - ${{ github.sha }}
+      env:
+        - git_sha: ${{ github.sha }}

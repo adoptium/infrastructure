@@ -15,8 +15,8 @@ RUN echo "localhost ansible_connection=local" > /infrastructure/ansible/hosts
 
 RUN set -eux; \
  cd /infrastructure; \
- ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$GITHUB_SHA" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
- ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$GITHUB_SHA" --tags="riscv"
+ ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --tags="riscv"
 
 RUN rm -rf /infrastructure; yum remove -y ansible; yum clean all
 
