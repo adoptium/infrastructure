@@ -19,7 +19,7 @@
 
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
-  register: output
+  register: git_output
   delegate_to: localhost
   ignore_errors: yes
 
@@ -30,6 +30,6 @@
     create: yes
     path: "{{ log_path }}/ansible.log"
     insertafter: EOF
-    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ output.stdout }}"
+    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ git_output.stdout }}"
   become: yes
   become_user: root

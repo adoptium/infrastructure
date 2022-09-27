@@ -4,14 +4,14 @@ RUN apk update \
     && apk upgrade \
     && apk add ansible
 
-COPY . /ansible
+COPY ../. /infrastructure
 
 RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
- cd /ansible; \
+ cd /infrastructure; \
  ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
- rm -rf /ansible; apk del ansible
+ rm -rf /infrastructure; apk del ansible
 
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/jdk8" \ 
