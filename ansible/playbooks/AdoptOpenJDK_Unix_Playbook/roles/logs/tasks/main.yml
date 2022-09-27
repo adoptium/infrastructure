@@ -17,39 +17,45 @@
   when:
     - ansible_distribution != "MacOSX"
 
-- name: List directory /infrastructure
-  shell: ls -la /infrastructure
-  register: ls_inf
-  delegate_to: localhost
+# - name: List directory /infrastructure
+#   shell: ls -la /infrastructure
+#   register: ls_inf
+#   delegate_to: localhost
 
-- name: List directory /
-  shell: ls -la /
-  register: ls_root_dir
-  delegate_to: localhost
+# - name: List directory /
+#   shell: ls -la /
+#   register: ls_root_dir
+#   delegate_to: localhost
 
-- name: List directory /infrastructure/ansible
-  shell: ls -la /infrastructure/ansible
-  register: ls_root_dir
-  delegate_to: localhost
+# - name: List directory /infrastructure/ansible
+#   shell: ls -la /infrastructure/ansible
+#   register: ls_root_dir
+#   delegate_to: localhost
 
-- name: List PWD
-  shell: pwd
-  register: pwd_output
-  delegate_to: localhost
+# - name: List PWD
+#   shell: pwd
+#   register: pwd_output
+#   delegate_to: localhost
 
-- name: Debug 
-  debug:
-    msg: "{{ item }}"
-  with_items:
-    - "{{ ls_inf.stdout }}"
-    - "{{ ls_root_dir.stdout }}"
-    - "{{ pwd_output.stdout }}"
+# - name: Debug 
+#   debug:
+#     msg: "{{ item }}"
+#   with_items:
+#     - "{{ ls_inf.stdout }}"
+#     - "{{ ls_root_dir.stdout }}"
+#     - "{{ pwd_output.stdout }}"
 
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: git_output
   delegate_to: localhost
   ignore_errors: yes
+  when: git_sha is not defined
+
+- name: Set git_output to git_sha
+  set_fact:
+    git_sha: "{{ git_output.stdout }}"
+  when: git_sha is not defined
 
 - name: Update Log File
   lineinfile:
@@ -58,6 +64,6 @@
     create: yes
     path: "{{ log_path }}/ansible.log"
     insertafter: EOF
-    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ git_output.stdout }}"
+    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ git_sha }}"
   become: yes
   become_user: root
