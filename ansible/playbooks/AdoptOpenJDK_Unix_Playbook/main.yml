@@ -19,6 +19,9 @@
   # Roles #
   #########
   roles:
+    - role: logs
+      position: "Start"
+      tags: always
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
@@ -132,4 +135,5 @@
     - role: disable_gui
       tags: adoptopenjdk
     - role: logs
+      position: "End"
       tags: always
