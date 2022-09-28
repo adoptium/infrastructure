@@ -17,6 +17,10 @@
   when:
     - ansible_distribution != "MacOSX"
 
+- name: Get Date and Time
+  shell: date +%Y-%m-%d\ %H:%M:%S
+  register: date_output
+
 - name: Get Latest git commit SHA
   shell: git rev-parse HEAD
   register: git_output
@@ -36,6 +40,6 @@
     create: yes
     path: "{{ log_path }}/ansible.log"
     insertafter: EOF
-    line: "{{ ansible_date_time.date }} {{ ansible_date_time.time }} {{ git_sha }}"
+    line: "{{ position }} {{ date_output.stdout }} {{ git_sha }}"
   become: yes
   become_user: root
