@@ -10,16 +10,16 @@ RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo; \
     yum -y install gcc openssl-devel bzip2-devel sqlite-devel sudo wget python3 epel-release; \
     yum -y install ansible
 
-COPY ../. /infrastructure
+COPY . /ansible
 
-RUN echo "localhost ansible_connection=local" > /infrastructure/ansible/hosts
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
- cd /infrastructure; \
- ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
- ansible-playbook -i ansible/hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --tags="riscv"
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --tags="riscv"
 
-RUN rm -rf /infrastructure; yum remove -y ansible; yum clean all
+RUN rm -rf /ansible; yum remove -y ansible; yum clean all
 
 RUN groupadd -g 1000 ${user}
 RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
