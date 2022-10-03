@@ -90,7 +90,7 @@
     # group: nagios
     mode: '0775'
 
-- name: copy Nagiosgraph CSS & JS files into place
+- name: Copy Nagiosgraph CSS & JS files into place
   copy:
     src: "{{ item }}"
     dest: "/usr/local/nagios/share"
