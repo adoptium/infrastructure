@@ -61,4 +61,4 @@ The Encrypted File Can Have Its Password Changed With The Following command
 
 Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html):
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
-For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html) :
+For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
