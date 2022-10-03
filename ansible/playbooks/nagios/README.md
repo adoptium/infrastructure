@@ -46,7 +46,7 @@ The Encrypted File Can Be Edited Using The Following Command (With The Relevant 
 
     ansible-vault edit secrets_setup_server.enc
 
-    The Encrypted File Can Have Its Password Changed With The Following command
+The Encrypted File Can Have Its Password Changed With The Following command
 
     ansible-vault rekey secrets_setup_server.enc
 
