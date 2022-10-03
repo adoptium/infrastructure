@@ -48,7 +48,7 @@
   become: yes
   when: not nagiosgraph_plugins_installation.stat.exists
 
-- name: copy nagiosgraph cgi files into place
+- name: Copy nagiosgraph cgi files into place
   copy:
     src: "{{ item.path }}"
     dest: "/usr/local/nagios/sbin"
