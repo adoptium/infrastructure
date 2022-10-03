@@ -21,7 +21,7 @@
     loop_var: pkg_name
   when: not nagios_installation.stat.exists
 
-- name: Download + Unpack Nagios Core Source Version {{ nagios_version }} 
+- name: Download + Unpack Nagios Core Source Version {{ nagios_version }}
   unarchive:
     src: "https://assets.nagios.com/downloads/nagioscore/releases/nagios-{{ nagios_version }}.tar.gz"
     remote_src: yes
@@ -54,7 +54,7 @@
     loop_var: make_target
   when: not nagios_installation.stat.exists
 
-- name: Add apache user to the 'nagios' group userid : '{{ apache_user }}'
+- name: Add apache user to the 'nagios' group userid
   user:
     name: "{{ apache_user }}"
     state: present
