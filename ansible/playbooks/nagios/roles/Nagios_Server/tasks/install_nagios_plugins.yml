@@ -14,7 +14,7 @@
     loop_var: pkg_name
   when: not nagios_plugins_installation.stat.exists
 
-- name: Download + Unpack Nagios Plugins {{ nagios_plugins_version }} source
+- name: Download + Unpack Nagios Plugins Source For Version {{ nagios_plugins_version }}
   unarchive:
     src: "https://github.com/nagios-plugins/nagios-plugins/releases/download/release-{{ nagios_plugins_version }}/nagios-plugins-{{ nagios_plugins_version }}.tar.gz"
     remote_src: yes
