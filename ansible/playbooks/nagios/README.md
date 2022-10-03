@@ -37,7 +37,7 @@ This was created by encrypting a plain text file, as per the example below :
 
     ansible-vault encrypt secrets_setup_server.enc
 
-    The Encrypted File Contains 2 Sensitive Pieces Of Information.
+The Encrypted File Contains 2 Sensitive Pieces Of Information.
 
     nagios_admin_pass: xxxxxxxxxx
     slack_webhook: xxxxxxxxxx
