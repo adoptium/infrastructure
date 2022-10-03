@@ -17,7 +17,7 @@
     loop_var: pkg_name
   when: not nagiosgraph_plugins_installation.stat.exists
 
-- name: Download + Unpack Nagiosgraph Plugin {{ nagiosgraph_plugin_version }} source
+- name: Download + Unpack Nagiosgraph Plugin Source Version {{ nagiosgraph_plugin_version }} 
   unarchive:
     src: "https://sourceforge.net/projects/nagiosgraph/files/nagiosgraph/{{ nagiosgraph_plugin_version }}/nagiosgraph-{{ nagiosgraph_plugin_version }}.tar.gz"
     remote_src: yes
