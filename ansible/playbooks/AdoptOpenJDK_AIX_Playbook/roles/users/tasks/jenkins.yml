@@ -19,7 +19,7 @@
   register: jenkins_pubkey
   tags: jenkins_user
 
-- name: warn about missing authorization for jenkins
+- name: Warn about missing authorization for jenkins
   debug:
     msg: "{{ Jenkins_User_SSHKey }} not included in authorizedkeys"
   when: jenkins_pubkey is defined and

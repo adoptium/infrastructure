@@ -305,21 +305,20 @@
 - name: Set python27
   set_fact:
     ansible_python_interpreter: /opt/csw/bin/python
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
-
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
 - name: Get Git Source
   get_url:
     url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz
     dest: /tmp/git-2.31.0.tar.gz
     mode: 0440
     checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
 
 - name: Extract git 2.31.0 source
   shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
   args:
     chdir: /tmp
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
   tags:
     - build_tools
 
@@ -327,7 +326,7 @@
   file:
     path: /tmp/git-2.31.0/libexec/git-core
     state: directory
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
   tags:
     - build_tools
 
@@ -337,7 +336,7 @@
     dest: "/tmp/git-2.31.0/libexec/git-core/"
     remote_src: yes
     mode: 0775
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
   tags:
     - build_tools
 
@@ -349,7 +348,7 @@
     gmake install
   environment:
     PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
   tags:
     - build_tools
 
@@ -359,6 +358,6 @@
     dest: "/usr/local/bin/"
     remote_src: yes
     mode: 0775
-  when: (git_noncsw_installed.rc != 0 ) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt') )
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
   tags:
     - build_tools

@@ -14,7 +14,7 @@ echo DEBUG: TEST_JDK_HOME = $TEST_JDK_HOME
 
 # Special case for Solaris. See: https://github.com/adoptium/infrastructure/pull/2405#issuecomment-999498345
 if [[ "$(uname)" == "SunOS" ]]; then
-	export PATH="/opt/csw/bin:/usr/local/bin:${PATH}"
+	export PATH="/usr/local/bin:/opt/csw/bin:${PATH}"
 fi
 
 mkdir -p $HOME/testLocation

@@ -4,7 +4,8 @@
 # Ubuntu 16 on x86 (depends on openjdk-8-jre) #
 ###############################################
 
-- hosts: "{{ groups['Vendor_groups'] | default('jck-*-ubuntu*') }}"
+- name: Ubuntu TCK play
+  hosts: "{{ groups['Vendor_groups'] | default('jck-*-ubuntu*') }}"
   remote_user: root
   become: yes
   tasks:
@@ -46,14 +47,14 @@
           apt: pkg={{ item }} state=latest
           with_items:
             - tightvncserver
-          when: isPower =="Y"
+          when: isPower == "Y"
           tags:
             - skip_ansible_lint
         - name: Install VNC on Non-Power systems
           apt: pkg={{ item }} state=latest
           with_items:
             - vnc4server
-          when: isPower =="N"
+          when: isPower == "N"
           tags:
             - skip_ansible_lint
         - name: Create Jenkins user

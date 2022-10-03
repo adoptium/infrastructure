@@ -22,7 +22,7 @@
     - ansible_port is not defined
 
 - name: SSH into the Nagios Master and excute the Nagios_Ansible_Config_tool.sh script
-  command: ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname  }} {{ ansible_host }} {{ provider }} {{ ansible_port }} "
+  command: ssh -o StrictHostKeyChecking=no root@{{ Nagios_Master_IP }} "/usr/local/nagios/Nagios_Ansible_Config_tool/Nagios_Ansible_Config_tool.sh  {{ ansible_distribution }} {{ ansible_architecture }} {{ inventory_hostname }} {{ ansible_host }} {{ provider }} {{ ansible_port }} "
   delegate_to: localhost
   when:
     - Nagios_Monitoring == "Enabled"

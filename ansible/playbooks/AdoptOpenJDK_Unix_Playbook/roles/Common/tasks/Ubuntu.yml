@@ -61,13 +61,6 @@
   with_items: "{{ OpenJFX_Build_Tool_Packages }}"
   tags: [build_tools, build_tools_jfx]
 
-- name: Install GCC G++ on supported platforms
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc_compiler }}"
-  when:
-    - not (ansible_distribution_major_version >= "20")
-  tags: build_tools
-
 - name: Install additional build tools for x86
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_x86 }}"

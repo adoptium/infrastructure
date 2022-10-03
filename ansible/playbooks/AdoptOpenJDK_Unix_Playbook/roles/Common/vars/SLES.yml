@@ -7,7 +7,9 @@
 Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
+  - bzip2
   - cpio
+  - cronie
   - curl
   - flex
   - gcc
@@ -49,7 +51,6 @@ Additional_Build_Tools_SLES15_NOT_SP2:
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
-  - git-core
   - libelf0
   - libfreetype6
   - libXext6
@@ -61,6 +62,13 @@ Additional_Build_Tools_SLES12:
   - Mesa-libGL1
   - ntp
   - perl-CPAN-Meta
+
+Additional_Build_Tools_SLES12_SP5:
+  - curl-devel    ## Required To Install Git From Source
+
+Additional_Build_Tools_SLES12_NOT_SP5:
+  - git-core
+
 Additional_Build_Tools_SLES11:
   - perl-Error
   - libelf0

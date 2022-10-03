@@ -31,7 +31,7 @@
   when:
     - pkg_config_installed.rc != 0
 
-- name: export PKG_CONFIG_PATH=/usr/local/bin
+- name: Export PKG_CONFIG_PATH=/usr/local/bin
   shell: export PKG_CONFIG_PATH=/usr/local/bin
   tags:
     - skip_ansible_lint

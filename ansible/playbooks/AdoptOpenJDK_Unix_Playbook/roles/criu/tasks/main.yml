@@ -219,7 +219,7 @@
   with_items:
     - /tmp/criu-{{ criuVersion }}.tar.gz
     - /tmp/criu-{{ criuVersion }}
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_architecture == "x86_64"
     - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")

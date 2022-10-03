@@ -11,7 +11,7 @@ on:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
 
     - uses: actions/checkout@v2
@@ -19,7 +19,27 @@ jobs:
     - name: Install dependencies
       run: |
         brew install ansible
-        brew install --cask virtualbox
+
+    - name: Install Solaris 10 Box If Not Already Present
+      run: |
+        if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
+        then
+          echo "Box Exists - Do Nothing"
+        else
+          echo "No Box - Download From Jenkins And Import"
+          wget https://ci.adoptopenjdk.net/userContent/vagrant/Solaris10.box.gz
+          CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
+          if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
+          then
+            echo "Checksum OK"
+            gunzip Solaris10.box.gz
+            vagrant box add --name="solaris10" ./Solaris10.box
+            rm Solaris10.box
+          else
+            echo "Sum Bad"
+            exit 99;
+          fi
+        fi
 
     - name: Setup Vagrant VM
       run: |
@@ -32,8 +52,10 @@ jobs:
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        [ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
+        ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
         sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
-        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 30"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
+        awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 60"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
     - name: Run Ansible Playbook
       run: |
