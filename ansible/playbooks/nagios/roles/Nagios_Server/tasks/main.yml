@@ -12,7 +12,7 @@
   include_tasks: install_nagios_plugins.yml
   when: '"install_plugins" in task_list'
 
-- name: Run PNP$NAGIOS-Plugin installation
+- name: Run PNP4NAGIOS-Plugin installation
   include_tasks: install_pnp4nagios.yml
   when: '"install_pnp4nagios" in task_list'
 
