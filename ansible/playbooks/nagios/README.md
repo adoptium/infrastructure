@@ -35,7 +35,7 @@ This is the playbook for installing the nagios server from scratch, it depends o
 
     This was created by encrypting a plain text file, as per the example below :
 
-    ansible-vault encrypt secrets_setup_server.yml
+    ansible-vault encrypt secrets_setup_server.enc
 
     The Encrypted File Contains 2 Sensitive Pieces Of Information.
 
