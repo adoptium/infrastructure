@@ -14,7 +14,7 @@
     loop_var: pkg_name
   when: not pnp4nagios_plugins_installation.stat.exists
 
-- name: Download + Unpack PNP4NAGIOS Plugin {{ pnp4nagios_plugin_version }} source
+- name: Download + Unpack PNP4NAGIOS Plugin Source Version {{ pnp4nagios_plugin_version }} 
   unarchive:
     src: "https://github.com/lingej/pnp4nagios/archive/{{ pnp4nagios_plugin_version }}.tar.gz"
     remote_src: yes
