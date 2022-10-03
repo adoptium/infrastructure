@@ -28,7 +28,7 @@ This file is a simple ansible inventory file used for creating the nagios server
 
 5)  play_setup_server.yml
 
-This is the playbook for installing the nagios server from scratch, it depends on the other 2 files contained within this directory
+This is the playbook for installing the nagios server from scratch, it depends on the other 2 files (vars_setup_server.yml secrets_setup_server.enc) and contained within this directory
 
     - vars_setup_server.yml - contains a list of variable defaults for a typical installation.
     - secrets_setup_server.enc - is an ansible vault containing the default nagios admin password, and the slack webhook URL.
