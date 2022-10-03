@@ -63,10 +63,13 @@ hosts:
       - marist:
           rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
           rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
+          rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
+          rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
 
       - osuosl:
           aix71-ppc64-1: {ip: 140.211.9.10, description: p8-aix1-adopt01.osuosl.org, 7100-04-04-1717}
           aix71-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org, 7100-04-04-1717}
+          aix72-ppc64-1: {ip: 140.211.9.166, description: adopt10, 7200-00-02-1614}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
 
@@ -110,6 +113,9 @@ hosts:
 
       - osuosl:
           ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
+
+      - marist:
+          ubuntu2204-s390x-1: {ip: 148.100.74.237, user: linux1}
 
   - test:
 
@@ -172,14 +178,20 @@ hosts:
 
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
-          sles15-s390x-1: {ip: 148.100.84.159, user: linux1, description: test machine in marist cloud}
+          sles15-s390x-1: {ip: 148.100.84.159, user: linux1, description: test machine in marist cloud, ansible_python_interpreter: /usr/bin/python3}
           rhel7-s390x-1: {ip: 148.100.84.26, user: linux1, description: test machine in marist cloud}
           rhel8-s390x-1: {ip: 148.100.84.52, user: linux1, description: test machine in marist cloud}
           ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
           ubuntu1804-s390x-1: {ip: 148.100.113.30, user: ubuntu}
           ubuntu1804-s390x-2: {ip: 148.100.113.46, user: ubuntu}
           ubuntu1804-s390x-3: {ip: 148.100.113.25, user: ubuntu}
-
+          rhel7-s390x-2: {ip: 148.100.74.92}
+          rhel8-s390x-2: {ip: 148.100.74.2}
+          sles12-s390x-2: {ip: 148.100.74.193}
+          sles15-s390x-2: {ip: 148.100.74.154, ansible_python_interpreter: /usr/bin/python3}
+          ubuntu1804-s390x-4: {ip: 148.100.75.181}
+          ubuntu2004-s390x-1: {ip: 148.100.74.240}
+          ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
       # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
       - nine:

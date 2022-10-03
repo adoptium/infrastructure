@@ -12,7 +12,7 @@
     key: https://download.docker.com/linux/{{ OS }}/gpg
     state: present
 
-- name: Add Docker Repo
+- name: Add Docker Repo x86_64
   yum_repository:
     name: docker
     description: docker repository
@@ -38,7 +38,7 @@
   yum_repository:
     name: docker
     description: docker YUM repo s390x
-    baseurl: https://download.docker.com/linux/rhel/docker-ce.repo
+    baseurl: https://download.docker.com/linux/rhel/7/s390x/stable/
     enabled: true
     gpgcheck: false
   when:

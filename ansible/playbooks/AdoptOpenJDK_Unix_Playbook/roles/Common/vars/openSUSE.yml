@@ -62,6 +62,4 @@ Test_Tool_Packages:
   - pulseaudio
   - xorg-x11
   - xorg-x11-devel
-  - xorg-x11-server
-  - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests

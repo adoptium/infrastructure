@@ -30,14 +30,14 @@
 - name: Add Devel-Tools repository (SLES15)
   zypper_repository:
     name: devel-tools
-    repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15/"
+    repo: "https://download.opensuse.org/repositories/devel:/tools/SLE_15_SP3/"
     auto_import_keys: yes
     state: present
   when:
     - ansible_distribution_major_version == "15"
   tags: patch_update
 
-- name: zypper upgrade all packages
+- name: Zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
 
@@ -57,12 +57,92 @@
     - ansible_distribution_major_version == "15"
   tags: build_tools
 
+- name: Install additional build tools for SLES 15 NOT SP2
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES15_NOT_SP2 }}"
+  when:
+    - (ansible_distribution_major_version == "15" and ansible_distribution_version != "15.2")
+  tags: build_tools
+
+- name: Install Earlier SystemTap On SLES15 SP2
+  zypper: name={{ item }} state=installed
+  with_items: "{{ Additional_Build_Tools_SLES15_SP2 }}"
+  when:
+    - (ansible_distribution_major_version == "15" and ansible_distribution_version == "15.2")
+  tags: build_tools
+
 - name: Install additional build tools for SLES 12
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_SLES12 }}"
   when:
     - ansible_distribution_major_version == "12"
   tags: build_tools
+
+- name: Install additional build tools for SLES 12 SP5
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES12_SP5 }}"
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
+  tags: build_tools
+
+- name: Install additional build tools for SLES 12 NOT SP5
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_SLES12_NOT_SP5 }}"
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version != "12.5")
+  tags: build_tools
+
+- name: Test if  Git Is Installed At /usr/local/bin
+  shell: /usr/local/bin/git --version >/dev/null
+  failed_when: false
+  register: git_installed
+  changed_when: false
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
+  tags:
+    - build_tools
+
+- name: Test if git is installed at the correct version
+  shell: /usr/local/bin/git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+  when:
+    - git_installed.rc == 0 and
+      (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
+  register: git_version
+  changed_when: false
+  tags:
+    - build_tools
+
+- name: Get Git Source
+  get_url:
+    url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz
+    dest: /tmp/git-2.31.0.tar.gz
+    mode: 0440
+    checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
+      (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+
+- name: Extract git 2.31.0 source
+  shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
+  args:
+    chdir: /tmp
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
+      (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Compile Git 2.31.0
+  shell: |
+    cd /tmp/git-2.31.0
+    ./configure
+    gmake -j4
+    gmake install
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5") and
+      (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
 
 - name: Install additional build tools for SLES 11
   package: "name={{ item }} state=latest"
@@ -89,7 +169,7 @@
 
 - name: Download Zlib
   get_url:
-    url: http://www.zlib.net/zlib-1.2.11.tar.gz
+    url: http://www.zlib.net/fossils/zlib-1.2.11.tar.gz
     dest: /tmp/zlib-1.2.11.tar.gz
     mode: 0440
     checksum: sha256:c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
@@ -169,7 +249,7 @@
     - not java8_installed.stat.exists
   tags: java8_SLES11
 
-- name: chmod +x /tmp/ibm-java.bin
+- name: Chmod +x /tmp/ibm-java.bin
   file:
     path: /tmp/ibm-java.bin
     state: file

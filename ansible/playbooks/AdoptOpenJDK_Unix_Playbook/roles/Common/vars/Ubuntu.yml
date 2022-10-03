@@ -62,16 +62,13 @@ OpenJFX_Build_Tool_Packages:
   - libxxf86vm-dev
   - ruby
 
-gcc_compiler:
-  - g++-4.8
-  - gcc-4.8
-
 Additional_Packages_Ubuntu16:
-  - xserver-xorg-legacy                 # Not actually sure if this is still needed
   - libgstreamer0.10-dev                # OpenJFX prereq
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - libmpfr4
   - libmpfr4-dbg
+  - gcc-7                               # Our own one doesn't seem to work on Ubuntu16
+  - g++-7                               # Our own one doesn't seem to work on Ubuntu16
 
 Additional_Packages_Ubuntu18:
   - libgstreamer1.0-dev                 # OpenJFX prereq
@@ -80,19 +77,13 @@ Additional_Packages_Ubuntu18:
 Additional_Build_Tools_x86:
   - libnuma-dev
   - numactl
-  - gcc-7
-  - g++-7
   - gcc-multilib                        # a dependency required for executing a 32-bit C binary
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev
   - numactl
-  - gcc-7                         # OpenJ9
-  - g++-7                         # OpenJ9
 
 Additional_Build_Tools_s390x:
-  - gcc-7                         # OpenJ9
-  - g++-7                         # OpenJ9
   - numactl
   - libfreetype6-dev              # Needed by test state=installed
 
@@ -108,7 +99,6 @@ Test_Tool_Packages:
   - mercurial
   - perl
   - xauth
-  - xorg
   - xvfb
   - binfmt-support
   - qemu-user-static

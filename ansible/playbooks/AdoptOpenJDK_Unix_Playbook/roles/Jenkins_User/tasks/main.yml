@@ -21,6 +21,14 @@
     - ansible_distribution == "Solaris"
   tags: [jenkins_user, adoptopenjdk]
 
+- name: Create Jenkins account group for SLES
+  group:
+    name: "{{ Jenkins_Username }}"
+    state: present
+  when:
+    - ansible_distribution == "SLES"
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Create Jenkins user
   action: user name={{ Jenkins_Username }} state=present home={{ home_folder }} shell=/bin/bash
   failed_when: false

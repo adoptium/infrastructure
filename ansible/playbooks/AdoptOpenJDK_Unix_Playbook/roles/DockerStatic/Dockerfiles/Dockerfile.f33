@@ -1,6 +1,6 @@
 FROM fedora:33
 
-RUN yum -y update && yum install -y perl openssh-server unzip wget
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Get java8
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
@@ -24,7 +24,7 @@ RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
-RUN yum install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst procps glibc-langpack-en fontconfig which hostname fakeroot
+RUN yum install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst procps glibc-langpack-en fontconfig which hostname fakeroot shared-mime-info
 # ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID

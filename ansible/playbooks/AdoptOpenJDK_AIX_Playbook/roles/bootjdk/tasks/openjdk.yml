@@ -12,7 +12,7 @@
         path: /usr/java{{ jdk }}_64
       register: java_installed
 
-    - name: "{{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
+    - name: "Unarchive {{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
       unarchive:
         src: "{{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
         dest: /usr
@@ -23,7 +23,7 @@
       failed_when: "openjdk.failed
         and 'HTTP Error 404: Not Found' not in openjdk.msg"
 
-    - name: "{{ baseurl }}/{{ jdk }}/ea/{{ os_img }}/{{ impl }}/{{ project }}"
+    - name: "Unarchive {{ baseurl }}/{{ jdk }}/ea/{{ os_img }}/{{ impl }}/{{ project }}"
       unarchive:
         src: "{{ baseurl }}/{{ jdk }}/ea/{{ os_img }}/{{ impl }}/{{ project }}"
         dest: /usr

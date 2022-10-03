@@ -186,7 +186,7 @@
     - yum
 
 # Create zlib.h and zconf.h links - See https://github.com/adoptium/infrastructure/issues/1952
-- name: copy zlib.h and zconf.h (See https://github.com/adoptium/infrastructure/issues/1952)
+- name: Copy zlib.h and zconf.h (See https://github.com/adoptium/infrastructure/issues/1952)
   copy:
     src: "/opt/freeware/include/{{ item }}"
     dest: "/usr/include/"

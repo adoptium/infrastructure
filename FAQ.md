@@ -26,7 +26,7 @@ Most Ansible changes are tested automatically with a series of CI jobs:
 |---|---|---|
 | Centos 6 | [build.yml](./.github/workflows/build.yml) | |
 | Alpine 3 | [build.yml](./.github/workflows/build.yml) | |
-| macOS 10.15 | [build_mac.yml](./.github/workflows/build_mac.yml) | |
+| macOS 11 | [build_mac.yml](./.github/workflows/build_mac.yml) | |
 | Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
 | Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 

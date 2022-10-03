@@ -1,7 +1,7 @@
 FROM redhat/ubi8
 # Install Base Requirements
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN dnf -y update && dnf install -y perl openssh-server unzip wget epel-release
+RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-release
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Install Additional Repos
 RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm' -O /tmp/gpgkey.rpm

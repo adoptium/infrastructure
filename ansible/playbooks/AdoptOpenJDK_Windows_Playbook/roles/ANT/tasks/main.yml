@@ -63,7 +63,7 @@
   when: (not ant_contrib_installed.stat.exists)
   tags: ANT
 
-- name: unzip ant-contrib
+- name: Unzip ant-contrib
   win_unzip:
     src: c:\temp\ant-contrib.zip
     dest: c:\temp\ant-contrib

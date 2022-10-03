@@ -285,3 +285,79 @@
     state: link
     force: yes
   tags: build_tools
+
+- name: Test if nonCSW Git Is Installed At /usr/local/bin
+  shell: /usr/local/bin/git --version >/dev/null
+  failed_when: false
+  register: git_noncsw_installed
+  changed_when: false
+  tags:
+    - build_tools
+
+- name: Test if git is installed at the correct version
+  shell: /usr/local/bin/git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+  when: git_noncsw_installed.rc == 0
+  register: git_noncsw_version
+  changed_when: false
+  tags:
+    - build_tools
+
+- name: Set python27
+  set_fact:
+    ansible_python_interpreter: /opt/csw/bin/python
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+- name: Get Git Source
+  get_url:
+    url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz
+    dest: /tmp/git-2.31.0.tar.gz
+    mode: 0440
+    checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+
+- name: Extract git 2.31.0 source
+  shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
+  args:
+    chdir: /tmp
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Create Git Temporary Compilation Library directory
+  file:
+    path: /tmp/git-2.31.0/libexec/git-core
+    state: directory
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Copy Existing Git Remote HTTPS Library Into Compile Area
+  copy:
+    src: "/opt/csw/libexec/git-core/git-remote-https"
+    dest: "/tmp/git-2.31.0/libexec/git-core/"
+    remote_src: yes
+    mode: 0775
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Compile Git 2.31.0
+  shell: |
+    cd /tmp/git-2.31.0
+    ./configure --with-curl=/opt/csw/lib/libcurl.so --with-openssl=/opt/csw/lib/libssl.so --with-expat
+    gmake -j4
+    gmake install
+  environment:
+    PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Copy New Git Remote HTTPS Library Into Runtime Area
+  copy:
+    src: "/tmp/git-2.31.0/libexec/git-core/git-remote-https"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+    mode: 0775
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools

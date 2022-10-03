@@ -60,13 +60,9 @@ OpenJFX_Build_Tool_Packages:
   - libxxf86vm-dev
   - ruby
 
-gcc_7:                            # On all architectures but arm32 and riscv64
-  - g++-7                         # OpenJ9
-  - gcc-7                         # OpenJ9
-
 gcc_compiler:
-  - g++-4.8
-  - gcc-4.8
+  - g++-7
+  - gcc-7
 
 Additional_Packages_Debian8:
   - libgstreamer0.10-dev                # OpenJFX prereq
@@ -98,7 +94,6 @@ Test_Tool_Packages:
   - acl
   - perl
   - xauth
-  - xorg
   - xvfb
   - binfmt-support
   - qemu-user-static
