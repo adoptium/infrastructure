@@ -4,7 +4,6 @@
   apt:
     update_cache: yes
   changed_when: false
-  when: ansible_distribution == "Ubuntu"
   become: yes
 
 - name: Check Nagios Installation
