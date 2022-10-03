@@ -1,6 +1,6 @@
 **IMPORTANT!**
 
-Currently the Nagios server installation playbook has only been developed and tested on Ubuntu 22.04. Changes will be required if you wish to install a Nagios Server on a different host O/S/
+Currently the Nagios server (4.4.7) installation playbook has only been developed and tested on Ubuntu 22.04. Changes will be required if you wish to install a Nagios Server on a different host OS
 
 Ensure to update the ansible.cfg and nagios_inventory.yml files before running this playbook.
 
