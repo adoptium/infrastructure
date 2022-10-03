@@ -58,7 +58,7 @@
     mode: 0775
   with_items: "{{ cgifiles.files }}"
 
-- name: Update Use Lib Path In Insert.PL script
+- name: Update Use Lib Path In insert.pl Script
   lineinfile:
     path: /usr/local/nagios/nagiosgraph/lib/insert.pl
     regexp: "use lib '/opt/nagiosgraph/etc';"
