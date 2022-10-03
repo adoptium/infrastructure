@@ -33,7 +33,7 @@ This is the playbook for installing the nagios server from scratch, it depends o
     - vars_setup_server.yml - contains a list of variable defaults for a typical installation.
     - secrets_setup_server.enc - is an ansible vault containing the default nagios admin password, and the slack webhook URL.
 
-    This was created by encrypting a plain text file, as per the example below :
+This was created by encrypting a plain text file, as per the example below :
 
     ansible-vault encrypt secrets_setup_server.enc
 
