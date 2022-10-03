@@ -90,7 +90,7 @@
 - name: Create nagiosadmin user for Nagios Instance
   htpasswd:
     path: /usr/local/nagios/etc/htpasswd.users
-    name: nagiosadmin
+    name: "{{ nagios_admin_user }}"
     password: "{{ nagios_admin_pass }}"
     state: present
   become: yes
