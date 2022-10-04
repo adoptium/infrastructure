@@ -1,9 +1,12 @@
 FROM alpine:3.11
 
 # Install OpenJDK 8 from Alpine because AdoptOpenJDK is 16+, only (February, 2021).
-RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget openjdk11 git curl make gcc perl xvfb \
+RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
         libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+
+RUN wget -q 'https://api.adoptopenjdk.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/adoptopenjdk?project=jdk' -O /tmp/jdk17.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 
 # Install ant and ant-contrib.
 RUN wget -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.9-bin.zip'
@@ -25,7 +28,7 @@ RUN chown -R jenkins:jenkins /home/jenkins/.ssh
 RUN chmod -R "g=,o=" /home/jenkins/.ssh
 
 # Remove temporary files.
-RUN rm -rf /tmp/ant* /tmp/ant-contrib*
+RUN rm -rf /tmp/jdk17.tar.gz /tmp/ant* /tmp/ant-contrib*
 
 # Start container with docker run -p 2222:22 UUID.
 CMD ["/usr/sbin/sshd","-D"]
