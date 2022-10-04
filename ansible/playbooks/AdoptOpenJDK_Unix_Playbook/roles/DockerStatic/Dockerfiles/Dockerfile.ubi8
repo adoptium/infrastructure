@@ -9,8 +9,8 @@ RUN rpm -i '/tmp/gpgkey.rpm'
 RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-3.el8.noarch.rpm' -O /tmp/centosrepos.rpm
 RUN rpm -i '/tmp/centosrepos.rpm'
 # Install java8 via WGET
-RUN wget -q 'https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk8.tar.gz
-RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 # Install ant via WGET
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
 RUN wget -q -O /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
@@ -21,7 +21,7 @@ RUN ln -s /usr/local/apache-ant-1.10.5/bin/ant /usr/bin/ant
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 # Housekeep Downloaded Archives
-RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/gpgkey.rpm
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/gpgkey.rpm
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh
@@ -32,6 +32,6 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot
 RUN yum install -y coreutils --allowerasing
-# ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
+# ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
