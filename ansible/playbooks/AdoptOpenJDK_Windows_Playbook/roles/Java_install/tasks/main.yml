@@ -2,7 +2,7 @@
 ################
 # Java_install #
 ################
-- name: Test if Java{{ jdk_version }} is already installed
+- name: Test if Java is already installed version {{ jdk_version }}
   win_stat:
     path: 'C:\openjdk\jdk-{{ jdk_version }}\bin'
   register: java_installed
