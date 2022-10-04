@@ -75,7 +75,7 @@ Additional_Build_Tools_RHEL_ppc64:
   - glibc-devel.ppc               # a dependency required for executing a 32-bit C binary
   - libstdc++.ppc                 # a dependency required for executing a 32-bit C binary
 
-Additional_Build_Tools_RHEL_s390x:
+Additional_Build_Tools_RHEL7_s390x:
   - glibc.s390                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
