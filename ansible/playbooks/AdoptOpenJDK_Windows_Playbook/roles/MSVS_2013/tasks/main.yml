@@ -17,7 +17,7 @@
   when: (not vs2013_installed.stat.exists)
   tags: MSVS_2013
 
-- name: unzip VS2013_COMMUNITY_LOCAL_MEDIA
+- name: Unzip VS2013_COMMUNITY_LOCAL_MEDIA
   win_unzip:
     src: C:\TEMP\VS2013_CE_MEDIA.zip
     dest: C:\TEMP\VS2013_CE_MEDIA
