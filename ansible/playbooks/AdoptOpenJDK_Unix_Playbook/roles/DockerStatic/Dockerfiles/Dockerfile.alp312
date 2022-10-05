@@ -5,7 +5,8 @@ RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget gi
         libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
-RUN wget -q 'https://api.adoptopenjdk.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/adoptopenjdk?project=jdk' -O /tmp/jdk17.tar.gz
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN sha512sum --check --strict /tmp/jdk17.sha
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 
 # Install ant and ant-contrib.

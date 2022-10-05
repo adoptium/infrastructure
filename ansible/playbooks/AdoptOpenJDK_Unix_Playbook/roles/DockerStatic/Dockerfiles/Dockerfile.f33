@@ -4,6 +4,8 @@ RUN yum -y update && yum install -y perl openssh-server unzip zip wget
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Get java8
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN echo "db61842d4482da4fd5b86aee5b1c7f7c28218a58d73850513f272153a1ab09374462cd0d6f631b69f30204e5cfaca44357fa481dc4ebc67a50eda5b71a761082  /tmp/jdk17.tar.gz" > /tmp/jdk17.sha
+RUN sha512sum --check --strict /tmp/jdk17.sha
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 # Install ant
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
