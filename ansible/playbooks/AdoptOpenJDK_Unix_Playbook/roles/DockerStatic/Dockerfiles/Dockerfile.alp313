@@ -6,6 +6,7 @@ RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget gi
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN echo "927a83458e89ff8acd82a443cfe08d6cd93e73bec3311661d2bd4e09eba151088e0d1f40206f50c681586d6629a02c4549fc97df043edacb255e841ea17c83f4  /tmp/jdk17.tar.gz" > /tmp/jdk17.sha
 RUN sha512sum --check --strict /tmp/jdk17.sha
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 
