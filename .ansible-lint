@@ -16,6 +16,7 @@ skip_list:
   - 'var-naming'     # var-naming File defines variable that violates variable naming standards
   - 'fqcn-builtins'  # Disable error introduced in ansible-lint 6.X (https://github.com/ansible/ansible-lint/pull/1908)
   - 'name[template]' # Jinja templates should only be at the end of ‘name’.
+  - 'template-instead-of-copy' # Replaced upstream in https://github.com/ansible/ansible-lint/pull/2512
 
 exclude_paths:
   - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
