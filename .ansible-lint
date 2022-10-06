@@ -13,8 +13,9 @@ skip_list:
   - '501'  # Become_user requires become to work as expected
   - '601'  # Don't compare to literal True/False
   - '602'  # Don't compare to empty string
-  - 'var-naming' # var-naming File defines variable that violates variable naming standards
-  - 'fqcn-builtins' # Disable error introduced in ansible-lint 6.X (https://github.com/ansible/ansible-lint/pull/1908)
+  - 'var-naming'     # var-naming File defines variable that violates variable naming standards
+  - 'fqcn-builtins'  # Disable error introduced in ansible-lint 6.X (https://github.com/ansible/ansible-lint/pull/1908)
+  - 'name[template]' # Jinja templates should only be at the end of ‘name’.
 
 exclude_paths:
   - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
