@@ -3,10 +3,12 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip
 
-# Get java8
+# Get latest jdk17 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
-RUN echo "db61842d4482da4fd5b86aee5b1c7f7c28218a58d73850513f272153a1ab09374462cd0d6f631b69f30204e5cfaca44357fa481dc4ebc67a50eda5b71a761082  /tmp/jdk17.tar.gz" > /tmp/jdk17.sha
-RUN sha512sum --check --strict /tmp/jdk17.sha
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk17 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 
 # Install ant
@@ -20,7 +22,7 @@ RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 
 # Clear up space
-RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig
 
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins

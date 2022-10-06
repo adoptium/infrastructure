@@ -1,13 +1,15 @@
 FROM alpine:3.13
 
-# Install OpenJDK 8 from Alpine because AdoptOpenJDK is 16+, only (February, 2021).
 RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
         libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
+# Get latest jdk17 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
-RUN echo "927a83458e89ff8acd82a443cfe08d6cd93e73bec3311661d2bd4e09eba151088e0d1f40206f50c681586d6629a02c4549fc97df043edacb255e841ea17c83f4  /tmp/jdk17.tar.gz" > /tmp/jdk17.sha
-RUN sha512sum --check --strict /tmp/jdk17.sha
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk17 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=alpine-linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 
 # Install ant and ant-contrib.
