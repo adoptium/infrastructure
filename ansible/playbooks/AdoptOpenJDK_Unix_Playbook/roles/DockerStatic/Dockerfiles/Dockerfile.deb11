@@ -23,7 +23,7 @@ RUN ln -s /usr/local/apache-ant-1.10.12/bin/ant /usr/bin/ant
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.12/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 # Housekeep Downloaded Archives
-RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.gpg
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh

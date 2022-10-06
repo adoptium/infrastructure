@@ -1,7 +1,7 @@
 FROM alpine:3.13
 
 RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
-        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot
+        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot gnupg
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
 # Get latest jdk17 ga
@@ -32,7 +32,7 @@ RUN chown -R jenkins:jenkins /home/jenkins/.ssh
 RUN chmod -R "g=,o=" /home/jenkins/.ssh
 
 # Remove temporary files.
-RUN rm -rf /tmp/jdk17.tar.gz /tmp/ant* /tmp/ant-contrib*
+RUN rm -rf /tmp/jdk17.tar.gz /tmp/ant* /tmp/ant-contrib* /tmp/jdk17.sig
 
 # Start container with docker run -p 2222:22 UUID.
 CMD ["/usr/sbin/sshd","-D"]
