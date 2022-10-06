@@ -1,0 +1,106 @@
+---
+- name: Check PNP4NAGIOS Plugins Installation
+  stat:
+    path: /usr/local/pnp4nagios/bin/npcd
+  register: pnp4nagios_plugins_installation
+
+- name: Install dependencies for building PNP4NAGIOS Plugins
+  package:
+    name: "{{ pkg_name }}"
+    state: latest
+  become: yes
+  loop: "{{ nagiospnp_pkg_list }}"
+  loop_control:
+    loop_var: pkg_name
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Download + Unpack PNP4NAGIOS Plugin Source Version {{ pnp4nagios_plugin_version }}
+  unarchive:
+    src: "https://github.com/lingej/pnp4nagios/archive/{{ pnp4nagios_plugin_version }}.tar.gz"
+    remote_src: yes
+    dest: "/tmp"
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run './configure' on pnp4nagios source.
+  command:
+    cmd: "./configure {{ extra_configure_args }}"
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}/"
+    creates: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}/Makefile"
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}"
+    target: all
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}"
+    target: fullinstall
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}"
+    target: install-webconf
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}"
+    target: install-config
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/pnp4nagios-{{ pnp4nagios_plugin_version }}"
+    target: install-init
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Update Magic Quotes Config
+  lineinfile:
+    path: /usr/local/pnp4nagios/lib/kohana/system/libraries/Input.php
+    regexp: '// magic_quotes_runtime is enabled'
+    insertafter: '// magic_quotes_runtime is enabled'
+    line: "if (version_compare(PHP_VERSION, '5.3.0', '<')) {"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Update Magic Quotes Config
+  lineinfile:
+    path: /usr/local/pnp4nagios/lib/kohana/system/libraries/Input.php
+    regexp: '// magic_quotes_runtime is enabled'
+    insertbefore: '// register_globals is enabled'
+    line: "}"
+  become: yes
+  when: not pnp4nagios_plugins_installation.stat.exists
+
+- name: Restart Apache
+  service:
+    name: "{{ apache2_service }}"
+    state: restarted
+    enabled: yes
+  become: yes
+
+- name: Restart Nagios
+  service:
+    name: nagios
+    state: restarted
+    enabled: yes
+  become: yes

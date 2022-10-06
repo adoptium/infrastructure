@@ -1,0 +1,22 @@
+---
+- name: Check Nagios Slack Notification Script Installation
+  stat:
+    path: /usr/local/nagios/bin/slack_nagios.pl
+  register: nagios_plugins_installation
+
+- name: Copy The Slack Notification Perl Script Into Place
+  copy:
+    src: scripts/slack_nagios.pl
+    dest: /usr/local/nagios/bin/slack_nagios.pl
+    owner: root
+    group: root
+    mode: '0755'
+    backup: yes
+
+- name: Update Slack Nagios Script With Correct URL From Secrets File
+  lineinfile:
+    path: /usr/local/nagios/bin/slack_nagios.pl
+    insertafter: 'SLACK_BOTNAME="nagios"'
+    line: 'WEBHOOK_URL="{{ slack_webhook }}" #Get it from Slack Incoming WebHooks setup instruction'
+  become: yes
+  #when: not nagiosgraph_plugins_installation.stat.exists

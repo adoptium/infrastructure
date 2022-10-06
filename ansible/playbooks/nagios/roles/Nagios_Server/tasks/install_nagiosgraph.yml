@@ -1,0 +1,178 @@
+---
+## Manual Installation Of Nagios Graph As per
+## https://sourceforge.net/p/nagiosgraph/git/ci/master/tree/INSTALL
+
+- name: Check nagiosgraph Plugins Installation
+  stat:
+    path: /usr/local/nagios/nagiosgraph/bin/insert.pl
+  register: nagiosgraph_plugins_installation
+
+- name: Install dependencies for building nagiosgraph Plugin
+  package:
+    name: "{{ pkg_name }}"
+    state: latest
+  become: yes
+  loop: "{{ nagiosgraph_pkg_list }}"
+  loop_control:
+    loop_var: pkg_name
+  when: not nagiosgraph_plugins_installation.stat.exists
+
+- name: Download + Unpack Nagiosgraph Plugin Source Version {{ nagiosgraph_plugin_version }}
+  unarchive:
+    src: "https://sourceforge.net/projects/nagiosgraph/files/nagiosgraph/{{ nagiosgraph_plugin_version }}/nagiosgraph-{{ nagiosgraph_plugin_version }}.tar.gz"
+    remote_src: yes
+    dest: "/tmp"
+  when: not nagiosgraph_plugins_installation.stat.exists
+
+- name: Check NagiosGraph directory exists.
+  stat:
+    path: /usr/local/nagios/nagiosgraph
+  register: ngraph_folder
+
+- name: Rename Nagiosgraph Directory
+  command: "mv /tmp/nagiosgraph-{{ nagiosgraph_plugin_version }} /usr/local/nagios/nagiosgraph"
+  when: ngraph_folder.stat.exists == false
+
+- name: Find NagiosGraph CGI Files
+  find:
+    paths: "/usr/local/nagios/nagiosgraph/cgi"
+    patterns: "*.cgi"
+  register: cgifiles
+
+- name: Update Use Lib Path In CGI Files
+  replace:
+    path: "{{ item.path }}"
+    regexp: "use lib '/opt/nagiosgraph/etc';"
+    replace: "use lib '/usr/local/nagios/nagiosgraph/etc';"
+  with_items: "{{ cgifiles.files }}"
+  become: yes
+  when: not nagiosgraph_plugins_installation.stat.exists
+
+- name: Copy nagiosgraph cgi files into place
+  copy:
+    src: "{{ item.path }}"
+    dest: "/usr/local/nagios/sbin"
+    remote_src: yes
+    # owner: nagios
+    # group: nagios
+    mode: 0775
+  with_items: "{{ cgifiles.files }}"
+
+- name: Update Use Lib Path In insert.pl Script
+  lineinfile:
+    path: /usr/local/nagios/nagiosgraph/lib/insert.pl
+    regexp: "use lib '/opt/nagiosgraph/etc';"
+    line: "use lib '/usr/local/nagios/nagiosgraph/etc';"
+  become: yes
+  when: not nagiosgraph_plugins_installation.stat.exists
+
+- name: Create bin directory if it does not exist
+  ansible.builtin.file:
+    path: /usr/local/nagios/nagiosgraph/bin
+    state: directory
+    mode: '0775'
+
+- name: Copy The NagiosGraph Perl Script Into Place
+  copy:
+    src: /usr/local/nagios/nagiosgraph/lib/insert.pl
+    remote_src: yes
+    dest: /usr/local/nagios/nagiosgraph/bin/insert.pl
+    # owner: nagios
+    # group: nagios
+    mode: '0775'
+
+- name: Copy The Slack NagiosGraph Perl Script Into Alt. Location
+  copy:
+    src: /usr/local/nagios/nagiosgraph/lib/insert.pl
+    remote_src: yes
+    dest: /usr/local/nagios/libexec/insert.pl
+    # owner: nagios
+    # group: nagios
+    mode: '0775'
+
+- name: Copy Nagiosgraph CSS & JS files into place
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/nagios/share"
+    # owner: nagios
+    # group: nagios
+    remote_src: yes
+    mode: '0775'
+  with_items:
+    - /usr/local/nagios/nagiosgraph/share/nagiosgraph.css
+    - /usr/local/nagios/nagiosgraph/share/nagiosgraph.js
+
+- name: Add Nagios Graph Configuration Block To Nagios Config
+  blockinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    marker: '# {mark} ANSIBLE MANAGED BLOCK - For Nagios Graph Configuration'
+    insertafter: EOF
+    block: |
+      # begin nagiosgraph configuration
+      # process nagios performance data using nagiosgraph
+      process_performance_data=1
+      service_perfdata_file=/tmp/perfdata.log
+      service_perfdata_file_template=$LASTSERVICECHECK$||$HOSTNAME$||$SERVICEDESC$||$SERVICEOUTPUT$||$SERVICEPERFDATA$
+      service_perfdata_file_mode=a
+      service_perfdata_file_processing_interval=10
+      service_perfdata_file_processing_command=process-service-perfdata-for-nagiosgraph
+      # end nagiosgraph configuration
+
+- name: Create rrd directory if it does not exist
+  ansible.builtin.file:
+    path: /usr/local/nagios/nagiosgraph/var/rrd
+    owner: nagios
+    group: nagios
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Create log directory if it does not exist
+  ansible.builtin.file:
+    path: /usr/local/nagios/nagiosgraph/var/log
+    owner: nagios
+    group: nagios
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Create NagiosGraph Logfile
+  ansible.builtin.file:
+    path: /usr/local/nagios/nagiosgraph/var/log/nagiosgraph.log
+    owner: nagios
+    group: nagios
+    state: touch
+    mode: '0644'
+  become: yes
+
+- name: Create NagiosGraph-CGI Logfile
+  ansible.builtin.file:
+    path: /usr/local/nagios/nagiosgraph/var/log/nagiosgraph-cgi.log
+    owner: nagios
+    group: nagios
+    state: touch
+    mode: '0644'
+  become: yes
+
+- name: Copy The NagiosGraph Image Into Place
+  copy:
+    src: /usr/local/nagios/nagiosgraph/share/graph.gif
+    remote_src: yes
+    dest: /usr/local/nagios/share/images/action.gif
+    mode: '0775'
+    backup: yes
+
+- name: Copy The  NagiosGraph SSI File Into Place
+  copy:
+    src: /usr/local/nagios/nagiosgraph/share/nagiosgraph.ssi
+    remote_src: yes
+    dest: /usr/local/nagios/share/ssi/common-header.ssi
+    mode: '0775'
+    backup: yes
+
+- name: Restart Nagios
+  service:
+    name: nagios
+    state: restarted
+    enabled: yes
+  become: yes

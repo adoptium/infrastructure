@@ -1,0 +1,8 @@
+---
+# Put The localhost Entry (L7/L8) In Place For Vagrant Based Testing
+
+Nagios_Server:
+  hosts:
+    #192.168.50.55
+    localhost:
+      ansible_connection: local
