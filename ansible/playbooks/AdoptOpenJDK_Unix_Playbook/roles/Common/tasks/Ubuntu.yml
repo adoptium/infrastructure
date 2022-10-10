@@ -22,13 +22,6 @@
   when: ansible_architecture == "aarch64"
   tags: patch_update
 
-- name: Add the ubuntu toolchain repository to apt for gcc-7 on Ubuntu 16.04
-  apt_repository: repo='ppa:ubuntu-toolchain-r/test'
-  when:
-    - ansible_architecture != "armv7l"
-    - ansible_distribution_major_version == "16"
-  tags: patch_update
-
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
     url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
