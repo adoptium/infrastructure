@@ -53,17 +53,17 @@ pipeline {
                 }
             }
         }
-        stage('Docker Manifest') {
-            agent {
-                label "dockerBuild&&linux&&x64"
-            } 
-            environment {
-                DOCKER_CLI_EXPERIMENTAL = "enabled"
-            }
-            steps {
-                dockerManifest()
-            }
-        }
+        // stage('Docker Manifest') {
+        //     agent {
+        //         label "dockerBuild&&linux&&x64"
+        //     } 
+        //     environment {
+        //         DOCKER_CLI_EXPERIMENTAL = "enabled"
+        //     }
+        //     steps {
+        //         dockerManifest()
+        //     }
+        // }
     } 
 } 
 
@@ -72,8 +72,8 @@ def dockerBuild(architecture, distro, dockerfile) {
     dockerImage = docker.build("adoptopenjdk/${distro}_build_image:linux-$architecture",
         "-f ansible/docker/$dockerfile .", "--build-arg git_sha=${env.GIT_COMMIT}")
     // dockerhub is the ID of the credentials stored in Jenkins 
-    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-        dockerImage.push()
+    // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+    //     dockerImage.push()
     }
 }
 
