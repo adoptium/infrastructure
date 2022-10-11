@@ -74,7 +74,7 @@ def dockerBuild(architecture, distro, dockerfile) {
     // dockerhub is the ID of the credentials stored in Jenkins 
     // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
     //     dockerImage.push()
-    }
+    // }
 }
 
 def dockerManifest() { 
