@@ -1,5 +1,6 @@
 FROM centos:7
 
+ARG git_sha
 ARG user=jenkins
 
 RUN yum -y update; yum -y install epel-release
@@ -11,7 +12,7 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
 
 RUN rm -rf /ansible; yum remove ansible; yum clean all
 
