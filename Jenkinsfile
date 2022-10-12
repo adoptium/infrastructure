@@ -69,8 +69,9 @@ pipeline {
 
 def dockerBuild(architecture, distro, dockerfile) {
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    echo "${env.GIT_COMMIT}"
     dockerImage = docker.build("adoptopenjdk/${distro}_build_image:linux-$architecture",
-        "-f ansible/docker/$dockerfile .", "--build-arg git_sha=${env.GIT_COMMIT}")
+        "-f ansible/docker/$dockerfile .")
     // dockerhub is the ID of the credentials stored in Jenkins 
     // docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
     //     dockerImage.push()
