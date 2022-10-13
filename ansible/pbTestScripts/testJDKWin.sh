@@ -20,7 +20,7 @@ then
 fi
 cd openjdk-tests
 
-./get.sh -t $HOME/testLocation/openjdk-tests -p x64_windows
+./get.sh -T $HOME/testLocation/openjdk-tests -p x64_windows
 cd TKG
 export BUILD_LIST=system
 make compile
