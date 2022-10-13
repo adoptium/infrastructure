@@ -94,17 +94,10 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install
+    - role: adoptopenjdk_install  # JDK11 is LTS and likely still relied on by some agents
       jdk_version: 11
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
-        - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
-      tags: build_tools
-    - role: adoptopenjdk_install  # JDK16 Build Bootstrap
-      jdk_version: 15
-      when:
-        - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
@@ -115,9 +108,23 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK18 Build Bootstrap
+    - role: adoptopenjdk_install  # Current LTS
       jdk_version: 17
       when:
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK19 Build Bootstrap
+      jdk_version: 18
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "riscv64"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
+      jdk_version: 19
+      when:
+        - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
