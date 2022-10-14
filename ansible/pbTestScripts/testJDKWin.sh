@@ -1,10 +1,11 @@
 #!/bin/bash
 
-mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* $HOME
+mv /tmp/workspace/build/src/build/*/images/jdk* /tmp/jdk
 # Ensures to set it to the JDK, not JRE or different images
-export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
+# export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
+export TEST_JDK_HOME=C:/tmp/$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
 
-cd $HOME
+cd /tmp
 if [ ! -d "testLocation" ];
 then
 	echo "Creating testLocation directory"
