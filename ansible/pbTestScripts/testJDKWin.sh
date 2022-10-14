@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to execute System tests on the previously built JDK.
-export HOME=c:/tmp/test
+export HOME=/cygdrive/c/tmp
 
 mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* $HOME
 # Ensures to set it to the JDK, not JRE or different images
