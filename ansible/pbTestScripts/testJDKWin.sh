@@ -1,21 +1,21 @@
 #!/bin/bash
 
 # Relocate Built JDKS
-mv /tmp/workspace/build/src/build/*/images/jdk* c:/tmp
+mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* c:/tmp
 
 # Remove Redundant Images
-rm -rf c:/tmp/*-debug-image
-rm -rf c:/tmp/*-jre
-rm -rf c:/tmp/*-test-image
+rm -rf /cygdrive/c/tmp/*-debug-image
+rm -rf /cygdrive/c/tmp/*-jre
+rm -rf /cygdrive/c/tmp/*-test-image
 
 #Identify The JDK
 
 # Set Test JDK HOME To The Relocated JDK
 # export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
-export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"`
+export TEST_JDK_HOME=`ls -d /cygdrive/c/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"`
 echo TEST_JDK_HOME=$TEST_JDK_HOME
 
-cd /tmp
+cd /cygdrive/c/tmp
 if [ ! -d "testLocation" ];
 then
 	echo "Creating testLocation directory"
