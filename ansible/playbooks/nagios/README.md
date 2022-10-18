@@ -82,33 +82,13 @@ The following files were edited
 	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
 	}
 ```
-2) /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1  :
+2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.
 ```bash
 	define service{
 		use				generic-service
-		host_name			build-osuosl-aix71-ppc64-1
+		host_name			machine's host name goes here
 		service_description		Disk Space check for Jenkins
 		check_command			check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
 		check_interval			60
 	}
 ```  
-3) /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-2  :
-```bash
-        define service{
-                use                             generic-service
-                host_name                       build-osuosl-aix71-ppc64-2
-                service_description             Disk Space check for Jenkins
-                check_command                   check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
-                check_interval                  60
-        }
-```
-4) /usr/local/nagios/etc/servers/build-osuosl-aix72-ppc64-1  :
-```bash
-        define service{
-                use                             generic-service
-                host_name                       build-osuosl-aix72-ppc64-1
-                service_description             Disk Space check for Jenkins
-                check_command                   check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
-                check_interval                  60
-        }
-```
