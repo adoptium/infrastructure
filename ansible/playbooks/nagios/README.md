@@ -62,3 +62,56 @@ The Encrypted File Can Have Its Password Changed With The Following command
 Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html):
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+
+### How to Add Additional Disk Space Check For /tmp on AIX hosts
+
+* The commands configuration file `commands.cfg` can be located at
+
+```bash
+/usr/local/nagios/etc/objects/commands.cfg
+```
+
+* Navigate to
+
+```bash
+cd /usr/local/nagios/etc/objects
+```
+
+* Open commands.cfg in a text editor
+
+```bash
+nano commands.cfg
+```
+
+* `check_tmp_disk` command definition
+
+```bash
+define command{
+	    command_name	check_tmp_disk
+	    command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+	}
+    
+```
+* Point the machine to a specific configuration(`.cfg`) file where to spin from for the tmp disk check. These configuration files can be found in this directory
+
+```bash
+/usr/local/nagios/etc/servers/example.cfg
+```
+
+* Open example.cfg in a text editor
+
+```bash
+nano example.cfg
+```
+
+* The configuration file should look like this
+
+```bash
+define service{
+    use                      generic-service
+    host_name                machine host name goes here
+    service_description      Disk Space check for tmp
+    check_command            check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /tmp
+    check_interval           40
+}
+```
