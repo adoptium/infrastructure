@@ -62,3 +62,44 @@ The Encrypted File Can Have Its Password Changed With The Following command
 Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html):
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+
+## How to Add Additional Jenkins Check Label Job To Nagios Server Group For windows ##
+
+* The commands configuration file `commands.cfg` can be located at 
+```bash
+/usr/local/nagios/etc/objects/commands.cfg
+```
+
+* Navigate to
+
+```bash
+cd /usr/local/nagios/etc/objects
+```
+
+* Open commands.cfg in a text editor
+
+```bash
+nano commands.cfg
+```
+* add `check_build_windows_x64` command definition
+
+```bash
+define command{
+	    command_name	check_label_build_windows_x64
+	    command_line  $USER1$/check_build_windows_x64 "$ARG1$" $ARG2$ $ARG3$
+
+	}
+```
+*  Amend the machine specific config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
+
+```bash
+	define service{
+		 use                             local-service
+        host_name                       Nagios_Server
+        check_period                    once-a-day-at-8
+        service_description             Check Label- build/windows/x64
+        check_command                   check_label!build&&windows&&x64!75!30
+        notifications_enabled           0
+
+	}
+``
