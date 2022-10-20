@@ -87,14 +87,13 @@ nano commands.cfg
 define command{
 	    command_name	check_label_build_windows_x64
 	    command_line  $USER1$/check_build_windows_x64 "$ARG1$" $ARG2$ $ARG3$
-
 	}
 ```
 *  Amend the machine specific config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
 
 ```bash
 	define service{
-		 use                             local-service
+		use                             local-service
         host_name                       Nagios_Server
         check_period                    once-a-day-at-8
         service_description             Check Label- build/windows/x64
