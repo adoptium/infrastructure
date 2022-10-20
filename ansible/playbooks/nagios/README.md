@@ -63,7 +63,7 @@ Based off the [installation guide](https://support.nagios.com/kb/article/nagios-
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
-## How to Add Additional Jenkins Check Label Job To Nagios Server Group For windows ##
+## How to add additional Jenkins Check Label Job To Nagios server group For Windows ##
 
 * The commands configuration file `commands.cfg` can be located at 
 ```bash
