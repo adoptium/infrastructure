@@ -93,7 +93,7 @@ define command{
 
 ```bash
 	define service{
-		use                             local-service
+        use                             local-service
         host_name                       Nagios_Server
         check_period                    once-a-day-at-8
         service_description             Check Label- build/windows/x64
