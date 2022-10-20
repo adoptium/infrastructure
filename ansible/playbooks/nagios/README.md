@@ -99,6 +99,5 @@ define command{
         service_description             Check Label- build/windows/x64
         check_command                   check_label!build&&windows&&x64!75!30
         notifications_enabled           0
-
 	}
 ``
