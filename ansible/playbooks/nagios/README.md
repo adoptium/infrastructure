@@ -70,11 +70,11 @@ Based off the [installation guide](https://support.nagios.com/kb/article/nagios-
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
-**Nagios Automation :**
-Task: Add additional disk space check for /home/jenkins on AIX hosts
+## How to add additional disk space check for /home/jenkins on AIX hosts.
   
-The following files were edited  
-1) /usr/local/nagios/etc/objects/commands.cfg :  
+Additional checks are defined and added to host specific config files (located in the /usr/local/nagios/etc/servers directory) in the Nagios monitoring server. The steps include :
+
+1) Define the command in the commands.cfg file located at /usr/local/nagios/etc/objects/commands.cfg :  
 ```bash
 	# 'check_jenkins_disk' command definition
 	define command{
@@ -82,13 +82,15 @@ The following files were edited
 	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
 	}
 ```
-2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.
+2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.  
+
 ```bash
-	define service{
+	define service {
 		use				generic-service
-		host_name			machine's host name goes here
+		host_name			AIX host name goes here
 		service_description		Disk Space check for Jenkins
 		check_command			check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
 		check_interval			60
 	}
 ```  
+The second step above is repeated for all AIX hosts in the /usr/local/nagios/etc/servers directory.  
