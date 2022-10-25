@@ -1,20 +1,4 @@
-**IMPORTANT!**
 
-Currently the Nagios server (4.4.7) installation playbook has only been developed and tested on Ubuntu 22.04. Changes will be required if you wish to install a Nagios Server on a different host OS
-
-Ensure to update the ansible.cfg and nagios_inventory.yml files before running this playbook.
-
-**Repository Contents:**
-
-README.MD (This File)
-
-1) ./VagrantFiles/
-
-  This directory contains a vagrantfile that can be used to create a test server for running the Nagios_Server playbook on.
-
-  **NB: For the Ubuntu 2204 Vagrantfile, its recommended to use a minimum Vagrant version of 2.2.19-1**
-
-2) ./roles/*
 
 This directory houses the ansible roles used in the creation of the nagios server.
 
@@ -65,31 +49,7 @@ For some useful tips for working with vault files see [here](https://docs.ansibl
 
 ## How to add additional Jenkins Check Label Job To Nagios server group For Windows ##
 
-* The commands configuration file `commands.cfg` can be located at 
-```bash
-/usr/local/nagios/etc/objects/commands.cfg
-```
-
-* Navigate to
-
-```bash
-cd /usr/local/nagios/etc/objects
-```
-
-* Open commands.cfg in a text editor
-
-```bash
-nano commands.cfg
-```
-* add `check_build_windows_x64` command definition
-
-```bash
-define command{
-	    command_name	check_label_build_windows_x64
-	    command_line  $USER1$/check_build_windows_x64 "$ARG1$" $ARG2$ $ARG3$
-	}
-```
-*  Amend the machine specific config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
+*  Amend the Nagios server config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
 
 ```bash
 	define service{
