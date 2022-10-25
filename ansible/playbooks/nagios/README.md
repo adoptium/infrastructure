@@ -1,4 +1,20 @@
+**IMPORTANT!**
 
+Currently the Nagios server (4.4.7) installation playbook has only been developed and tested on Ubuntu 22.04. Changes will be required if you wish to install a Nagios Server on a different host OS
+
+Ensure to update the ansible.cfg and nagios_inventory.yml files before running this playbook.
+
+**Repository Contents:**
+
+README.MD (This File)
+
+1) ./VagrantFiles/
+
+  This directory contains a vagrantfile that can be used to create a test server for running the Nagios_Server playbook on.
+
+  **NB: For the Ubuntu 2204 Vagrantfile, its recommended to use a minimum Vagrant version of 2.2.19-1**
+
+2) ./roles/*
 
 This directory houses the ansible roles used in the creation of the nagios server.
 
