@@ -57,11 +57,44 @@ The Encrypted File Can Have Its Password Changed With The Following command
 
 2) Either directly on the nagios server host (ansible must be installed), or alternatively from an ansible machine with connection to the nagios server to be.
 
-    ansible-playbook -b play_setup_server.yml --ask-vault-pass
+    ansible-playbook -b play_setup_server.yml --ask-vault-pass  
+3) For Windows users getting this error when trying to run the playbook
+```bash
+	[WARNING]: Ansible is being run in a world writable directory (/vagrant), ignoring it as an ansible.cfg source
+```
+edit your Vagrantfile and add  
+`, id: "vagrant-root", disabled: false, mount_options: ["dmode=775"]`
+to the `nagios_server.vm.synced_folder ".", "/vagrant"` line
 
 Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html):
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+
+add_disk_space_check
+## How to add additional disk space check for /home/jenkins on AIX hosts.
+  
+Additional checks are defined and added to host specific config files (located in the /usr/local/nagios/etc/servers directory) in the Nagios monitoring server. The steps include :
+
+1) Define the command in the commands.cfg file located at /usr/local/nagios/etc/objects/commands.cfg :  
+```bash
+	# 'check_jenkins_disk' command definition
+	define command{
+	command_name	check_jenkins_disk
+	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+	}
+```
+2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.  
+
+```bash
+	define service {
+		use				generic-service
+		host_name			AIX host name goes here
+		service_description		Disk Space check for Jenkins
+		check_command			check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
+		check_interval			60
+	}
+```  
+The second step above is repeated for all AIX hosts in the /usr/local/nagios/etc/servers directory.  
 
 ### How to update a host group name to the nagios core configurations
 
@@ -131,3 +164,4 @@ define host {
 ```bash
 /etc/init.d/nagios reload
 ```
+master
