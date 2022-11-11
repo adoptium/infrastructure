@@ -1,12 +1,21 @@
 #!/bin/bash
 
-# Script to execute System tests on the previously built JDK.
+# Relocate Built JDKS
+mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* c:/tmp
 
-mv /cygdrive/c/tmp/workspace/build/src/build/*/images/jdk* $HOME
-# Ensures to set it to the JDK, not JRE or different images
-export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
+# Remove Redundant Images
+rm -rf /cygdrive/c/tmp/*-debug-image
+rm -rf /cygdrive/c/tmp/*-jre
+rm -rf /cygdrive/c/tmp/*-test-image
 
-cd $HOME
+#Identify The JDK
+
+# Set Test JDK HOME To The Relocated JDK
+# export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
+export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"`
+echo TEST_JDK_HOME=$TEST_JDK_HOME
+
+cd /cygdrive/c/tmp
 if [ ! -d "testLocation" ];
 then
 	echo "Creating testLocation directory"
@@ -20,7 +29,7 @@ then
 fi
 cd openjdk-tests
 
-./get.sh -t $HOME/testLocation/openjdk-tests -p x64_windows
+./get.sh -T $HOME/testLocation/openjdk-tests -p x64_windows
 cd TKG
 export BUILD_LIST=system
 make compile
