@@ -70,6 +70,7 @@ Based off the [installation guide](https://support.nagios.com/kb/article/nagios-
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
+add_disk_space_check
 ## How to add additional disk space check for /home/jenkins on AIX hosts.
   
 Additional checks are defined and added to host specific config files (located in the /usr/local/nagios/etc/servers directory) in the Nagios monitoring server. The steps include :
@@ -94,3 +95,73 @@ Additional checks are defined and added to host specific config files (located i
 	}
 ```  
 The second step above is repeated for all AIX hosts in the /usr/local/nagios/etc/servers directory.  
+
+### How to update a host group name to the nagios core configurations
+
+* The hostgroups.cfg can be located at
+
+```bash
+/usr/local/nagios/etc/objects/hostgroups.cfg
+```
+
+* Navigate to
+
+```bash
+cd /usr/local/nagios/etc/objects
+```
+
+* Open hostgroups.cfg in a text editor
+
+```bash
+vi hostgroups.cfg
+```
+
+* After opening the `hostgroups.cfg` update the host group name in the code related to the following block of code.
+
+```bash
+define hostgroup {
+    hostgroup_name  linuxubuntu
+    alias           linux-ubuntu
+}
+```
+
+* Move a directory up and then edit the nagios.cfg file:
+
+```bash
+cd ..
+vi nagios.cfg
+```
+
+* Check whether the config file is declared in nagios.cfg. It should look like this
+
+```bash
+cfg_file=/usr/local/nagios/etc/objects/hostgroups.cfg
+```
+
+and can be added if there is non
+
+* For each of the hosts we want to be part of the group, find their definitions and update a hostgroups directive to put them into the updated hostgroup. In this case, our definitions for sparta.example.net and athens.example.net ends up looking like this: The hostgroups name can be updated to the corresponding name `linuxubuntu`
+
+```bash
+define host {
+    use         linux-server
+    host_name   khan.example.net
+    alias       khan
+    address     192.0.2.21
+    hostgroups  linuxubuntu
+}
+define host {
+    use         linux-server
+    host_name   khu.example.net
+    alias       khu
+    address     192.0.2.22
+    hostgroups  linuxubuntu
+}
+```
+
+* Restart Nagios:
+
+```bash
+/etc/init.d/nagios reload
+```
+master
