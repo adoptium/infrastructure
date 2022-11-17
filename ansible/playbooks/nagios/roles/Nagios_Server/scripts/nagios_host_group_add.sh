@@ -6,7 +6,7 @@ read hostgroup_name
 echo "enter the hostgroup alias"
 read hostgroup_alias
 
-echo "enter enter the hostgroup members"
+echo "enter the hostgroup members"
 read hostgroup_members
 
 echo "define hostgroup{" >> /usr/local/nagios/etc/objects/hostgroups.cfg
