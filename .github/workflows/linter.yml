@@ -13,17 +13,22 @@ on:
     branches:         
     - master
 
+permissions:
+  contents: read
 
 jobs:
   yamllint:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      pull-requests: write  # for karancode/yamllint-github-action to post comments on PRs
     name: Yamllint
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: 'Yamllint'
-      uses: karancode/yamllint-github-action@master
+      uses: karancode/yamllint-github-action@dd59165b84d90d37fc919c3c7dd84c7e37cd6bfb # master
       with:
         yamllint_comment: true
       env:
@@ -34,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: Set up Python 3.x
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
       with:
         python-version: '3.x'
 

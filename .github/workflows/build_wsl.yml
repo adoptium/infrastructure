@@ -17,6 +17,9 @@ concurrency:
   group: "${{ github.ref }}"
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions:
+  contents: read
+
 jobs:
   build-wsl:
     strategy:
@@ -38,9 +41,9 @@ jobs:
         .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
         .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
-    - uses: Vampire/setup-wsl@v1
+    - uses: Vampire/setup-wsl@230f54c1aaf45965739002df30b3e4de43349a37 # v1.3.4
 
     - name: Install dependencies
       run: |
