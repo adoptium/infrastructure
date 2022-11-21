@@ -72,7 +72,7 @@
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
-    - NSCLient                    # Required For Nagios Monitoring
+    - NSClient                    # Required For Nagios Monitoring
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
     - role: Thunderbird
