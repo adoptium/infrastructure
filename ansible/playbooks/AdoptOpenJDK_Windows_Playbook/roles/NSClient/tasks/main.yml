@@ -30,8 +30,11 @@
   tags: NSClient
 
 - name: Install NSClient
-  raw: msiexec /i /qn C:\temp\nscp.msi INSTALLLOCATION=c:\nsclient CONF_CAN_CHANGE=1 MONITORING_TOOL=none ALLOWED_HOSTS=127.0.0.1,{{ Nagios_Master_IP }} ADD_DEFAULTS=1 CONF_CHECKS=1 CONF_NSCLIENT=1
-  failed_when: false
+  win_package:
+    path: 'C:\temp\nscp.msi'
+    creates_path: 'c:\nsclient\nscp.exe'
+    state: present
+    arguments: /l* C:\temp\nscp.log /quiet INSTALLLOCATION=c:\nsclient CONF_CAN_CHANGE=1 MONITORING_TOOL=none ALLOWED_HOSTS=127.0.0.1,{{ Nagios_Master_IP }} ADD_DEFAULTS=1 CONF_CHECKS=1 CONF_NSCLIENT=1 /quiet
   when: (not nsclient_installed.stat.exists)
   tags: NSClient
 
