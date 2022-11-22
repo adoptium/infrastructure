@@ -64,8 +64,3 @@
     state: absent
   failed_when: false
   tags: NSClient
-
-- name: Print all available facts
-  ansible.builtin.debug:
-    var: ansible_facts
-  tags: NSClient
