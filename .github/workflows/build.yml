@@ -16,26 +16,29 @@ on:
     branches:
     - master
 
+permissions:
+  contents: read
+
 jobs:
   build-and-push-centos6:
     name: Centos6
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: Set up Docker Buildx to use cache feature
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # v2.2.1
 
     - name: Login to Docker Hub
-      uses: docker/login-action@v2
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
       if: github.ref == 'refs/heads/master'
 
     - name: Docker Build & Push Centos6 Image to Docker Hub
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
       with:
         file: ./ansible/docker/Dockerfile.CentOS6
         build-args: git_sha=${{ github.sha }}
@@ -49,13 +52,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: Set up Docker Buildx to use cache feature
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # v2.2.1
 
     - name: Docker Build Alpine3 Image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
       with:
         file: ./ansible/docker/Dockerfile.Alpine3
         build-args: git_sha=${{ github.sha }}
