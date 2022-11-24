@@ -70,6 +70,21 @@ Based off the [installation guide](https://support.nagios.com/kb/article/nagios-
 And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
+## How to add additional Jenkins Check Label Job To Nagios server group For Windows ##
+
+*  Amend the Nagios server config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
+
+```bash
+	define service{
+        use                             local-service
+        host_name                       Nagios_Server
+        check_period                    once-a-day-at-8
+        service_description             Check Label- build/windows/x64
+        check_command                   check_label!build&&windows&&x64!75!30
+        notifications_enabled           0
+	}
+```
+
 ### How to Add Additional Disk Space Check For /tmp on AIX hosts
 
 * The commands configuration file `commands.cfg` can be located at
