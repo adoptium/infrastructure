@@ -13,5 +13,4 @@ bootjdk: hotspot
 heapsize: normal
 
 ## Nagios Server Details
-Nagios_Monitoring: Enabled
 Nagios_Master_IP: 78.47.239.96
