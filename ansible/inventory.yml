@@ -89,6 +89,9 @@ hosts:
       - spearhead:
           freebsd12-x64-1: {ip: 185.131.222.224}
 
+      - loongson:
+              loongnix20-loongarch64-1: {ip: 114.242.206.180, port: 25817, user: loongson}
+
   - docker:
 
       - aws:
@@ -213,3 +216,6 @@ hosts:
           ubuntu1604-x64-1: {ip: 169.48.4.141}
           win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
           win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}
+
+      - loongson:
+              loongnix20-loongarch64-1: {ip: 114.242.206.180, port: 25817, user: loongson}
