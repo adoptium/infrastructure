@@ -1,42 +1,98 @@
 ---
 ##############################################################
 # Install CRIU, a utility to checkpoint/restore Linux tasks  #
-# OpenJ9 requirement for Linux x86-64                        #
+# OpenJ9 requirement for Linux x86-64, ppc64le, s390x        #
 # Ref: https://github.com/eclipse-openj9/openj9/issues/14016 #
 ##############################################################
 
-- name: Set CRIU version on Ubuntu
+# Requires EPEL repositories enabled, see Common tasks
+
+- name: Set CRIU version
   set_fact: criuVersion=3.17.1
-  when:
-    - ansible_architecture == "x86_64"
-    - ansible_distribution == "Ubuntu"
   tags: criu
 
 - name: Set CRIU version on CentOS/RHEL 7
   set_fact: criuVersion=3.12
   when:
-    - ansible_architecture == "x86_64"
-    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
     - ansible_distribution_major_version == "7"
   tags: criu
 
-- name: Check if CRIU is installed on Linux x86-64 CentOS/RHEL 7 or Ubuntu
+- name: Display CRIU Version
+  debug:
+    var: criuVersion
+  tags: criu
+
+- name: Check if CRIU is installed
   stat:
     path: /usr/local/sbin/criu
   when:
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   register: criu_installed
   tags: criu
 
-- name: Install CRIU prerequisites on CentOS/RHEL 7
+#####################
+# Enable EPEL Repos #
+#####################
+
+- name: Enable Code Ready Linux Builder repository for RHEL 8, 9
+  rhsm_repository:
+    name: codeready-builder-for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms
+    state: enabled
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ansible_distribution == "RedHat"
+    - ((ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "9"))
+  tags: criu
+
+- name: Enable EPEL release for RHEL 8, 9
+  yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ansible_distribution == "RedHat"
+    - ((ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "9"))
+  tags: criu
+
+- name: Enable EPEL repository for CentOS 8
+  shell: |
+    dnf config-manager --set-enabled powertools
+    dnf install -y epel-release epel-next-release
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
+  tags: criu
+
+- name: Enable EPEL repository for CentOS 9
+  shell: |
+    dnf config-manager --set-enabled crb
+    dnf install -y epel-release epel-next-release
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "9"
+  tags: criu
+
+#####################
+
+- name: Install CRIU prerequisites on CentOS/RHEL
   yum:
     name: "{{ packages }}"
   vars:
     packages:
       - asciidoc
       - gnutls-devel
-      - libbsd-devel
       - libcap-devel
       - libnet-devel
       - libnl3-devel
@@ -44,90 +100,142 @@
       - protobuf-c
       - protobuf-c-devel
       - protobuf-devel
-      - protobuf-python
-      - python-ipaddress
       - xmlto
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+  tags: criu
+
+- name: Install CRIU prerequisites on CentOS/RHEL 7
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - protobuf-python
+      - python-ipaddress
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
     - ansible_distribution_major_version == "7"
+  tags: criu
+
+- name: Install CRIU prerequisites on CentOS/RHEL 8, 9
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - nftables
+      - nftables-devel
+      - python3-protobuf
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+    - ((ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "9"))
+  tags: criu
+
+# EPEL 7 not supported on aarch64 and s390x
+- name: Install CRIU prerequisites on CentOS/RHEL
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - libbsd-devel
+    state: present
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+    - ansible_distribution_major_version != "7"
+    - ((ansible_architecture != "s390x") or (ansible_architecture != "aarch64"))
   tags: criu
 
 - name: Install CRIU prerequisites on Ubuntu
   apt:
-    name: "{{ item }}"
-    state: present
-    install_recommends: no
-  with_items:
-    - asciidoc
-    - libbsd-dev
-    - libcap-dev
-    - libgnutls28-dev
-    - libgnutls30
-    - libnet1-dev
-    - libnl-3-dev
-    - libprotobuf-c-dev
-    - libprotobuf-dev
-    - pkg-config
-    - protobuf-c-compiler
-    - protobuf-compiler
-    - xmlto
+    pkg:
+      - asciidoc
+      - libbsd-dev
+      - libcap-dev
+      - libgnutls28-dev
+      - libgnutls30
+      - libnet1-dev
+      - libnl-3-dev
+      - libprotobuf-c-dev
+      - libprotobuf-dev
+      - pkg-config
+      - protobuf-c-compiler
+      - protobuf-compiler
+      - xmlto
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
   tags: criu
 
 - name: Install CRIU prerequisites on Ubuntu 16
   apt:
-    name: "{{ item }}"
+    name: python-protobuf
     state: present
-  with_items:
-    - python-protobuf
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version == "16"
   tags: criu
 
 - name: Install CRIU prerequisites on Ubuntu 18+
   apt:
-    name: "{{ item }}"
+    name: python3-protobuf
     state: present
-  with_items:
-    - python3-protobuf
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version != "16"
   tags: criu
 
 - name: Install CRIU prerequisites on Ubuntu 20+
   apt:
-    name: "{{ item }}"
+    name: libnftables-dev
     state: present
-  with_items:
-    - libnftables-dev
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
-    - (ansible_distribution_major_version != "16" and ansible_distribution_major_version != "18")
+    - ((ansible_distribution_major_version != "16") and (ansible_distribution_major_version != "18"))
   tags: criu
 
 - name: Download CRIU source
   get_url:
     url: https://github.com/checkpoint-restore/criu/archive/refs/tags/v{{ criuVersion }}.tar.gz
+    validate_certs: no
     dest: /tmp
     force: no
     mode: 0644
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   tags: criu
 
 - name: Extract CRIU source
@@ -137,75 +245,98 @@
     copy: False
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   tags: criu
 
 - name: Set CRIU lib directory on Ubuntu
-  set_fact: criuLib=/usr/local/lib/x86_64-linux-gnu
+  set_fact: criuLib=/usr/local/lib/{{ ansible_architecture }}-linux-gnu
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
   tags: criu
 
-- name: Set CRIU lib directory on CentOS/RHEL 7
+- name: Set CRIU lib directory on CentOS/RHEL Linux x86_64
   set_fact: criuLib=/usr/local/lib64
   when:
     - not criu_installed.stat.exists
     - ansible_architecture == "x86_64"
-    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
-    - ansible_distribution_major_version == "7"
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+  tags: criu
+
+- name: Set CRIU lib directory on CentOS/RHEL Linux s390x
+  set_fact: criuLib=/usr/local/lib/
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_architecture == "s390x") or (ansible_architecture == "ppc64le"))
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   tags: criu
 
 - name: Create /etc/ld.so.conf.d/criu.conf
   copy:
     dest: /etc/ld.so.conf.d/criu.conf
     content: "{{ criuLib }}"
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   tags: criu
 
 - name: Compile and install CRIU
   shell: cd /tmp/criu-{{ criuVersion }} && make && make install && ldconfig
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+    - ansible_architecture != "ppc64le"
+  tags: criu
+
+# skip AMD plugin due to installation failure
+- name: Compile and install CRIU on PPC LE
+  shell: cd /tmp/criu-{{ criuVersion }} && make CONFIG_AMDGPU=n && make install CONFIG_AMDGPU=n && ldconfig
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+    - ansible_architecture == "ppc64le"
   tags: criu
 
 - name: Set capablities for CRIU on CentOS/RHEL
   shell: setcap cap_sys_time,cap_dac_override,cap_sys_rawio,cap_sys_pacct,cap_syslog,cap_sys_module,cap_setfcap,cap_net_bind_service,cap_net_broadcast,cap_lease,cap_ipc_owner,cap_ipc_lock,cap_chown,cap_setpcap,cap_setgid,cap_audit_control,cap_dac_read_search,cap_net_admin,cap_sys_chroot,cap_sys_ptrace,cap_fowner,cap_kill,cap_fsetid,cap_sys_resource,cap_setuid,cap_sys_admin=eip /usr/local/sbin/criu
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
-    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
-    - ansible_distribution_major_version == "7"
+    - ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+  become: yes
+  become_user: root
+  become_method: sudo
   tags: criu
 
 - name: Set other_capabilities variable on Ubuntu
   set_fact: other_capabilities=cap_checkpoint_restore,
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
     - ansible_distribution_major_version == "22"
   tags: criu
 
 - name: Set capablities for CRIU on Ubuntu
   shell: setcap {{ other_capabilities | default("") | quote }}cap_sys_time,cap_dac_override,cap_chown,cap_setpcap,cap_setgid,cap_audit_control,cap_dac_read_search,cap_net_admin,cap_sys_chroot,cap_sys_ptrace,cap_fowner,cap_kill,cap_fsetid,cap_sys_resource,cap_setuid,cap_sys_admin=eip /usr/local/sbin/criu
+  become: yes
+  become_user: root
+  become_method: sudo
   when:
     - not criu_installed.stat.exists
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
   tags: criu
 
 - name: Set Python3 version on Ubuntu
   shell: python3 -V | awk '{print $2}'  | cut -f 1,2 -d'.'
   when:
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
   register: python3_version
   tags:
@@ -215,21 +346,35 @@
 - name: Set capablities for python3 on Ubuntu
   shell: setcap cap_sys_admin=eip /usr/bin/python"{{ python3_version.stdout_lines[0] }}"
   when:
-    - ansible_architecture == "x86_64"
     - ansible_distribution == "Ubuntu"
+  become: yes
+  become_user: root
+  become_method: sudo
   tags:
     - criu
     - python3_caps
+
+- name: Check CRIU installation
+  shell: /usr/local/sbin/criu check
+  become: yes
+  become_user: root
+  become_method: sudo
+  when:
+    - not criu_installed.stat.exists
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
+  tags: criu
 
 - name: Remove downloaded packages for CRIU
   file:
     path: "{{ item }}"
     state: absent
+  become: yes
+  become_user: root
+  become_method: sudo
   with_items:
     - /tmp/criu-{{ criuVersion }}.tar.gz
     - /tmp/criu-{{ criuVersion }}
   failed_when: false
   when:
-    - ansible_architecture == "x86_64"
-    - (((ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and ansible_distribution_major_version == "7") or ansible_distribution == "Ubuntu")
+    - ((ansible_distribution == "Ubuntu") or (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat"))
   tags: criu
