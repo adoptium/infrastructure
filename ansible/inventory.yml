@@ -47,8 +47,7 @@ hosts:
           centos69-x64-2: {ip: 167.71.130.191}
 
       - equinix_esxi:
-          solaris10u11-x64-1: {ip: 147.75.85.212}
-          solaris10u11-x64-2: {ip: 147.75.85.213}
+          solaris10-x64-1: {ip: 145.40.115.43}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
@@ -99,7 +98,6 @@ hosts:
 
       - equinix:
           ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
-          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC}
 
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
@@ -107,8 +105,8 @@ hosts:
   - dockerhost:
 
       - equinix:
-          ubuntu2004-x64-1: {ip: 139.178.85.251, description: AMD EPYC 2.8GHz 24 core, 64Gb}
-          ubuntu2004-x64-2: {ip: 147.75.79.143, description: Xeon GOLD 5120 28 core, 380Gb}
+          ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
+          ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
           ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
 
       - osuosl:
@@ -159,9 +157,12 @@ hosts:
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
 
       - equinix:
-          ubuntu1604-x64-1: {ip: 147.75.204.239}
-          ubuntu2004-x64-2: {ip: 147.75.100.127}
           win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
+
+      - equinix_esxi:
+          ubuntu2204-x64-1: {ip: 145.40.115.44, description: Perf machine}
+          ubuntu2204-x64-2: {ip: 145.40.115.46, description: Perf machine}
+          solaris10-x64-1: {ip: 145.40.115.45}
 
       - macincloud:
           macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
