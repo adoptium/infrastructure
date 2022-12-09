@@ -27,7 +27,7 @@
   ignore_errors: yes
   when:
     - git_sha is not defined
-    - inventory_hostname != "localhost" or inventory_hostname != "127.0.0.1"
+    - inventory_hostname != "localhost" and inventory_hostname != "127.0.0.1"
 
 - name: Set git_output to git_sha
   set_fact:
