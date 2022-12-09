@@ -6,8 +6,7 @@
     log_path: 'C:\Users\{{ ansible_user }}'
 
 - name: Get Date and Time
-  shell: date +%Y-%m-%d\ %H:%M:%S
-  delegate_to: localhost
+  win_command: 'echo %date%'
   register: date_output
 
 - name: Get Latest git commit SHA
@@ -27,4 +26,4 @@
     create: yes
     path: '{{ log_path }}\ansible.log'
     insertafter: EOF
-    line: "{{ position }} {{ date_output.stdout }} {{ git_sha }}"
+    line: "{{ position }} {{ date_output.start }} {{ git_sha }}"
