@@ -82,9 +82,6 @@ hosts:
           win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
           win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
 
-      - spearhead:
-          freebsd12-x64-1: {ip: 185.131.222.224}
-
   - docker:
 
       - aws:
@@ -129,10 +126,6 @@ hosts:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
-
-      - gdams:
-          debian10-riscv64-1: {ip: gdams.ddns.net}
-          debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
