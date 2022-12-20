@@ -28,8 +28,8 @@ jobs:
             distro: ubuntu18.04
           - arch: s390x
             distro: ubuntu18.04
-          - arch: armv7
-            distro: jessie
+          # - arch: armv7
+          #   distro: jessie
 
     steps:
       - uses: actions/checkout@v2.1.0
