@@ -36,7 +36,6 @@ jobs:
 
       - name: Run on architecture
         uses: uraimo/run-on-arch-action@v2.3.0
-
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
@@ -48,7 +47,7 @@ jobs:
 
       - name: Run the UNIX playbook
         run: |
-        echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
-        set -eux
-        cd ansible
-        sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }}' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="adoptopenjdk,jenkins"
+          echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+          set -eux
+          cd ansible
+          sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }}' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="adoptopenjdk,jenkins"
