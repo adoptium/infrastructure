@@ -39,11 +39,13 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
-      
-      - name: Install Ansible
         run: |
           apt -y update
           apt -y install ansible
+          echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+          set -eux
+          cd ansible
+          sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }}' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="adoptopenjdk,jenkins"
 
       - name: Run the UNIX playbook
         run: |
