@@ -41,7 +41,7 @@ jobs:
           distro: ${{ matrix.distro }}
           run: |
             apt -y update
-            apt -y install ansible
+            apt -y install ansible sudo
             echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
             set -eux
             cd ansible
