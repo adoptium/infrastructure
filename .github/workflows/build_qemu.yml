@@ -45,5 +45,5 @@ jobs:
             echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
             set -eux
             cd ansible
-            if [[ "${{ matrix.distro }}" == "buster" ]] ; then export interp=/usr/bin/python3 ; else export interp=/usr/bin/python; fi
-            sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }} ansible_python_interpreter=$interp' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,adoptopenjdk,jenkins"
+            if [[ "${{ matrix.distro }}" == "buster" ]] ; then export interpVar="ansible_python_interpreter=/usr/bin/python3" ; fi
+            sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }} $interpVar' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,adoptopenjdk,jenkins"
