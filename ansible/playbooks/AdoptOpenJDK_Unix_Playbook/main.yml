@@ -54,9 +54,11 @@
       when:
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris" # These steps fail on Solaris
+      tags: adoptopenjdk
     - role: Crontab
       when:
         - ansible_distribution != "MacOSX"
+      tags: adoptopenjdk
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
     - gcc_48
