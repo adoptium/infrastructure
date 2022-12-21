@@ -46,4 +46,4 @@ jobs:
             set -eux
             cd ansible
             if [ ! -e /usr/bin/python ] ; then ln -s /usr/bin/python3 /usr/bin/python ; fi
-            sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }}' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,swap_file,adoptopenjdk,jenkins"
+            sudo ansible-playbook -i hosts --extra-vars 'git_sha=${{ github.sha }}' playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,ntp_time,swap_file,adoptopenjdk,jenkins"
