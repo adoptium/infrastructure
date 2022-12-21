@@ -72,8 +72,6 @@
     - 20.61.136.213 # jck-skytap-aix71-ppc64-2
     - 20.61.222.79 # jck-skytap-aix72-ppc64-3
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
-    - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
-    - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
     - 147.75.83.133 # jck-equinix-ubuntu2004-x64-1
