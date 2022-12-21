@@ -1,0 +1,9 @@
+---
+- name: Run python script
+  script: /ansible/playbooks/nagios/roles/Nagios_Config/scripts/nagios_yaml.py
+
+- name: Move .cfg files from scripts to configs
+  ansible.builtin.move:
+    src: /roles/Nagios_Config/scripts/*.cfg
+    dest: /roles/Nagios_Config/scripts/configs
+    force: yes

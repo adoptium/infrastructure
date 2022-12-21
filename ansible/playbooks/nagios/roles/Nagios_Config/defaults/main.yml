@@ -1,0 +1,6 @@
+---
+# defaults file for Nagios_Configuration
+
+task_list:
+    - Download inventory file
+    - Run python script

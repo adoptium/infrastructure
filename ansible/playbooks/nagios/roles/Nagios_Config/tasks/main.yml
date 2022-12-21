@@ -1,0 +1,10 @@
+---
+# tasks file for Nagios_Configuration
+
+- name: Download inventory file
+  include_tasks: get_inventory.yml
+  when: '"Download inventory file" in task_list'
+
+- name: Run python script
+  include_tasks: run_py_script.yml
+  when: '"Run python script" in task_list'
