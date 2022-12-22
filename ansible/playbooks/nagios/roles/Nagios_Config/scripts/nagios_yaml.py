@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -17,6 +17,8 @@ except ImportError:
     import ConfigParser as configparser
 
 valid_types = ('build', 'dockerhost', 'test')
+
+Output_Path=sys.argv[1]
 
 def main():
 
@@ -68,7 +70,7 @@ def load_yaml_file(file_name):
 
     return hosts
 
-def parse_yaml(hosts, config,Output_Path):
+def parse_yaml(hosts, config):
     """Parses host information from the output of yaml.safe_load"""
 
     export = {'_meta': {'hostvars': {}}}
@@ -105,9 +107,5 @@ def parse_yaml(hosts, config,Output_Path):
     return export
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--list', action='store_true')
-    parser.add_argument('--host', action='store')
-    args = parser.parse_args()
-
+   
     main()

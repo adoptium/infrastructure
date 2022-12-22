@@ -1,5 +1,3 @@
 ---
 - name: Run python script
-  ansible.builtin.script: ../scripts/nagios_yaml.py {{Output_Path}}
-  args:
-    executable: /python3
+  script: ../scripts/nagios_yaml.py {{Output_Path}}
