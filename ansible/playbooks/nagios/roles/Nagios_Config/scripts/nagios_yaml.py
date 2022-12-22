@@ -68,7 +68,7 @@ def load_yaml_file(file_name):
 
     return hosts
 
-def parse_yaml(hosts, config):
+def parse_yaml(hosts, config,Output_Path):
     """Parses host information from the output of yaml.safe_load"""
 
     export = {'_meta': {'hostvars': {}}}
@@ -98,7 +98,7 @@ def parse_yaml(hosts, config):
                         if (host_type) in (valid_types):
                             formatted_name = host_type+'-'+provider_name+'-'+host
                             # Creates a file with the .cfg extension using the output
-                            with open(f"{formatted_name}.cfg", "w") as f:
+                            with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
                                 f.write(f"Configuration for {formatted_name}")
 
                         export[host_type]['hosts'].sort()

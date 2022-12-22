@@ -4,3 +4,6 @@
 task_list:
     - Download inventory file
     - Run python script
+
+# Output Path
+Output_Path: /usr/local/nagios/etc/servers

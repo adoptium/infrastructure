@@ -1,11 +1,5 @@
 ---
 - name: Run python script
-  ansible.builtin.script: ../scripts/nagios_yaml.py
+  ansible.builtin.script: ../scripts/nagios_yaml.py {{Output_Path}}
   args:
-    executable: /usr/bin/python3
-
-- name: Move .cfg files from scripts to configs
-  ansible.builtin.move:
-    src: /roles/Nagios_Config/scripts/*.cfg
-    dest: /roles/Nagios_Config/scripts/configs
-    force: yes
+    executable: /python3
