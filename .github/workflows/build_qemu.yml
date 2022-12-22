@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v2.1.0
 
       - name: Run on architecture
-        uses: uraimo/run-on-arch-action@v2.3.0
+        uses: uraimo/run-on-arch-action@v2.4.0
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
