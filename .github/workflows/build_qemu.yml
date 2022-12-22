@@ -5,14 +5,16 @@ on:
     paths:
     - .github/workflows/build_qemu.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
-    branches:         
+    branches:       
     - master
+    types: [ labeled ]
 
 permissions:
   contents: read
 
 jobs:
   build_job:
+    if: ${{ github.event.label.name == 'QEMU-playbook-check' }}
     # The host should always be linux
     runs-on: ubuntu-18.04
     name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
