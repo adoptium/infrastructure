@@ -1,5 +1,5 @@
 ---
-- name: Run python script 
+- name: Run python script
   script: /ansible/playbooks/nagios/roles/Nagios_Config/scripts/nagios_yaml.py
 
 - name: Move .cfg files from scripts to configs
