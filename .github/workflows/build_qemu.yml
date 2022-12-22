@@ -28,6 +28,8 @@ jobs:
             distro: ubuntu18.04
           - arch: s390x
             distro: ubuntu18.04
+          - arch: riscv
+            distro: ubuntu22.04
           # - arch: armv7
           #   distro: jessie
 
