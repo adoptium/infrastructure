@@ -1,0 +1,7 @@
+---
+# Path To Ansible Inventory File
+inventory_path: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml
+
+task_list:
+    - Download inventory file
+    - Run python script
