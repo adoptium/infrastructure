@@ -8,8 +8,8 @@
 - name: Download Ansible inventory file
   include_tasks: Get_Ansible_Inventory.yml
   when:
-       - '"Download Ansible Inventory File" in task_list'
-       - not inventory_is_present.stat.exists
+    - '"Download Ansible Inventory File" in task_list'
+    - not inventory_is_present.stat.exists
 
 # tasks file for Nagios_Configuration
 - name: Check if Inventory File Exists
