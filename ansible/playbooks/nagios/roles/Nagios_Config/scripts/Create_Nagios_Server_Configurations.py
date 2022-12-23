@@ -17,7 +17,8 @@ except ImportError:
 
 valid_types = ('build', 'dockerhost', 'test')
 
-Output_Path = sys.argv[1]
+Input_Path = sys.argv[1]
+Output_Path = sys.argv[2]
 
 def main():
 
@@ -27,7 +28,7 @@ def main():
 
     # load public inventory
     basepath = path.dirname(__file__)
-    inventory_path = "/tmp/ansible_inventory.yml"
+    inventory_path = "{Input_Path}"
     export = parse_yaml(load_yaml_file(inventory_path), config)
 
     # export in JSON for Ansible
