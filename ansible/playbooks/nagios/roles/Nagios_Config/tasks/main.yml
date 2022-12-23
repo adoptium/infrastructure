@@ -1,15 +1,16 @@
 ---
 # tasks file for Nagios_Configuration
 - name: Check if Inventory File Exists
-  stat: path=/tmp/ansible_inventory.yml
+  stat:
+    path: /tmp/ansible_inventory.yml
   register: inventory_is_present
-  
+
 - name: Download Ansible inventory file
   include_tasks: Get_Ansible_Inventory.yml
   when: '"Download Ansible Inventory File" in task_list'
 
 - name: Run Create Nagios Server Configurations
   include_tasks: Create_Nagios_Server_Configurations.yml
-  when: 
+  when:
     - '"Run Create Nagios Server Configurations script" in task_list' and
     - inventory_is_present.stat.exists
