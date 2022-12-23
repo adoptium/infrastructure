@@ -33,7 +33,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 RUN mkdir /var/run/sshd
 CMD ["/usr/sbin/sshd","-D"]
-RUN apt-get install git curl make gcc gnupg xvfb libxrender-dev libxi-dev libxtst-dev fontconfig fakeroot -y
+RUN apt-get install git make gcc xvfb libxrender-dev libxi-dev libxtst-dev fontconfig fakeroot -y
 # ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 21
 # Start with docker run -p 2211:22 UUID
