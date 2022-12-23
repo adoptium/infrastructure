@@ -1,7 +1,7 @@
 FROM debian:bullseye
 # Install Base Requirements
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update && apt-get install -y perl openssh-server unzip zip wget apt-utils
+RUN apt-get update && apt-get install -y perl openssh-server unzip zip wget apt-utils gnupg curl
 RUN echo "y" | ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 RUN apt-get update
 
