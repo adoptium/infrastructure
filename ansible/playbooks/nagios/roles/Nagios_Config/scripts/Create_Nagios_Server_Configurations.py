@@ -28,7 +28,7 @@ def main():
 
     # load public inventory
     basepath = path.dirname(__file__)
-    inventory_path = "{Input_Path}"
+    inventory_path = Input_Path
     export = parse_yaml(load_yaml_file(inventory_path), config)
 
     # export in JSON for Ansible
