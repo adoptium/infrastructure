@@ -18,7 +18,7 @@ except ImportError:
 
 valid_types = ('build', 'dockerhost', 'test')
 
-Output_Path=sys.argv[1]
+Output_Path = sys.argv[1]
 
 def main():
 
