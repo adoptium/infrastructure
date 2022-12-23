@@ -12,5 +12,5 @@
 - name: Run Create Nagios Server Configurations
   include_tasks: Create_Nagios_Server_Configurations.yml
   when:
-    - '"Run Create Nagios Server Configurations script" in task_list' and
+    - "'Run Create Nagios Server Configurations script' in task_list"
     - inventory_is_present.stat.exists
