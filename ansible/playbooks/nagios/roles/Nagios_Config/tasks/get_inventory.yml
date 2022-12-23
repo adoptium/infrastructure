@@ -1,3 +1,0 @@
----
-- name: Download inventory file
-  shell: wget {{inventory_path}} -O /tmp/ansible_inventory.yml

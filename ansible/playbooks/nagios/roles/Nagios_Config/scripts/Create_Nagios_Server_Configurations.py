@@ -3,7 +3,6 @@
 
 from __future__ import print_function
 
-import argparse
 import json
 import os
 import subprocess
@@ -33,25 +32,6 @@ def main():
 
     # export in JSON for Ansible
     # print(json.dumps(export, sort_keys=True, indent=2))
-
-
-# https://stackoverflow.com/a/7205107
-def merge(a, b, path=None):
-    "merges b into a"
-    path = path or []
-    for key in b:
-        if key in a:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                merge(a[key], b[key], path + [str(key)])
-            elif isinstance(a[key], list) and isinstance(b[key], list):
-                a[key] = sorted(set(a[key]).union(b[key]))
-            elif a[key] == b[key]:
-                pass  # same leaf value
-            else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
-        else:
-            a[key] = b[key]
-    return a
 
 def load_yaml_file(file_name):
     """Loads YAML data from a file"""

@@ -1,10 +1,10 @@
 ---
 # tasks file for Nagios_Configuration
 
-- name: Download inventory file
-  include_tasks: get_inventory.yml
-  when: '"Download inventory file" in task_list'
+- name: Download Ansible inventory file
+  include_tasks: Get_Ansible_Inventory.yml
+  when: '"Download Ansible Inventory File" in task_list'
 
-- name: Run python script
-  include_tasks: run_py_script.yml
-  when: '"Run python script" in task_list'
+- name: Run Create Nagios Server Configurations
+  include_tasks: Create_Nagios_Server_Configurations.yml
+  when: '"Run Create Nagios Server Configurations script" in task_list'

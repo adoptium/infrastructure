@@ -2,8 +2,8 @@
 # defaults file for Nagios_Configuration
 
 task_list:
-    - Download inventory file
-    - Run python script
+    - Download Ansible Inventory File
+    - Run Create Nagios Server Configurations script
 
 # Output Path
 Output_Path: /usr/local/nagios/etc/servers

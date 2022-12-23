@@ -1,3 +1,0 @@
----
-- name: Run python script
-  script: ../scripts/nagios_yaml.py {{Output_Path}}
