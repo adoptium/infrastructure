@@ -2,4 +2,4 @@
 - name: Download Ansible Inventory File
   get_url:
      url: "{{inventory_path}}"
-     dest: /tmp/ansible_inventory.yml
+     dest: "{{Input_Path}}"
