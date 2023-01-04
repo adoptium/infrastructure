@@ -60,8 +60,6 @@ hosts:
           macos11-arm64-2: {ip: 207.254.31.16, user: Administrator}
 
       - marist:
-          rhel77-s390x-1: {ip: 148.100.86.102, user: linux1}
-          rhel77-s390x-2: {ip: 148.100.245.197, user: linux1}
           rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
           rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
 
@@ -71,9 +69,6 @@ hosts:
           aix72-ppc64-1: {ip: 140.211.9.166, description: adopt10, 7200-00-02-1614}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
-
-      - equinix:
-          centos8-armv8-1: {ip: 139.178.86.243, description: Altra}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.46.107}
@@ -93,9 +88,6 @@ hosts:
       - aws:
           ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
 
-      - marist:
-          ubuntu1604-s390x-1: {ip: 148.100.113.58, user: ubuntu}
-
       - equinix:
           ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
 
@@ -108,6 +100,7 @@ hosts:
           ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
           ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
           ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+          ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
           ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
@@ -131,10 +124,6 @@ hosts:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
           ubuntu1804-armv8-1: {ip: 34.243.202.254}
-
-      - gdams:
-          debian10-riscv64-1: {ip: gdams.ddns.net}
-          debian10-riscv64-2: {ip: gdams.ddns.net, port: 2222}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
@@ -179,18 +168,12 @@ hosts:
 
       - marist:
           sles12-s390x-1: {ip: 148.100.86.128}
-          sles15-s390x-1: {ip: 148.100.84.159, user: linux1, description: test machine in marist cloud, ansible_python_interpreter: /usr/bin/python3}
           rhel7-s390x-1: {ip: 148.100.84.26, user: linux1, description: test machine in marist cloud}
           rhel8-s390x-1: {ip: 148.100.84.52, user: linux1, description: test machine in marist cloud}
-          ubuntu1604-s390x-1: {ip: 148.100.113.20, user: ubuntu}
-          ubuntu1804-s390x-1: {ip: 148.100.113.30, user: ubuntu}
-          ubuntu1804-s390x-2: {ip: 148.100.113.46, user: ubuntu}
-          ubuntu1804-s390x-3: {ip: 148.100.113.25, user: ubuntu}
           rhel7-s390x-2: {ip: 148.100.74.92}
           rhel8-s390x-2: {ip: 148.100.74.2}
           sles12-s390x-2: {ip: 148.100.74.193}
           sles15-s390x-2: {ip: 148.100.74.154, ansible_python_interpreter: /usr/bin/python3}
-          ubuntu1804-s390x-4: {ip: 148.100.75.181}
           ubuntu2004-s390x-1: {ip: 148.100.74.240}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
