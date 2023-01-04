@@ -1,0 +1,9 @@
+---
+- name: Configure Nagios
+  hosts: Nagios_Server
+  vars_files:
+    - vars_configure_server.yml
+  tasks:
+    - name: Include Nagios Server Configuration role
+      include_role:
+        name: Nagios_Config
