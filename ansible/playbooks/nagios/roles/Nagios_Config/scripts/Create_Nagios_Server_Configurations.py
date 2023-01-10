@@ -15,10 +15,9 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-valid_types = ('build', 'dockerhost', 'test')
-
 Input_Path = sys.argv[1]
 Output_Path = sys.argv[2]
+Nagios_Service_Types = sys.argv[3]
 
 def main():
 
@@ -78,15 +77,19 @@ def parse_yaml(hosts, config):
                         hostname = '{}-{}{}{}'.format(host_type, provider_name, delimiter, host)
                         export[host_type]['hosts'].append(hostname)
                         hostvars = {}
-                        if (host_type) in (valid_types):
-                            formatted_name = host_type+'-'+provider_name+'-'+host
-                            # Creates a file with the .cfg extension using the output
-                            with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
-                                f.write(f"Configuration for {formatted_name}")
 
-                        export[host_type]['hosts'].sort()
+                        service_list=Nagios_Service_Types.split(" ")
+
+                        for service in service_list:
+                            if host_type==service:
+                                formatted_name = host_type+'-'+provider_name+'-'+host
+                                # Creates a file with the .cfg extension using the output
+                                with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
+                                    f.write(f"Configuration for {formatted_name}")
+
+                                    export[host_type]['hosts'].sort()
     return export
 
 if __name__ == "__main__":
-   
+
     main()

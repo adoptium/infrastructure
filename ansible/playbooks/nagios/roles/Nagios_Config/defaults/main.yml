@@ -10,3 +10,6 @@ Input_Path: /tmp/ansible_inventory.yml
 
 # Output Path
 Output_Path: /usr/local/nagios/etc/servers
+
+# Ansible Inventory Host Group Types To Monitor -- Maps To Nagios Service Groups
+Nagios_Service_Types: 'build test dockerhost'
