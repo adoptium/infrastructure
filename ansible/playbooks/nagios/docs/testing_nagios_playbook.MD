@@ -1,12 +1,12 @@
-Testing The Nagios Server Playbooks - A Guide
+## Testing The Nagios Server Playbooks - A Guide
 
 This is a brief step by step guide on how I tested the above PR... this is to prove working in a clean new vagrant environment
 
-1) Identify fork & branch of code..
+#### 1) Identify fork & branch of code..
 
-	https://github.com/lumuchris256/infrastructure/tree/2865
+		https://github.com/lumuchris256/infrastructure/tree/2865
 
-2) Create Working Area Of Code
+#### 2) Create Working Area Of Code
 
 	2.1) Clone fork
 
@@ -17,7 +17,7 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 		git fetch
 		git switch 2865 << This Is The Branch From The Chosen Fork >>
 
-3) Create Blank Vagrant Machine To Test Server
+#### 3) Create Blank Vagrant Machine To Test Server
 
 	3.1) Create a copy of the nagios vagrant file, and update with a static IP ( to make testing easier! )
 
@@ -34,7 +34,7 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 
 		vagrant up << takes a few mins >>
 
-4) Run The Nagios Server Install Playbook
+#### 4) Run The Nagios Server Install Playbook
 
 	4.1) Log In To The Running Vagrant VM
 
@@ -55,7 +55,7 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 
 		exit
 		vagrant snapshot save nagios_server << snapshot name >>
-			( e.g. vagrant snapshot save nagios_server INITIAL )
+		( e.g. vagrant snapshot save nagios_server INITIAL )
 
 	4.5) Restart The Nagios Service & Check The Nagios Server Is Up & Running
 
@@ -63,36 +63,36 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 		sudo systemctl start nagios
 		sudo systemctl status nagios << should show running >>
 
-		Access the nagios server in the browser http://http://192.168.50.66/nagios/
+	Access the nagios server in the browser http://http://192.168.50.66/nagios/
 
-	At this point we have a base install of a nagios server, and can use this to test changes.
+At this point we have a base install of a nagios server, and can use this to test changes.
 
-5) Testing The Configuration Playbooks..
+#### 5) Testing The Configuration Playbooks..
 
 Its important to note that whilst development, testing the individual playbooks will almost certainly cause the nagios server to fail to start, this is because the configuration files are interdependent , and thus until all of the new automatically configured configuration files are in place, some manual workarounds ( using template configuration files ) will need to be used.
 
 There is a sample set of config files contained in the testconfig.zip file found in this directory , these can and should be extracted into the nagios server directory to provide a base for additional configuration.
 
-	5.1) Run the nagios automated configuration playbooks
+5.1) Run the nagios automated configuration playbooks
 
-		ansible-playbook -b play_config_server.yml
+	ansible-playbook -b play_config_server.yml
 
   5.2) Stop, Restart & Check The Status Of The Nagios Server
 
-  sudo systemctl stop nagios
+	sudo systemctl stop nagios
 	sudo systemctl start nagios
 	sudo systemctl status nagios << should show running >>
 
-	At this point in time it may be necessary to amend some of the nagios configuration files to allow the server to start, this is required because all of the work to automate the nagios configuration process is not completed. To find out which configuration files require amendment, you can use the nagios configuration validation command :
+At this point in time it may be necessary to amend some of the nagios configuration files to allow the server to start, this is required because all of the work to automate the nagios configuration process is not completed. To find out which configuration files require amendment, you can use the nagios configuration validation command :
 
 	/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
-6) Useful Commands
+#### 6) Useful Commands
 
-	To Restore A Vagrant Snapshot ( From The Vagrantfile Directory : )
+To Restore A Vagrant Snapshot ( From The Vagrantfile Directory : )
 
-		vagrant snapshot restore nagios_server << snapshot name >>
+	vagrant snapshot restore nagios_server << snapshot name >>
 
-	To Remove A Vagrant Snapshot ( From The Vagrantfile Directory : )
+To Remove A Vagrant Snapshot ( From The Vagrantfile Directory : )
 
-		vagrant snapshot delete nagios_server << snapshot name >>
+	vagrant snapshot delete nagios_server << snapshot name >>
