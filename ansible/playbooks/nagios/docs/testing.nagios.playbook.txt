@@ -71,7 +71,7 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 
 Its important to note that whilst development, testing the individual playbooks will almost certainly cause the nagios server to fail to start, this is because the configuration files are interdependent , and thus until all of the new automatically configured configuration files are in place, some manual workarounds ( using template configuration files ) will need to be used.
 
-There is a sample set of config contained in the testconfig.zip file found in this directory , this can be extracted into the nagios server directory to provide a base for additional configuration.
+There is a sample set of config files contained in the testconfig.zip file found in this directory , this can be extracted into the nagios server directory to provide a base for additional configuration.
 
 6) Useful Commands
 
