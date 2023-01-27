@@ -43,7 +43,7 @@
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
-    - (ansible_distribution != "openSUSE")  
+    - (ansible_distribution != "openSUSE")
   tags: cmake
 
 - name: Extract cmake
