@@ -17,6 +17,7 @@ Build_Tool_Packages:
   - gcc
   - gettext
   - git
+  - gnupg
   - libasound2-dev
   - libcups2-dev
   - libcurl4-openssl-dev
