@@ -43,6 +43,7 @@
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
+    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
