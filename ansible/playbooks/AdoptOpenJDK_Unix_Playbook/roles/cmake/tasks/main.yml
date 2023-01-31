@@ -37,6 +37,16 @@
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
+# The checksum file of the download is checked, not the binary itself. The checksum in the download step is equal to the one in the file
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -fl "https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4-SHA-256.txt" -sl "https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4-SHA-256.txt.asc" -k {{ key.cmake }}
+  when:
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
+    - ansible_architecture != "armv7l"
+    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
+    - (ansible_distribution != "openSUSE")
+  tags: cmake
+
 - name: Extract cmake
   unarchive:
     src: /tmp/cmake-{{ cmakeVersion }}.tar.gz
