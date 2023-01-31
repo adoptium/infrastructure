@@ -60,7 +60,7 @@ Members of this team that holds super user access to our machines to perform mai
 * [@willsparker](https://github.com/Willsparker) - Will Parker (Red Hat)
 * [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
 * [@aahlenst](https://github.com/aahlenst) - Andreas Ahlenstorf (ZHAW)
-* [@steelhead31](https://github.com/steelhead31) - Scorr Fryer (Red Hat)
+* [@steelhead31](https://github.com/steelhead31) - Scott Fryer (Red Hat)
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 
