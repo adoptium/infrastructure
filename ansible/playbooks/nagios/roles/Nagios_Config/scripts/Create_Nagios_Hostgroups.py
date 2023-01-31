@@ -93,7 +93,7 @@ def parse_yaml(hosts, config):
                          if provider_name not in uniqProvider:
                              uniqProvider.append(provider_name)
 
-    with open('hostgroups.cfg', 'w') as f:
+    with open(f"{Output_Path}/hostgroups.cfg", "w") as f:
      for hostgroup in uniqProvider:
         f.write('define hostgroup{'+'\n')
         f.write('hostgroup_name'+'\t'+hostgroup+'\n')
