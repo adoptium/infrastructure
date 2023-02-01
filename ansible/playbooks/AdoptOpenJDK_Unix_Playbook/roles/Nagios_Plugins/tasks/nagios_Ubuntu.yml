@@ -41,3 +41,9 @@
     src: roles/Nagios_Plugins/tasks/additional_plugins/check_timesync
     dest: /usr/local/nagios/libexec/check_timesync
     mode: 0755
+
+- name: Copy check_ubuntu_ntp_timesync plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ubuntu_ntp_timesync
+    dest: /usr/local/nagios/libexec/check_ubuntu_ntp_timesync
+    mode: 0755
