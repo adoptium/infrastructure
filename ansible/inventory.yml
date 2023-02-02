@@ -85,9 +85,6 @@ hosts:
 
   - docker:
 
-      - equinix:
-          ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
-
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
 
