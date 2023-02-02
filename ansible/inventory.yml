@@ -85,12 +85,6 @@ hosts:
 
   - docker:
 
-      - aws:
-          ubuntu1604-x64-1: {ip: 34.253.28.27, user: ubuntu}
-
-      - equinix:
-          ubuntu2004-armv8-1: {ip: 139.178.82.146, description: Ampere eMag}
-
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
 
@@ -126,7 +120,6 @@ hosts:
       - aws:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
-          ubuntu1804-armv8-1: {ip: 34.243.202.254}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
