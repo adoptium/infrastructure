@@ -120,7 +120,6 @@ hosts:
       - aws:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
-          ubuntu1804-armv8-1: {ip: 34.243.202.254}
 
       - inspira:
           solaris10u11-sparcv9-1: {}
