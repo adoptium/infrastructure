@@ -41,6 +41,12 @@
     state: directory
     mode: '0755'
   when: ansible_distribution == "Solaris"
+  tags: ant
+
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-1.10.5-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc" -k {{ key.apache_ant }}
+  when: ant_installed.rc != 0
+  tags: ant
 
 - name: Extract ant
   unarchive:
@@ -57,6 +63,7 @@
     state: directory
     mode: '0755'
   when: ansible_distribution != "MacOSX"
+  tags: ant
 
 - name: Create /usr/local/bin/ant symlink
   file:

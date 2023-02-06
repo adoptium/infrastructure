@@ -1,0 +1,36 @@
+---
+# tasks file for Nagios_Configuration
+- name: Check if Inventory File Exists
+  stat:
+    path: /tmp/ansible_inventory.yml
+  register: inventory_is_present
+
+- name: Download Ansible inventory file
+  include_tasks: Get_Ansible_Inventory.yml
+  when:
+    - '"Download Ansible Inventory File" in task_list'
+    - not inventory_is_present.stat.exists
+
+# tasks file for Nagios_Configuration
+- name: Check if Inventory File Exists
+  stat:
+    path: /tmp/ansible_inventory.yml
+  register: inventory_is_present
+
+- name: Run Create Nagios Server Configurations
+  include_tasks: Create_Nagios_Server_Configurations.yml
+  when:
+    - "'Run Create Nagios Server Configurations script' in task_list"
+    - inventory_is_present.stat.exists
+
+# tasks file for Nagios_Servicegroups_Configuration
+- name: Check if Inventory File Exists
+  stat:
+    path: /tmp/ansible_inventory.yml
+  register: inventory_is_present
+
+- name: Run Create Nagios Servicegroups script
+  include_tasks: Create_Nagios_Servicegroups.yml
+  when:
+    - "'Run Create Nagios Servicegroups script' in task_list"
+    - inventory_is_present.stat.exists

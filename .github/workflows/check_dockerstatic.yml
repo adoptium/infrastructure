@@ -13,6 +13,9 @@ on:
 env:
   ROOT_PATH: "ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/"
 
+permissions:
+  contents: read
+
 jobs:
   check-alpine:
     name: alpine
@@ -31,7 +34,7 @@ jobs:
          - os: alpine13.4
            dockerfile: "Dockerfile.alp314"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -48,7 +51,7 @@ jobs:
          - os: centos8
            dockerfile: "Dockerfile.cent8"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -69,7 +72,7 @@ jobs:
          - os: fedora35
            dockerfile: "Dockerfile.f35"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -92,7 +95,7 @@ jobs:
          - os: ubuntu21.04
            dockerfile: "Dockerfile.u2104"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}

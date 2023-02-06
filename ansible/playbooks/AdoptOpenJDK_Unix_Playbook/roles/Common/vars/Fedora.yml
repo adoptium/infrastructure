@@ -18,6 +18,7 @@ Build_Tool_Packages:
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
+  - gnupg
   - gcc
   - gcc-c++
   - gettext

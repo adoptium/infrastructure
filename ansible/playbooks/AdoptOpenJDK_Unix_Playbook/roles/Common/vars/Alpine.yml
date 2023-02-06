@@ -19,6 +19,7 @@ Build_Tool_Packages:
   - freetype
   - freetype-dev
   - grep
+  - gnupg
   - libdwarf                      # OpenJ9
   - libdwarf-dev                  # OpenJ9
   - libx11

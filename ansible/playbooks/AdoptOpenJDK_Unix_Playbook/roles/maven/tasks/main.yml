@@ -25,6 +25,11 @@
   when: maven_installed.rc != 0 and ansible_distribution == "Solaris"
   tags: maven
 
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-maven-3.6.3-bin.tar.gz -sl "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz.asc" -k {{ key.apache_maven }}
+  when: maven_installed.rc != 0
+  tags: maven
+
 - name: Extract Apache Maven v3.6.3
   unarchive:
    src: /tmp/apache-maven-3.6.3-bin.tar.gz

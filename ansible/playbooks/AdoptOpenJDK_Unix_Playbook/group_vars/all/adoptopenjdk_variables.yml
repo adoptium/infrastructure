@@ -32,3 +32,12 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 
 # Default BootJDK installed
 bootjdk: hotspot
+
+# GPG Public Keys
+key:
+  curl: 27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2 # Daniel Stenberg <daniel@haxx.se>
+  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
+  apache_maven: B02137D875D833D9B23392ECAE5A7FB608A0221C # Robert Scholte <rfscholte@apache.org>
+  autoconf: A7A16B4A2527436A # Eric Blake <eblake@redhat.com>
+  cmake: EC8FEF3A7BFB4EDA # Brad King <brad.king@kitware.com>
+  gmake: 96B047156338B6D4 # Paul Smith (Mad Scientist) <psmith@gnu.org>

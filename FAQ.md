@@ -251,7 +251,7 @@ To add a new system:
 3. Add it to bastillion (requires extra privileges) so that all of the appropriate admin keys are deployed to the system (Can be delayed for expediency by putting AWX key into `~root/.ssh/authorized_keys`)
 4. Create a PR to add the machine to [inventory.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
 5. Once merged, run the ansible scripts on it - ideally via AWX (Ensure the project and inventory sources are refreshed, then run the appropriate `Deploy **** playbook` template with a `LIMIT` of the new machine name)
-6. Add it to jenkins, verify a typical job runs on it if you can and add the appropriate tags
+6. Add it to Jenkins and verify a typical job runs on it if you can and add the appropriate tags.  When adding systems for use by test pipelines, verify all of the different types of tests can successfully run on that system by launching an [AQA_Test_Pipeline](https://ci.adoptopenjdk.net/job/AQA_Test_Pipeline/) job and setting LABEL parameter to the hostname of the machine.  Once you verify that the AQA_Test_Pipeline runs cleanly, you can add the appropriate test labels (as per LABELs defined in the aqa-tests [PLATFORM_MAP](https://github.com/adoptium/aqa-tests/blob/master/buildenv/jenkins/openjdk_tests#L3)).
 
 NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc.) you should also add it to
    [adoptopenjdk_yaml.py](https://github.com/adoptium/infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)

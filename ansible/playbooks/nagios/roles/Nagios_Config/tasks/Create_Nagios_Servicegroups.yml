@@ -1,0 +1,3 @@
+---
+- name: Run Create Nagios Servicegroups script
+  script: ../scripts/Create_Nagios_Servicegroups_config_file.py "{{Nagios_Base_Path}}/etc/objects" "{{Nagios_Service_Types}}"

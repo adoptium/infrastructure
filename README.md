@@ -57,9 +57,10 @@ Members of this team that holds super user access to our machines to perform mai
 * [@gdams](https://github.com/gdams) - George Adams (Microsoft) - *
 * [@johnoliver](https://github.com/johnoliver) - John Oliver (Microsoft / LJC) - *
 * [@sxa](https://github.com/sxa) - Stewart X Addison (Red Hat) - *
-* [@willsparker](https://github.com/Willsparker) - Will Parker
+* [@willsparker](https://github.com/Willsparker) - Will Parker (Red Hat)
 * [@Haroon-Khel](https://github.com/Haroon-Khel) - Haroon Khel (Red Hat)
 * [@aahlenst](https://github.com/aahlenst) - Andreas Ahlenstorf (ZHAW)
+* [@steelhead31](https://github.com/steelhead31) - Scott Fryer (Red Hat)
 
 ## [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure)
 

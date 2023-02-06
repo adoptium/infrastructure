@@ -21,6 +21,7 @@ Build_Tool_Packages:
   - wget
   - curl
   - gmake
+  - gnupg
   - gtar
   - xz
   - zip

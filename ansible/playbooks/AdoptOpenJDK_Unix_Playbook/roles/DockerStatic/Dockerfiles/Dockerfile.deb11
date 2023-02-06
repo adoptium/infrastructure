@@ -1,7 +1,7 @@
 FROM debian:bullseye
 # Install Base Requirements
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update && apt-get install -y perl openssh-server unzip zip wget apt-utils
+RUN apt-get update && apt-get install -y perl openssh-server unzip zip wget apt-utils gnupg curl
 RUN echo "y" | ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 RUN apt-get update
 
@@ -33,7 +33,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 RUN mkdir /var/run/sshd
 CMD ["/usr/sbin/sshd","-D"]
-RUN apt-get install git curl make gcc gnupg xvfb libxrender-dev libxi-dev libxtst-dev fontconfig fakeroot -y
+RUN apt-get install git make gcc xvfb libxrender-dev libxi-dev libxtst-dev fontconfig fakeroot -y
 # ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 21
 # Start with docker run -p 2211:22 UUID

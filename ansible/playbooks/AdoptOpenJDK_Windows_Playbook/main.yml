@@ -33,6 +33,9 @@
   # Roles #
   #########
   roles:
+    - role: logs
+      position: "Start"
+      tags: always
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins]
@@ -72,7 +75,11 @@
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
+    - NSClient                    # Required For Nagios Monitoring
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
     - role: Thunderbird
       tags: [Thunderbird, jck, adoptopenjdk]
+    - role: logs
+      position: "End"
+      tags: always
