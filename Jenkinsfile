@@ -3,6 +3,14 @@ pipeline {
     stages {
         stage('Docker Build') {
             parallel { 
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
                 stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
@@ -83,6 +91,12 @@ def dockerManifest() {
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
         git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
         sh '''
+            # Centos6
+            export TARGET="adoptopenjdk/centos6_build_image"
+            AMD64=$TARGET:linux-amd64
+            docker manifest create $TARGET $AMD64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest push $TARGET
             # Centos7
             export TARGET="adoptopenjdk/centos7_build_image"
             AMD64=$TARGET:linux-amd64
