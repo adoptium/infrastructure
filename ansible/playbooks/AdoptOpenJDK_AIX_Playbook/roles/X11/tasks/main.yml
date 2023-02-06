@@ -17,26 +17,26 @@
 # /usr/lpp/X11.vfb                    X11.vfb
 - name: Examine X11 base requirements
   block:
-  - name: Verify X11.base
-    stat:
+   - name: Verify X11.base
+     stat:
       path: /usr/lib/libX11.a
-    register: _base
+     register: _base
 
-  - name: Verify X11 extensions
-    stat:
+   - name: Verify X11 extensions
+     stat:
       path: /usr/lpp/X11/include/X11/extensions
-    register: _ext
+     register: _ext
 
-  - name: Verify X11 Frame Buffer Requirements
-    stat:
+   - name: Verify X11 Frame Buffer Requirements
+     stat:
       path: /usr/lpp/X11.vfb
-    register: _vfb
+     register: _vfb
 
-  - name: Compute X11 Readiness
-    set_fact:
+   - name: Compute X11 Readiness
+     set_fact:
       _x11rdy: "{{ ((_base.stat.islnk is defined) and _base.stat.islnk)
-        and _ext.stat.exists
-        and _vfb.stat.exists }}"
+         and _ext.stat.exists
+         and _vfb.stat.exists }}"
   tags: x11
 
 - name: Halt when X11.base Not Ready
