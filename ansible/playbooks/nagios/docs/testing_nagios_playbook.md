@@ -19,15 +19,19 @@ This is a brief step by step guide on how I tested the above PR... this is to pr
 
 #### 3) Create Blank Vagrant Machine To Test Server
 
-	3.1) Create a copy of the nagios vagrant file, and update with a static IP ( to make testing easier! )
-
+	3.1) Create a copy of the nagios vagrant file ( either cp or ln )
+	
 		cd infrastructure/ansible/playbooks/nagios
 		cp VagrantFiles/Vagrantfile.Nagios.Server.Ubuntu2204 ./Vagrantfile
 		vi Vagrantfile
 
+		N.B 
+		If you want to force the static IP do this, otherwise you can skip this step
+		( you may need to tweak the static IP / and create relevant configuration in virtual box et al )
+		
 		<< Swap This Line >>
 		nagios_server.vm.network :private_network, type: "dhcp"
-		<< For This One >>
+		<< For This One , Dont Forget To Substitute The IP for the one on your virtual / guest network. >>
 		nagios_server.vm.network :private_network, ip: '192.168.50.66'
 
 	3.2) Start The Vagrant VM
