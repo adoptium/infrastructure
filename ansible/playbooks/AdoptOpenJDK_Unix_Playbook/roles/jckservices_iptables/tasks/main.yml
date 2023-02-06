@@ -74,7 +74,6 @@
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
-    - 147.75.83.133 # jck-equinix-ubuntu2004-x64-1
     - 139.178.86.125 # jck-equinix-ubuntu2004-aarch64-1
     - 208.52.168.211 # iywk3-macos11-x64
     - 207.254.73.168 # gn324-macos11-x86_64
