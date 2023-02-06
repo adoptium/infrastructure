@@ -61,7 +61,8 @@
     jump: ACCEPT
   with_items:
     # List comes from https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml
-    - 148.100.74.16 # jck-marist-ubuntu2004-s390x-3
+    - 148.100.74.163 # jck-marist-ubuntu2004-s390x-3
+    - 148.100.74.16 # jck-marist-ubuntu2204-s390x-1
     - 148.100.74.223 # jck-marist-rhel7-s390x-2
     - 129.33.196.193 # jck-ibm-aix71-ppc64-1
     - 129.33.196.194 # jck-ibm-aix71-ppc64-2
