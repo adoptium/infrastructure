@@ -15,6 +15,7 @@ Build_Tool_Packages:
   - curl
   - cups-devel
   - elfutils-libelf-devel
+  - file
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
