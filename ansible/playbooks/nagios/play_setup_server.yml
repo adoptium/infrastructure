@@ -2,7 +2,7 @@
 - name: Install Nagios
   hosts: Nagios_Server
   vars_files:
-    - secrets_setup_server.enc
+    # - secrets_setup_server.enc
     - vars_setup_server.yml
   tasks:
     - name: Include Ansible installation role
