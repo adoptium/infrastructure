@@ -21,3 +21,4 @@ skip_list:
 
 exclude_paths:
   - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
+  - ./ansible/playbooks/nagios/secrets_setup_server.enc # Contains Secure Information So Removed From Linter
