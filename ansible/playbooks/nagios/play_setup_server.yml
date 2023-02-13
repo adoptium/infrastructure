@@ -2,6 +2,8 @@
 - name: Install Nagios
   hosts: Nagios_Server
   vars_files:
+    # - The below line is commented out, as it as encrypted vault, as per the README.md document
+    # - This file should be created with the appropriate content, before being commented out and the playbook run.
     # - secrets_setup_server.enc
     - vars_setup_server.yml
   tasks:
