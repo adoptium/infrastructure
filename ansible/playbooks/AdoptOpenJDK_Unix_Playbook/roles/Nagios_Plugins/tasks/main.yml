@@ -102,9 +102,8 @@
     - Nagios_Plugins == "Enabled"
     - ansible_distribution == "Solaris"
 
-- name: Install Get Container Health Plugin
-  - name: Copy check_timesync plugin
-    copy:
-      src: roles/Nagios_Plugins/tasks/additional_plugins/check_container_spaces
-      dest: /usr/local/nagios/libexec/check_container_spaces
-      mode: 0755
+- name: Copy Get Container Health Plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ubuntu_ntp_timesync
+    dest: /usr/local/nagios/libexec/check_ubuntu_ntp_timesync
+    mode: 0755
