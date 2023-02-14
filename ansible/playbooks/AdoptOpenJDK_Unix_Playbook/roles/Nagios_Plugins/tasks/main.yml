@@ -104,6 +104,6 @@
 
 - name: Copy Get Container Health Plugin
   copy:
-    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ubuntu_ntp_timesync
-    dest: /usr/local/nagios/libexec/check_ubuntu_ntp_timesync
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_container_space
+    dest: /usr/local/nagios/libexec/check_container_space
     mode: 0755
