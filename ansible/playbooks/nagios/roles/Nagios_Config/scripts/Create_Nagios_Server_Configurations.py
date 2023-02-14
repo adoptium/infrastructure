@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 from os import path
+from jinja2 import Environment, FileSystemLoader
 
 import yaml
 try:
@@ -15,9 +16,19 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+# Parameter Definitions
 Input_Path = sys.argv[1]
 Output_Path = sys.argv[2]
 Nagios_Service_Types = sys.argv[3]
+Overwrite_Mode = sys.argv[4]
+
+# Template Assignments
+environment = Environment(loader=FileSystemLoader("templates/"))
+
+# Import Configuration
+import config
+templates = config.templates
+excluded_hosts = config.excluded_hosts
 
 def main():
 
@@ -30,8 +41,7 @@ def main():
     inventory_path = Input_Path
     export = parse_yaml(load_yaml_file(inventory_path), config)
 
-    # export in JSON for Ansible
-    # print(json.dumps(export, sort_keys=True, indent=2))
+
 
 def load_yaml_file(file_name):
     """Loads YAML data from a file"""
@@ -50,9 +60,9 @@ def load_yaml_file(file_name):
 
     return hosts
 
+
 def parse_yaml(hosts, config):
     """Parses host information from the output of yaml.safe_load"""
-
     export = {'_meta': {'hostvars': {}}}
 
     for host_types in hosts['hosts']:
@@ -66,29 +76,78 @@ def parse_yaml(hosts, config):
             }
 
             for provider in providers:
-                #print (provider)
                 for provider_name, hosts in provider.items():
-                    #print (provider_name)
+                    # print (provider_name)  # print (hosts) # print (provider_name[ip])
                     for host, metadata in hosts.items():
-                        #print(host_type,'-',provider_name,'-',host)
+                        # Get the IP From metadata
+                        for i in metadata:
+                            # Assign IP To Variable
+                              if i == "ip":
+                                 host_ip = metadata[i]
+
                         # some hosts have metadata appended to provider
                         # which requires underscore
+                        # print(host_type,'-',provider_name,'-',host)
                         delimiter = "_" if host.count('-') == 3 else "-"
                         hostname = '{}-{}{}{}'.format(host_type, provider_name, delimiter, host)
+                        # print("Hostname = "+hostname) # print("Host IP: = "+host_ip)
                         export[host_type]['hosts'].append(hostname)
-                        hostvars = {}
+                        # hostvars = {}
 
-                        service_list=Nagios_Service_Types.split(" ")
+                        service_list = Nagios_Service_Types.split(" ")
+
+                        matched_list=[]
+                        unmatched_list=[]
 
                         for service in service_list:
-                            if host_type==service:
+                            if host_type == service:
                                 formatted_name = host_type+'-'+provider_name+'-'+host
-                                # Creates a file with the .cfg extension using the output
-                                with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
-                                    f.write(f"Configuration for {formatted_name}")
+                                templated_name = host_type+'_'+host
 
-                                    export[host_type]['hosts'].sort()
-    return export
+                                if formatted_name not in (excluded_hosts):
+                                    for key,value in templates.items():
+                                        if templated_name.startswith(key):
+                                            matched_list += [formatted_name]
+
+                                    ## Check List Of Matched Hosts
+                                    if formatted_name in matched_list:
+                                        for key in templates:
+                                            if templated_name.startswith(key):
+                                                # print(formatted_name) # print(key, '->', templates[key])
+                                                print("Name = "+formatted_name+" Template = "+templates[key]+" IP = "+host_ip)
+                                                template_name=str(templates[key])
+                                                template = environment.get_template(template_name)
+
+                                                filepath = Output_Path+'/'+formatted_name+'.cfg'
+                                                if os.path.isfile(Output_Path+'/'+formatted_name+'.cfg'):
+                                                     ## Only Create File If Overwrite Is True
+                                                     if OverWrite is True:
+                                                         print("Overwrite")
+                                                         with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
+                                                             ## Render J2 Template
+                                                             content = template.render(
+                                                             host_name = formatted_name,
+                                                             host_ip_address = host_ip)
+                                                             #  print(content)
+                                                             f.write(f"{content}")
+                                                             f.close()
+                                                     else:
+                                                        print("Will Not Overwrite :"+filepath)
+                                                else:
+                                                     print("Doesnt Exist - Create File")
+                                                     with open(f"{Output_Path}/{formatted_name}.cfg", "w") as f:
+                                                         ## Render J2 Template
+                                                         content = template.render(
+                                                         host_name = formatted_name,
+                                                         host_ip_address = host_ip)
+                                                         #  print(content)
+                                                         f.write(f"{content}")
+                                                         f.close()
+                                    else:
+                                        ## Deal With No Matching template
+                                        print("No Matching Template For Hostname = "+hostname)
+                                else:
+                                    print("Excluded Host = "+formatted_name)
 
 if __name__ == "__main__":
 

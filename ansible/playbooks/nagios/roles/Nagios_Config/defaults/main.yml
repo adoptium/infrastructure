@@ -5,6 +5,7 @@ task_list:
     - Download Ansible Inventory File
     - Run Create Nagios Server Configurations script
     - Run Create Nagios Servicegroups script
+    - Run Create Nagios Hostgroups script
 
 # Input Path
 Input_Path: /tmp/ansible_inventory.yml
