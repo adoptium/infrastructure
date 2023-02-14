@@ -1,3 +1,4 @@
 ---
 - name: Run Create Nagios Server Configurations script
   script: ../scripts/Create_Nagios_Server_Configurations.py "{{Input_Path}}" "{{Nagios_Base_Path}}/etc/servers" "{{Nagios_Service_Types}}" "{{Overwrite_Mode}}"
+  
