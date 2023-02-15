@@ -8,7 +8,7 @@ WarnThreshold=$(expr $1)
 ErrorThreshold=$(expr $2)
 
 ## Get Running Container IDs
-containerDets=$(docker ps --format "{{.Names}},{{.ID}}")
+containerDets=`docker ps --format "{{.Names}},{{.ID}}"`
 
 ##containerIds=$(docker ps -q)
 
@@ -41,7 +41,7 @@ done
 warncount=`echo $WarnList | wc -c`
 errorcount=`echo $ErrorList | wc -c`
 
-if  [ $errorcount -gt 1 ] && [ $warncount -gt 1 ] 
+if  [ $errorcount -gt 1 ] && [ $warncount -gt 1 ]
 then
         echo "CRITICAL - These Docker Containers Have Extremely Large Workspaces: "$ErrorList
 	echo "WARNING - These Docker Containers Have Large Workspaces :"$WarnList
