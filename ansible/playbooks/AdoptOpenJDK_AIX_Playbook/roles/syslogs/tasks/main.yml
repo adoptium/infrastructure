@@ -25,7 +25,7 @@
   tags: syslog
 
 - name: Reload syslogd
-  service: name=syslogd state=reloaded
+  ansible.builtin.service: name=syslogd state=reloaded
   changed_when: false
   tags: syslog
 

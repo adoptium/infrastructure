@@ -96,14 +96,14 @@
   become: yes
 
 - name: Restart Nagios
-  service:
+  ansible.builtin.service:
     name: nagios
     state: restarted
     enabled: yes
   become: yes
 
 - name: Restart Apache
-  service:
+  ansible.builtin.service:
     name: "{{ apache2_service }}"
     state: restarted
     enabled: yes

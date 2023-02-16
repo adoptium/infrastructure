@@ -156,7 +156,7 @@
           tags: nginx_conf
 
         - name: Restart nginx service
-          service:
+          ansible.builtin.service:
             name: nginx
             state: restarted
           tags: nginx_conf

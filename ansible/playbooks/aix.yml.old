@@ -698,7 +698,7 @@
           tags: syslog
 
         - name: Reload syslogd
-          service: name=syslogd state=reloaded
+          ansible.builtin.service: name=syslogd state=reloaded
           changed_when: False
           tags: syslog
 
@@ -917,12 +917,12 @@
           tags: ntp
 
         - name: Stop NTP daemon
-          service: name=xntpd state=stopped
+          ansible.builtin.service: name=xntpd state=stopped
           changed_when: False
           tags: ntp
 
         - name: Start NTP daemon
-          service: name=xntpd state=started
+          ansible.builtin.service: name=xntpd state=started
           changed_when: False
           tags: ntp
 
@@ -930,7 +930,7 @@
       # Disable sendmail #
       ####################
         - name: Ensure sendmail is stopped
-          service: name=sendmail state=stopped
+          ansible.builtin.service: name=sendmail state=stopped
           tags: sendmail
 
         - name: Ensure sendmail is disabled

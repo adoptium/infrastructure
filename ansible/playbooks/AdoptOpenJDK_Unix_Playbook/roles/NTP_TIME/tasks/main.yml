@@ -11,7 +11,7 @@
 
 - name: Ensure systemd-timesyncd service is disabled
   failed_when: false
-  service:
+  ansible.builtin.service:
     name: systemd-timesyncd
     enabled: no
   when:
@@ -29,7 +29,7 @@
     - skip_ansible_lint
 
 - name: Start NTP for Ubuntu and SLES 11
-  service:
+  ansible.builtin.service:
     name: ntp
     state: restarted
     enabled: yes
@@ -38,7 +38,7 @@
   tags: ntp_time
 
 - name: Start NTP for RedHat, SLES 12 and CentOS 7
-  service:
+  ansible.builtin.service:
     name: ntpd
     state: restarted
     enabled: yes
@@ -49,7 +49,7 @@
   tags: ntp_time
 
 - name: Start NTP for SUSE12
-  service:
+  ansible.builtin.service:
     name: ntp.service
     state: restarted
     enabled: yes
@@ -59,7 +59,7 @@
   tags: ntp_time
 
 - name: Start chronyd for RHEL8 and SLES15
-  service:
+  sansible.builtin.ervice:
     name: chronyd
     state: restarted
     enabled: yes

@@ -49,7 +49,7 @@
   become: yes
 
 - name: Restart Nagios
-  service:
+  ansible.builtin.service:
     name: nagios
     state: restarted
     enabled: yes

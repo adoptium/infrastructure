@@ -55,7 +55,7 @@
   tags: [security, adoptopenjdk]
 
 - name: Restart ssh service
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
     enabled: yes
@@ -73,7 +73,7 @@
   tags: [security, adoptopenjdk]
 
 - name: Restart sshd service
-  service:
+  ansible.builtin.service:
     name: sshd
     state: restarted
     enabled: yes

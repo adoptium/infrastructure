@@ -68,7 +68,7 @@
         - jenkins
 
 - name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
-  service:
+  ansible.builtin.service:
     name: docker
     state: started
     enabled: yes

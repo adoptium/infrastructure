@@ -44,6 +44,6 @@
     backup: yes
 
 - name: Restart vsftpd service
-  service:
+  ansible.builtin.service:
     name: vsftpd
     state: restarted

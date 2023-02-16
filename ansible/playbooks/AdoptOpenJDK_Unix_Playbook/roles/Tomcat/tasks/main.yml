@@ -21,6 +21,6 @@
     line: <Connector port="80" protocol="HTTP/1.1"
 
 - name: Start tomcat9 service
-  service:
+  ansible.builtin.service:
     name: tomcat9
     state: restarted

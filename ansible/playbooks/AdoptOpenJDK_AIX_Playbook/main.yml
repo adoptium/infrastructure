@@ -206,12 +206,12 @@
       tags: ntp
 
     - name: Stop NTP daemon
-      service: name=xntpd state=stopped
+      ansible.builtin.service: name=xntpd state=stopped
       changed_when: false
       tags: ntp
 
     - name: Start NTP daemon
-      service: name=xntpd state=started
+      ansible.builtin.service: name=xntpd state=started
       changed_when: false
       tags: ntp
 
@@ -219,7 +219,7 @@
     # Disable sendmail #
     ####################
     - name: Ensure sendmail is stopped
-      service: name=sendmail state=stopped
+      ansible.builtin.service: name=sendmail state=stopped
       tags: sendmail
 
     - name: Ensure sendmail is disabled

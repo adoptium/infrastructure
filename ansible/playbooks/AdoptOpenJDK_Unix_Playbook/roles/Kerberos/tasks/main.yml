@@ -39,11 +39,11 @@
     - skip_ansible_lint
 
 - name: Start krb5-kdc service
-  service:
+  ansible.builtin.service:
     name: krb5-kdc
     state: started
 
 - name: Start krb5-admin-server service
-  service:
+  ansible.builtin.service:
     name: krb5-admin-server
     state: started
