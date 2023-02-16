@@ -59,7 +59,7 @@
   tags: ntp_time
 
 - name: Start chronyd for RHEL8 and SLES15
-  sansible.builtin.ervice:
+  ansible.builtin.service:
     name: chronyd
     state: restarted
     enabled: yes
