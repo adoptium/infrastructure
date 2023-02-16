@@ -21,6 +21,7 @@
   when: apple_variables is not defined
 
 - name: Install Xcode
+  when: apple_variables is defined
   block:
     - name: Ensure Ruby is installed for xcode-install
       become: yes
@@ -101,4 +102,3 @@
 
     - name: Set Xcode switch path to "/Applications/Xcode.app"
       shell: sudo xcode-select --switch "/Applications/Xcode.app"
-  when: apple_variables is defined

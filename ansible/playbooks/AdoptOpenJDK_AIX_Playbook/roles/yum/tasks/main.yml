@@ -37,6 +37,9 @@
 # new python installed via yum. During the second pass this block is skipped.
 ##############################################################################
 - name: "Install yum bundle from AIXToolbox (block #1)"
+  when: _yum.stat.islnk is not defined
+  tags:
+    - yum
   block:
     - name: Ensure dest exists
       file:
@@ -72,11 +75,10 @@
 
     - name: Install yum bundle
       command: rpm -i /tmp/yum/*.rpm
-  when: _yum.stat.islnk is not defined
-  tags:
-    - yum
 
 - name: "Update yum installation (Block #2)"
+  tags:
+    - yum
   block:
     - name: Remove /tmp/yum, if present
       file:
@@ -100,8 +102,6 @@
 
     - name: Ensure AIX_Toolbox_71 repo is enabled
       shell: yum-config-manager --enable AIX_Toolbox_71
-  tags:
-    - yum
 
 ##############################################################################
 # YUM AIXToolbox integration is installed

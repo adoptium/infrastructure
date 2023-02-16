@@ -5,6 +5,7 @@
 #########################################################################
 ---
 - name: Remove obsolete agent (for Director, FSM based system management)
+  tags: aixsec
   block:
     - name: Disable inetd on boot
       shell: /usr/sbin/chrctcp -S -d inetd
@@ -25,4 +26,3 @@
       register: _installp
       changed_when: _installp.rc == 0
       when: _lslpp.rc == 0
-  tags: aixsec

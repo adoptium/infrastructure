@@ -98,6 +98,7 @@
 
 - name: Install JDK for aarch64
   when: ansible_architecture == "aarch64"
+  tags: build_tools
   block:
     - name: Check if Temurin jdk8 is installed
       stat:
@@ -219,4 +220,3 @@
         state: link
       when:
         - not zulu18_installed.stat.exists
-  tags: build_tools

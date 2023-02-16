@@ -5,6 +5,7 @@
 ########################################################################
 ---
 - name: "Tagged Block for setting security attributes on {{ rbac_cmd }}"
+  tags: rbac
   block:
     - name: "Verify file {{ rbac_cmd }} exists"
       stat:
@@ -12,6 +13,7 @@
       register: _exists
 
     - name: "Add authorization to command {{ rbac_cmd }}"
+      when: _exists.stat.exists and _exists.stat.isreg
       block:
         - name: "Add authorization to command {{ rbac_cmd }}"
           shell:
@@ -23,5 +25,3 @@
 
         - name: Update Security Tables
           shell: setkst
-      when: _exists.stat.exists and _exists.stat.isreg
-  tags: rbac

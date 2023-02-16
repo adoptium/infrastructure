@@ -16,6 +16,7 @@
 # /usr/lpp/X11/include/X11/extensions X11.adt.ext
 # /usr/lpp/X11.vfb                    X11.vfb
 - name: Examine X11 base requirements
+  tags: x11
   block:
    - name: Verify X11.base
      stat:
@@ -37,7 +38,6 @@
       _x11rdy: "{{ ((_base.stat.islnk is defined) and _base.stat.islnk)
          and _ext.stat.exists
          and _vfb.stat.exists }}"
-  tags: x11
 
 - name: Halt when X11.base Not Ready
   fail: msg="X11.base is required for AIXToolbox OSS needed later! Cannot proceed."

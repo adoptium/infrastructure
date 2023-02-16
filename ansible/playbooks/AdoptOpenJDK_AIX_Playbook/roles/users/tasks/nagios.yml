@@ -8,6 +8,7 @@
   register: nagios_lib
 
 - name: Install nagios libexec
+  when: nagios_lib.stat.exists == False
   block:
     - name: Transfer over Nagios Image
       copy:
@@ -37,8 +38,6 @@
         src: /opt/nagios
         dest: /usr/local/nagios
         state: link
-
-  when: nagios_lib.stat.exists == False
 
 - name: Add {{ username }} key
   authorized_key:

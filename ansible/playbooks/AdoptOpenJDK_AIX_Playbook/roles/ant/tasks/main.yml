@@ -4,6 +4,9 @@
 # Needs yum tag - so when yum is skipped, unarchive does not fail
 ---
 - name: Ant package processing
+  tags:
+    - ant
+    - yum
   block:
     - name: Checking for Ant availability
       stat:
@@ -25,6 +28,3 @@
     - name: Create symlink for ant
       file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
       when: ant.stat.islnk is not defined
-  tags:
-    - ant
-    - yum
