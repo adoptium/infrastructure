@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Linux installer setup playbook
+  hosts: all
   gather_facts: yes
   tasks:
     - block:
