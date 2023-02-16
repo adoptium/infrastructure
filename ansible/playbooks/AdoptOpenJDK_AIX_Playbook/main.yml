@@ -4,7 +4,8 @@
 # --------------- AIX ---------------  #
 ########################################
 
-- hosts: all
+- name: Ansible playbook for AIX
+  hosts: all
   remote_user: root
   become: true
   environment:
