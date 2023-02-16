@@ -3,7 +3,8 @@
 # Install build requirements for IcedTeaWeb #
 #############################################
 
-- hosts: all
+- name: Install build requirements for IcedTeaWeb
+  hosts: all
   gather_facts: yes
   tasks:
     - block:
