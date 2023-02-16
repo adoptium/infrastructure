@@ -2,7 +2,8 @@
 #######################################################
 # AdoptOpenJDK - Ansible Playbook for git-hg machines #
 #######################################################
-- hosts: all
+- name: Ansible playbook for git-hg machines
+  hosts: all
   gather_facts: yes
   tasks:
     - block:
