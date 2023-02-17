@@ -18,6 +18,10 @@ skip_list:
   - 'fqcn-builtins'  # Disable error introduced in ansible-lint 6.X (https://github.com/ansible/ansible-lint/pull/1908)
   - 'name[template]' # Jinja templates should only be at the end of ‘name’.
   - 'template-instead-of-copy' # Replaced upstream in https://github.com/ansible/ansible-lint/pull/2512
+  - 'no-free-form' # Exclude As Requires Significant Changes ( 196 changes required )
+  - 'fqcn[action]' # Exclude As Requires Significant Changes ( 249 changes required )
+  - 'args[module]' # Exclude Experimental Rule Validation ( Prevents 4 experimental warnings )
+
 
 exclude_paths:
   - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926

@@ -41,27 +41,27 @@
 
 # zeus and nagios are not getting user_attributes so "in-lining" their management
 - name: Zeus account management
+  tags:
+    - zeus_user
+    - adoptopenjdk
   block:
     - name: Assign username variable
       set_fact:
         username: zeus
-    - name: create account
+    - name: Create account
       include_tasks: create_user.yml
     - name: Perform customization for zeus
       include_tasks: "{{ username }}.yml"
-  tags:
-    - zeus_user
-    - adoptopenjdk
 
 - name: Nagios account management
+  tags:
+    - nagios
+    - adoptopenjdk
   block:
     - name: Assign username variable
       set_fact:
         username: nagios
-    - name: create account
+    - name: Create account
       include_tasks: create_user.yml
     - name: Perform customization for zeus
       include_tasks: "{{ username }}.yml"
-  tags:
-    - nagios
-    - adoptopenjdk

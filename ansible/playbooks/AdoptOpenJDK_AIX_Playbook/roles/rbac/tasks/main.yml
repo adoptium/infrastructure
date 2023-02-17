@@ -18,6 +18,8 @@
   tags: rbac
 
 - name: Update RBAC to include new authorizations
+  when: rtclk_exists.rc == 2
+  tags: rbac
   block:
     - name: Top-level authorization
       shell:
@@ -39,8 +41,6 @@
         mkrole authorizations='ojdk.rtclk,ojdk.proccore' dfltmsg='Adoptium Role for testing' rtclk
     - name: Update Security Tables
       shell: setkst
-  when: rtclk_exists.rc == 2
-  tags: rbac
 
 # Assign security attributes to commands in list
 # The tag here is not passed to the included_task, the tag skips
