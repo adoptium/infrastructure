@@ -9,7 +9,7 @@ on:
     paths:
     - .github/workflows/build_wsl.yml
     - ansible/playbooks/AdoptOpenJDK_Windows_Playbook/**
-    branches:         
+    branches:
     - master
 
 # Cancel existing runs if user makes another push.
@@ -62,7 +62,7 @@ jobs:
         ansible_password=Ansible_password123!
         ansible_become=false
         EOF
-        sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        sed -i -e "s/.*hosts:.*/hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 
     - name: Run Ansible Playbook
       working-directory: ansible
