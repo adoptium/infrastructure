@@ -16,6 +16,7 @@
   when: sudoers.stat.exists and sudoers.stat.isreg and Superuser_Account == "Enabled"
 
 - name: "Customize {{ username }}"
+  when: pubkey is defined and pubkey.stat.exists
   block:
     - name: Add key
       authorized_key:
@@ -30,7 +31,6 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-  when: pubkey is defined and pubkey.stat.exists
 
 - name: Warn about missing authorization for zeus
   debug:

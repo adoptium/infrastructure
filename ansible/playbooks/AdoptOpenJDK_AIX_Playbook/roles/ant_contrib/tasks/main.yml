@@ -5,6 +5,9 @@
 # so, also tagged as yum
 ---
 - name: Process ant-contrib
+  tags:
+    - ant-contrib
+    - yum
   block:
     - name: Checking for ant-contrib availability
       stat:
@@ -34,6 +37,3 @@
       with_items:
         - /tmp/ant-contrib
         - /tmp/ant-contrib-1.0b2-bin.tar.gz
-  tags:
-    - ant-contrib
-    - yum
