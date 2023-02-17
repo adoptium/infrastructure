@@ -4,10 +4,12 @@
 # -------- Ubuntu 20 (tested on x64) -------- #
 ###############################################
 
-- hosts: all
+- name: Ansibl JCK Services Playbook
+  hosts: all
   gather_facts: yes
   tasks:
-    - block:
+    - name: Load Variables
+      block:
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
 

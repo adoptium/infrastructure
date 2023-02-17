@@ -111,6 +111,8 @@
   tags: patch_update
 
 - name: Remove expired cert \"DST Root CA X3\"
+  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
+  tags: patch_update
   block:
     - name: Deselect certificate from ca-certificates.conf
       replace:
@@ -121,9 +123,6 @@
 
     - name: Refresh ca-certificates
       command: "update-ca-certificates --fresh"
-
-  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
-  tags: patch_update
 
 ############################
 # Build Packages and tools #

@@ -3,14 +3,16 @@
 # AdoptOpenJDK Ansible TRSS Playbook       #
 # Currently supports Ubuntu 18 on x64 only #
 ############################################
-- hosts: all
+- name: Ansible TRSS Playbook
+  hosts: all
   user: root
   become: yes
   vars:
     TRSS_working_dir: "/home/jenkins/openjdk-test-tools/TestResultSummaryService"
     TRSS_config_path: "/data/db/credentials/trssConf.json"
   tasks:
-    - block:
+    - name: Run TRSS Tasks
+      block:
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
 

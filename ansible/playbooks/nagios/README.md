@@ -49,11 +49,15 @@ The Encrypted File Can Be Edited Using The Following Command (With The Relevant 
 The Encrypted File Can Have Its Password Changed With The Following command
 
     ansible-vault rekey secrets_setup_server.enc
-
-
+  
 **Usage Guide :**
 
-1) Prior to running the nagios server installation playbook, ensure the ansible.cfg, nagios_inventory and the secrets_setup_server.enc vault file have been updated as necessary.
+1) Prior to running the nagios server installation playbook, ensure the ansible.cfg, nagios_inventory and the secrets_setup_server.enc vault file have been updated as necessary. You will also need to uncomment the line from the play_setup_server.yml file to include the new ansible vault file.
+```
+  vars_files:
+    **# - secrets_setup_server.enc**
+    - vars_setup_server.yml
+```
 
 2) Either directly on the nagios server host (ansible must be installed), or alternatively from an ansible machine with connection to the nagios server to be.
 
