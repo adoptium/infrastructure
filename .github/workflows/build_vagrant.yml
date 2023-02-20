@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
     - .github/workflows/build_vagrant.yml
+    - ansible/vagrant/Vagrantfile.Solaris10
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:
     - master
