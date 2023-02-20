@@ -223,7 +223,7 @@ to validate them.
 
 ## Jenkins access
 
-The AdoptOpenJDK Jenkins server at [https://ci.adoptium.net](https://ci.adoptium.net) is used for all the
+The Adoptium Jenkins server at [https://ci.adoptium.net](https://ci.adoptium.net) is used for all the
 builds and testing automation. Since we're as open as possible, general read
 access is enabled. For others, access is controlled via github teams (via
 the Jenkins `Github Authentication Plugin` as follows. (Links here won't work for
