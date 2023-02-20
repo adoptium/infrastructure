@@ -8,10 +8,3 @@
     path: /usr/local/nagios/etc/objects/localhost.cfg
     regexp: 'localhost'
     replace: '{{ ansible_fqdn }}'
-
-- name: Restart Nagios
-  service:
-    name: nagios
-    state: restarted
-    enabled: yes
-  become: yes
