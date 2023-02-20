@@ -10,7 +10,7 @@ Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityPro
 
 3) Login to the Jenkins user on the machine via RDP.
 
-4) On the machine, in a web browser, login to [ci.adoptopenjdk.net](https://ci.adoptopenjdk.net/), create a new node and download/run the `slave-agent.jnlp`. [IcedTea-Web](https://adoptopenjdk.net/icedtea-web.html) (or another `javaws` implementation) will need to be installed to run the `.jnlp` file.
+4) On the machine, in a web browser, login to [ci.adoptium.net](https://ci.adoptium.net/), create a new node and download/run the `slave-agent.jnlp`. [IcedTea-Web](https://adoptopenjdk.net/icedtea-web.html) (or another `javaws` implementation) will need to be installed to run the `.jnlp` file.
 
 5) Install the Jenkins agent as a service, by clicking 'File > Install as a Service'. This will require the Administrator credentials.
 
@@ -18,4 +18,4 @@ Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityPro
 
 7) If done correctly, under the `C:\Users\jenkins\` directory, there will be a series of `jenkins-slave.*` files, as well as the default Windows home folders, such as 'Desktop','Contacts' and 'Documents' etc.
 
-8) Ensure you have signed out of ci.adoptopenjdk.net
+8) Ensure you have signed out of ci.adoptium.net

@@ -3,7 +3,7 @@
 Most people will not need to run this directly, but if you can it will
 reduce the likelihood of breaking things when you adjust the playbooks.
 These scripts can be invoked via the
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/)
+[VagrantPlaybookCheck](https://ci.adoptium.net/view/Tooling/job/VagrantPlaybookCheck/)
 job if you have access to our jenkins, and they take 60-90 minutes to run
 on the UNIX/Linux-based platforms, but closer to three hours for Windows.
 

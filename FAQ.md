@@ -81,9 +81,9 @@ have at the moment:
 
 | Dockerfile | Image | Platforms  | Where is this built? | In use?
 |---|---|---|---|---|
-| [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
+| [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
-| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptopenjdk.net/job/centos7_docker_image_updater/) | Yes
+| [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
@@ -214,7 +214,7 @@ should have an underscore `_` prepended to it.
 
 If you are making a change which might have a negative effect on the
 playbooks on other platforms, be sure to run it through the
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/job/VagrantPlaybookCheck/)
+[VagrantPlaybookCheck](https://ci.adoptium.net/job/VagrantPlaybookCheck/)
 job first. This job takes a branch from a fork of the
 `adoptium/infrastructure` repository as a parameter and runs the playbooks
 against a variety of Operating Systems using Vagrant and the scripts in
@@ -223,7 +223,7 @@ to validate them.
 
 ## Jenkins access
 
-The AdoptOpenJDK Jenkins server at [https://ci.adoptopenjdk.net](https://ci.adoptopenjdk.net) is used for all the
+The AdoptOpenJDK Jenkins server at [https://ci.adoptium.net](https://ci.adoptium.net) is used for all the
 builds and testing automation. Since we're as open as possible, general read
 access is enabled. For others, access is controlled via github teams (via
 the Jenkins `Github Authentication Plugin` as follows. (Links here won't work for
@@ -236,8 +236,8 @@ most people as the teams are restricted access)
 - [jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) as you might expect has access to Administer anything
 
 Some jobs within jenkins, such as the
-[build signing job](https://ci.adoptopenjdk.net/job/build-scripts/job/release/job/sign_build)
-and [Release tool job](https://ci.adoptopenjdk.net/job/build-scripts/job/release/job/refactor_openjdk_release_tool)
+[build signing job](https://ci.adoptium.net/job/build-scripts/job/release/job/sign_build)
+and [Release tool job](https://ci.adoptium.net/job/build-scripts/job/release/job/refactor_openjdk_release_tool)
 are restricted further via the `Enable project-based security` section of
 the job definition. In the case of those two in particular it's `jenkins-admins` and
 `release` teams only who have access to them respectively.
@@ -251,7 +251,7 @@ To add a new system:
 3. Add it to bastillion (requires extra privileges) so that all of the appropriate admin keys are deployed to the system (Can be delayed for expediency by putting AWX key into `~root/.ssh/authorized_keys`)
 4. Create a PR to add the machine to [inventory.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) (See NOTE at end of the list)
 5. Once merged, run the ansible scripts on it - ideally via AWX (Ensure the project and inventory sources are refreshed, then run the appropriate `Deploy **** playbook` template with a `LIMIT` of the new machine name)
-6. Add it to Jenkins and verify a typical job runs on it if you can and add the appropriate tags.  When adding systems for use by test pipelines, verify all of the different types of tests can successfully run on that system by launching an [AQA_Test_Pipeline](https://ci.adoptopenjdk.net/job/AQA_Test_Pipeline/) job and setting LABEL parameter to the hostname of the machine.  Once you verify that the AQA_Test_Pipeline runs cleanly, you can add the appropriate test labels (as per LABELs defined in the aqa-tests [PLATFORM_MAP](https://github.com/adoptium/aqa-tests/blob/master/buildenv/jenkins/openjdk_tests#L3)).
+6. Add it to Jenkins and verify a typical job runs on it if you can and add the appropriate tags.  When adding systems for use by test pipelines, verify all of the different types of tests can successfully run on that system by launching an [AQA_Test_Pipeline](https://ci.adoptium.net/job/AQA_Test_Pipeline/) job and setting LABEL parameter to the hostname of the machine.  Once you verify that the AQA_Test_Pipeline runs cleanly, you can add the appropriate test labels (as per LABELs defined in the aqa-tests [PLATFORM_MAP](https://github.com/adoptium/aqa-tests/blob/master/buildenv/jenkins/openjdk_tests#L3)).
 
 NOTE ref inventory: If you are adding a new type of machine (`build`, `perf` etc.) you should also add it to
    [adoptopenjdk_yaml.py](https://github.com/adoptium/infrastructure/blob/master/ansible/plugins/inventory/adoptopenjdk_yaml.py#L45)

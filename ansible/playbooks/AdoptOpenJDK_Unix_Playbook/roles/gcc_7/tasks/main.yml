@@ -23,7 +23,7 @@
 
 - name: Download AdoptOpenJDK gcc-7.5.0 binary
   get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar.{{ gccsuffix }}
+    url: https://ci.adoptium.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar.{{ gccsuffix }}
     dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.{{ gccsuffix }}'
     force: no
     mode: 0644

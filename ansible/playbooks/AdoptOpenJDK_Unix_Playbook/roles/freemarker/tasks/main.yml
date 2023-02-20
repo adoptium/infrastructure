@@ -17,7 +17,7 @@
 # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
 - name: Download and extract freemarker.jar
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
+    src: https://ci.adoptium.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
     dest: /tmp/
     remote_src: yes
     mode: 0755
@@ -26,7 +26,7 @@
 
 - name: Download and extract freemarker.jar (Solaris)
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
+    src: https://ci.adoptium.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
     dest: /tmp/
     remote_src: yes
     mode: 0755

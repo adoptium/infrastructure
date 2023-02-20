@@ -1,6 +1,6 @@
 # Recreating QEMU images
 
-This is a document how to rebuild the images used in the [QEMUPlaybookCheck](https://ci.adoptopenjdk.net/job/QEMUPlaybookCheck/) (QPC) Jenkins job, in the event of having to migrate the machine that runs QPC. In this document, the **host machine** refers to the machine running QPC and the **guest machine** refers to the QEMU VM.
+This is a document how to rebuild the images used in the [QEMUPlaybookCheck](https://ci.adoptium.net/job/QEMUPlaybookCheck/) (QPC) Jenkins job, in the event of having to migrate the machine that runs QPC. In this document, the **host machine** refers to the machine running QPC and the **guest machine** refers to the QEMU VM.
 
 ## Standardized rules
 

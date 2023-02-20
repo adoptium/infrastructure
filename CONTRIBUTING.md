@@ -118,18 +118,18 @@ is not getting enough attention, let one the team know via the
 
 To test changes made to our ansible playbooks, we have the following test jobs which you can use to validate your pull request:
 
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/)
+[VagrantPlaybookCheck](https://ci.adoptium.net/view/Tooling/job/VagrantPlaybookCheck/)
    - Tests changes made to the Unix or Windows playbook.
    - Suitable to test changes made which concern the x86_64 tasks of the ansible playbooks
    - Requires authorised access to kick off (ping a member of the [infrastructure](https://github.com/adoptium/infrastructure#infrastructure-core) team if necessary)
 
-[QemuPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/QEMUPlaybookCheck/)
+[QemuPlaybookCheck](https://ci.adoptium.net/view/Tooling/job/QEMUPlaybookCheck/)
    - Tests changes made to the Unix playbook
    - Suitable to test changes made which concern non x86_64 tasks of the ansible playbooks, such as s390x, arm32, aarch64, riscv and ppc64le
    - Requires authorised access to kick off (ping a member of the [infrastructure](https://github.com/adoptium/infrastructure#infrastructure-core) team if necessary)
 
 `QEMU-playbook-check` pull request Label
-   - Similar to [QemuPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/QEMUPlaybookCheck/), but runs as a github workflow
+   - Similar to [QemuPlaybookCheck](https://ci.adoptium.net/view/Tooling/job/QEMUPlaybookCheck/), but runs as a github workflow
    - Does not require authorised access to kick off, just add the `QEMU-playbook-check` label to your pull request
    - See https://github.com/adoptium/infrastructure/blob/master/.github/workflows/build_qemu.yml for supported platforms
 

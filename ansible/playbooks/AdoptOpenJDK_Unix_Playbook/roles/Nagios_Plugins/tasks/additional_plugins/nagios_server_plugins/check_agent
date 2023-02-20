@@ -14,7 +14,7 @@
 
 #!/usr/bin/env bash
 
-# Nagios plugin to check if a given agent is connected to ci.adoptopenjdk.net
+# Nagios plugin to check if a given agent is connected to ci.adoptium.net
 
 if [ -z $1 ]; then
   echo "UNKNOWN - Invalid arguments"
@@ -27,7 +27,7 @@ if ! command -v jq &> /dev/null; then
   exit 3
 fi
 
-CURL_RESPONSE=$(curl -s https://ci.adoptopenjdk.net/computer/$1/api/json?pretty=true)
+CURL_RESPONSE=$(curl -s https://ci.adoptium.net/computer/$1/api/json?pretty=true)
 if [[ $? != 0 ]]; then
   echo "UNKNOWN- Failed to get agent information"
   exit 3
