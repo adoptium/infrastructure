@@ -27,7 +27,7 @@ if ! command -v jq &> /dev/null; then
   exit 3
 fi
 
-CURL_RESPONSE=$(curl -s https://ci.adoptopenjdk.net/computer/$1/api/json?pretty=true)
+CURL_RESPONSE=$(curl -s https://ci.adoptium.net/computer/$1/api/json?pretty=true)
 if [[ $? != 0 ]]; then
   echo "UNKNOWN- Failed to get agent information"
   exit 3
