@@ -19,12 +19,31 @@
     path: /usr/local/nagios/etc/objects/hostgroups.cfg
   register: nagios_host_group_config
 
-- name: Create Base Config File
+- name: Create Base HostGroups Config File
   file:
     path: /usr/local/nagios/etc/objects/hostgroups.cfg
     state: touch
   become: yes
   when: nagios_host_group_config.stat.exists == false
+
+- name: Add Host Groups Configuration File Entry To Nagios Config`
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    insertafter: '# You can specify individual object config files as shown below:'
+    line: 'cfg_file=/usr/local/nagios/etc/objects/servicegroups.cfg'
+  become: yes
+
+- name: Register The Nagios Service Groups Config File
+  stat:
+    path: /usr/local/nagios/etc/objects/servicegroups.cfg
+  register: nagios_service_group_config
+
+- name: Create Base ServiceGroups Config File
+  file:
+    path: /usr/local/nagios/etc/objects/servicegroups.cfg
+    state: touch
+  become: yes
+  when: nagios_service_group_config.stat.exists == false
 
 - name: Create servers folder
   file:
