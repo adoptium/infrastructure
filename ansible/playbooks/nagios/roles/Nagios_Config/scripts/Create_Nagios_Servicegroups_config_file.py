@@ -21,8 +21,11 @@ def main():
     service_list=service_list_with_default.split(' ')
 
    # Check To See If File Exists
-    path = Output_Path+"servicegroups.cfg"
+    path = Output_Path+"/servicegroups.cfg"
     check_file = os.path.isfile(path)
+
+    # print("path = "+path)
+    # print(check_file)
 
     foundList=[]
     notfoundList=[]
@@ -67,12 +70,12 @@ def main():
         for service in MissingList:
             servicegroup_name = service+'_Servers'
             servicegroup_alias = service+'_Servers'
-            with open(f"{Output_Path}/servicegroups.cfg", "a") as s:
-                s.write(f"define servicegroup{{\n")
-                s.write(f"  servicegroup_name {servicegroup_name}\n")
-                s.write(f"  alias {servicegroup_alias}\n")
-                s.write(f"}}\n")
-                s.close()
+            with open(f"{Output_Path}/servicegroups.cfg", "a") as t:
+                t.write(f"define servicegroup{{\n")
+                t.write(f"  servicegroup_name {servicegroup_name}\n")
+                t.write(f"  alias {servicegroup_alias}\n")
+                t.write(f"}}\n")
+                t.close()
 
 
 if __name__ == "__main__":
