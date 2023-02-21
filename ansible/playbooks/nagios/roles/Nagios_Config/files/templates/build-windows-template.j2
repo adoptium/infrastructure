@@ -30,6 +30,7 @@ define service {
     host_name               {{ host_name }}
     service_description     Uptime
     check_command           check_nt!UPTIME
+    servicegroups                   build_Servers
 }
 
 

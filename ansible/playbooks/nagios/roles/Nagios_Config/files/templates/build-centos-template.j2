@@ -18,6 +18,7 @@ define service{
         host_name                       {{ host_name }}
         service_description             PING
 	check_command			check_ping!200.0,20%!500.0,60%
+        servicegroups                   build_Servers
         }
 
 define service{

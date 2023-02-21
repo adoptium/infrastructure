@@ -57,6 +57,7 @@ define service{
         service_description             PING
         check_period                    once-a-day-at-8
         check_command                   check_ping!200.0,20%!500.0,60%
+        servicegroups                   test_Servers
 }
 
 define service{

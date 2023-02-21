@@ -52,7 +52,7 @@ define service{
 	check_interval                  15
         check_command                   check_ping!200.0,20%!500.0,60%
         action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
-
+        servicegroups                   test_Servers
 }
 
 define service{

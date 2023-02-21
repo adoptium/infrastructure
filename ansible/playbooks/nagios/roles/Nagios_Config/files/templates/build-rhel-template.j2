@@ -65,6 +65,7 @@ define service{
         service_description             PING
         check_period                    once-a-day-at-8
         check_command                   check_ping!200.0,20%!500.0,60%
+        servicegroups                   build_Servers
         }
 define service{
         use                             generic-service
