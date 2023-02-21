@@ -182,7 +182,7 @@ We have some automation for running under Vagrant which we use to validate
 playbook changes before they are merged. See the
 [pbTestScripts](pbTestScripts/) folder for more info. The scripts from there
 are run on jenkins in the
-[VagrantPlaybookCheck](https://ci.adoptopenjdk.net/view/Tooling/job/VagrantPlaybookCheck/) job
+[VagrantPlaybookCheck](https://ci.adoptium.net/view/Tooling/job/VagrantPlaybookCheck/) job
 
 Any additional help in setting up Vagrant with Virtualbox can be found [here](https://www.vagrantup.com/intro/getting-started/index.html)
 

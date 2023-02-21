@@ -6,10 +6,10 @@ A verbose description of our static docker container system can be found in the 
 The DockerStatic ansible role provides allows us to automate the setup of our dockerhost machines using the [dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml) playbook.
 
 ## Our current Dockerhost machines
-* [docker-packet-ubuntu2004-amd-1](https://ci.adoptopenjdk.net/computer/docker-packet-ubuntu2004-amd-1/)
-* [docker-packet-ubuntu2004-intel-1](https://ci.adoptopenjdk.net/computer/docker-packet-ubuntu2004-intel-1/)
-* [docker-packet-ubuntu2004-armv8-1](https://ci.adoptopenjdk.net/computer/docker-packet-ubuntu2004-armv8-1/)
-* [dockerhost-equinix-ubuntu2004-armv8-1](https://ci.adoptopenjdk.net/computer/dockerhost-equinix-ubuntu2004-armv8-1/)
+* [docker-packet-ubuntu2004-amd-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-amd-1/)
+* [docker-packet-ubuntu2004-intel-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-intel-1/)
+* [docker-packet-ubuntu2004-armv8-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-armv8-1/)
+* [dockerhost-equinix-ubuntu2004-armv8-1](https://ci.adoptium.net/computer/dockerhost-equinix-ubuntu2004-armv8-1/)
 
 
 ## Setting up a new DockerStatic container
@@ -30,7 +30,7 @@ If you would like to setup an individual container on one of these machines, fol
 
 `docker run --restart unless-stopped -p {{ PORT }}:22 --cpus=2.0 --memory=6G --detach --name {{ name }} {{ tag }}`
 
-* Finally, go to https://ci.adoptopenjdk.net/computer/new and create a new jenkins node for this container.
+* Finally, go to https://ci.adoptium.net/computer/new and create a new jenkins node for this container.
 
 **NOTE**
 If you are creating a new container with the intention of replacing a container with an older OS, follow the above steps to create the new container. Then:

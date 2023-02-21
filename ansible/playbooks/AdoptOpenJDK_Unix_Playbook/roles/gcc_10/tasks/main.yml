@@ -13,7 +13,7 @@
 
 - name: Download AdoptOpenJDK gcc-10.3 binary
   get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc103.{{ ansible_architecture }}.tar.xz
+    url: https://ci.adoptium.net/userContent/gcc/gcc103.{{ ansible_architecture }}.tar.xz
     dest: '/tmp/ansible-adoptopenjdk-gcc-10.tar.xz'
     force: no
     mode: 0644

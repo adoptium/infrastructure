@@ -236,7 +236,7 @@ startVMPlaybook()
 	[ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
 	
-	sed -i -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 	
 	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
@@ -319,7 +319,7 @@ startVMPlaybookWin()
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	
 	# Changes the value of "hosts" in main.yml
-	sed -i'' -e "s/.*hosts:.*/- hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+	sed -i'' -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
 	sed -i'' -e "s/.*ansible_password.*/ansible_password: vagrant/g" playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	# If "credssp" isn't found in adoptopenjdk_variables.yml
