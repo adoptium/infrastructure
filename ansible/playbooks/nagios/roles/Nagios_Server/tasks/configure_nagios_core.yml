@@ -42,8 +42,6 @@
   file:
     path: /usr/local/nagios/etc/objects/servicegroups.cfg
     state: touch
-    owner: nagios
-    group: nagios
   become: yes
   when: nagios_service_group_config.stat.exists == false
 
