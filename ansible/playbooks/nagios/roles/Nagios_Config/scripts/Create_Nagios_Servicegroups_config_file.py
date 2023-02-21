@@ -20,8 +20,12 @@ def main():
 
     service_list=service_list_with_default.split(' ')
 
-   # Check To See If File Exists
     path = Output_Path+"/servicegroups.cfg"
+    # check_size = os.path.getsize(path)
+    # print(check_size)
+    # if check_size == 0:
+    #     os.remove(path)
+
     check_file = os.path.isfile(path)
 
     print("path = "+path)
@@ -47,12 +51,12 @@ def main():
         for service in service_list:
             servicegroup_name = service+'_Servers'
             servicegroup_alias = service+'_Servers'
-            # print(servicegroup_name+' '+servicegroup_alias)
-            file = open(Output_Path+"/servicegroups.cfg", "r")
-            for line in file:
-                if re.search(servicegroup_name, line):
+            with open(path) as f:
+                if servicegroup_name in f.read():
+                    print("True")
                     foundList.append(servicegroup_name)
                 else:
+                    print("False")
                     notfoundList.append(servicegroup_name)
 
         for service in (foundList):
@@ -67,16 +71,15 @@ def main():
             if service not in UniqfoundList:
                 MissingList.append(service)
 
-        for service in MissingList:
-            servicegroup_name = service+'_Servers'
-            servicegroup_alias = service+'_Servers'
-            with open(f"{Output_Path}/servicegroups.cfg", "a") as t:
-                t.write(f"define servicegroup{{\n")
-                t.write(f"  servicegroup_name {servicegroup_name}\n")
-                t.write(f"  alias {servicegroup_alias}\n")
-                t.write(f"}}\n")
-                t.close()
-
+        print(MissingList)
+        with open(f"{Output_Path}/servicegroups.cfg", "a") as t:
+          for service in MissingList:
+            print(service)
+            t.write(f"define servicegroup{{\n")
+            t.write(f"  servicegroup_name {service}\n")
+            t.write(f"  alias {service}\n")
+            t.write(f"}}\n")
+        t.close()
 
 if __name__ == "__main__":
 
