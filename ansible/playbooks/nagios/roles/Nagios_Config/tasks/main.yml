@@ -46,3 +46,7 @@
   when:
     - "'Run Create Nagios Hostgroups script' in task_list"
     - inventory_is_present.stat.exists
+
+- name: Restart Nagios Server
+  include_tasks: restart_nagios_server.yml
+  when: '"restart_nagios_server" in task_list'

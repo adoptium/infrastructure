@@ -7,3 +7,4 @@ task_list:
     - Run Create Nagios Server Configurations script
     - Run Create Nagios Servicegroups script
     - Run Create Nagios Hostgroups script
+    - restart_nagios_server
