@@ -13,7 +13,8 @@ templates = {'build_win': 'build-windows-template.j2',
             'build_rhel': 'build-rhel-template.j2',
             'test_rhel': 'test-rhel-template.j2',
             'build_sles': 'build-sles-template.j2',
-            'test_sles': 'test-sles-template.j2'}
+            'test_sles': 'test-sles-template.j2',
+            'dockerhost_ubuntu': 'dockerhost-ubuntu-template.j2'}
 
 ## Define Any Hosts That Should Be Excluded
 
