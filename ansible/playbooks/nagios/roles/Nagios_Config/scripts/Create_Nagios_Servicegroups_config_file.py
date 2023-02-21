@@ -24,8 +24,8 @@ def main():
     path = Output_Path+"/servicegroups.cfg"
     check_file = os.path.isfile(path)
 
-    # print("path = "+path)
-    # print(check_file)
+    print("path = "+path)
+    print(check_file)
 
     foundList=[]
     notfoundList=[]

@@ -41,7 +41,7 @@
     path: /tmp/ansible_inventory.yml
   register: inventory_is_present
 
-- name: Run Create Nagios Servicegroups script
+- name: Run Create Nagios Hostgroups script
   include_tasks: Create_Nagios_Hostgroups.yml
   when:
     - "'Run Create Nagios Hostgroups script' in task_list"
