@@ -23,7 +23,7 @@ def main():
        servicegroup_alias = service+'_Servers'
 
        # Add service group information to servicegroups.cfg file
-       with open(f"{Output_Path}/servicegroups.cfg", "a") as s:
+       with open(f"{Output_Path}/servicegroups.cfg", "w") as s:
             s.write(f"define servicegroup{{\n")
             s.write(f"  servicegroup_name {servicegroup_name}\n")
             s.write(f"  alias {servicegroup_alias}\n")
