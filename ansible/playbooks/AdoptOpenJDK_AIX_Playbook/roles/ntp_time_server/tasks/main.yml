@@ -1,0 +1,34 @@
+---
+###################
+# NTP Time Server #
+###################
+- name: Ensure NTP daemon is enabled
+  replace:
+    dest: /etc/rc.tcpip
+    regexp: '^ *# *(start /usr/sbin/xntpd (.+)\n)'
+    replace: '\1'
+  tags: ntp
+
+- name: Ensure NTP daemon is configured
+  copy:
+    content: |
+      server 1.pool.ntp.org
+      server 2.pool.ntp.org
+      server 3.pool.ntp.org
+      driftfile /etc/ntp.drift
+      tracefile /etc/ntp.trace
+    dest: /etc/ntp.conf
+    owner: root
+    group: system
+    mode: 0664
+  tags: ntp
+
+- name: Stop NTP daemon
+  service: name=xntpd state=stopped
+  changed_when: false
+  tags: ntp
+
+- name: Start NTP daemon
+  service: name=xntpd state=started
+  changed_when: false
+  tags: ntp
