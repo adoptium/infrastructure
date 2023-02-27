@@ -30,7 +30,7 @@ jobs:
           echo "Box Exists - Do Nothing"
         else
           echo "No Box - Download From Jenkins And Import"
-          wget https://ci.adoptopenjdk.net/userContent/vagrant/Solaris10.box.gz
+          wget https://ci.adoptium.net/userContent/vagrant/Solaris10.box.gz
           CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
           if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
           then

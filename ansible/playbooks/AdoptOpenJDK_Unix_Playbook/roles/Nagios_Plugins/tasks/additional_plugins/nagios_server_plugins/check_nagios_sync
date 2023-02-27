@@ -69,7 +69,7 @@ logPath="$HOME/check_inventory_logs/check_nagios_sync_`date +%H%M_%d%m%Y`"
 rm -rf "$HOME/check_inventory_logs/check_nagios_sync_*"
 
 nagiosList=$(ls -la /usr/local/nagios/etc/servers/ | awk '/.cfg/ { print $9 }' | cut -d. -f1)
-jenkinsList=$(curl -s https://ci.adoptopenjdk.net/computer/api/json | jq -r '.computer[] | .displayName')
+jenkinsList=$(curl -s https://ci.adoptium.net/computer/api/json | jq -r '.computer[] | .displayName')
 [[ $? != 0 ]] && echo "UNKNOWN- Curl failed" && exit 3
 
 echo "
