@@ -9,7 +9,7 @@
 
 - name: Copy Python Files To Remote
   ansible.builtin.copy:
-    src:  files
+    src: files
     dest: /tmp/python-temp/
     owner: nagios
     group: nagios
