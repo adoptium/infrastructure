@@ -1,7 +1,7 @@
 ---
 - name: Copy Contacts Template To Server
   ansible.builtin.copy:
-    src: ../files/contacts.cfg
+    src: "{{ role_path }}/files/contacts.cfg"
     dest: /usr/local/nagios/etc/objects/contacts.cfg
     remote_src: no
 
