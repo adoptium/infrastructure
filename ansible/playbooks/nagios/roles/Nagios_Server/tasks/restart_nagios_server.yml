@@ -1,4 +1,4 @@
---
+---
 
 - name: Restart Nagios
   service:
