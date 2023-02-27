@@ -17,7 +17,7 @@
 
 - name: Copy Main script
   ansible.builtin.copy:
-    src: ../scripts/Create_Nagios_Server_Configurations.py
+    src: "{{role_path}}/scripts/Create_Nagios_Server_Configurations.py"
     dest: /tmp/python-temp/files
     owner: nagios
     group: nagios

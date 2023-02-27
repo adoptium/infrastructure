@@ -9,7 +9,7 @@
 
 - name: Copy Main script
   ansible.builtin.copy:
-    src: ../scripts/Create_Nagios_Servicegroups_config_file.py
+    src: "{{role_path}}/scripts/Create_Nagios_Servicegroups_config_file.py"
     dest: /tmp/python-temp
     owner: nagios
     group: nagios
