@@ -322,3 +322,25 @@
     - (ansible_architecture == "x86_64") or (ansible_architecture == "s390x")
     - not expat_installed.stat.exists
   tags: expat
+
+- name: Add libffi6 symlink for (SLES12, s390x)
+  file:
+    src: /usr/lib64/libffi.so.4
+    dest: /usr/lib64/libffi.so.6
+    owner: root
+    group: root
+    state: link
+  when:
+    - (ansible_distribution_major_version == "12" and ansible_architecture == "s390x")
+  tags: libffi_sles
+
+- name: Add libffi6 symlink for (SLES15, s390x)
+  file:
+    src: /usr/lib64/libffi.so.7
+    dest: /usr/lib64/libffi.so.6
+    owner: root
+    group: root
+    state: link
+  when:
+    - (ansible_distribution_major_version == "15" and ansible_architecture == "s390x")
+  tags: libffi_sles
