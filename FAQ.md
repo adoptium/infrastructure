@@ -4,9 +4,10 @@
 The three github teams relevant to this repository are as follows (Note, you
 won't necessarily have access to see these links):
 
-- [adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure) - write access to the repository which lets you be an official approver of PRs (triage doesn't)
-- [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - higher level of access for system administrators only
-- [admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) - The Admin team - can force through changes without approval etc.
+- [infrastructure-triage](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - was used for pre-Adoptium github access, but no longer actively used. Superceded by Temurin Contributor status
+- [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) - the main team of people working on infrastructure issues (Mostly superceded by Temurin->Collaborator access)
+- [infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core) - higher level of access for system administrators only. Allows control of jenkins agents
+- [infrastructure-secret](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-secret) - The group of people who have access to the secrets repository.
 
 ## Change approvals
 
@@ -229,18 +230,32 @@ access is enabled. For others, access is controlled via github teams (via
 the Jenkins `Github Authentication Plugin` as follows. (Links here won't work for
 most people as the teams are restricted access)
 
-- [release](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) can run and configure jobs and views
-- [build](https://github.com/orgs/AdoptOpenJDK/teams/build/members) has the access for `release` plus the ability to create new jobs
+- [jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) Full administrative access to the jenkins server
+- [build-triage](https://github.com/orgs/AdoptOpenJDK/teams/build-triage/members) View and run access to all build jobs (including non-Temurin ones)
+- [build](https://github.com/orgs/AdoptOpenJDK/teams/build/members) has the access for performing releases plus the ability to create new jobs
+- [build-core](https://github.com/orgs/AdoptOpenJDK/teams/build-core/members) Build members who have access to all jobs including signing
+- [build-release](https://github.com/orgs/AdoptOpenJDK/teams/build-release/members) Similar to build-core but without access to create new jobs and run [refactor_openjdk_release_tool](https://ci.adoptium.net/job/build-scripts/job/release/job/refactor_openjdk_release_tool/)
+- [installer](https://github.com/orgs/AdoptOpenJDK/teams/installer/members) Users who can access the installer creation jobs
+- [test-triage](https://github.com/orgs/AdoptOpenJDK/teams/test-triage/members) has ability to run Grinder jobs
 - [test](https://github.com/orgs/AdoptOpenJDK/teams/test/members) has the same access as `build`
-- [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure/members) has the same as `build`/`testing` plus can manage agent machines
-- [jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins/members) as you might expect has access to Administer anything
+- [test-core](https://github.com/orgs/AdoptOpenJDK/teams/test-core/members) As test, but can also perform [TRSS syncs](https://ci.adoptium.net/job/TRSS_Code_Sync/)
+- [intrastructure-triage](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-triage-/members) Allows access to [VPC](https://ci.adoptium.net/job/build-scripts/job/release/job/refactor_openjdk_release_tool) and [QPC](https://ci.adoptium.net/view/Tooling/job/VagrantPlaybookCheck/)
+- [infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure/members) has the same as `build`/`test` plus can manage agent machines
+- [infrastructure-core](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure-core/members) List of people with admin access to jenkins and infrastructure providers
 
-Some jobs within jenkins, such as the
-[build signing job](https://ci.adoptium.net/job/build-scripts/job/release/job/sign_build)
-and [Release tool job](https://ci.adoptium.net/job/build-scripts/job/release/job/refactor_openjdk_release_tool)
-are restricted further via the `Enable project-based security` section of
-the job definition. In the case of those two in particular it's `jenkins-admins` and
-`release` teams only who have access to them respectively.
+Note that the special `eclipse-temurin-bot` has explicit read only access to some of the build pipelines jobs too.
+
+For GitHub issue access, this is controlled by the Eclipse Foundation via
+the Adoptium projects, and people can be given "contributor" or
+"collaborator" access (see
+[the wiki](https://github.com/adoptium/adoptium/wiki/Working-with-Eclipse) for
+the processes around this) to the repositories which are under each Adoptium
+project as per
+[this comment](https://github.com/adoptium/infrastructure/issues/2549#issuecomment-1178903957). 
+Most of the relevant ones are under the
+[temurin](https://projects.eclipse.org/projects/adoptium.temurin/who)
+or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
+
 
 ## Adding new systems
 
