@@ -1,0 +1,38 @@
+FROM registry.access.redhat.com/rhel7
+# This dockerfile should be built using:
+#  docker build --no-cache -t rhel7_build_image -f ansible/docker/Dockerfile.RHEL7 --build-arg ROSIUSER=******* --build-arg ROSIPW=******* --build-arg git_sha=******* `pwd`
+ARG ROSIUSER
+ARG ROSIPW
+RUN sed -i 's/\(def in_container():\)/\1\n    return False/g' /usr/lib64/python*/*-packages/rhsm/config.py
+RUN subscription-manager register --username=${ROSIUSER} --password=${ROSIPW} --auto-attach
+RUN subscription-manager repos --enable rhel-7-for-system-z-optional-rpms
+# ^^ Optional repo needed for Xvfb
+
+ARG git_sha
+ARG user=jenkins
+
+RUN yum -y update; yum install -y sudo
+RUN yum --enablerepo=rhel-7-server-ansible-2-for-system-z-rpms install -y ansible
+RUN yum clean all
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,locales,ntp_time"
+# ^^^ locales ommitted because locale-gen isn't present on RHEL and the ones we install aren't there by default
+
+RUN rm -rf /ansible; yum remove ansible; yum clean all
+
+RUN groupadd -g 1003 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1002 -g 1003 -m ${user}
+
+ENV \
+    JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk" \
+    JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
+    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"
+RUN subscription-manager unregister
+
