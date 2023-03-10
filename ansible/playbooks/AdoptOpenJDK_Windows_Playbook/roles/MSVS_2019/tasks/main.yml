@@ -18,19 +18,12 @@
   register: vs2019_installed
   tags: MSVS_2019
 
-- name: Test if VS 2019 Layout is available
-  stat: path=/Vendor_Files/windows/VS2019_layout.16.11.32106.67.zip
-  register: vs2019_layout_available
-  delegate_to: localhost
-  run_once: true
-  tags: MSVS_2019
-
 - name: Transfer VS2019 Layout File
   win_copy:
     src: /Vendor_Files/windows/VS2019_layout.16.11.32106.67.zip
     dest: C:\TEMP\VS2019_Layout.zip
     remote_src: no
-  when: (vs2019_layout_available.stat.exists)
+  when: (not vs2019_installed.stat.exists)
 
 # Check For The Transferred File & Exit If AdoptOpenJDK Run
 - name: Check If Layout Has Transferred
@@ -43,7 +36,7 @@
 # This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
 - name: Exit With Error When No Layout Within AdoptOpenJDK
   fail:
-    msg: "The VS2019 Layout File Appears To Be Missing From The Vendor_Files"
+    msg: "The VS2019 Layout File Appears To Be Missing From Vendor_Files"
   when: (not vs2019_layout_ready.stat.exists) and ( AdoptYes|bool == true)
   tags: MSVS_2019
 
