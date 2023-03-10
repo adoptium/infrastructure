@@ -25,6 +25,7 @@
     dest: C:\TEMP\VS2019_Layout.zip
     remote_src: no
   when: (not vs2019_installed.stat.exists) or ( AdoptYes|bool == true)
+  failed_when: false
 
 # Check For The Transferred File & Exit If AdoptOpenJDK Run
 - name: Check If Layout Has Transferred
@@ -100,7 +101,6 @@
     - C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\DIA SDK\bin\msdia140.dll
     - C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\DIA SDK\bin\amd64\msdia140.dll
   when: (not vs2019_installed.stat.exists)
-  # when: (not vs2019_installed.stat.exists) and ( AdoptYes|bool == false)
   tags: MSVS_2019
 
 - name: Reboot machine after Visual Studio installation
