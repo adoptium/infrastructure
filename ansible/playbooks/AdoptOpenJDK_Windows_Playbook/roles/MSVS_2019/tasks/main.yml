@@ -19,7 +19,6 @@
   tags: MSVS_2019
 
 - name: Transfer VS2019 Layout File
-  ignore_errors: True
   win_copy:
     src: /Vendor_Files/windows/VS2019_layout.16.11.32106.67.zip
     dest: C:\TEMP\VS2019_Layout.zip
