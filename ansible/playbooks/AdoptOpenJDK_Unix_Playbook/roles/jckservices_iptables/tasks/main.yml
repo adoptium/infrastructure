@@ -41,13 +41,6 @@
     destination_port: 53
     jump: ACCEPT
 
-- name: Setup iptables allow 80
-  iptables:
-    chain: INPUT
-    protocol: tcp
-    destination_port: 80
-    jump: ACCEPT
-
 - name: Allow Azure private network (10.1.x.x)
   iptables:
     chain: INPUT
