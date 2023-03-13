@@ -21,10 +21,6 @@ def main():
     service_list=service_list_with_default.split(' ')
 
     path = Output_Path+"/servicegroups.cfg"
-    # check_size = os.path.getsize(path)
-    # print(check_size)
-    # if check_size == 0:
-    #     os.remove(path)
 
     check_file = os.path.isfile(path)
 
