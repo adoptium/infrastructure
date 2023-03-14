@@ -45,7 +45,8 @@
     - Common
     - Windows_Updates
     - WMF_5.1
-    - Jenkins                     # AdoptOpenJDK infrastructure
+    - role: Jenkins               # AdoptOpenJDK infrastructure
+      tags: [jenkins, adoptopenjdk]
     - CodesignCert
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
@@ -66,8 +67,10 @@
     - role: Java_install
       jdk_version: 17
     - ANT                         # Testing
-    - MSVS_2013
-    - MSVS_2017                   # OpenJ9
+    - role: MSVS_2013
+      when: ansible_architecture == "64-bit"
+    - role: MSVS_2017             # OpenJ9
+      when: ansible_architecture == "64-bit"
     - MSVS_2019                   # OpenJ9
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME

@@ -18,7 +18,6 @@
       - Users
       - Remote Desktop Users
       - Performance Log Users
-  tags: jenkins
 
 
 #######################################################################
@@ -42,4 +41,3 @@
     username: SYSTEM
     state: present
     enabled: true
-  tags: jenkins
