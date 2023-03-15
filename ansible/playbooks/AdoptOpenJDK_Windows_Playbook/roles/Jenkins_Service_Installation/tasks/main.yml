@@ -49,7 +49,7 @@
   win_user_right:
     name: SeServiceLogonRight
     users:
-    - "{{ Jenkins_Username }}"
+      - "{{ Jenkins_Username }}"
     action: add
   when: jenkins_service.exists == false
 
