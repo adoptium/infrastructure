@@ -46,8 +46,7 @@ Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityPro
  
 	 You should get confirmation prompts on screen that the service has been created.
 	 
-	- Next open the windows services dialog, and identify the Jenkins service that has just been created. Right click on the service and select **Properties** from the pop up menu.
-	- Select the log on tab from the dialog, and change the logon type from local system account to the jenkins account, and enter the password for the jenkins user, followed by **Ok**
+	- Next open the windows services dialog, and identify the Jenkins service that has just been created. Right click on the service and select **Start** from the pop up menu.
 	
-	You should now get some confirmations, that the Jenkins user has been granted the log on as a service permission, and you should be able to start the service, and check that the agent is online and available in Jenkins.
+The jenkins service should then be started.
 
