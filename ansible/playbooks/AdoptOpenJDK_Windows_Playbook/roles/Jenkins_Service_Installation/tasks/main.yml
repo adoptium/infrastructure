@@ -9,9 +9,15 @@
   register: jenkins_service
   failed_when: false
 
+# Allow workspace to be overridden by a variable in inventory.yml
+- name: Set workspace variable
+  set_fact:
+    workspace: C:\Users\{{ Jenkins_Username }}\workspace
+  when: (jenkins_service.exists == false) and (workspace is not defined)
+
 - name: Create workspace directory in C:\Users\{{ Jenkins_Username }}
   win_file:
-    path: C:\Users\{{ Jenkins_Username }}\workspace
+    path: "{{ workspace }}"
     state: directory
     recurse: yes
     owner: "{{ Jenkins_Username }}"
