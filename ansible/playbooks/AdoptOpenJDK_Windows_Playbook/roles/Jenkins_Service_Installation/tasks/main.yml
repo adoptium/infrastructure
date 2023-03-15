@@ -60,4 +60,3 @@
     password: "{{ Jenkins_Win_Passwd }}"
     start_mode: auto
     state: started
-  when: jenkins_service.exists == false
