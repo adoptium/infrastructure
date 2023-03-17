@@ -130,10 +130,16 @@
     - skip_ansible_lint
 
 - name: Install JDK {{ jdk_version }} on Linux/Alpine-Linux
-  block:
+  when:
+    - ansible_distribution != "MacOSX"
+    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
+    - ansible_os_family != "Solaris"
+    - adoptopenjdk_installed.rc != 0  
+  tags: adoptopenjdk_install
     # Api does not return release information for JDK10
+  block:
     - name: Get Signature File Link (Linux/Alpine-Linux)
-      shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}' 
+      shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk_version != 10
       register: sig_output
@@ -147,7 +153,7 @@
       delay: 5
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
-      
+
     - name: GPG Signature verification (Linux/Alpine-Linux)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
@@ -163,16 +169,16 @@
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
-  when:
-    - ansible_distribution != "MacOSX"
-    - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
-    - ansible_os_family != "Solaris"
-    - adoptopenjdk_installed.rc != 0  
-  tags: adoptopenjdk_install
 
 # # CentOS6 needs it's own task so it can use a different python interpreter.
 # # See: https://github.com/adoptium/infrastructure/issues/1877
 - name: Install latest release if not already installed (CentOS6)
+  vars:
+    ansible_python_interpreter: /usr/local/python2/bin/python2.7
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
   block:
     - name: Download latest release (CentOS6)
       get_url:
@@ -183,9 +189,9 @@
       delay: 5
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
-    
+
     - name: Get Signature File Link
-      shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}' 
+      shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk_version != 10
       register: sig_output
@@ -205,14 +211,12 @@
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
-  vars:
-    ansible_python_interpreter: /usr/local/python2/bin/python2.7
-  when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6"
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
 
 - name: Install latest release if one not already installed (macOS)
+  when:
+    - ansible_distribution == "MacOSX"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
   block:
     - name: Download latest release
       get_url:
@@ -248,7 +252,7 @@
       when:
         - jdk_version != 10
 
-    - name: Run installer (macOS)
+    - name: Run installer
       shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
       when:
         - jdk_version != 10
@@ -256,7 +260,7 @@
     # The boot JDK will be installed into a temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
     # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
 
-    - name: Find bootjdk install directory (MacOS)
+    - name: Find bootjdk install directory
       find:
         paths: /Library/Java/JavaVirtualMachines
         patterns:
@@ -267,7 +271,7 @@
         file_type: directory
       register: bootjdk_install_dir
 
-    - name: Create jdk symlink to bootjdk install directory (MacOS)
+    - name: Create jdk symlink to bootjdk install directory
       file:
         src: '{{ bootjdk_install_dir.files[0].path }}'
         dest: '{{ path }}'
@@ -277,12 +281,12 @@
       become: yes
       become_user: root
       become_method: sudo
-  when:
-    - ansible_distribution == "MacOSX"
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
 
 - name: Install latest release if one not already installed (Solaris)
+  when:
+    - ansible_os_family == "Solaris"
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
   block:
     - name: Download latest release
       command: wget https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
@@ -290,7 +294,7 @@
       until: adoptopenjdk_download is not failed
 
     - name: Get Signature File Link
-      shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}' 
+      shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       register: sig_output
 
     - name: GPG Signature verification
@@ -300,10 +304,6 @@
       command: tar -xf /tmp/jdk-{{ jdk_version }}.tar.gz -C /usr/lib/jvm
       register: adoptopenjdk_unpack
       until: adoptopenjdk_unpack is not failed
-  when:
-    - ansible_os_family == "Solaris"
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
 
 - name: Get {{ path }}* full path name
   shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
