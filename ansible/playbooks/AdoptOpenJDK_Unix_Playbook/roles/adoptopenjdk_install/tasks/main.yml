@@ -172,7 +172,7 @@
 
 # # CentOS6 needs it's own task so it can use a different python interpreter.
 # # See: https://github.com/adoptium/infrastructure/issues/1877
-- name: Install latest release if not already installed (CentOS6)
+- name: Install latest JDK {{ jdk_version }} release if not already installed (CentOS6)
   vars:
     ansible_python_interpreter: /usr/local/python2/bin/python2.7
   when:
@@ -180,7 +180,7 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
   block:
-    - name: Download latest release (CentOS6)
+    - name: Download latest JDK {{ jdk_version }} release (CentOS6)
       get_url:
         url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
@@ -201,7 +201,7 @@
       when:
         - jdk_version != 10
 
-    - name: Install latest release if one not already installed (CentOS6)
+    - name: Install latest JDK {{ jdk_version }} release (CentOS6)
       unarchive:
         src: /tmp/jdk{{ jdk_version }}.tar.gz
         dest: /usr/lib/jvm
@@ -212,13 +212,13 @@
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
 
-- name: Install latest release if one not already installed (macOS)
+- name: Install latest JDK {{ jdk_version }} release if one not already installed (macOS)
   when:
     - ansible_distribution == "MacOSX"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
   block:
-    - name: Download latest release (macOS)
+    - name: Download latest JDK {{ jdk_version }} release (macOS)
       get_url:
         url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         dest: /tmp/{{ jdk_version }}-installer.pkg
@@ -252,7 +252,7 @@
       when:
         - jdk_version != 10
 
-    - name: Run installer (macOS)
+    - name: Run installer for JDK {{ jdk_version }} (macOS)
       shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
       when:
         - jdk_version != 10
@@ -282,13 +282,13 @@
       become_user: root
       become_method: sudo
 
-- name: Install latest release if one not already installed (Solaris)
+- name: Install latest JDK {{ jdk_version }} release if one not already installed (Solaris)
   when:
     - ansible_os_family == "Solaris"
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
   block:
-    - name: Download latest release (Solaris)
+    - name: Download latest JDK {{ jdk_version }} release (Solaris)
       command: wget https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
@@ -300,7 +300,7 @@
     - name: GPG Signature verification (Solaris)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk-{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
 
-    - name: Extract latest release (Solaris)
+    - name: Extract latest JDK {{ jdk_version }} release (Solaris)
       command: tar -xf /tmp/jdk-{{ jdk_version }}.tar.gz -C /usr/lib/jvm
       register: adoptopenjdk_unpack
       until: adoptopenjdk_unpack is not failed
