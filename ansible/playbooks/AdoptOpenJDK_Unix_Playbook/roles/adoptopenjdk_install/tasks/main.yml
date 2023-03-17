@@ -165,7 +165,7 @@
         dest: /usr/lib/jvm
         remote_src: yes
 
-    - name: Remove jdk{{ jdk_version }}.tar.gz
+    - name: Remove jdk{{ jdk_version }}.tar.gz (Linux/Alpine-Linux)
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
@@ -190,24 +190,24 @@
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
 
-    - name: Get Signature File Link
+    - name: Get Signature File Link (CentOS6)
       shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk_version != 10
       register: sig_output
 
-    - name: GPG Signature verification (Linux/Alpine-Linux)
+    - name: GPG Signature verification (CentOS6)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
         - jdk_version != 10
 
-    - name: Install latest release if one not already installed (Linux/Alpine-Linux)
+    - name: Install latest release if one not already installed (CentOS6)
       unarchive:
         src: /tmp/jdk{{ jdk_version }}.tar.gz
         dest: /usr/lib/jvm
         remote_src: yes
 
-    - name: Remove jdk{{ jdk_version }}.tar.gz
+    - name: Remove jdk{{ jdk_version }}.tar.gz (CentOS6)
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
@@ -218,7 +218,7 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
   block:
-    - name: Download latest release
+    - name: Download latest release (macOS)
       get_url:
         url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         dest: /tmp/{{ jdk_version }}-installer.pkg
@@ -227,7 +227,7 @@
       when:
         - jdk_version != 10
 
-    - name: Download tarball when installer is not available (JDK 10)
+    - name: Download JDK10 tarball when installer is not available (macOS)
       unarchive:
         src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         remote_src: yes
@@ -241,18 +241,18 @@
       when:
         - jdk_version == 10
 
-    - name: Get Signature File Link
+    - name: Get Signature File Link (macOS)
       shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=mac&vendor=eclipse' | grep signature_link | grep pkg | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk_version != 10
       register: sig_output
 
-    - name: GPG Signature verification
+    - name: GPG Signature verification (macOS)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/{{ jdk_version }}-installer.pkg -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
         - jdk_version != 10
 
-    - name: Run installer
+    - name: Run installer (macOS)
       shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
       when:
         - jdk_version != 10
@@ -260,7 +260,7 @@
     # The boot JDK will be installed into a temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
     # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
 
-    - name: Find bootjdk install directory
+    - name: Find bootjdk install directory (macOS)
       find:
         paths: /Library/Java/JavaVirtualMachines
         patterns:
@@ -271,7 +271,7 @@
         file_type: directory
       register: bootjdk_install_dir
 
-    - name: Create jdk symlink to bootjdk install directory
+    - name: Create jdk symlink to bootjdk install directory (macOS)
       file:
         src: '{{ bootjdk_install_dir.files[0].path }}'
         dest: '{{ path }}'
@@ -288,19 +288,19 @@
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
   block:
-    - name: Download latest release
+    - name: Download latest release (Solaris)
       command: wget https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
 
-    - name: Get Signature File Link
+    - name: Get Signature File Link (Solaris)
       shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       register: sig_output
 
-    - name: GPG Signature verification
+    - name: GPG Signature verification (Solaris)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk-{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
 
-    - name: Extract latest release
+    - name: Extract latest release (Solaris)
       command: tar -xf /tmp/jdk-{{ jdk_version }}.tar.gz -C /usr/lib/jvm
       register: adoptopenjdk_unpack
       until: adoptopenjdk_unpack is not failed
