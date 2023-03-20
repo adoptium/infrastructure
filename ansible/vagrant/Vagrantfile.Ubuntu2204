@@ -7,7 +7,8 @@ if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
 # Ubuntu 22.04 box doesn't accept the RSA key
-echo PubkeyAcceptedAlgorithms +ssh-rsa >> /etc/sshd/sshd_config
+echo PubkeyAcceptedAlgorithms +ssh-rsa | sudo tee -a /etc/ssh/sshd_config
+sudo systemctl restart sshd
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
