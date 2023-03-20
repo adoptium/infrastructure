@@ -142,6 +142,7 @@
       shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk_version != 10
+        - not (jdk_version == 8 and ansible_architecture == "s390x")
       register: sig_output
 
     - name: Download latest release (Linux/Alpine-Linux)
@@ -158,6 +159,7 @@
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
         - jdk_version != 10
+        - not (jdk_version == 8 and ansible_architecture == "s390x")
 
     - name: Install latest release if one not already installed (Linux/Alpine-Linux)
       unarchive:
