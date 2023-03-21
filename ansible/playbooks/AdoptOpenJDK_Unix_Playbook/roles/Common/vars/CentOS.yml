@@ -60,6 +60,9 @@ gcc48_devtoolset_compiler:
   - devtoolset-2-binutils
   - devtoolset-2-gcc-c++
 
+Additional_Build_Tools_CentOS6:
+  - libselinux-python
+
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
   - ccache
