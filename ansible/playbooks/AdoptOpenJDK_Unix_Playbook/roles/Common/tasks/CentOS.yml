@@ -60,12 +60,6 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additiona; build tools for CentOS 6
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS6 }}"
-  when: ansible_distribution_major_version == "6"
-  tags: build_tools
-
 - name: Install additional build tools for CentOS 7
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS7 }}"
