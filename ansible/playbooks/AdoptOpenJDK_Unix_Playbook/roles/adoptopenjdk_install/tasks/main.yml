@@ -181,10 +181,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (CentOS6)
-      get_url:
-        url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-        dest: /tmp/jdk{{ jdk_version }}.tar.gz
-        mode: 0440
+      command: wget -q 'https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
       vars:
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
