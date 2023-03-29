@@ -56,6 +56,22 @@
     - ansible_architecture == "i386"
   tags: adoptopenjdk_install
 
+- name: Set api_version variables for not JDK 10
+  set_fact:
+    api_version: adoptium
+    api_project: eclipse
+  when:
+    - jdk_version != 10
+  tags: adoptopenjdk_install
+
+- name: Set api_version variables for JDK 10
+  set_fact:
+    api_version: adoptopenjdk
+    api_project: adoptopenjdk
+  when:
+    - jdk_version == 10
+  tags: adoptopenjdk_install
+
 # Download x64 binaries until we have arm64 binaries available
 - name: Set x64 api_architecture variable for macOS Arm64
   set_fact:
@@ -147,7 +163,7 @@
 
     - name: Download latest release (Linux/Alpine-Linux)
       get_url:
-        url: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
+        url: https://api.{{ api_version }}.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_project }}?project=jdk
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
         mode: 0440
       retries: 3
@@ -181,7 +197,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (CentOS6)
-      command: wget -q 'https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
+      command: wget -q 'https://api.{{ api_version }}.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_project }}?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
       vars:
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
@@ -228,7 +244,7 @@
 
     - name: Download JDK10 tarball when installer is not available (macOS)
       unarchive:
-        src: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
+        src: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         remote_src: yes
         dest: /Library/Java/JavaVirtualMachines/
       become: yes
