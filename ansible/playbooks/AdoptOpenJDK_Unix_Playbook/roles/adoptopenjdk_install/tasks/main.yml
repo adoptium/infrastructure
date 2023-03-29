@@ -147,7 +147,7 @@
 
     - name: Download latest release (Linux/Alpine-Linux)
       get_url:
-        url: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+        url: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
         mode: 0440
       retries: 3
@@ -181,7 +181,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (CentOS6)
-      command: wget -q 'https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
+      command: wget -q 'https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
       vars:
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
@@ -219,7 +219,7 @@
   block:
     - name: Download latest JDK {{ jdk_version }} release (macOS)
       get_url:
-        url: https://api.adoptium.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+        url: https://api.adoptium.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
         dest: /tmp/{{ jdk_version }}-installer.pkg
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
@@ -228,7 +228,7 @@
 
     - name: Download JDK10 tarball when installer is not available (macOS)
       unarchive:
-        src: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+        src: https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
         remote_src: yes
         dest: /Library/Java/JavaVirtualMachines/
       become: yes
@@ -288,7 +288,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (Solaris)
-      command: wget https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
+      command: wget https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
 
