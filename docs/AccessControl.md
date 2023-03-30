@@ -1,6 +1,6 @@
 # Guide to access controls for infrastructure
 
-This document providers an overview of the access controls which are applied
+This document provides an overview of the access controls which are applied
 at different parts of the project in order to secure the systems and allow
 people to have access when required for onboarding and offboarding people. 
 Note that this document's scope does not cover the committer/contributor
