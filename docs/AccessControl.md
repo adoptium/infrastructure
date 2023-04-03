@@ -5,7 +5,7 @@ at different parts of the project in order to secure the systems and allow
 people to have access when required for onboarding and offboarding people. 
 Note that this document's scope does not cover the committer/contributor
 process for the Adoptium github org which is managed by Eclipse and
-controlled via their normal contributor election process.
+controlled via their [normal committer election process](https://www.eclipse.org/membership/become_a_member/committer.php).
 
 ## Jenkins build/test agents
 
