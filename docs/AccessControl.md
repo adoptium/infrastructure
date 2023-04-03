@@ -16,7 +16,7 @@ systems to a higher level)
 Administrative access to the build systems is currently granted to all members of the
 infrastructure team although in some cases individuals may have more
 restricted access (e.g.  to administer certain types of machine).  These
-policies are controlled by Bastillion which distributes the infrastructure
+policies are controlled by [Bastillion](https://www.bastillion.io/) which distributes the infrastructure
 team's ssh keys to the systems.  Addition and removal of users to profiles
 in there can be done when people are onboarded/offboarded. For Windows
 systems, the credentials are currently stored in our secrets repostory (See
