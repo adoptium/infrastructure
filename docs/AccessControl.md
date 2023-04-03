@@ -31,7 +31,7 @@ likely we would have a `root-build` profile in Bastillion to manage those.
 
 **Onboarding process:** Add a User to Bastillion and add the user to required profiles
 
-**Offboarding process:**qs Remove the User from the required profiles, remove the account
+**Offboarding process:** Remove the User from the required profiles, remove the account
 
 
 ## Build infrastructure e.g. jenkins/AWX/Bastillion
