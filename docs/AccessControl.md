@@ -141,7 +141,7 @@ the Adoptium org, and grant access to the `infrastructure` Group (or
 
 ## secrets / dotgpg
 
-We currently store various credentials in the provate secrets repository where the
+We currently store various credentials in the private secrets repository where the
 access to data in there is
 ([currently](https://github.com/adoptium/infrastructure/issues/2661))
 controlled using the [dotgpg](https://github.com/ConradIrwin/dotgpg) tool
