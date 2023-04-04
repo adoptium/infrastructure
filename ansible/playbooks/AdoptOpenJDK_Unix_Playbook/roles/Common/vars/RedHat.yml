@@ -41,6 +41,7 @@ Build_Tool_Packages:
   - mpfr-devel
   - openssl-devel
   - perl-devel
+  - perl-IPC-Cmd                  # required for openssl v3 compiles
   - pkgconfig
   - systemtap-sdt-devel
   - unzip
@@ -71,7 +72,6 @@ Additional_Build_Tools_RHEL_x86:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
-  - perl-IPC-Cmd                  # required for openssl v3 compiles
 
 Additional_Build_Tools_RHEL_ppc64:
   - glibc.ppc                     # a dependency required for executing a 32-bit C binary
