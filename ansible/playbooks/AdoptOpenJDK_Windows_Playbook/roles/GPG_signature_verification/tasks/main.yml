@@ -1,0 +1,11 @@
+---
+# These tasks can only run once cygwin is installed on the remote machine
+
+- name: Import GPG Key
+  win_command: gpg --keyserver keyserver.ubuntu.com --recv-keys "{{ GPG_key }}"
+
+- name: Get signature file
+  win_command: wget -q "{{ signature_link }}" -O sigfile
+
+- name: Verify binary
+  win_command: gpg --verify sigfile {{ file_path }}

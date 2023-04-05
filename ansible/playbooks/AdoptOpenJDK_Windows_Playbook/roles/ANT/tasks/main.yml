@@ -26,6 +26,16 @@
   register: ant_download
   tags: ANT
 
+- name: GPG Signature Verification of Binary
+  import_tasks:
+    file: roles/GPG_signature_verification/tasks/main.yml
+  vars:
+    file_path: c:\temp\ant.zip
+    signature_link: "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc"
+    GPG_key: "{{ key.apache_ant }}"
+  when: (not ant_installed.stat.exists) and (not ant_download.stat.exists)
+  tags: ANT
+
 - name: Deploy Apache ANT
   win_unzip:
     src: c:\temp\ant.zip

@@ -14,3 +14,7 @@ heapsize: normal
 
 ## Nagios Server Details
 Nagios_Master_IP: 78.47.239.96
+
+# GPG Public Keys
+key:
+  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
