@@ -33,7 +33,7 @@
     file_path: c:\temp\ant.zip
     signature_link: "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc"
     GPG_key: "{{ key.apache_ant }}"
-  when: (not ant_installed.stat.exists) and (not ant_download.stat.exists)
+  when: (not ant_installed.stat.exists)
   tags: ANT
 
 - name: Deploy Apache ANT
