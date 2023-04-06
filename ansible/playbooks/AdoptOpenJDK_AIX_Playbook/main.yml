@@ -65,6 +65,8 @@
     - aixfs
     - yum
 
+    - GnuPG2
+
     ## additional OSS packages
     - ant
     - ant_contrib
