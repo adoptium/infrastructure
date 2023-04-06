@@ -34,7 +34,7 @@
       unarchive:
         src: /tmp/apache-ant-1.9.9-bin.zip
         dest: /opt
-      copy: False
+        copy: False
       when: ant.stat.islnk is not defined
 
     - name: Create symlink for ant
