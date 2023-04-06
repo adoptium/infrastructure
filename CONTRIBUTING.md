@@ -157,6 +157,7 @@ Wherever possible, prefix the commit message with the area which you are changin
 - plugins:
 - inventory:
 - github:
+- tools:
 
 ## Further Docs
 
