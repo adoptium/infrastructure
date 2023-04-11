@@ -166,7 +166,6 @@ hosts:
           macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}
 
       - marist:
-          sles12-s390x-1: {ip: 148.100.86.128}
           rhel7-s390x-1: {ip: 148.100.84.26, user: linux1, description: test machine in marist cloud}
           rhel8-s390x-1: {ip: 148.100.84.52, user: linux1, description: test machine in marist cloud}
           rhel7-s390x-2: {ip: 148.100.74.92}
