@@ -125,6 +125,7 @@
     - fontconfig-devel
     - gawk
     - git
+    - gnupg2-2.0.30
     - grep
     - libffi-devel
     - make
@@ -252,3 +253,9 @@
   tags:
     - yum
     - adoptopenjdk
+
+- name: Link /usr/bin/gpg2 to /usr/bin/gpg
+  file:
+    src: /usr/bin/gpg2
+    dest: /usr/bin/gpg
+    state: link
