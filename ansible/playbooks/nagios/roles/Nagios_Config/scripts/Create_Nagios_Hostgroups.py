@@ -9,6 +9,9 @@ import subprocess
 import sys
 from os import path
 
+import Nagios_Server_Config
+excluded_hosts = Nagios_Server_Config.excluded_hosts
+
 import yaml
 try:
     import configparser
@@ -86,7 +89,7 @@ def parse_yaml(hosts, config):
                         for service in service_list:
                             if host_type==service:
                                 formatted_name = host_type+'-'+provider_name+'-'+host
-                                if formatted_name not in hostList:
+                                if formatted_name not in hostList and formatted_name not in excluded_hosts:
                                     hostList.append(formatted_name)
                                     providerList.append(provider_name)
                     for provider_name in providerList:
