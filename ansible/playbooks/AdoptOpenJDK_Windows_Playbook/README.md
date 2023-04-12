@@ -20,7 +20,7 @@ Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityPro
     <hostname>: <secret>
     ```
 
-    1. Set the variable manually in the [adoptopenjdk_variables.yml](./group_vars/all/adoptopenjdk_variables.yml) file.
+    2. Set the variable manually in the [adoptopenjdk_variables.yml](./group_vars/all/adoptopenjdk_variables.yml) file.
 
 Note that the role will be skipped if it cannot find a `jenkins_secret` variable. The role will also not remove any previosuly created service using the previous JNLP process.
 
