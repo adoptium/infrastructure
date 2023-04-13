@@ -254,6 +254,7 @@
     - yum
     - adoptopenjdk
 
+# See https://github.com/adoptium/infrastructure/pull/3020#discussion_r1162721897 for why link is necessary
 - name: Link /usr/bin/gpg2 to /usr/bin/gpg
   file:
     src: /usr/bin/gpg2
