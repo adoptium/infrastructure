@@ -18,7 +18,7 @@ Ansible is required to run the playbooks, either directly on the Nagios server h
 
 4) The next step in the installation process is to run they play_config_server.yml playbook, however prior to that, there are a few important details, that should be checked/amended as required to suit. The configuration playbook, requires a few key elements to be configured (these are currently configured to work within the context of the Adoptium infrastructure, but can be amended).
 
-Firstly within the vars_configure_server.yml file, there is a path to an Ansible inventory file, by default it is configured to use a link to a RAW yml file stored within Github.
+4.1) Firstly within the vars_configure_server.yml file, there is a path to an Ansible inventory file, by default it is configured to use a link to a RAW yml file stored within Github.
 
   `inventory_path: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml`
 
@@ -26,8 +26,16 @@ This inventory file is created using the following system of tiered stanzas, e.g
 
 test-osuosl-aix72-ppc64-4 (Function - Provider - O/S - Architecture - Counter)
 
+These stanzas will be used to create the groups, and server check configurations displayed by the Nagios server.
+
 More details can be found within the (public inventory file)[https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml] and within the documentation contained within the (infrastructure repository)[https://github.com/adoptium/infrastructure/]
 
+4.2) Secondly, a context needs to be defined for which of the top tier/function based Stanzas should be used for creating configurations. Within the Adoptium context, we currently only create automated configuration files for the build, test and dockerhost functions. This option is defined in the main.yml file within the Nagios_Config role defaults file. The parameter shown below can be amended to limit the scope of the automated configuration generator.
+
+# Ansible Inventory Host Group Types To Monitor -- Maps To Nagios Service Groups
+Nagios_Service_Types: 'build test dockerhost'
+
+4.3) Finally, there is a mapping process which maps the Function & O/S stanzas of the hostnames defined in the Ansible inventory file to jinja2 templates. The rules for mapping hostnames to template files is in the Nagios_Server_Config.py file found within the roles/Nagios_Config/files/ directory, the templates themselves are found within the parallel templates subdirectory. The mapping process works by matching the Function & O/S stanzas is, build-windows to a matching j2 template file e.g. build-windows-template.j2, the rules python file also contains an exclusion list for excluding specific hosts. Hosts that do not have matching template rules and are not in the exclusion list
 
 
 Additional Notes For Installing Using Vagrant
