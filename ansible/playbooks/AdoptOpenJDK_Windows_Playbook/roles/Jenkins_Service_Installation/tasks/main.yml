@@ -1,0 +1,68 @@
+---
+###############################
+# Jenkins Service Installaion #
+###############################
+
+- name: Check if Jenkins service already exists
+  win_service:
+    name: Jenkins
+  register: jenkins_service
+  failed_when: false
+
+# Allow workspace to be overridden by a variable in inventory.yml
+- name: Set workspace variable
+  set_fact:
+    workspace: C:\Users\{{ Jenkins_Username }}\workspace
+  when: (jenkins_service.exists == false) and (workspace is not defined)
+
+- name: Create workspace directory in C:\Users\{{ Jenkins_Username }}
+  win_file:
+    path: "{{ workspace }}"
+    state: directory
+    recurse: yes
+    owner: "{{ Jenkins_Username }}"
+  when: jenkins_service.exists == false
+
+- name: Create agent directory in C:\Users\{{ Jenkins_Username }}
+  win_file:
+    path: C:\Users\{{ Jenkins_Username }}\agent
+    state: directory
+    recurse: yes
+    owner: "{{ Jenkins_Username }}"
+  when: jenkins_service.exists == false
+
+# TODO: Add support for Windows Aarch64 native binary once it's available
+- name: Download WIN-SW
+  win_get_url:
+    url: https://github.com/winsw/winsw/releases/download/v2.12.0/WinSW-x64.exe
+    dest: C:\Users\{{ Jenkins_Username }}\agent\JenkinsAgentService.exe
+  when: jenkins_service.exists == false
+
+- name: Create xml file from template for Jenkins Agent Service
+  win_template:
+    src: "{{ role_path }}/templates/JenkinsAgentService.xml.j2"
+    dest: C:\Users\{{ Jenkins_Username }}\agent\JenkinsAgentService.xml
+    owner: "{{ Jenkins_Username }}"
+  when: jenkins_service.exists == false
+
+- name: Install Jenkins Service
+  win_shell: .\JenkinsAgentService.exe install
+  args:
+    chdir: C:\Users\{{ Jenkins_Username }}\agent
+  when: jenkins_service.exists == false
+
+- name: Grant Jenkins user the Logon as a service right
+  win_user_right:
+    name: SeServiceLogonRight
+    users:
+      - "{{ Jenkins_Username }}"
+    action: add
+  when: jenkins_service.exists == false
+
+- name: Start Jenkins Service
+  win_service:
+    name: Jenkins
+    username: "{{ Jenkins_Username }}"
+    password: "{{ Jenkins_Win_Passwd }}"
+    start_mode: auto
+    state: started

@@ -1,0 +1,10 @@
+<service>
+	<id>Jenkins</id>
+	<name>Jenkins</name>
+	<description>This service runs an agent for Jenkins automation server.</description>
+	<executable>C:\openjdk\jdk-17\bin\java.exe</executable>
+	<arguments>-Xrs -jar "%BASE%\agent.jar" -jnlpUrl https://ci.adoptium.net/computer/{{ inventory_hostname }}/jenkins-agent.jnlp -secret {{ jenkins_secret }} -workDir=C:\Users\{{ Jenkins_Username }}\workspace</arguments>
+	<logmode>rotate</logmode>
+	<onfailure action="restart" />
+	<download from="https://ci.adoptium.net/jnlpJars/agent.jar" to="%BASE%\agent.jar"/>
+</service>

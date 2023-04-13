@@ -2,55 +2,26 @@
 
 There's a process to setting up Windows machines and getting them connected to Jenkins. If not followed, issues can occur with Jenkins workspaces (See: https://github.com/adoptium/infrastructure/issues/1674).
 
-1) Log on to the Windows machine via RDP and run the `ConfigureRemotingForAnsible` commands listed in [main.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml).
+1. Log on to the Windows machine via RDP and run the `ConfigureRemotingForAnsible` commands listed in [main.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml).
 
 Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12` needs to be executed to stop `Invoke-WebRequest` encountering a `Could not create SSL/TLS secure channel` error. See: https://github.com/adoptium/infrastructure/issues/1858
 
-2) Run the playbook on the machine, without skipping the 'adoptopenjdk' and 'jenkins' tags. (See [this](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) for more information).
+1. Run the playbook on the machine, without skipping the 'adoptopenjdk' and 'jenkins' tags. (See [this](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) for more information).
 
-3) Login as the Jenkins user on the machine via RDP, and ensure access can be gained, and create 2 directories, one for the jenkins workspace ( typically called workspace, and a parallel directory called agent.
+1. Login as the Jenkins user on the machine via RDP, and ensure access can be gained, and create 2 directories, one for the jenkins workspace ( typically called workspace, and a parallel directory called agent.
 
-4) On any machine, in a web browser, login to [ci.adoptium.net](https://ci.adoptium.net/), create a new node ( best done as a copy of an existing node ), but ensure the launch option is set to "Launch Agent By Connecting It To A Controller"
+1. On any machine, in a web browser, login to [ci.adoptium.net](https://ci.adoptium.net/), create a new node ( best done as a copy of an existing node ), but ensure the launch option is set to "Launch Agent By Connecting It To A Controller"
 
-5) Login as the administrator user on the machine via RDP, and download the relevant [WinSW - Windows Service Wrapper](https://github.com/winsw/winsw/releases/) executable for the platform, e.g [WinSW-x64.exe](https://github.com/winsw/winsw/releases/download/v2.12.0/WinSW-x64.exe)  and copy the downloaded file to the agent directory created in step 3.
+1. Jenkins service creation is now automated by the [Jenkins_Service_Installation](./roles/Jenkins_Service_Installation/) role which automatically creates the relevant config files and installs [WIN-SW](https://github.com/winsw/winsw). In order to take advantage of this role you must first set a variable called `jenkins_secret` which is set to the secret JNLP string defined in Jenkins when you create the new node. This can be done in one of two ways:
 
-6) In the created agent directory, rename the file downloaded in step 5) from WinSW-x64.exe to something meaningful, e.g. JenkinsAgentService.exe
+    1. Add the machine to the secrets repo config file in `secrets/vendor_files/Jenkins_Secrets.yml.gpg`. Simply add a new line using the following schema, commit and push:
 
-7) Create an accompanying XML file in the agent directory, and give it the same name as the renamed executable, but with an xml file extension, e.g JenkinsAgentService.xml.
+    ```yaml
+    <hostname>: <secret>
+    ```
 
-8) Now edit the xml file and populate the file in a similar fashion to the below, the key , edit the fields from the example shown below as appropriate:
-   - **id** :  This should be set to a unique name for the windows service
-   - **name** : This should be set to a descriptive name, and will be the name of the service displayed on the screen in windows
-   - **description** : This should be set to a meaningful description
-   - **executable** : This should be set to the full path to the  java executable, that will be used to run the jenkins agent.
-   - **arguments** This can be obtained from the node configuration page in Jenkins, the *xxxxxx* should reflect the name of the node being created in jenkins, and the *yyyyyyyy* string will be an encoded hex string, used for passing the jenkins user password
-   - **download from** the URL here should be changed to match the jenkins server name, from which the service can download the agent.jar
+    2. Set the variable manually in the [adoptopenjdk_variables.yml](./group_vars/all/adoptopenjdk_variables.yml) file.
 
-	All other fields can be left as in the example.
+Note that the role will be skipped if it cannot find a `jenkins_secret` variable. The role will also not remove any previosuly created service using the previous JNLP process.
 
->     <service>
->       <id>Jenkins</id>
->       <name>Jenkins</name>
->      <description>This service runs an agent for Jenkins automation server.</description>
->      <executable>C:\openjdk\jdk-17\bin\java.exe</executable>
->      <arguments>-Xrs -jar "%BASE%\agent.jar" -jnlpUrl https://ci.adoptium.net/computer/xxxxxxxxxx/jenkins-agent.jnlp -secret yyyyyyyyyyyyy -workDir=F:\workspace</arguments>
->      <logmode>rotate</logmode>
->      <onfailure action="restart" />
->        <download from="https://ci.adoptium.net/jnlpJars/agent.jar" to="%BASE%\agent.jar"/>
->      </service>
-
-9)  As the windows administrator, open an elevated command prompt, and now create the Jenkins agent service by following this process :
-
-	 - cd to the agent directory ( where the executable and xml file are stored )
-	 - run the executable with a parameter install (e.g **.\JenkinsAgentService.exe INSTALL**)
- 
-	 You should get confirmation prompts on screen that the service has been created.
-	 
-	- Next open the windows services dialog, and identify the Jenkins service that has just been created. Right click on the service and select **Properties** from the pop up menu.
-	- Select the log on tab from the dialog, and change the logon type from local system account to the jenkins account, and enter the password for the jenkins user, followed by **Ok**
-	- Finally right click on the service, and select **Start** from the pop up menu.
-	
-	You should now get some confirmations, that the Jenkins user has been granted the log on as a service permission, and you should be able to start the service, and check that the agent is online and available in Jenkins.
-	
 The jenkins service should then be started.
-
