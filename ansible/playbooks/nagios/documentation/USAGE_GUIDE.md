@@ -8,11 +8,30 @@ Installing On A Linux Server
 
 Ansible is required to run the playbooks, either directly on the Nagios server host, or alternatively from an Ansible machine with the ability to connect to the Nagios server. The playbooks will need to run as the root user, as it will need to install a number of packages, and create a "nagios" user, for the server to run as.
 
-1) Prior to running the Nagios server installation playbook, ensure the ansible.cfg, nagios_inventory and the secrets_setup_server.enc vault file have been updated as necessary.
+1) Prior to running the Nagios server installation playbook, ensure the ansible.cfg, nagios_inventory and the secrets_setup_server.enc vault file have been updated as necessary. This is detailed in the main README.MD file.
 
-2) To run the first playbook (which will create a base nagios install)
+2) To run the first playbook (which will create a base nagios server installation)
 
     ansible-playbook -b play_setup_server.yml --ask-vault-pass  
+
+3) Once this is completed, the Nagios server will be accessible via the Web UI, (access via http://nagios.server.id/nagios), replacing the nagios.server.id with the IP address or hostname for the server Nagios has been installed on.
+
+4) The next step in the installation process is to run they play_config_server.yml playbook, however prior to that, there are a few important details, that should be checked/amended as required to suit. The configuration playbook, requires a few key elements to be configured (these are currently configured to work within the context of the Adoptium infrastructure, but can be amended).
+
+Firstly within the vars_configure_server.yml file, there is a path to an Ansible inventory file, by default it is configured to use a link to a RAW yml file stored within Github.
+
+  `inventory_path: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml`
+
+This inventory file is created using the following system of tiered stanzas, e.g
+
+test-osuosl-aix72-ppc64-4 (Function - Provider - O/S - Architecture - Counter)
+
+More details can be found within the (public inventory file)[https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml] and within the documentation contained within the (infrastructure repository)[https://github.com/adoptium/infrastructure/]
+
+
+
+Additional Notes For Installing Using Vagrant
+---------------------------------------
 
 3) For Windows users getting this error when trying to run the playbook
 ```bash
@@ -22,165 +41,12 @@ edit your Vagrantfile and add
 `, id: "vagrant-root", disabled: false, mount_options: ["dmode=775"]`
 to the `nagios_server.vm.synced_folder ".", "/vagrant"` line
 
-Based off the [installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html):
-And Off This [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
+
+
+Notes
+----------------------------------------
+This guide (and the automation of nagios server installation and configuration) has been based off the [official Nagios installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html): and this [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
+
+For additional documentation regarding Nagios see this link [Nagios HTML Docs](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/index.html)
+
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
-
-## How to add additional Jenkins Check Label Job To Nagios server group For Windows ##
-
-*  Amend the Nagios server config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
-
-```bash
-	define service{
-        use                             local-service
-        host_name                       Nagios_Server
-        check_period                    once-a-day-at-8
-        service_description             Check Label- build/windows/x64
-        check_command                   check_label!build&&windows&&x64!75!30
-        notifications_enabled           0
-	}
-```
-
-### How to Add Additional Disk Space Check For /tmp on AIX hosts
-
-* The commands configuration file `commands.cfg` can be located at
-
-```bash
-/usr/local/nagios/etc/objects/commands.cfg
-
-add_disk_space_check
-## How to add additional disk space check for /home/jenkins on AIX hosts.
-
-Additional checks are defined and added to host specific config files (located in the /usr/local/nagios/etc/servers directory) in the Nagios monitoring server. The steps include :
-
-1) Define the command in the commands.cfg file located at /usr/local/nagios/etc/objects/commands.cfg :  
-```bash
-	# 'check_jenkins_disk' command definition
-	define command{
-	command_name	check_jenkins_disk
-	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
-	}
-```
-2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.  
-
-```bash
-	define service {
-		use				generic-service
-		host_name			AIX host name goes here
-		service_description		Disk Space check for Jenkins
-		check_command			check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /home/jenkins
-		check_interval			60
-	}
-```  
-The second step above is repeated for all AIX hosts in the /usr/local/nagios/etc/servers directory.  
-
-### How to update a host group name to the Nagios core configurations
-
-* The hostgroups.cfg can be located at
-
-```bash
-/usr/local/nagios/etc/objects/hostgroups.cfg
-```
-
-* Navigate to
-
-```bash
-cd /usr/local/nagios/etc/objects
-```
-
-* Open commands.cfg in a text editor
-
-```bash
-nano commands.cfg
-```
-
-* `check_tmp_disk` command definition
-
-```bash
-define command{
-	    command_name	check_tmp_disk
-	    command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
-	}
-
-```
-* Point the machine to a specific configuration(`.cfg`) file where to spin from for the tmp disk check. These configuration files can be found in this directory
-
-```bash
-/usr/local/nagios/etc/servers/example.cfg
-```
-
-* Open example.cfg in a text editor
-
-```bash
-nano example.cfg
-```
-
-* The configuration file should look like this
-
-```bash
-define service{
-    use                      generic-service
-    host_name                machine host name goes here
-    service_description      Disk Space check for tmp
-    check_command            check_by_ssh!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /tmp
-    check_interval           40
-}
-```
-
-* Open hostgroups.cfg in a text editor
-
-```bash
-vi hostgroups.cfg
-```
-
-* After opening the `hostgroups.cfg` update the host group name in the code related to the following block of code.
-
-```bash
-define hostgroup {
-    hostgroup_name  linuxubuntu
-    alias           linux-ubuntu
-}
-```
-
-* Move a directory up and then edit the nagios.cfg file:
-
-```bash
-cd ..
-vi nagios.cfg
-```
-
-* Check whether the config file is declared in nagios.cfg. It should look like this
-
-```bash
-cfg_file=/usr/local/nagios/etc/objects/hostgroups.cfg
-```
-
-and can be added if there is non
-
-* For each of the hosts we want to be part of the group, find their definitions and update a hostgroups directive to put them into the updated hostgroup. In this case, our definitions for sparta.example.net and athens.example.net ends up looking like this: The hostgroups name can be updated to the corresponding name `linuxubuntu`
-
-```bash
-define host {
-    use         linux-server
-    host_name   khan.example.net
-    alias       khan
-    address     192.0.2.21
-    hostgroups  linuxubuntu
-}
-define host {
-    use         linux-server
-    host_name   khu.example.net
-    alias       khu
-    address     192.0.2.22
-    hostgroups  linuxubuntu
-}
-```
-
-* Restart Nagios:
-
-```bash
-/etc/init.d/nagios reload
-```
-
-Installing Using Vagrant
----------------------------------------
