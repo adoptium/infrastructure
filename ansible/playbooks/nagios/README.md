@@ -28,7 +28,7 @@ This directory houses the Ansible roles used in the creation and configuration o
 
     ./roles/Nagios_Server - This role will create a base Nagios server, with default monitoring options for the Nagios server itself.
 
-    ./roles/Nagios_Config - This role will create the Nagios server configuration files based on an Ansible inventory file in a defined format, and the mapping templates defined within the role. Specific documentation
+    ./roles/Nagios_Config - This role will create the Nagios server configuration files based on an Ansible inventory file in a defined format, and the mapping templates defined within the role. Some more details about how this role works can be found in the documentation/USAGE_GUIDE.MD document.
 
 4) ansible.cfg
 
