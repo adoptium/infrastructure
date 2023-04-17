@@ -41,7 +41,7 @@ Nagios_Service_Types: 'build test dockerhost'
 Additional Notes For Installing Using Vagrant
 ---------------------------------------
 
-3) For Windows users getting this error when trying to run the playbook
+1) For Windows users getting this error when trying to run the playbook
 ```bash
 	[WARNING]: Ansible is being run in a world writable directory (/vagrant), ignoring it as an ansible.cfg source
 ```
@@ -51,7 +51,7 @@ to the `nagios_server.vm.synced_folder ".", "/vagrant"` line
 
 
 
-Notes
+Useful References
 ----------------------------------------
 This guide (and the automation of nagios server installation and configuration) has been based off the [official Nagios installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html): and this [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 
