@@ -1,5 +1,55 @@
 This document details a few examples of the manual processes involved in adding additional checks on the nagios server, and amending the configuration files for individual hosts. This process has been automated by the Nagios_Config role in ansible, but this provides useful context.
 
+### Important Notes On Amending Nagios Configuration Files Manually
+
+Firstly before amending any Nagios config files, it is important to back up the files PRIOR to editing, the configuration files are sensitive to interrelated changes, so backups of any files being edited must be made.
+
+Secondly, the Nagios server provides the ability to validate any config files, prior to restarting the Nagios server service
+
+    /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+The output of this command, will show any errors in the configuration files , which must be reverted or corrected prior to restarting the Nagios service to pick up changes.
+
+Sample Output
+
+    Nagios Core 4.4.6
+    Copyright (c) 2009-present Nagios Core Development Team and Community Contributors
+    Copyright (c) 1999-2009 Ethan Galstad
+    Last Modified: 2020-04-28
+    License: GPL
+
+    Website: https://www.nagios.org
+    Reading configuration data...
+       Read main config file okay...
+       Read object config files okay...
+
+    Running pre-flight check on configuration data...
+
+    Checking objects...
+    	Checked 478 services.
+    	Checked 74 hosts.
+    	Checked 14 host groups.
+    	Checked 3 service groups.
+    	Checked 1 contacts.
+    	Checked 1 contact groups.
+    	Checked 49 commands.
+    	Checked 6 time periods.
+    	Checked 0 host escalations.
+    	Checked 0 service escalations.
+    Checking for circular paths...
+    	Checked 74 hosts
+    	Checked 0 service dependencies
+    	Checked 0 host dependencies
+    	Checked 6 timeperiods
+    Checking global event handlers...
+    Checking obsessive compulsive processor commands...
+    Checking misc settings...
+
+    Total Warnings: 0
+    Total Errors:   0
+
+Finally after changes are made and validated the Nagios service must be restarted to make any changes effective.
+
 ## How to add additional Jenkins Check Label Job To Nagios server group For Windows ##
 
 *  Amend the Nagios server config file, e.g ( /usr/local/nagios/etc/objects/localhost.cfg ) to include the entry for the new label check.
@@ -15,27 +65,20 @@ This document details a few examples of the manual processes involved in adding 
 	}
 ```
 
-### How to Add Additional Disk Space Check For /tmp on AIX hosts
+### Example Of How to Add Additional Disk Space Check For /tmp on AIX hosts
 
-* The commands configuration file `commands.cfg` can be located at
+Firstly, in order to add a new command, the nagios list of master command templates needs to be updated. The  `commands.cfg` file which contains all the default command templates for a default nagios installation can be located at /usr/local/nagios/etc/objects/commands.cfg
 
-```bash
-/usr/local/nagios/etc/objects/commands.cfg
+An entry similar to the below should be added into the commands.cfg file
 
-add_disk_space_check
-## How to add additional disk space check for /home/jenkins on AIX hosts.
-
-Additional checks are defined and added to host specific config files (located in the /usr/local/nagios/etc/servers directory) in the Nagios monitoring server. The steps include :
-
-1) Define the command in the commands.cfg file located at /usr/local/nagios/etc/objects/commands.cfg :  
-```bash
 	# 'check_jenkins_disk' command definition
 	define command{
 	command_name	check_jenkins_disk
 	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
 	}
-```
-2) Amend the machine specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) to include the entry for the new check.  
+
+
+Once this is done, then the server specific config file should be edited to include the new command to be run, so for this example the server specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) should have a section as shown in the example below added :
 
 ```bash
 	define service {
@@ -46,7 +89,7 @@ Additional checks are defined and added to host specific config files (located i
 		check_interval			60
 	}
 ```  
-The second step above is repeated for all AIX hosts in the /usr/local/nagios/etc/servers directory.  
+The second step above is repeated could then be repeated for any/all AIX hosts in the /usr/local/nagios/etc/servers directory.  
 
 ### How to update a host group name to the Nagios core configurations
 
@@ -148,10 +191,4 @@ define host {
     address     192.0.2.22
     hostgroups  linuxubuntu
 }
-```
-
-* Restart Nagios:
-
-```bash
-/etc/init.d/nagios reload
 ```
