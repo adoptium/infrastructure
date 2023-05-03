@@ -67,7 +67,7 @@ Finally after changes are made and validated the Nagios service must be restarte
 
 ### Example Of How to Add Additional Disk Space Check For /tmp on AIX hosts
 
-Firstly, in order to add a new command, the nagios list of master command templates needs to be updated. The  `commands.cfg` file which contains all the default command templates for a default nagios installation can be located at /usr/local/nagios/etc/objects/commands.cfg
+Firstly, in order to add a new command, the Nagios list of master command templates needs to be updated. The  `commands.cfg` file which contains all the default command templates for a default Nagios installation can be located at `/usr/local/nagios/etc/objects/commands.cfg`
 
 An entry similar to the below should be added into the commands.cfg file
 
