@@ -71,11 +71,6 @@ Firstly, in order to add a new command, the Nagios list of master command templa
 
 An entry similar to the below should be added into the commands.cfg file
 
-	# 'check_jenkins_disk' command definition
-	define command{
-	command_name	check_jenkins_disk
-	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
-	}
 
 
 Once this is done, then the server specific config file should be edited to include the new command to be run, so for this example the server specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) should have a section as shown in the example below added :
