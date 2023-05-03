@@ -57,6 +57,6 @@ Useful References
 ----------------------------------------
 This guide (and the automation of nagios server installation and configuration) has been based off the [official Nagios installation guide](https://support.nagios.com/kb/article/nagios-core-installing-nagios-core-from-source-96.html): and this [GitRepo](https://github.com/Willsparker/AnsibleBoilerPlates/tree/main/Nagios) :
 
-For additional documentation regarding Nagios see this link [Nagios HTML Docs](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/index.html)
+For additional documentation regarding Nagios see the [Nagios HTML Docs](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/4/en/index.html)
 
 For some useful tips for working with vault files see [here](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
