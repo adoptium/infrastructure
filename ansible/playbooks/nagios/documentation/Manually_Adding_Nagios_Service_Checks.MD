@@ -1,4 +1,4 @@
-This document details a few examples of the manual processes involved in adding additional checks on the nagios server, and amending the configuration files for individual hosts. This process has been automated by the Nagios_Config role in ansible, but this provides useful context.
+This document details a few examples of the manual processes involved in adding additional checks on the Nagios server, and amending the configuration files for individual hosts. This process has been automated by the Nagios_Config role in ansible, but this provides useful context.
 
 ### Important Notes On Amending Nagios Configuration Files Manually
 
