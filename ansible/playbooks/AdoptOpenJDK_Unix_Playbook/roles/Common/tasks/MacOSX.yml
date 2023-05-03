@@ -103,7 +103,7 @@
 - name: Update Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  command: "{{ homebrew_path }}" cu -y
+  command: "{{ homebrew_path }} cu -y"
   tags:
     - brew_cu
     - skip_ansible_lint
