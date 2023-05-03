@@ -73,7 +73,7 @@ An entry similar to the below should be added into the commands.cfg file
 
 
 
-Once this is done, then the server specific config file should be edited to include the new command to be run, so for this example the server specific config file, e.g ( /usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg ) should have a section as shown in the example below added :
+Once this is done, then the server specific config file should be edited to include the new command to be run, so for this example the server specific config file, e.g ( `/usr/local/nagios/etc/servers/build-osuosl-aix71-ppc64-1.cfg` ) should have a section as shown in the example below added :
 
 ```bash
 	define service {
