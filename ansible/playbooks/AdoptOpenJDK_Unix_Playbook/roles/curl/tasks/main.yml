@@ -109,6 +109,8 @@
   tags: curl
 
 - name: Install latest version of curl for MacOS
+  become: yes
+  become_user: "{{ ansible_user }}"
   homebrew:
     name: curl
     state: latest
