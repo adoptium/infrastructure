@@ -1,0 +1,6 @@
+---
+- name: Copy Timeperiods Template To Server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/timeperiods.cfg"
+    dest: /usr/local/nagios/etc/objects/timeperiods.cfg
+    remote_src: no

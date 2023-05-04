@@ -83,6 +83,9 @@
     - NSClient                    # Required For Nagios Monitoring
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
+    - role: Jenkins_Service_Installation # Automate installing the jenkins service
+      tags: [jenkins, adoptopenjdk]
+      when: jenkins_secret is defined  # Only run if jenkins_secret is defined
     - role: Thunderbird
       tags: [Thunderbird, jck, adoptopenjdk]
     - role: logs

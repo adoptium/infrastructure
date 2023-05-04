@@ -120,27 +120,9 @@ TODO Need to check all of this
 
 ### Backups
 
-The following items are stored in GitHub.
-
-* Source code, System deployment scripts (Ansible), Instructions/How to Information
-
-|  Description | Storage Location | Frequency  |
-|---|---|---|
-| Jenkins (ci) - Configuration and Settings | localhost `/mnt/backup-server/jenkins_backup` | Daily |
-| Nagios - Configuration and Settings | localhost `/root/backups` | Weekly |
-| AWX - Configuration and Settings | not currently backed up | N/A |
-
-### Questions
-
-Backup schedule:
-
-* How often should be backup?
-* Where should it be stored?
-
-Backup retention:
-
-* How long should be keep it?
-* How many copies?
+These are taken on a daily basis, and one per month is currently kept
+"forever" on our backup server. Details are now in a
+[separate document](docs/Backups.md)
 
 ### OS Patch Management
 
