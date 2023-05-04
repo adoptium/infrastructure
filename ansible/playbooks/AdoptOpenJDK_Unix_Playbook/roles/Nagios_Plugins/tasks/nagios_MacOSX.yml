@@ -33,7 +33,7 @@
 # See: https://github.com/adoptium/infrastructure/issues/1716#issuecomment-764713146
 - name: Symlink to plugins (arm64)
   file:
-    src: /opt/homebrew/Cellar/nagios-plugins/2.3.3/sbin/
+    src: /opt/homebrew/Cellar/nagios-plugins/2.4.4/sbin/
     dest: /usr/local/nagios/libexec
     state: link
   become: yes
