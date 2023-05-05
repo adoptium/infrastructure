@@ -148,7 +148,7 @@
 # Used for JCK printer tests
 - name: Check if PDFwriter is installed
   stat:
-    path: /Users/Shared/PDFwriter/
+    path: /Users/Shared/PDFwriter
   register: pdfwriter
   tags: jck_tools
 
