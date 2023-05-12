@@ -1,7 +1,7 @@
 ---
 - name: Add Docker Repo for SLES12
   community.general.zypper_repository:
-    name: docker
+    # name: docker
     repo: https://download.docker.com/linux/sles/docker-ce.repo
     state: present
     auto_import_keys: yes
