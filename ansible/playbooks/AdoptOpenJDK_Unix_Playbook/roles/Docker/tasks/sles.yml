@@ -1,12 +1,12 @@
 ---
 - name: Add Docker Repo for SLES12
-  # command: zypper ar https://download.docker.com/linux/sles/docker-ce.repo
   community.general.zypper_repository:
-    name: docker-ce-stable
-    repo: https://download.docker.com/linux/sles/15/s390x/stable
+    name: docker
+    repo: https://download.docker.com/linux/sles/docker-ce.repo
     state: present
-    auto_import_keys: true
-    autorefresh: true
+    auto_import_keys: yes
+  when:
+    - ansible_architecture == "x86_64"
 
 - name: Install Docker on SLES12
   zypper:
