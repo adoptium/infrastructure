@@ -91,6 +91,12 @@ Most information about our machines can be found at
 reference for the team, but is used by AWX which we often use to deploy
 ansible playbooks so it is important that it is kept up to date
 
+### Infrastructure Map
+
+[Here](https://github.com/adoptium/infrastructure/blob/master/docs/AdoptiumInfrastructureMapMiro.pdf) is a map of our Build, Test, Dockerhost and Other Infrastructure machines. 
+
+The original Miro board can be viewed [here](https://miro.com/app/board/uXjVMfhXwh0=/?share_link_id=454451259876)
+
 ### Maintenance Information
 
 TODO Need to check all of this
