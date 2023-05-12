@@ -129,16 +129,16 @@
       tags:
         - build_tools
 
-  - name: Compile Git 2.31.0
-    shell: |
-      cd /tmp/git-2.31.0
-      ./configure
-      gmake -j4
-      gmake install
-    when:
-      - (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
-    tags:
-      - build_tools
+    - name: Compile Git 2.31.0
+      shell: |
+        cd /tmp/git-2.31.0
+        ./configure
+        gmake -j4
+        gmake install
+      when:
+        - (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
+      tags:
+        - build_tools
 
 - name: Install additional build tools for SLES 11
   package: "name={{ item }} state=latest"
