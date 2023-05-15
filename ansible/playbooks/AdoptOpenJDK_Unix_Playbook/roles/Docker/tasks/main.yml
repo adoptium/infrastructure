@@ -47,10 +47,10 @@
         use: auto       # automatic select package manager to use yum, apt and so on
       when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
 
-    - name: Install for SLES12 # zypper does not support in package module
+    - name: Install for SLES15 # zypper does not support in package module
       include_tasks: sles.yml
       when:
-        - ansible_distribution == "SLES" and ansible_distribution_major_version == "12"
+        - ansible_distribution == "SLES" and ansible_distribution_major_version == "15"
 
     ################
     # Post Install #
