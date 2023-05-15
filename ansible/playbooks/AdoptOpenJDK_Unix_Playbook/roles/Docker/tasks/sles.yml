@@ -4,6 +4,11 @@
   when:
     - ansible_architecture == "x86_64" or ansible_architecture == "s390x"
 
+- name: Add repo for container-selinux
+  command: zypper ar https://download.opensuse.org/repositories/security:SELinux/SLE_15_SP3/security:SELinux.repo
+  when:
+    - ansible_architecture == "x86_64" or ansible_architecture == "s390x"
+
 - name: Install Docker on SLES15
   zypper:
     pkg: "{{ item }}"
