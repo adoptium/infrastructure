@@ -16,13 +16,18 @@ templates = {'build_win': 'build-windows-template.j2',
             'test_sles': 'test-sles-template.j2',
             'dockerhost_ubuntu': 'dockerhost-ubuntu-template.j2'}
 
+## Define Any Hosts That Should Have Specialist Mappings
+## Any Hosts With Entries In This Section, Will OverRide The Default Checks
+## Mapping Is Done On A Per-Host Basis
+
+special_templates = {'test-equinix_esxi-solaris10-x64-1': 'test-solaris-noport-template.j2',
+            'test-siteox-solaris10u11-sparcv9-1': 'test-solaris-port-template.j2',
+            'build-equinix_esxi-solaris10-x64-1': 'test-solaris-noport-template.j2',
+            'build-siteox-solaris10u11-sparcv9-1': 'test-solaris-port-template.j2'}
+
 ## Define Any Hosts That Should Be Excluded
 
 excluded_hosts = {'build-spearhead-freebsd12-x64-1',
-                  'test-siteox-solaris10u11-sparcv9-1',
-                  'test-equinix_esxi-solaris10-x64-1',
                   'test-inspira-solaris10u11-sparcv9-1',
-                  'build-equinix_esxi-solaris10-x64-1',
                   'build-inspira-solaris10u11-sparcv9-1',
-                  'build-inspira-solaris10u11-sparcv9-2',
-                  'build-siteox-solaris10u11-sparcv9-1'}
+                  'build-inspira-solaris10u11-sparcv9-2'}
