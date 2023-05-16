@@ -44,3 +44,7 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 # Errata
 Asian_Locales: Disabled
 Slack_Notification: Disabled
+
+key:
+  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
+  adoptium: 3B04D753C9050D9A5D343F39843C48A565F8F04B # Adoptium GPG Key (DEB/RPM Signing Key) <temurin-dev@eclipse.org>

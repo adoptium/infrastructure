@@ -23,6 +23,16 @@
   debug:
     var: macos_version_number
 
+- name: Set homebrew path (x64)
+  set_fact:
+    homebrew_path: /usr/local/bin/brew
+  when: ansible_architecture == "x86_64"
+
+- name: Set homebrew path (Arm64)
+  set_fact:
+    homebrew_path: /opt/homebrew/bin/brew
+  when: ansible_architecture == "arm64"
+
 - name: Configure system-wide Bash profile
   become: yes
   copy:
@@ -57,7 +67,7 @@
 
 - name: Check if Homebrew is already installed
   stat:
-    path: /usr/local/bin/brew
+    path: "{{ homebrew_path }}"
   register: brew
 
 - name: Install Homebrew
@@ -71,7 +81,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
-  when: "macos_version_number is version('10.13', '>')"
+  when: "macos_version_number is version('10.15', '>')"
   tags:
     - brew_upgrade
 
@@ -93,20 +103,7 @@
 - name: Update Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  command: /usr/local/bin/brew cu
-  when:
-    - ansible_architecture != "arm64"
-  tags:
-    - brew_cu
-    - skip_ansible_lint
-
-# Skipping linting as no situation where this can't run (lint error 301)
-- name: Update Casks (Arm64)
-  become: yes
-  become_user: "{{ ansible_user }}"
-  command: /opt/homebrew/bin/brew cu
-  when:
-    - ansible_architecture == "arm64"
+  command: "{{ homebrew_path }} cu -y"
   tags:
     - brew_cu
     - skip_ansible_lint
@@ -151,7 +148,7 @@
 # Used for JCK printer tests
 - name: Check if PDFwriter is installed
   stat:
-    path: /Users/Shared/PDFwriter/
+    path: /Users/Shared/PDFwriter
   register: pdfwriter
   tags: jck_tools
 
