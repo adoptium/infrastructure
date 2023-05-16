@@ -1,0 +1,61 @@
+define host {
+         use                             linux-server
+         host_name                       {{ host_name }}
+         alias                           Add by Ansible
+         address                         {{ host_ip_address }}
+	       _sshport                        {{ host_port }}
+         check_command                   check_ssh!-4 -t 60 -p {{ host_port }} {{ host_ip_address }}
+         max_check_attempts              5
+         check_period                    24x7
+         notification_interval           720
+         notification_period             24x7
+         icon_image                      sunlogo.png
+         icon_image_alt                  sunlogo
+         statusmap_image                 sunlogo.gd2
+ }
+
+define service{
+        use                             generic-service
+	host_name                       {{ host_name }}
+        service_description             Current Load
+        check_command                   check_by_ssh_port!$_HOSTSSHPORT!/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,24,20
+         check_interval                  30
+         action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+
+}
+
+define service{
+         use                             generic-service
+         host_name                       {{ host_name }}
+         service_description             Disk Space Root Partition
+         check_command                   check_by_ssh_port!$_HOSTSSHPORT!/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /
+         check_interval                  60
+         action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+
+}
+
+define service {
+         use                             generic-service
+         host_name                       {{ host_name }}
+         service_description             Check Jenkins Connection
+         check_command                   check_agent!{{ host_name }}
+         check_interval                  30
+         action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+
+}
+
+define service{
+         use                             local-service
+         host_name                       {{ host_name }}
+         service_description             Ping via SSH
+         check_period                    once-a-day-at-8
+	check_command			check_by_ssh_port!$_HOSTSSHPORT!/usr/local/nagios/libexec/check_ping localhost -w 3000.0,80% -c 5000.0,100%
+}
+
+define service{
+        use                             generic-service
+        host_name                       {{ host_name }}
+        service_description             RAM
+        check_command                   check_by_ssh_port!$_HOSTSSHPORT!/usr/local/nagios/libexec/check_mem -f -C -w 15 -c 5
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=nagios$&service=$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=nagios$&service=$&period=hour&rrdopts=-w+450
+}
