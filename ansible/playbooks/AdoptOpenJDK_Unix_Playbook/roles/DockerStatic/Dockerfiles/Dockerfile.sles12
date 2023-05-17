@@ -34,5 +34,7 @@ CMD ["/usr/sbin/sshd", "-D"]
 
 RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server awk
 
+RUN ln -s /usr/lib64/libffi.so.4 /usr/lib64/libffi.so.6
+
 EXPOSE 22
 # Start with docker run -p 22XX:22 UUID
