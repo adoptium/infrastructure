@@ -41,7 +41,6 @@ hosts:
       - azure:
           win2012r2-x64-1: {ip: 51.132.23.101, user: adoptopenjdk}
           win2012r2-x64-2: {ip: 51.132.22.249, user: adoptopenjdk}
-          win2016-x64-1: {ip: 51.104.239.17, user: adoptopenjdk}
           win2022-x64-1: {ip: 172.187.129.163, user: adoptopenjdk}
           win2022-x64-2: {ip: 172.187.176.15, user: adoptopenjdk}
 
@@ -135,8 +134,6 @@ hosts:
           aix715-ppc64-4: {ip: 140.211.9.169, description: p8-java1-adopt08.osuosl.org, 7100-05-06-2028}
           aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org, 7200-04-02-2028}
           aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix1-adopt04.osuosl.org, 7200-02-05-1938}
-          aix72-ppc64-3: {ip: 140.211.9.163, description: p8-java1-adopt09.osuosl.org, 7X00-TL-SP-YYWW}
-          aix72-ppc64-4: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org, 7X00-TL-SP-YYWW}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
@@ -167,9 +164,6 @@ hosts:
           macos11-arm64-2: {ip: 199.7.163.52, user: Administrator}
 
       - marist:
-          sles12-s390x-1: {ip: 148.100.86.128}
-          rhel7-s390x-1: {ip: 148.100.84.26, user: linux1, description: test machine in marist cloud}
-          rhel8-s390x-1: {ip: 148.100.84.52, user: linux1, description: test machine in marist cloud}
           rhel7-s390x-2: {ip: 148.100.74.92}
           rhel8-s390x-2: {ip: 148.100.74.2}
           sles12-s390x-2: {ip: 148.100.74.193}

@@ -32,6 +32,26 @@
   include_tasks: configure_nagios_commands.yml
   when: '"configure_nagios_commands" in task_list'
 
+- name: Configure Nagios-Contacts
+  include_tasks: configure_nagios_contacts.yml
+  when: '"configure_nagios_contacts" in task_list'
+
+- name: Configure Nagios-Default Templates
+  include_tasks: configure_nagios_templates.yml
+  when: '"configure_nagios_templates" in task_list'
+
+- name: Configure Nagios-TimePeriods
+  include_tasks: configure_nagios_timeperiods.yml
+  when: '"configure_nagios_timeperiods" in task_list'
+
+- name: Configure Nagios-Windows-Checks
+  include_tasks: configure_nagios_windows.yml
+  when: '"configure_nagios_windows" in task_list'
+
 - name: Configure Nagios-Server-Monitoring
   include_tasks: configure_nagios_server_monitoring.yml
   when: '"configure_nagios_server_monitoring" in task_list'
+
+- name: Restart Nagios Server
+  include_tasks: restart_nagios_server.yml
+  when: '"restart_nagios_server" in task_list'

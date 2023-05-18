@@ -95,6 +95,14 @@
     state: present
   become: yes
 
+- name: Create nagios user's home folder
+  file:
+    path: /home/nagios
+    state: directory
+    owner: "nagios"
+    group: nagios
+    mode: 0700
+
 - name: Restart Nagios
   service:
     name: nagios

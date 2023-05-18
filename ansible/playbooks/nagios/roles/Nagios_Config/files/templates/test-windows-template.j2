@@ -1,0 +1,72 @@
+define host {
+        use                             windows-server
+        host_name                       {{ host_name }}
+        alias                           Added by Ansible
+        address                         {{ host_ip_address }}
+        check_command                   noping_nsclient
+        max_check_attempts              5
+        check_period                    24x7
+        notification_interval           720
+        notification_period             24x7
+        icon_image                      win40.gif
+        icon_image_alt                  Windows OS
+        statusmap_image                 win40.gd2
+}
+
+define service {
+    use                     generic-service
+    host_name               {{ host_name }}
+    service_description     NSClient++ Version
+    check_command           check_nt!CLIENTVERSION
+}
+
+
+# Create a service for monitoring the uptime of the server
+# Change the host_name to match the name of the host you defined above
+
+define service {
+
+    use                     generic-service
+    host_name               {{ host_name }}
+    service_description     Uptime
+    check_command           check_nt!UPTIME
+    servicegroups           test_Servers
+}
+
+
+# Create a service for monitoring CPU load
+# Change the host_name to match the name of the host you defined above
+
+define service {
+
+    use                     generic-service
+    host_name               {{ host_name }}
+    service_description     CPU Load
+    check_command           check_nt!CPULOAD!-l 5,80,90
+}
+
+
+
+# Create a service for monitoring memory usage
+# Change the host_name to match the name of the host you defined above
+
+define service {
+
+    use                     generic-service
+    host_name               {{ host_name }}
+    service_description     Memory Usage
+    check_command           check_nt!MEMUSE!-w 80 -c 90
+}
+
+
+
+# Create a service for monitoring C:\ disk usage
+# Change the host_name to match the name of the host you defined above
+
+define service {
+
+    use                     generic-service
+    host_name               {{ host_name }}
+    service_description     C:\ Drive Space
+    check_command           check_nt!USEDDISKSPACE!-l c -w 90 -c 95
+}

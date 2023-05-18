@@ -1,0 +1,13 @@
+---
+- name: Copy Contacts Template To Server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/contacts.cfg"
+    dest: /usr/local/nagios/etc/objects/contacts.cfg
+    remote_src: no
+
+- name: Add Contacts Configuration File Entry To Nagios Config`
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    insertafter: '# You can specify individual object config files as shown below:'
+    line: 'cfg_file=/usr/local/nagios/etc/objects/contacts.cfg'
+  become: yes
