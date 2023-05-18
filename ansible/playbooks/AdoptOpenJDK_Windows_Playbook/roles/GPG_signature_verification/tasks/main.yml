@@ -12,7 +12,7 @@
 
 - name: Fix Permissions
   win_shell: C:/cygwin64/bin/bash.exe -c "chmod og-rwx ~/.gnupg"
- 
+
 - name: Import GPG Key
   win_command: gpg --keyserver keyserver.ubuntu.com --recv-keys "{{ GPG_key }}"
 
