@@ -30,7 +30,7 @@
   tags: MSVS_2017
 
 - name: Register Visual Studio Community 2017 DIA SDK shared libraries
-  win_command: 'regsvr32 "{{ item }}"'
+  win_command: 'regsvr32 /s "{{ item }}"'
   with_items:
     - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\msdia140.dll
     - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\amd64\msdia140.dll
