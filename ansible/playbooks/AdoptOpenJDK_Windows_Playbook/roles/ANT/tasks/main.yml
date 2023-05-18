@@ -1,5 +1,4 @@
 ---
-
 ###########################
 # Apache ANT Installation #
 ###########################
@@ -29,7 +28,7 @@
 
 - name: GPG Signature Verification of Binary
   import_tasks:
-    file: {{ playbook_dir }}/roles/GPG_signature_verification/tasks/main.yml
+    file: "{{playbook_dir}}/roles/GPG_signature_verification/tasks/main.yml"
   vars:
     file_path: c:\temp\ant.zip
     signature_link: "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc"
