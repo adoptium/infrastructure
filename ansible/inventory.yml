@@ -66,8 +66,8 @@ hosts:
 
       - osuosl:
           aix71-ppc64-1: {ip: 140.211.9.10, description: p8-aix1-adopt01.osuosl.org, 7100-04-04-1717}
-          aix71-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org, 7100-04-04-1717}
-          aix72-ppc64-1: {ip: 140.211.9.166, description: adopt10, 7200-00-02-1614}
+          aix72-ppc64-1: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org, 7200-02-04-1914}
+          aix72-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org, 7200-02-04-1914}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
 
