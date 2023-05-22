@@ -70,6 +70,7 @@ hosts:
           aix72-ppc64-2: {ip: 140.211.9.12, description: p8-aix1-adopt02.osuosl.org, 7200-02-04-1914}
           centos74-ppc64le-1: {ip: 140.211.168.138}
           centos74-ppc64le-2: {ip: 140.211.168.117}
+          ubuntu2204-aarch64-1: {ip: 140.211.169.57}
 
       - scaleway:
           ubuntu1604-x64-1: {ip: 51.15.46.107}
