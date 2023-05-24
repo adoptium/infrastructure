@@ -113,15 +113,15 @@
       when:
         - ansible_distribution != "Solaris"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK19 Build Bootstrap
-      jdk_version: 18
+    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
+      jdk_version: 19
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
-      jdk_version: 19
+    - role: adoptopenjdk_install  # JDK21 Build Bootstrap
+      jdk_version: 20
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"

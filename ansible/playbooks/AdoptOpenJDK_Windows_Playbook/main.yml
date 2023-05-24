@@ -59,12 +59,12 @@
       jdk_version: 10
     - role: Java_install          # For Gradle
       jdk_version: 11
-    - role: Java_install          # JDK16 build bootstrap
-      jdk_version: 15
-    - role: Java_install          # JDK17 build bootstrap
-      jdk_version: 16
-    - role: Java_install
+    - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 17
+    - role: Java_install          # Bootstrap for JDK20
+      jdk_version: 19
+    - role: Java_install          # Bootstrap for JDK21
+      jdk_version: 20
     - ANT                         # Testing
     - role: MSVS_2013
       when: ansible_architecture == "64-bit"
