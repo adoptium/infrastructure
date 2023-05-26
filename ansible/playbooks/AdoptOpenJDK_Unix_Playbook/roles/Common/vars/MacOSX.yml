@@ -14,6 +14,7 @@ Build_Tool_Packages:
   - gnu-sed
   - gnu-tar
   - nasm # openj9 jdk13+
+  - p11-kit
   - wget
   - bash # OpenJ9 needs bash v4 or later
 
