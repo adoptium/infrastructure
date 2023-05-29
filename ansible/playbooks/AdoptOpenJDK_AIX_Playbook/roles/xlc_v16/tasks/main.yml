@@ -8,14 +8,8 @@
   register: xlc16
   tags: xlc16
 
-- name: "Debug: xlc16 installed, skipping download and installation"
-  debug:
-    msg: "xlc16 installed, skipping download and installation"
-  when: xlc16.stat.exists and xlc16.stat.isdir
-  tags: xlc16
-
 - name: Vendor File processing
-  when: xlc16.stat.exists is false
+  when: xlc16.stat.isdir is undefined
   tags: [xlc16, vendor_files]
   block:
     - name: Transfer and Extract XLC16
