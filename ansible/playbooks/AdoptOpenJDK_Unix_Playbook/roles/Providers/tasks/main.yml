@@ -65,3 +65,20 @@
   tags:
     - providers
     - adoptopenjdk
+
+###########
+# Marist  #
+###########
+
+# Marist machines need their host template updated for changes to /etc/hosts to persist
+- name: Update /etc/cloud/cloud.cfg file - To remove update hosts function
+  lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    regexp: "^.*update_etc_hosts.*$"
+    state: absent
+  when:
+    - provider_name.rc == 0
+    - provider_name.stdout == "marist"
+  tags:
+    - providers
+    - adoptopenjdk
