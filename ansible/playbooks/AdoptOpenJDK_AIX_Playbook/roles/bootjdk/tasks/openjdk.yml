@@ -36,14 +36,14 @@
     - name: Get Signature File Link
       shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk }}/hotspot?architecture=ppc64&image_type=jdk&os=aix&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
-        - jdk != 10 and jdk != 16
+        - jdk != '10' and jdk != '16'
         - java_installed.stat.isdir is not defined
       register: sig_output
 
     - name: GPG Signature verification
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
-        - jdk != 10 and jdk != 16
+        - jdk != '10' and jdk != '16'
         - java_installed.stat.isdir is not defined
 
     - name: Install JDK {{ jdk }} binary
