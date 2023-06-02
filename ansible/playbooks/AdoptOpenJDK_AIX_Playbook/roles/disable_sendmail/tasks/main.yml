@@ -5,6 +5,7 @@
 - name: Ensure sendmail is stopped
   service: name=sendmail state=stopped
   tags: sendmail
+  ignore_errors: yes
 
 - name: Ensure sendmail is disabled
   replace:
