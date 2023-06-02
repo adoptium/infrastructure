@@ -15,7 +15,6 @@
     state: present
     key: "{{ lookup('file', '{{ Jenkins_User_SSHKey }}') }}"
   when: pubkey is defined and pubkey.stat.exists
-  delegate_to: localhost
   register: jenkins_pubkey
   tags: jenkins_user
 
