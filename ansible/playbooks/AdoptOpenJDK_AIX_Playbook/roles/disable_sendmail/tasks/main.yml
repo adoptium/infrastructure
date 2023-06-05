@@ -8,14 +8,16 @@
   register: sendmail_installed
   tags: sendmail
 
-- name: Ensure sendmail is stopped
-  service: name=sendmail state=stopped
-  when: sendmail_installed.stat.exists is true
+- name: Stop and disable sendmail
+  when: sendmail_installed.stat.exists
   tags: sendmail
+  block:
 
-- name: Ensure sendmail is disabled
-  replace:
-    dest: /etc/rc.tcpip
-    regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
-    replace: '#\1'
-  tags: sendmail
+    - name: Ensure sendmail is stopped
+      service: name=sendmail state=stopped
+
+    - name: Ensure sendmail is disabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+        replace: '#\1'
