@@ -10,7 +10,7 @@
 
 - name: Ensure sendmail is stopped
   service: name=sendmail state=stopped
-  when: sendmail_installed.stat exists
+  when: sendmail_installed.stat.exists is true
   tags: sendmail
 
 - name: Ensure sendmail is disabled
