@@ -57,7 +57,7 @@
 
 - name: Update RBAC Security Tables to kernel
   shell: setkst
-  when: ojdk_exists.rc == 2 OR rtclk_exists.rc == 2 OR rtcore_exists.rc == 2
+  when: ojdk_exists.rc == 2 or rtclk_exists.rc == 2 or rtcore_exists.rc == 2
   tags: rbac
 
 # Assign security attributes to commands in list
