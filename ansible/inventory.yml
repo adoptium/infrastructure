@@ -72,9 +72,6 @@ hosts:
           centos74-ppc64le-2: {ip: 140.211.168.117}
           ubuntu2204-aarch64-1: {ip: 140.211.169.57}
 
-      - scaleway:
-          ubuntu1604-x64-1: {ip: 51.15.46.107}
-
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
