@@ -65,13 +65,17 @@
       when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
+      when: ansible_architecture != "riscv64"
       tags: [build_tools, build_tools_openj9]
     - role: gcc_9                 # Dragonwell
       tags: [build_tools]
+      when: ansible_architecture != "riscv64"
     - role: gcc_10                # JDK17+
       tags: [build_tools]
+      when: ansible_architecture != "riscv64"
     - role: gcc_11                # JDK19+
       tags: [build_tools]
+      when: ansible_architecture != "riscv64"
     - role: Xcode
       when: ansible_distribution == "MacOSX"
       tags: [build_tools, xcode, adoptopenjdk]

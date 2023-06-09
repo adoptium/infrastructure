@@ -131,6 +131,13 @@
 ####################
 # Set default Java #
 ####################
+
+- name: Install 'openjdk-8-jdk' package
+  package:
+    name: locales
+    state: present
+  when: ansible_architecture != "riscv64"
+
 - name: Set default java version for x86_64
   alternatives:
     name: java

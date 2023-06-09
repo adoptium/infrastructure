@@ -41,7 +41,6 @@ Build_Tool_Packages:
   - libxtst-dev
   - make
   - ntp
-  - openjdk-8-jdk
   - pigz
   - pkg-config
   - systemtap-sdt-dev
