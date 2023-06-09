@@ -146,15 +146,27 @@
         - not (jdk_version == 8 and ansible_architecture == "s390x")
       register: sig_output
 
-    - name: Download latest release (Linux/Alpine-Linux)
+    - name: Download latest release from api.adoptopenjdk.net (Linux/Alpine-Linux)
       get_url:
         url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
         mode: 0440
       retries: 3
       delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
+      register: adopt_download
+      until: adopt_download is not failed
+      when: {{ jdk_version }} == 10 or {{ jdk_version }} == 16
+
+    - name: Download latest release from api.adoptium.net (Linux/Alpine-Linux)
+      get_url:
+        url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse
+        dest: /tmp/jdk{{ jdk_version }}.tar.gz
+        mode: 0440
+      retries: 3
+      delay: 5
+      register: adopt_download
+      until: adopt_download is not failed
+      when: not ( {{ jdk_version }} == 10 or {{ jdk_version }} == 16 )
 
     - name: GPG Signature verification (Linux/Alpine-Linux)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
@@ -310,8 +322,8 @@
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
       delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
+      register: adopt_download
+      until: adopt_download is not failed
 
     - name: Get Signature File Link (CentOS6)
       shell: curl -s 'https://api.adoptium.net/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
@@ -345,8 +357,8 @@
       get_url:
         url: https://api.adoptium.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
         dest: /tmp/{{ jdk_version }}-installer.pkg
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
+      register: adopt_download
+      until: adopt_download is not failed
       when:
         - jdk_version != 10
 
@@ -359,8 +371,8 @@
       become_user: root
       retries: 3
       delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
+      register: adopt_download
+      until: adopt_download is not failed
       when:
         - jdk_version == 10
 
@@ -413,8 +425,8 @@
   block:
     - name: Download latest JDK {{ jdk_version }} release (Solaris)
       command: wget https://api.adoptium.net/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
+      register: adopt_download
+      until: adopt_download is not failed
 
     - name: Get Signature File Link (Solaris)
       shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
