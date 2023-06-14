@@ -3,14 +3,14 @@
 # Visual Studio Community 2019 #
 ################################
 
-- name: Register AdoptOpenJDK Var
-  ansible.builtin.set_fact:
-    AdoptYes: false
+# - name: Register AdoptOpenJDK Var
+#   ansible.builtin.set_fact:
+#     AdoptYes: false
 
-- name: Set AdoptOpenJDK Var If Running With AdoptOpenJDK Tag
-  ansible.builtin.set_fact:
-    AdoptYes: true
-  tags: adoptopenjdk
+# - name: Set AdoptOpenJDK Var If Running With AdoptOpenJDK Tag
+#   ansible.builtin.set_fact:
+#     AdoptYes: true
+#   tags: adoptopenjdk
 
 - name: Test if VS 2019 is installed
   win_stat:
@@ -25,6 +25,7 @@
     remote_src: no
   when: (not vs2019_installed.stat.exists) or ( AdoptYes|bool == true)
   failed_when: false
+  tags: MSVS_2019
 
 # Check For The Transferred File & Exit If AdoptOpenJDK Run
 - name: Check If Layout Has Transferred
@@ -38,7 +39,7 @@
 - name: Exit With Error When No Layout Within AdoptOpenJDK
   fail:
     msg: "The VS2019 Layout File Appears To Be Missing From Vendor_Files"
-  when: (not vs2019_layout_ready.stat.exists) and ( AdoptYes|bool == true)
+  when: (not vs2019_layout_ready.stat.exists) # and ( AdoptYes|bool == true)
   tags: MSVS_2019
 
 # Install VS2019 From Layout For AdoptOpenJDK
@@ -74,7 +75,7 @@
     checksum_algorithm: sha256
     dest: 'C:\temp\vs_community19.exe'
     force: no
-  when: (not vs2019_installed.stat.exists) and ( AdoptYes|bool == false)
+  when: (not vs2019_installed.stat.exists) # and ( AdoptYes|bool == false)
   tags: MSVS_2019
 
 - name: Run Visual Studio 2019 Installer From Download
@@ -82,7 +83,7 @@
       Start-Process -Wait -FilePath 'C:\temp\vs_community19.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
   args:
     executable: powershell
-  when: (not vs2019_installed.stat.exists) and ( AdoptYes|bool == false)
+  when: (not vs2019_installed.stat.exists) # and ( AdoptYes|bool == false)
   register: vs2019_error
   failed_when: vs2019_error.rc != 0 and vs2019_error.rc != 3010
   tags: MSVS_2019
@@ -91,7 +92,7 @@
   win_shell: Start-Process -FilePath 'C:\temp\vs_community19.exe' -Wait -NoNewWindow -ArgumentList
     'modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community" --quiet
     --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
-  when: (not vs2019_installed.stat.exists) and ( AdoptYes|bool == false)
+  when: (not vs2019_installed.stat.exists) # and ( AdoptYes|bool == false)
   tags: MSVS_2019
 
 - name: Register Visual Studio Community 2019 DIA SDK shared libraries
