@@ -31,7 +31,10 @@ RUN ssh-keygen -A
 
 CMD ["/usr/sbin/sshd", "-D"]
 
-RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server
+RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server gawk
+
+# Link libffi library (See https://github.com/adoptium/infrastructure/issues/3026#issuecomment-1589277527)
+RUN ln -s /usr/lib64/libffi.so.7 /usr/lib64/libffi.so.6
 
 EXPOSE 22
 # Start with docker run -p 22XX:22 UUID
