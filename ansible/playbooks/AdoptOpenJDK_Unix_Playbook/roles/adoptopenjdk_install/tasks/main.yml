@@ -279,7 +279,7 @@
         group: wheel
       become: yes
       become_user: root
-      become_method: sudo
+      become_method: ansible.builtin.sudo
 
 - name: Install latest JDK {{ jdk_version }} release if one not already installed (Solaris)
   when:
