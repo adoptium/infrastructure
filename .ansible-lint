@@ -25,7 +25,7 @@ skip_list:
   - 'args[module]' # Exclude Experimental Rule Validation ( Prevents 4 experimental warnings )
 
 kinds:
-  - vars: "./ansible/playbooks/adoptopenjdk_variables.yml"
+  - vars: "ansible/playbooks/adoptopenjdk_variables.yml"
 
 exclude_paths:
-  - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
+  - ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
