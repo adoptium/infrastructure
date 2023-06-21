@@ -1,6 +1,0 @@
----
-
-rules:
-  vars:
-    schema:vars
-    path: ./adoptopenjdk_variables.yml
