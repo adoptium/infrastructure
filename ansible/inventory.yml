@@ -127,12 +127,12 @@ hosts:
           solaris10u11-sparcv9-1: {}
 
       - osuosl:
-          aix715-ppc64-1: {ip: 140.211.9.99, description: p9-aix1-adopt05.osuosl.org, 7100-05-06-2028}
-          aix715-ppc64-2: {ip: 140.211.9.100, description: p9-aix1-adopt06.osuosl.org, 7100-05-06-2028}
           aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org, 7200-04-02-2028}
           aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix1-adopt04.osuosl.org, 7200-02-05-1938}
           aix72-ppc64-3: {ip: 140.211.9.168, description: p8-java1-adopt07.osuosl.org, 7200-02-04-1914}
           aix72-ppc64-4: {ip: 140.211.9.169, description: p8-java1-adopt08.osuosl.org, 7200-02-04-1914}
+          aix72-ppc64-5: {ip: 140.211.9.99, description: p9-aix1-adopt05.osuosl.org, 7200-02-04-1914}
+          aix72-ppc64-6: {ip: 140.211.9.100, description: p9-aix1-adopt06.osuosl.org, 7200-02-04-1914}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
           ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
