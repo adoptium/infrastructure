@@ -23,7 +23,6 @@
   win_stat:
     path: 'C:\TEMP\VS2019_Layout.zip'
   register: vs2019_layout_ready
-  when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
 # Exit Play If No VS2019 Layout & AdoptOpenJDK = true
