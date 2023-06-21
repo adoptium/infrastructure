@@ -1,4 +1,9 @@
 ---
+# .ansible-lint
+
+exclude_paths:
+  - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
+
 skip_list:
   - '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
   - '204'  # Lines should be no longer than 160 chars
@@ -21,7 +26,3 @@ skip_list:
   - 'no-free-form' # Exclude As Requires Significant Changes ( 196 changes required )
   - 'fqcn[action]' # Exclude As Requires Significant Changes ( 249 changes required )
   - 'args[module]' # Exclude Experimental Rule Validation ( Prevents 4 experimental warnings )
-
-
-exclude_paths:
-  - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
