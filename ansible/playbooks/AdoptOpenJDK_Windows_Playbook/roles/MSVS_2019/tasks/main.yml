@@ -30,7 +30,7 @@
 - name: Exit With Error When No Layout Within AdoptOpenJDK
   fail:
     msg: "The VS2019 Layout File Appears To Be Missing From Vendor_Files"
-  when: (not vs2019_layout_ready.stat.exists)
+  when: (not vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
 # Install VS2019 From Layout For AdoptOpenJDK
@@ -38,7 +38,7 @@
   win_unzip:
     src: C:\TEMP\VS2019_Layout.zip
     dest: C:\TEMP
-  when: (vs2019_layout_ready.stat.exists)
+  when: (vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
 - name: Run Visual Studio 2019 Installer From Layout
@@ -55,6 +55,7 @@
   with_items:
     - 'C:\TEMP\VS2019_Layout.zip'
     - 'C:\temp\VSLayout2019'
+  when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
 ## Check If VS2019 Has Been Installed From Layout Even If Not AdoptOpenJDK
