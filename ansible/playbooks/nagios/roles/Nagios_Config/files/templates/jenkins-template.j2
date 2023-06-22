@@ -18,7 +18,7 @@ define service{
 	host_name                       {{ host_name }}
         service_description             Current Load
         check_command                   check_by_ssh!/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,24,20
-        notifications_enabled   0
+        notifications_enabled           0
         check_interval                  30
         action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
 }
