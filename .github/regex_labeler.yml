@@ -76,9 +76,9 @@ labels:
   - label: "provider:osuosl"
     matcher:
       title: "osuosl"
-  - label: "provider:scaleway"
+  - label: "provider:skytap"
     matcher:
-      title: "scaleway"
+      title: "skytap"
   - label: "provider:nine"
     matcher:
       title: "nine"

@@ -45,7 +45,7 @@ valid = {
   'type': ('build', 'docker', 'dockerhost', 'infrastructure', 'test', 'jck'),
 
   # providers - validated for consistency
-  'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
+  'provider': ('alibaba', 'azure', 'marist', 'osuosl',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead', 'siteox',
         'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
         'aws', 'inspira', 'equinix_esxi', 'nine', 'gdams', 'skytap',
