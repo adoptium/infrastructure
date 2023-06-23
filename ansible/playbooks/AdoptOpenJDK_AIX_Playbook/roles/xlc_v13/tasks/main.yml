@@ -8,14 +8,8 @@
   register: xlc13
   tags: xlc13
 
-- name: Announce all is ready and move on
-  debug:
-    msg: "xlc_v13.1.3 installed, skipping download and installation"
-  when: xlc13.stat.isdir is defined and xlc13.stat.isdir
-  tags: xlc13
-
 - name: Unpack and install Vendor Files
-  when: xlc13.stat.isdir is undefined or xlc13.stat.isdir is false
+  when: xlc13.stat.isdir is undefined
   tags: [xlc13, vendor_files]
   block:
     - name: Transfer and Extract XLC13

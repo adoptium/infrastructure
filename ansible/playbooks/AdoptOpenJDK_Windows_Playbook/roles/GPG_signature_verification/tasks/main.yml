@@ -1,0 +1,27 @@
+---
+# These tasks can only run once cygwin is installed on the remote machine
+
+- name: Check if gnupg directory exists
+  win_stat:
+    path: 'C:\cygwin64\home\%USERNAME%\.gnupg'
+  register: gnupg_check
+
+- name: Create gnupg directory with Cygwin ( if it doesnt exist )
+  win_shell: C:/cygwin64/bin/bash.exe -c "mkdir -p ~/.gnupg"
+  when: (not gnupg_check.stat.exists)
+
+- name: Fix Permissions
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod og-rwx ~/.gnupg"
+
+- name: Import GPG Key
+  win_command: gpg --keyserver keyserver.ubuntu.com --recv-keys "{{ GPG_key }}"
+
+- name: Get signature file
+  win_command: wget -q "{{ signature_link }}" -O sigfile
+
+- name: Verify binary
+  win_command: gpg --verify sigfile {{ file_path }}
+
+- name: Remove gnupg directory with Cygwin ( when it didnt exist previously )
+  win_shell: C:/cygwin64/bin/bash.exe -c "rm -rf ~/.gnupg"
+  when: (not gnupg_check.stat.exists)

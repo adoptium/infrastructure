@@ -1,8 +1,11 @@
 FROM alpine:3.14
 
 RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
-        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 fontconfig libxext freetype zlib fakeroot gnupg
+        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 msttcorefonts-installer fontconfig libxext freetype zlib fakeroot gnupg
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+
+## Ensure Fonts Are Updated (Issue https://github.com/adoptium/infrastructure/issues/3039)
+RUN update-ms-fonts
 
 # Get latest jdk17 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/alpine-linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
