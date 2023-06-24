@@ -72,6 +72,7 @@ hosts:
           centos74-ppc64le-2: {ip: 140.211.168.117}
           ubuntu2204-aarch64-1: {ip: 140.211.169.57}
 
+
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
@@ -174,9 +175,6 @@ hosts:
       - nine:
           macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
           macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
-
-      - scaleway:
-          ubuntu1604-x64-1: {ip: 51.15.76.107}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
