@@ -1,0 +1,64 @@
+---
+###################
+# OpenSSL v1.1.1 #
+###################
+# Required by OpenJ9 for out-of-process JIT compilation (aka JITaaS)
+# Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
+
+# Note: some systems have already OpenSSL 1.1.1 instaled (as system)
+# do not install 1.1.1b on them
+
+- name: Set capstone version
+  set_fact:
+    capstone_version: 4.0.2
+  tags: capstone_source
+
+# check if it is installed in custom location or as system
+
+- name: Test if capstone 4 is installed
+  shell: test -f /usr/local/lib/libcapstone.so.4 || test -f /usr/lib/libcapstone.so.4
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
+    - capstone_installed.rc != 0
+  register: capstone_installed
+  changed_when: false
+  failed_when: false
+  tags: capstone_source
+
+- name: Download capstone {{ capstone_version }}
+  get_url:
+    url: https://github.com/capstone-engine/capstone/archive/{{ capstone_version }}.tar.gz
+    dest: /tmp/capstone-{{ capstone_version }}.tar.gz
+    force: no
+    mode: 0644
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
+    - capstone_installed.rc != 0
+  tags: capstone_source
+
+- name: Extract capstone {{ capstone_version }}
+  unarchive:
+    src: /tmp/capstone-{{ capstone_version }}.tar.gz
+    dest: /tmp
+    copy: False
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
+    - capstone_installed.rc != 0
+  tags: capstone_source
+
+- name: Build and install capstone {{ capstone_version }}
+  shell: cd /tmp/capstone-{{ capstone_version }}} && ./make.sh && PREFIX=/usr/local ./make.sh install
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - capstone_installed.rc != 0
+  tags: capstone_source
+
+- name: Remove downloaded packages for capstone {{ capstone_version }}
+  file:
+    path: /tmp/capstone-{{ capstone_version }}.tar.gz
+    state: absent
+  failed_when: false
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
+    - capstone_installed.rc != 0
+  tags: capstone_source

@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - bison                         # OpenJ9
   - bzip2
   - ca-certificates
+  - capstone-devel
   - cpio
   - curl
   - cups-devel
