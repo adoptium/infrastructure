@@ -50,10 +50,6 @@ hosts:
       - equinix_esxi:
           solaris10-x64-1: {ip: 145.40.115.43}
 
-      - inspira:
-          solaris10u11-sparcv9-1: {}
-          solaris10u11-sparcv9-2: {}
-
       - macstadium:
           macos1014-x64-1: {ip: 208.83.1.170, user: Administrator}
           macos1014-x64-2: {ip: 207.254.28.76, user: Administrator}
@@ -123,9 +119,6 @@ hosts:
       - aws:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
           rhel8-x64-1: {ip: 54.246.216.49}
-
-      - inspira:
-          solaris10u11-sparcv9-1: {}
 
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org, 7200-04-02-2028}
