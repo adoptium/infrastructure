@@ -1,12 +1,10 @@
 ---
-###################
-# OpenSSL v1.1.1 #
-###################
-# Required by OpenJ9 for out-of-process JIT compilation (aka JITaaS)
-# Currently only used by the alternate openj9 branch at https://github.com/eclipse/openj9/tree/jitaas
-
-# Note: some systems have already OpenSSL 1.1.1 instaled (as system)
-# do not install 1.1.1b on them
+##########################
+# Install capstone 4.0.2 #
+##########################
+# Required to build with hsdis disassembler support.
+# Note that at present this is only supported in the openjdk codebase
+# on x64 and aarch64, but this installs on all archs except RISC-V
 
 - name: Set capstone version
   set_fact:
@@ -18,8 +16,7 @@
 - name: Test if capstone 4 is installed
   shell: test -f /usr/local/lib/libcapstone.so.4 || test -f /usr/lib/libcapstone.so.4
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
-    - capstone_installed.rc != 0
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
   register: capstone_installed
   changed_when: false
   failed_when: false
@@ -33,8 +30,9 @@
     mode: 0440
     checksum: sha512:7f93534517307b737422a8825b66b2a1f3e1cca2049465d60ab12595940154aaf843ba40ed348fce58de58b990c19a0caef289060eb72898cb008a88c470970e
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - capstone_installed.rc != 0
+    - (ansible_architecture != "riscv64")
   tags: capstone_source
 
 - name: Extract capstone {{ capstone_version }}
@@ -43,15 +41,37 @@
     dest: /tmp
     copy: False
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "SLES")
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - capstone_installed.rc != 0
+    - (ansible_architecture != "riscv64")
   tags: capstone_source
 
+- name: Set architecture variable for x64
+  set_fact: capstone_architecture=x86
+  when: ansible_architecture == "x86_64"
+
+- name: Set architecture variable for arm32
+  set_fact: capstone_architecture=arm
+  when: ansible_architecture == "armv7l"
+
+- name: Set architecture variable for aarch64
+  set_fact: capstone_architecture=aarch64
+  when: ansible_architecture == "aarch64"
+
+- name: Set architecture variable for ppc64le
+  set_fact: capstone_architecture=powerpc
+  when: ansible_architecture == "ppc64le"
+
+- name: Set architecture variable for s390x
+  set_fact: capstone_architecture=systemz
+  when: ansible_architecture == "s390x"
+
 - name: Build and install capstone {{ capstone_version }}
-  shell: cd /tmp/capstone-{{ capstone_version }}} && ./make.sh && PREFIX=/usr/local ./make.sh install
+  shell: cd /tmp/capstone-{{ capstone_version }} && CAPSTONE_ARCHS={{ capstone_architecture }} ./make.sh && PREFIX=/usr/local ./make.sh install
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - capstone_installed.rc != 0
+    - (ansible_architecture != "riscv64")
   tags: capstone_source
 
 - name: Remove downloaded packages for capstone {{ capstone_version }}
