@@ -135,9 +135,6 @@ hosts:
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
 
-      - equinix:
-          win2012r2-x64-1: {ip: 147.75.32.146, user: Admin}
-
       - equinix_esxi:
           ubuntu2204-x64-1: {ip: 145.40.115.44, description: Perf machine}
           ubuntu2204-x64-2: {ip: 145.40.115.46, description: Perf machine}
