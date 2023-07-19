@@ -28,8 +28,3 @@
   service: name=syslogd state=reloaded
   changed_when: false
   tags: syslog
-
-- name: Ensure full core files are enabled
-  command: chdev -l sys0 -a fullcore=true
-  changed_when: false
-  tags: syslog
