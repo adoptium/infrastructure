@@ -1,0 +1,22 @@
+---
+################
+#  rng daemon  #
+################
+- name: Install rng-tools and start service
+  tags: rngd
+  block:
+    - name: Install rng-tools and start rng-tools.service (Ubuntu)
+      include_tasks: ubuntu.yml
+      when:
+        - ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "21"
+
+    - name: Install rng-tools and start rngd (Fedora)
+      include_tasks: fedora.yml
+      when:
+        - (ansible_distribution == "RedHat" and ansible_distribution_major_version <= "8") or 
+          (ansible_distribution == "CentOS" and ansible_distribution_major_version <= "8")
+
+    - name: Install rng-tools and start rng-tools.service (SLES)
+      include_tasks: sles.yml
+      when:
+        - ansible_distribution == "SLES" and ansible_distribution_major_version <= "12"

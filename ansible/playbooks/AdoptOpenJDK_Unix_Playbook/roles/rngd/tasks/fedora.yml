@@ -1,0 +1,20 @@
+---
+- name: Install the rng-tools package (Fedora)
+  package: 
+    name: rng-tools
+    state: latest
+
+- name: Update the rngd.service file (Fedora)
+  ini_file: 
+    path: /usr/lib/systemd/system/rngd.service
+    section: service
+    option: ExecStart
+    value: "/sbin/rngd -f -r /dev/urandom -o /dev/random"
+    backup: yes
+
+- name: Start and enable "rngd" service (Fedora)
+  service: 
+    name: rngd
+    state: started
+    enabled: yes
+    
