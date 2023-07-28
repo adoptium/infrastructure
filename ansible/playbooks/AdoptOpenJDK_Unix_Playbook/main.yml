@@ -141,3 +141,4 @@
     - role: logs
       position: "End"
       tags: always
+    - rngd

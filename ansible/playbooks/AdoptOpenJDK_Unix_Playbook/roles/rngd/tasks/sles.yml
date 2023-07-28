@@ -1,0 +1,19 @@
+---
+- name: Install the rng-tools package (SLES)
+  package:
+    name: rng-tools
+    state: latest
+
+- name: Update the rng-tools.service file (SLES)
+  ini_file:
+    path: /usr/lib/systemd/system/rng-tools.service
+    section: service
+    option: ExecStart
+    value: "usr/sbin/rngd -f -r /dev/urandom -o /dev/random"
+    backup: yes
+
+- name: Start and enable "rng-tools" service (SLES)
+  service:
+    name: rng-tools
+    state: started
+    enabled: yes
