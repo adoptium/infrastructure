@@ -249,4 +249,6 @@
   script: scripts/updatepackages.sh
   args:
     executable: bash
-  tags: updateContainers
+  tags:
+    - updateContainers
+    - never
