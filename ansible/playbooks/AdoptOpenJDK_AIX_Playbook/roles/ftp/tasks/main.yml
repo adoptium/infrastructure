@@ -1,0 +1,44 @@
+---
+#################################
+# Activate ftp server via inetd #
+#################################
+- name: Copy configuration of inet
+  copy:
+    src: inetd.conf
+    dest: /etc/inetd.conf
+    owner: root
+    group: system
+    mode: '0554'
+  notify: Restart inetd
+  tags: ftp
+
+- name: Copy configuration of ftp
+  copy:
+    src: ftpaccess.ctl
+    dest: /etc/ftpaccess.ctl
+    owner: root
+    group: system
+    mode: '0554'
+  tags: ftp
+
+- name: Create FTP user
+  action: user name="{{ jckftp_Username }}" home="/home/{{ jckftp_Username }}" state=present
+  tags: ftp
+
+- name: "Create /home/{{ jckftp_Username }}/ftp"
+  file:
+    path: "/home/{{ jckftp_Username }}/ftp"
+    owner: "{{ jckftp_Username }}"
+    group: "{{ jckftp_Groupname }}"
+    state: directory
+  tags: ftp
+
+- name: Create file for FTP access
+  copy:
+    content: ""
+    dest: "/home/{{ jckftp_Username }}/ftp/filename.txt"
+    force: no
+    owner: "{{ jckftp_Username }}"
+    group: "{{ jckftp_Groupname }}"
+    mode: 0755
+  tags: ftp

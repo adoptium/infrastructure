@@ -1,0 +1,6 @@
+---
+- name: Restart inetd
+  service:
+    name: inetd
+    state: restarted
+

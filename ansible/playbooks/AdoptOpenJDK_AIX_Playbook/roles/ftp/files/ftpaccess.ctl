@@ -1,0 +1,2 @@
+allow: localhost
+useronly: jckftp

@@ -102,3 +102,7 @@
     - role: logs
       position: "End"
       tags: always
+
+    # 8. Add local ftp server and jckftp user
+    - ftp
+

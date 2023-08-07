@@ -32,6 +32,7 @@ Security: Enabled
 
 # JCK Variables:
 jckftp_Username: jckftp
+jckftp_Groupname: jck
 
 # Jcktestr User Variables:
 Jcktestr_Username: jcktestr
