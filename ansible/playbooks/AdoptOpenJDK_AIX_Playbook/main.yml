@@ -11,6 +11,8 @@
     PERL_MB_OPT: "--install_base /opt/freeware"
     PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
 
+  force_handlers: True
+
   roles:
     - role: logs
       position: "Start"
