@@ -47,4 +47,4 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^#X11UseLocalhost'
-        line: 'X12UseLocalhost yes'
+        line: 'X11UseLocalhost yes'
