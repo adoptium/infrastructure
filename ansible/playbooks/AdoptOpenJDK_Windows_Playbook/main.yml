@@ -12,7 +12,7 @@
 # Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
 # Run powershell as the Administrator
 # If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/adoptium/infrastructure/issues/1858
-# wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# wget https://github.com/ansible/ansible-documentation/tree/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
 # .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 # .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
