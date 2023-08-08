@@ -151,6 +151,15 @@ Note that when running from inside a `vagrant` instance:
 
 This is useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
 
+## Enforcing running handlers 
+There are some handlers defined in playbooks, like `sshd` restart, and they will not run unless all tasks in a play succeed.
+
+In order to enforce handlers to be executed anyway, add `--force-handlers` option to command:
+
+```bash
+ansible-playbook -i [/path/to/hosts] --force-handlers -b AdoptOpenJDK_AIX_Playbook/main.yml 
+```
+
 ## Verbose mode, debugging Ansible playbooks
 
 Below are the levels of verbosity available with using ansible scripts:
