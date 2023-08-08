@@ -35,7 +35,7 @@ jobs:
       run: |
         Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Ansible_password123!" -Force)
         New-NetFirewallRule -DisplayName "ALLOW TCP PORT 5986" -Direction inbound -Profile Any -Action Allow -LocalPort 5986 -Protocol TCP
-        Invoke-WebRequest https://github.com/ansible/ansible-documentation/tree/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+        Invoke-WebRequest https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
         .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
         .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
         .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
