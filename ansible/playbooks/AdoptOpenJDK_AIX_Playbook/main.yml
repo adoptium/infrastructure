@@ -35,7 +35,8 @@
 
     # 2. AIX BOS configuration
 
-    - syslogs
+    - sys0
+    - syslog
     - crontab
     # TBD: additional tasks below that need to be promoted to
     # or migrated into an AIX setup role - in paritcular -
@@ -96,7 +97,6 @@
     - bash_login
     - ntp_time_server
     - disable_sendmail
-    - fullcore
     - enable_swap
 
     - role: logs
