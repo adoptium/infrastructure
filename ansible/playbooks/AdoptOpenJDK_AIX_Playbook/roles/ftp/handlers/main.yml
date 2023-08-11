@@ -3,4 +3,3 @@
   service:
     name: inetd
     state: restarted
-
