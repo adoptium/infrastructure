@@ -315,12 +315,14 @@ cases they may be used as `dockerBuild` hosts too.
 
 Instructions on how to create a static docker container can be found [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md)
 
+### Dockerhost Patching System
+
+At the moment we have the [updatepackages.sh](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) script which runs weekly on all of our Dockerhost systems to ensure that the Static Docker containers are patched and up to date. The script is also used to install new test [prerequisite](https://github.com/adoptium/aqa-tests/blob/master/doc/Prerequisites.md#prerequisites) packages onto the containers.
+
 ### DockerHost TODO
 
-1. Set up patching cycle
-2. Identify ways to redeploy when needed to pick up updates
-3. Allow dockerhost.yml playbook to adjust core file settings
-4. Add mechanism to deploy differently based on host machine size
+1. Allow dockerhost.yml playbook to adjust core file settings
+2. Add mechanism to deploy differently based on host machine size
 
 ## Temporary access to a machine
 
