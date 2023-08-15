@@ -30,11 +30,7 @@
   tags: patch_update
 
 - name: Enable CentOS-PowerTools repo for CentOS8
-  replace:
-    path: /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
-    regexp: 'enabled=0'
-    replace: "enabled=1"
-  failed_when: false
+  shell: dnf config-manager --set-enabled powertools
   when:
     - ansible_distribution_major_version == "8"
   tags: patch_update

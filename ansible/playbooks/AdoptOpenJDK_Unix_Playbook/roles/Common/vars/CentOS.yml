@@ -85,7 +85,7 @@ Additional_Build_Tools_CentOS_x86:
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
 
 Additional_Build_Tools_CentOS8_Stream:
-  - libdwarf.x86_64
+  - libdwarf
   - libmpc-devel
 
 Additional_Build_Tools_NOT_CentOS8_Stream:
