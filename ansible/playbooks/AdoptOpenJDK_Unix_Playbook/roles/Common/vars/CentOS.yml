@@ -26,8 +26,12 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - gnutls
+  - gnutls-utils
   - java-1.8.0-openjdk-devel
   - libcurl-devel
+  - libnss3.so
+  - libnssutil3.so
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -38,6 +42,8 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - numactl-devel                 # OpenJ9
   - openssh-clients               # IBM: cloning over SSH
   - openssl-devel
@@ -105,3 +111,9 @@ Test_Tool_Packages:
   - xorg-x11-xauth
   - xorg-x11-server-Xvfb
   - fakeroot
+  - gnutls
+  - gnutls-utils
+  - libnss3.so
+  - libnssutil3.so
+  - nss-devel
+  - nss-tools
