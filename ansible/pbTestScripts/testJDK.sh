@@ -38,7 +38,7 @@ else
 fi
 
 # Run SSL Client Tests Linux Only ( Not Solaris / FreeBSD )
-if [[ "$(uname)" == "FreeBSD" ] || ["$(uname)" == "SunOS"]]; then
+if [[ "$(uname)" == "FreeBSD" ]] || [["$(uname)" == "SunOS"]]; then
 	echo "Skipping SSL Tests As Not Supported"
 else
 	export TESTJAVA=$TEST_JDK_HOME
