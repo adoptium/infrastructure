@@ -25,13 +25,13 @@
 
 - name: Add AdoptOpenJDK GPG key
   apt_key:
-    url: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
     state: present
   tags: patch_update
 
 - name: Add the adoptopenjdk repository to apt for JDK8
   apt_repository:
-    repo: "deb https://packages.adoptium.net/artifactory/deb {{ ansible_distribution_release }} main"
+    repo: "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb {{ ansible_distribution_release }} main"
     update_cache: no
   when:
     - (ansible_architecture != "riscv64")
