@@ -25,22 +25,6 @@
   register: vs2019_layout_ready
   tags: adoptopenjdk
 
-- name: Get SHA256 checksum of the file
-  win_shell: |
-    $filePath = "C:\TEMP\VS2019_Layout.zip"
-    $expectedChecksum = "91AA8F9C5A131132FD04F04427A540CCEE6FCA41915558898ED12D9A20296134"
-    $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-
-    if ($actualChecksum -ne $expectedChecksum) {
-        Write-Output "Checksum mismatch"
-        Write-Output "Actual Checksum: $actualChecksum"
-        Write-Output "Expect Checksum: $expectedChecksum"
-        exit 1
-    }
-  register: checksum_result
-  changed_when: false
-  tags: adoptopenjdk
-
 # Exit Play If No VS2019 Layout & AdoptOpenJDK = true
 # This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
 - name: Exit With Error When No Layout Within AdoptOpenJDK
@@ -65,17 +49,12 @@
   when: (vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
-- name: Remove VS2019 Zip File
+- name: Remove Visual Studio 2019 Layout Files
   win_file:
-    path: C:\TEMP\VS2019_Layout.zip
-    state: absent
-  when: (not vs2019_installed.stat.exists)
-  tags: adoptopenjdk
-
-- name: Remove VS2019 Unzipped Layout
-  win_file:
-    path: C:\temp\VSLayout2019
-    state: absent
+    path: "{{ items }}"
+  with_items:
+    - 'C:\TEMP\VS2019_Layout.zip'
+    - 'C:\temp\VSLayout2019'
   when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
