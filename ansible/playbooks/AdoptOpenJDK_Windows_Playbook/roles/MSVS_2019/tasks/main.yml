@@ -28,7 +28,7 @@
 - name: Get SHA256 checksum of the file
   win_shell: |
     $filePath = "C:\TEMP\VS2019_Layout.zip"
-    $expectedChecksum = "91AA8F9C5A131132FD04F04427A540CCEE6FCA41915558898ED12D9A20296134"
+    $expectedChecksum = "C73A5F3C8A8AB50BC971551FA626438FEA89E0ED71F77EE570094E0C394C419E"
     $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
     if ($actualChecksum -ne $expectedChecksum) {
