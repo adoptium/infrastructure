@@ -48,7 +48,7 @@
   when: (not vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists)
   tags: adoptopenjdk
 
-# Install VS2019 From Layout For AdoptOpenJDK
+# Install VS2022 From Layout For AdoptOpenJDK
 - name: Unzip VS2022 Layout
   win_unzip:
     src: C:\TEMP\VS2022_Layout.zip
