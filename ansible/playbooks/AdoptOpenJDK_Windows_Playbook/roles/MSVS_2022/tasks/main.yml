@@ -85,7 +85,7 @@
   register: vs2022_installed
 
 # Download & Install VS2022 When No Layout & Not AdoptOpenJDK
-# This is the target that you're redirected to when you go to https://aka.ms/vs/16/release/vs_community.exe
+# This is the target that you're redirected to when you go to https://aka.ms/vs/17/release/vs_community.exe
 - name: Download Visual Studio Community 2022
   win_get_url:
     url: 'https://aka.ms/vs/17/release/vs_Community.exe'
