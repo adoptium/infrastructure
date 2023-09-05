@@ -29,7 +29,7 @@
     state: present
   tags: patch_update
 
-- name: Add the adoptopenjdk repository to apt for JDK8
+- name: Add the Eclipse Temurin repository to apt for JDK8
   apt_repository:
     repo: "deb https://packages.adoptium.net/artifactory/deb {{ ansible_distribution_release }} main"
     update_cache: no
