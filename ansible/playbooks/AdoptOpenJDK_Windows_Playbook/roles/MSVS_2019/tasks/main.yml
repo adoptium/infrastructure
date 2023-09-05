@@ -52,6 +52,7 @@
 - name: Remove Visual Studio 2019 Layout Files
   win_file:
     path: "{{ items }}"
+    state: absent
   with_items:
     - 'C:\TEMP\VS2019_Layout.zip'
     - 'C:\temp\VSLayout2019'

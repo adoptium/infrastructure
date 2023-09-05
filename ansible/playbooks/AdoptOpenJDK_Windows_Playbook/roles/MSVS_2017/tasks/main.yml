@@ -21,7 +21,7 @@
   tags: MSVS_2017
 
 - name: Install Visual Studio Community 2017
-  win_shell: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop;includeRecommended;includeOptional --quiet --norestart'
+  win_shell: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --passive --norestart'
   args:
     executable: cmd
   when: (not vs2017_installed.stat.exists)
@@ -34,6 +34,7 @@
   with_items:
     - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\msdia140.dll
     - C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\amd64\msdia140.dll
+  when: (not vs2017_installed.stat.exists)
   tags: MSVS_2017
 
 - name: Reboot machine after Visual Studio installation
