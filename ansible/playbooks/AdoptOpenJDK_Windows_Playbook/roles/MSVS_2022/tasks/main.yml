@@ -84,7 +84,7 @@
     path: 'C:\Program Files\Microsoft Visual Studio\2022\Community'
   register: vs2022_installed
 
-# Download & Install VS2019 When No Layout & Not AdoptOpenJDK
+# Download & Install VS2022 When No Layout & Not AdoptOpenJDK
 # This is the target that you're redirected to when you go to https://aka.ms/vs/16/release/vs_community.exe
 - name: Download Visual Studio Community 2022
   win_get_url:
