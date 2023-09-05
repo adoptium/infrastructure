@@ -23,7 +23,7 @@
     state: present
   tags: patch_update
 
-- name: Add AdoptOpenJDK GPG key
+- name: Add Eclipse Temurin GPG key
   apt_key:
     url: https://packages.adoptium.net/artifactory/api/gpg/key/public
     state: present
