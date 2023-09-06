@@ -68,7 +68,7 @@ Additional_Packages_Debian8:
   - libgstreamer0.10-dev                # OpenJFX prereq
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - openjdk-7-jdk
-  - adoptopenjdk-8-hotspot
+  - temurin-8-jdk
   - libmpfr4
   - libmpfr4-dbg
 
