@@ -20,14 +20,22 @@
   when: (not vs2017_installed.stat.exists)
   tags: MSVS_2017
 
-- name: Install Visual Studio Community 2017
-  win_shell: 'C:\temp\vs_community.exe --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --passive --norestart --downloadThenInstall'
+# - name: Install Visual Studio Community 2017
+#   win_shell: 'C:\temp\vs_community.exe --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --passive --norestart --downloadThenInstall'
+#   args:
+#     executable: cmd
+#   when: (not vs2017_installed.stat.exists)
+#   register: vs2017_error
+#   failed_when: vs2017_error.rc != 1 and vs2017_error.rc != 0
+#   tags: MSVS_2017
+
+- name: Run Visual Studio 2017 Installer From Layout
+  win_shell: |
+      Start-Process -Wait -FilePath 'C:\temp\vs_community.exe' -ArgumentList '--nocache --passive --norestart --wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional'
   args:
-    executable: cmd
+    executable: powershell
   when: (not vs2017_installed.stat.exists)
-  register: vs2017_error
-  failed_when: vs2017_error.rc != 1 and vs2017_error.rc != 0
-  tags: MSVS_2017
+  tags: adoptopenjdk
 
 - name: Register Visual Studio Community 2017 DIA SDK shared libraries
   win_command: 'regsvr32 /s "{{ item }}"'
