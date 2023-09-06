@@ -25,6 +25,22 @@
   register: vs2019_layout_ready
   tags: adoptopenjdk
 
+- name: Get SHA256 checksum of the file
+  win_shell: |
+    $filePath = "C:\TEMP\VS2019_Layout.zip"
+    $expectedChecksum = "C73A5F3C8A8AB50BC971551FA626438FEA89E0ED71F77EE570094E0C394C419E"
+    $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+    if ($actualChecksum -ne $expectedChecksum) {
+        Write-Output "Checksum mismatch"
+        Write-Output "Actual Checksum: $actualChecksum"
+        Write-Output "Expect Checksum: $expectedChecksum"
+        exit 1
+    }
+  register: checksum_result
+  changed_when: false
+  tags: adoptopenjdk
+
 # Exit Play If No VS2019 Layout & AdoptOpenJDK = true
 # This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
 - name: Exit With Error When No Layout Within AdoptOpenJDK
