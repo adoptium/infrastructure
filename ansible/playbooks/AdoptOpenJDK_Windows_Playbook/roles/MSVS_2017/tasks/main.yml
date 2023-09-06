@@ -29,6 +29,18 @@
   failed_when: vs2017_error.rc != 1 and vs2017_error.rc != 0
   tags: MSVS_2017
 
+- name: Check If VS2017 Has Installed 1
+  win_stat:
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\msdia140.dll'
+  register: vs2017_dll1_ready
+  tags: MSVS_2017
+
+- name: Check If VS2017 Has Installed 2
+  win_stat:
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\DIA SDK\bin\amd64\msdia140.dll'
+  register: vs2017_dll2_ready
+  tags: MSVS_2017
+
 - name: Register Visual Studio Community 2017 DIA SDK shared libraries
   win_command: 'regsvr32 /s "{{ item }}"'
   with_items:
