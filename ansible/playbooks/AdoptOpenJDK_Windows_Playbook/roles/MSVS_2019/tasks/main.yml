@@ -49,13 +49,17 @@
   when: (vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
-- name: Remove Visual Studio 2019 Layout Files
+- name: Remove VS2019 Zip File
   win_file:
-    path: "{{ items }}"
+    path: C:\TEMP\VS2019_Layout.zip
     state: absent
-  with_items:
-    - 'C:\TEMP\VS2019_Layout.zip'
-    - 'C:\temp\VSLayout2019'
+  when: (not vs2019_installed.stat.exists)
+  tags: adoptopenjdk
+
+- name: Remove VS2019 Unzipped Layout
+  win_file:
+    path: C:\temp\VSLayout2019
+    state: absent
   when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
