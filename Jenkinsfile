@@ -70,43 +70,60 @@ pipeline {
 def dockerBuild(architecture, distro, dockerfile) {
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
     def git_sha = "${env.GIT_COMMIT.trim()}"
-    dockerImage = docker.build("adoptopenjdk/${distro}_build_image:linux-$architecture",
+    dockerImage = docker.build("adoptopenjdk/${distro}_build_image:linux-${architecture}",
         "--build-arg git_sha=$git_sha -f ansible/docker/$dockerfile .")
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
         dockerImage.push()
+    }
+
+    // Push to GitHub Packages
+    def ghRepo = "adoptium/infrastructure"
+    def ghPackageTag = "docker.pkg.github.com/${ghRepo}/${distro}_build_image:linux-${architecture}"
+
+    dockerImage.tag(ghPackageTag)
+    docker.withRegistry('https://docker.pkg.github.com', 'eclipse_temurin_bot_token') {
+        dockerImage.push(ghPackageTag)
     }
 }
 
 def dockerManifest() { 
     // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-        git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
-        sh '''
-            # Centos7
-            export TARGET="adoptopenjdk/centos7_build_image"
-            AMD64=$TARGET:linux-amd64
-            ARM64=$TARGET:linux-arm64
-            PPC64LE=$TARGET:linux-ppc64le
-            docker manifest create $TARGET $AMD64 $ARM64 $PPC64LE
-            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
-            docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
-            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
-            docker manifest push $TARGET
-            # Ubuntu1604
-            export TARGET="adoptopenjdk/ubuntu1604_build_image"
-            ARMV7L=$TARGET:linux-armv7l
-            docker manifest create $TARGET $ARMV7L
-            docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
-            docker manifest push $TARGET
-            # Alpine3
-            export TARGET="adoptopenjdk/alpine3_build_image"
-            AMD64=$TARGET:linux-amd64
-            ARM64=$TARGET:linux-arm64
-            docker manifest create $TARGET $AMD64 $ARM64
-            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
-            docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
-            docker manifest push $TARGET
-        '''
+        processManifest('https://github.com/adoptium/infrastructure.git')
     }
+
+    docker.withRegistry('https://docker.pkg.github.com', 'eclipse_temurin_bot_token') {
+        processManifest('https://github.com/adoptium/infrastructure.git', 'docker.pkg.github.com/adoptium/infrastructure/')
+    }
+}
+
+def processManifest(gitUrl, registryPrefix='') {
+    git poll: false, url: gitUrl
+    sh '''
+        # Add function to process each image manifest
+        createAndPushManifest() {
+            export TARGET="${1}${2}"
+            docker manifest create $TARGET "$@"
+            shift
+            shift
+            for IMAGE in "$@"; do
+                ARCH=$(echo $IMAGE | rev | cut -d- -f1 | rev)
+                docker manifest annotate $TARGET $IMAGE --arch $ARCH --os linux
+            done
+            docker manifest push $TARGET
+        }
+        # Centos7
+        createAndPushManifest "${registryPrefix}" "adoptopenjdk/centos7_build_image" \
+            "adoptopenjdk/centos7_build_image:linux-amd64" \
+            "adoptopenjdk/centos7_build_image:linux-arm64" \
+            "adoptopenjdk/centos7_build_image:linux-ppc64le"
+        # Ubuntu1604
+        createAndPushManifest "${registryPrefix}" "adoptopenjdk/ubuntu1604_build_image" \
+            "adoptopenjdk/ubuntu1604_build_image:linux-armv7l"
+        # Alpine3
+        createAndPushManifest "${registryPrefix}" "adoptopenjdk/alpine3_build_image" \
+            "adoptopenjdk/alpine3_build_image:linux-amd64" \
+            "adoptopenjdk/alpine3_build_image:linux-arm64"
+    '''
 }
