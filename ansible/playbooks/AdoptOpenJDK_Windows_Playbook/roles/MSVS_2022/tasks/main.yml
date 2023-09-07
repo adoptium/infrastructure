@@ -3,6 +3,11 @@
 # Visual Studio Community 2022 #
 ################################
 
+- name: Check the Windows version
+  win_shell: |
+    Get-WmiObject -Class Win32_OperatingSystem | Select-Object -ExpandProperty Version
+  register: windows_version
+
 - name: Test if VS 2022 is installed
   win_stat:
     path: 'C:\Program Files\Microsoft Visual Studio\2022\Community'
@@ -14,7 +19,7 @@
     src: /Vendor_Files/windows/vs_layout_2022.zip
     dest: C:\TEMP\VS2022_Layout.zip
     remote_src: no
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   failed_when: false
   tags: adoptopenjdk
 
@@ -23,20 +28,23 @@
   win_stat:
     path: 'C:\TEMP\VS2022_Layout.zip'
   register: vs2022_layout_ready
+  when: windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)')
   tags: adoptopenjdk
 
 - name: Get SHA256 checksum of the file
   win_shell: |
     $filePath = "C:\TEMP\VS2022_Layout.zip"
-    $expectedChecksum = "7BEBEF0A67E01FA3DF718D019DE58C47FF24DF1A24CCE3DE5B1DD9E302C04F43"
-
+    $expectedChecksum = "29567E33B5361E4BAD36DFDFF83FEB3DDFDF0518122237E8273F0FA4E11E8B74"
     $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
     if ($actualChecksum -ne $expectedChecksum) {
         Write-Output "Checksum mismatch"
+        Write-Output "Actual Checksum: $actualChecksum"
+        Write-Output "Expect Checksum: $expectedChecksum"
         exit 1
     }
   register: checksum_result
+  when: (vs2022_layout_ready.stat.exists ) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   changed_when: false
   tags: adoptopenjdk
 
@@ -53,7 +61,7 @@
   win_unzip:
     src: C:\TEMP\VS2022_Layout.zip
     dest: C:\TEMP
-  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists)
+  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags: adoptopenjdk
 
 - name: Run Visual Studio 2022 Installer From Layout
@@ -61,25 +69,32 @@
       Start-Process -Wait -FilePath 'C:\temp\VSLayout2022\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
   args:
     executable: powershell
-  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists)
+  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
+  tags: adoptopenjdk
+
+- name: Register Visual Studio Community 2022 DIA SDK shared libraries
+  win_command: 'regsvr32 /s "{{ item }}"'
+  with_items:
+    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\msdia140.dll
+    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\amd64\msdia140.dll
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags: adoptopenjdk
 
 - name: Remove VS2022 Zip File
   win_file:
     path: C:\TEMP\VS2022_Layout.zip
     state: absent
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags: adoptopenjdk
 
 - name: Remove VS2022 Unzipped Layout
   win_file:
     path: C:\temp\VSLayout2022
     state: absent
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags: adoptopenjdk
-#
-## Check If VS2019 Has Been Installed From Layout Even If Not AdoptOpenJDK
-- name: Test if VS 2022 is installed
+
+- name: Test if VS 2022 is installed(non adopt)
   win_stat:
     path: 'C:\Program Files\Microsoft Visual Studio\2022\Community'
   register: vs2022_installed
@@ -93,14 +108,14 @@
     checksum_algorithm: sha256
     dest: 'C:\temp\vs_community22.exe'
     force: no
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
 
 - name: Run Visual Studio 2022 Installer From Download
   win_shell: |
       Start-Process -Wait -FilePath 'C:\temp\vs_community22.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
   args:
     executable: powershell
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   register: vs2022_error
   failed_when: vs2022_error.rc != 0 and vs2022_error.rc != 3010
 
@@ -108,19 +123,19 @@
   win_shell: Start-Process -FilePath 'C:\temp\vs_community22.exe' -Wait -NoNewWindow -ArgumentList
     'modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community" --quiet
     --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
 
 - name: Register Visual Studio Community 2022 DIA SDK shared libraries
   win_command: 'regsvr32 /s "{{ item }}"'
   with_items:
     - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\msdia140.dll
     - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\amd64\msdia140.dll
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
 
 - name: Reboot machine after Visual Studio installation
   win_reboot:
     reboot_timeout: 1800
     shutdown_timeout: 1800
-  when: (not vs2022_installed.stat.exists)
+  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags:
     - reboot

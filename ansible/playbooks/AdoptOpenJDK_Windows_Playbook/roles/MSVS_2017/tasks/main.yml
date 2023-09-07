@@ -21,7 +21,7 @@
   tags: MSVS_2017
 
 - name: Install Visual Studio Community 2017
-  win_shell: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
+  win_shell: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop;includeRecommended;includeOptional --quiet --norestart'
   args:
     executable: cmd
   when: (not vs2017_installed.stat.exists)
