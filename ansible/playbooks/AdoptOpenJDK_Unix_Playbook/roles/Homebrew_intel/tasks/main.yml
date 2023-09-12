@@ -1,0 +1,24 @@
+---
+# Install Intel Homebrew onto our arm64 mac machines. This is needed to build x64 jdk8:
+# The freetype build process requires Intel libpng installed, which needs Intel Homebrew
+
+- name: Check if Intel Homebrew is installed
+  stat:
+    path: /usr/local/Homebrew/bin/brew
+  register: intel_homebrew_installed
+
+- name: Run Homebrew install script in a Rosetta shell
+  ansible.builtin.shell: arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not intel_homebrew_installed.exists
+
+- name: (debug) Check if install was successful
+  stat:
+    path: /usr/local/Homebrew/bin/brew
+  register: debug_intel_homebrew_installed
+
+- name: (debug) print debug_intel_homebrew_installed 
+  debug:
+    msg: "{{ debug_intel_homebrew_installed }}"
+
+- name: Install Intel libpng
+  ansible.builtin.shell: arch -x86_64 yes | /usr/local/Homebrew/bin/brew install libpng
