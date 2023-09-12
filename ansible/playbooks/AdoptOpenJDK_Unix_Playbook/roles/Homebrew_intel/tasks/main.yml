@@ -16,7 +16,7 @@
     path: /usr/local/Homebrew/bin/brew
   register: debug_intel_homebrew_installed
 
-- name: (debug) print debug_intel_homebrew_installed 
+- name: (debug) print debug_intel_homebrew_installed
   debug:
     msg: "{{ debug_intel_homebrew_installed }}"
 
