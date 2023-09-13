@@ -1,6 +1,7 @@
 ---
-# Install Intel Homebrew onto our arm64 mac machines. This is needed to build x64 jdk8:
+# Install Intel Homebrew onto our arm64 mac machines. This is needed to build x64 jdk8
 # The freetype build process requires Intel libpng installed, which needs Intel Homebrew
+# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
 
 - name: Check if Intel Homebrew is installed
   stat:
