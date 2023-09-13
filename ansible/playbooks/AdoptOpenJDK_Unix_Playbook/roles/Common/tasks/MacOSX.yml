@@ -114,7 +114,9 @@
 - name: Install Build Tool Packages
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
@@ -122,7 +124,9 @@
 - name: Install Build Tool Packages NOT macOS 10.12
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present"
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
@@ -132,7 +136,9 @@
 - name: Install Build Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew_cask: "name={{ item }} state=present"
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Casks }}"
   tags: build_tools
@@ -140,7 +146,9 @@
 - name: Install Test Tool Packages
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
@@ -148,7 +156,9 @@
 - name: Install JCK Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew_cask: "name={{ item }} state=present"
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ JCK_Tool_Casks }}"
   tags: jck_tools
