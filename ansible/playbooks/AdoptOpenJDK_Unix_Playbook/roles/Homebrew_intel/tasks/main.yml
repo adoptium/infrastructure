@@ -8,17 +8,8 @@
   register: intel_homebrew_installed
 
 - name: Run Homebrew install script in a Rosetta shell
-  ansible.builtin.shell: arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  when: not intel_homebrew_installed.exists
-
-- name: (debug) Check if install was successful
-  stat:
-    path: /usr/local/Homebrew/bin/brew
-  register: debug_intel_homebrew_installed
-
-- name: (debug) print debug_intel_homebrew_installed
-  debug:
-    msg: "{{ debug_intel_homebrew_installed }}"
+  ansible.builtin.shell: yes | arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not intel_homebrew_installed.stat.exists
 
 - name: Install Intel libpng
   ansible.builtin.shell: arch -x86_64 yes | /usr/local/Homebrew/bin/brew install libpng
