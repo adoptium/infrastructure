@@ -126,7 +126,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
-    state: present"
+    state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
