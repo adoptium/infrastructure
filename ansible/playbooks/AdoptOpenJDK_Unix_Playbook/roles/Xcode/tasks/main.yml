@@ -20,6 +20,16 @@
           Ensure that Apple_ID_User, Apple_ID_Password and FASTLANE_SESSION are defined. Skipping Xcode installation"
   when: apple_variables is not defined
 
+- name: Set Mac homebrew path (x64)
+  set_fact:
+    homebrew_path: /usr/local/bin
+  when: ansible_distribution == "MacOSX" ansible_architecture == "x86_64"
+
+- name: Set Mac homebrew path (Arm64)
+  set_fact:
+    homebrew_path: /opt/homebrew/bin
+  when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
+
 - name: Install Xcode
   when: apple_variables is defined
   block:
@@ -29,6 +39,7 @@
       homebrew:
         name: ruby@2.7 # no 3.0 yet for fastlane (https://github.com/fastlane/fastlane/issues/17931)
         state: present
+        path: "{{ homebrew_path }}"
 
     - name: Configure Bash profile extension for Ruby
       become: yes
