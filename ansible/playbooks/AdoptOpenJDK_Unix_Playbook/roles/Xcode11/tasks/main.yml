@@ -1,7 +1,7 @@
 ---
-# Xcode 11.7 is needed to build x64 JDK8
+# Xcode 11.7 is needed to build x64 JDK8 om Arm64 Mac
 # See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
-# Xcode11.7 package should be in Vendor_Files directory
+# The Xcode11.7 package should be present in /Vendor_Files/mac/Xcode_11.7.xip on the controller node
 
 - name: Check if Xcode11.7 is installed
   stat:
