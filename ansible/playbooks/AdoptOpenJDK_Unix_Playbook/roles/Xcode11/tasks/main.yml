@@ -1,0 +1,26 @@
+---
+# Xcode 11.7 is needed to build x64 JDK8
+# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
+# Xcode11.7 package should be in Vendor_Files directory
+
+- name: Check if Xcode11.7 is installed
+  stat:
+    path: /Applications/Xcode.11.7.app/
+  register: xcode11_installed
+
+- name: Install Xcode11.7
+  when: not xcode11_installed.stat exists
+  block:
+    - name: Transfer Xcode11.7 over to remote machine
+      copy:
+        src: /Vendor_Files/mac/Xcode_11.7.xip
+        dest: /tmp/Xcode_11.7.xip
+
+    - name: Extract Xcode11.7
+      command: xip -x /tmp/Xcode_11.7.xip
+
+    - name: Move Xcode11.7 to /Applications directory
+      copy:
+        src: /tmp/Xcode.app
+        dest: /Applications/Xcode.11.7.app/
+        remote_src: true
