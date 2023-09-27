@@ -10,7 +10,7 @@
   register: xcode11_installed
 
 - name: Install Xcode11.7
-  when: xcode11_installed.stat.exists is false
+  when: not xcode11_installed.stat.exists
   block:
     - name: Transfer Xcode11.7 over to remote machine
       copy:
