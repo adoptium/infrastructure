@@ -18,7 +18,7 @@
         dest: /tmp/Xcode_11.7.xip
 
     - name: Extract Xcode11.7
-      command: cd /tmp/ && xip -x /tmp/Xcode_11.7.xip
+      shell: cd /tmp/ && xip -x /tmp/Xcode_11.7.xip
 
     - name: Move Xcode11.7 to /Applications directory
       copy:
