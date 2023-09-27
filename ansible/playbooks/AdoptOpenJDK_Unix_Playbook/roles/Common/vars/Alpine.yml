@@ -20,9 +20,9 @@ Build_Tool_Packages:
   - freetype-dev
   - grep
   - gnupg
-  - gnutls
-  - gnutls-dev
-  - gnutls-utils
+  - gnutls                        # OpenSSL tests
+  - gnutls-dev                    # OpenSSL tests
+  - gnutls-utils                  # OpenSSL tests
   - libdwarf                      # OpenJ9
   - libdwarf-dev                  # OpenJ9
   - libx11
