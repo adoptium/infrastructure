@@ -211,9 +211,9 @@ should have an underscore `_` prepended to it.
 (For the last one, that makes use of the system.custom target added via
 [this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
 
+## Running The SSL Test Suites
 <details>
-
-<summary>## Running The SSL Test Suites</summary>
+<summary>Quick Guide To Running The SSL Test Suites</summary>
 
 As part of the fix for infrastructure [issue 3059](https://github.com/adoptium/infrastructure/issues/3059) several new pre-requisite packages have been added to the Unix playbooks, usually things such as (gnutls, gnutls-utils, libnss3.so, libnssutil3.so, nss-devel, nss-tools) or their O/S specific variants. In order to validate that these tests can run following any changes, the following process can be followed once the playbooks have been run successfully:
 
@@ -268,6 +268,8 @@ IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_EMPTY_RENEGOTIATION_INFO_SCSV
 ```
 
 N.B. Due to a missing pre-requisite binary(tstclnt) not being available in the nss packages on Alpine, OpenSuse or SLES, the ssl-tests-nss-client.sh tests can not be run.
+
+</details>
 
 ## Testing changes
 
@@ -401,5 +403,3 @@ suitable for most UNIX-based platforms:
 6. The issue should be left open until the user is finished with the machine (if it has been a while, ask them in the issue)
 7. Once user is finished, remove the ID (`userdel -r username`)
 8. Close the issue
-
-</details>
