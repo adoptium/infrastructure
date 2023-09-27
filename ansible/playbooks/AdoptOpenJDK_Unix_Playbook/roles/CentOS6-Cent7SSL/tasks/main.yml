@@ -51,6 +51,42 @@
     line: '#%patch68 -p1 -b .secure-getenv'
   when: cacertsold.rc == 0
 
+# Need To Regenerate The SMIME Test certificates
+# Due To Coding In The Generator Script, Need To Include The CHDIRS :(
+# Also Need To Seperate The Compile From The Testing
+
+- name: Update Spec File To Seperate App Build Target From Test Targets ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/openssl.spec
+    regexp: 'make -C test apps tests'
+    line: 'make -C apps'
+  when: cacertsold.rc == 0
+
+- name: Update Spec File To Regenerate SMIME Test Certificates And Run Tests ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/openssl.spec
+    regexp: './openssl-thread-test --threads %{thread_test_threads}'
+    backrefs: yes
+    state: present
+    line: |
+      ./openssl-thread-test --threads %{thread_test_threads}
+      cd test/smime-certs/
+      chmod 755 ./mksmime-certs.sh
+      ./mksmime-certs.sh
+      cd ../..
+      make -C test tests
+        %{__cc} -o openssl-thread-test \
+        `krb5-config --cflags` \
+        -I./include \
+        $RPM_OPT_FLAGS \
+        %{SOURCE8} \
+        -L. \
+        -lssl -lcrypto \
+        `krb5-config --libs` \
+        -lpthread -lz -ldl
+      ./openssl-thread-test --threads %{thread_test_threads}
+  when: cacertsold.rc == 0
+
 - name: Build OpenSSL 1.0.2k with rpmbuild ...
   shell: cd /root/rpmbuild/SPECS && rpmbuild -bb openssl.spec
   when: cacertsold.rc == 0
