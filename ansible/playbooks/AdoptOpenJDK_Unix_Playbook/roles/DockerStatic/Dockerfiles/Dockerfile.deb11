@@ -2,6 +2,8 @@ FROM debian:bullseye
 # Install Base Requirements
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN apt-get update && apt-get install -y perl openssh-server unzip zip wget apt-utils gnupg curl
+# Install Packages For OpenSSL pbTestScripts
+RUN apt-get install -y gnutls-bin libnss3 libnss3-dev libnss3-tools pkg-config
 RUN echo "y" | ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 RUN apt-get update
 
