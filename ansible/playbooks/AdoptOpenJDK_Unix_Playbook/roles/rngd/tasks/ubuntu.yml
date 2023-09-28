@@ -1,0 +1,19 @@
+---
+- name: Install the rng-tools package (Ubuntu)
+  package:
+    name: rng-tools
+    state: latest
+
+- name: Update the rng-tools defaults file (Ubuntu)
+  lineinfile:
+    dest: '/etc/default/rng-tools'
+    regexp: '^HRNGDEVICE=/dev/urandom'
+    mode: '0644'
+    insertafter: '^#HRNGDEVICE=/dev/null'
+    line: 'HRNGDEVICE=/dev/urandom'
+
+- name: Start and enable "rngd" service (Ubuntu)
+  systemd:
+    name: rng-tools.service
+    state: started
+    enabled: yes
