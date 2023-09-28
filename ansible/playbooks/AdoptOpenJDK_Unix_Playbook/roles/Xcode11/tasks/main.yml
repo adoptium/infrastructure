@@ -2,7 +2,7 @@
 # Xcode 11.7 is needed to build x64 JDK8 om Arm64 Mac
 # Xcode11.7 can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
 # See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
-# The Xcode11.7 package should be present in /Vendor_Files/mac/Xcode_11.7.xip on the controller node 
+# The Xcode11.7 package should be present in /Vendor_Files/mac/Xcode_11.7.xip on the controller node
 
 - name: Check if Xcode11.7 is installed
   stat:
@@ -23,5 +23,10 @@
     - name: Move Xcode11.7 to /Applications directory
       copy:
         src: /tmp/Xcode.app
-        dest: /Applications/Xcode.11.7.app/
+        dest: /Applications/Xcode-11.7.app/
         remote_src: true
+
+    - name: Clean up Xcode11.7.xip file
+      file:
+        path: /tmp/Xcode_11.7.xip
+        state: absent

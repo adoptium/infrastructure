@@ -6,7 +6,7 @@
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
 - name: Ansible Unix playbook
-  hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
+  hosts: all
   gather_facts: yes
   tasks:
     - name: Run Tasks
