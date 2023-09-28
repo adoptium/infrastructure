@@ -65,7 +65,7 @@ Test_Tool_Packages:
   - pulseaudio
   - xorg-x11
   - xorg-x11-devel
-  - glibc-locale
+  - glibc-locale                  # Internationalization tests
   - gnutls
   - libnss3.so
-  - mozilla-nss                 # Internationalization tests
+  - mozilla-nss
