@@ -6,7 +6,7 @@
 
 - name: Check if Xcode11.7 is installed
   stat:
-    path: /Applications/Xcode.11.7.app/
+    path: /Applications/Xcode-11.7.app/
   register: xcode11_installed
 
 - name: Install Xcode11.7
