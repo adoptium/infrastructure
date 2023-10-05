@@ -2,7 +2,8 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
-sudo /opt/csw/bin/pkgutil -y -i python
+# Install Python 2.7
+sudo /opt/csw/bin/pkgutil -y -i python27
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
