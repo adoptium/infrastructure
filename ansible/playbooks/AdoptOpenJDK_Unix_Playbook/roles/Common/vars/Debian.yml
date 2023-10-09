@@ -17,6 +17,7 @@ Build_Tool_Packages:
   - gcc
   - gettext
   - libasound2-dev
+  - libcapstone-dev
   - libcups2-dev
   - libcurl4-openssl-dev
   - libdwarf-dev                  # OpenJ9
