@@ -16,6 +16,7 @@ Build_Tool_Packages:
   - g++
   - gcc
   - gettext
+  - gnutls-bin
   - libasound2-dev
   - libcapstone-dev
   - libcups2-dev
@@ -29,6 +30,9 @@ Build_Tool_Packages:
   - libgmp3-dev
   - libmpfr-dev
   - libmpfr-doc
+  - libnss3
+  - libnss3-dev
+  - libnss3-tools
   - libssl-dev
   - libwww-perl
   - libx11-dev
@@ -98,6 +102,10 @@ Test_Tool_Packages:
   - xvfb
   - binfmt-support
   - qemu-user-static
+  - gnutls-bin
+  - libnss3
+  - libnss3-dev
+  - libnss3-tools
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

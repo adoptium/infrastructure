@@ -2,6 +2,10 @@ FROM alpine:3.12
 
 RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
         libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 msttcorefonts-installer fontconfig libxext freetype zlib fakeroot gnupg
+
+# Add SSL Test packages
+RUN apk --update add openssl gnutls gnutls-dev gnutls-utils nss nss-dev nss-tools
+
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
 ## Ensure Fonts Are Updated (Issue https://github.com/adoptium/infrastructure/issues/3039)

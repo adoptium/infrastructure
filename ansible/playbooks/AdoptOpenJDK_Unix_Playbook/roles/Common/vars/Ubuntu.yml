@@ -18,6 +18,7 @@ Build_Tool_Packages:
   - gettext
   - git
   - gnupg
+  - gnutls-bin
   - libasound2-dev
   - libcapstone-dev
   - libcups2-dev
@@ -31,6 +32,9 @@ Build_Tool_Packages:
   - libgmp3-dev
   - libmpfr-dev
   - libmpfr-doc
+  - libnss3
+  - libnss3-tools
+  - libnss3-dev
   - libssl-dev
   - libwww-perl
   - libx11-dev
@@ -106,6 +110,10 @@ Test_Tool_Packages:
   - libexpat1-dev
   - libcurl4-openssl-dev
   - fakeroot
+  - gnutls-bin
+  - libnss3
+  - libnss3-tools
+  - libnss3-dev
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

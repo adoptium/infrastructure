@@ -27,8 +27,11 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - gnutls
+  - gnutls-utils
   - libcurl-devel
   - libffi-devel
+  - libnss3.so
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -39,6 +42,8 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - openssl-devel
   - perl-devel
   - pkgconfig
@@ -128,3 +133,8 @@ Test_Tool_Packages:
   - expat-devel
   - libcurl-devel
   - mercurial
+  - gnutls
+  - gnutls-utils
+  - libnss3.so
+  - nss-devel
+  - nss-tools

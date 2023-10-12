@@ -16,9 +16,13 @@ Build_Tool_Packages:
   - gcc-c++
   - glibc
   - glibc-devel
+  - gnutls
   - libdw1
   - libelf1
   - make
+  - mozilla-nss
+  - mozilla-nss-devel
+  - mozilla-nss-tools
   - pkg-config
   - unzip
   - wget
@@ -92,3 +96,7 @@ Test_Tool_Packages:
   - xorg-x11-server
   - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests
+  - gnutls
+  - mozilla-nss
+  - mozilla-nss-devel
+  - mozilla-nss-tools

@@ -33,6 +33,8 @@ RUN ssh-keygen -A
 CMD ["/usr/sbin/sshd", "-D"]
 
 RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server awk
+# Install SSL Test packages
+RUN zypper install -y gnutls mozilla-nss mozilla-nss-devel mozilla-nss-tools
 
 RUN ln -s /usr/lib64/libffi.so.4 /usr/lib64/libffi.so.6
 
