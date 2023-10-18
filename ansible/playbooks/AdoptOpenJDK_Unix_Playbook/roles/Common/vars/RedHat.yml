@@ -31,7 +31,6 @@ Build_Tool_Packages:
   - gmp-devel
   - libcurl-devel
   - libffi-devel
-  - libnss3.so
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -114,6 +113,5 @@ Test_Tool_Packages:
   - mercurial
   - gnutls
   - gnutls-utils
-  - libnss3.so
   - nss-devel
   - nss-tools
