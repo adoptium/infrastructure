@@ -190,7 +190,7 @@ everything required to build and ship the code. This includes:
 
 - [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) Various tools utilised by the AQAvit test team, including the TRSS server used for providing test execution summaries
 - [aqa-tests](https://github.com/adoptium/aqa-tests) Top level automation used for testing java implementations
-- [TKG)(https://github.com/adoptium/TKG) TestKitGen test harness used by aqa-tests automation
+- [TKG](https://github.com/adoptium/TKG) TestKitGen test harness used by aqa-tests automation
 - [STF](https://github.com/adoptium/STF) The System Test Framework used by test cases in the aqa-systemtest repository
 - [aqa-systemtest](https://github.com/adoptium/aqa-systemtest) A set of system/stress tests that run under the aqa automation
 - [bunblebench](https://github.com/adoptium/bumblebench) Microbenchmarking framework
