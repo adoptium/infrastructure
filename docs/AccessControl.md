@@ -162,14 +162,14 @@ Access to these projects is controlled by Eclipse's election processes. For
 infromation checkout the "Process for adding new committers" section of
 https://github.com/adoptium/adoptium/wiki/Working-with-Eclipse
 
-### adoptium
+### [adoptium](https://projects.eclipse.org/projects/adoptium)
 
 Contains the [top level adoptium repository](https://github.com/adoptium/adoptium),
 [the API](https://github.com/adoptium/api.adoptium.net), the
 [status dashboard](https://github.com/adoptium/dash.adoptium.net), plus a
 few obsolete ones
 
-### adoptium.temurin
+### [adoptium.temurin](https://projects.eclipse.org/projects/adoptium.temurin)
 
 This contains our mirrors of the upstream openjdk source repositories
 (jdkXXu), our
@@ -186,7 +186,7 @@ everything required to build and ship the code. This includes:
 - [adoptium-support](https://github.com/adoptium/adoptium-support) for Temurin users to ask support questions
 - [build-jdk](https://github.com/adoptium/build-jdk) - GitHub action to build a JDK using the scripts in temurin-build
 
-### adoptium.aqavit
+### [adoptium.aqavit](https://projects.eclipse.org/projects/adoptium.aqavit)
 
 - [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) Various tools utilised by the AQAvit test team, including the TRSS server used for providing test execution summaries
 - [aqa-tests](https://github.com/adoptium/aqa-tests) Top level automation used for testing java implementations
