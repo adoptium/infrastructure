@@ -75,9 +75,6 @@
     - role: Xcode
       when: ansible_distribution == "MacOSX"
       tags: [build_tools, xcode, adoptopenjdk]
-    - role: Homebrew_intel
-      when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
-      tags: [build_tools, homebrew_intel]
     - role: cmake                 # OpenJ9 / OpenJFX
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
