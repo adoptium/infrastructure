@@ -1,0 +1,58 @@
+---
+###########################################
+### Installs gdb, perf, nmon & valgrind ###
+###   On Ubuntu, Rhel, CentOS & SLES    ###
+###########################################
+###            Optional Role            ###
+###########################################
+
+- name: Install gdb & valgrind
+  become: yes
+  package:
+    update_cache: yes
+    name: ['gdb', 'valgrind']
+    state: latest
+  when: ansible_distribution == "Ubuntu" or
+        ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat" or
+        ansible_distribution == "SLES"
+  tags: performance_tools
+
+- name: Install Perf (except Ubuntu)
+  become: yes
+  package:
+    update_cache: yes
+    name: perf
+    state: latest
+  when: ansible_distribution != "Ubuntu"
+  tags: performance_tools
+
+- name: Perf installation (Ubuntu)
+  become: yes
+  when: ansible_distribution == "Ubuntu"
+  tags: performance_tools
+  block:
+    - name: Get kernel info (Ubuntu) #for perf installation
+      shell: uname -r
+      register: uname
+
+    - name: Check perf for the specific kernel exists or not (Ubuntu)
+      shell: apt search linux-tools-`uname -r` 2>/dev/null #2?/dev/null remove apt cli warning
+      register: linux_tools
+
+    - name: Install perf (Ubuntu)
+      package:
+        update_cache: yes
+        name: ['linux-tools-common', 'linux-tools-generic', 'linux-tools-{{ uname.stdout }}']
+        state: latest
+      when: "'linux-tools-'~uname.stdout in linux_tools.stdout" # ~ -> concatenates string
+
+- name: Install nmon (except Rhel 7/CentOS 7 s390x) #nmon needs epel repo
+  become: yes
+  package:
+    update_cache: yes
+    name: nmon
+    state: latest
+  when: not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x" and
+        (ansible_distribution == "RedHat" or ansible_distribution == "CentOS"))
+  tags: performance_tools
