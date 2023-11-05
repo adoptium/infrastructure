@@ -82,6 +82,20 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
+- name: Install additional build tools for !riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_not_riscv64 }}"
+  when:
+    - ansible_architecture != "riscv64"
+  tags: build_tools
+
+- name: Install additional build tools for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
+  tags: build_tools
+
 - name: Install additional build tools for Ubuntu 20 +
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_Ubuntu20 }}"
@@ -97,6 +111,20 @@
   with_items: "{{ Test_Tool_Packages_x86_64 }}"
   when:
     - ansible_architecture == "x86_64"
+  tags: test_tools
+
+- name: Install additional Test Tool Packages for !riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Test_Tool_Packages_not_riscv64 }}"
+  when:
+    - ansible_architecture != "riscv64"
+  tags: test_tools
+
+- name: Install additional Test Tool Packages for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Test_Tool_Packages_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
   tags: test_tools
 
 - name: Install additional Packages specific to Ubuntu 16
