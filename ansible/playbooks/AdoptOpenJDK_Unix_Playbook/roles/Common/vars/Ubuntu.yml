@@ -98,6 +98,7 @@ Additional_Build_Tools_not_riscv64:
 
 Additional_Build_Tools_riscv64:
   - openjdk-11-jdk
+  - openjdk-17-jdk
 
 Additional_Build_Tools_Ubuntu20:
   - cmake

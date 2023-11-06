@@ -20,4 +20,6 @@ RUN groupadd -g 1000 ${user}
 RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
 
 ENV \
+    JDK11_BOOT_DIR="/usr/lib/jvm/java-11-openjdk-riscv64" \
+    JDK17_BOOT_DIR="/usr/lib/jvm/java-17-openjdk-riscv64" \
     JAVA_HOME="/usr/lib/jvm/java-11-openjdk-riscv64"
