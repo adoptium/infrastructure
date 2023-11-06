@@ -50,7 +50,7 @@
     - CodesignCert
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
-    - Firefox
+#    - Firefox                    # Redundant No Longer Required
     - Strawberry_Perl             # Testing
 #    - Freemarker                  # OpenJ9"
     - GIT
@@ -90,7 +90,7 @@
       tags: [jenkins, adoptopenjdk]
       when: jenkins_secret is defined  # Only run if jenkins_secret is defined
     - role: Thunderbird
-      tags: [Thunderbird, jck, adoptopenjdk]
+      tags: jck
     - role: logs
       position: "End"
       tags: always
