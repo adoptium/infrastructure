@@ -16,7 +16,7 @@ jobs:
   build_job:
     if: ${{ github.event.label.name == 'QEMU-playbook-check' }}
     # The host should always be linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
 
     strategy:
@@ -43,10 +43,11 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
-          run: |
+          install: |
             apt -y update
             apt -y install ansible sudo
             echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+          run: |
             set -eux
             cd ansible
             if [ ! -e /usr/bin/python ] ; then ln -s /usr/bin/python3 /usr/bin/python ; fi
