@@ -41,11 +41,10 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
-          install: |
+          run: |
             apt -y update
             apt -y install ansible sudo
             echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
-          run: |
             set -eux
             cd ansible
             if [ ! -e /usr/bin/python ] ; then ln -s /usr/bin/python3 /usr/bin/python ; fi
