@@ -113,20 +113,6 @@
     - ansible_architecture == "x86_64"
   tags: test_tools
 
-- name: Install additional Test Tool Packages for !riscv64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Test_Tool_Packages_not_riscv64 }}"
-  when:
-    - ansible_architecture != "riscv64"
-  tags: test_tools
-
-- name: Install additional Test Tool Packages for riscv64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Test_Tool_Packages_riscv64 }}"
-  when:
-    - ansible_architecture == "riscv64"
-  tags: test_tools
-
 - name: Install additional Packages specific to Ubuntu 16
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Packages_Ubuntu16 }}"

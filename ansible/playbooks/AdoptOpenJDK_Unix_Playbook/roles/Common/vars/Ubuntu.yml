@@ -121,13 +121,3 @@ Test_Tool_Packages:
 
 Test_Tool_Packages_x86_64:
   - pulseaudio
-
-Test_Tool_Packages_not_riscv64:
-  - mercurial
-
-# For some reasons, mercurial-common package is available in riscv64 ubuntu,
-# but not mercurial
-Test_Tool_Packages_riscv64:
-  - mercurial-common
-  - python2
-  - ucf
