@@ -11,6 +11,7 @@
     state: present
   when:
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int < 20
 
 - name: Add Docker Repo for Ubuntu s390x
   apt_repository:
@@ -18,6 +19,7 @@
     state: present
   when:
     - ansible_architecture == "s390x"
+    - ansible_distribution_major_version | int < 20
 
 - name: Add Docker Repo for Ubuntu ppc64le
   apt_repository:
@@ -25,6 +27,7 @@
     state: present
   when:
     - ansible_architecture == "ppc64le"
+    - ansible_distribution_major_version | int < 20
 
 - name: Add Docker Repo for Ubuntu aarch64
   apt_repository:
@@ -32,6 +35,7 @@
     state: present
   when:
     - ansible_architecture == "aarch64"
+    - ansible_distribution_major_version | int < 20
 
 - name: Add Docker Repo for Ubuntu armv7l
   apt_repository:
@@ -39,6 +43,7 @@
     state: present
   when:
     - ansible_architecture == "armv7l"
+    - ansible_distribution_major_version | int < 20
 
 - name: Install Docker prerequisites for Ubuntu
   apt:
