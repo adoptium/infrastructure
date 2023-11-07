@@ -134,6 +134,7 @@
     - ansible_distribution != "MacOSX"
     - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
+    - not (ansible_architecture == "riscv64" and jdk_version == 19) # Linux-riscv64 for JDK 19 is special cased
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
     # Api does not return release information for JDK10
@@ -170,6 +171,36 @@
     - name: Remove jdk{{ jdk_version }}.tar.gz (Linux/Alpine-Linux)
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
+        state: absent
+
+# JDK 19 on Linux-riscv64 is a special-case because JDK 19 is the first version that supports
+# RISC-V. There is also no JDK 19 or 20 available on Ubuntu 20.04 that we can use as boot JDK.
+- name: Install JDK {{ jdk_version }} on Linux-riscv64
+  when:
+    - ansible_architecture == "riscv64" and jdk_version == 19
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+    # Api does not return release information for JDK10
+  block:
+    - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
+      get_url:
+        url: https://ci.adoptium.net/job/build-jdk19-rv64-cross/392/artifact/archive/jdk19u-riscv64-20231104.tar.gz
+        dest: /tmp/jdk19.tar.gz
+        mode: 0440
+      retries: 3
+      delay: 5
+      register: adoptopenjdk_download
+      until: adoptopenjdk_download is not failed
+
+    - name: Install latest jdk{{ jdk_version }} release if one not already installed (Linux-riscv64)
+      unarchive:
+        src: /tmp/jdk19.tar.gz
+        dest: /usr/lib/jvm
+        remote_src: yes
+
+    - name: Remove jdk19.tar.gz (Linux-riscv64)
+      file:
+        path: /tmp/jdk19.tar.gz
         state: absent
 
 # # CentOS6 needs it's own task so it can use a different python interpreter.
