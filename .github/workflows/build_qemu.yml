@@ -7,12 +7,14 @@ on:
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:       
     - master
+    types: [ labeled ]
 
 permissions:
   contents: read
 
 jobs:
   build_job:
+    if: ${{ github.event.label.name == 'QEMU-playbook-check' }}
     # The host should always be linux
     runs-on: ubuntu-latest
     name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
