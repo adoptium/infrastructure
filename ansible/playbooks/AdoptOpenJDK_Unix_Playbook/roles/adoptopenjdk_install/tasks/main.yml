@@ -184,7 +184,7 @@
   block:
     - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
       get_url:
-        url: https://ci.adoptium.net/job/build-jdk19-rv64-cross/392/artifact/archive/jdk19u-riscv64-20231104.tar.gz
+        url: https://ci.adoptium.net/userContent/riscv/jdk19u-riscv64-20231107.glib227.tar.gz
         dest: /tmp/jdk19.tar.gz
         mode: 0440
       retries: 3
