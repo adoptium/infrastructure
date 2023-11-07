@@ -23,6 +23,7 @@
   win_stat:
     path: 'C:\TEMP\VS2019_Layout.zip'
   register: vs2019_layout_ready
+  when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
 
 - name: Get SHA256 checksum of the file
@@ -38,6 +39,7 @@
         exit 1
     }
   register: checksum_result
+  when: (not vs2019_installed.stat.exists)
   changed_when: false
   tags: adoptopenjdk
 
