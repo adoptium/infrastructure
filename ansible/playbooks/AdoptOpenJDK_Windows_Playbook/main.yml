@@ -50,7 +50,6 @@
     - CodesignCert
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
-#    - Firefox                    # Redundant No Longer Required
     - Strawberry_Perl             # Testing
 #    - Freemarker                  # OpenJ9"
     - GIT
