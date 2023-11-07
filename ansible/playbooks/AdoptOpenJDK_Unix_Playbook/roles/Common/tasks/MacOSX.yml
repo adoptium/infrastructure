@@ -25,12 +25,12 @@
 
 - name: Set homebrew path (x64)
   set_fact:
-    homebrew_path: /usr/local/bin/brew
+    homebrew_path: /usr/local/bin
   when: ansible_architecture == "x86_64"
 
 - name: Set homebrew path (Arm64)
   set_fact:
-    homebrew_path: /opt/homebrew/bin/brew
+    homebrew_path: /opt/homebrew/bin
   when: ansible_architecture == "arm64"
 
 - name: Configure system-wide Bash profile
@@ -67,7 +67,7 @@
 
 - name: Check if Homebrew is already installed
   stat:
-    path: "{{ homebrew_path }}"
+    path: "{{ homebrew_path }}/brew"
   register: brew
 
 - name: Install Homebrew
@@ -81,6 +81,7 @@
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
+    path: "{{ homebrew_path }}"
   when: "macos_version_number is version('10.15', '>')"
   tags:
     - brew_upgrade
@@ -90,6 +91,7 @@
   become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: buo/cask-upgrade
+    path: "{{ homebrew_path }}"
   tags:
     - brew_cu
 
@@ -98,12 +100,13 @@
   become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: AdoptOpenJDK/openjdk
+    path: "{{ homebrew_path }}"
 
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  command: "{{ homebrew_path }} cu -y"
+  command: "{{ homebrew_path }}/brew cu -y"
   tags:
     - brew_cu
     - skip_ansible_lint
@@ -111,14 +114,20 @@
 - name: Install Build Tool Packages
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
 - name: Install Build Tool Packages NOT macOS 10.12
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
     - not (macos_version_number | regex_search("10.12"))
@@ -127,21 +136,30 @@
 - name: Install Build Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew_cask: "name={{ item }} state=present"
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Casks }}"
   tags: build_tools
 
 - name: Install Test Tool Packages
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
 - name: Install JCK Tool Casks
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew_cask: "name={{ item }} state=present"
+  homebrew_cask:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   with_items: "{{ JCK_Tool_Casks }}"
   tags: jck_tools
 
@@ -161,6 +179,15 @@
   command: installer -pkg ./RWTS-PDFwriter.pkg -target /
   when: not pdfwriter.stat.exists
   tags: jck_tools
+
+- name: Uninstall libpng
+  become: yes
+  become_user: "{{ ansible_user }}"
+  homebrew:
+    name: libpng
+    state: absent
+    path: "{{ homebrew_path }}"
+  tags: adoptopenjdk
 
 # As per https://github.com/eclipse/openj9/issues/3790
 - name: Creating /etc/sysctl.conf for kernel tunings
