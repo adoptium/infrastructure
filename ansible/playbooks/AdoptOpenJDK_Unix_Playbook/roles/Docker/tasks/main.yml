@@ -54,7 +54,7 @@
         state: latest   # TODO: Package installs should not use latest
         use: auto       # automatic select package manager to use yum, apt and so on
       when: ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20) or ansible_distribution == "Debian")
-      
+
     - name: Install for SLES15 # zypper does not support in package module
       include_tasks: sles.yml
       when:
