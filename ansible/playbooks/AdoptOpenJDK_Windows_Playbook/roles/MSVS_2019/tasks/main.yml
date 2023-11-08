@@ -9,75 +9,68 @@
   register: vs2019_installed
   tags: adoptopenjdk
 
-- name: Transfer VS2019 Layout File
-  win_copy:
-    src: /Vendor_Files/windows/VS2019_layout.16.11.32106.67.zip
-    dest: C:\TEMP\VS2019_Layout.zip
-    remote_src: no
-  when: (not vs2019_installed.stat.exists)
-  failed_when: false
-  tags: adoptopenjdk
-
-# Check For The Transferred File & Exit If AdoptOpenJDK Run
-- name: Check If Layout Has Transferred
-  win_stat:
-    path: 'C:\TEMP\VS2019_Layout.zip'
-  register: vs2019_layout_ready
-  tags: adoptopenjdk
-
-- name: Get SHA256 checksum of the file
-  win_shell: |
-    $filePath = "C:\TEMP\VS2019_Layout.zip"
-    $expectedChecksum = "C73A5F3C8A8AB50BC971551FA626438FEA89E0ED71F77EE570094E0C394C419E"
-    $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-
-    if ($actualChecksum -ne $expectedChecksum) {
-        Write-Output "Checksum mismatch"
-        Write-Output "Actual Checksum: $actualChecksum"
-        Write-Output "Expect Checksum: $expectedChecksum"
-        exit 1
-    }
-  register: checksum_result
-  changed_when: false
-  tags: adoptopenjdk
-
-# Exit Play If No VS2019 Layout & AdoptOpenJDK = true
-# This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
-- name: Exit With Error When No Layout Within AdoptOpenJDK
-  fail:
-    msg: "The VS2019 Layout File Appears To Be Missing From Vendor_Files"
-  when: (not vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
-  tags: adoptopenjdk
-
-# Install VS2019 From Layout For AdoptOpenJDK
-- name: Unzip VS2019 Layout
-  win_unzip:
-    src: C:\TEMP\VS2019_Layout.zip
-    dest: C:\TEMP
-  when: (vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
-  tags: adoptopenjdk
-
-- name: Run Visual Studio 2019 Installer From Layout
-  win_shell: |
-      Start-Process -Wait -FilePath 'C:\temp\VSLayout2019\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
-  args:
-    executable: powershell
-  when: (vs2019_layout_ready.stat.exists) and (not vs2019_installed.stat.exists)
-  tags: adoptopenjdk
-
-- name: Remove VS2019 Zip File
-  win_file:
-    path: C:\TEMP\VS2019_Layout.zip
-    state: absent
+- name: Install vs2019 from Layout File
   when: (not vs2019_installed.stat.exists)
   tags: adoptopenjdk
+  block:
+    - name: Transfer VS2019 Layout File
+      win_copy:
+        src: /Vendor_Files/windows/VS2019_layout.16.11.32106.67.zip
+        dest: C:\TEMP\VS2019_Layout.zip
+        remote_src: no
+      failed_when: false
 
-- name: Remove VS2019 Unzipped Layout
-  win_file:
-    path: C:\temp\VSLayout2019
-    state: absent
-  when: (not vs2019_installed.stat.exists)
-  tags: adoptopenjdk
+    # Check For The Transferred File & Exit If AdoptOpenJDK Run
+    - name: Check If Layout Has Transferred
+      win_stat:
+        path: 'C:\TEMP\VS2019_Layout.zip'
+      register: vs2019_layout_ready
+
+    - name: Get SHA256 checksum of the file
+      win_shell: |
+        $filePath = "C:\TEMP\VS2019_Layout.zip"
+        $expectedChecksum = "C73A5F3C8A8AB50BC971551FA626438FEA89E0ED71F77EE570094E0C394C419E"
+        $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+        if ($actualChecksum -ne $expectedChecksum) {
+            Write-Output "Checksum mismatch"
+            Write-Output "Actual Checksum: $actualChecksum"
+            Write-Output "Expect Checksum: $expectedChecksum"
+            exit 1
+        }
+      register: checksum_result
+      changed_when: false
+
+    # Exit Play If No VS2019 Layout & AdoptOpenJDK = true
+    # This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
+    - name: Exit With Error When No Layout Within AdoptOpenJDK
+      fail:
+        msg: "The VS2019 Layout File Appears To Be Missing From Vendor_Files"
+      when: (not vs2019_layout_ready.stat.exists)
+
+    # Install VS2019 From Layout For AdoptOpenJDK
+    - name: Unzip VS2019 Layout
+      win_unzip:
+        src: C:\TEMP\VS2019_Layout.zip
+        dest: C:\TEMP
+      when: (vs2019_layout_ready.stat.exists)
+
+    - name: Run Visual Studio 2019 Installer From Layout
+      win_shell: |
+          Start-Process -Wait -FilePath 'C:\temp\VSLayout2019\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
+      args:
+        executable: powershell
+      when: (vs2019_layout_ready.stat.exists)
+
+    - name: Remove VS2019 Zip File
+      win_file:
+        path: C:\TEMP\VS2019_Layout.zip
+        state: absent
+
+    - name: Remove VS2019 Unzipped Layout
+      win_file:
+        path: C:\temp\VSLayout2019
+        state: absent
 
 ## Check If VS2019 Has Been Installed From Layout Even If Not AdoptOpenJDK
 - name: Test if VS 2019 is installed
