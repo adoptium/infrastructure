@@ -82,6 +82,20 @@
     - ansible_architecture == "aarch64"
   tags: build_tools
 
+- name: Install additional build tools for !riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_not_riscv64 }}"
+  when:
+    - ansible_architecture != "riscv64"
+  tags: build_tools
+
+- name: Install additional build tools for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
+  tags: build_tools
+
 - name: Install additional build tools for Ubuntu 20 +
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_Ubuntu20 }}"

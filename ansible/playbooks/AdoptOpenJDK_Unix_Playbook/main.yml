@@ -125,7 +125,6 @@
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]

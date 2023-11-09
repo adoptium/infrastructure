@@ -35,6 +35,14 @@ pipeline {
                         dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
                     }
                 }
+                stage('Ubuntu20.04 riscv64') {
+                    agent {
+                        label "docker&&linux&&riscv64"
+                    }
+                    steps {
+                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
+                    }
+                }
                 stage('Alpine3 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
