@@ -14,85 +14,75 @@
   register: vs2022_installed
   tags: adoptopenjdk
 
-- name: Transfer VS2022 Layout File
-  win_copy:
-    src: /Vendor_Files/windows/vs_layout_2022.zip
-    dest: C:\TEMP\VS2022_Layout.zip
-    remote_src: no
-  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  failed_when: false
-  tags: adoptopenjdk
-
-# Check For The Transferred File & Exit If AdoptOpenJDK Run
-- name: Check If Layout Has Transferred
-  win_stat:
-    path: 'C:\TEMP\VS2022_Layout.zip'
-  register: vs2022_layout_ready
-  when: windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)')
-  tags: adoptopenjdk
-
-- name: Get SHA256 checksum of the file
-  win_shell: |
-    $filePath = "C:\TEMP\VS2022_Layout.zip"
-    $expectedChecksum = "29567E33B5361E4BAD36DFDFF83FEB3DDFDF0518122237E8273F0FA4E11E8B74"
-    $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-
-    if ($actualChecksum -ne $expectedChecksum) {
-        Write-Output "Checksum mismatch"
-        Write-Output "Actual Checksum: $actualChecksum"
-        Write-Output "Expect Checksum: $expectedChecksum"
-        exit 1
-    }
-  register: checksum_result
-  when: (vs2022_layout_ready.stat.exists ) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  changed_when: false
-  tags: adoptopenjdk
-
-# Exit Play If No VS2022 Layout & AdoptOpenJDK = true
-# This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
-- name: Exit With Error When No Layout Within AdoptOpenJDK
-  fail:
-    msg: "The VS2022 Layout File Appears To Be Missing From Vendor_Files"
-  when: (not vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists)
-  tags: adoptopenjdk
-
-# Install VS2022 From Layout For AdoptOpenJDK
-- name: Unzip VS2022 Layout
-  win_unzip:
-    src: C:\TEMP\VS2022_Layout.zip
-    dest: C:\TEMP
-  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  tags: adoptopenjdk
-
-- name: Run Visual Studio 2022 Installer From Layout
-  win_shell: |
-      Start-Process -Wait -FilePath 'C:\temp\VSLayout2022\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
-  args:
-    executable: powershell
-  when: (vs2022_layout_ready.stat.exists) and (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  tags: adoptopenjdk
-
-- name: Register Visual Studio Community 2022 DIA SDK shared libraries
-  win_command: 'regsvr32 /s "{{ item }}"'
-  with_items:
-    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\msdia140.dll
-    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\amd64\msdia140.dll
+- name: Install VS2022
   when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   tags: adoptopenjdk
+  block:
+    - name: Transfer VS2022 Layout File
+      win_copy:
+        src: /Vendor_Files/windows/vs_layout_2022.zip
+        dest: C:\TEMP\VS2022_Layout.zip
+        remote_src: no
+      failed_when: false
 
-- name: Remove VS2022 Zip File
-  win_file:
-    path: C:\TEMP\VS2022_Layout.zip
-    state: absent
-  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  tags: adoptopenjdk
+    # Check For The Transferred File & Exit If AdoptOpenJDK Run
+    - name: Check If Layout Has Transferred
+      win_stat:
+        path: 'C:\TEMP\VS2022_Layout.zip'
+      register: vs2022_layout_ready
 
-- name: Remove VS2022 Unzipped Layout
-  win_file:
-    path: C:\temp\VSLayout2022
-    state: absent
-  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-  tags: adoptopenjdk
+    - name: Get SHA256 checksum of the file
+      win_shell: |
+        $filePath = "C:\TEMP\VS2022_Layout.zip"
+        $expectedChecksum = "29567E33B5361E4BAD36DFDFF83FEB3DDFDF0518122237E8273F0FA4E11E8B74"
+        $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+        if ($actualChecksum -ne $expectedChecksum) {
+            Write-Output "Checksum mismatch"
+            Write-Output "Actual Checksum: $actualChecksum"
+            Write-Output "Expect Checksum: $expectedChecksum"
+            exit 1
+        }
+      register: checksum_result
+      when: (vs2022_layout_ready.stat.exists)
+      changed_when: false
+
+    # Exit Play If No VS2022 Layout & AdoptOpenJDK = true
+    # This Is Defined Behaviour - This Shouldnt Occur But If It Does, Its Captured Here
+    - name: Exit With Error When No Layout Within AdoptOpenJDK
+      fail:
+        msg: "The VS2022 Layout File Appears To Be Missing From Vendor_Files"
+      when: (not vs2022_layout_ready.stat.exists)
+
+    # Install VS2022 From Layout For AdoptOpenJDK
+    - name: Unzip VS2022 Layout
+      win_unzip:
+        src: C:\TEMP\VS2022_Layout.zip
+        dest: C:\TEMP
+      when: (vs2022_layout_ready.stat.exists)
+
+    - name: Run Visual Studio 2022 Installer From Layout
+      win_shell: |
+          Start-Process -Wait -FilePath 'C:\temp\VSLayout2022\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
+      args:
+        executable: powershell
+      when: (vs2022_layout_ready.stat.exists)
+
+    - name: Register Visual Studio Community 2022 DIA SDK shared libraries
+      win_command: 'regsvr32 /s "{{ item }}"'
+      with_items:
+        - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\msdia140.dll
+        - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\amd64\msdia140.dll
+
+    - name: Remove VS2022 Zip File
+      win_file:
+        path: C:\TEMP\VS2022_Layout.zip
+        state: absent
+
+    - name: Remove VS2022 Unzipped Layout
+      win_file:
+        path: C:\temp\VSLayout2022
+        state: absent
 
 - name: Test if VS 2022 is installed(non adopt)
   win_stat:
