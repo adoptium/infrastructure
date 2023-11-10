@@ -317,6 +317,12 @@ Most of the relevant ones are under the
 [temurin](https://projects.eclipse.org/projects/adoptium.temurin/who)
 or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
 
+## Patching
+
+At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines. 
+The Unix, Windows, MacOS and AIX playbooks are executed weekly to keep our machines patched and up to date.
+
+For more information see https://github.com/adoptium/infrastructure/wiki/Ansible-AWX#schedules
 
 ## Adding new systems
 
