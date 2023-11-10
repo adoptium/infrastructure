@@ -320,7 +320,7 @@ or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
 ## Patching
 
 At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines. 
-The Unix, Windows, MacOS and AIX playbooks are executed weekly to keep our [machines](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) patched and up to date.
+The Unix, Windows, MacOS and AIX playbooks are executed weekly onto our [machines](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) to keep them patched and up to date.
 
 For more information see https://github.com/adoptium/infrastructure/wiki/Ansible-AWX#schedules
 
