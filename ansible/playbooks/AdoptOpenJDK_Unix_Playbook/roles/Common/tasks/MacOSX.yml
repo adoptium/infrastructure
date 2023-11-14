@@ -10,6 +10,10 @@
     msg: "The version of Ansible you are using needs to be greater than 2.11"
   when: ansible_version.full is version('2.11', '<=')
 
+- name: Switch back to command line tools xcode before proceeding
+  command: sudo xcode-select --switch /
+  tags: adoptopenjdk
+
 - name: Get macOS version
   shell: sw_vers -productVersion
   register: macos_version
