@@ -88,6 +88,7 @@
   tags: ant-contrib
 
 - name: Move ant-contrib.jar to ant lib folder
+  become: true
   command: mv /tmp/ant-contrib/lib/ant-contrib.jar {{ ant_lib_dir }}
   when: not antcontrib_status.stat.exists
   tags: ant-contrib
