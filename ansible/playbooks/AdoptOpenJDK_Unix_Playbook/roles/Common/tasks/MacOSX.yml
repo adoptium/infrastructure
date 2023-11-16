@@ -180,15 +180,6 @@
   when: not pdfwriter.stat.exists
   tags: jck_tools
 
-- name: Uninstall libpng
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew:
-    name: libpng
-    state: absent
-    path: "{{ homebrew_path }}"
-  tags: adoptopenjdk
-
 # As per https://github.com/eclipse/openj9/issues/3790
 - name: Creating /etc/sysctl.conf for kernel tunings
   file:
