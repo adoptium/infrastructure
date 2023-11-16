@@ -26,11 +26,23 @@ source "macstadium-orka" "sonoma-arm64" {
   image_force_overwrite = true
   orka_endpoint = var.ORKA_ENDPOINT
   orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sonoma-arm64-builder"
+}
+
+source "macstadium-orka" "sonoma-intel" {
+  source_image = "sonoma-intel-base"
+  image_name = "adoptium-sonoma-intel"
+  image_description = "Base image with sudoers setup and brew/ansible installed"
+  image_force_overwrite = true
+  orka_endpoint = var.ORKA_ENDPOINT
+  orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sonoma-intel-builder"
 }
 
 build {
   sources = [
     "macstadium-orka.sonoma-arm64",
+    "macstadium-orka.sonoma-intel"
   ]
 
   # Create /tmp/packer-provisioner-ansible-local
@@ -42,7 +54,7 @@ build {
 
   # Copy playbooks/Supporting_Scripts to /tmp/packer-provisioner-ansible-local
   provisioner "file" {
-    source      = "../playbooks/Supporting_Scripts"
+    source = "../playbooks/Supporting_Scripts"
     destination = "/tmp/packer-provisioner-ansible-local"
   }
 
@@ -54,6 +66,6 @@ build {
       "--extra-vars", "ansible_user=admin",
       "--skip-tags=hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
     ]
-    command = "/opt/homebrew/bin/ansible-playbook" 
+    command = "source /Users/admin/.zprofile; ansible-playbook"
   }
 }
