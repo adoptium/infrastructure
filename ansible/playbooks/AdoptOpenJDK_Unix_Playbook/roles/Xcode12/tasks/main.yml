@@ -1,0 +1,59 @@
+---
+# Xcode 12.4 is needed to build JDK 17+
+# Xcode12.4 can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
+# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
+
+- name: Check if Xcode12.4 is installed
+  stat:
+    path: /Applications/Xcode-12.4.app/
+  register: xcode12_installed
+
+- name: Check if SAS variable is defined
+  set_fact:
+    apple_variables: yes
+  when: not xcode12_installed.stat.exists and XCode12_4_SAS_TOKEN is defined
+
+- name: Display Information when XCode12_4_SAS_TOKEN is not defined
+  debug:
+    msg: "XCode12_4_SAS_TOKEN is not defined. Xcode will need to be installed manually.
+          Skipping Xcode installation"
+  when: not xcode12_installed.stat.exists and apple_variables is not defined
+
+- name: Install Xcode12.4
+  when: not xcode12_installed.stat.exists and apple_variables is defined
+  block:
+    - name: Check for /tmp/Xcode_12.4.xip
+      stat:
+        path: /tmp/Xcode_12.4.xip
+      register: xcode12_4_xip
+
+    # Stored in Azure Blob Storage (SAS URL set to expire in 2033)
+    - name: Download XCode 12.4 from Azure blob storage
+      when: not xcode12_4_xip.stat.exists
+      get_url:
+        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode-12-4/Xcode_12.4.xip?{{ XCode12_4_SAS_TOKEN }}"
+        dest: /tmp/Xcode_12.4.xip
+        mode: 0755
+
+    - name: Extract Xcode12.4
+      shell: xip -x /tmp/Xcode_12.4.xip
+      args:
+        chdir: /tmp
+        creates: /tmp/Xcode.app
+
+    - name: Move Xcode12.4 to /Applications directory
+      copy:
+        src: /tmp/Xcode.app
+        dest: /Applications/Xcode.app/
+        remote_src: true
+
+    - name: Select Xcode12.4 as the default Xcode
+      shell: sudo xcode-select --switch /Applications/Xcode.app
+
+    - name: Accept Xcode license
+      shell: arch -x86_64 sudo xcodebuild -license accept
+
+    - name: Clean up Xcode12.4.xip file
+      file:
+        path: /tmp/Xcode_12.4.xip
+        state: absent

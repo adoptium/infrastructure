@@ -19,10 +19,18 @@ variable "ORKA_ENDPOINT" {
   default = "http://10.221.188.20"
 }
 
+variable "XCode11_7_SAS_TOKEN" {
+  default = env("XCode11_7_SAS_TOKEN")
+}
+
+variable "XCode12_4_SAS_TOKEN" {
+  default = env("XCode12_4_SAS_TOKEN")
+}
+
 source "macstadium-orka" "sonoma-arm64" {
   source_image = "sonoma-90gb-orka3-arm"
   image_name = "sonoma-arm64-base"
-  image_description = "Base image with sudoers setup and brew/ansible installed"
+  image_description = "Base image with sudoers setup and xcode/brew/ansible installed"
   image_force_overwrite = true
   orka_endpoint = var.ORKA_ENDPOINT
   orka_auth_token = var.ORKA_TOKEN
@@ -78,7 +86,9 @@ EOF
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--tags", "xcode11"
+      "--extra-vars", "XCode11_7_SAS_TOKEN=\"${var.XCode11_7_SAS_TOKEN}\"",
+      "--extra-vars", "XCode12_4_SAS_TOKEN=\"${var.XCode12_4_SAS_TOKEN}\"",
+      "--tags", "xcode11,xcode12"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }
