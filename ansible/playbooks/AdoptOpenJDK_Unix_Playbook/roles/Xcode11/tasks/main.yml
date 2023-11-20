@@ -25,7 +25,7 @@
     dest: /tmp/Xcode_11.7.xip
     mode: 0755
   when: not xcode11_installed.stat.exists and apple_variables is defined
-    
+
 - name: Install Xcode11.7
   when: not xcode11_installed.stat.exists and apple_variables is defined
   block:
