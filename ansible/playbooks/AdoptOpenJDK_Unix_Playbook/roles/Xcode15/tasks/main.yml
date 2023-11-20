@@ -1,0 +1,59 @@
+---
+# Xcode 15.0.1 is needed to build JDK 17+
+# Xcode 15.0.1 can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
+# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
+
+- name: Check if Xcode15.0.1 is installed
+  stat:
+    path: /Applications/Xcode.app
+  register: xcode15_installed
+
+- name: Check if SAS variable is defined
+  set_fact:
+    apple_variables: yes
+  when: not xcode15_installed.stat.exists and XCode15_0_1_SAS_TOKEN is defined
+
+- name: Display Information when XCode15_0_1_SAS_TOKEN is not defined
+  debug:
+    msg: "XCode15_0_1_SAS_TOKEN is not defined. Xcode will need to be installed manually.
+          Skipping Xcode installation"
+  when: not xcode15_installed.stat.exists and apple_variables is not defined
+
+- name: Install Xcode15.0.1
+  when: not xcode15_installed.stat.exists and apple_variables is defined
+  block:
+    - name: Check for /tmp/Xcode_15.0.1.xip
+      stat:
+        path: /tmp/Xcode_15.0.1.xip
+      register: xcode15_0_1_xip
+
+    # Stored in Azure Blob Storage (SAS URL set to expire in 2033)
+    - name: Download XCode 15.0.1 from Azure blob storage
+      when: not xcode15_0_1_xip.stat.exists
+      get_url:
+        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode-15-0-1/Xcode_15.0.1.xip?{{ XCode15_0_1_SAS_TOKEN }}"
+        dest: /tmp/Xcode_15.0.1.xip
+        mode: 0755
+
+    - name: Extract Xcode15.0.1
+      shell: xip -x /tmp/Xcode_15.0.1.xip
+      args:
+        chdir: /tmp
+        creates: /tmp/Xcode.app
+
+    - name: Move Xcode15.0.1 to /Applications directory
+      copy:
+        src: /tmp/Xcode.app
+        dest: /Applications/Xcode.app/
+        remote_src: true
+
+    - name: Select Xcode15.0.1 as the default Xcode
+      shell: sudo xcode-select --switch /Applications/Xcode.app
+
+    - name: Accept Xcode license
+      shell: arch -x86_64 sudo xcodebuild -license accept
+
+    - name: Clean up Xcode15.0.1.xip file
+      file:
+        path: /tmp/Xcode_15.0.1.xip
+        state: absent
