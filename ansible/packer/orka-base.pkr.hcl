@@ -23,8 +23,8 @@ variable "XCode11_7_SAS_TOKEN" {
   default = env("XCode11_7_SAS_TOKEN")
 }
 
-variable "XCode12_4_SAS_TOKEN" {
-  default = env("XCode12_4_SAS_TOKEN")
+variable "XCode15_0_1_SAS_TOKEN" {
+  default = env("XCode15_0_1_SAS_TOKEN")
 }
 
 source "macstadium-orka" "sonoma-arm64" {
@@ -61,6 +61,9 @@ build {
     ]
   }
 
+  # Pause the provisioner until user interacts (for install Xcode etc)
+  provisioner "breakpoint" {}
+
   # Install homebrew and ansible
   provisioner "shell" {
     inline = [<<EOF
@@ -87,8 +90,8 @@ EOF
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
       "--extra-vars", "XCode11_7_SAS_TOKEN=\"${var.XCode11_7_SAS_TOKEN}\"",
-      "--extra-vars", "XCode12_4_SAS_TOKEN=\"${var.XCode12_4_SAS_TOKEN}\"",
-      "--tags", "xcode11,xcode12"
+      "--extra-vars", "XCode15_0_1_SAS_TOKEN=\"${var.XCode15_0_1_SAS_TOKEN}\"",
+      "--tags", "xcode11,xcode15"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }
