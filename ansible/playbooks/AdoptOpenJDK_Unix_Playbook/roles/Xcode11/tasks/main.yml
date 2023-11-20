@@ -19,14 +19,16 @@
           Skipping Xcode installation"
   when: not xcode11_installed.stat.exists and apple_variables is not defined
 
+- name: Download XCode 11.7 from Azure blob storage
+  get_url:
+    url: "https://ansiblestorageadopt.blob.core.windows.net/xcode11-7/Xcode_11.7.xip?{{ XCode11.7_SAS_TOKEN }}"
+    dest: /tmp/Xcode_11.7.xip
+    mode: 0755
+  when: not xcode11_installed.stat.exists and apple_variables is defined
+
 - name: Install Xcode11.7
   when: not xcode11_installed.stat.exists and apple_variables is defined
   block:
-    - name: Download XCode 11.7 from Azure blob storage
-      get_url:
-        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode11-7/Xcode_11.7.xip?{{ XCode11.7_SAS_TOKEN }}"
-        dest: /tmp/Xcode_11.7.xip
-        mode: 0755
 
     - name: Extract Xcode11.7
       shell: xip -x /tmp/Xcode_11.7.xip
