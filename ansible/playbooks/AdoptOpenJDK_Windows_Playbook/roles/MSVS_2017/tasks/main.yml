@@ -20,7 +20,7 @@
   when: (not vs2017_installed.stat.exists)
   tags: MSVS_2017
 
-- name: Run Visual Studio 2017 Installer From Download With Powershell
+- name: Run Visual Studio 2017 Installer From Download
   win_shell: |
       Start-Process -Wait -FilePath 'C:\temp\vs_community.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
   args:
