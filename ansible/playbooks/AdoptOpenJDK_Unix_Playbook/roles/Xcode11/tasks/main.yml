@@ -29,7 +29,7 @@
 - name: Install Xcode11.7
   when: not xcode11_installed.stat.exists and apple_variables is defined
   block:
-  
+
     - name: Extract Xcode11.7
       shell: xip -x /tmp/Xcode_11.7.xip
       args:
