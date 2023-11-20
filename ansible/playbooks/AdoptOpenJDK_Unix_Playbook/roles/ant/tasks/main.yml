@@ -49,10 +49,11 @@
   tags: ant
 
 - name: Extract ant
+  become: true
   unarchive:
     src: /tmp/apache-ant-1.10.5-bin.zip
     dest: /usr/local
-    copy: False
+    copy: false
   when:
     - ant_installed.rc != 0
   tags: ant
@@ -66,6 +67,7 @@
   tags: ant
 
 - name: Create /usr/local/bin/ant symlink
+  become: true
   file:
     src: /usr/local/apache-ant-1.10.5/bin/ant
     dest: /usr/local/bin/ant
