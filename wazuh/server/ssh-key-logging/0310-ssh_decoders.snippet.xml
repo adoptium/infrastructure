@@ -1,0 +1,7 @@
+<decoder name="sshd-success">
+  <parent>sshd</parent>
+  <prematch>^Accepted</prematch>
+  <regex offset="after_prematch">^ \S+ for (\S+) from (\S+) port (\S+) ssh2: RSA SHA256:(\S+)</regex>
+  <order>user, srcip, srcport, keysum</order>
+  <fts>name, user, location</fts>
+</decoder>
