@@ -2,7 +2,7 @@
 
 ## Requirement
 
-The Adoptium public infrastructure windows hosts, receive significantly more intrusion attempts than any other platform, and as such, Wazuh will issue anti-flooding alerts & warnings. The best solution to this, is to improve the volume of logging requests permitted on windows hosts.
+Adoptium's public windows hosts receive significantly more intrusion attempts than any other platform. As such, Wazuh will issue anti-flooding alerts & warnings for this platform. The best solution is to increase the number of logging requests permitted on windows hosts.
 
 ## How
 
