@@ -89,7 +89,7 @@ Starting wazuh-logtest v4.5.3
 Type one log per line
 ```
 
-At this point, paste in a sample log line extracted from a log, e.g
+At this point, paste in a sample line extracted from a log, e.g
 
 ```
 Nov 19 21:33:32 xxxxxx sshd[1914646]: Accepted publickey for xxxxxx from xxx.xx.xxx.xxx port xxxxx ssh2: RSA SHA256:XXXXXXXXX
