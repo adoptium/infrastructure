@@ -133,7 +133,7 @@ The following output is then displayed, which shows the new field being capture:
 
 ## Notes
 
-* It is important to note, that custom decoders WILL NOT over ride existing ones, so in order to amend an existing one, it must be removed from the standard rules, and replaced with a custom ruleset for all elements.
+* It is important to note that custom decoders WILL NOT override existing ones. So in order to amend an existing decoder, it must be removed from the standard rules and replaced with a custom ruleset for all elements.
 
 * Custom rules, decoders and configuration files should be backed up prior to running an upgrade.
 
