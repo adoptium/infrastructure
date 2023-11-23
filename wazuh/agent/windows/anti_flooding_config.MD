@@ -6,7 +6,7 @@ The Adoptium public infrastructure windows hosts, receive significantly more int
 
 ## How
 
-To achieve this, a simple configuration change can be made specifically on the windows hosts by amending the client buffer section of the agent configuration on each windows machine. This change could be made in the centralised configuration, but given we have only encountered flooding issues on windows, globally increasing the amount of logging available for all agents across all platforms, could potentially cause disk space issues, and a loss of visibility of an period where an increased number of attacks on a specific machine or platform are occurring.
+To achieve this on windows, we could amend the client buffer section of the agent configuration. We could also put this change in the centralised configuration, but given we've only seen flooding issues on windows, allowing more logs for all agents across all platforms could cause disk space issues and a loss of visibility during periods of focused hacker activity.
 
 Assuming a default installation, the file agent.conf can be found in "C:\Program Files (x86)\ossec-agent\ossec.conf" , and the client buffer section should be altered to match the below.
 
