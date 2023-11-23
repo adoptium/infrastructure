@@ -95,7 +95,7 @@ At this point, paste in a sample log line extracted from a log, e.g
 Nov 19 21:33:32 xxxxxx sshd[1914646]: Accepted publickey for xxxxxx from xxx.xx.xxx.xxx port xxxxx ssh2: RSA SHA256:XXXXXXXXX
 ```
 
-The following output is then displayed, which shows the new field being capture:
+The following output is then displayed, which shows the new field being captured:
 
 ```
 **Phase 1: Completed pre-decoding.
