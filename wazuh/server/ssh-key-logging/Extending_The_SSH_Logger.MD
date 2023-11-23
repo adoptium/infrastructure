@@ -139,7 +139,7 @@ The following output is then displayed, which shows the new field being capture:
 
 ## References
 
-Useful sections from the Wazuh documentation
+Useful sections from the Wazuh documentation:
 
 * Wazuh Decoder Reference: https://documentation.wazuh.com/current/user-manual/ruleset/custom.html
 
