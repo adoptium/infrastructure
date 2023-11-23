@@ -6,7 +6,7 @@ Implementing A Mechanism For Tracing Direct Logins : https://github.com/adoptium
 
 ## How
 
-Wazuh uses elements called decoders for processing the log files shipped from the agents to the servers, the standard set of decoders can both extended and customised, the official documentation from Wazuh is linked in the references section below, but this document  will detail the specific process used to extend the SSH logger to capture the checksum of the SSH keys used to login.
+Wazuh uses "decoders" to process the log files shipped from the agents to the servers. The standard set of decoders can be extended and customised. The official Wazuh docs are linked under "References" below, but here we will detail the specific process used to extend the SSH logger to capture the checksum of the SSH keys used to log in.
 
 A pre-requisite of this is to ensure the captured auditd/sshd/system logs have the relevant information for Wazuh to capture and process. Wazuh also provide a very useful testing tool, detailed here: https://documentation.wazuh.com/current/user-manual/ruleset/testing.html
 
