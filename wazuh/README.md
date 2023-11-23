@@ -12,6 +12,8 @@ Documentation for which can be found: https://documentation.wazuh.com/4.5/user-m
 
 ## Repository Structure
 
-At the top level, this repository has a folder for each of the two main components on the server. These will contain any configuration changes that are applied to files hosted on the physical server. These, in turn, will include changes to the shared agent configuration (located on the Wazuh server), and then applied to all agents connected.
+At the top level, this repository contains two folders that relate directly to the Wazuh application. These consist of the Wazuh central server, and the agent components that are installed on each machine. These individual folders contain any relevant configuration changes that are applied to files hosted on the physical server, or the agents as appropriate.
 
-The agents folder will contain only configuration changes required to individual agents, platforms or groups of agents, that should not be applied via the  global shared agent configuration.
+The server folder will contain configuration changes, that are applied to the server itself, or to the global shared configuration shared by all agents.
+
+The agent folder will contain only configuration changes required to individual agents, platforms or groups of agents, that should not be applied via the global shared agent configuration.
