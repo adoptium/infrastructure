@@ -45,10 +45,9 @@
 
 ## For Ubuntu 22+ Set GCC to gcc_11
 
-- name: Checking for gcc-11 binary installation
+- name: Checking for /usr/bin/gcc-11
   stat: path=/usr/bin/gcc-11
   register: gcc11
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22
   tags: nasm
 
 - name: Setting CC to gcc-11 binary found
