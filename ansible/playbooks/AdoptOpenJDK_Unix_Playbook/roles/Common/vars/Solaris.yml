@@ -27,6 +27,7 @@ Build_Tool_Packages:
   - zip
   - tcl
   - python27
+  - truss                        # For SBOM dependency analysis
 
 Additional_Build_Tools_x64:
   - freetype

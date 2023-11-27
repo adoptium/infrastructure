@@ -47,6 +47,7 @@ Build_Tool_Packages:
   - perl-devel
   - perl-IPC-Cmd                  # required for openssl v3 compiles
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget

@@ -24,6 +24,7 @@ Build_Tool_Packages:
   - mozilla-nss-devel
   - mozilla-nss-tools
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - unzip
   - wget
   - zip

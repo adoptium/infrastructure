@@ -53,6 +53,7 @@ Build_Tool_Packages:
   - perl-libwww-perl
   - perl-Time-HiRes
   - pigz
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget

@@ -48,6 +48,7 @@ Build_Tool_Packages:
   - ntp
   - pigz
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-dev
   - wget
   - zip

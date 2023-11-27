@@ -47,6 +47,7 @@ Build_Tool_Packages:
   - openssl-devel
   - perl-devel
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget
