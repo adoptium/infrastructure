@@ -36,24 +36,10 @@
   stat: path=/usr/local/gcc/bin/gcc-7.5
   register: gcc7
   tags: nasm
-
 - name: Setting CC to gcc-7.5 binary found
   set_fact:
     CC: "/usr/local/gcc/bin/gcc-7.5"
   when: gcc7.stat.exists and CC is not defined
-  tags: nasm
-
-## For Ubuntu 22+ Set GCC to gcc_11
-
-- name: Checking for /usr/bin/gcc-11
-  stat: path=/usr/bin/gcc-11
-  register: gcc11
-  tags: nasm
-
-- name: Setting CC to gcc-11 binary found
-  set_fact:
-    CC: "/usr/bin/gcc-11"
-  when: gcc11.stat.exists and ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22
   tags: nasm
 
 - name: Print 'CC' variable
@@ -99,31 +85,19 @@
     - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
   tags: nasm
 
-## Patch NASM Source On Ubuntu 22.04 due to bug with compiling with gcc 8+
-## See With https://src.fedoraproject.org/rpms/nasm/raw/0cc3eb244bd971df81a7f02bc12c5ec259e1a5d6/f/0001-Remove-invalid-pure_func-qualifiers.patch
-
-- name: Patch NASM 13.03 Source
-  lineinfile:
-    path: /tmp/nasm-2.13.03/include/nasmlib.h
-    regexp: '^void pure_func seg_init\(void\);.*$'
-    line: 'void seg_init(void);'
+- name: Running ./configure & make for nasm ( Not Ubuntu 22+ )
+  shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} && ./configure -prefix=/usr/local && make install
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) ) and (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - (ansible_distribution != "Ubuntu" or ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
   tags: nasm
 
-- name: Patch NASM 13.03 Source
-  lineinfile:
-    path: /tmp/nasm-2.13.03/include/nasmlib.h
-    regexp: '^int32_t pure_func seg_alloc\(void\);.*$'
-    line: 'int32_t seg_alloc(void);'
+- name: Running ./configure & make for nasm ( Ubuntu 22+ x64 )
+  shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} && ./configure -prefix=/usr/local && make install
+  environment:
+    CC: "{{ CC }}"
+    LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) ) and (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
-  tags: nasm
-
-- name: Running ./configure & make for nasm
-  shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} ./configure -prefix=/usr/local && make install
-  when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "22" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
   tags: nasm
 
 - name: Remove downloaded packages for nasm
