@@ -2,7 +2,6 @@ name: Docker
 
 on:
   pull_request:
-    types: [opened, closed]
     paths:
     - .github/workflows/build.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
@@ -10,7 +9,6 @@ on:
     branches:
     - master
   push:
-    types: [opened, closed]
     paths:
     - .github/workflows/build.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
