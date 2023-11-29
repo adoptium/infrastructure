@@ -21,9 +21,10 @@ permissions:
 
 jobs:
   debug-pr-status:
-  name: Input check
+    name: Input check
     runs-on: ubuntu-latest
     steps:
+    
       - name: Checking your input
         run: |
           echo "github.event.pull_request.merged           : $MERGED_RAW"
