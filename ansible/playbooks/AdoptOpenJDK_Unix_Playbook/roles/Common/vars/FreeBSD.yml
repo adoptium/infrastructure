@@ -29,6 +29,7 @@ Build_Tool_Packages:
   - openjdk11
   - pkgconf
   - png
+  - strace                        # For SBOM dependency analysis
   - unzip
   - wget
   - zip
