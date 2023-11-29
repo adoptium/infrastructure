@@ -48,7 +48,7 @@ checkOS() {
                 "Ubuntu2104" | "U21" | "u21" )
                         osToDestroy="U21";;
                 "Ubuntu2204" | "U22" | "u22" )
-				                        osToDestroy="U22";;
+                        osToDestroy="U22";;
                 "CentOS6" | "centos6" | "C6" | "c6" )
                         osToDestroy="C6" ;;
                 "CentOS7" | "centos7" | "C7" | "c7" )
