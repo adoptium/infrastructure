@@ -1,0 +1,133 @@
+---
+
+- name: Check if dnf is installed
+
+- name: Set install flag
+  set_fact:
+    install_flag: "-d"
+
+- name: Check if yum is installed
+
+- name: Set install flag is yum is installed
+  set_fact:
+    install_flag: "-y"
+  when: yum is installed
+
+- name: Install dnf
+  when: dnf is not installed
+  block:
+    - name: Download dnf script
+
+    - name: Install dnf
+
+    - name: Remove dnf script
+
+- name: Update dnf
+  dnf:
+    update_cache: true
+    name: '*'
+    state: latest
+
+- name: Install OSS dev run-time-env using yum
+  dnf: 
+    name: "{{ item }} "
+    state: present 
+    update_cache: yes
+  with_items:
+    - bash
+    - autoconf-2.69-1
+    - bc
+    - bison
+    - coreutils
+    - cpio
+    - cups-devel
+    - cups-libs
+    - expect
+    - flex
+    - freetype2-devel-2.8-1
+    - fontconfig-devel
+    - gawk
+    - git
+    - gnupg2-2.0.30
+    - grep
+    - libffi-devel
+    - make
+    - m4
+    - pcre
+    - pkg-config
+    - popt
+    - sed
+    - sudo
+    - tar
+    - tcl
+    - unzip
+    - wget
+    - xz-libs
+    - zip
+    - zsh
+
+##########################################################################
+# Adoptium builds do not work properly with the latest cmake @AIXToolbox #
+##########################################################################
+# NOTE: Cannot use dnf module here as it will pull in cmake 3.16 which we do not want
+- name: Install cmake 3.14.3 prerequisites
+  command:
+    cmd: rpm -i "{{ item }}"
+    creates: /opt/freeware/etc/rpm/macros.cmake
+  with_items:
+    - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-filesystem-3.14.3-1.aix7.1.ppc.rpm
+    - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-rpm-macros-3.14.3-1.aix7.1.ppc.rpm
+  tags:
+    - rpm_install
+    - cmake
+
+# See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492 for why we are locking this
+- name: Install cmake 3.14.3 (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)
+  dnf:
+    name: cmake-3.14.3
+    state: present
+    update_cache: yes
+  tags:
+    - rpm_install
+    - cmake
+##############################################################################
+# TASK [yum : Install cmake 3.14.3
+#   (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)]
+# fatal: [x077]: FAILED! =>
+#   {"changed": false, "msg": "No package matching 'cmake-3.14.3' found available,
+#   installed or updated", "rc": 126,
+#   "results": ["No package matching 'cmake-3.14.3' found available,
+#   installed or updated"}
+## If you get this message - you need to remove 'cmake*' from
+#   /opt/freeware/etc/yum/yum.conf
+##############################################################################
+
+- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+  failed_when: false
+  tags:
+    - rpm_install
+
+# Create zlib.h and zconf.h links - See https://github.com/adoptium/infrastructure/issues/1952
+- name: Copy zlib.h and zconf.h (See https://github.com/adoptium/infrastructure/issues/1952)
+  copy:
+    src: "/opt/freeware/include/{{ item }}"
+    dest: "/usr/include/"
+    force: true
+    remote_src: true
+  with_items:
+    - zconf.h
+    - zlib.h
+
+##############################################################################
+# Prevent accidental updates to 'locked' packages
+##############################################################################
+- name: Exclude packages from dnf (main)
+  lineinfile:
+    dest: /opt/freeware/etc/dnf/dnf.conf
+    firstmatch: true
+    insertafter: 'plugins=1'
+    line: 'exclude=autoconf cmake* freetype2*'
+  tags:
+    - cmake
+    - freetype2
