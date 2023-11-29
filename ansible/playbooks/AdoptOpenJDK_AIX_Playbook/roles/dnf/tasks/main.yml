@@ -160,3 +160,23 @@
   tags:
     - cmake
     - freetype2
+
+- name: Remove packages - in case installed historically, or by accident
+  dnf:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - libXrender-devel
+    - libXrender
+    - libXft
+    - tk
+    - renderproto
+  tags:
+    - adoptopenjdk
+
+- name: Remove, if exists, reference to libXrender-devel include files
+  file:
+    state: absent
+    path: /opt/freeware/include/X11/extensions
+  tags:
+    - adoptopenjdk
