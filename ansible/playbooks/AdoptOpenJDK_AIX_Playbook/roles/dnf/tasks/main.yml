@@ -57,10 +57,10 @@
     name: '*'
     state: latest
 
-- name: Install OSS dev run-time-env using yum
-  dnf: 
+- name: Install packages
+  dnf:
     name: "{{ item }}"
-    state: present 
+    state: present
     update_cache: yes
   with_items:
     - bash
