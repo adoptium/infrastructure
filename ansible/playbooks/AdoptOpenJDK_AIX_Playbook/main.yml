@@ -64,7 +64,8 @@
     # Note: AIX File system configuration must be run now as RPM based software
     # cannot expand filesystem space on demand
     - aixfs
-    - dnf
+    - role: dnf
+      tags: dnf
 
     ## additional OSS packages
     - ant
