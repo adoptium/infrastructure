@@ -1,26 +1,55 @@
 ---
 
+# See https://github.com/adoptium/infrastructure/issues/3142#issuecomment-1658743632
+# Yum is no longer supported on AIX 7.3. Dnf is recommended. Dnf supports AIX 7.1 TL3 and higher
+# Dnf needs python3
+# For more information https://community.ibm.com/community/user/power/blogs/sangamesh-mallayya1/2021/05/28/dnf-is-now-available-on-aix-toolbox?CommunityKey=10c1d831-47ee-4d92-a138-b03f7896f7c9&tab=recentcommunityblogsdashboard
+
+# Dnf needs python3
+- name: Fail if python3 is not available
+  stat:
+    path: /opt/freeware/bin/python3
+  register: python3_installed
+  failed_when: not python3_installed.stat.exists
+
 - name: Check if dnf is installed
-
-- name: Set install flag
-  set_fact:
-    install_flag: "-d"
-
-- name: Check if yum is installed
-
-- name: Set install flag is yum is installed
-  set_fact:
-    install_flag: "-y"
-  when: yum is installed
+  stat:
+    path: /opt/freeware/bin/dnf
+  register: dnf_installed
 
 - name: Install dnf
-  when: dnf is not installed
+  when: not dnf_installed.stat.exists
   block:
+    # Installs dnf when yum is not present
+    - name: Set install flag
+      set_fact:
+        install_flag: "-d"
+
+    - name: Check if yum is installed
+      stat:
+        path: /opt/freeware/bin/yum
+      register: yum_installed
+
+    # Installs dnf when yum is present, links yum to dnf
+    - name: Set install flag if yum is installed
+      set_fact:
+        install_flag: "-y"
+      when: yum_installed.stat.exists
+
     - name: Download dnf script
+      get_url:
+        url: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/dnf_aixtoolbox.sh"
+        mode: 0644
+        validate_certs: false
+        dest: /tmp/dnf_aixtoolbox.sh
 
     - name: Install dnf
+      shell: "/tmp/dnf_aixtoolbox.sh {{ install_flag }}"
 
     - name: Remove dnf script
+      file:
+        state: absent
+        path: /tmp/dnf_aixtoolbox.sh
 
 - name: Update dnf
   dnf:
@@ -30,7 +59,7 @@
 
 - name: Install OSS dev run-time-env using yum
   dnf: 
-    name: "{{ item }} "
+    name: "{{ item }}"
     state: present 
     update_cache: yes
   with_items:
