@@ -42,6 +42,7 @@
         mode: 0644
         validate_certs: false
         dest: /tmp/dnf_aixtoolbox.sh
+        checksum: sha256:7582a79530a30280548bebf6730686ff3c8b4b7259ddf2d1361494be19a193f8
 
     - name: Install dnf
       shell: "/tmp/dnf_aixtoolbox.sh {{ install_flag }}"
