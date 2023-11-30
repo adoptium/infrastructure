@@ -36,6 +36,12 @@
         install_flag: "-y"
       when: yum_installed.stat.exists
 
+      # debug
+    
+    - name: print install flag variable
+      debug:
+        msg: "{{ install_flag }}"
+
     - name: Download dnf script
       get_url:
         url: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/dnf_aixtoolbox.sh"
