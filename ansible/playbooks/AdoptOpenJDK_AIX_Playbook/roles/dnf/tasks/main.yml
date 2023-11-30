@@ -36,22 +36,16 @@
         install_flag: "-y"
       when: yum_installed.stat.exists
 
-      # debug
-    
-    - name: print install flag variable
-      debug:
-        msg: "{{ install_flag }}"
-
     - name: Download dnf script
       get_url:
         url: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/dnf_aixtoolbox.sh"
-        mode: 0644
+        mode: 0744
         validate_certs: false
         dest: /tmp/dnf_aixtoolbox.sh
         checksum: sha256:7582a79530a30280548bebf6730686ff3c8b4b7259ddf2d1361494be19a193f8
 
     - name: Install dnf
-      shell: "/tmp/dnf_aixtoolbox.sh {{ install_flag }}"
+      command: "/tmp/dnf_aixtoolbox.sh {{ install_flag }}"
 
     - name: Remove dnf script
       file:
