@@ -10,8 +10,6 @@
     PATH: "/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:{{ ansible_env.PATH }}"
     PERL_MB_OPT: "--install_base /opt/freeware"
     PERL_MM_OPT: "INSTALL_BASE=/opt/freeware"
-  vars:
-    ansible_python_interpreter: /opt/freeware/bin/python3
 
   roles:
     - role: logs
