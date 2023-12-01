@@ -20,6 +20,21 @@ permissions:
   contents: read
 
 jobs:
+  debug-pr-status:
+    name: Input check
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checking your input
+        run: |
+          echo "github.event.pull_request.merged           : $MERGED_RAW"
+          echo "github.event.pull_request.merged == 'true' : $MERGED_TRUE_STR"
+          echo "github.event.pull_request.merged  == true  : $MERGED_TRUE_BOOL"
+        env:
+          MERGED_RAW: ${{ github.event.pull_request.merged }}
+          MERGED_TRUE_STR: ${{ github.event.pull_request.merged == 'true' }}
+          MERGED_TRUE_BOOL: ${{ github.event.pull_request.merged == true }}
+          
   build-and-push-centos6:
     name: Centos6
     runs-on: ubuntu-latest
@@ -35,7 +50,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-      if: github.event.pull_request.merged == true
+      if: github.event.pull_request.merged
 
     - name: Docker Build CentOS6 Image Test
       uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
@@ -57,8 +72,7 @@ jobs:
         cache-from: type=registry,ref=adoptopenjdk/centos6_build_image:latest
         cache-to: type=inline
         push: true
-      if: github.event.pull_request.merged == true
-
+      if: github.event.pull_request.merged
 
   build-and-push-alpine3:
     name: Alpine3
