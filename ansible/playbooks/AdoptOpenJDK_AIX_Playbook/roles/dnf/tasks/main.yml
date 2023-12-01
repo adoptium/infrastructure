@@ -52,11 +52,11 @@
         state: absent
         path: /tmp/dnf_aixtoolbox.sh
 
-- name: Update dnf
-  dnf:
-    update_cache: true
-    name: '*'
-    state: latest
+# - name: Update dnf
+#   dnf:
+#     update_cache: true
+#     name: '*'
+#     state: latest
 
 - name: Install packages
   dnf:
