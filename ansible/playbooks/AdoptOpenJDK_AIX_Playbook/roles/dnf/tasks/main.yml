@@ -71,41 +71,40 @@
 
     - name: Install packages
       dnf:
-        name: "{{ item }}"
         state: present
         update_cache: yes
-      with_items:
-        - bash
-        - autoconf-2.69-1
-        - bc
-        - bison
-        - coreutils
-        - cpio
-        - cups-devel
-        - cups-libs
-        - expect
-        - flex
-        - freetype2-devel-2.8-1
-        - fontconfig-devel
-        - gawk
-        - git
-        # - gnupg2-2.0.30
-        - grep
-        - libffi-devel
-        - make
-        - m4
-        - pcre
-        - pkg-config
-        - popt
-        - sed
-        - sudo
-        - tar
-        - tcl
-        - unzip
-        - wget
-        - xz-libs
-        - zip
-        - zsh
+        name:
+          - bash
+          - autoconf-2.69-1
+          - bc
+          - bison
+          - coreutils
+          - cpio
+          - cups-devel
+          - cups-libs
+          - expect
+          - flex
+          - freetype2-devel-2.8-1
+          - fontconfig-devel
+          - gawk
+          - git
+          # - gnupg2-2.0.30
+          - grep
+          - libffi-devel
+          - make
+          - m4
+          - pcre
+          - pkg-config
+          - popt
+          - sed
+          - sudo
+          - tar
+          - tcl
+          - unzip
+          - wget
+          - xz-libs
+          - zip
+          - zsh
 
     ##########################################################################
     # Adoptium builds do not work properly with the latest cmake @AIXToolbox #
@@ -181,7 +180,7 @@
     dest: /opt/freeware/etc/dnf/dnf.conf
     firstmatch: true
     insertafter: 'plugins=1'
-    line: 'exclude=autoconf cmake* freetype2*'
+    line: 'exclude=autoconf* cmake* freetype2*'
   tags:
     - cmake
     - freetype2
