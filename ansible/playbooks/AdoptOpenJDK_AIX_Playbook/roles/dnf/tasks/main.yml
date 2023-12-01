@@ -58,7 +58,7 @@
     name: yum-utils
     state: absent
   vars:
-    ansible_python_interpreter: /opt/freeware/bin/python3
+    ansible_python_interpreter: /opt/freeware/libexec/python3
 
 - name: Update dnf
   dnf:
