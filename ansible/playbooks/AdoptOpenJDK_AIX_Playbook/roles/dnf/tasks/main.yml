@@ -52,11 +52,17 @@
         state: absent
         path: /tmp/dnf_aixtoolbox.sh
 
-# - name: Update dnf
-#   dnf:
-#     update_cache: true
-#     name: '*'
-#     state: latest
+# See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836227877
+- name: Remove yum-utils before dnf update
+  dnf:
+    name: yum-utils
+    state: absent
+
+- name: Update dnf
+  dnf:
+    update_cache: true
+    name: '*'
+    state: latest
 
 - name: Install packages
   dnf:
