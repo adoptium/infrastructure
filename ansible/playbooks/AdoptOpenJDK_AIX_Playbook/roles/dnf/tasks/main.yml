@@ -89,7 +89,7 @@
         - fontconfig-devel
         - gawk
         - git
-        - gnupg2-2.0.30
+        # - gnupg2-2.0.30
         - grep
         - libffi-devel
         - make
