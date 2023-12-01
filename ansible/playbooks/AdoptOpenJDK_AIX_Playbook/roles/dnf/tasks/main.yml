@@ -73,6 +73,7 @@
       dnf:
         state: present
         update_cache: yes
+        disable_excludes: all
         name:
           - bash
           - autoconf-2.69-1
