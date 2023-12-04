@@ -1,32 +1,37 @@
 ##################################################################
-# Verify openssl from IBM                                        #
+# Install OpenSSL 3.0.10.1000                                    #
 ##################################################################
 ---
 - name: Check if openssl is installed
   stat:
     path: /usr/bin/openssl
-  register: openssl_bin
+  register: openssl_installed
 
-- name: "Fail: OpenSSL 1.0.2p or later required"
-  fail:
-    msg:
-      - "OpenSSL is required. Version 1.0.2p (1.0.2.1601) or later"
-      - "Please ask your AIX OS provider to install it on this host"
-  when: not (openssl_bin.stat.exists and openssl_bin.stat.executable)
-
-- name: Get openssl version
-  command: openssl version
+- name: Get version of installed openssl (if installed else skip)
+  command: /usr/bin/openssl version | awk '{split ($0,a," "); print a[2]}' | awk '{split ($0,a,"."); print a[1]}'
   register: openssl_version
+  when: openssl_installed.stat.exists
 
-- name: Check Version legitimacy
-  set_fact:
-    rdy: openssl_version.split(' ')[1] >= '1.0.2p'
-  when: openssl_version is defined
+- name: Install openssl if not installed or version is less than 3
+  when: (not openssl_installed.stat.exists) or (openssl_version.stdout_lines | int) < 3
+  block:
+    - name: Transfer openssl binary
+      unarchive:
+        src: /Vendor_Files/aix/openssl-3.0.10.1000.tar.Z
+        dest: /tmp/openssl-3.0.10.1000
+        remote_src: false
 
-- name: "Fail: OpenSSL 1.0.2p or later required"
-  fail:
-    msg:
-      - "OpenSSL Version 1.0.2p (1.0.2.1601) or later is required."
-      - "Please ask your AIX OS provider to install it on this host"
-      - "current OpenSSL: {{ openssl_version.stdout }}"
-  when: rdy is undefined or not rdy
+    - name: cd into openssl directory and installp the binary
+      command: cd /tmp/openssl-3.0.10.1000 && installp -qaXFY -d . openssl.base openssl.license openssl.man.en_US
+
+    - name: Update AIX-rpm package
+      shell: PATH=/usr/bin/:$PATH && /usr/sbin/updtvpkg
+
+    - name: Remove openssl directory and binary
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/openssl-3.0.10.1000.tar.Z
+        - /tmp/openssl-3.0.10.1000.tar
+        - /tmp/openssl-3.0.10.1000
