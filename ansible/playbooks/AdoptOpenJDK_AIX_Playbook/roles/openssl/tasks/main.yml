@@ -1,5 +1,7 @@
 ##################################################################
 # Install OpenSSL 3.0.10.1000                                    #
+# An OpenSSL version greater than 1.1.x is needed for DNF        #
+# See https://github.com/adoptium/infrastructure/issues/3274
 ##################################################################
 ---
 - name: Check if openssl is installed
