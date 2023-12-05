@@ -19,10 +19,6 @@
 - name: Install openssl if not installed or version is less than 3
   when: (not openssl_installed.stat.exists) or ((openssl_version.stdout | int) < 3)
   block:
-    - name: debug
-      debug:
-        msg: "Version is less than 3: {{ ((openssl_version.stdout | int) < 3) }}"
-
     - name: Transfer openssl binary
       unarchive:
         src: /Vendor_Files/aix/openssl-3.0.10.1000.tar.Z
