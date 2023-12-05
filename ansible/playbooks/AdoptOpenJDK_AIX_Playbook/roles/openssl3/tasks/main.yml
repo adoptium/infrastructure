@@ -24,7 +24,7 @@
         remote_src: false
 
     - name: cd into openssl directory and installp the binary
-      command: cd /tmp/openssl-3.0.10.1000 && installp -qaXFY -d . openssl.base openssl.license openssl.man.en_US
+      command: PATH=/usr/bin/:$PATH && cd /tmp/openssl-3.0.10.1000 && installp -qaXFY -d . openssl.base openssl.license openssl.man.en_US
 
     - name: Update AIX-rpm package
       shell: PATH=/usr/bin/:$PATH && /usr/sbin/updtvpkg
