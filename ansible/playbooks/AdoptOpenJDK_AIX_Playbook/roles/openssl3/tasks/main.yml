@@ -10,7 +10,7 @@
   register: openssl_installed
 
 - name: Get version of installed openssl (if installed else skip)
-  command: /usr/bin/openssl version | awk '{split ($0,a," "); print a[2]}' | awk '{split ($0,a,"."); print a[1]}'
+  command: /usr/bin/openssl version | awk '{print$2}' | awk -F. '{print$1}'
   register: openssl_version
   when: openssl_installed.stat.exists
 
