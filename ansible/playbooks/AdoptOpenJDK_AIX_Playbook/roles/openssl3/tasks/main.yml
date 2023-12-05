@@ -20,7 +20,7 @@
     - name: Transfer openssl binary
       unarchive:
         src: /Vendor_Files/aix/openssl-3.0.10.1000.tar.Z
-        dest: /tmp/openssl-3.0.10.1000
+        dest: /tmp/
         remote_src: false
 
     - name: cd into openssl directory and installp the binary
