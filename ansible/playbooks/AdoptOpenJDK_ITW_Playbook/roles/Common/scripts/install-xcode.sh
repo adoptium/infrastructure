@@ -8,7 +8,7 @@ echo 2 = $osx_vers
 
 # Installing the latest Xcode command line tools on 10.9.x or higher
 
-if [[ "$os_maj_vers" -ge 10 ]] && [[ "$osx_vers" -ge 9 ]]; then
+if [[ "$os_maj_vers" -eq 10 ]] && [[ "$osx_vers" -ge 9 ]]; then
   touch "$cmd_line_tools_temp_file";
   PROD=$(softwareupdate -l |
     grep "\*.*Command Line" |
