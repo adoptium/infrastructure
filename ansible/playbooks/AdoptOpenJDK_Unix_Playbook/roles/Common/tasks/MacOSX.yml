@@ -76,6 +76,10 @@
   script: scripts/install-homebrew.sh
   when: not brew.stat.exists
 
+- name: Switch back to command line tools xcode before proceeding
+  command: sudo xcode-select --switch /
+  tags: adoptopenjdk
+
 - name: Upgrade installed packages
   become: yes
   become_user: "{{ ansible_user }}"
