@@ -45,6 +45,7 @@ Build_Tool_Packages:
   - numactl-devel                 # OpenJ9
   - openssh-clients               # IBM: cloning over SSH
   - openssl-devel
+  - patch
   - perl-DBI
   - perl-devel
   - perl-Digest-SHA
@@ -55,6 +56,7 @@ Build_Tool_Packages:
   - pigz
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
+  - texinfo
   - unzip
   - wget
   - which
