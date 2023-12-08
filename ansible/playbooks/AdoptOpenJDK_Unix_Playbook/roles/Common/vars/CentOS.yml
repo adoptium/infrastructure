@@ -45,7 +45,7 @@ Build_Tool_Packages:
   - numactl-devel                 # OpenJ9
   - openssh-clients               # IBM: cloning over SSH
   - openssl-devel
-  - patch
+  - patch                         # For DevKit creation that runs "patch"
   - perl-DBI
   - perl-devel
   - perl-Digest-SHA
@@ -56,7 +56,7 @@ Build_Tool_Packages:
   - pigz
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
-  - texinfo
+  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - which
