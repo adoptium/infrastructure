@@ -14,7 +14,7 @@ Currently, the supported x86-64 systems are:
 - Ubuntu 16.04, 18.04, 20.04 and 22.04
 - CentOS 6, 7 and 8
 - Solaris 10
-
+- Fedora 35
 ## Qemu Playbook Check
 
 The QEMU Playbook Check (QPC) job is similar to the VPC job except it is not limited to x86-64 virtual machines.
