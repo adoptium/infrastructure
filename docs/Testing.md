@@ -6,7 +6,7 @@ This document will include all of the ways in which testing is done in the infra
 
 The Vagrant Playbook Check (VPC) job is used to test changes made to the [Windows and Linux playbooks](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks).
 
-The job is built in our [Jenkins server](https://ci.adoptium.net/job/VagrantPlaybookCheck/). The job runs a user's pull request onto the supported operating systems using Vagrant virtual machines. The vagrant files for the supported operating systems can be found [here](https://github.com/adoptium/infrastructure/tree/master/ansible/vagrant).
+The job is built in our [Jenkins server](https://ci.adoptium.net/job/VagrantPlaybookCheck/). The job runs a user's fork of the infrastructure repository onto the supported operating systems using Vagrant virtual machines. The vagrant files for the supported operating systems can be found [here](https://github.com/adoptium/infrastructure/tree/master/ansible/vagrant).
 
 Currently, the supported x86-64 systems are:
 - Windows 2012 and 2022
