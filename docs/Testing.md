@@ -50,7 +50,7 @@ Similar to the [job that runs in our Jenkins server](https://github.com/adoptium
 
 The supported platforms are:
 - Ubuntu 18.04 on aarch64, ppc64le and s390x
-- Ubuntu 20.04 on risc-v
+- Ubuntu 20.04 on riscv64
 - Debian 10 on aarch64
 
 The workflow file can be found [here](https://github.com/adoptium/infrastructure/blob/master/.github/workflows/build_qemu.yml).
