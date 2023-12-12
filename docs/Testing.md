@@ -23,7 +23,7 @@ It is built in our [Jenkins server](https://ci.adoptium.net/job/QEMUPlaybookChec
 
 Currently, the supported platorms are:
 - Ubuntu 18.04 on ppc64le, aarch64 and s390x
-- Debian 11 on risc64
+- Debian 11 on riscv64
 - Debian 10 on aarch64
 - Debian 8 on arm32
 
