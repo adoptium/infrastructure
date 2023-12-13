@@ -94,6 +94,15 @@ consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
 defined on the jenkins build pipelines as configured in the
 [pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
 
+### Adding a new dockerBuild dockerhub repository
+
+To add a new repository to the [AdoptOpenJDK dockerhub](https://hub.docker.com/u/adoptopenjdk), a user with `owner` privileges must create the repository initially and then give the automated `adoptopenjdkuser` user read and write permissions.
+
+Users with `owner` privileges include:
+- Tim Ellison @telisson
+- George Adams @gadams
+- Martijn Verburg @karianna
+
 ## Adding a new role to the ansible scripts
 
 Other than the dependencies on the machines which come from packages shipped
