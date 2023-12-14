@@ -30,7 +30,9 @@
 
     # These packages are installed using installp - which can enlarge
     # filesystem space, as needed, on demand
-    - openssl
+    - role: openssl3
+      tags: openssl3
+
     - security
 
     # 2. AIX BOS configuration

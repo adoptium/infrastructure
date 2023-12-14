@@ -1,0 +1,41 @@
+#################################################################################
+# Install OpenSSL 3.0.10.1000                                                   #
+# An OpenSSL version greater than 1.1.x is needed for DNF                       #
+# See https://github.com/adoptium/infrastructure/issues/3274                    #
+# OpenSSL 3.0.10.1000 is downloaded from this link:                             #
+# https://www.ibm.com/resources/mrs/assets/DownloadList?source=aixbp&lang=en_US #
+#################################################################################
+---
+- name: Check if openssl is installed
+  stat:
+    path: /usr/bin/openssl
+  register: openssl_installed
+
+- name: Get version of installed openssl (if installed else skip)
+  shell: /usr/bin/openssl version | awk '{print$2}' | awk -F. '{print$1}'
+  register: openssl_version
+  when: openssl_installed.stat.exists
+
+- name: Install openssl if not installed or version is less than 3
+  when: (not openssl_installed.stat.exists) or ((openssl_version.stdout | int) < 3)
+  block:
+    - name: Transfer openssl binary
+      unarchive:
+        src: /Vendor_Files/aix/openssl-3.0.10.1000.tar.Z
+        dest: /tmp/
+        remote_src: false
+
+    - name: Install openssl files
+      shell: PATH=/usr/bin/:$PATH && cd /tmp/openssl-3.0.10.1000 && installp -qaXFY -d . openssl.base openssl.license openssl.man.en_US
+
+    - name: Update AIX-rpm package
+      shell: PATH=/usr/bin/:$PATH && /usr/sbin/updtvpkg
+
+    - name: Remove openssl directory and binary
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /tmp/openssl-3.0.10.1000.tar.Z
+        - /tmp/openssl-3.0.10.1000.tar
+        - /tmp/openssl-3.0.10.1000
