@@ -31,6 +31,8 @@ Most Ansible changes are tested automatically with a series of CI jobs:
 | Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
 | Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 
+Please note that the Centos 6 & Alpine 3 build jobs, build a docker image but DO NOT PUSH to dockerhub. The job has a seperate configuration section to push to dockerhub when a PR is merged, however that function is disabled, and has been superceded by the Jenkins docker image updater job. The code has been left in place for two reasons, the first to allow the ability to re-enable quickly, and also to test the authentication job for the dockerhub credentials. These credentials are stored in GitHub and are managed by the EF infrastructure team.
+
 ## Running the ansible scripts on local machines
 
 The full documentation for running locally is at [ansible/README.md].
@@ -328,7 +330,7 @@ or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
 
 ## Patching
 
-At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines. 
+At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines.
 The Unix, Windows, MacOS and AIX playbooks are executed weekly onto our [machines](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) to keep them patched and up to date.
 
 For more information see https://github.com/adoptium/infrastructure/wiki/Ansible-AWX#schedules
