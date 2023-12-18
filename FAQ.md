@@ -101,7 +101,7 @@ defined on the jenkins build pipelines as configured in the
 To add a new repository to the [AdoptOpenJDK dockerhub](https://hub.docker.com/u/adoptopenjdk), a user with `owner` privileges must create the repository initially and then give the automated `adoptopenjdkuser` user read and write permissions.
 
 Users with `owner` privileges include:
-- Tim Ellison @telisson
+- Tim Ellison @tellison
 - George Adams @gadams
 - Martijn Verburg @karianna
 
