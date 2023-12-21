@@ -187,6 +187,7 @@
         url: https://api.adoptium.net/v3/binary/version/jdk-21.0.1+12.1-ea-beta/linux/riscv64/jdk/hotspot/normal/adoptium
         dest: /tmp/jdk21.tar.gz
         mode: 0440
+        checksum: sha256:45baa6571849e4a93b76156a96a4eb83c0398f410d4542b8039a4e097c7c2161
       retries: 3
       delay: 5
       register: adoptopenjdk_download
@@ -247,6 +248,7 @@
         url: https://ci.adoptium.net/userContent/riscv/jdk17u-riscv64-17.0.9+9-ea-cross-20231221.tar.gz
         dest: /tmp/jdk17.tar.gz
         mode: 0440
+        checksum: sha256:7b84db96e69f075dbea49164f866d7296b1f2f7a45961978155505d4fd07b0e4
       retries: 3
       delay: 5
       register: adoptopenjdk_download
