@@ -74,6 +74,6 @@ certbot --nginx
 
 4. If your `nginx` configuration is setup correctly, run `nginx -s reload`.
 
-If you would like to stop the service run `npm run docker-down`, then run `docker system prune` before rerunning the service with step 2.
+If you would like to stop the service run `npm run docker-down`, then run `docker system prune` before rerunning the service with step 3.
 
 If `npm run docker-down` does not fully stop the service, check which containers of the service are still running and stop them manually with `docker stop`.
