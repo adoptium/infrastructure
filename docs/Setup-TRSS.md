@@ -68,7 +68,7 @@ certbot --nginx
 
 ### Steps to run the service
 
-1. On the filesystem created for the TRSS service (see this [step](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-TRSS.md#pre-setup-recommendations)), clone the [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) repository and `cd` into it.
+1. On the filesystem created for TRSS (see this [step](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-TRSS.md#pre-setup-recommendations)), clone the [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) repository and `cd` into it.
 
 2. Move the `trssConf.json` file you created [earlier](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-TRSS.md#Connecting-to-Jenkins) into `aqa-test-tools/TestResultSummaryService/`
 
