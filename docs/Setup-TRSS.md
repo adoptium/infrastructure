@@ -11,7 +11,7 @@ This page documents the setup of the production-ready Test Result Summary Servic
 
 #### Pre setup recommendations:
 - Dedicate a separate disk for `/var/lib/docker` (>30G) and one for the directory in which you kick off the TRSS service (>60G), the latter will be where TRSS stores its data.
-- Run the TRSS service with a non root user.
+- Run the service with a non-root user.
 
 ### Before running the service:
 
