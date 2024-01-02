@@ -30,7 +30,7 @@ This page documents the setup of the production-ready Test Result Summary Servic
 
 #### Nginx config
 
-The TRSS setup will include 2 layers of nginx. One running on the host system and one in a docker container (the docker container is created later when you run the TRSS service for the first time). The host system layer is responsible for receiving all inbound traffic which it will direct to the nginx docker container. The docker container layer will redirect this traffic to the appropriate TRSS service.
+The TRSS setup includes 2 layers of nginx. One running on the host system and one in a docker container (the docker container is created later when you run the TRSS service for the first time). The host system layer is responsible for receiving all inbound traffic which will direct to the nginx docker container. The docker container layer redirects this traffic to the appropriate TRSS service.
 
 The host system layer nginx.conf at `/etc/nginx/nginx.conf` should include 
 ```
