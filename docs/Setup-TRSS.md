@@ -1,6 +1,6 @@
 # TRSS Setup
 
-This page will document the setup of the TRSS service running at [trss.adoptium.net](https://trss.adoptium.net).
+This page documents the setup of the production-ready Test Result Summary Service (TRSS) running at [trss.adoptium.net](https://trss.adoptium.net).  For instructions to run TRSS for development purposes, refer to the [local deployment instructions](https://github.com/adoptium/aqa-test-tools/tree/master/TestResultSummaryService#docker-compose) in the aqa-test-tools repository.
 
 ## Setup
 
