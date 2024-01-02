@@ -30,7 +30,9 @@ This page will document the setup of the TRSS service running at [trss.adoptium.
 
 #### Nginx config
 
-A basic `/etc/nginx/nginx.conf` should include 
+The TRSS setup will include 2 layers of nginx. One running on the host system and one in a docker container (the docker container is created later when you run the TRSS service for the first time). The host system layer is responsible for receiving all inbound traffic which it will direct to the nginx docker container. The docker container layer will redirect this traffic to the appropriate TRSS service.
+
+The host system layer nginx.conf at `/etc/nginx/nginx.conf` should include 
 ```
 include /etc/nginx/sites-enabled/*;
 ```
@@ -43,7 +45,7 @@ The file `/etc/nginx/sites-enabled/defaults` should contain a code block which p
     }
 ```
 
-`http://localhost:4000` runs another `nginx` service in a docker container. Its purpose is to redirect traffic to the appropriate TRSS docker container.
+`http://localhost:4000` will be where the docker nginx layer will listen for incoming traffic.
 
 #### Installing Certbot (requires root access)
 
@@ -66,11 +68,11 @@ certbot --nginx
 
 ### Steps to run the service
 
-1. Clone the [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) repository and `cd` into it
+1. On the filesystem created for the TRSS service (see this [step](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-TRSS.md#pre-setup-recommendations)), clone the [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) repository and `cd` into it.
 
 2. Move the `trssConf.json` file you created [earlier](https://github.com/adoptium/infrastructure/blob/master/docs/Setup-TRSS.md#Connecting-to-Jenkins) into `aqa-test-tools/TestResultSummaryService/`
 
-3. From the top level directory of the repository run `npm run docker &`
+3. From the top level directory of the repository run `npm run docker &`. FYI the directory `$PWD/aqa-test-tools/mongo/data` is mapped to `/data/db` inside the aqa-test-tools-mongo docker container, this directory will be where mongo stores its data. See the [docker-compose.yml](https://github.com/adoptium/aqa-test-tools/blob/master/docker-compose.yml) for more details.
 
 4. If your `nginx` configuration is setup correctly, run `nginx -s reload`.
 
