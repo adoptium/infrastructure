@@ -1,10 +1,9 @@
 FROM registry.access.redhat.com/rhel7
-# This dockerfile should be built using:
-#  docker build --no-cache -t rhel7_build_image -f ansible/docker/Dockerfile.RHEL7 --build-arg ROSIUSER=******* --build-arg ROSIPW=******* --build-arg git_sha=******* `pwd`
+# This dockerfile should be built using this from the top level of the repository:
+#  ROSIPW=******* docker build --no-cache -t rhel7_build_image -f ansible/docker/Dockerfile.RHEL7 --build-arg ROSIUSER=******* --secret id=ROSIPW --build-arg git_sha="$(git rev-parse --short HEAD)" `pwd`
 ARG ROSIUSER
-ARG ROSIPW
 RUN sed -i 's/\(def in_container():\)/\1\n    return False/g' /usr/lib64/python*/*-packages/rhsm/config.py
-RUN subscription-manager register --username=${ROSIUSER} --password=${ROSIPW} --auto-attach
+RUN --mount=type=secret,id=ROSIPW,required=true subscription-manager register --username=${ROSIUSER} --password="$(cat /run/secrets/ROSIPW)" --auto-attach
 RUN subscription-manager repos --enable rhel-7-for-system-z-optional-rpms
 # ^^ Optional repo needed for Xvfb
 
