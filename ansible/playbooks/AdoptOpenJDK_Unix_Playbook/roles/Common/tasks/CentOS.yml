@@ -17,7 +17,7 @@
     name: epel-release
     state: installed
     update_cache: yes
-    validate_certs: no
+    validate_certs: true
   when: ansible_distribution_major_version != "8"
   tags: patch_update
 
@@ -199,7 +199,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: true
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - ansible_architecture == "x86_64"
