@@ -31,7 +31,7 @@
   tags: [patch_update, azul-key]
 
 - name: Add Azul Zulu repository for x86_64
-  apt_repository: repo='deb https://repos.azulsystems.com/ubuntu stable main'
+  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
   when:
     - ansible_architecture == "x86_64"
   tags: patch_update
