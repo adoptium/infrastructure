@@ -30,7 +30,7 @@
     dest: /tmp/
     remote_src: yes
     mode: 0755
-    validate_certs: False
+    validate_certs: True
   when: not freemarker.stat.exists and ansible_distribution == "Solaris"
   tags: [freemarker, adoptopenjdk]
 
