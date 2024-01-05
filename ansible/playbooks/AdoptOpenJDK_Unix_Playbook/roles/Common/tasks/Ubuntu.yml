@@ -24,14 +24,14 @@
 
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
-    url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    url: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
     state: present
   when:
     - ansible_architecture == "x86_64"
   tags: [patch_update, azul-key]
 
 - name: Add Azul Zulu repository for x86_64
-  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+  apt_repository: repo='deb https://repos.azulsystems.com/ubuntu stable main'
   when:
     - ansible_architecture == "x86_64"
   tags: patch_update
