@@ -217,9 +217,9 @@
 
 - name: Download IBM Java 8
   get_url:
-    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.5.7/linux/x86_64/ibm-java-sdk-8.0-5.7-x86_64-archive.bin
+    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.8.11/linux/x86_64/ibm-java-sdk-8.0-8.11-x86_64-archive.bin
     dest: /tmp/ibm-java.bin
-    validate_certs: no
+    validate_certs: yes
   when:
     - ansible_distribution_major_version == "11"
     - not java8_installed.stat.exists
@@ -291,7 +291,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: yes
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")

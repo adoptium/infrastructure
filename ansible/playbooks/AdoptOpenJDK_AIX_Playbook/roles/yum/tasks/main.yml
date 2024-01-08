@@ -50,7 +50,7 @@
       get_url:
         url: "{{ item }}"
         mode: 0644
-        validate_certs: false
+        validate_certs: true
         dest: /tmp/yum
       with_items:
         "{{ yum_downloads }}"
