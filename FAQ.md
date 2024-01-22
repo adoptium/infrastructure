@@ -208,8 +208,10 @@ is more information on running tests yourself in the
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of.
 These are the parameters to pass into a Grinder job in jenkins. If using
-these from the command line as per the example above, the `TARGET` name
-should have an underscore `_` prepended to it.
+these from the command line instead of a Grinder job there are a couple of
+things regarding the information in this table:
+- The `TARGET` name should have an underscore `_` prepended to it (like the shell snippet above)
+- For custom targets, specify it as a JDK_CUSTOM_TARGET variable to make e.g. `make _jdk_custom JDK_CUSTOM_TARGET=java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 | `BUILD_LIST` | `TARGET` | `CUSTOM_TARGET` | What does it test? |
 | --- | --- | --- | --- |
