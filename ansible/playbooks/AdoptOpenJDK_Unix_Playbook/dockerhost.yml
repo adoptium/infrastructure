@@ -30,7 +30,7 @@
     - role: Swap_File
     - role: Crontab
     - role: adoptopenjdk_install
-      jdk_version: 11
+      jdk_version: 21
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
