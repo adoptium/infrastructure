@@ -4,9 +4,22 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.n
 RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-release
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Install Additional Repos
+# N.B https is not available for centos mirror, so adding independently verified checksum validation for http downloads
 RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm' -O /tmp/gpgkey.rpm
+ARG GPG_CHECKSUM=79cda0505d8dd88b8277c1af9c55021319a0e516df8d24c893d740eac1d74feb
+RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
+    && if [ "$ACTUAL_CHECKSUM" != "$GPG_CHECKSUM" ]; then \
+           echo "Checksum mismatch! Aborting installation."; \
+           exit 1; \
+       fi
 RUN rpm -i '/tmp/gpgkey.rpm'
 RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-3.el8.noarch.rpm' -O /tmp/centosrepos.rpm
+ARG REPO_CHECKSUM=bd0c7fe3f1f6a08f4658cc0cc9b1c1a91e38f8bf60c3af2ed2ee220523ded269
+RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
+    && if [ "$ACTUAL_CHECKSUM" != "$REPO_CHECKSUM" ]; then \
+           echo "Checksum mismatch! Aborting installation."; \
+           exit 1; \
+       fi
 RUN rpm -i '/tmp/centosrepos.rpm'
 # Get latest jdk17 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
