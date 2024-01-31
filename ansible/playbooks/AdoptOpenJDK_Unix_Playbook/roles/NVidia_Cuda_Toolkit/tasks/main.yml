@@ -112,7 +112,7 @@
     - nvidia_cuda_toolkit
     - skip_ansible_lint
 
-- name: Enable NVidia CUDA toolkit Repo for SLES12 on x86_64
+- name: Install NVidia CUDA toolkit Repo for SLES12 on x86_64
   command: rpm -i /tmp/sles12_cuda9_repo.rpm
   when:
     - cuda_installed.stat.islnk is not defined
