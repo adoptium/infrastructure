@@ -100,6 +100,7 @@ hosts:
 
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212, description: 32CPU, 400G}
+          ubuntu2204-x64-1: {ip: 20.61.136.254, description: 24 core Intel X5650}
 
   - test:
 
