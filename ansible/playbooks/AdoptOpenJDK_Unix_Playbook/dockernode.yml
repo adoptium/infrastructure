@@ -3,7 +3,7 @@
 # Adoptium - Ansible Playbook #
 ###############################
 
-- name: dockernode playbook
+- name: Dockernode playbook
   hosts: all
   gather_facts: yes
 
