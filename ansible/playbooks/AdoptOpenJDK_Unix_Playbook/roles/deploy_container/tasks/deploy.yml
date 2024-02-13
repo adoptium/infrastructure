@@ -1,26 +1,36 @@
 ---
 
-# - name: debug from deploy - task 1
-#   debug:
-#     msg: "{{ docker_image }}"
-
-# - name: task 2
-#   debug:
-#     msg: " Hello "
-
-# - name: task 3
-#   debug:
-#     msg: "{{ arch }} + {{ os }}"
-
-
-- name: Find free port
-
 - name: Transfer dockerfile
+  copy:
+    src: Dockerfiles/
+    dest: /tmp/Dockerfiles/Dockerfile.{{ docker_image }}
 
-- name: build docker images
-  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ item }} --memory=6G -f /tmp/Dockerfiles/Dockerfile.Dockerfile{{ docker_image }} /tmp/Dockerfiles
+- name: Translate architecture in dockerfiles
+  replace:
+    dest: /tmp/Dockerfiles/Dockerfile.{{ docker_image }}
+    regexp: "arch=x64"
+    replace: "arch={{ ansible_architecture }}"
+  when: ansible_architecture != "x86_64"
 
-- name: run container
-  command: docker run --restart unless-stopped -p {{ port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image }}.{{ port }} aqa_{{ docker_image }}
+- name: Set jenkins authorized_Key in dockerfiles
+  replace:
+    dest:  /tmp/Dockerfiles/Dockerfile.{{ docker_image }}
+    regexp: "Jenkins_User_SSHKey"
+    replace: "{{ Jenkins_User_SSHKey }}"
+
+- name: Build {{ docker_image }} docker images
+  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ item }} --memory=6G -f /tmp/Dockerfiles/Dockerfile.{{ docker_image }} /tmp/Dockerfiles
+
+# Without specifying a port here, docker will give the container a random unused port
+- name: Run {{ docker_image }} docker container
+  command: docker run --restart unless-stopped -p 22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.PORT aqa_{{ docker_image }}
+
+# Now we want to rename the running container with the port name
+- name: Find assigned port of {{ docker_image }} container
+  command: docker port {{ docker_image | upper }}.PORT | head -n 1 | cut -d ':' -f 2
+  register: docker_port
+
+- name: Rename {{ docker_image }} container to {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
+  command: docker rename {{ docker_image | upper }}.PORT {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
 
 # - name: run python file which creates jenkins node

@@ -4,10 +4,11 @@
 ###############################
 
 - name: dockernode playbook
-  hosts: localhost
+  hosts: all
   gather_facts: yes
   
   roles:
-    - Debug
+    - role: Debug
+      tags: debug
     - role: deploy_container
       tags: deploy
