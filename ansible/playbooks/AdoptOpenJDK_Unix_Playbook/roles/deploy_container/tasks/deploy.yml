@@ -2,7 +2,7 @@
 
 - name: Transfer dockerfile
   copy:
-    src: Dockerfiles/
+    src: DockerStatic/Dockerfiles/
     dest: /tmp/Dockerfiles/Dockerfile.{{ docker_image }}
 
 - name: Translate architecture in dockerfiles
