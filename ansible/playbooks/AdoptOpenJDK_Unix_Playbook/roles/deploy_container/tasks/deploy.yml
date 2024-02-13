@@ -32,5 +32,3 @@
 
 - name: Rename {{ docker_image }} container to {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
   command: docker rename {{ docker_image | upper }}.PORT {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
-
-# - name: run python file which creates jenkins node
