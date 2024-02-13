@@ -6,7 +6,7 @@
 - name: dockernode playbook
   hosts: all
   gather_facts: yes
-  
+
   roles:
     - role: Debug
       tags: debug
