@@ -4,7 +4,7 @@
   set_fact:
     docker_images_list: "{{ docker_images.split(',') | list }}"
 
-- name: Check if dockerfiles exist
+- name: Check if dockerfile exists
   stat:
     path: "DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
   loop: "{{ docker_images_list }}"
