@@ -31,7 +31,7 @@ RUN ssh-keygen -A
 
 CMD ["/usr/sbin/sshd", "-D"]
 
-RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server gawk
+RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server gawk hostname
 
 # Install SSL Test packages
 RUN zypper install -y gnutls mozilla-nss mozilla-nss-devel mozilla-nss-tools
