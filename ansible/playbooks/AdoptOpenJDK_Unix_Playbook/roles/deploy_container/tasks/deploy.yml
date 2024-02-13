@@ -1,0 +1,26 @@
+---
+
+# - name: debug from deploy - task 1
+#   debug:
+#     msg: "{{ docker_image }}"
+
+# - name: task 2
+#   debug:
+#     msg: " Hello "
+
+# - name: task 3
+#   debug:
+#     msg: "{{ arch }} + {{ os }}"
+
+
+- name: Find free port
+
+- name: Transfer dockerfile
+
+- name: build docker images
+  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ item }} --memory=6G -f /tmp/Dockerfiles/Dockerfile.Dockerfile{{ docker_image }} /tmp/Dockerfiles
+
+- name: run container
+  command: docker run --restart unless-stopped -p {{ port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image }}.{{ port }} aqa_{{ docker_image }}
+
+# - name: run python file which creates jenkins node

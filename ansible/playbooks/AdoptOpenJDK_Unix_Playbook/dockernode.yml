@@ -1,0 +1,13 @@
+---
+###############################
+# Adoptium - Ansible Playbook #
+###############################
+
+- name: dockernode playbook
+  hosts: localhost
+  gather_facts: yes
+  
+  roles:
+    - Debug
+    - role: deploy_container
+      tags: deploy

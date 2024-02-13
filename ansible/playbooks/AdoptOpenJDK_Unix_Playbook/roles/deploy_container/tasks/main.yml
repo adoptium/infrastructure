@@ -1,0 +1,31 @@
+---
+
+# This is a wrapper, this role with run a sub role (one which actually builds and runs the container)
+# It will loop the sub role depending on the number of containers the user wants to build
+
+# Does there exist a dockerfile of the chosen OS?
+- name: Verify passed variables
+  debug:
+    msg: "{{ docker_images }}"
+
+# List of docker images to create
+- name: set docker images list
+  set_fact:
+    docker_images_list: "{{ docker_images.split(',') | list }}"
+
+# - name: print docker_images_list
+#   debug:
+#     msg: "{{ item }}"
+#   loop: "{{ docker_images_list }}"
+
+- name: Set variables (architecture etc) to be put into dockerfile
+  
+  # set_fact:
+  #   arch: armv7
+  #   os: ubuntu
+
+- name: run deploy.yml with variables
+  include_tasks: deploy.yml
+  loop: "{{ docker_images_list }}"
+  loop_control:
+    loop_var: docker_image
