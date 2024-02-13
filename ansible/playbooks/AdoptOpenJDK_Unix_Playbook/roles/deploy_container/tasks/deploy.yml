@@ -19,7 +19,7 @@
     replace: "{{ Jenkins_User_SSHKey }}"
 
 - name: Build {{ docker_image }} docker images
-  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ item }} --memory=6G -f /tmp/Dockerfiles/Dockerfile.{{ docker_image }} /tmp/Dockerfiles
+  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }} --memory=6G -f /tmp/Dockerfiles/Dockerfile.{{ docker_image }} /tmp/Dockerfiles
 
 # Without specifying a port here, docker will give the container a random unused port
 - name: Run {{ docker_image }} docker container
