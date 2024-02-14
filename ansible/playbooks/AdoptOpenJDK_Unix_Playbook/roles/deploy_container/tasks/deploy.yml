@@ -8,8 +8,8 @@
 - name: Translate architecture in dockerfile
   replace:
     dest: /tmp/Dockerfile.{{ docker_image }}
-    regexp: "arch=x64"
-    replace: "arch={{ ansible_architecture }}"
+    regexp: "x64"
+    replace: "{{ ansible_architecture }}"
   when: ansible_architecture != "x86_64"
 
 - name: Set jenkins authorized_Key in dockerfiles
@@ -27,7 +27,7 @@
 
 # Now we want to rename the running container with the port name
 - name: Find assigned port of {{ docker_image }} container
-  command: docker port {{ docker_image | upper }}.PORT | head -n 1 | cut -d ':' -f 2
+  shell: docker port {{ docker_image | upper }}.PORT | head -n 1 | cut -d ':' -f 2
   register: docker_port
 
 - name: Rename {{ docker_image }} container to {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
