@@ -5,8 +5,9 @@
     docker_images_list: "{{ docker_images.split(',') | list }}"
 
 - name: Check if dockerfile exists
+  delegate_to: localhost
   stat:
-    path: "../../DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
+    path: "DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
   loop: "{{ docker_images_list }}"
   register: dockerfiles_exist
 
