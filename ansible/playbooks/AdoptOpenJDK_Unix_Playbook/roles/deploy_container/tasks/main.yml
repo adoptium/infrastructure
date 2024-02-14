@@ -11,8 +11,8 @@
   register: dockerfiles_exist
 
 - name: Debug, print dockerfiles_exist
-  msg:
-    debug: "{{ dockerfiles_exist }}"
+  debug:
+    msg: "{{ dockerfiles_exist }}"
 
 - name: Fail if dockerfile does not exist
   fail:
