@@ -10,5 +10,7 @@
   roles:
     - role: Debug
       tags: debug
+    - role: Get_Vendor_Files
+      tags: deploy
     - role: deploy_container
       tags: deploy
