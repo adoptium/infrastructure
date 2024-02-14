@@ -52,9 +52,6 @@ hosts:
       - equinix_esxi:
           solaris10-x64-1: {ip: 145.40.115.43}
 
-      - macstadium:
-          macos1014-x64-1: {ip: 208.83.1.170, user: Administrator, description: G3B i7-4C/16G/250G}
-
       - marist:
           rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
           rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
@@ -147,7 +144,6 @@ hosts:
 
       - macstadium:
           macos1014-x64-1: {ip: 207.254.29.43, user: administrator, description: G3B i7/4C/16G/250G}
-          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator, description: G5A M1/8C/8G/256G}
 
       - marist:
           rhel7-s390x-2: {ip: 148.100.74.92}
