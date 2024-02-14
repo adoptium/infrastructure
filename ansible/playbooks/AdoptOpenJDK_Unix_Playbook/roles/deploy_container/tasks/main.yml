@@ -6,7 +6,7 @@
 
 - name: Check if dockerfile exists
   stat:
-    path: "DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
+    path: "../../DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
   loop: "{{ docker_images_list }}"
   register: dockerfiles_exist
 
@@ -16,7 +16,7 @@
 
 - name: Fail if dockerfile does not exist
   fail:
-    msg: "{{ item.stat.path }} does not exist"
+    msg: "{{ item.invocation.module_args.path }} does not exist"
   when: not item.stat.exists
   loop: "{{ dockerfiles_exist.results }}"
 
