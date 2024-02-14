@@ -16,8 +16,8 @@
   when: not item.stat.exists
   loop: "{{ dockerfiles_exist.results }}"
 
-- name: Run deploy.yml for every docker image
-  include_tasks: deploy.yml
-  loop: "{{ docker_images_list }}"
-  loop_control:
-    loop_var: docker_image
+# - name: Run deploy.yml for every docker image
+#   include_tasks: deploy.yml
+#   loop: "{{ docker_images_list }}"
+#   loop_control:
+#     loop_var: docker_image
