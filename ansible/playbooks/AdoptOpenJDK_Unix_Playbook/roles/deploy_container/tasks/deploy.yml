@@ -5,7 +5,7 @@
     src: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ docker_image }}"
     dest: "/tmp/Dockerfiles/Dockerfile.{{ docker_image }}"
 
-- name: Translate architecture in dockerfiles
+- name: Translate architecture in dockerfile
   replace:
     dest: /tmp/Dockerfiles/Dockerfile.{{ docker_image }}
     regexp: "arch=x64"

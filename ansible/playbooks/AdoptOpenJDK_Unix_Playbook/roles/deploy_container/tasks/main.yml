@@ -11,10 +11,6 @@
   loop: "{{ docker_images_list }}"
   register: dockerfiles_exist
 
-- name: Debug, print dockerfiles_exist
-  debug:
-    msg: "{{ dockerfiles_exist }}"
-
 - name: Fail if dockerfile does not exist
   fail:
     msg: "{{ item.invocation.module_args.path }} does not exist"
