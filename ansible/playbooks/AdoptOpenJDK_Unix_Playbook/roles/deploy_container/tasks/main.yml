@@ -4,15 +4,6 @@
   set_fact:
     docker_images_list: "{{ docker_images.split(',') | list }}"
 
-- name: PWD
-  delegate_to: localhost
-  command: pwd
-  register: PWD
-
-- name: Print PWD output
-  debug:
-    msg: "{{ PWD.stdout }}"
-
 - name: Check if dockerfile exists
   delegate_to: localhost
   stat:
