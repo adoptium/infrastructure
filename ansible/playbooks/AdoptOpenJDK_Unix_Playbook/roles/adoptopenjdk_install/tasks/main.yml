@@ -162,7 +162,7 @@
 
     - name: Download latest release (Linux/Alpine-Linux)
       get_url:
-        url: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+        url: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk"
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
         mode: 0440
       retries: 3
@@ -360,7 +360,7 @@
   block:
     - name: Download latest JDK {{ jdk_version }} release (macOS)
       get_url:
-        url: {{ api_url }}/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
+        url: "{{ api_url }}/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk"
         dest: /tmp/{{ jdk_version }}-installer.pkg
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
@@ -369,7 +369,7 @@
 
     - name: Download JDK10 tarball when installer is not available (macOS)
       unarchive:
-        src: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+        src: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk"
         remote_src: yes
         dest: /Library/Java/JavaVirtualMachines/
       become: yes
