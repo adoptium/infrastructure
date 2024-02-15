@@ -1,10 +1,11 @@
 ---
-
+# Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
 - name: Transfer dockerfile
   copy:
     src: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ docker_image }}"
     dest: "/tmp/Dockerfile.{{ docker_image }}"
 
+# For images built on non x86_64 dockerhosts
 - name: Translate architecture in dockerfile
   replace:
     dest: /tmp/Dockerfile.{{ docker_image }}

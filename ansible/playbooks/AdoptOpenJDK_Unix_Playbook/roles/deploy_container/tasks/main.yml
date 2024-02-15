@@ -1,5 +1,6 @@
 ---
-
+# This task verifies the docker_images arguments passed into the playbook
+# Then runs the deploy.yml task to build and run each image on the dockerhost
 - name: Set docker images list variable
   set_fact:
     docker_images_list: "{{ docker_images.split(',') | list }}"
