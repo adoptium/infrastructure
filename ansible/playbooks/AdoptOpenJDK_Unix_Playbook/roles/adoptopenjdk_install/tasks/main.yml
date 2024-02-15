@@ -11,14 +11,14 @@
   set_fact:
     api_url: https://api.adoptium.net
   when:
-    - ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+    - ( jdk_version == 8 OR jdk_version == 11 OR jdk_version >= 17 )
   tags: adoptopenjdk_install
 
 - name: Use adoptopenjdk API if release is not supported by adoptium
   set_fact:
     api_url: https://api.adoptopenjdk.net
   when:
-    - ! ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+    - ! ( jdk_version == 8 OR jdk_version == 11 OR jdk_version >= 17 )
   tags: adoptopenjdk_install
 
 - name: Set path variable when jdk_version == 8
