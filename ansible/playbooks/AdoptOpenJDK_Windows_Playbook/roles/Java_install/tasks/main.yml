@@ -8,14 +8,23 @@
   register: java_installed
   tags: Java_install
 
+- name: Use adoptium API if release is available at adoptium
+  set_fact:
+    api_url: https://api.adoptium.net
+  when:
+    - ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+  tags: adoptopenjdk_install
 
-- name: Set API source for old java versions
-  set_fact: apisource=api.adoptopenjdk.net
-  when: jdk_version==10
-    
+- name: Use adoptopenjdk API if release is not supported by adoptium
+  set_fact:
+    api_url: https://api.adoptopenjdk.net
+  when:
+    - ! ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+  tags: adoptopenjdk_install
+
 - name: Download Java{{ jdk_version }}
   win_get_url:
-    url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    url: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
   when: not java_installed.stat.exists and jdk_version!=10
   tags: Java_install
@@ -23,7 +32,7 @@
 # Java 10 is the only version we still need to retrieve from adoptopenjdk
 - name: Download Java{{ jdk_version }} from adoptopenjdk
   win_get_url:
-    url: https://api.adoptopenjdk.net/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    url: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
   when: not java_installed.stat.exists and jdk_version==10
   tags: Java_install
