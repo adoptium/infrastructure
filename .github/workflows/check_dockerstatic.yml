@@ -25,14 +25,8 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: alpine13.1
-           dockerfile: "Dockerfile.alp311"
-         - os: alpine13.2
-           dockerfile: "Dockerfile.alp312"
-         - os: alpine13.3
-           dockerfile: "Dockerfile.alp313"
-         - os: alpine13.4
-           dockerfile: "Dockerfile.alp314"
+         - os: alpine3.19
+           dockerfile: "Dockerfile.alp319"
     steps:
     - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
@@ -65,12 +59,8 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: fedora33
-           dockerfile: "Dockerfile.f33"
-         - os: fedora34
-           dockerfile: "Dockerfile.f34"
          - os: fedora35
-           dockerfile: "Dockerfile.f35"
+           dockerfile: "Dockerfile.f39"
     steps:
     - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
