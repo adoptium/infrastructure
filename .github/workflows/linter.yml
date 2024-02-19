@@ -6,6 +6,7 @@ on:
     paths:
       - ansible/**
       - .ansible-lint
+      - .github/workflows/*
     branches:         
       - master
   push:
