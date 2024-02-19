@@ -1,12 +1,13 @@
+---
 name: Vagrant Playbook Checker
 
 on:
   pull_request:
     paths:
-    - .github/workflows/build_vagrant.yml
-    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
+      - .github/workflows/build_vagrant.yml
+      - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:
-    - master
+      - master
 
 # Cancel existing runs if user makes another push.
 concurrency:
@@ -22,7 +23,7 @@ jobs:
     runs-on: macos-12
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: Install dependencies
       run: |

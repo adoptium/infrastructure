@@ -1,3 +1,4 @@
+---
 # GH action workflow to check ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/*
 # trigger on PR towards 'master' branch when files in ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic changed
 
@@ -6,10 +7,10 @@ name: DockerStatic Checker
 on:
   pull_request:
     paths:
-    - .github/workflows/check_dockerstatic.yml
-    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/**
+      - .github/workflows/check_dockerstatic.yml
+      - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/**
     branches:         
-    - master
+      - master
 env:
   ROOT_PATH: "ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/"
 
@@ -24,17 +25,17 @@ jobs:
       fail-fast: true
       max-parallel: 4
       matrix:
-       include:
-         - os: alpine13.1
-           dockerfile: "Dockerfile.alp311"
-         - os: alpine13.2
-           dockerfile: "Dockerfile.alp312"
-         - os: alpine13.3
-           dockerfile: "Dockerfile.alp313"
-         - os: alpine13.4
-           dockerfile: "Dockerfile.alp314"
+        include:
+          - os: alpine13.1
+            dockerfile: "Dockerfile.alp311"
+          - os: alpine13.2
+            dockerfile: "Dockerfile.alp312"
+          - os: alpine13.3
+            dockerfile: "Dockerfile.alp313"
+          - os: alpine13.4
+            dockerfile: "Dockerfile.alp314"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -51,7 +52,7 @@ jobs:
          - os: centos8
            dockerfile: "Dockerfile.cent8"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -64,15 +65,15 @@ jobs:
       fail-fast: true
       max-parallel: 4
       matrix:
-       include:
-         - os: fedora33
-           dockerfile: "Dockerfile.f33"
-         - os: fedora34
-           dockerfile: "Dockerfile.f34"
-         - os: fedora35
-           dockerfile: "Dockerfile.f35"
+        include:
+          - os: fedora33
+            dockerfile: "Dockerfile.f33"
+          - os: fedora34
+            dockerfile: "Dockerfile.f34"
+          - os: fedora35
+            dockerfile: "Dockerfile.f35"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -85,13 +86,13 @@ jobs:
       fail-fast: true
       max-parallel: 4
       matrix:
-       include:
-         - os: ubuntu16.04
-           dockerfile: "Dockerfile.u1604"
-         - os: ubuntu18.04
-           dockerfile: "Dockerfile.u1804"
-         - os: ubuntu20.04
-           dockerfile: "Dockerfile.u2004"
+        include:
+          - os: ubuntu16.04
+            dockerfile: "Dockerfile.u1604"
+          - os: ubuntu18.04
+            dockerfile: "Dockerfile.u1804"
+          - os: ubuntu20.04
+            dockerfile: "Dockerfile.u2004"
     steps:
     - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
     - name: Test Dockerfile on ${{ matrix.os }}

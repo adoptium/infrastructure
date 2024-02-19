@@ -1,3 +1,4 @@
+---
 name: Windows Playbook Checker
 
 defaults:
@@ -7,10 +8,10 @@ defaults:
 on:
   pull_request:
     paths:
-    - .github/workflows/build_wsl.yml
-    - ansible/playbooks/AdoptOpenJDK_Windows_Playbook/**
+      - .github/workflows/build_wsl.yml
+      - ansible/playbooks/AdoptOpenJDK_Windows_Playbook/**
     branches:
-    - master
+      - master
 
 # Cancel existing runs if user makes another push.
 concurrency:

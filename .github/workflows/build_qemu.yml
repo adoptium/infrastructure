@@ -1,12 +1,13 @@
+---
 name: QEMU Playbook Checker
 
 on:
   pull_request:
     paths:
-    - .github/workflows/build_qemu.yml
-    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
+      - .github/workflows/build_qemu.yml
+      - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
     branches:       
-    - master
+      - master
     types: [ labeled ]
 
 permissions:

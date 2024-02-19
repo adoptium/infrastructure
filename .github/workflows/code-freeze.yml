@@ -1,9 +1,10 @@
+---
 name: Code Freeze Bot
 
 # Controls when the workflow will run
 on:
   pull_request_target:
-    branches: [ "master" ]
+    branches: ["master"]
   issue_comment:
     types: [created]
 

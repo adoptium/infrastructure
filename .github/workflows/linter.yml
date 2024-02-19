@@ -1,17 +1,18 @@
+---
 name: Linter
 
 on:
   pull_request:
     paths:
-    - ansible/**
-    - .ansible-lint
+      - ansible/**
+      - .ansible-lint
     branches:         
-    - master
+      - master
   push:
     paths:
-    - ansible/**
+      - ansible/**
     branches:         
-    - master
+      - master
 
 permissions:
   contents: read
@@ -25,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: 'Yamllint'
       uses: karancode/yamllint-github-action@fdef6bc189425ecc84cc4543b2674566c0827053 # v2.1.1
@@ -39,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
     - name: Set up Python 3.x
       uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
