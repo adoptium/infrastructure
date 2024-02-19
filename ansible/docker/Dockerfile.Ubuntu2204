@@ -18,7 +18,6 @@ RUN rm -rf /ansible
 
 RUN groupadd -g 1000 ${user}
 RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
-RUN mv /bin/uname /bin/uname.real && echo "/bin/uname.real \$@ | sed 's/aarch64/armv7l/g'" > /bin/uname && chmod 755 /bin/uname
 
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/jdk8" \
