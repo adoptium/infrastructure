@@ -39,6 +39,7 @@
   action: user name={{ Jenkins_Username }} group=staff state=present home={{ home_folder }} shell=/bin/bash
   when: ansible_distribution == "MacOSX"
   tags: [jenkins_user, adoptopenjdk]
+  become: true
 
 - name: Enable SSH login for Jenkins user (macOS)
   command: dseditgroup -o edit -a {{ Jenkins_Username }} -t staff com.apple.access_ssh
@@ -78,23 +79,20 @@
   authorized_key:
     user: "{{ Jenkins_Username }}"
     state: present
-    key: "{{ Jenkins_User_SSHKey }}"
+    key: "{{ lookup('file', 'authorized_key.pub') }}"
   tags: [jenkins_user, jenkins_authorized_key, adoptopenjdk]
+  become: true
 
-- name: Add github.com to known_hosts
+- name: Add needed items to "{{ home_folder }}/.ssh/known_hosts"
   known_hosts:
-    name: github.com
-    key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+    name: "{{ item.name }}"
+    key: "{{ item.value }}"
     path: "{{ home_folder }}/.ssh/known_hosts"
     state: present
+  with_items: "{{known_keys}}"
   tags: [jenkins_user, adoptopenjdk]
-
-- name: Change ownership of jenkins' ~/.ssh/known_hosts
-  file:
-    path: "{{ home_folder }}/.ssh/known_hosts"
-    owner: "{{ Jenkins_Username }}"
-    mode: 0644
-  tags: [jenkins_user, adoptopenjdk]
+  become: true
+  become_user: '{{ Jenkins_Username }}'
 
 - name: Add Jenkins user to the audio group
   user: name={{ Jenkins_Username }}
@@ -104,6 +102,7 @@
     - (ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture != "armv7l"
   tags: [jenkins_user, adoptopenjdk]
+  become: true
 
 - name: Unset expiry on user account for Redhat for Jenkins user
   command: chage -M -1 -E -1 {{ Jenkins_Username }}
@@ -136,5 +135,51 @@
     - ansible_architecture == "x86_64"
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"
+  tags:
+    - jenkins_user
+
+#additional settings for user jenkins
+- name: check if bin paths are exist before add them to {{ home_folder }}/.bashrc
+  stat: path={{item}}
+  with_items: 
+    - /opt/homebrew/bin/
+    - /usr/local/bin/
+  register: mac_bin_paths
+  tags:
+    - jenkins_user
+
+- name: configure {{ home_folder }}/.bashrc
+  copy:
+    dest: "{{ home_folder }}/.bashrc"
+    content: "export PATH={{ mac_bin_paths | join(':') }}:{{ lookup('ansible.builtin.env', 'PATH') }}"
+    owner: "{{ Jenkins_Username }}"
+    mode: 0700
+  become: true
+  tags:
+    - jenkins_user
+
+- name: create folder "{{ home_folder }}/openjdk_cache"
+  file: 
+    path: "{{ home_folder }}/openjdk_cache"
+    state: directory
+    owner: "{{ Jenkins_Username }}"
+    mode: 0755
+  become: true
+  tags:
+    - jenkins_user
+
+- name: fetch required JDK repo into {{ home_folder }}/openjdk_cache
+  shell: 
+    cmd: |
+      git init --bare
+      git remote -v | grep jdk8   || git remote add jdk8 https://github.com/ibmruntimes/openj9-openjdk-jdk8.git
+      git remote -v | grep jdk11  || git remote add jdk11 https://github.com/ibmruntimes/openj9-openjdk-jdk11.git 
+      git remote -v | grep jdk    || git remote add jdk https://github.com/ibmruntimes/openj9-openjdk-jdk.git 
+      git remote -v | grep openj9 || git remote add openj9 https://github.com/eclipse-openj9/openj9.git 
+      git remote -v | grep omr    || git remote add omr https://github.com/eclipse-openj9/openj9-omr.git
+      git fetch --all
+    chdir: "{{ home_folder }}/openjdk_cache"
+  become: true
+  become_user:  "{{ Jenkins_Username }}"
   tags:
     - jenkins_user

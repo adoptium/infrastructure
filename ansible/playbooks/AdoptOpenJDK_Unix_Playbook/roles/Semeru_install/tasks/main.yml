@@ -1,0 +1,8 @@
+---
+#####################
+# install Semeru OE #
+#####################
+
+- name: install Semeru OE
+  include_tasks: semeru-install.yml
+  tags: semeru_install

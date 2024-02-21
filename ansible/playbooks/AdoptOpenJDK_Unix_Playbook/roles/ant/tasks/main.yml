@@ -5,34 +5,9 @@
 
 # Install Apache Ant from binaries on RHEL and Centos
 
-- name: Check if Apache Ant is already installed in custom location /usr/local
-  shell: ls /usr/local/apache-ant-1.10.5 >/dev/null 2>&1
-  failed_when: false
-  register: ant_installed
-  changed_when: false
-  tags:
-    - ant
-    - skip_ansible_lint
-
-- name: Download Apache Ant binaries
-  get_url:
-    url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip
-    dest: /tmp/
-    mode: 0440
-    timeout: 25
-    validate_certs: no
-    checksum: sha512:2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163
-  when:
-    - ant_installed.rc != 0
-    - ansible_distribution != "MacOSX"
-    - ansible_distribution != "Solaris"
-  tags: ant
-
-- name: Download Apache Ant binaries (macOS) and (Solaris)
-  command: wget https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip -O /tmp/apache-ant-1.10.5-bin.zip
-  when:
-    - ant_installed.rc != 0
-    - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
+- name: set ant binary file name to variable
+  set_fact:
+    ant_binary_file_name: "{{ Ant_Download_URL.split('/')[-1] }}"
   tags: ant
 
 - name: Create /usr/local if it doesn't exist
@@ -43,46 +18,13 @@
   when: ansible_distribution == "Solaris"
   tags: ant
 
-- name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-1.10.5-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc" -k {{ key.apache_ant }}
-  when: ant_installed.rc != 0
-  tags: ant
-
-- name: Extract ant
-  unarchive:
-    src: /tmp/apache-ant-1.10.5-bin.zip
-    dest: /usr/local
-    copy: False
-  when:
-    - ant_installed.rc != 0
-  tags: ant
-
 - name: Create /usr/local/bin if it doesn't exist
   file:
     path: /usr/local/bin
     state: directory
     mode: '0755'
   when: ansible_distribution != "MacOSX"
-  tags: ant
-
-- name: Create /usr/local/bin/ant symlink
-  file:
-    src: /usr/local/apache-ant-1.10.5/bin/ant
-    dest: /usr/local/bin/ant
-    state: link
-  when:
-    - ant_installed.rc != 0
-  tags: ant
-
-- name: Clean up downloaded packages
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /tmp/apache-ant-1.10.5-bin.zip
-  when:
-    - ant_installed.rc != 0
-  failed_when: false
+  become: true
   tags: ant
 
 - name: Remove the older Ant package via yum
@@ -104,4 +46,63 @@
       - ant-optional
   when:
     - ansible_distribution == "Ubuntu"
+  tags: ant
+
+- name: Check if Apache Ant is already installed in custom location /usr/local
+  stat: 
+    path: /usr/local/bin/ant
+  register: ant_installed
+  tags:
+    - ant
+    - skip_ansible_lint
+
+- name: install and configure ant
+  block:
+
+  - name: Download Apache Ant binaries
+    get_url:
+      url: '{{ Ant_Download_URL }}'
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
+      validate_certs: no
+      checksum: sha512:2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163
+    when:
+      - ansible_distribution != "MacOSX"
+      - ansible_distribution != "Solaris"
+
+  - name: Download Apache Ant binaries (macOS) and (Solaris)
+    get_url: url={{ Ant_Download_URL }} dest=/tmp/{{ ant_binary_file_name }}
+    when:
+      - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
+
+  - name: GPG Signature verification
+    script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/{{ ant_binary_file_name }} -sl "{{ Ant_Download_URL }}.asc" -k {{ key.apache_ant }}
+    ignore_errors: true
+
+  - name: Extract ant
+    unarchive:
+      src: /tmp/{{ ant_binary_file_name }}
+      dest: /usr/local
+      copy: False
+    become: true
+
+  - name: Create /usr/local/bin/ant symlink
+    file:
+      src: /usr/local/{{ ant_binary_file_name.split('-bin')[0] }}/bin/ant
+      dest: "{{ item }}"
+      state: link
+    with_items:
+      - /usr/local/bin/ant
+    become: true
+
+  - name: Clean up downloaded packages
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /tmp/{{ ant_binary_file_name }}
+    failed_when: false
+
+  when: not ant_installed.stat.exists
   tags: ant

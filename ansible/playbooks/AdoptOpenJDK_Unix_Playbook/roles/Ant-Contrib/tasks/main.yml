@@ -1,21 +1,21 @@
 ---
-###############
-# Ant-Contrib #
-###############
+
 
 # ANT_HOME/lib is: /usr/local/apache-ant-*/lib
+# Use the following variables:
+#  antContribVersion: default('1.0b2')
+- name: set ant binary file name to variable
+  set_fact:
+    ant_binary_file_name: "{{ Ant_Download_URL.split('/')[-1].split('-bin')[0] }}"
+  tags: ant-contrib
 
 - name: Set ant-contrib version
-  set_fact: antContribVersion=1.0b2
+  set_fact: antContribVersion={{ antContribVersion | default('1.0b2') }}
   tags: ant-contrib
 
 - name: Set ant_lib_dir variable for on {{ ansible_distribution }} {{ ansible_architecture }}
   set_fact:
-    ant_lib_dir: /usr/local/apache-ant-1.10.5/lib
-  tags: ant-contrib
-
-- name: "Print ant_lib_dir variable"
-  debug: var=ant_lib_dir
+    ant_lib_dir: /usr/local/{{ ant_binary_file_name }}/lib
   tags: ant-contrib
 
 - name: Check if ant-contrib is already installed
@@ -25,79 +25,96 @@
   tags: ant-contrib
 
 - name: Download ant-contrib
-  get_url:
-    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-    dest: /tmp/
-    mode: 0440
-    timeout: 25
-    validate_certs: no
-    checksum: sha256:c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf
-  retries: 3
-  delay: 5
-  register: antContrib_download
-  until: antContrib_download is not failed
+  block:
+
+  - name: Download ant-contrib
+    get_url:
+      url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+      dest: /tmp/
+      mode: 0440
+      timeout: 25
+      validate_certs: no
+      checksum: sha256:c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf
+    retries: 3
+    delay: 5
+    register: antContrib_download
+    until: antContrib_download is not failed
+    when:
+      - ansible_distribution != "MacOSX"
+      - ansible_distribution != "Solaris"
+      - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
+
+  # Use wget instead of ansible's get_url for Centos 6 https://github.com/adoptium/infrastructure/issues/2486
+
+  - name: Download ant-contrib (CentOS 6)
+    command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+    retries: 3
+    delay: 5
+    register: antContrib_download
+    until: antContrib_download is not failed
+    when:
+      - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+  - name: Verify sha256 checksum of download (CentOS 6)
+    stat:
+      path: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+      checksum_algorithm: sha256
+      get_checksum: yes
+    register: antcontrib_checksum
+    failed_when: antcontrib_checksum.stat.checksum != 'c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf'
+    when:
+      - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
+
+  - name: Download ant-contrib (macOS) and (Solaris)
+    get_url: 
+      url: "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz" 
+      dest: "/tmp"
+    retries: 3
+    delay: 5
+    register: antContrib_download
+    until: antContrib_download is not failed
+    when:
+      - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
+
+  - name: Creates directory {{ ant_lib_dir }}
+    file:
+      path: "{{ ant_lib_dir }}"
+      state: directory
+    become: true
+
+  - name: Extract ant-contrib
+    unarchive:
+      src: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+      dest: /tmp
+      copy: False
+    when: 
+      - ansible_distribution != "MacOSX"   
+
+  - name: Extract ant-contrib tar -xf /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz -C /tmp
+    command: tar -xf /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz -C /tmp
+    register: antcontrib_unpack
+    become: true
+    until: antcontrib_unpack is not failed
+    when:
+      - ansible_distribution == "MacOSX" 
+
+  - name: copy ant-contrib /tmp/ant-contrib/lib/ant-contrib.jar into /usr/local/{{ ant_binary_file_name }}/lib
+    copy:
+      src: /tmp/ant-contrib/lib/ant-contrib.jar
+      dest: "/usr/local/{{ant_binary_file_name }}/lib/"
+      remote_src: true
+    become: true
+
+  - name: Cleanup after ant-contrib installed
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - /tmp/ant-contrib/
+      - /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
+    failed_when: false
+    become: true
+  
+  tags: ant-contrib
   when:
     - not antcontrib_status.stat.exists
-    - ansible_distribution != "MacOSX"
-    - ansible_distribution != "Solaris"
-    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
-  tags: ant-contrib
-
-# Use wget instead of ansible's get_url for Centos 6 https://github.com/adoptium/infrastructure/issues/2486
-
-- name: Download ant-contrib (CentOS 6)
-  command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  retries: 3
-  delay: 5
-  register: antContrib_download
-  until: antContrib_download is not failed
-  when:
-    - not antcontrib_status.stat.exists
-    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
-  tags: ant-contrib
-
-- name: Verify sha256 checksum of download (CentOS 6)
-  stat:
-    path: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-    checksum_algorithm: sha256
-    get_checksum: yes
-  register: antcontrib_checksum
-  failed_when: antcontrib_checksum.stat.checksum != 'c9b8b1ca18b13e293688cafbd8990c940ca49104dbeefc242e5c3f8de271abdf'
-  when:
-    - not antcontrib_status.stat.exists
-    - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
-  tags: ant-contrib
-
-- name: Download ant-contrib (macOS) and (Solaris)
-  command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  retries: 3
-  delay: 5
-  register: antContrib_download
-  until: antContrib_download is not failed
-  when:
-    - not antcontrib_status.stat.exists
-    - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
-  tags: ant-contrib
-
-- name: Extract ant-contrib
-  unarchive:
-    src: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-    dest: /tmp/
-    copy: False
-  when: not antcontrib_status.stat.exists
-  tags: ant-contrib
-
-- name: Move ant-contrib.jar to ant lib folder
-  command: mv /tmp/ant-contrib/lib/ant-contrib.jar {{ ant_lib_dir }}
-  when: not antcontrib_status.stat.exists
-  tags: ant-contrib
-
-- name: Remove downloaded packages for ant-contrib
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - /tmp/ant-contrib
-    - /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  failed_when: false
-  tags: ant-contrib

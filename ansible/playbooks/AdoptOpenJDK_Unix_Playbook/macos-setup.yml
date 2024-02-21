@@ -1,0 +1,54 @@
+---
+
+- name: Ansible MacOS playbook
+  hosts: "all"
+  gather_facts: yes
+  become_method: sudo
+  vars:
+    ansible_python_interpreter: /Library/Frameworks/Python.framework/Versions/3.11/bin/python3
+    Ant_Download_URL: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.12-bin.zip
+    known_keys:
+      - {name: "github.com", value: "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"}
+    xcode_version: '15.0.1'
+    ansible_user: adminuser
+    jdk_version: 17
+
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - role: brew
+      tags: [build_tools, xcode, adoptopenjdk]
+    - role: Xcode_offline
+      tags: [build_tools, xcode, adoptopenjdk]
+    - role: Common  
+      tags: [build_tools, build_tools_openj9]
+    - role: Jenkins_User  
+      tags: [build_tools, build_tools_openj9, jenkins]
+    - role: Semeru_install
+      tags: [build_tools, build_tools_openj9, semeru]
+    - role: ant
+      tags: [build_tools, build_tools_openj9]
+    - role: Ant-Contrib  
+      tags: [build_tools, build_tools_openj9]
+
+# Macos do not let any Ansible activity before you install python manually. So you need to do a workaround before running this PB. 
+# 1- download python from https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg
+# 2- scp downloaded file to macos (example: scp ~/Downloads/python-3.11.4-macos11.pkg adminuser@macXXXXXX.rtp.raleigh.ibm.com:~/)
+# 3- ssh to mac machine and run this to install python:
+#  sudo installer -pkg ~/python-3.11.4-macos11.pkg -target /Applications  && /Applications/Python\ 3.11/Install\ Certificates.command && /Applications/Python\ 3.11/Update\ Shell\ Profile.command
+# 
+# 4- then you can start using the PB as normal like other machine types:
+# example: ansible-playbook -i hosts.yml macos-setup.yml -Kk
+#
+# sample host.yml file:
+
+# all:
+#  children:
+#     hosts:
+#        macXXXXXX.yourdomain.com:
+
+
+
+    

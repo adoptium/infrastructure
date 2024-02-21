@@ -1,0 +1,173 @@
+---
+#####################
+# install Semeru OE #
+#####################
+
+# Install Semeru <jdk_version> Open Edition into
+# /usr/lib/jvm on Linux
+# /Library/Java/JavaVirtualMachines on MacOSX
+# Requires the following variables:
+#  jdk_version: 11 | 17 | 18 | 19
+
+# Note: set "ansible_become_password: <super user password>" in the AWX job for MacOSX
+
+- name: Set path variable for RedHat/CentOS/Ubuntu
+  set_fact:
+    install_path: "/usr/lib/jvm"
+  when:
+    - ansible_distribution != "MacOSX"
+    - ansible_distribution != "SLES"
+  tags: semeru_install
+
+- name: Set path variable for SLES
+  set_fact:
+    install_path: "/usr/lib64/jvm"
+  when:
+    - ansible_distribution == "SLES"
+  tags: semeru_install
+
+- name: Set path variable for MacOS
+  set_fact:
+    install_path: "/Library/Java/JavaVirtualMachines"
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
+
+- name: Set api_architecture variable
+  set_fact:
+    api_architecture: "{{ ansible_architecture }}"
+  tags: semeru_install
+
+- name: Set api_architecture variable (Linux x86_64)
+  set_fact:
+    api_architecture: x64
+  when:
+    - ansible_architecture == "x86_64"
+  tags: semeru_install
+
+- name: Set api_architecture variable (MacOS Arm64)
+  set_fact:
+    api_architecture: aarch64
+  when:
+    - ansible_os_family == "Darwin"
+    - ansible_architecture == "arm64"
+  tags: semeru_install
+
+- name: Print api_architecture variable
+  debug:
+    var: api_architecture
+  tags: semeru_install
+
+- name: Checking for {{ install_path }}
+  stat: path={{ install_path }}
+  register: install_path_exists
+  tags: semeru_install
+
+- name: Create {{ install_path }}
+  file:
+    path: '{{ install_path }}'
+    state: directory
+    owner: root
+    mode: 0755
+  when:
+    - ansible_distribution != "MacOSX"
+    - not install_path_exists.stat.exists
+  tags: semeru_install
+
+#########
+# Linux #
+#########
+
+- name: Install Semeru {{ jdk_version }} OE latest release (Linux)
+  unarchive:
+    src: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/linux/{{ api_architecture }}/jdk/openj9/normal/ibm?project=jdk
+    dest: '{{ install_path }}'
+    remote_src: yes
+    validate_certs: no
+  retries: 3
+  delay: 5
+  register: semeru_download
+  until: semeru_download is not failed
+  when: ansible_distribution != "MacOSX"
+  tags: semeru_install
+
+- name: Get {{ install_path }}/jdk-{{ jdk_version }}* full path name (Linux)
+  shell: ls -ld {{ install_path }}/jdk-{{ jdk_version }}.* 2>/dev/null | awk '{print $9}'
+  register: semeru_install_dir
+  when: ansible_distribution != "MacOSX"
+  tags: semeru_install
+
+- name: Create symlink to Semeru {{ jdk_version }} install directory (Linux)
+  file:
+    src: '{{ semeru_install_dir.stdout_lines[0] }}'
+    dest: '{{ install_path }}/semeru-{{ jdk_version }}'
+    owner: root
+    group: root
+    state: link
+  when: ansible_distribution != "MacOSX"
+  tags: semeru_install
+
+- name: Set Semeru {{ jdk_version }} OE as default java (Linux)
+  alternatives:
+    name: java
+    path: '{{ install_path }}/semeru-{{ jdk_version }}/bin/java'
+    link: /usr/bin/java
+  when: ansible_distribution != "MacOSX"
+  tags: semeru_install
+
+- name: Update /usr/bin/javac symlink (Linux)
+  alternatives:
+    name: javac
+    path: '{{ install_path }}/semeru-{{ jdk_version }}/bin/javac'
+    link: /usr/bin/javac
+  when: ansible_distribution != "MacOSX"
+  tags: semeru_install
+
+##########
+# MacOSX #
+##########
+
+- name: Install Semeru {{ jdk_version }} OE latest release (MacOS)
+  get_url:
+    url: https://api.adoptopenjdk.net/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/openj9/normal/ibm?project=jdk
+    dest: /tmp/semeru-{{ jdk_version }}-installer.pkg
+    validate_certs: no
+  register: semeru_pkg_download
+  until: semeru_pkg_download is not failed
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
+
+- name: Run MacOSX installer
+  shell: installer -pkg /tmp/semeru-{{ jdk_version }}-installer.pkg -target /
+  become: yes
+  become_user: root
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
+
+- name: Find Semeru {{ jdk_version }} OE installation directory (MacOS)
+  find:
+     paths: '{{ install_path }}'
+     patterns: "^ibm-semeru-open-{{ jdk_version }}.*"
+     use_regex: yes
+     file_type: directory
+  become: yes
+  become_user: root
+  register: semeru_install_dir_mac
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
+
+- name: Create symlink to Semeru {{ jdk_version }} install directory (MacOS)
+  file:
+    src: '{{ semeru_install_dir_mac.files[0].path }}/Contents/Home'
+    dest: '{{ install_path }}/semeru-{{ jdk_version }}'
+    state: link
+  become: yes
+  become_user: root
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
+
+- name: Clean up Semeru {{ jdk_version }} OE installer
+  file:
+    path: '/Users/j9admin/semeru-{{ jdk_version }}-installer.pkg'
+    state: absent
+  when: ansible_distribution == "MacOSX"
+  tags: semeru_install
