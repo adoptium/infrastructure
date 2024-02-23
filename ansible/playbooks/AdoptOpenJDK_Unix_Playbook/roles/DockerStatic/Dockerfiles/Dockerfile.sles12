@@ -4,9 +4,9 @@ RUN zypper ar https://download.opensuse.org/distribution/leap/15.4/repo/oss/ sle
 RUN zypper --gpg-auto-import-keys refresh
 RUN zypper update -y && zypper install -y wget perl openssh-server unzip zip tar gzip
 
-RUN wget 'https://api.adoptium.net/v3/binary/latest/11/ga/linux/s390x/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk11.tar.gz
-RUN mkdir -p /usr/lib/jvm/jdk11 && tar -xpzf /tmp/jdk11.tar.gz -C /usr/lib/jvm/jdk11 --strip-components=1
-RUN ln -s /usr/lib/jvm/jdk11/bin/java /usr/bin/java
+RUN wget 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
+RUN ln -s /usr/lib/jvm/jdk17/bin/java /usr/bin/java
 
 # Install ant
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
@@ -19,7 +19,7 @@ RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tar.gz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 
 # Clear up space
-RUN rm /tmp/jdk11.tar.gz /tmp/ant.zip /tmp/ant-contrib.tar.gz
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tar.gz
 
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
