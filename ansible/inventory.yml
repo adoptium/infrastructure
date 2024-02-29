@@ -83,6 +83,9 @@ hosts:
 
   - dockerhost:
 
+      - azure:
+          ubuntu2204-x64-1: {ip: 20.40.219.35:22, description: AMD EPYC 7763 16 cores, 64GB}
+
       - equinix:
           ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
           ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
