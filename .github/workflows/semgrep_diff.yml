@@ -19,7 +19,5 @@ jobs:
       # Step 2: Differential scan
       - name: Differential scan
         run: |
-          semgrep scan --config="p/trailofbits" \
-            --error \
-            -- metrics=off \
+          semgrep scan --error --metrics=off --config="p/trailofbits" \
             --baseline-commit ${{ github.event.before }}
