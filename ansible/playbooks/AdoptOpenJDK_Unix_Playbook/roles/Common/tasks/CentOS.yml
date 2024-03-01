@@ -17,7 +17,7 @@
     name: epel-release
     state: installed
     update_cache: yes
-    validate_certs: true
+    validate_certs: false
   when: ansible_distribution_major_version != "8"
   tags: patch_update
 
