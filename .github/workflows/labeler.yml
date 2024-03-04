@@ -3,9 +3,7 @@
 name: "Pull Request Labeler"
 on:
   pull_request:
-  issues:
-  issue_comment:
-
+  
 jobs:
   triage:
     permissions:
