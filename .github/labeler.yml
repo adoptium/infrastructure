@@ -1,5 +1,3 @@
-Update Labeler Config
-
 # Config file used by .github/workflows/labeler.yml
 
 # This file matches file/folder changes to labels. See https://github.com/actions/labeler for more information.
