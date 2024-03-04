@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Assign Labels
     steps:
-    - uses: actions/labeler@8558fd74291d67161a8a78ce36a881fa63b766a9 # v5.0.0
+    - uses: actions/labeler@5c7539237e04b714afd8ad9b4aed733815b9fab4 # v4.0.2
       if: ${{ github.event.pull_request }}
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
-    - uses: fuxingloh/multi-labeler@b15a54460c38f54043fa75f7b08a0e2aa5b94b5b # v4.0.0
+    - uses: fuxingloh/multi-labeler@fb9bc28b2d65e406ffd208384c5095793c3fd59a # v1.8.0
       with:
         github-token: "${{secrets.GITHUB_TOKEN}}"
         config-path: .github/regex_labeler.yml
