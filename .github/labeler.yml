@@ -1,3 +1,5 @@
+Update Labeler Config
+
 # Config file used by .github/workflows/labeler.yml
 
 # This file matches file/folder changes to labels. See https://github.com/actions/labeler for more information.
@@ -9,20 +11,28 @@
 
 # label_name:
 #   - path/to/file_or_folder
+
 ghActions:
-    - .github/workflows/**/*
+- changed-files:
+  - any-glob-to-any-file: [.github/*]
+/**/*
 doc:
-    - docs/*
-    - '**/*.md'
+- changed-files:
+    - any-glob-to-any-file: [docs/*]
+    - any-glob-to-any-file: ['**/*.md']
 Vagrant:
-    - ansible/pbTestScripts/**/*
-    - ansible/vagrant/Vagrantfile*
+- changed-files:
+    - any-glob-to-any-file: [ansible/pbTestScripts/**/*]
+    - any-glob-to-any-file: [ansible/vagrant/Vagrantfile*]
 pbTests:
-    - ansible/pbTestScripts/**/*
+- changed-files:
+    - any-glob-to-any-file: [ansible/pbTestScripts/**/*]
 docker:
-    - ansible/docker/Dockerfile*
+- changed-files:
+    - any-glob-to-any-file: [ansible/docker/Dockerfile*]
 ansible:
-    - ansible/playbooks/**/*
-    - ansible/plugins/**/*
-    - ansible/inventory.yml
-    - ansible/ansible.cfg
+- changed-files:
+    - any-glob-to-any-file: [ansible/playbooks/**/*]
+    - any-glob-to-any-file: [ansible/plugins/**/*]
+    - any-glob-to-any-file: [ansible/inventory.yml]
+    - any-glob-to-any-file: [ansible/ansible.cfg]
