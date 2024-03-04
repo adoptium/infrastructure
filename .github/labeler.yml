@@ -15,7 +15,6 @@ Update Labeler Config
 ghActions:
 - changed-files:
   - any-glob-to-any-file: [.github/*]
-/**/*
 doc:
 - changed-files:
     - any-glob-to-any-file: [docs/*]
