@@ -1,0 +1,2 @@
+# Ignore The Nagios Configuration J2 templates, as they are only examples.
+./ansible/playbooks/nagios/roles/Nagios_Config/files/templates/*.j2
