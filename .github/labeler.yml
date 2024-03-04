@@ -15,12 +15,10 @@ ghActions:
   - any-glob-to-any-file: [.github/*]
 doc:
 - changed-files:
-    - any-glob-to-any-file: [docs/*]
-    - any-glob-to-any-file: ['**/*.md']
+    - any-glob-to-any-file: [docs/*, '**/*.md']
 Vagrant:
 - changed-files:
-    - any-glob-to-any-file: [ansible/pbTestScripts/**/*]
-    - any-glob-to-any-file: [ansible/vagrant/Vagrantfile*]
+    - any-glob-to-any-file: [ansible/pbTestScripts/**/*, ansible/vagrant/Vagrantfile*]
 pbTests:
 - changed-files:
     - any-glob-to-any-file: [ansible/pbTestScripts/**/*]
@@ -29,7 +27,4 @@ docker:
     - any-glob-to-any-file: [ansible/docker/Dockerfile*]
 ansible:
 - changed-files:
-    - any-glob-to-any-file: [ansible/playbooks/**/*]
-    - any-glob-to-any-file: [ansible/plugins/**/*]
-    - any-glob-to-any-file: [ansible/inventory.yml]
-    - any-glob-to-any-file: [ansible/ansible.cfg]
+    - any-glob-to-any-file: [ansible/playbooks/**/*, ansible/plugins/**/*, ansible/inventory.yml, ansible/ansible.cfg]
