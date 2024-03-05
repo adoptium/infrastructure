@@ -134,7 +134,7 @@
     - ansible_distribution != "MacOSX"
     - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
-    - not (ansible_architecture == "riscv64" and (jdk_version == 21 or jdk_version == 19 or jdk_version == 17)) # Linux-riscv64 for JDK 17, 19, 21 are special cased
+    - not (ansible_architecture == "riscv64" and (jdk_version == 21 or jdk_version == 19 or jdk_version == 17 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 17, 19, 21 are special cased
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
     # Api does not return release information for JDK10
@@ -263,6 +263,37 @@
     - name: Remove jdk17.tar.gz (Linux-riscv64)
       file:
         path: /tmp/jdk17.tar.gz
+        state: absent
+
+# JDK 11 on Linux-riscv64 is a special-case because the Ubuntu openjdk-11-jdk package is just too
+# damn slow (it's Zero VM) and times out on CI
+- name: Install JDK {{ jdk_version }} on Linux-riscv64
+  when:
+    - ansible_architecture == "riscv64" and jdk_version == 11
+    - adoptopenjdk_installed.rc != 0
+  tags: adoptopenjdk_install
+    # Api does not return release information for JDK10
+  block:
+    - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
+      get_url:
+        url: https://ci.adoptium.net/userContent/riscv/OpenJDK11U-jdk_riscv64_linux_hotspot_2024-02-08-16-01.tar.gz
+        dest: /tmp/jdk11.tar.gz
+        mode: 0440
+        checksum: sha256:b14e237de3929f235671c38694a9458e7aeab1720065edc1888aa8754a2e21b2
+      retries: 3
+      delay: 5
+      register: adoptopenjdk_download
+      until: adoptopenjdk_download is not failed
+
+    - name: Install latest jdk{{ jdk_version }} release if one not already installed (Linux-riscv64)
+      unarchive:
+        src: /tmp/jdk11.tar.gz
+        dest: /usr/lib/jvm
+        remote_src: yes
+
+    - name: Remove jdk11.tar.gz (Linux-riscv64)
+      file:
+        path: /tmp/jdk11.tar.gz
         state: absent
 
 # # CentOS6 needs it's own task so it can use a different python interpreter.

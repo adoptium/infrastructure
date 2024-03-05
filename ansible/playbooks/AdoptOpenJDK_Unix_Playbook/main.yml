@@ -107,7 +107,6 @@
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # Previous LTS
       jdk_version: 17
