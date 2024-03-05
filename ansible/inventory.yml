@@ -10,12 +10,10 @@ hosts:
 
   - infrastructure:
 
-      - aws:
-          ubuntu1804-x64-1: {ip: 54.78.186.5, user: ubuntu, description: trss.adoptopenjdk.net}
-
       - azure:
           ubuntu2004-x64-1: {ip: 40.121.206.1, user: webmaster, description: jckservices.adoptium.net}
           ubuntu2204-x64-1: {ip: 172.187.163.163, user: adoptopenjdk, description: infra-wazuh-server}
+          ubuntu2204-x64-2: {ip: 20.90.182.165, description: trss.adoptium.net}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
@@ -30,6 +28,9 @@ hosts:
 
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
+
+      - osuosl:
+          ubuntu2204-aarch64-1: {ip: 140.211.169.21, description: jenkins-worker}
 
   - build:
 
@@ -50,12 +51,6 @@ hosts:
 
       - equinix_esxi:
           solaris10-x64-1: {ip: 145.40.115.43}
-
-      - macstadium:
-          macos1014-x64-1: {ip: 208.83.1.170, user: Administrator, description: G3B i7-4C/16G/250G}
-          macos1014-x64-2: {ip: 207.254.28.76, user: Administrator, description: G3C i7-4C/16G/500G}
-          macos11-arm64-1: {ip: 207.254.31.15, user: Administrator, description: G5G M1/8C/16G/1T}
-          macos11-arm64-2: {ip: 207.254.31.16, user: Administrator, description: G5G M1/8C/16G/1T}
 
       - marist:
           rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
@@ -88,6 +83,9 @@ hosts:
 
   - dockerhost:
 
+      - azure:
+          ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
+
       - equinix:
           ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
           ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
@@ -96,12 +94,14 @@ hosts:
 
       - osuosl:
           ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
+          ubuntu2204-aarch64-1: {ip: 140.211.167.67}
 
       - marist:
           ubuntu2204-s390x-1: {ip: 148.100.74.237, user: linux1}
 
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212, description: 32CPU, 400G}
+          ubuntu2204-x64-1: {ip: 20.61.136.254, description: 24 core Intel X5650}
 
   - test:
 
@@ -148,12 +148,6 @@ hosts:
 
       - macstadium:
           macos1014-x64-1: {ip: 207.254.29.43, user: administrator, description: G3B i7/4C/16G/250G}
-          macos1014-x64-2: {ip: 207.254.29.44, user: administrator, description: G3B i7/4C/16G/250G}
-          macos1014-x64-3: {ip: 207.254.28.237, user: administrator, description: G3B i7/4C/16G/250G}
-          macos1014-x64-4: {ip: 207.254.71.202, user: Administrator, description: G4B i7-6C/32G/512G}
-          macos1015-x64-1: {ip: 207.254.28.171, user: administrator, description: G3B i7/4C/16G/250G}
-          macos11-arm64-1: {ip: 199.7.163.51, user: Administrator, description: G5A M1/8C/8G/256G}
-          macos11-arm64-2: {ip: 199.7.163.52, user: Administrator, description: G5A M1/8C/8G/256G}
 
       - marist:
           rhel7-s390x-2: {ip: 148.100.74.92}
@@ -167,6 +161,10 @@ hosts:
       - nine:
           macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
           macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
+
+      - scaleway:
+          ubuntu2310-riscv64-1: {ip: 62.210.163.13, user: ubuntu}
+          ubuntu2310-riscv64-2: {ip: 62.210.163.98, user: ubuntu}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}

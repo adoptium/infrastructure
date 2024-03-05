@@ -12,7 +12,28 @@ The DockerStatic ansible role provides allows us to automate the setup of our do
 * [dockerhost-equinix-ubuntu2004-armv8-1](https://ci.adoptium.net/computer/dockerhost-equinix-ubuntu2004-armv8-1/)
 
 
-## Setting up a new DockerStatic container
+## Setting up a new DockerStatic container (recommended)
+
+The [dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockernode.yml) playbook is used to deploy docker containers onto our dockerhost machines. 
+
+Example usage:
+
+```
+ansible-playbook -u root -i <host-file> AdoptOpenJDK_Unix_Playbook
+/dockernode.yml -t "deploy" -e "docker_images=u2204,alp319,deb12"
+```
+
+The `docker_images` variable is where the user can specifiy which docker containers to deploy, using the dockerfiles avaiable [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles) (which do get updated regularly).
+
+The `dockerhost.yml` playbook can deploy single, multiple and duplicate containers, for example
+
+```
+-e "docker_images=u2204,alp319,u1804,u1804,u1804"
+```
+
+will deploy 1 Ubuntu 22.04 container, 1 Alpine 3.19 container and 3 Ubuntu 18.04 containers.
+
+## Setting up a new DockerStatic container (manually)
 
 If you would like to setup an individual container on one of these machines, follow these instructions:
 
