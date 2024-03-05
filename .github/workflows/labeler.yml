@@ -5,7 +5,7 @@ on:
   pull_request_target:
   issues:
   issue_comment:
-
+  
 jobs:
   triage:
     permissions:
