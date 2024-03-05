@@ -1,4 +1,4 @@
-FROM fedora:35
+FROM fedora:39
 
 RUN yum -y update && yum install -y perl openssh-server unzip zip wget
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
@@ -30,7 +30,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 CMD ["/usr/sbin/sshd","-D"]
 RUN yum install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst procps glibc-langpack-en fontconfig which hostname fakeroot shared-mime-info
 # Install Packages For openssl
-RUN yum -y update && yum install -y openssl gnutls gnutls-utils libnss3.so nss-devel nss-tools
+RUN yum -y update && yum install -y openssl gnutls gnutls-utils nss-devel nss-tools
 # ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
