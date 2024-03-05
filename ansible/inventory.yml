@@ -162,6 +162,10 @@ hosts:
           macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
           macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
 
+      - scaleway:
+          ubuntu2310-riscv64-1: {ip: 62.210.163.13, user: ubuntu}
+          ubuntu2310-riscv64-2: {ip: 62.210.163.98, user: ubuntu}
+
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
 
