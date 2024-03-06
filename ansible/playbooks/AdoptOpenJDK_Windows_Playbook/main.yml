@@ -2,7 +2,7 @@
 ########################################
 # AdoptOpenJDK - Ansible Playbook for: #
 # -------- Windows 7, 8, 10 ---------  #
-# - Windows Server 2008, 2012, 2016  - #
+# - Windows Server 2008, 2012        - #
 ########################################
 
 ################
@@ -12,7 +12,7 @@
 # Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
 # Run powershell as the Administrator
 # If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/adoptium/infrastructure/issues/1858
-# wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
 # .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 # .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
@@ -21,10 +21,12 @@
 # Groups can be passed in as a command-line variable in Ansible playbook.
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
-- hosts: "{{ Groups | default('build*win*:test*win*') }}"
+- name: Ansible Windows playbook
+  hosts: "{{ Groups | default('build*win*:test*win*') }}"
   gather_facts: yes
   tasks:
-    - block:
+    - name: Load Standard Variables
+      block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
@@ -33,6 +35,9 @@
   # Roles #
   #########
   roles:
+    - role: logs
+      position: "Start"
+      tags: always
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins]
@@ -40,13 +45,13 @@
     - Common
     - Windows_Updates
     - WMF_5.1
-    - Jenkins                     # AdoptOpenJDK infrastructure
+    - role: Jenkins               # AdoptOpenJDK infrastructure
+      tags: [jenkins, adoptopenjdk]
     - CodesignCert
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
-    - Firefox
     - Strawberry_Perl             # Testing
-    - Freemarker                  # OpenJ9
+#    - Freemarker                  # OpenJ9"
     - GIT
     - Java7                       # JDK8 build bootstrap
     - Java8                       # JDK9 build bootstrap/ For Gradle
@@ -61,19 +66,28 @@
     - role: Java_install
       jdk_version: 17
     - ANT                         # Testing
-    - MSVS_2013
-    - MSVS_2017                   # OpenJ9
-    - MSVS_2019                   # OpenJ9
+    - role: MSVS_2013
+      when: ansible_architecture == "64-bit"
+    - role: MSVS_2017             # OpenJ9
+      when: ansible_architecture == "64-bit"
+    - role: MSVS_2019                   # OpenJ9
+      tags: MSVS_2019
+    - role: MSVS_2022
+      tags: MSVS_2022
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - Clang_64bit                 # OpenJ9
     - Clang_32bit                 # OpenJ9
     - nasm                        # OpenJ9
-    - OpenSSL                     # OpenJ9
     - Rust                        # IcedTea-Web
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
+    - NSClient                    # Required For Nagios Monitoring
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
-    - role: Thunderbird
-      tags: [Thunderbird, jck, adoptopenjdk]
+    - role: Jenkins_Service_Installation # Automate installing the jenkins service
+      tags: [jenkins, adoptopenjdk]
+      when: jenkins_secret is defined  # Only run if jenkins_secret is defined
+    - role: logs
+      position: "End"
+      tags: always

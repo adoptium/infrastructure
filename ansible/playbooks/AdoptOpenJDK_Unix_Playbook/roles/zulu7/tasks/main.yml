@@ -23,8 +23,9 @@
 
 - name: Check if Zulu-7 is already installed in the target location
   shell: ls -ld /usr/lib/jvm/zulu7 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: zulu7_installed
+  changed_when: false
   when:
     - ansible_architecture == "x86_64"
     - ((ansible_distribution == "Redhat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version|int >= 8)) or

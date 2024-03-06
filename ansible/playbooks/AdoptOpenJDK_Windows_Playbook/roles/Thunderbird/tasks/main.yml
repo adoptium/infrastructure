@@ -15,9 +15,9 @@
 
 - name: Download Thunderbird
   win_get_url:
-    url: https://ftp.mozilla.org/pub/thunderbird/releases/78.11.0/win64/en-GB/Thunderbird%20Setup%2078.11.0.exe
+    url: https://ftp.mozilla.org/pub/thunderbird/releases/115.4.1/win64/en-GB/Thunderbird%20Setup%20115.4.1.exe
     dest: 'C:\temp\thunderbird.exe'
-    checksum: 58479f60339aadef41210f522d380dc13fe2611690e2942e141fd5361393c7da
+    checksum: 7e68974880164058142491714e3e1c1fb92cef657d84244e2e37ee5c0c1cc909
     checksum_algorithm: sha256
   when: (not thunderbird_download.stat.exists) and (not thunderbird_installed.stat.exists)
 

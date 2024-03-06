@@ -1,5 +1,6 @@
 FROM centos:6.9
 
+ARG git_sha
 ARG user=jenkins
 
 # Install Python 3
@@ -15,8 +16,8 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
- ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --tags="riscv"
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --tags="riscv"
 
 RUN rm -rf /ansible; yum remove -y ansible; yum clean all
 

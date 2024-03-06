@@ -1,0 +1,24 @@
+# Task to create accounts
+---
+- name: "Create {{ username }} account"
+  user:
+    name: "{{ username }}"
+    shell: /usr/bin/ksh
+    group: staff
+    groups: staff
+    append: true
+    generate_ssh_key: true
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+    home: "/home/{{ username }}"
+    # create_home: true
+    state: present
+    comment: "Adoptium Build Farm account"
+  register: newuser
+
+# May update/change this to copy a template profile
+- name: Remove .profile
+  file:
+    path: /home/{{ username }}/.profile
+    state: absent
+  when: newuser is defined and newuser.changed

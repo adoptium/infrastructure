@@ -5,7 +5,7 @@
 
 - name: Test if VS 2017 is installed
   win_stat:
-    path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017'
+    path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Community'
   register: vs2017_installed
   tags: MSVS_2017
 
@@ -20,13 +20,14 @@
   when: (not vs2017_installed.stat.exists)
   tags: MSVS_2017
 
-- name: Install Visual Studio Community 2017
-  win_shell: 'C:\temp\vs_community.exe --wait --add Microsoft.VisualStudio.Workload.NativeDesktop;includeRecommended;includeOptional --quiet --norestart'
+- name: Run Visual Studio 2017 Installer From Download
+  win_shell: |
+      Start-Process -Wait -FilePath 'C:\temp\vs_community.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
   args:
-    executable: cmd
+    executable: powershell
   when: (not vs2017_installed.stat.exists)
   register: vs2017_error
-  failed_when: vs2017_error.rc != 1 and vs2017_error.rc != 0
+  failed_when: vs2017_error.rc != 0 and vs2017_error.rc != 1
   tags: MSVS_2017
 
 - name: Register Visual Studio Community 2017 DIA SDK shared libraries
@@ -41,4 +42,6 @@
     reboot_timeout: 1800
     shutdown_timeout: 1800
   when: (not vs2017_installed.stat.exists)
-  tags: MSVS_2017
+  tags:
+    - MSVS_2017
+    - reboot

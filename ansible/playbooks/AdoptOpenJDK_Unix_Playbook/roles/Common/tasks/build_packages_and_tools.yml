@@ -28,6 +28,7 @@
     - ansible_distribution != "FreeBSD"
     - ansible_distribution != "RedHat"
     - ansible_distribution != "CentOS"
+    - ansible_distribution != "Fedora"
   tags: build_tools
 
 - name: Install Test Tool Packages

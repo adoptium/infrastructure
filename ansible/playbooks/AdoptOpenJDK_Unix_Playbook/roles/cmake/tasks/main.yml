@@ -9,8 +9,9 @@
 
 - name: Test if cmake is installed on path
   shell: cmake >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: cmake_installed
+  changed_when: false
   tags:
     - cmake
     - skip_ansible_lint
@@ -19,6 +20,7 @@
   shell: set -o pipefail | cmake --version 2>/dev/null | grep version | awk '{print $3}'
   when: cmake_installed.rc == 0
   register: cmake_version
+  changed_when: false
   tags: cmake
 
 - name: Download cmake
@@ -30,8 +32,18 @@
     validate_certs: no
     checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
+    - (ansible_distribution != "openSUSE")
+  tags: cmake
+
+# The checksum file of the download is checked, not the binary itself. The checksum in the download step is equal to the one in the file
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -fl "https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4-SHA-256.txt" -sl "https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4-SHA-256.txt.asc" -k {{ key.cmake }}
+  when:
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
+    - ansible_architecture != "armv7l"
+    - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
     - (ansible_distribution != "openSUSE")
   tags: cmake
 
@@ -41,7 +53,7 @@
     dest: /tmp
     copy: False
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
     - (ansible_distribution != "openSUSE")
   tags: cmake
@@ -50,7 +62,7 @@
 - name: Running ./configure & make for cmake
   shell: cd /tmp/cmake-{{ cmakeVersion }} && PATH=/opt/gcc-4.8.5/bin:$PATH && ./configure && make -j {{ ansible_processor_vcpus }} && make install
   when:
-    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt') )
+    - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
     - (ansible_distribution != "openSUSE")
   tags: cmake
@@ -62,5 +74,5 @@
   with_items:
     - /tmp/cmake-{{ cmakeVersion }}
     - /tmp/cmake-{{ cmakeVersion }}.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: cmake

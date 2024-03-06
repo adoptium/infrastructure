@@ -5,49 +5,50 @@
 
 - name: Check if gcc 7.5 is installed on RHEL/CentOS/Ubuntu16
   shell: /usr/local/gcc/bin/gcc-7.5 --version 2>&1 > /dev/null
-  ignore_errors: yes
+  failed_when: false
   register: gcc7_installed
-  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+  when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+  changed_when: false
   tags: gcc_7
 
 - name: Configure gcc75 tarball extension on non-armv7l
-  set_fact: gccsuffix=.xz
+  set_fact: gccsuffix=xz
   tags: gcc_7
   when: ansible_architecture != "armv7l"
 
 - name: Configure gcc75 tarball extension on armv7l
-  set_fact: gccsuffix=.gz
+  set_fact: gccsuffix=gz
   tags: gcc_7
   when: ansible_architecture == "armv7l"
 
-# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-7.5.0 binary
   get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar{{ gccsuffix }}
-    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar{{ gccsuffix }}'
+    url: https://ci.adoptium.net/userContent/gcc/gcc750+ccache.{{ ansible_architecture }}.tar.{{ gccsuffix }}
+    dest: '/tmp/ansible-adoptopenjdk-gcc-7.tar.{{ gccsuffix }}'
     force: no
     mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + gccsuffix) }}"
   when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
     - gcc7_installed.rc != 0
   tags: gcc_7
 
 - name: Extract AdoptOpenJDK gcc-7 binary to /usr/local/gcc
   unarchive:
-    src: /tmp/ansible-adoptopenjdk-gcc-7.tar{{ gccsuffix }}
+    src: /tmp/ansible-adoptopenjdk-gcc-7.tar.{{ gccsuffix }}
     dest: /usr/local/
     copy: False
   when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
     - gcc7_installed.rc != 0
   tags: gcc_7
 
 - name: Remove downloaded gcc 7 binary tarball
   file:
-    path: '/tmp/ansible-adoptopenjdk-gcc-7.tar{{ gccsuffix }}'
+    path: '/tmp/ansible-adoptopenjdk-gcc-7.tar.{{ gccsuffix }}'
     state: absent
   when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
     - gcc7_installed.rc != 0
   tags: gcc_7
 
@@ -58,7 +59,7 @@
     path: /usr/local/bin/ccache
   register: ccache_symlink
   when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
   tags: gcc_7
 
 - name: Create symlink for ccache
@@ -67,6 +68,6 @@
     dest: /usr/local/bin/ccache
     state: link
   when:
-    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
     - not ccache_symlink.stat.exists
   tags: gcc_7

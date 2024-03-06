@@ -1,0 +1,69 @@
+---
+- name: Check Nagios Plugins Installation
+  stat:
+    path: /usr/local/nagios/libexec/check_ssh
+  register: nagios_plugins_installation
+
+- name: Install dependencies for building Nagios Plugins {{ nagios_plugins_version }}
+  package:
+    name: "{{ pkg_name }}"
+    state: latest
+  become: yes
+  loop: "{{ plugin_pkg_list }}"
+  loop_control:
+    loop_var: pkg_name
+  when: not nagios_plugins_installation.stat.exists
+
+- name: Download + Unpack Nagios Plugins Source For Version {{ nagios_plugins_version }}
+  unarchive:
+    src: "https://github.com/nagios-plugins/nagios-plugins/releases/download/release-{{ nagios_plugins_version }}/nagios-plugins-{{ nagios_plugins_version }}.tar.gz"
+    remote_src: yes
+    dest: "/tmp"
+  when: not nagios_plugins_installation.stat.exists
+
+  # 'Creates' argument keeps the playbook idempotent.
+- name: Run './configure' on source.
+  command:
+    cmd: "./configure"
+    chdir: "/tmp/nagios-plugins-{{ nagios_plugins_version }}/"
+    creates: "/tmp/nagios-plugins-{{ nagios_plugins_version }}/Makefile"
+  when: not nagios_plugins_installation.stat.exists
+
+# The 'when' field should make this idempotent.
+- name: Run Make Install cmd.
+  make:
+    chdir: "/tmp/nagios-plugins-{{ nagios_plugins_version }}"
+    target: install
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  when: not nagios_plugins_installation.stat.exists
+
+  ##############################
+  # Install custom server plugins #
+  ##############################
+
+- name: Download add-on check_mem plugin
+  get_url:
+    url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
+    dest: /usr/local/nagios/libexec/check_mem
+    mode: 0755
+    checksum: sha256:bd6476a3ea399aa6653c359c415be23ca485431e609642f44f456493270789ce
+
+- name: Copy Get Jenkins Check Agent Plugin
+  copy:
+    src: roles/Nagios_Server/files/nagios_server_plugins/check_agent
+    dest: /usr/local/nagios/libexec/check_agent
+    mode: 0755
+
+- name: Copy Ansible Inventory Check Plugin
+  copy:
+    src: roles/Nagios_Server/files/nagios_server_plugins/check_inventory
+    dest: /usr/local/nagios/libexec/check_inventory
+    mode: 0755
+
+- name: Copy Ansible Nagios Synch Check Plugin
+  copy:
+    src: roles/Nagios_Server/files/nagios_server_plugins/check_nagios_sync
+    dest: /usr/local/nagios/libexec/check_check_nagios_sync
+    mode: 0755

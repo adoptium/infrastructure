@@ -13,10 +13,10 @@
   shell: |
     security delete-certificate -c "Developer ID Application: London Jamocha Community CIC" "/Users/jenkins/Library/Keychains/login.keychain-db"
   become_user: jenkins
-  ignore_errors: true
+  failed_when: false
 
 - name: Remove Installer Certificate
   shell: |
     security delete-certificate -c "Developer ID Installer: London Jamocha Community CIC" "/Users/jenkins/Library/Keychains/login.keychain-db"
   become_user: jenkins
-  ignore_errors: true
+  failed_when: false

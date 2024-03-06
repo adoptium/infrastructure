@@ -1,0 +1,6 @@
+---
+- name: Update Nagios Server Config File With Correct Hostname
+  ansible.builtin.replace:
+    path: /usr/local/nagios/etc/objects/localhost.cfg
+    regexp: 'localhost'
+    replace: '{{ ansible_fqdn }}'

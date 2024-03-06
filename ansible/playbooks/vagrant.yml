@@ -4,13 +4,15 @@
 #  ------------- Vagrant --------------#
 ########################################
 
-- hosts: all
+- name: Vagrant play
+  hosts: all
   gather_facts: yes
   remote_user: root
   become: yes
 
   tasks:
-    - block:
+    - name: Vagrant playbook
+      block:
         - name: Print facts
           debug:
             msg:
@@ -67,13 +69,13 @@
 
         - name: Check if jdk8 is already installed in the target location
           shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: adoptopenjdk_installed
           tags: java
 
         - name: Check if there is a default java
           shell: java -version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: default_java
           tags: java
 
@@ -113,7 +115,7 @@
 
         - name: Check if Ansible is installed
           shell: which ansible >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: ansible_installed
           tags: ansible
 
@@ -136,7 +138,7 @@
 
         - name: Check if Git is installed
           shell: git --version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: git_installed
           tags:
             - skip_ansible_lint
@@ -157,7 +159,7 @@
             mode: 0440
             checksum: sha256:107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a
           when:
-            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
           tags: git
 
         - name: Extract Git Source
@@ -166,14 +168,14 @@
             dest: /tmp/
             copy: False
           when:
-            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
           tags: git
 
         - name: Compile and Install Git from Source
           shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
           become: yes
           when:
-            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
           tags: git
 
         - name: Remove system git if needed
@@ -181,7 +183,7 @@
             name: git
             state: absent
           when:
-            - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+            - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
           tags: git
 
         - name: Symlink git to /usr/bin/git
@@ -190,7 +192,7 @@
             dest: /usr/bin/git
             state: link
           when:
-            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
           tags: git
 
       ###########
@@ -199,7 +201,7 @@
 
         - name: Check if Vagrant is installed
           shell: which vagrant >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: vagrant_installed
           tags: vagrant
 
@@ -215,21 +217,21 @@
             dest: /tmp/vagrant_2.2.5_x86_64.deb
             checksum: sha256:415f50b93235e761db284c761f6a8240a6ef6762ee3ec7ff869d2bccb1a1cdf7
           when:
-            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
           tags: vagrant
 
         - name: Remove system vagrant if necessary
           apt:
             name: vagrant
             state: absent
-          when: (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+          when: (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
           tags: vagrant
 
         - name: Install Vagrant
           command: dpkg -i /tmp/vagrant_2.2.5_x86_64.deb
           become: yes
           when:
-            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt') )
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
           tags: vagrant
 
       ##############
@@ -238,7 +240,7 @@
 
         - name: Check if Virtualbox is installed
           shell: which virtualbox >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: virtualbox_installed
           tags: VBox
 
@@ -271,7 +273,7 @@
 
         - name: Check to see if QEMU is installed
           shell: qemu-system-s390x --version >/dev/null 2>&1
-          ignore_errors: yes
+          failed_when: false
           register: qemu_installed
           tags: QEMU
 

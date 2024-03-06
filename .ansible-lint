@@ -1,18 +1,31 @@
+---
+# .ansible-lint
+
 skip_list:
   - '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern
   - '204'  # Lines should be no longer than 160 chars
   - '207'  # Nested jinja pattern
   - '208'  # File permissions unset or incorrect
   - '301'  # Commands should not change things if nothing needs doing
-  - '303'  # Using command rather than module 
+  - '303'  # Using command rather than module
   - '305'  # Use shell only when shell functionality is required
-  - '306'  # Shells that use pipes should set the pipefail option  
+  - '306'  # Shells that use pipes should set the pipefail option
   - '401'  # Git checkouts must contain explicit version
   - '403'  # Package installs should not use latest
   - '501'  # Become_user requires become to work as expected
+  - '503'  # Tasks that run when changed should likely be handlers.
   - '601'  # Don't compare to literal True/False
   - '602'  # Don't compare to empty string
-  - 'var-naming' # var-naming File defines variable that violates variable naming standards
+  - 'var-naming'     # var-naming File defines variable that violates variable naming standards
+  - 'fqcn-builtins'  # Disable error introduced in ansible-lint 6.X (https://github.com/ansible/ansible-lint/pull/1908)
+  - 'name[template]' # Jinja templates should only be at the end of ‘name’.
+  - 'template-instead-of-copy' # Replaced upstream in https://github.com/ansible/ansible-lint/pull/2512
+  - 'no-free-form' # Exclude As Requires Significant Changes ( 196 changes required )
+  - 'fqcn[action]' # Exclude As Requires Significant Changes ( 249 changes required )
+  - 'args[module]' # Exclude Experimental Rule Validation ( Prevents 4 experimental warnings )
+
+kinds:
+  - vars: "ansible/playbooks/adoptopenjdk_variables.yml"
 
 exclude_paths:
-  - ./ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926
+  - ansible/playbooks/adoptopenjdk_variables.yml # See: https://github.com/AdoptOpenJDK/openjdk-infrastructure/issues/1926

@@ -1,0 +1,118 @@
+---
+
+- name: Update Package Cache (apt/Ubuntu)
+  apt:
+    update_cache: yes
+  changed_when: false
+  become: yes
+
+- name: Check Nagios Installation
+  stat:
+    path: /usr/local/nagios/etc/nagios.cfg
+  register: nagios_installation
+
+- name: Install dependencies for building Nagios Core {{ nagios_version }}
+  package:
+    name: "{{ pkg_name }}"
+    state: latest
+  become: yes
+  loop: "{{ pkg_list }}"
+  loop_control:
+    loop_var: pkg_name
+  when: not nagios_installation.stat.exists
+
+- name: Download + Unpack Nagios Core Source Version {{ nagios_version }}
+  unarchive:
+    src: "https://assets.nagios.com/downloads/nagioscore/releases/nagios-{{ nagios_version }}.tar.gz"
+    remote_src: yes
+    dest: "/tmp"
+  when: not nagios_installation.stat.exists
+
+# 'Creates' argument keeps the playbook idempotent.
+- name: Run './configure' on source.
+  command:
+    cmd: "./configure {{ extra_configure_args }}"
+    chdir: "/tmp/nagios-{{ nagios_version }}/"
+    creates: "/tmp/nagios-{{ nagios_version }}/Makefile"
+  when: not nagios_installation.stat.exists
+
+- name: Sanity check make_list
+  debug:
+    var: make_list
+  when: not nagios_installation.stat.exists
+
+# The 'when' field should make this idempotent.
+- name: Run Make commands
+  make:
+    chdir: "/tmp/nagios-{{ nagios_version }}"
+    target: "{{ make_target }}"
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus }}"
+  become: yes
+  loop: "{{ make_list }}"
+  loop_control:
+    loop_var: make_target
+  when: not nagios_installation.stat.exists
+
+- name: Add apache user to the 'nagios' group userid
+  user:
+    name: "{{ apache_user }}"
+    state: present
+    groups: nagios
+    append: yes
+  become: yes
+  when: '"install-groups-users" in make_list'
+
+  # Install extra apache2 modules for Ubuntu
+- name: Add modules to Apache2
+  apache2_module:
+    name: "{{ module }}"
+    state: present
+  loop:
+    - rewrite
+    - cgi
+  loop_control:
+    loop_var: module
+  become: yes
+  when:
+    - '"install-webconf" in make_list'
+    - ansible_distribution == "Ubuntu"
+
+- name: Configure Firewalld for RHEL
+  firewalld:
+    zone: public
+    port: 80/tcp
+    permanent: yes
+    state: enabled
+  become: yes
+  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+
+- name: Create nagiosadmin user for Nagios Instance
+  htpasswd:
+    path: /usr/local/nagios/etc/htpasswd.users
+    name: "{{ nagios_admin_user }}"
+    password: "{{ nagios_admin_pass }}"
+    state: present
+  become: yes
+
+- name: Create nagios user's home folder
+  file:
+    path: /home/nagios
+    state: directory
+    owner: "nagios"
+    group: nagios
+    mode: 0700
+
+- name: Restart Nagios
+  service:
+    name: nagios
+    state: restarted
+    enabled: yes
+  become: yes
+
+- name: Restart Apache
+  service:
+    name: "{{ apache2_service }}"
+    state: restarted
+    enabled: yes
+  become: yes

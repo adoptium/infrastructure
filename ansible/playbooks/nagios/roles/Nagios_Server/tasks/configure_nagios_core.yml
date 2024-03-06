@@ -1,0 +1,77 @@
+---
+
+- name: Ensure that cfg_dir includes `/usr/local/nagios/etc/servers`
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    regexp: '#cfg_dir=/usr/local/nagios/etc/servers'
+    line: 'cfg_dir=/usr/local/nagios/etc/servers'
+  become: yes
+
+- name: Add Host Groups Configuration File Entry To Nagios Config`
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    insertafter: '# You can specify individual object config files as shown below:'
+    line: 'cfg_file=/usr/local/nagios/etc/objects/hostgroups.cfg'
+  become: yes
+
+- name: Register The Nagios Server Host Groups Config File
+  stat:
+    path: /usr/local/nagios/etc/objects/hostgroups.cfg
+  register: nagios_host_group_config
+
+- name: Create Base HostGroups Config File
+  file:
+    path: /usr/local/nagios/etc/objects/hostgroups.cfg
+    state: touch
+  become: yes
+  when: nagios_host_group_config.stat.exists == false
+
+- name: Add Host Groups Configuration File Entry To Nagios Config`
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    insertafter: '# You can specify individual object config files as shown below:'
+    line: 'cfg_file=/usr/local/nagios/etc/objects/servicegroups.cfg'
+  become: yes
+
+- name: Register The Nagios Service Groups Config File
+  stat:
+    path: /usr/local/nagios/etc/objects/servicegroups.cfg
+  register: nagios_service_group_config
+
+- name: Create Base ServiceGroups Config File
+  file:
+    path: /usr/local/nagios/etc/objects/servicegroups.cfg
+    state: touch
+    owner: nagios
+    group: nagios
+  become: yes
+  when: nagios_service_group_config.stat.exists == false
+
+- name: Create servers folder
+  file:
+    path: /usr/local/nagios/etc/servers
+    state: directory
+    owner: nagios
+    group: nagios
+  become: yes
+
+- name: Update Lock File Path
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    regexp: 'lock_file=/run/nagios.lock'
+    line: 'lock_file=/usr/local/nagios/var/nagios.lock'
+  become: yes
+
+- name: Disable Flapping
+  lineinfile:
+    path: /usr/local/nagios/etc/nagios.cfg
+    regexp: 'enable_flap_detection=1'
+    line: 'enable_flap_detection=0'
+  become: yes
+
+- name: Restart Nagios
+  service:
+    name: nagios
+    state: restarted
+    enabled: yes
+  become: yes

@@ -115,19 +115,3 @@
     state: present
     backup: yes
   tags: hosts_file, adoptopenjdk
-
-# This doesn't work as ansible says it can't write to the directory
-# Leaving this here in case someoen can make it work in the future
-#
-#- name: Record playbook completion with time in /var/log/ansiblerun.log
-#  lineinfile:
-#    state: present
-#    create: yes
-#    path: /var/tmp/ansiblerun.log
-#    mode: 0644
-#    line: "{{ ansible_date_time.iso8601_basic_short }} END"
-#  tags: ansiblerunlog
-
-# Version of the above that works
-- name: Record playbook completion with time in /var/log/ansiblerun.log
-  command: echo $(date +%Y%m%dT%H%M%S) >> /var/log/ansiblerun.log

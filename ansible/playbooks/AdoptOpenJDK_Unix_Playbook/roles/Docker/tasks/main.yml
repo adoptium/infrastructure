@@ -2,351 +2,99 @@
 ##########
 # Docker #
 ##########
-- name: Test if docker is already installed
-  shell: docker >/dev/null 2>&1
-  ignore_errors: yes
-  register: docker_installed
+
+- name: Check if docker already exists
+  command: docker version
+  failed_when: false
+  changed_when: false
+  register: docker_version
   tags:
     - docker
     # TODO: write a condition when NOT to run this step
     - skip_ansible_lint
 
-# Ubuntu
-- name: Add Docker GPG apt Key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
+- name: Install Docker Engineer
+  when: docker_version.rc != 0  # when no docker version set
   tags: docker
+  block:
+    ################
+    # Pre Install  #
+    ################
+    - name: Prepare for RHEL/CentOS 7/8
+      include_tasks: rhel.yml
+      when:
+        - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+        - ansible_distribution_major_version >= "7"
 
-- name: Add Docker Repo for Ubuntu x86_64
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "x86_64"
-  tags: docker
+    - name: Prepare for Ubuntu
+      include_tasks: ubuntu.yml
+      when:
+        - ansible_distribution == "Ubuntu"
 
-- name: Add Docker Repo for Ubuntu s390x
-  apt_repository:
-    repo: "deb [arch=s390x] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "s390x"
-  tags: docker
+    - name: Prepare for Debian / Raspbian
+      include_tasks: debian.yml
+      when:
+        - ansible_distribution == "Debian"
 
-- name: Add Docker Repo for Ubuntu ppc64le
-  apt_repository:
-    repo: "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "ppc64le"
-  tags: docker
+    ##################
+    # Install Docker #
+    ##################
+    - name: Install docker based on OS (Ubuntu, RHEL/CentOS 7/8, Debian)
+      package:
+        name:
+          - docker-ce
+        state: latest   # TODO: Package installs should not use latest
+        use: auto       # automatic select package manager to use yum, apt and so on
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 20) or ansible_distribution == "Debian")
 
-- name: Add Docker Repo for Ubuntu aarch64
-  apt_repository:
-    repo: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "aarch64"
-  tags: docker
+    - name: Install default docker on Ubuntu 22+
+      package:
+        name:
+          - docker.io
+        state: present
+        use: auto       # automatic select package manager to use yum, apt and so on
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
 
-- name: Add Docker Repo for Ubuntu armv7l
-  apt_repository:
-    repo: "deb [arch=armhf] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_architecture == "armv7l"
-  tags: docker
+    - name: Install for SLES # zypper does not support in package module
+      include_tasks: sles.yml
+      when:
+        - ansible_distribution == "SLES"
 
-- name: Install Docker prerequisites for Ubuntu
-  apt: pkg={{ item }} state=latest update_cache=yes
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - software-properties-common
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
+    ################
+    # Post Install #
+    ################
+    - name: Add Jenkins user to the docker group for Ubuntu, Debian, SLES, CentOS7  and RHEL7
+      user:
+        name: "{{ Jenkins_Username }}"
+        groups: docker
+        append: yes
+        state: present
+      when:
+        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
+        - ansible_architecture != "riscv64"
+      tags:
+        - jenkins
 
-- name: Install additional Docker prerequisites for Ubuntu 14
-  apt: pkg={{ item }} state=latest
-  with_items:
-    - linux-image-extra-{{ ansible_kernel }}
-    - linux-image-extra-virtual
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version == "14"
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
+    - name: Add Nagios user to the docker group for Ubuntu, Debian, SLES, CentOS7  and RHEL7
+      user:
+        name: nagios
+        groups: docker
+        append: yes
+        state: present
+      when:
+        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
+        - ansible_architecture != "riscv64"
+        - Nagios_Plugins == "Enabled"
+      tags:
+        - docker
 
-# RedHat/CentOS
-- name: Install EPEL repo for RedHat/CentOS 7
-  yum:
-    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    state: present
-  ignore_errors: yes
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  tags: docker
-
-- name: Add Docker Repo for RedHat/CentOS 7 x86_64
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
-    force: yes
-    owner: root
-    group: root
-    mode: 0644
-    checksum: sha256:8ab5599eef0afcac10cbd3e8670873efee20fcceb5fb3526a62edeade603cec7
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  tags: docker
-
-- name: Add Docker repo for RedHat/CentOS 7 ppc64le
-  yum_repository:
-    name: docker
-    description: docker YUM repo ppc64le
-    baseurl: http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/
-    enabled: yes
-    gpgcheck: no
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "ppc64le"
-  tags: docker
-
-- name: Add Docker repo for RedHat/CentOS 7 s390x
-  get_url:
-    url: https://download.docker.com/linux/rhel/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
-    force: yes
-    owner: root
-    group: root
-    mode: 0644
-    checksum: sha256:38c53be402c717744ed5bd502a87de761f16528e79b033eee8a40da872307376
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "s390x"
-  tags: docker
-
-- name: Import Docker Repo key for RedHat/CentOS 7 x86_64
-  rpm_key:
-    key: https://download.docker.com/linux/centos/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "x86_64"
-  tags: docker
-
-- name: Import Docker repo key for RedHat/CentOS 7 s390x
-  rpm_key:
-    key: https://download.docker.com/linux/rhel/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
-    - ansible_distribution_major_version == "7"
-    - ansible_architecture == "s390x"
-  tags: docker
-
-# SLES
-- name: Install Docker on SLES12
-  zypper: pkg={{ item }} state=latest update_cache=yes
-  with_items:
-    - apparmor-parser
-    - bridge-utils
-    - ca-certificates
-    - docker
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "SLES"
-    - ansible_distribution_major_version == "12"
-    - ansible_architecture == "x86_64"
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-# Debian
-- name: Add Docker GPG apt Key for Debian ( < 10 )
-  apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Debian"
-    - ansible_distribution_major_version|int <10
-  tags: docker
-
-- name: Add Docker GPG apt key for Raspbian
-  apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Debian" and ansible_architecture == "armv7l"
-  tags: docker
-
-- name: Install Docker prerequisites for Debian
-  apt: pkg={{ item }} state=latest
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - software-properties-common
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Debian"
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Add Docker repo for Debian x86_64
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Debian"
-    - ansible_distribution_major_version|int <10
-    - ansible_architecture == "x86_64"
-  tags: docker
-
-- name: Add Docker repo for Raspbian arm7vl
-  apt_repository:
-    repo: "deb https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} stable"
-    state: present
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Debian"
-    - ansible_architecture == "armv7l"
-  tags: docker
-
-# All OS' - Common
-- name: Run apt-get update
-  apt:
-    update_cache: yes
-  when:
-    - ansible_distribution == "Ubuntu"
-  tags: docker
-
-- name: Install Docker for Ubuntu
-  package: "name=docker.io state=latest"
-  when:
-    - docker_installed.rc != 0
-    - ansible_distribution == "Ubuntu"
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Install Docker for CentOS/RHEL 7
-  package: "name=docker-ce state=latest"
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Install Docker for Debian <10
-  package: "name=docker-ce state=latest"
-  when:
-    - docker_installed.rc != 0
-    - ansible_architecture != "riscv64"
-    - (ansible_distribution == "Debian" and ansible_distribution_major_version|int <10)
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Install Docker for Debian >=10
-  package: "name=docker.io state=latest"
-  when:
-    - docker_installed.rc != 0
-    - ansible_architecture != "riscv64"
-    - (ansible_distribution == "Debian" and ansible_distribution_major_version|int >=10)
-  tags:
-    - docker
-    # TODO: Package installs should not use latest
-    - skip_ansible_lint
-
-- name: Add Jenkins user to the docker group for Ubuntu and Debian
-  user: name={{ Jenkins_Username }}
-    groups=docker
-    append=yes
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
-  tags:
-    - docker
-    - jenkins
-
-- name: Add Jenkins user to the docker group for SLES 12, CentOS7, and RHEL7
-  user: name={{ Jenkins_Username }}
-    groups=docker
-    append=yes
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
-  tags:
-    - docker
-    - jenkins
-
-- name: Enable and Start Docker Service for Ubuntu and Debian
+- name: Enable and Start Docker Service for Ubuntu, Debian, SLES, CentOS7  and RHEL7
   service:
     name: docker
-    state: restarted
+    state: started
     enabled: yes
   when:
-    - docker_installed.rc != 0
+    - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
     - ansible_architecture != "riscv64"
-    - (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
-  tags: docker
-
-- name: Enable and Start Docker Service for SLES 12, CentOS7, and RHEL7
-  service:
-    name: docker
-    state: restarted
-    enabled: yes
-  when:
-    - docker_installed.rc != 0
-    - (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
-    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le" or ansible_architecture == "s390x")
-  tags: docker
+  tags:
+    - docker

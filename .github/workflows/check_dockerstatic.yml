@@ -1,0 +1,90 @@
+# GH action workflow to check ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/*
+# trigger on PR towards 'master' branch when files in ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic changed
+
+name: DockerStatic Checker
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/check_dockerstatic.yml
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/**
+    branches:         
+    - master
+env:
+  ROOT_PATH: "ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/"
+
+permissions:
+  contents: read
+
+jobs:
+  check-alpine:
+    name: alpine
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+       include:
+         - os: alpine3.19
+           dockerfile: "Dockerfile.alp319"
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - name: Test Dockerfile on ${{ matrix.os }}
+      env:
+        DOCKERFILE: ${{ matrix.dockerfile }}
+      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+
+  check-centos:
+    name: centos
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+       include:
+         - os: centos8
+           dockerfile: "Dockerfile.cent8"
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - name: Test Dockerfile on ${{ matrix.os }}
+      env:
+        DOCKERFILE: ${{ matrix.dockerfile }}
+      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+
+  check-fedora:
+    name: fedora
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+       include:
+         - os: fedora39
+           dockerfile: "Dockerfile.f39"
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - name: Test Dockerfile on ${{ matrix.os }}
+      env:
+        DOCKERFILE: ${{ matrix.dockerfile }}
+      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+
+  check-ubuntu:
+    name: ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+       include:
+         - os: ubuntu18.04
+           dockerfile: "Dockerfile.u1804"
+         - os: ubuntu20.04
+           dockerfile: "Dockerfile.u2004"
+         - os: ubuntu22.04
+           dockerfile: "Dockerfile.u2204"
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - name: Test Dockerfile on ${{ matrix.os }}
+      env:
+        DOCKERFILE: ${{ matrix.dockerfile }}
+      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .

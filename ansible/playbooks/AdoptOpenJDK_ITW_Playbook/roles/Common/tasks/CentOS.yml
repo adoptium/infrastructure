@@ -11,7 +11,7 @@
     name: epel-release
     state: installed
     update_cache: yes
-    validate_certs: no
+    validate_certs: yes
   tags: patch_update
 
 - name: YUM upgrade all packages

@@ -1,0 +1,36 @@
+---
+# defaults file for Nagios_Installation
+#
+nagios_admin_user: nagiosadmin
+nagios_admin_pass: password
+
+nagios_version: 4.4.7
+nagios_plugins_version: 2.3.3
+pnp4nagios_plugin_version: 0.6.26
+nagiosgraph_plugin_version: 1.5.2
+
+make_list:
+    - all
+    - install-groups-users
+    - install
+    - install-daemoninit
+    - install-commandmode
+    - install-config
+    - install-webconf
+
+extra_configure_args: ""
+
+task_list:
+    - install_core
+    - install_plugins
+    - install_pnp4nagios
+    - install_nagiosgraph
+    - configure_nagios_core
+    - install_nagios_scripts
+    - configure_nagios_commands
+    - configure_nagios_contacts
+    - configure_nagios_timeperiods
+    - configure_nagios_windows
+    - configure_nagios_templates
+    - configure_nagios_server_monitoring
+    - restart_nagios_server

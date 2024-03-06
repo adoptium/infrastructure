@@ -6,31 +6,39 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+
+## Check If System Is Centos Stream
+- name: Check For Centos8 Stream
+  shell: cat /etc/centos-release
+  register: relfile_contents
+
 - name: Enable EPEL release (not CentOS8)
   yum:
     name: epel-release
     state: installed
     update_cache: yes
-    validate_certs: no
+    validate_certs: true
   when: ansible_distribution_major_version != "8"
   tags: patch_update
 
 - name: Enable EPEL release for CentOS8
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_architecture != "s390x"
     - ansible_distribution_major_version == "8"
   tags: patch_update
 
 - name: Enable CentOS-PowerTools repo for CentOS8
-  replace:
-    path: /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
-    regexp: 'enabled=0'
-    replace: "enabled=1"
-  ignore_errors: yes
+  shell: dnf config-manager --set-enabled powertools
   when:
     - ansible_distribution_major_version == "8"
+  tags: patch_update
+
+- name: Enable CodeReady Builder repo for CentOS9 Stream
+  shell: dnf config-manager --set-enabled crb
+  when:
+    - ansible_distribution_major_version == "9"
   tags: patch_update
 
 - name: Clean dnf cache
@@ -60,15 +68,41 @@
   when: ansible_distribution_major_version == "7"
   tags: build_tools
 
-- name: Install additional build tools for CentOS 8
+- name: Install additional build tools for CentOS 8/9 Stream
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS8 }}"
-  when: ansible_distribution_major_version == "8"
+  with_items: "{{ Additional_Build_Tools_CentOS8_CentOS9Stream }}"
+  when: ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9"
   tags: build_tools
 
-- name: Install additional build tools for NOT CentOS8
+- name: Install additional build tools for NOT CentOS8/9
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8 }}"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_CentOS9Stream }}"
+  when:
+    - ansible_distribution_major_version != "8"
+    - ansible_distribution_major_version != "9"
+  tags: build_tools
+
+- name: Install Libdwarf.h for CentOS8 Stream
+  shell: dnf --enablerepo=powertools install libdwarf-devel -y
+  when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
+  tags: build_tools
+
+- name: Install additional build tools for CentOS 8 Stream
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_CentOS8_Stream }}"
+  when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
+  tags: build_tools
+
+- name: Install additional build tools for CentOS8
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
+  when:
+    - (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') == -1)
+  tags: build_tools
+
+- name: Install additional build tools for NOT CentOS8 Stream
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
   when:
     - ansible_distribution_major_version != "8"
   tags: build_tools
@@ -102,6 +136,7 @@
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version != "8"
+    - ansible_distribution_major_version != "9"
   tags: build_tools
 
 - name: Sed change the baseurl for CentOS SCL (CentOS6)
@@ -164,7 +199,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: true
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - ansible_architecture == "x86_64"
@@ -242,7 +277,7 @@
 - name: Get locale list
   shell: locale -a
   register: localeList
-  changed_when: False
+  changed_when: false
   tags:
     - locales
     - skip_ansible_lint
@@ -251,28 +286,28 @@
 # https://github.com/ansible/ansible/issues/44708
 - name: Create Japanese locale
   shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
-  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  when: localeList.stdout | lower is not search("ja_jp\.utf8")
   tags:
     - locales
     - skip_ansible_lint
 
 - name: Create Korean locale
   shell: localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8
-  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  when: localeList.stdout | lower is not search("ko_kr\.utf8")
   tags:
     - locales
     - skip_ansible_lint
 
 - name: Create Chinese locale
   shell: localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8
-  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  when: localeList.stdout | lower is not search("zh_cn\.utf8")
   tags:
     - locales
     - skip_ansible_lint
 
 - name: Create Taiwanese locale
   shell: localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
-  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  when: localeList.stdout | lower is not search("zh_tw\.utf8")
   tags:
     - locales
     - skip_ansible_lint

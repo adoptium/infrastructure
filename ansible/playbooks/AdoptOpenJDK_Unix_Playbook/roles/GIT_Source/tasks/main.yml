@@ -10,8 +10,9 @@
 
 - name: Test if git is installed on path
   shell: git --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: git_installed
+  changed_when: false
   tags:
     - git_source
     # Emits 'git used in place of git module'
@@ -21,6 +22,7 @@
   shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
   when: git_installed.rc == 0
   register: git_version
+  changed_when: false
   tags:
     - git_source
     # Emits 'git used in place of git module'
@@ -37,7 +39,7 @@
   register: git_download
   until: git_download is not failed
   when:
-    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_distribution != "FreeBSD"
   tags: git_source
 
@@ -49,13 +51,14 @@
       - --no-same-owner
     copy: False
   when:
-    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_distribution != "FreeBSD"
   tags: git_source
 
 - name: Find Curl directory
   shell: ls -ld /usr/local/curl-* | awk '{print $9}'
   register: curl_install_dir
+  changed_when: false
   when:
     - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
   tags: git_source
@@ -64,7 +67,7 @@
   shell: cd /tmp/git-2.15.0 && ./configure --with-curl={{ curl_install_dir.stdout }} --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
-    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_architecture != "s390x"
     - (( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
   tags: git_source
@@ -73,7 +76,7 @@
   shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
-    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_architecture != "s390x"
     - ansible_distribution != "FreeBSD"
     - not(( ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
@@ -83,7 +86,7 @@
   shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make -j {{ ansible_processor_cores }} && make install
   become: yes
   when:
-    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_architecture == "s390x"
     - ansible_distribution != "FreeBSD"
   tags: git_source
@@ -95,7 +98,7 @@
       - perl-Git
     state: absent
   when:
-    - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   tags:
     - git_source
@@ -106,7 +109,7 @@
     name: git
     state: absent
   when:
-    - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt') )
+    - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_distribution == "SLES" or ansible_distribution == "openSUSE"
   tags:
     - git_source
@@ -119,5 +122,5 @@
   with_items:
     - /tmp/git-2.15.0
     - /tmp/git-2.15.0.tar.xz
-  ignore_errors: yes
+  failed_when: false
   tags: git_source

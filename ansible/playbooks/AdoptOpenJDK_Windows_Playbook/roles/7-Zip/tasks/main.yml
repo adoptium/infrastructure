@@ -4,19 +4,27 @@
 ########
 # Added for extracting MinGW-W64
 
-- name: Download 7-Zip (required to unpack MinGW-W64)
-  win_get_url:
-    url: https://www.7-zip.org/a/7z1805-x64.exe
-    dest: 'C:\temp\7z.exe'
-    force: no
-    checksum: c1e42d8b76a86ea1890ad080e69a04c75a5f2c0484bdcd838dc8fa908dd4a84c
-    checksum_algorithm: sha256
+- name: Check if 7-Zip is installed
+  win_stat:
+    path: 'C:\7-Zip\7z.exe'
+  register: zip_installed
   tags: 7zip
 
-- name: Install 7-Zip
-  win_package:
-    path: 'C:\temp\7z.exe'
-    creates_path: 'C:\7-Zip\7z.exe'
-    state: present
-    arguments: /S /D="C:\7-Zip"
+- name: Download and install 7-Zip
+  when: not zip_installed.stat.exists
   tags: 7zip
+  block:
+    - name: Download 7-Zip (required to unpack MinGW-W64)
+      win_get_url:
+        url: https://www.7-zip.org/a/7z2201-x64.exe
+        dest: 'C:\temp\7z.exe'
+        force: no
+        checksum: b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
+        checksum_algorithm: sha256
+
+    - name: Install 7-Zip
+      win_package:
+        path: 'C:\temp\7z.exe'
+        creates_path: 'C:\7-Zip\7z.exe'
+        state: present
+        arguments: /S /D="C:\7-Zip"

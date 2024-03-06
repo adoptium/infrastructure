@@ -9,7 +9,8 @@
 - name: Check for Python 2's version
   shell: python -V 2>&1 | grep -Po '(?<=Python )(.+)'
   register: python_version
-  ignore_errors: yes
+  changed_when: false
+  failed_when: false
   when:
     - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat") and (ansible_distribution_major_version == "6")
   tags:
@@ -17,7 +18,7 @@
 
 - name: Install Python2.7 to /usr/local/python2
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/usrlocalPython27.tar.xz
+    src: https://ci.adoptium.net/userContent/usrlocalPython27.tar.xz
     dest: /usr/local/
     remote_src: yes
     mode: 0755

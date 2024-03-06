@@ -6,10 +6,12 @@
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
 #- hosts: "{{ Groups | default('localhost:docker:!*zos*:!*win*:!*aix*') }}"
-- hosts: all
+- name: Ansible dockerhost playbook
+  hosts: all
   gather_facts: yes
   tasks:
-    - block:
+    - name: Load Variables
+      block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
@@ -28,7 +30,7 @@
     - role: Swap_File
     - role: Crontab
     - role: adoptopenjdk_install
-      jdk_version: 11
+      jdk_version: 21
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure

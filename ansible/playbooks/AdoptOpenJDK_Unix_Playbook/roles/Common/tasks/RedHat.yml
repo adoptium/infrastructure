@@ -10,7 +10,7 @@
   shell: |
     subscription-manager repos --enable=rhel-7-server-extras-rpms
     subscription-manager repos --enable rhel-7-server-optional-rpms
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "x86_64"
@@ -19,7 +19,7 @@
 
 - name: Enable EPEL release for RHEL8 or RHEL6 or RHEL7
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_architecture != "s390x"
     - (ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
@@ -95,11 +95,12 @@
     - ansible_architecture == "ppc64"
   tags: build_tools
 
-- name: Install additional build tools for RHEL on s390x
+- name: Install additional build tools for RHEL6/7 on s390x (31-bit support)
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_s390x }}"
+  with_items: "{{ Additional_Build_Tools_RHEL7_s390x }}"
   when:
     - ansible_architecture == "s390x"
+    - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 8
@@ -204,7 +205,7 @@
 - name: Get locale list
   shell: locale -a
   register: localeList
-  changed_when: False
+  changed_when: false
   tags:
     - locales
     - skip_ansible_lint
@@ -213,26 +214,26 @@
   locale_gen:
     name: ja_JP.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("ja_jp\.utf8")
+  when: localeList.stdout | lower is not search("ja_jp\.utf8")
   tags: locales
 
 - name: Create Korean locale
   locale_gen:
     name: ko_KR.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("ko_kr\.utf8")
+  when: localeList.stdout | lower is not search("ko_kr\.utf8")
   tags: locales
 
 - name: Create Chinese locale
   locale_gen:
     name: zh_CN.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("zh_cn\.utf8")
+  when: localeList.stdout | lower is not search("zh_cn\.utf8")
   tags: locales
 
 - name: Create Taiwanese locale
   locale_gen:
     name: zh_TW.UTF-8
     state: present
-  when: localeList.stdout|lower is not search("zh_tw\.utf8")
+  when: localeList.stdout | lower is not search("zh_tw\.utf8")
   tags: locales

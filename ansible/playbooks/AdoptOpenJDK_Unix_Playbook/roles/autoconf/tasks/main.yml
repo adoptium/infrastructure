@@ -10,6 +10,7 @@
     - ansible_distribution_major_version == "6"
     - ansible_architecture == "x86_64"
   register: autoconf_version
+  changed_when: false
   tags: autoconf-2.69
 
 - name: Download Autoconf v2.69
@@ -19,6 +20,15 @@
     force: no
     mode: 0755
     checksum: sha256:954bd69b391edc12d6a4a51a2dd1476543da5c6bbf05a95b59dc0dd6fd4c2969
+  when:
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_distribution_major_version == "6"
+    - ansible_architecture == "x86_64"
+    - ((autoconf_version.rc == 0) and (autoconf_version.stdout is version_compare('2.69', operator='lt')))
+  tags: autoconf-2.69
+
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/autoconf-2.69.tar.gz -sl "https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz.sig" -k {{ key.autoconf }}
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"
@@ -65,7 +75,7 @@
   with_items:
     - /tmp/autoconf-2.69.tar.gz
     - /tmp/autoconf-2.69
-  ignore_errors: yes
+  failed_when: false
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"

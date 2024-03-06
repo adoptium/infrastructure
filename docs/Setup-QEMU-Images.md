@@ -1,6 +1,6 @@
 # Recreating QEMU images
 
-This is a document how to rebuild the images used in the [QEMUPlaybookCheck](https://ci.adoptopenjdk.net/job/QEMUPlaybookCheck/) (QPC) Jenkins job, in the event of having to migrate the machine that runs QPC. In this document, the **host machine** refers to the machine running QPC and the **guest machine** refers to the QEMU VM.
+This is a document how to rebuild the images used in the [QEMUPlaybookCheck](https://ci.adoptium.net/job/QEMUPlaybookCheck/) (QPC) Jenkins job, in the event of having to migrate the machine that runs QPC. In this document, the **host machine** refers to the machine running QPC and the **guest machine** refers to the QEMU VM.
 
 ## Standardized rules
 
@@ -143,9 +143,11 @@ qemu-system-aarch64 -nographic -machine virt,gic-version=max -m 512M -cpu max -s
 -drive file=flash0.img,format=raw,if=pflash -drive file=flash1.img,format=raw,if=pflash
 ```
 
-### Debian 8 ARM32
+### Debian / ARM32
 
 This disk image was setup using the instructions [here](https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+
+** NB ** Debian 8 Has been deprecated so the instructions have been updated for the current stable Debian build based on the instructions [here:](https://www.willhaley.com/blog/debian-arm-qemu/)
 
 To summarize the instructions in the link:
 
@@ -155,29 +157,46 @@ The packages `qemu-system-arm, libguestfs-tools` and `qemu-utils` are installed.
 Create an empty disk image
 
 ```bash
-qemu-img create -f qcow2 debian8.arm32 20G
+qemu-img create -f qcow2 debian11.arm32 80G
 ```
 
 `qcow2` is the format of the image.
 
 The instructions recommend using an initrd and a kernel from the Debian website
 
-```bash
-wget -O installer-vmlinuz http://http.us.debian.org/debian/dists/jessie/main/installer-armhf/current/images/netboot/vmlinuz
-wget -O installer-initrd.gz http://http.us.debian.org/debian/dists/jessie/main/installer-armhf/current/images/netboot/initrd.gz
+The initrd and kernel should be downloaded from the following links in a secure fashion, the links below are sample links for the current stable version ( Debian 11 ), but can be updated appropriately for the version being installed.
+
+```
+ftp.us.debian.org/debian/dists/stable/main/installer-armhf/current/images/cdrom/initrd.gz
+ftp.us.debian.org/debian/dists/stable/main/installer-armhf/current/images/cdrom/vmlinuz
+```  
+
+The ISO to be used for installing Debian 11 can be downloaded using:
+
+```
+curl -O -L https://cdimage.debian.org/debian-cd/current/armhf/iso-dvd/debian-11.1.0-armhf-DVD-1.iso
 ```
 
 Then boot up the disk image for the first time and install the OS
 
 ```bash
-qemu-system-arm -M virt -m 2G \
-  -kernel installer-vmlinuz \
-  -initrd installer-initrd.gz \
-  -drive if=none,file=debian8.arm32,format=qcow2,id=hd \
-  -device virtio-blk-device,drive=hd \
-  -netdev user,id=mynet \
-  -device virtio-net-device,netdev=mynet \
-  -nographic -no-reboot
+qemu-system-arm \
+  -m 4G \
+  -machine type=virt \
+  -cpu cortex-a7 \
+  -smp 4 \
+  -initrd "./initrd.gz" \
+  -kernel "./vmlinuz" \
+  -append "console=ttyAMA0" \
+  -drive file="./debian-11.1.0-armhf-DVD-1.iso",id=cdrom,if=none,media=cdrom \
+    -device virtio-scsi-device \
+    -device scsi-cd,drive=cdrom \
+  -drive file="./debian-arm.sda.qcow2",id=hd,if=none,media=disk \
+    -device virtio-scsi-device \
+    -device scsi-hd,drive=hd \
+  -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+    -device virtio-net-device,netdev=net0 \
+  -nographic
 ```
 
 During the installation, you will receive a message complaining about no bootloader installed. Disregard this and continue the installation.
@@ -188,33 +207,47 @@ The installer places the initrd and kernel files onto the disk image in the `/bo
 Using `libguestfs-tools` installed earlier (the VM MUST not be running when using `libguestfs-tools`), we can see inside the `/boot` directory of the disk image.
 
 ```bash
-virt-ls -a debian8.arm32 /boot/
+virt-ls -a debian11.arm32 /boot/
 
-System.map-3.16.0-4-armmp-lpae
-config-3.16.0-4-armmp-lpae
+## Note The Names Of These Files May Differ
+
+System.map-x.x.x-x-armmp-lpae
+configx.x.x-x-armmp-lpae
 initrd.img
-initrd.img-3.16.0-4-armmp-lpae
+initrd.img-x.x.x-x-armmp-lpae
 lost+found
 vmlinuz
-vmlinuz-3.16.0-4-armmp-lpae
+vmlinuz-x.x.x-x-armmp-lpae
 ```
 
 Copy out the appropriate files
 
 ```bash
-virt-copy-out -a debian8.arm32 /boot/vmlinuz-3.16.0-4-armmp-lpae /boot/initrd.img-3.16.0-4-armmp-lpae .
+## Start SSHD On The VM
+chroot /target/ sh -c "mkdir -p /var/run/sshd && /sbin/sshd -D"
+## Use SCP To Copy The Appropriate Files
+scp -P 5555 <your username in the VM>@localhost:/boot/vmlinuz ./vmlinuz-from-guest \
+scp -P 5555 <your username in the VM>@localhost:/boot/initrd.img ./initrd.img-from-guest
+##
+exit
 ```
 
 Finally, boot up the VM
 
 ```bash
-qemu-system-arm -M virt -m 2G \
-  -kernel vmlinuz-3.16.0-4-armmp-lpae \
-  -initrd initrd.img-3.16.0-4-armmp-lpae \
-  -append 'root=/dev/vda2' \
-  -drive if=none,file=debian8.arm32,format=qcow2,id=hd \
-  -device virtio-blk-device,drive=hd \
-  -device virtio-net-device,netdev=mynet -netdev user,id=mynet,hostfwd=tcp::10022-:22 \
+qemu-system-arm \
+  -m 4G \
+  -machine type=virt \
+  -cpu cortex-a7 \
+  -smp 4 \
+  -initrd "./initrd.img-from-guest" \
+  -kernel "./vmlinuz-from-guest" \
+  -append "console=ttyAMA0 root=/dev/sda2" \
+  -drive file="./debian-arm.sda.qcow2",id=hd,if=none,media=disk \
+    -device virtio-scsi-device \
+    -device scsi-hd,drive=hd \
+  -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+    -device virtio-net-device,netdev=net0 \
   -nographic
 ```
 

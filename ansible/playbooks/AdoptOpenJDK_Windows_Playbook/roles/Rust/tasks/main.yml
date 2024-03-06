@@ -5,7 +5,7 @@
 
 - name: Test if Rust is already installed
   win_stat:
-    path: 'C:\Program Files\Rust stable MSVC 1.33\bin\rustc.exe'
+    path: 'C:\rust\bin\rustc.exe'
   register: rust_installed
   tags: Rust
 
@@ -21,7 +21,7 @@
 
 - name: Install Rust
   raw: msiexec /i C:\temp\rust.msi INSTALLDIR="c:\rust" /quiet
-  ignore_errors: yes
+  failed_when: false
   when: (not rust_installed.stat.exists)
   tags: Rust
 
@@ -29,5 +29,5 @@
   win_file:
     path: C:\temp\rust.msi
     state: absent
-  ignore_errors: yes
+  failed_when: false
   tags: Rust

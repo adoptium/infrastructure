@@ -1,8 +1,10 @@
 ---
-- hosts: all
+- name: Run Installer Playbook
+  hosts: all
   gather_facts: yes
   tasks:
-    - block:
+    - name: Set Variables
+      block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml

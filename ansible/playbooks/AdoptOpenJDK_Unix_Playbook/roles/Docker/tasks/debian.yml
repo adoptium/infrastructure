@@ -1,0 +1,54 @@
+---
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+###################################################################################################################
+
+- name: Add Docker repo for Debian x86_64
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "x86_64"
+
+- name: Add Docker repo for Raspbian arm7vl
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "armv7l"
+
+- name: Run apt-get update
+  apt:
+    update_cache: true
+
+###########################################################################################
+- name: Install Docker prerequisites for Debian ( >= 10 )
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+  when:
+    - ansible_distribution_major_version|int >= 10
+  tags:
+    - skip_ansible_lint
+
+- name: Install Docker prerequisites for Debian ( < 10 )
+  apt:
+    pkg: "{ item }}"
+    state: latest
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  when:
+    - ansible_distribution_major_version|int <10
+  tags:
+    - skip_ansible_lint

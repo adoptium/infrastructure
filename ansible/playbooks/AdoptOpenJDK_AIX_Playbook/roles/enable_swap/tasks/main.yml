@@ -1,0 +1,25 @@
+---
+#####################
+# Enable swap space #
+#####################
+- name: Verify paging space is at reasonable value
+  vars:
+    swap_lv: hd6
+    target_ps: 2048
+  shell: |
+    pp_size=$(lsvg rootvg | grep "PP SIZE" | awk ' { print $6 } ')
+    current_ps=$(lsps -s | tail -1 | awk -FM ' { print $1 } ')
+    if [[ $current_ps -lt {{ target_ps }} ]]
+    then
+      # echo "Extending swap space {{ swap_lv }}"
+      chps -s $(expr \( {{ target_ps }} - $current_ps \) / $pp_size) {{ swap_lv }}
+    elif [[ $current_ps -gt {{ target_ps }} ]]
+    then
+      # echo "Shrinking swap space {{ swap_lv }}"
+      chps -d $(expr \( $current_ps - {{ target_ps }} \) / $pp_size) {{ swap_lv }}
+    fi
+  register: chps
+  changed_when: chps.stdout != ""
+  tags:
+    - swap
+    - skip_ansible_lint

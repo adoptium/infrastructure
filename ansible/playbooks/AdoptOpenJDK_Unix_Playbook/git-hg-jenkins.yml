@@ -2,10 +2,12 @@
 #######################################################
 # AdoptOpenJDK - Ansible Playbook for git-hg machines #
 #######################################################
-- hosts: all
+- name: Ansible playbook for git-hg machines
+  hosts: all
   gather_facts: yes
   tasks:
-    - block:
+    - name: Load Variables
+      block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml

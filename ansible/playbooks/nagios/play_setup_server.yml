@@ -1,0 +1,13 @@
+---
+- name: Install Nagios
+  hosts: Nagios_Server
+  vars_files:
+    # Please Ensure The Secrets File Is Updated As Per the README
+    # And Also Ensure It Is Encrypted!
+    # The current file is a placeholder and has dummy values.
+    - secrets_setup_server.enc
+    - vars_setup_server.yml
+  tasks:
+    - name: Include Ansible installation role
+      include_role:
+        name: Nagios_Server

@@ -1,0 +1,43 @@
+#!/bin/sh
+set -x
+cd /home/backups || exit 1
+echo $(date +%T) : Starting backups of jenkins config.xml files ...
+ssh jenkins@ci.adoptium.net 'ls -1 /home/jenkins/.jenkins/plugins/*.?pi | while read FILENAME; do basename $FILENAME ; unzip -p $FILENAME META-INF/MANIFEST.MF | sort -d | grep "Short-Name\|Long-Name\|Plugin-Version" ; echo --- ; done > /home/jenkins/.jenkins/pluginVersions.txt'
+ssh jenkins@ci.adoptium.net 'find . \( -name config.xml -o -name pluginVersions.txt \) | grep -v config-history | tar czf - -T -' > jenkins/jenkins.$(date +%Y%m%d).tar.gz
+ssh jenkins@ci.adoptium.net 
+#echo $(date +%T) : I would delete $(ls -1 jenkins/jenkins.*.gz | grep -v 20....01.tar.gz | head -n -3)
+rm -v $(ls -1 jenkins/jenkins.*.gz | grep -v 20....01.tar.gz | head -n -3)
+echo $(date +%T) : Backup up jenkins thin backup file if there has is one ...
+
+LASTTHINBACKUP=$(ssh jenkins@ci.adoptium.net "cd /mnt/backup-server/jenkins_thinbackup && ls -rtd FULL* | tail -1")
+LASTTHINBACKUPLOCALDATE=$(echo $LASTTHINBACKUP | cut -d- -f2- | cut -d_ -f1 | tr -d -)
+if [ -z "$LASTTHINBACKUPLOCALDATE=" ]; then
+  echo $(date +%T) :  FORMAT ERROR in last thin backup date - cannot take backup
+else
+  if [ ! -r jenkins/thinbackup.${LASTTHINBACKUPLOCALDATE}.tar.xz ]; then
+    echo $(date +%T) : Backup up last full thinbackup from $LASTTHINBACKUP ...
+    ssh jenkins@ci.adoptium.net tar cJf - -C /mnt/backup-server/jenkins_thinbackup $LASTTHINBACKUP > jenkins/thinbackup.${LASTTHINBACKUPLOCALDATE}.tar.xz
+  else
+    echo $(date +%T) : No new full thinbackup - skipping
+  fi
+fi
+# rm -v $(ls -1 jenkins/thinbackup.*.xz | grep -v 20....01.tar.gz | head -n -3)
+
+echo $(date +%T) : Backing up /usr/local/nagios ...
+ssh nagios@nagios.adoptopenjdk.net tar czf - --exclude=nagiosgraph.log --exclude=archives /usr/local/nagios > nagios/nagios.$(date +%Y%m%d).tar.gz
+#echo $(date +%T) : I would delete $(ls -1 nagios/nagios.*.gz | grep -v 20....01.tar.gz | head -n -3)
+rm -v $(ls -1 nagios/nagios.*.gz | grep -v 20....01.tar.gz | head -n -3)
+
+echo $(date +%T) : Backing up Bastillion-jetty directory ...
+tar czf bastillion/bastillion.$(date +%Y%m%d).tar.gz -C /home/bastillion Bastillion-jetty
+#echo $(date +%T) : I would delete $(ls -1 bastillion/bastillion.*.gz | grep -v 20....01.tar.gz | head -n -3)
+
+echo $(date +%T) : Backing up TRSS using mongodump ...
+ssh backups@54.78.186.5 mongodump --archive --db=exampleDb | xz > trss/trss.$(date +%Y%m%d).tar.xz
+#echo $(date +%T) : I would delete $(ls -1 trss/trss.*.?z | grep -v 20....01.tar..z | head -n -3)
+rm -v $(ls -1 trss/trss.*.?z | grep -v 20....01.tar..z | head -n -3)
+
+echo $(date +%T) : Backing up jenkins userContent via rsync
+rsync -arv jenkins@ci.adoptium.net:userContent jenkins
+
+echo $(date +%T) : All done

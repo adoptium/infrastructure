@@ -28,7 +28,7 @@ For [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_inf
 
 ## External Services
 
-### [ci.adoptopenjdk.net](https://ci.adoptopenjdk.net)
+### [ci.adoptium.net](https://ci.adoptium.net)
 
 All infrastructure members have full admin access to the jenkins follower section allowing them to create, delete and update followers.
 

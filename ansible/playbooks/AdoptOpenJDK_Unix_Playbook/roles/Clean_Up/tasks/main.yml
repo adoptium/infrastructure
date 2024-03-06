@@ -20,8 +20,6 @@
 
 - name: Remove yum dependencies that are no longer required - RedHat and CentOS
   command: yum -y autoremove
-  args:
-    warn: no
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "6") or (ansible_distribution == "CentOS" and ansible_distribution_major_version != "6")
     - ansible_architecture != "aarch64"
@@ -51,5 +49,7 @@
     - /tmp/sles12_cuda9_repo.rpm # NVidia_Cuda_Toolkit
     - /tmp/zlib-1.2.11 # zlib_sles11_ppc64
     - /tmp/zlib-1.2.11.tar.gz # zlib_sles11_ppc64
-  ignore_errors: yes
+    - /tmp/git-2.31.0.tar.gz # solaris_git
+    - /tmp/git-2.31.0 # solaris_git
+  failed_when: false
   tags: clean_up

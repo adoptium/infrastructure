@@ -1,0 +1,50 @@
+#########################################################################
+# Playbook to setup basic AIX hardening
+# - Deactivate inetd - to stop all services such as telnet, ftp, rexecd
+# - remove cas_agent, if installed. Not needed in modern systems
+#########################################################################
+---
+- name: Remove obsolete agent (for Director, FSM based system management)
+  tags: aixsec
+  block:
+    - name: Disable inetd on boot
+      shell: /usr/sbin/chrctcp -S -d inetd
+      register: chrctcp
+      changed_when: '"requested to stop" in chrctcp.stdout'
+
+    - name: Look for obsolete agent (for Director, FSM based system management)
+      shell:
+        lslpp -L cas.agent
+      changed_when: false
+      register: _lslpp
+      failed_when: "_lslpp.rc != 0
+        and 'cas.agent not installed' not in _lslpp.stderr"
+
+    - name: Remove obsolete agent (for Director, FSM based system management)
+      shell:
+        installp -ug cas.agent
+      register: _installp
+      changed_when: _installp.rc == 0
+      when: _lslpp.rc == 0
+
+- name: Enable X11Forwarding
+  notify:
+    - Restart sshd
+  block:
+    - name: Make sure X11Forwarding is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?X11Forwarding'
+        line: 'X11Forwarding yes'
+
+    - name: Make sure X11DisplayOffset is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?X11DisplayOffset'
+        line: 'X11DisplayOffset 10'
+
+    - name: Make sure X11UseLocalhost is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#X11UseLocalhost'
+        line: 'X11UseLocalhost yes'

@@ -17,7 +17,7 @@
 # https://sourceforge.net/projects/freemarker/files/freemarker/2.3.8/freemarker-2.3.8.tar.gz
 - name: Download and extract freemarker.jar
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
+    src: https://ci.adoptium.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
     dest: /tmp/
     remote_src: yes
     mode: 0755
@@ -26,11 +26,11 @@
 
 - name: Download and extract freemarker.jar (Solaris)
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
+    src: https://ci.adoptium.net/userContent/freemarker-{{ freemarkerVersion }}.tar.gz
     dest: /tmp/
     remote_src: yes
     mode: 0755
-    validate_certs: False
+    validate_certs: true
   when: not freemarker.stat.exists and ansible_distribution == "Solaris"
   tags: [freemarker, adoptopenjdk]
 
@@ -56,5 +56,5 @@
   with_items:
     - /tmp/freemarker-{{ freemarkerVersion }}
     - /tmp/freemarker-{{ freemarkerVersion }}.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: [freemarker, adoptopenjdk]

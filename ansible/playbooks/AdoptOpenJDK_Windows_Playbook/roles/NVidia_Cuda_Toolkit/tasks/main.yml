@@ -10,42 +10,42 @@
 
 - name: Download NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
   win_get_url:
-    url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_windows_network-exe'
-    dest: 'C:\temp\cuda_9.0.176_windows_network-exe.exe'
-    checksum: ab1c3d046d43e8c190f74a6a4ea94b2e87b9be4c8bc0e67304e460fc0d7caccc
+    url: 'https://developer.nvidia.com/compute/cuda/9.1/Prod/network_installers/cuda_9.1.85_windows_network'
+    dest: 'C:\temp\cuda_9.1.85_windows_network.exe'
+    checksum: e4a8718c338bb5d4cb23579ebefeecede70ff93a601d1c4aa0ffe68c10bdc34f
     checksum_algorithm: sha256
   when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
-  win_shell: C:\temp\cuda_9.0.176_windows_network-exe.exe -s compiler_9.0 nvml_dev_9.0
+  win_shell: C:\temp\cuda_9.1.85_windows_network.exe -s compiler_9.1 nvml_dev_9.1
   when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
 - name: Cleanup NVidia CUDA toolkit - Windows 7,8 and Server 2008,2012
   win_file:
-    path: C:\temp\cuda_9.0.176_windows_network-exe.exe
+    path: C:\temp\cuda_9.1.85_windows_network.exe
     state: absent
   when: (not cuda_installed.stat.exists) and (ansible_distribution_major_version == "5" or ansible_distribution_major_version == "6")
   tags: NVidia_Cuda_Toolkit
 
-- name: Download NVidia CUDA toolkit - Windows 10 and Server 2016
+- name: Download NVidia CUDA toolkit - Windows 10
   win_get_url:
-    url: 'https://developer.nvidia.com/compute/cuda/9.0/Prod/network_installers/cuda_9.0.176_win10_network-exe'
-    dest: 'C:\temp\cuda_9.0.176_win10_network-exe.exe'
-    checksum: 9a2f4bc524437b0b46e6374d69976bfda431c4d55c247078fb1fcad410573b15
+    url: 'https://developer.nvidia.com/compute/cuda/9.1/Prod/network_installers/cuda_9.1.85_win10_network'
+    dest: 'C:\temp\cuda_9.1.85_win10_network.exe'
+    checksum: cc2bf93bb0063d2996e4964071326e7afc3741423f97252b1fee9b28bea19982
     checksum_algorithm: sha256
   when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 
-- name: Install NVidia CUDA toolkit - Windows 10 and Server 2016
-  win_shell: C:\temp\cuda_9.0.176_win10_network-exe.exe -s compiler_9.0 nvml_dev_9.0
+- name: Install NVidia CUDA toolkit - Windows 10
+  win_shell: C:\temp\cuda_9.1.85_win10_network.exe -s compiler_9.1 nvml_dev_9.1
   when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 
-- name: Cleanup NVidia CUDA toolkit - Windows 10 and Server 2016
+- name: Cleanup NVidia CUDA toolkit - Windows 10
   win_file:
-    path: C:\temp\cuda_9.0.176_win10_network-exe.exe
+    path: C:\temp\cuda_9.1.85_win10_network.exe.exe
     state: absent
   when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit

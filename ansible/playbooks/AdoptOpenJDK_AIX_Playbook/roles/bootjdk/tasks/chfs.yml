@@ -1,0 +1,10 @@
+# Tasks to check and enlarge /usr before performing a download
+---
+- name: Verify 512M free in /usr
+  shell: |
+    free=$(/usr/bin/df -m /usr | tail -1 | awk ' { print $3 } ' | awk -F. ' { print $1 } ')
+    if [[ $free -lt 512 ]]; then
+      chfs -a size=+512M /usr
+    fi
+  register: chfs
+  changed_when: "'Filesystem size changed ' in chfs.stdout"

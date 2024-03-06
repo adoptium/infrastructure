@@ -1,0 +1,5 @@
+---
+- name: Download Ansible Inventory File
+  get_url:
+     url: "{{ inventory_path }}"
+     dest: "{{ Input_Path }}"

@@ -1,0 +1,6 @@
+---
+- name: Copy Defaults Templates To Server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/templates.cfg"
+    dest: /usr/local/nagios/etc/objects/templates.cfg
+    remote_src: no

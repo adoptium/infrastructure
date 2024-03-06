@@ -22,7 +22,8 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
   register: openssl_version
-  ignore_errors: True
+  changed_when: false
+  failed_when: false
   tags: openssl-1.1.1
 
 - name: Print current OpenSSL version
@@ -37,6 +38,7 @@
 - name: Convert openssl_latest_release variable
   shell: echo {{ openssl_latest_release }} | sed 's/\./_/g'
   register: converted_openssl_latest_release
+  changed_when: false
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
@@ -57,7 +59,7 @@
     dest: /tmp/openssl-{{ openssl_latest }}.tar.gz
     force: no
     mode: 0755
-    validate_certs: no
+    validate_certs: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
@@ -92,7 +94,7 @@
   with_items:
     - /tmp/openssl-{{ openssl_latest }}.tar.gz
     - /tmp/openssl-OpenSSL_{{ converted_openssl_latest_release.stdout }}
-  ignore_errors: True
+  failed_when: false
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
@@ -141,7 +143,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
     - openssl_version.stdout == ''
-  ignore_errors: True
+  failed_when: false
   tags: openssl-1.1.1
 
 - name: Create /etc/profile.d/openssl-{{ openssl_latest_release }}.sh
@@ -162,7 +164,7 @@
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"
     - openssl_version.stdout == ''
-  ignore_errors: True
+  failed_when: false
   tags: openssl-1.1.1
 
 - name: Create /etc/ld.so.conf.d/openssl-{{ openssl_latest_release }}.conf

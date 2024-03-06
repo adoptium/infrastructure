@@ -9,18 +9,33 @@
   register: vs2013_installed
   tags: MSVS_2013
 
-- name: Download Visual Studio Community 2013
-  win_get_url:
-    url: 'https://go.microsoft.com/fwlink/?LinkId=532495'
-    dest: 'C:\TEMP\vs2013_community.exe'
-    force: no
+- name: Transfer VS2013_COMMUNITY_LOCAL_MEDIA
+  win_copy:
+    src: /Vendor_Files/windows/VS2013_CE_MEDIA.zip
+    dest: C:\TEMP\VS2013_CE_MEDIA.zip
+    remote_src: no
   when: (not vs2013_installed.stat.exists)
   tags: MSVS_2013
 
-- name: Install Visual Studio Community 2013
-  raw: 'C:\TEMP\vs2013_community.exe /Silent /NoRestart
-        /Log C:\TEMP\vs2013_install_log.txt'
+- name: Unzip VS2013_COMMUNITY_LOCAL_MEDIA
+  win_unzip:
+    src: C:\TEMP\VS2013_CE_MEDIA.zip
+    dest: C:\TEMP\VS2013_CE_MEDIA
   when: (not vs2013_installed.stat.exists)
+  tags: MSVS_2013
+
+- name: Remove Zip File
+  win_file:
+    path: C:\TEMP\VS2013_CE_MEDIA.zip
+    state: absent
+
+- name: Install Visual Studio Community 2013
+  win_shell: 'C:\TEMP\VS2013_CE_MEDIA\vs_community.exe /Silent /NoRestart /Log C:\TEMP\vs2013_install_log.txt'
+  args:
+    executable: cmd
+  when: (not vs2013_installed.stat.exists)
+  register: vs2013_error
+  failed_when: vs2013_error.rc != 1 and vs2013_error.rc != 0
   tags: MSVS_2013
 
 - name: Register Visual Studio Community 2013 DIA SDK shared libraries
@@ -30,9 +45,16 @@
     - C:\Program Files (x86)\Microsoft Visual Studio 12.0\DIA SDK\bin\amd64\msdia120.dll
   tags: MSVS_2013
 
+- name: Remove Extracted VS2013 Installation Files
+  win_file:
+    path: C:\TEMP\VS2013_CE_MEDIA
+    state: absent
+
 - name: Reboot machine after Visual Studio installation
   win_reboot:
     reboot_timeout: 1800
     shutdown_timeout: 1800
   when: (not vs2013_installed.stat.exists)
-  tags: MSVS_2013
+  tags:
+    - MSVS_2013
+    - reboot

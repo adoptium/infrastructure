@@ -6,8 +6,22 @@
 ########################################
 # Install Nagios dependencies packages #
 ########################################
+
+- name: Set Mac homebrew path (x64)
+  set_fact:
+    homebrew_path: /usr/local/bin
+  when: ansible_architecture == "x86_64"
+
+- name: Set Mac homebrew path (Arm64)
+  set_fact:
+    homebrew_path: /opt/homebrew/bin
+  when: ansible_architecture == "arm64"
+
 - name: Install additional packages used by Nagios
-  homebrew: "name={{ item }} state=present"
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
   become: yes
   become_user: "{{ ansible_user }}"
   with_items:
@@ -33,7 +47,7 @@
 # See: https://github.com/adoptium/infrastructure/issues/1716#issuecomment-764713146
 - name: Symlink to plugins (arm64)
   file:
-    src: /opt/homebrew/Cellar/nagios-plugins/2.3.3/sbin/
+    src: /opt/homebrew/Cellar/nagios-plugins/2.4.4/sbin/
     dest: /usr/local/nagios/libexec
     state: link
   become: yes

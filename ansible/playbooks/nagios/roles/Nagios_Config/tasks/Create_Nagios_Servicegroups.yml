@@ -1,0 +1,31 @@
+---
+- name: Create Temporary Python folder
+  file:
+    path: /tmp/python-temp
+    state: directory
+    owner: nagios
+    group: nagios
+  become: yes
+
+- name: Copy Main script
+  ansible.builtin.copy:
+    src: "{{ role_path }}/scripts/Create_Nagios_Servicegroups_config_file.py"
+    dest: /tmp/python-temp
+    owner: nagios
+    group: nagios
+    mode: '0755'
+
+- name: Copy Inventory Files To Remote
+  ansible.builtin.copy:
+    src: "{{ Input_Path }}"
+    dest: "{{ Input_Path }}"
+
+- name: Run Create Nagios Server ServiceGroups script
+  command: python3 /tmp/python-temp/Create_Nagios_Servicegroups_config_file.py "{{ Nagios_Base_Path }}/etc/objects" "{{ Nagios_Service_Types }}"
+
+- name: HouseKeep Temporary Files
+  ansible.builtin.file:
+    path: /tmp/python-temp
+    state: absent
+- name: Run Create Nagios Servicegroups script
+  script: ../scripts/Create_Nagios_Servicegroups_config_file.py "{{ Nagios_Base_Path }}/etc/objects" "{{ Nagios_Service_Types }}"

@@ -9,6 +9,7 @@ Build_Tool_Packages:
   - autoconf
   - bison                         # OpenJ9
   - build-essential
+  - ca-certificates
   - cpio
   - curl
   - flex                          # Openj9
@@ -16,7 +17,10 @@ Build_Tool_Packages:
   - gcc
   - gettext
   - git
+  - gnupg
+  - gnutls-bin
   - libasound2-dev
+  - libcapstone-dev
   - libcups2-dev
   - libcurl4-openssl-dev
   - libdwarf-dev                  # OpenJ9
@@ -28,6 +32,9 @@ Build_Tool_Packages:
   - libgmp3-dev
   - libmpfr-dev
   - libmpfr-doc
+  - libnss3
+  - libnss3-tools
+  - libnss3-dev
   - libssl-dev
   - libwww-perl
   - libx11-dev
@@ -39,9 +46,9 @@ Build_Tool_Packages:
   - libxtst-dev
   - make
   - ntp
-  - openjdk-8-jdk
   - pigz
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-dev
   - wget
   - zip
@@ -61,12 +68,7 @@ OpenJFX_Build_Tool_Packages:
   - libxxf86vm-dev
   - ruby
 
-gcc_compiler:
-  - g++-4.8
-  - gcc-4.8
-
 Additional_Packages_Ubuntu16:
-  - xserver-xorg-legacy                 # Not actually sure if this is still needed
   - libgstreamer0.10-dev                # OpenJFX prereq
   - libgstreamer-plugins-base0.10-dev   # OpenJFX prereq
   - libmpfr4
@@ -79,24 +81,28 @@ Additional_Packages_Ubuntu18:
 Additional_Build_Tools_x86:
   - libnuma-dev
   - numactl
-  - gcc-7
-  - g++-7
   - gcc-multilib                        # a dependency required for executing a 32-bit C binary
 
 Additional_Build_Tools_ppc64le:
   - libnuma-dev
   - numactl
-  - gcc-7                         # OpenJ9
-  - g++-7                         # OpenJ9
 
 Additional_Build_Tools_s390x:
-  - gcc-7                         # OpenJ9
-  - g++-7                         # OpenJ9
   - numactl
   - libfreetype6-dev              # Needed by test state=installed
 
 Additional_Build_Tools_aarch64:
   - libpng-dev
+
+Additional_Build_Tools_not_riscv64:
+  - openjdk-8-jdk
+
+Additional_Build_Tools_riscv64:
+  - gcc-10
+  - g++-10
+  - openjdk-11-jdk
+  - openjdk-17-jdk
+  - libatomic1
 
 Additional_Build_Tools_Ubuntu20:
   - cmake
@@ -104,10 +110,8 @@ Additional_Build_Tools_Ubuntu20:
 
 Test_Tool_Packages:
   - acl
-  - mercurial
   - perl
   - xauth
-  - xorg
   - xvfb
   - binfmt-support
   - qemu-user-static
@@ -115,6 +119,10 @@ Test_Tool_Packages:
   - libexpat1-dev
   - libcurl4-openssl-dev
   - fakeroot
+  - gnutls-bin
+  - libnss3
+  - libnss3-tools
+  - libnss3-dev
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

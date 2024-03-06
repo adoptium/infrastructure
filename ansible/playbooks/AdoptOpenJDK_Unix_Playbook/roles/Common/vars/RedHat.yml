@@ -10,13 +10,18 @@ Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
   - bzip2
+  - ca-certificates
   - cpio
   - curl
   - cups-devel
   - elfutils-libelf-devel
+  - file
   - flex                          # OpenJ9
   - fontconfig-devel
   - freetype-devel
+  - gnupg
+  - gnutls
+  - gnutls-utils
   - gcc
   - gcc-c++
   - gettext
@@ -36,10 +41,16 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - openssl-devel
+  - patch                         # For DevKit creation that runs "patch"
   - perl-devel
+  - perl-IPC-Cmd                  # required for openssl v3 compiles
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
+  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - xz
@@ -57,11 +68,9 @@ Additional_Build_Tools_RHEL8:
   - glibc-langpack-zh             # required for creating Chinese locales
   - git
   - cmake
-  - ccache
 
 Additional_Build_Tools_RHEL7:
   - libstdc++-static
-  - ccache
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libstdc++
@@ -70,13 +79,14 @@ Additional_Build_Tools_RHEL_x86:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
+  - libnss3.so
 
 Additional_Build_Tools_RHEL_ppc64:
   - glibc.ppc                     # a dependency required for executing a 32-bit C binary
   - glibc-devel.ppc               # a dependency required for executing a 32-bit C binary
   - libstdc++.ppc                 # a dependency required for executing a 32-bit C binary
 
-Additional_Build_Tools_RHEL_s390x:
+Additional_Build_Tools_RHEL7_s390x:
   - glibc.s390                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
@@ -105,3 +115,7 @@ Test_Tool_Packages:
   - expat-devel
   - libcurl-devel
   - mercurial
+  - gnutls
+  - gnutls-utils
+  - nss-devel
+  - nss-tools

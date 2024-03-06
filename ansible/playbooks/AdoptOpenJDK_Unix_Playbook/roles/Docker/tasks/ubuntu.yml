@@ -1,0 +1,79 @@
+---
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+###################################################################################################################
+- name: Add Docker Repo for Ubuntu x86_64
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int < 20
+
+- name: Add Docker Repo for Ubuntu s390x
+  apt_repository:
+    repo: "deb [arch=s390x] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "s390x"
+    - ansible_distribution_major_version | int < 20
+
+- name: Add Docker Repo for Ubuntu ppc64le
+  apt_repository:
+    repo: "deb [arch=ppc64el] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "ppc64le"
+    - ansible_distribution_major_version | int < 20
+
+- name: Add Docker Repo for Ubuntu aarch64
+  apt_repository:
+    repo: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "aarch64"
+    - ansible_distribution_major_version | int < 20
+
+- name: Add Docker Repo for Ubuntu armv7l
+  apt_repository:
+    repo: "deb [arch=armhf] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+    - ansible_architecture == "armv7l"
+    - ansible_distribution_major_version | int < 20
+
+- name: Install Docker prerequisites for Ubuntu
+  apt:
+    pkg={{ item }}
+    state=latest
+    update_cache=yes
+  with_items:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+  tags:
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+###########################################################################################
+- name: Install additional Docker prerequisites for Ubuntu 14
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items:
+    - linux-image-extra-{{ ansible_kernel }}
+    - linux-image-extra-virtual
+  when:
+    - ansible_distribution_major_version == "14"
+  tags:
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+##############################################################
+- name: Run apt-get update
+  apt:
+    update_cache: yes

@@ -1,0 +1,6 @@
+---
+- name: Copy Commands Template To Server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/commands.cfg"
+    dest: /usr/local/nagios/etc/objects/commands.cfg
+    remote_src: no

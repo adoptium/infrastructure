@@ -1,0 +1,33 @@
+---
+# Nagios_Core version
+nagios_version: 4.4.7
+
+# Nagios_Plugins version
+nagios_plugins_version: 2.3.3
+
+make_list:
+    - all
+    - install-groups-users
+    - install
+    - install-daemoninit
+    - install-commandmode
+    - install-config
+    - install-webconf
+
+# This is for when configuring the Nagios Installation
+extra_configure_args: ""
+
+# List of items this playbook will install.
+task_list:
+    - install_core
+    - install_plugins
+    - install_pnp4nagios
+    - install_nagiosgraph
+    - configure_nagios_core
+    - install_nagios_scripts
+    - configure_nagios_commands
+    - configure_nagios_contacts
+    - configure_nagios_timeperiods
+    - configure_nagios_windows
+    - configure_nagios_templates
+    - configure_nagios_server_monitoring

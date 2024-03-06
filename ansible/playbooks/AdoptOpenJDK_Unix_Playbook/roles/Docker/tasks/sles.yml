@@ -1,0 +1,41 @@
+---
+- name: Add Docker Repo for SLES15
+  command: zypper ar https://download.docker.com/linux/sles/docker-ce.repo
+  when:
+    - ansible_distribution_major_version == "15"
+    - ansible_architecture == "x86_64" or ansible_architecture == "s390x"
+
+- name: Add security repo for container-selinux for SLES 15
+  zypper_repository:
+    repo: https://download.opensuse.org/repositories/security:SELinux/SLE_15_SP3/security:SELinux.repo
+    state: present
+    auto_import_keys: yes
+  when:
+    - ansible_distribution_major_version == "15"
+    - ansible_architecture == "x86_64" or ansible_architecture == "s390x"
+
+- name: Install Docker on SLES15
+  zypper:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+  when:
+    - ansible_distribution_major_version == "15"
+    - ansible_architecture == "x86_64" or ansible_architecture == "s390x"
+  tags:
+    # TODO: Package installs should not use latest
+    - skip_ansible_lint
+
+- name: Install docker in SLES 12
+  package:
+    update_cache: yes
+    name: ['containerd', 'runc', 'docker']
+    state: latest
+  when:
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version == "12"
+    - ansible_architecture != "aarch64"  #no docker support for sles 12 aarch64

@@ -9,7 +9,8 @@
 - name: Check version of ca-certificates package on the system ...
   shell: rpm -q ca-certificates | grep -E 'ca-certificates.2020|ca-certificates.201' warn=no
   register: cacertsold
-  ignore_errors: true
+  changed_when: false
+  failed_when: false
 
 - name: Install prereqs for building openssl
   yum:
@@ -30,6 +31,7 @@
 - name: Verify checksum for CentOS7 OpenSSL 1.0.2k SRPM
   shell: sha256sum  openssl-1.0.2k-21.el7_9.src.rpm | grep ^6dd850b2be01ff85c500428461019566984d91d7ad8d0002885d33ea37546da4
   when: cacertsold.rc == 0
+  changed_when: false
 
 # Invoking rpm as ansible yum module skips due to non-source RPM presence
 - name: Install CentOS7 OpenSSL 1.0.2k SRPM ...
@@ -49,21 +51,51 @@
     line: '#%patch68 -p1 -b .secure-getenv'
   when: cacertsold.rc == 0
 
+# Need To Regenerate The SMIME Test certificates
+# Due To Coding In The Generator Script, Need To Include The CHDIRS :(
+# Also Need To Seperate The Compile From The Testing
+
+- name: Update Spec File To Seperate App Build Target From Test Targets ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/openssl.spec
+    regexp: 'make -C test apps tests'
+    line: 'make -C apps'
+  when: cacertsold.rc == 0
+
+- name: Update Spec File To Regenerate SMIME Test Certificates And Run Tests ...
+  lineinfile:
+    path: /root/rpmbuild/SPECS/openssl.spec
+    regexp: './openssl-thread-test --threads %{thread_test_threads}'
+    backrefs: yes
+    state: present
+    line: |
+      ./openssl-thread-test --threads %{thread_test_threads}
+      cd test/smime-certs/
+      chmod 755 ./mksmime-certs.sh
+      ./mksmime-certs.sh
+      cd ../..
+      make -C test tests
+        %{__cc} -o openssl-thread-test \
+        `krb5-config --cflags` \
+        -I./include \
+        $RPM_OPT_FLAGS \
+        %{SOURCE8} \
+        -L. \
+        -lssl -lcrypto \
+        `krb5-config --libs` \
+        -lpthread -lz -ldl
+      ./openssl-thread-test --threads %{thread_test_threads}
+  when: cacertsold.rc == 0
+
 - name: Build OpenSSL 1.0.2k with rpmbuild ...
   shell: cd /root/rpmbuild/SPECS && rpmbuild -bb openssl.spec
   when: cacertsold.rc == 0
 
-- name: Install new OpenSSL 1.0.2k libs and development package ...
-  yum:
-    name:
-      - /root/rpmbuild/RPMS/x86_64/openssl-libs-1.0.2k-21.el6.x86_64.rpm
-      - /root/rpmbuild/RPMS/x86_64/openssl-devel-1.0.2k-21.el6.x86_64.rpm
+- name: Install new OpenSSL 1.0.2k, libs and development package ...
+  shell: "rpm -U openssl-1.0.2k-21.el6.x86_64.rpm openssl-libs-1.0.2k-21.el6.x86_64.rpm openssl-devel-1.0.2k-21.el6.x86_64.rpm"
+  args:
+    chdir: /root/rpmbuild/RPMS/x86_64/
   when: cacertsold.rc == 0
-
-# This shouldn't be necessary but it doesn't update if I include in previous step
-- name: Install new OpenSSL 1.0.2k main package ...
-  yum:
-    name: /root/rpmbuild/RPMS/x86_64/openssl-1.0.2k-21.el6.x86_64.rpm
 
 - name: Install prereqs for building ca-certificate bundle ...
   yum:
@@ -79,6 +111,7 @@
 - name: Verify checksum for CentOS6 ca-certificates download ...
   shell: sha256sum ca-certificates-2020.2.41-65.1.el6_10.src.rpm | grep ^85326e70da937c09d342612190d23d3501a2a46954d2e197f9d343bf060ca000
   when: cacertsold.rc == 0
+  changed_when: false
 
 # Invoking rpm as ansible yum module skips due to non-source RPM presence
 - name: Install CentOS6 ca-certificates SRPM ...
@@ -90,8 +123,9 @@
   when: cacertsold.rc == 0
 
 - name: Verify checksum for CentOS7 ca-certificates  download ...
-  shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^dc2cf4f9f51313e8fe6df3bd5e7c30926a99c2ad861a2bbfa4fd6210c00daaf6
+  shell: sha256sum  ca-certificates-2021.2.50-72.el7_9.src.rpm | grep ^86fe6df26e7612e63a70e435786f2eb6587cb00e6f9927aea113797afacebb57
   when: cacertsold.rc == 0
+  changed_when: false
 
 - name: Extract certdata.txt from CentOS7 ca-certificates SRPM ...
   shell: rpm2cpio ca-certificates-2021.2.50-72.el7_9.src.rpm | (cd /root/rpmbuild/SOURCES && cpio -idmv certdata.txt)

@@ -1,0 +1,21 @@
+---
+# defaults file for Nagios_Configuration
+
+task_list:
+    - Download Ansible Inventory File
+    - Run Create Nagios Server Configurations script
+    - Run Create Nagios Hostgroups script
+    - Run Create Nagios Servicegroups script
+    - restart_nagios_server
+
+# Input Path
+Input_Path: /tmp/ansible_inventory.yml
+
+# Nagios Server Base Path
+Nagios_Base_Path: /usr/local/nagios
+
+# Ansible Inventory Host Group Types To Monitor -- Maps To Nagios Service Groups
+Nagios_Service_Types: 'build test dockerhost infrastructure'
+
+# Should Ansible Replace Existing Configuration File
+Overwrite_Mode: True

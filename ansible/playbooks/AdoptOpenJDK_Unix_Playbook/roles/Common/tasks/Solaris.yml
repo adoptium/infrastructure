@@ -10,8 +10,9 @@
 
 - name: Check if pkgutil is installed
   shell: pkgutil --version
-  ignore_errors: true
+  failed_when: false
   register: pkgutil_installed
+  changed_when: false
   tags:
     - build_tools
 
@@ -283,4 +284,174 @@
     group: root
     state: link
     force: yes
+  tags: build_tools
+
+- name: Test if nonCSW Git Is Installed At /usr/local/bin
+  shell: /usr/local/bin/git --version >/dev/null
+  failed_when: false
+  register: git_noncsw_installed
+  changed_when: false
+  tags:
+    - build_tools
+
+- name: Test if git is installed at the correct version
+  shell: /usr/local/bin/git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+  when: git_noncsw_installed.rc == 0
+  register: git_noncsw_version
+  changed_when: false
+  tags:
+    - build_tools
+
+- name: Set python27
+  set_fact:
+    ansible_python_interpreter: /opt/csw/bin/python
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+- name: Get Git Source
+  get_url:
+    url: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.31.0.tar.gz
+    dest: /tmp/git-2.31.0.tar.gz
+    mode: 0440
+    checksum: sha256:bc6168777883562569144d536e8a855b12d25d46870d95188a3064260d7784ee
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+
+- name: Extract git 2.31.0 source
+  shell: gzip -cd git-2.31.0.tar.gz | tar xpf -
+  args:
+    chdir: /tmp
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Create Git Temporary Compilation Library directory
+  file:
+    path: /tmp/git-2.31.0/libexec/git-core
+    state: directory
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Copy Existing Git Remote HTTPS Library Into Compile Area
+  copy:
+    src: "/opt/csw/libexec/git-core/git-remote-https"
+    dest: "/tmp/git-2.31.0/libexec/git-core/"
+    remote_src: yes
+    mode: 0775
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Compile Git 2.31.0
+  shell: |
+    cd /tmp/git-2.31.0
+    ./configure --with-curl=/opt/csw/lib/libcurl.so --with-openssl=/opt/csw/lib/libssl.so --with-expat
+    gmake -j4
+    gmake install
+  environment:
+    PATH: /opt/solarisstudio12.3/bin/:/opt/csw/bin/:/usr/ccs/bin:/usr/bin
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Copy New Git Remote HTTPS Library Into Runtime Area
+  copy:
+    src: "/tmp/git-2.31.0/libexec/git-core/git-remote-https"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+    mode: 0775
+  when: (git_noncsw_installed.rc != 0) or (git_noncsw_installed.rc == 0 and git_noncsw_version.stdout is version_compare('2.31', operator='lt'))
+  tags:
+    - build_tools
+
+- name: Install additional build tools for x64
+  pkgutil: "name={{ item }} state=present"
+  with_items: "{{ Additional_Build_Tools_x64 }}"
+  when:
+    - ansible_architecture == "i386"
+  tags: build_tools
+
+- name: Check if Liberica 11 is already installed in the target location
+  stat: path=/usr/lib/jvm/jdk-11/bin/java
+  register: liberica11_installed
+  tags: build_tools
+
+- name: Download Liberica 11.0.18+10 (SPARC)
+  get_url:
+    url: https://download.bell-sw.com/java/11.0.18+10/bellsoft-jdk11.0.18+10-solaris-sparcv9.tar.gz
+    dest: /tmp/bellsoft-jdk11.0.18+10-solaris.tar.gz
+    force: no
+    mode: 0755
+    checksum: sha1:4cba710351022cbfe5e8f90c919ed93e9a0292c0
+  when:
+    - ansible_architecture == "sun4v"
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Download Liberica 11.0.18+10 (x64)
+  get_url:
+    url: https://download.bell-sw.com/java/11.0.18+10/bellsoft-jdk11.0.18+10-solaris-x64.tar.gz
+    dest: /tmp/bellsoft-jdk11.0.18+10-solaris.tar.gz
+    force: no
+    mode: 0755
+    checksum: sha1:e93ae23bff63e108ebafb16065d5b408a3ce6f22
+  when:
+    - ansible_architecture == "i386"
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Creating /usr/lib/jvm/bell-jdk-11.0.18.tmp for temporary use
+  file:
+    path: /usr/lib/jvm/bell-jdk-11.0.18.tmp
+    state: directory
+    owner: root
+    mode: 0755
+  when:
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Decompress Liberica 11
+  unarchive:
+    src: /tmp/bellsoft-jdk11.0.18+10-solaris.tar.gz
+    dest: /usr/lib/jvm/bell-jdk-11.0.18.tmp
+    remote_src: yes
+  when:
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Remove top level of directory
+  command: mv /usr/lib/jvm/bell-jdk-11.0.18.tmp/jdk-11.0.18 /usr/lib/jvm/bell-jdk-11.0.18
+  args:
+    removes: /usr/lib/jvm/bell-jdk-11.0.18.tmp/jdk-11.0.18
+    creates: /usr/lib/jvm/bell-jdk-11.0.18/bin/java
+  when:
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Clear temp directory
+  file:
+    path: /usr/lib/jvm/bell-jdk-11.0.18.tmp
+    state: absent
+  when:
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Create symlink to point at Liberica 11
+  file:
+    src: /usr/lib/jvm/bell-jdk-11.0.18
+    dest: /usr/lib/jvm/jdk-11
+    state: link
+  when:
+    - not liberica11_installed.stat.exists
+  tags: build_tools
+
+- name: Check for /usr/lib/jvm/fallocate.so
+  stat:
+    path: /usr/lib/jvm/fallocate.so
+  register: fallocate_installed
+
+- name: Copy fallocate.so into place for JDK11
+  copy:
+    src: files/{{ ansible_architecture }}/fallocate.so
+    dest: /usr/lib/jvm/fallocate.so
+  when:
+    - not fallocate_installed.stat.exists
   tags: build_tools

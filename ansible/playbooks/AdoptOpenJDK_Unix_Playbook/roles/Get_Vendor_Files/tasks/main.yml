@@ -22,6 +22,7 @@
   when:
     - not local_vendor_files.stat.exists
   run_once: true
+  changed_when: false
 
 - name: Generate list of remote vendor_files
   command: dotgpg cat {{ item }}

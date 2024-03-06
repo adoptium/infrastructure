@@ -22,6 +22,7 @@
   when:
     - not local_vendor_files.stat.exists
   run_once: true
+  changed_when: false
 
 - name: Generate list of remote vendor_files
   command: dotgpg cat {{ item }}
@@ -54,3 +55,13 @@
   when:
     - local_vendor_files.stat.exists
   run_once: true
+
+- name: Parse Jenkins_Secrets.yml if it's defined
+  set_fact: jenkins_secrets="{{ Jenkins_Secrets_yml | from_yaml }}"
+  when:
+    - Jenkins_Secrets_yml is defined
+
+- name: Set jenkins_secret for host if defined
+  set_fact: jenkins_secret="{{ jenkins_secrets[inventory_hostname] }}"
+  when:
+    - (jenkins_secrets is defined) and (inventory_hostname in jenkins_secrets)

@@ -1,0 +1,6 @@
+---
+- name: Copy Windows Template To Server
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/windows.cfg"
+    dest: /usr/local/nagios/etc/objects/windows.cfg
+    remote_src: no

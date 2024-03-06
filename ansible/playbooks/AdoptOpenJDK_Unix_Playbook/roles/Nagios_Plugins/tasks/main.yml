@@ -32,7 +32,7 @@
 
 - name: Create Nagios user
   action: user name=nagios state=present home={{ home_folder }} shell=/bin/bash
-  ignore_errors: yes
+  failed_when: false
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution != "MacOSX"
@@ -45,7 +45,7 @@
 
 - name: Enable SSH login for Nagios user (macOS)
   command: dseditgroup -o edit -a nagios -t staff com.apple.access_ssh
-  ignore_errors: yes
+  failed_when: false
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution == "MacOSX"
@@ -91,7 +91,7 @@
     url: https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
     dest: /usr/local/nagios/libexec/check_mem
     mode: 0755
-    checksum: sha256:0b72dbc68d67292a3eb164679af5bac03d97f95b49dc68cf337fdc46f8f58a0c
+    checksum: sha256:bd6476a3ea399aa6653c359c415be23ca485431e609642f44f456493270789ce
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution != "Solaris"
@@ -101,3 +101,9 @@
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution == "Solaris"
+
+- name: Copy Get Container Health Plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_container_spaces.sh
+    dest: /usr/local/nagios/libexec/check_container_spaces.sh
+    mode: 0755

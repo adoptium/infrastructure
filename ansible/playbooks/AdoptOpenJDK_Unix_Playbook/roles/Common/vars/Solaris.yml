@@ -21,9 +21,12 @@ Build_Tool_Packages:
   - wget
   - curl
   - gmake
+  - gnupg
   - gtar
   - xz
   - zip
+  - tcl
+  - python27
 
 Additional_Build_Tools_x64:
   - freetype

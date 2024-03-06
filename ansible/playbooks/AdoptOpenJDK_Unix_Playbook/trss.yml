@@ -3,14 +3,16 @@
 # AdoptOpenJDK Ansible TRSS Playbook       #
 # Currently supports Ubuntu 18 on x64 only #
 ############################################
-- hosts: all
+- name: Ansible TRSS Playbook
+  hosts: all
   user: root
   become: yes
   vars:
     TRSS_working_dir: "/home/jenkins/openjdk-test-tools/TestResultSummaryService"
     TRSS_config_path: "/data/db/credentials/trssConf.json"
   tasks:
-    - block:
+    - name: Run TRSS Tasks
+      block:
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
 
@@ -23,38 +25,36 @@
           apt: upgrade=safe update_cache=yes
           tags: patch_update
 
-        - name: Download Nodev12.16.1 tarball
-          get_url:
-            url: https://nodejs.org/dist/v12.16.1/node-v12.16.1-linux-x64.tar.xz
-            dest: /tmp/node-v12.16.1-linux-x64.tar.xz
-            mode: 0440
+        # install nodejs 16.x(current LTS) since ubuntu18 has GLIBC_2.27, nodejs 18 need GLIBC_2.28
+        - name: Add nodejs apt key
+          apt_key:
+            url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+            state: present
           tags: node_install
 
-        - name: Extract Node tarball
-          unarchive:
-            src: /tmp/node-v12.16.1-linux-x64.tar.xz
-            dest: /usr/local/lib/
-            copy: False
+        - name: Add nodejs 16.x ppa
+          apt_repository:
+            repo: deb [arch=amd64] https://deb.nodesource.com/node_16.x bionic main
+            update_cache: yes
           tags: node_install
 
-        - name: Create symlinks for node, npm and npx from node install directory to /usr/local/bin/
-          file:
-            src: /usr/local/lib/node-v12.16.1-linux-x64/bin/{{ item }}
-            dest: /usr/local/bin/{{ item }}
-            state: link
+        - name: Install nodejs
+          apt:
+            update_cache: yes
+            name: nodejs
+            state: present
+          tags: node_install
+
+        - name: Install NPM packages globally
+          npm:
+            name: "{{ item }}"
+            global: yes
+            state: present
           with_items:
-            - node
-            - npm
-            - npx
-          tags: node_install
-
-        - name: Import MongoDB 4.2 key
-          raw: "wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -"
-          tags: mongodb
-
-        - name: Create list file for MongoDB
-          raw: "echo \"deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse\" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list"
-          tags: mongodb
+            - forever
+            - forever-service
+            - yarn
+          tags: forever
 
         - name: Install API prerequisistes
           apt:
@@ -70,6 +70,19 @@
             - dependencies
             - skip_ansible_lint
 
+        # Prepare for mongodb
+        - name: Import MongoDB 4.2 key
+          apt_key:
+            url: https://www.mongodb.org/static/pgp/server-4.2.asc
+            state: present
+          tags: mongodb
+
+        - name: Add Mongo repo
+          apt_repository:
+            repo: "deb [arch=amd64] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse"
+            state: present
+          tags: mongodb
+
         - name: Start mongoDB
           systemd:
             name: mongod
@@ -77,25 +90,23 @@
           tags: mongodb
 
         - name: Create Jenkins user
-          action: user name={{ Jenkins_Username }} state=present shell=/bin/bash
-          ignore_errors: yes
+          user:
+            name: "{{ Jenkins_Username }}"
+            shell: /bin/bash
+            stat: present
+          failed_when: false
           tags: jenkins_user
 
-        - name: Install NPM packages globally
-          npm:
-            name: "{{ item }}"
-            global: yes
+        - name: Install java runtime for jenkins agent
+          apt:
+            name: openjdk-17-jre-headless
             state: present
-          with_items:
-            - forever
-            - forever-service
-            - yarn
-          tags: forever
+          tags: jenkins_user
 
         # Skipping linting as we want the latest checkouts (lint error 401)
-        - name: Git Clone openjdk-test-tools.git
+        - name: Git clone aqa-test-tools.git
           git:
-            repo: 'https://github.com/AdoptOpenJDK/openjdk-test-tools.git'
+            repo: "https://github.com/adoptium/aqa-test-tools.git"
             dest: "/home/{{ Jenkins_Username }}/openjdk-test-tools"
             update: yes
             force: yes
@@ -107,12 +118,13 @@
             owner: "{{ Jenkins_Username }}"
             group: "{{ Jenkins_Username }}"
 
-        - name: npm ci && npm run build of test-result-summary-client
+        - name: Run npm ci && npm run build of test-result-summary-client
           shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/test-result-summary-client/ && npm ci && npm run build
 
-        - name: npm ci of TestResultSummaryService
+        - name: Run npm ci of TestResultSummaryService
           shell: cd /home/{{ Jenkins_Username }}/openjdk-test-tools/TestResultSummaryService/ && npm ci
 
+        # Prepare Nginx
         - name: Install nginx seperately
           apt:
             name: nginx
@@ -128,7 +140,7 @@
             state: present
           tags: nginx_conf
 
-        - name: Add server name trss.adoptopenjdk.net /etc/nginx/sites-enabled/default
+        - name: Replace server name with trss.adoptopenjdk.net /etc/nginx/sites-enabled/default
           lineinfile:
             path: /etc/nginx/sites-enabled/default
             regex: 'server_name _;'
@@ -136,20 +148,13 @@
             state: present
           tags: nginx_conf
 
-        - name: Add Location /api/ to /etc/nginx/sites-enabled/default
-          lineinfile:
+        - name: Add block of location and file extension in /etc/nginx/sites-enabled/default
+          blockinfile:
             path: /etc/nginx/sites-enabled/default
-            insertafter: 'server_name trss.adoptopenjdk.net;'
-            line: 'location /api/ { proxy_pass http://localhost:3001; proxy_http_version 1.1; }'
-            state: present
-          tags: nginx_conf
-
-        - name: Add file extension rule to /etc/nginx/sites-enabled/default
-          lineinfile:
-            path: /etc/nginx/sites-enabled/default
-            insertafter: 'server_name trss.adoptopenjdk.net;'
-            line: 'location ~ ^.+\..+$ { try_files $uri =404; }'
-            state: present
+            insertafter: "server_name trss.adoptopenjdk.net;"
+            block: |
+              location /api/ { proxy_pass http://localhost:3001; proxy_http_version 1.1; }
+              location ~ ^.+\..+$ { try_files $uri =404; }
           tags: nginx_conf
 
         - name: Restart nginx service

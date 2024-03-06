@@ -1,22 +1,26 @@
 ################################
 # AIX filesystem configuration #
-# rewrite into Ansible commands - tbd
 ################################
+# /usr is not included - as it gets increased as needed during bootjdk
 ---
-- name: Download AIX filesystem configuration script
-  get_url:
-    url: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/playbooks/scripts/AIX_filesystem_config.sh
-    dest: /tmp/AIX_filesystem_config.sh
-    mode: 0775
-    validate_certs: no
-  tags: filesystem
-
-- name: Execute AIX filesystem configuration script
-  command: /tmp/AIX_filesystem_config.sh
-  tags: filesystem
-
-- name: Remove AIX filesystem configuration script
-  file:
-    state: absent
-    path: /tmp/AIX_filesystem_config.sh
-  tags: filesystem
+- name: Set AIX Filesystems to default values
+  command:
+    cmd: /usr/sbin/chfs -a size={{ item.size }}G {{ item.mount }}
+  register: chfs
+  changed_when: "'The filesystem size is already' not in chfs.stdout"
+  loop:
+    - mount: /
+      size: 3
+    - mount: /var
+      size: 4
+    - mount: /tmp
+      size: 4
+    - mount: /admin
+      size: 1
+    - mount: /opt
+      size: 3
+    - mount: /home
+      size: 32
+    - mount: /var/adm/ras/livedump
+      size: 1
+  tags: aixfs

@@ -21,9 +21,17 @@
     - ansible_distribution == "Solaris"
   tags: [jenkins_user, adoptopenjdk]
 
+- name: Create Jenkins account group for SLES
+  group:
+    name: "{{ Jenkins_Username }}"
+    state: present
+  when:
+    - ansible_distribution == "SLES"
+  tags: [jenkins_user, adoptopenjdk]
+
 - name: Create Jenkins user
   action: user name={{ Jenkins_Username }} state=present home={{ home_folder }} shell=/bin/bash
-  ignore_errors: yes
+  failed_when: false
   when: ansible_distribution != "MacOSX"
   tags: [jenkins_user, adoptopenjdk]
 
@@ -34,7 +42,7 @@
 
 - name: Enable SSH login for Jenkins user (macOS)
   command: dseditgroup -o edit -a {{ Jenkins_Username }} -t staff com.apple.access_ssh
-  ignore_errors: yes
+  failed_when: false
   when: ansible_distribution == "MacOSX"
   tags: [jenkins_user, adoptopenjdk]
 

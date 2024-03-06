@@ -41,13 +41,6 @@
     destination_port: 53
     jump: ACCEPT
 
-- name: Setup iptables allow 80
-  iptables:
-    chain: INPUT
-    protocol: tcp
-    destination_port: 80
-    jump: ACCEPT
-
 - name: Allow Azure private network (10.1.x.x)
   iptables:
     chain: INPUT
@@ -61,32 +54,31 @@
     jump: ACCEPT
   with_items:
     # List comes from https://github.com/temurin-compliance/infrastructure/blob/master/ansible/inventory.yml
-    - 148.100.84.95 # jck-marist-ubuntu2004-s390x-1
-    - 148.100.84.175 # jck-marist-ubuntu2004-s390x-2
-    - 147.75.83.133 # jck-packet-ubuntu2004-x64-1
+    - 148.100.74.163 # jck-marist-ubuntu2004-s390x-3
+    - 148.100.74.16 # jck-marist-ubuntu2204-s390x-1
+    - 148.100.74.223 # jck-marist-rhel7-s390x-2
     - 129.33.196.193 # jck-ibm-aix71-ppc64-1
     - 129.33.196.194 # jck-ibm-aix71-ppc64-2
-    - 52.255.173.94 # build-p0smh-win2019-x64
-    - 52.179.7.91 # build-x0vrb-win2019-x64
-    - 208.52.168.211 # iywk3-macos11-temurin-compliance
-    - 207.254.73.168 # gn324-macos11-temurin-compliance
-    - 140.211.168.163 # jck-ubuntu2004-ppc64le-1
-    - 140.211.168.2 # jck-ubuntu2004-ppc64le-2
-    - 213.146.141.66 # jck-linaru-ubuntu2004-aarch64-2
+    - 140.211.168.163 # jck-osuol-ubuntu2004-ppc64le-1
+    - 140.211.168.2 # jck-osuol-ubuntu2004-ppc64le-2
+    - 213.146.141.66 # jck-linaro-ubuntu2004-aarch64-2
     - 20.61.136.211 # jck-skytap-aix71-ppc64-1
     - 20.61.136.213 # jck-skytap-aix71-ppc64-2
+    - 20.61.222.79 # jck-skytap-aix72-ppc64-3
+    - 20.61.222.106 # jck-skytap-aix72-ppc64-4
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
-    - 147.75.85.211 # jck-equinix_esxi-solaris10u11-x64-1
-    - 147.75.85.214 # jck-equinix_esxi-solaris10u11-x64-2
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
     - 139.178.86.125 # jck-equinix-ubuntu2004-aarch64-1
+    - 208.52.168.211 # iywk3-macos11-x64
+    - 207.254.73.168 # gn324-macos11-x86_64
     - 207.254.28.13 # esmv4-macos11-arm64
+    - 207.254.28.99 # noh7B-macos12-arm64
 
 - name: Setup iptables
   iptables:
     chain: INPUT
     jump: REJECT
 
-- name: iptables_permanent
+- name: Set iptables_permanent
   shell: iptables-save > /etc/iptables/rules.v4

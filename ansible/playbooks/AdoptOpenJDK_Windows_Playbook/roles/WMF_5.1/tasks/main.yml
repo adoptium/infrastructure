@@ -8,6 +8,7 @@
   args:
     executable: powershell
   register: powershell_output
+  changed_when: false
   tags: WMF
 
 - name: Get WMF 5.1 Packages

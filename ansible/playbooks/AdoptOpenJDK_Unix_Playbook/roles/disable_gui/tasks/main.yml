@@ -1,0 +1,27 @@
+---
+#################################################
+# Ensure that no desktop environment is running #
+#################################################
+
+- name: Check if desktop is installed
+  stat:
+    path: /usr/share/xsessions
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "18")
+  register: desktop_installed
+  tags: disable_gui
+
+- name: Disable GNOME for CentOS 7+ and Ubuntu 18+
+  shell: systemctl isolate multi-user.target
+  register: gui_disabled
+  when:
+    - (ansible_distribution == "CentOS" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "18")
+    - desktop_installed.stat.exists
+  tags: disable_gui
+
+- name: Keep GNOME for CentOS 7+ and Ubuntu 18+ disabled after reboot
+  shell: systemctl set-default multi-user
+  when:
+    - (ansible_distribution == "CentOS" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "18")
+    - desktop_installed.stat.exists
+    - gui_disabled.stdout == ''
+  tags: disable_gui

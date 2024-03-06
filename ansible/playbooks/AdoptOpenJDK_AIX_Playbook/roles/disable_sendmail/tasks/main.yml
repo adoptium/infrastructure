@@ -1,0 +1,23 @@
+---
+####################
+# Disable sendmail #
+####################
+- name: Check if sendmail is installed
+  stat:
+    path: /usr/sbin/sendmail
+  register: sendmail_installed
+  tags: sendmail
+
+- name: Stop and disable sendmail
+  when: sendmail_installed.stat.exists
+  tags: sendmail
+  block:
+
+    - name: Ensure sendmail is stopped
+      service: name=sendmail state=stopped
+
+    - name: Ensure sendmail is disabled
+      replace:
+        dest: /etc/rc.tcpip
+        regexp: '^ *(start /usr/lib/sendmail (.+)\n)'
+        replace: '#\1'

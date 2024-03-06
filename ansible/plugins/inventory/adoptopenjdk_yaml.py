@@ -32,6 +32,7 @@ import sys
 from os import path
 
 import yaml
+
 try:
     import configparser
 except ImportError:
@@ -39,16 +40,17 @@ except ImportError:
 
 valid = {
   # taken from nodejs/node.git: ./configure
-  'arch': ('armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9' , 'riscv64'),
+  'arch': ('aarch64', 'armv7', 'armv8', 'ppc64le', 'ppc64', 'x64', 's390x', 'arm64', 'sparcv9' , 'riscv64'),
 
   # valid roles - add as necessary
   'type': ('build', 'docker', 'dockerhost', 'infrastructure', 'test', 'jck'),
 
   # providers - validated for consistency
-  'provider': ('alibaba', 'azure', 'marist', 'osuosl', 'scaleway',
+  'provider': ('alibaba', 'azure', 'marist', 'osuosl',
         'macstadium', 'macincloud', 'ibmcloud', 'spearhead', 'siteox',
-        'packet', 'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'packet_esxi', 'nine', 'gdams', 'skytap')
+        'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
+        'aws', 'inspira', 'equinix_esxi', 'nine', 'scaleway', 'skytap',
+        'hetzner')
 }
 
 def main():

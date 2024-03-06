@@ -4,8 +4,9 @@
 ##############
 - name: Test if python3 is installed on path
   shell: python3 --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: python3_installed
+  changed_when: false
   tags:
     - python3_source
 

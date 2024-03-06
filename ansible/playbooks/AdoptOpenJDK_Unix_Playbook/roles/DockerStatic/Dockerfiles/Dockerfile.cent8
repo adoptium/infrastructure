@@ -1,10 +1,21 @@
 FROM centos:8
 
-RUN dnf -y update && dnf install -y perl openssh-server unzip wget epel-release
+# Update mirror to vault.centos.org after EOL 2021-12-31
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-release
+# Install OpenSSL Packages
+RUN dnf install -y gnutls gnutls-utils nss-devel nss-tools
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
-# Get java8
-RUN wget -q 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&type=jdk' -O /tmp/jdk8.tar.gz
-RUN mkdir -p /usr/lib/jvm/jdk8 && tar -xpzf /tmp/jdk8.tar.gz -C /usr/lib/jvm/jdk8 --strip-components=1
+# Get latest jdk17 ga
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk17 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
+
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 # Install ant
 RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
 RUN wget -q -O /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
@@ -15,7 +26,7 @@ RUN ln -s /usr/local/apache-ant-1.10.5/bin/ant /usr/bin/ant
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 # Clear up space
-RUN rm /tmp/jdk8.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh
@@ -26,6 +37,6 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot
 RUN rm /run/nologin
-# ENTRYPOINT /usr/lib/jvm/jdk8/bin/java
+# ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID

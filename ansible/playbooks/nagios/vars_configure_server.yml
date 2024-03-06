@@ -1,0 +1,10 @@
+---
+# Path To Ansible Inventory File
+inventory_path: https://raw.githubusercontent.com/adoptium/infrastructure/master/ansible/inventory.yml
+
+task_list:
+    - Download Ansible Inventory File
+    - Run Create Nagios Server Configurations script
+    - Run Create Nagios Hostgroups script
+    - Run Create Nagios Servicegroups script
+    - restart_nagios_server

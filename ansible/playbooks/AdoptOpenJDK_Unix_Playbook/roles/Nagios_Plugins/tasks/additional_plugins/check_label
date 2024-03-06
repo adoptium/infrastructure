@@ -14,7 +14,7 @@
 
 #!/usr/bin/env bash
 
-# Nagios Plugin to check the percentage of machines online for a given label on ci.adoptopenjdk.net
+# Nagios Plugin to check the percentage of machines online for a given label on ci.adoptium.net
 
 if [ -z $1 ] || [ -z $2 ] || [ -z $3 ]; then
   echo "UNKNOWN - Invalid arguments"
@@ -28,13 +28,13 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Get list of machines in label
-mapfile -t machine_array < <(curl -s https://ci.adoptopenjdk.net/label/$1/api/json | jq -r '.nodes[] | .nodeName')
+mapfile -t machine_array < <(curl -s https://ci.adoptium.net/label/$1/api/json | jq -r '.nodes[] | .nodeName')
 
 # For each machine, query if they're connected
 response_array=()
 for node in ${machine_array[@]}
 do
-  response_array+=($(curl -s "https://ci.adoptopenjdk.net/computer/${node}/api/json" | jq .offline)) 
+  response_array+=($(curl -s "https://ci.adoptium.net/computer/${node}/api/json" | jq .offline)) 
 done
 
 online=0

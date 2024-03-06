@@ -5,10 +5,12 @@
 # Groups can be passed in as a command-line variable in Ansible playbook.
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
-- hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
+- name: Ansible Unix playbook
+  hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
-    - block:
+    - name: Run Tasks
+      block:
       # Set standard variables
         - name: Load AdoptOpenJDKs variable file
           include_vars: group_vars/all/adoptopenjdk_variables.yml
@@ -19,6 +21,9 @@
   # Roles #
   #########
   roles:
+    - role: logs
+      position: "Start"
+      tags: always
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
@@ -32,8 +37,8 @@
     - autoconf
     - curl
     - Jenkins_User                # AdoptOpenJDK Infrastructure
-    - role: freemarker            # OpenJ9
-      tags: [build_tools, build_tools_openj9]
+#  - role: freemarker            # OpenJ9
+#      tags: [build_tools, build_tools_openj9]
     - role: macos_codesign
       tags: [adoptopenjdk, codesign]
       when: ansible_distribution == "MacOSX"
@@ -51,22 +56,32 @@
       when:
         - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris" # These steps fail on Solaris
+      tags: adoptopenjdk
     - role: Crontab
       when:
         - ansible_distribution != "MacOSX"
+      tags: adoptopenjdk
     - role: NTP_TIME
       when: ansible_distribution != "MacOSX"
     - gcc_48
     - role: gcc_7                 # OpenJ9
       tags: [build_tools, build_tools_openj9]
-    - role: gcc_9
+    - role: gcc_9                 # Dragonwell
+      tags: [build_tools]
+    - role: gcc_10                # JDK17+
+      tags: [build_tools]
+    - role: gcc_11                # JDK19+
       tags: [build_tools]
     - role: Xcode
       when: ansible_distribution == "MacOSX"
-      tags: [build_tools, xcode, adoptopenjdk]
+    - role: Xcode11
+      when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
+      tags: [xcode11]
     - role: cmake                 # OpenJ9 / OpenJFX
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
+    - role: capstone
+      tags: [build_tools]
     - role: ccache
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
     - role: nasm                  # OpenJ9
@@ -77,44 +92,44 @@
     - role: adoptopenjdk_install
       jdk_version: 8
       when:
-        - ansible_distribution != "Alpine"
+        - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_architecture != "riscv64"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
       when:
         - ansible_distribution != "Alpine"
-        - ansible_distribution != "MacOSX"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install
+    - role: adoptopenjdk_install  # JDK11 is LTS and likely still relied on by some agents
       jdk_version: 11
       when:
-        - ansible_distribution != "Alpine"
+        - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK16 Build Bootstrap
-      jdk_version: 15
-      when:
-        - ansible_distribution != "Alpine"
-        - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
-      tags: build_tools
-    - role: adoptopenjdk_install  # JDK17 Build Bootstrap
-      jdk_version: 16
-      when:
-        - ansible_distribution != "Alpine"
-        - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
-      tags: build_tools
-    - role: adoptopenjdk_install # JDK18 Build Bootstrap
+    - role: adoptopenjdk_install  # Previous LTS
       jdk_version: 17
       when:
+        - ansible_distribution != "Solaris"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK19 Build Bootstrap
+      jdk_version: 18
+      when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
+      tags: build_tools
+    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
+      jdk_version: 19
+      when:
+        - ansible_distribution != "Alpine"
+        - ansible_distribution != "Solaris"
+      tags: build_tools
+    - role: adoptopenjdk_install  # Current LTS
+      jdk_version: 21
+      when:
+        - ansible_architecture == "riscv64"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
@@ -127,3 +142,8 @@
     - Security
     - Vendor
     - IPv6
+    - role: disable_gui
+      tags: adoptopenjdk
+    - role: logs
+      position: "End"
+      tags: always

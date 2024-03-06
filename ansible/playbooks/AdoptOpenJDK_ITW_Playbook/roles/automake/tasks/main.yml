@@ -5,7 +5,7 @@
 
 - name: Check if automake 1.31.1 is installed
   shell: automake --version | grep 1.13.1
-  ignore_errors: yes
+  failed_when: false
   register: automake_installed
   tags:
     - skip_ansible_lint

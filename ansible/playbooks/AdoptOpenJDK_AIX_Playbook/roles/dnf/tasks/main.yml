@@ -1,0 +1,194 @@
+---
+
+# See https://github.com/adoptium/infrastructure/issues/3142#issuecomment-1658743632
+# Yum is no longer supported on AIX 7.3. Dnf is recommended. Dnf supports AIX 7.1 TL3 and higher
+# Dnf needs python3
+# For more information https://community.ibm.com/community/user/power/blogs/sangamesh-mallayya1/2021/05/28/dnf-is-now-available-on-aix-toolbox?CommunityKey=10c1d831-47ee-4d92-a138-b03f7896f7c9&tab=recentcommunityblogsdashboard
+
+# Dnf needs python3
+- name: Fail if python3 is not available
+  stat:
+    path: /opt/freeware/bin/python3
+  register: python3_installed
+  failed_when: not python3_installed.stat.exists
+
+- name: Check if dnf is installed
+  stat:
+    path: /opt/freeware/bin/dnf
+  register: dnf_installed
+
+- name: Install dnf
+  when: not dnf_installed.stat.exists
+  block:
+    # Installs dnf when yum is not present
+    - name: Set install flag
+      set_fact:
+        install_flag: "-d"
+
+    - name: Check if yum is installed
+      stat:
+        path: /opt/freeware/bin/yum
+      register: yum_installed
+
+    # Installs dnf when yum is present, links yum to dnf
+    - name: Set install flag if yum is installed
+      set_fact:
+        install_flag: "-y"
+      when: yum_installed.stat.exists
+
+    - name: Download dnf script
+      get_url:
+        url: "https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/ezinstall/ppc/dnf_aixtoolbox.sh"
+        mode: 0744
+        validate_certs: false
+        dest: /tmp/dnf_aixtoolbox.sh
+        checksum: sha256:7582a79530a30280548bebf6730686ff3c8b4b7259ddf2d1361494be19a193f8
+
+    - name: Install dnf
+      command: "/tmp/dnf_aixtoolbox.sh {{ install_flag }}"
+
+    - name: Remove dnf script
+      file:
+        state: absent
+        path: /tmp/dnf_aixtoolbox.sh
+
+# See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836343656
+- name: Dnf module needs /opt/freeware/libexec/python3 as its ansible_python_interpreter
+  vars:
+    ansible_python_interpreter: /opt/freeware/libexec/python3
+  block:
+    # See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836227877
+    - name: Remove yum-utils before dnf update
+      dnf:
+        name: yum-utils
+        state: absent
+
+    - name: Update dnf
+      dnf:
+        update_cache: true
+        name: '*'
+        state: latest
+
+    - name: Install packages
+      dnf:
+        state: present
+        update_cache: yes
+        disable_excludes: all
+        name:
+          - bash
+          - autoconf-2.69-1
+          - bc
+          - bison
+          - coreutils
+          - cpio
+          - cups-devel
+          - cups-libs
+          - expect
+          - flex
+          - freetype2-devel-2.8-1
+          - fontconfig-devel
+          - gawk
+          - git
+          # - gnupg2-2.0.30
+          - grep
+          - libffi-devel
+          - make
+          - m4
+          - pcre
+          - pkg-config
+          - popt
+          - sed
+          - sudo
+          - tar
+          - tcl
+          - unzip
+          - wget
+          - xz-libs
+          - zip
+          - zsh
+
+    ##########################################################################
+    # Adoptium builds do not work properly with the latest cmake @AIXToolbox #
+    ##########################################################################
+    # NOTE: Cannot use dnf module here as it will pull in cmake 3.16 which we do not want
+    - name: Install cmake 3.14.3 prerequisites
+      command:
+        cmd: rpm -i "{{ item }}"
+        creates: /opt/freeware/etc/rpm/macros.cmake
+      with_items:
+        - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-filesystem-3.14.3-1.aix7.1.ppc.rpm
+        - https://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/RPMS/ppc-7.1/cmake/cmake-rpm-macros-3.14.3-1.aix7.1.ppc.rpm
+      tags:
+        - rpm_install
+        - cmake
+
+    # See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492 for why we are locking this
+    - name: Install cmake 3.14.3 (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)
+      dnf:
+        name: cmake-3.14.3
+        state: present
+        update_cache: yes
+        disable_excludes: all
+      tags:
+        - rpm_install
+        - cmake
+    ##############################################################################
+    # TASK [yum : Install cmake 3.14.3
+    #   (See https://github.com/AdoptOpenJDK/openjdk-build/issues/2492)]
+    # fatal: [x077]: FAILED! =>
+    #   {"changed": false, "msg": "No package matching 'cmake-3.14.3' found available,
+    #   installed or updated", "rc": 126,
+    #   "results": ["No package matching 'cmake-3.14.3' found available,
+    #   installed or updated"}
+    ## If you get this message - you need to remove 'cmake*' from
+    #   /opt/freeware/etc/yum/yum.conf
+    ##############################################################################
+
+    - name: Remove packages - in case installed historically, or by accident
+      dnf:
+        state: absent
+        name:
+          - libXrender-devel
+          - libXrender
+          - libXft
+          - tk
+          - renderproto
+      tags:
+        - adoptopenjdk
+
+- name: Ensure perl from /opt/freeware/bin is the default in /usr/bin
+  shell: mv /usr/bin/perl /usr/bin/perl.old && ln -s /opt/freeware/bin/perl /usr/bin/
+  failed_when: false
+  tags:
+    - rpm_install
+
+# Create zlib.h and zconf.h links - See https://github.com/adoptium/infrastructure/issues/1952
+- name: Copy zlib.h and zconf.h (See https://github.com/adoptium/infrastructure/issues/1952)
+  copy:
+    src: "/opt/freeware/include/{{ item }}"
+    dest: "/usr/include/"
+    force: true
+    remote_src: true
+  with_items:
+    - zconf.h
+    - zlib.h
+
+##############################################################################
+# Prevent accidental updates to 'locked' packages
+##############################################################################
+- name: Exclude packages from dnf (main)
+  lineinfile:
+    dest: /opt/freeware/etc/dnf/dnf.conf
+    firstmatch: true
+    insertafter: 'plugins=1'
+    line: 'exclude=autoconf* cmake* freetype2*'
+  tags:
+    - cmake
+    - freetype2
+
+- name: Remove, if exists, reference to libXrender-devel include files
+  file:
+    state: absent
+    path: /opt/freeware/include/X11/extensions
+  tags:
+    - adoptopenjdk

@@ -8,6 +8,17 @@ Nagios_Plugins: Disabled
 ##### This needs to be set before running ######
 #ansible_password: CHANGE_ME
 
+# If Experiencing timeout errors, set the two variables below. (See https://github.com/adoptium/infrastructure/tree/master/ansible#how-do-i-run-the-playbooks-on-a-remote-windows-host)
+# ansible_winrm_operation_timeout_sec: 600
+# ansible_winrm_read_timeout_sec: 630
+
 ### Default JDK ###
 bootjdk: hotspot
 heapsize: normal
+
+## Nagios Server Details
+Nagios_Master_IP: 78.47.239.96
+
+# GPG Public Keys
+key:
+  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>

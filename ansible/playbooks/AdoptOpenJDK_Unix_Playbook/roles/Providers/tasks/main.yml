@@ -8,8 +8,9 @@
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Determine the provider by the hostname
   shell: set -o pipefail | hostname | cut -d- -f2
-  ignore_errors: yes
+  failed_when: false
   register: provider_name
+  changed_when: false
   tags:
     - providers
     - adoptopenjdk
@@ -61,6 +62,23 @@
     - provider_name.rc == 0
     - provider_name.stdout == "godaddy"
     - Domain != "adoptopenjdk.net"
+  tags:
+    - providers
+    - adoptopenjdk
+
+###########
+# Marist  #
+###########
+
+# Marist machines need their host template updated for changes to /etc/hosts to persist
+- name: Update /etc/cloud/cloud.cfg file - To remove update hosts function
+  lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    regexp: "^.*update_etc_hosts.*$"
+    state: absent
+  when:
+    - provider_name.rc == 0
+    - provider_name.stdout == "marist"
   tags:
     - providers
     - adoptopenjdk

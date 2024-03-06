@@ -7,17 +7,24 @@
 Build_Tool_Packages:
   - bind-utils
   - bison                         # OpenJ9
+  - bzip2
   - cpio
+  - cronie
   - curl
   - flex
   - gcc
   - gcc-c++
   - glibc
   - glibc-devel
+  - gnutls
   - libdw1
   - libelf1
   - make
+  - mozilla-nss
+  - mozilla-nss-devel
+  - mozilla-nss-tools
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - unzip
   - wget
   - zip
@@ -38,11 +45,17 @@ Additional_Build_Tools_SLES15:
   - libXrender-devel
   - libXt-devel
   - libXtst-devel
+  - cron
+  - python-xml
+
+Additional_Build_Tools_SLES15_SP2:
+  - systemtap=4.2-3.3.1
+
+Additional_Build_Tools_SLES15_NOT_SP2:
   - systemtap-sdt-devel
 
 Additional_Build_Tools_SLES12:
   - java-1_8_0-openjdk
-  - git-core
   - libelf0
   - libfreetype6
   - libXext6
@@ -54,6 +67,14 @@ Additional_Build_Tools_SLES12:
   - Mesa-libGL1
   - ntp
   - perl-CPAN-Meta
+
+Additional_Build_Tools_SLES12_SP5:
+  - libcurl-devel    ## Required To Install Git From Source
+  - zlib-devel
+
+Additional_Build_Tools_SLES12_NOT_SP5:
+  - git-core
+
 Additional_Build_Tools_SLES11:
   - perl-Error
   - libelf0
@@ -65,7 +86,6 @@ Additional_Build_Tools_SLES_x86:
   - glibc-devel-32bit             # a dependency required for executing a 32-bit C binary
   - libstdc++6-32bit              # a dependency required for executing a 32-bit C binary
   - libelf0-32bit                 # a dependency required for executing a 32-bit C binary
-  - libelf0-debuginfo-32bit       # a dependency required for executing a 32-bit C binary
   - libstdc++-devel-32bit         # a dependency required for executing a 32-bit C binary
   - libXtst6-32bit                # a dependency required for executing a 32-bit C binary
 
@@ -77,3 +97,7 @@ Test_Tool_Packages:
   - xorg-x11-server
   - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests
+  - gnutls
+  - mozilla-nss
+  - mozilla-nss-devel
+  - mozilla-nss-tools

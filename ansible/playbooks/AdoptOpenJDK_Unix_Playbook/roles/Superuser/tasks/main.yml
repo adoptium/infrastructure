@@ -21,6 +21,15 @@
     - ansible_distribution == "Solaris"
   tags: [superuser, adoptopenjdk]
 
+- name: Create Superuser account group for SLES
+  group:
+    name: zeus
+    state: present
+  when:
+    - ansible_distribution == "SLES"
+    - Superuser_Account == "Enabled"
+  tags: [superuser, adoptopenjdk]
+
 - name: Create Superuser account - zeus
   action: user name=zeus state=present home={{ home_folder }} shell=/bin/bash
   when:
@@ -37,13 +46,13 @@
 
 - name: Enable SSH login for Superuser user (macOS)
   command: dseditgroup -o edit -a zeus -t staff com.apple.access_ssh
-  ignore_errors: yes
+  failed_when: false
   when:
     - Superuser_Account == "Enabled"
     - ansible_distribution == "MacOSX"
   tags: [superuser, adoptopenjdk]
 
-- name: Create Superuser account home folder for s390x
+- name: Create Superuser account home folder for SLES
   file:
     path: /home/zeus/
     owner: zeus
@@ -51,7 +60,7 @@
     mode: 0700
     state: directory
   when:
-    - ansible_architecture == "s390x"
+    - ansible_distribution == "SLES"
     - Superuser_Account == "Enabled"
   tags: [superuser, adoptopenjdk]
 

@@ -10,10 +10,10 @@
 
 - name: Download WiX
   win_get_url:
-    url: https://wixtoolset.org/downloads/v3.14.0.3910/wix314.exe
+    url: https://github.com/wixtoolset/wix3/releases/download/wix314rtm/wix314.exe
     dest: 'C:\temp\wix.exe'
     follow_redirects: all
-    checksum: f333d4cf132f03b75222aa107633d28ce5ba8d612892b38cfc2ddc4cd92ad6de
+    checksum: 704439ea88fc9e5a3647eedeeb45943f9a392e3d209f58512280130096847937
     checksum_algorithm: sha256
   when: (not wix_installed.stat.exists)
   tags: Wix
@@ -30,7 +30,7 @@
   win_file:
     path: 'C:\temp\wix.exe'
     state: absent
-  ignore_errors: yes
+  failed_when: false
   tags: Wix
 
 - name: Test if Windows 10 SDK is already installed

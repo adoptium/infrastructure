@@ -14,10 +14,16 @@
   set_fact: makeVersion=4.1
   tags: goodmake_source
 
+# This SHA was determined by SHA after verifying the public key pulled from ubuntu's keyserver
+- name: Set make sha256sum
+  set_fact: makeVersionSHA=9fc7a9783d3d2ea002aa1348f851875a2636116c433677453cc1d1acc3fc4d55
+  tags: goodmake_source
+
 - name: Test if self-built make {{ makeVersion }} is available
   shell: /usr/local/bin/make --version >/dev/null
-  ignore_errors: yes
+  failed_when: false
   register: goodmake_installed
+  changed_when: false
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
@@ -30,6 +36,17 @@
     url: https://ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
     dest: /tmp/make-{{ makeVersion }}.tar.gz
     mode: 0440
+    checksum: sha256:{{ makeVersionSHA }}
+  when:
+    - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
+      ansible_architecture == "x86_64") or
+      ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version|int < 8)
+    - goodmake_installed.rc != 0
+  tags: goodmake_source
+
+- name: GPG Signature verification
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/make-{{ makeVersion }}.tar.gz -sl "https://ftp.gnu.org/gnu/make/make-4.1.tar.gz.sig" -k {{ key.gmake }}
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
@@ -83,7 +100,7 @@
   with_items:
     - /tmp/make-{{ makeVersion }}
     - /tmp/make-{{ makeVersion }}.tar.gz
-  ignore_errors: yes
+  failed_when: false
   tags: goodmake_source
 
 

@@ -1,0 +1,29 @@
+---
+# Updates $HOME/ansible.log with the date and time of latest ansible playbook run
+
+- name: Set Log path
+  set_fact:
+    log_path: /var/log
+
+- name: Get Date and Time
+  shell: date +%Y-%m-%d\ %H:%M:%S
+  register: date_output
+
+- name: Get Latest git commit SHA
+  shell: git rev-parse HEAD
+  register: git_output
+  delegate_to: localhost
+  ignore_errors: yes
+  when: git_sha is not defined
+
+- name: Set git_output to git_sha
+  set_fact:
+    git_sha: "{{ git_output.stdout }}"
+  when: git_sha is not defined
+
+- name: Update Log File
+  lineinfile:
+    create: yes
+    path: "{{ log_path }}/ansible.log"
+    insertafter: EOF
+    line: "{{ position }} {{ date_output.stdout }} {{ git_sha }}"

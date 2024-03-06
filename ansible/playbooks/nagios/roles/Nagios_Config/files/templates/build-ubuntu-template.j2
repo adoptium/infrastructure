@@ -1,0 +1,78 @@
+define host {
+        use                             linux-server
+        host_name                       {{ host_name }}
+        alias                           Add by Ansible
+        address                         {{ host_ip_address }}
+        check_command                   check_ssh!-4 -t 60
+        max_check_attempts              5
+        check_period                    24x7
+        notification_interval           720
+        notification_period             24x7
+        icon_image                      Ubuntu.png
+        icon_image_alt                  Ubuntu
+        statusmap_image                 Ubuntu.gd2
+}
+
+define service{
+        use                             generic-service
+	host_name                       {{ host_name }}
+        service_description             Current Load
+        check_command                   check_by_ssh!/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,24,20
+        notifications_enabled   0
+        check_interval                  30
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+}
+
+define service{
+        use                             generic-service
+        host_name                       {{ host_name }}
+        service_description             Disk Space Root Partition
+        check_command                   check_by_ssh!/usr/local/nagios/libexec/check_disk -w 10% -c 5% -p /
+        check_interval                  60
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+}
+
+define service {
+        use                             generic-service
+        host_name                       {{ host_name }}
+        service_description             Check if Jenkins Agent Connected
+        check_command                   check_agent!{{ host_name }}
+        notification_options            c,r
+        check_interval                  30
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+}
+
+define service{
+        use                             generic-service
+        host_name                       {{ host_name }}
+        service_description             Check Network Time System
+        check_command                   check_by_ssh!/usr/local/nagios/libexec/check_timesync
+        check_interval                  15
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=hour&rrdopts=-w+450
+}
+
+define service{
+        use                             local-service
+        host_name                       {{ host_name }}
+        service_description             PING
+        check_period                    once-a-day-at-8
+        check_command                   check_ping!200.0,20%!500.0,60%
+        servicegroups                   build_Servers
+}
+
+define service{
+        use                             generic-service
+        host_name                       {{ host_name }}
+        service_description             RAM
+        check_command                   check_by_ssh!/usr/local/nagios/libexec/check_mem -f -C -w 15 -c 5
+        action_url      /nagiosgraph/cgi-bin/show.cgi?host=nagios$&service=$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/nagiosgraph/cgi-bin/showgraph.cgi?host=nagios$&service=$&period=hour&rrdopts=-w+450
+        }
+
+define service{
+        use                             generic-service
+        host_name                       {{ host_name }}
+	check_period			once-a-day-at-8
+        service_description             Updates Required - apt
+        check_command			check_by_ssh!/usr/lib/nagios/plugins/check_apt
+	notifications_enabled   0
+        }

@@ -5,20 +5,21 @@
 
 - name: Check if gcc 9.3 is installed on RHEL/CentOS
   shell: /usr/local/gcc9/bin/gcc-9.3 --version 2>&1 > /dev/null
-  ignore_errors: yes
+  failed_when: false
   register: gcc9_installed
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")
+  changed_when: false
   tags: gcc_9
 
-# Unable to check the checksum of the binary as it'll be different for each architecture's tar.xz file
 - name: Download AdoptOpenJDK gcc-9.3.0 binary
   get_url:
-    url: https://ci.adoptopenjdk.net/userContent/gcc/gcc930.{{ ansible_architecture }}.tar.xz
+    url: https://ci.adoptium.net/userContent/gcc/gcc930.{{ ansible_architecture }}.tar.xz
     dest: '/tmp/ansible-adoptopenjdk-gcc-9.tar.xz'
     force: no
     mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" )
     - (ansible_architecture == "x86_64" or ansible_architecture == "aarch64")

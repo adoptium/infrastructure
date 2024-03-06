@@ -44,7 +44,7 @@
     - patch_update
     - skip_ansible_lint
 
-- name: zypper upgrade all packages
+- name: Run zypper upgrade all packages
   zypper: name='*' state=latest update_cache=yes
   tags: patch_update
 
@@ -106,8 +106,9 @@
 
 - name: Check if jdk-8 is already installed in the target location
   shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
-  ignore_errors: yes
+  failed_when: false
   register: adoptopenjdk_installed
+  changed_when: false
   tags:
     - java8_SUSE
     - skip_ansible_lint
@@ -124,6 +125,7 @@
   shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk8* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
   when: adoptopenjdk_installed.rc != 0
+  changed_when: false
   tags: java8_SUSE
 
 - name: Chown /usr/lib/jvm/jdk8*

@@ -1,0 +1,43 @@
+---
+##########
+# gcc_11 #
+##########
+
+- name: Check if gcc 11.2 is installed on RHEL/CentOS/Ubuntu16
+  shell: /usr/local/gcc11/bin/gcc-11.2 --version 2>&1 > /dev/null
+  failed_when: false
+  register: gcc11_installed
+  when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+  changed_when: False
+  tags: gcc_11
+
+- name: Download Adoptium gcc-11.2 binary
+  get_url:
+    url: https://ci.adoptium.net/userContent/gcc/gcc112.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-11.tar.xz'
+    force: no
+    mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc11_installed.rc != 0
+  tags: gcc_11
+
+- name: Extract AdoptOpenJDK gcc-11 binary to /usr/local/gcc11
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-11.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc11_installed.rc != 0
+  tags: gcc_11
+
+- name: Remove downloaded gcc 11 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-11.tar.xz'
+    state: absent
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian"))
+    - gcc11_installed.rc != 0
+  tags: gcc_11

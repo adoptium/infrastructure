@@ -9,6 +9,30 @@
 # Not installed: When swap_root.rc or swap_tmp.rc does NOT equal 0
 # Assume swap path of /swapfile override where applicable
 
+- name: Intialise btrfs variable
+  set_fact:
+    btrfs_fs_found: false
+  tags: swap_file
+
+- name: Check and set fact if / mount point exists and is BTRFS
+  set_fact:
+    btrfs_fs_found: true
+  when: (item.mount == '/') and (item.fstype == 'btrfs')
+  loop: "{{ ansible_facts.mounts }}"
+  tags: swap_file
+
+- name: Check and set fact if / mount point exists and is NOT BTRFS
+  set_fact:
+    btrfs_fs_found: false
+  when: (item.mount == '/') and (item.fstype != 'btrfs')
+  loop: "{{ ansible_facts.mounts }}"
+  tags: swap_file
+
+- name: Print Root FS Type
+  debug:
+    msg: "FS Type = {{ btrfs_fs_found }}"
+  tags: swap_file
+
 - name: Set Swapfile path - /swapfile
   set_fact:
     swap_path: /swapfile
@@ -36,15 +60,30 @@
 
 - name: Disable dphys-swapfile where applicable
   command: "dphys-swapfile uninstall"
-  ignore_errors: yes
+  failed_when: false
   when:
     - ansible_architecture == "armv7l"
   tags: swap_file
 
-- name: Create swap file - via DD
+- name: Touch Swapfile For BTRFS
+  copy:
+    content: ""
+    dest: "{{ swap_path }}"
+    force: no
+  when:
+    (btrfs_fs_found == True) and not (swap_exists.stat.exists)
+  tags: swap_file
+
+- name: Add Attribute For BTRFS File System
+  command: "chattr +C {{ swap_path }}"
+  when:
+    - (btrfs_fs_found == True) and not (swap_exists.stat.exists)
+  tags: swap_file
+
+- name: Create/Populate swap file - via DD
   command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
   when:
-    - not (swap_exists.stat.exists)
+    not (swap_exists.stat.exists)
   tags: swap_file
 
 - name: Set swap file permissions

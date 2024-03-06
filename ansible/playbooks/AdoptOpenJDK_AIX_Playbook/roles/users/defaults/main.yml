@@ -1,0 +1,12 @@
+# Default users - positioned here to ease command-line precedence
+# adding -e users="['user1', ..., 'usern']" will override
+# ALSO: add: --skip_tags users_custom unless you also add an (empty) task file named
+# roles/users/tasks/{{user_name}}.yml
+---
+users:
+  - "{{ Jenkins_Username | default('jenkins') }}"
+
+# prefer to keep this users outside of a generic role (for now)
+skipusers:
+  - zeus
+  - nagios

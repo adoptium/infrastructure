@@ -18,12 +18,14 @@ Build_Tool_Packages:
   - gcc-c++
   - glibc
   - glibc-devel
+  - gnutls
   - libcurl-devel
   - libdw1
   - libdwarf-devel
   - libelf-devel
   - libelf0
   - libelf1
+  - libnss3.so
   - libnuma-devel
   - libpng15-devel
   - libXext-devel
@@ -33,9 +35,11 @@ Build_Tool_Packages:
   - libXt-devel
   - libXtst-devel
   - make
+  - mozilla-nss
   - ntp
   - numactl
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget
@@ -62,6 +66,7 @@ Test_Tool_Packages:
   - pulseaudio
   - xorg-x11
   - xorg-x11-devel
-  - xorg-x11-server
-  - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests
+  - gnutls
+  - libnss3.so
+  - mozilla-nss

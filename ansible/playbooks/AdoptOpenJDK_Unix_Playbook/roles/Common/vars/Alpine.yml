@@ -19,6 +19,10 @@ Build_Tool_Packages:
   - freetype
   - freetype-dev
   - grep
+  - gnupg
+  - gnutls                        # OpenSSL tests
+  - gnutls-dev                    # OpenSSL tests
+  - gnutls-utils                  # OpenSSL tests
   - libdwarf                      # OpenJ9
   - libdwarf-dev                  # OpenJ9
   - libx11
@@ -34,8 +38,14 @@ Build_Tool_Packages:
   - libxtst
   - libxtst-dev
   - linux-headers
+  - nss
+  - nss-dev
+  - nss-tools
   - numactl
   - numactl-dev                   # OpenJ9
+  - pigz                          # Used in preference to gzip for tar.gz'ing
+  - sed                           # JDK8u requires GNU sed
+  - strace                        # For SBOM dependency analysis
   - unzip
   - wget
   - which
@@ -56,3 +66,9 @@ Test_Tool_Packages:
   - xauth
   - xorg-server
   - xvfb
+  - gnutls
+  - gnutls-dev
+  - gnutls-utils
+  - nss
+  - nss-dev
+  - nss-tools

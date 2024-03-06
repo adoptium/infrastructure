@@ -10,7 +10,7 @@
   tags: ntp_time
 
 - name: Ensure systemd-timesyncd service is disabled
-  ignore_errors: true
+  failed_when: false
   service:
     name: systemd-timesyncd
     enabled: no
@@ -45,7 +45,7 @@
   when:
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "8") or
       (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or
-      (ansible_distribution == "centos" and ansible_distribution_major_version == "7" )
+      (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
   tags: ntp_time
 
 - name: Start NTP for SUSE12

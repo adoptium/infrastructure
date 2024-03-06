@@ -33,7 +33,7 @@
   win_shell: "fsutil file setshortname \"C:\\Program Files (x86)\" \"PROGRA~2\""
   args:
     executable: cmd
-  ignore_errors: yes
+  failed_when: false
   tags: basic_config
 
 # Some providers of machines set invalid hostnames with a hyphen at the end.
@@ -47,13 +47,13 @@
 
 - name: Print new hostname
   debug:
-    msg: "{{ hostname_output.stdout | replace('-','') | trim }}"
+    msg: "{{ hostname_output.stdout | replace('-', '') | trim }}"
   when:
     - not (hostname_output.stdout == "")
   tags: basic_config
 
 - name: Remove stray '-' from hostname
-  win_shell: Rename-Computer -NewName "{{ hostname_output.stdout | replace('-','') | trim }}"
+  win_shell: Rename-Computer -NewName "{{ hostname_output.stdout | replace('-', '') | trim }}"
   args:
     executable: powershell
   when:

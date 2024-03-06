@@ -5,7 +5,7 @@
 
 - name: Check if pkg-config-0.29.2 is installed
   shell: pkg-config --version | grep 0.29.2
-  ignore_errors: yes
+  failed_when: false
   register: pkg_config_installed
   tags:
     - skip_ansible_lint
@@ -31,7 +31,7 @@
   when:
     - pkg_config_installed.rc != 0
 
-- name: export PKG_CONFIG_PATH=/usr/local/bin
+- name: Export PKG_CONFIG_PATH=/usr/local/bin
   shell: export PKG_CONFIG_PATH=/usr/local/bin
   tags:
     - skip_ansible_lint

@@ -23,15 +23,15 @@
     state: present
   tags: patch_update
 
-- name: Add AdoptOpenJDK GPG key
+- name: Add Eclipse Temurin GPG key
   apt_key:
-    url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+    url: https://packages.adoptium.net/artifactory/api/gpg/key/public
     state: present
   tags: patch_update
 
-- name: Add the adoptopenjdk repository to apt for JDK8
+- name: Add the Eclipse Temurin repository to apt for JDK8
   apt_repository:
-    repo: "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb {{ ansible_distribution_release }} main"
+    repo: "deb https://packages.adoptium.net/artifactory/deb {{ ansible_distribution_release }} main"
     update_cache: no
   when:
     - (ansible_architecture != "riscv64")
@@ -60,14 +60,14 @@
 
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
-    url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    url: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
     state: present
   when:
     - ansible_architecture == "x86_64"
   tags: [patch_update, azul-key]
 
 - name: Add Azul Zulu repository for x86_64
-  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+  apt_repository: repo='deb https://repos.azulsystems.com/ubuntu stable main'
   when:
     - ansible_architecture == "x86_64"
   tags: patch_update
@@ -76,8 +76,8 @@
 - name: Add additional repositories for Raspbian Buster
   apt_repository: repo={{ item }}
   with_items:
-    - deb-src http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
-    - deb http://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
+    - deb-src https://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi
+    - deb https://mirrordirector.raspbian.org/raspbian/ jessie main contrib non-free rpi
   when:
     - (ansible_distribution_major_version == "10" and ansible_architecture == "armv7l")
   tags: patch_update
@@ -91,8 +91,8 @@
     - deb-src https://deb.debian.org/debian/ stable-updates main contrib non-free
     - deb https://deb.debian.org/debian-security stable/updates main
     - deb-src https://deb.debian.org/debian-security stable/updates main
-    - deb http://ftp.debian.org/debian stretch-backports main
-    - deb-src http://ftp.debian.org/debian stretch-backports main
+    - deb https://ftp.debian.org/debian stretch-backports main
+    - deb-src https://ftp.debian.org/debian stretch-backports main
   when:
     - (ansible_distribution_major_version == "9" and ansible_architecture == "armv7l")
   tags: patch_update
@@ -110,6 +110,20 @@
     force: yes
   tags: patch_update
 
+- name: Remove expired cert \"DST Root CA X3\"
+  when: (ansible_distribution_major_version == "8") and (ansible_architecture == "x86_64")
+  tags: patch_update
+  block:
+    - name: Deselect certificate from ca-certificates.conf
+      replace:
+        path: /etc/ca-certificates.conf
+        replace: "!DST_Root_CA_X3.crt"
+        regexp: "^(.*)?/DST_Root_CA_X3.crt"
+        backup: yes
+
+    - name: Refresh ca-certificates
+      command: "update-ca-certificates --fresh"
+
 ############################
 # Build Packages and tools #
 ############################
@@ -119,13 +133,6 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Call gcc-7 for all but arm32
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc_7 }}"
-  when:
-    - ansible_architecture != "armv7l"
-    - ansible_architecture != "riscv64"
-  tags: build_tools
 
 - name: Call Build Packages and Tools Task for OpenJFX
   package: "name={{ item }} state=latest"
@@ -136,9 +143,8 @@
   package: "name={{ item }} state=latest"
   with_items: "{{ gcc_compiler }}"
   when:
-    - (ansible_distribution_major_version != "9" and ansible_architecture != "armv7l")
     - ansible_architecture != "riscv64"
-    - ansible_distribution_major_version != "10"
+    - ansible_distribution_major_version == "10"
   tags: build_tools
 
 - name: Install GCC G++ on Raspian Buster

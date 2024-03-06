@@ -40,7 +40,7 @@
 
 - name: Retrieve and unpack the riscv toolchain
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/riscv/riscv_toolchain_linux64.tar.xz
+    src: https://ci.adoptium.net/userContent/riscv/riscv_toolchain_linux64.tar.xz
     dest: /opt/
     remote_src: yes
   when:
@@ -53,7 +53,7 @@
 
 - name: Retrieve and Unpack the fedora sysroot folder
   unarchive:
-    src: https://ci.adoptopenjdk.net/userContent/riscv/fedora28_riscv_smlroot_ssl110gdev.tar.xz
+    src: https://ci.adoptium.net/userContent/riscv/fedora28_riscv_smlroot_ssl110gdev.tar.xz
     dest: /opt/
     remote_src: yes
   when:

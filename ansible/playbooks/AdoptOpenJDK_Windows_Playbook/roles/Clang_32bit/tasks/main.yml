@@ -14,7 +14,7 @@
 
 - name: Download Clang 32bit
   win_get_url:
-    url: https://ci.adoptopenjdk.net/userContent/winansible/llvm-7.0.0-win32.zip
+    url: https://ci.adoptium.net/userContent/winansible/llvm-7.0.0-win32.zip
     dest: 'C:\temp\'
     force: no
     checksum: 89dcd42d240b3e7ef3a5487855e224f2f90a23a2a194dbadd8c427c2dd59df79
@@ -47,5 +47,5 @@
   win_file:
     path: 'c:\temp\LLVM-7.0.0-win32.zip'
     state: absent
-  ignore_errors: yes
+  failed_when: false
   tags: clang_32bit

@@ -1,0 +1,25 @@
+# USER Role variables
+# More precendence that roles/{{rolename}}/defaults/main.yml
+---
+user_attrs:
+  - attr: fsize
+  - attr: core
+  - attr: cpu
+  - attr: data
+    value: 524288
+  - attr: rss
+    value: 524288
+  - attr: stack
+    value: 16777216
+  - attr: nofiles
+  - attr: capabilities
+    value: CAP_NUMA_ATTACH,CAP_BYPASS_RAC_VMM,CAP_PROPAGATE
+
+# SKIP these attributes until the AIX RBAC role is actually used.
+# See: https://github.com/adoptium/infrastructure/issues/1803
+# and https://github.com/adoptium/infrastructure/issues/1918
+_skip_attrs:
+  - attr: roles
+    value: rtclk
+  - attr: default_roles
+    value: rtclk
