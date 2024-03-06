@@ -14,7 +14,7 @@
 - name: Add Devel-Tools repository (SLES12, s390x)
   zypper_repository:
     name: devel-tools
-    repo: 'https://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Factory_zSystems/'
+    repo: 'http://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Factory_zSystems/'
     auto_import_keys: yes
     state: present
   when:
