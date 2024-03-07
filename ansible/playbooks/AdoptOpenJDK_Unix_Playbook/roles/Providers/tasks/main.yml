@@ -66,11 +66,11 @@
     - providers
     - adoptopenjdk
 
-###########
-# Marist  #
-###########
+#####################
+# Marist & Scaleway #
+#####################
 
-# Marist machines need their host template updated for changes to /etc/hosts to persist
+# Marist & Scaleway machines need their host template updated for changes to /etc/hosts to persist
 - name: Update /etc/cloud/cloud.cfg file - To remove update hosts function
   lineinfile:
     dest: /etc/cloud/cloud.cfg
@@ -78,7 +78,7 @@
     state: absent
   when:
     - provider_name.rc == 0
-    - provider_name.stdout == "marist"
+    - (provider_name.stdout == "marist" or provider_name.stdout == "scaleway")
   tags:
     - providers
     - adoptopenjdk
