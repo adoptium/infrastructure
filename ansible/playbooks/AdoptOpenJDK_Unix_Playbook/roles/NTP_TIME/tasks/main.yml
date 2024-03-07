@@ -37,12 +37,38 @@
     - (ansible_distribution == "Ubuntu") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "11")
   tags: ntp_time
 
+- name: Gather Facts About The Services Present
+  service_facts:
+  tags: ntp_time
+
+- name: Check If NTPD Exists In The Service Facts
+  set_fact:
+    ntpd_entry_exists: "{{ 'ntpd.service' in services }}"
+  when: ansible_facts.services is defined
+  tags: ntp_time
+
+- name: Set Fact Where NTPD Is Not Available As A Service
+  set_fact:
+    ntpd_entry_exists: "false"
+  when: ansible_facts.services is not defined
+  tags: ntp_time
+
+- name: Display NTPD Status
+  debug:
+    var: ntpd_entry_exists
+  when:
+    - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "8") or
+      (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or
+      (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+  tags: ntp_time
+
 - name: Start NTP for RedHat, SLES 12 and CentOS 7
   service:
     name: ntpd
     state: restarted
     enabled: yes
   when:
+    - ntpd_entry_exists | default(false) | bool
     - (ansible_distribution == "RedHat" and ansible_distribution_major_version != "8") or
       (ansible_distribution == "SLES" and ansible_distribution_major_version == "12") or
       (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
