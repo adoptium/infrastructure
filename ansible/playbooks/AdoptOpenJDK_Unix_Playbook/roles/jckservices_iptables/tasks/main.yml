@@ -74,6 +74,8 @@
     - 207.254.73.168 # gn324-macos11-x86_64
     - 207.254.28.13 # esmv4-macos11-arm64
     - 207.254.28.99 # noh7B-macos12-arm64
+    - 62.210.163.172 # jck-scaleway-ubuntu2310-riscv64-1
+    - 62.210.163.106 # jck-scaleway-ubuntu2310-riscv64-2
 
 - name: Setup iptables
   iptables:
