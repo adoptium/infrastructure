@@ -187,7 +187,6 @@
         path: /tmp/jdk{{ jdk_version }}.tar.gz
         state: absent
 
-<<<<<<< HEAD
 # JDK 21 on Linux-riscv64 is a special-case because JDK 21 is the first version that supports
 # RISC-V. There is also no JDK 21 or 20 available on Ubuntu 20.04 that we can use as boot JDK.
 - name: Install JDK {{ jdk_version }} on Linux-riscv64
@@ -219,8 +218,6 @@
         path: /tmp/jdk21.tar.gz
         state: absent
 
-=======
->>>>>>> b240053 (Use correct API for each JDK version)
 # JDK 19 on Linux-riscv64 is a special-case because JDK 19 is the first version that supports
 # RISC-V. There is also no JDK 19 or 20 available on Ubuntu 20.04 that we can use as boot JDK.
 - name: Install JDK {{ jdk_version }} on Linux-riscv64

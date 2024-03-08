@@ -31,7 +31,7 @@
       delay: 5
       when:
         - java_installed.stat.isdir is not defined
-        - ! ( jdk == 8 or jdk == 11 or jdk >= 17 )
+        - jdk == 10 or jdk == 16 # These are the only two we still use from adoptopenjdk API
       register: openjdk
 
     - name: Download JDK {{ jdk }} binary from api.adoptium.net
@@ -44,10 +44,10 @@
       delay: 5
       when:
         - java_installed.stat.isdir is not defined
-        - jdk == 8 or jdk == 11 or jdk >= 17
+        - ! ( jdk == 10 or jdk == 16 )
       register: openjdk
 
-    - name: Download JDK {{ jdk }} binary
+    - name: Download JDK {{ jdk }} binary from api.adoptopenjdk.net
       get_url:
         url: "{{ adoptopenjdk_baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
         dest: /tmp/jdk{{ jdk }}.tar.gz
@@ -57,7 +57,8 @@
       delay: 5
       when:
         - java_installed.stat.isdir is not defined
-        - jdk < 17
+        - jdk == 10 or jdk == 16
+
       register: openjdk
 
     - name: Get Signature File Link

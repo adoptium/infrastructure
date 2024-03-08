@@ -60,6 +60,8 @@
     - role: Java_install          # For Gradle
       jdk_version: 11
     - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 16
+    - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 17
     - role: Java_install          # Bootstrap for JDK21
       jdk_version: 20

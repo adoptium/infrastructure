@@ -10,31 +10,23 @@
 
 - name: Use adoptium API if release is available at adoptium
   set_fact:
-    api_url: https://api.adoptium.net
+    api_url: api.adoptium.net
   when:
     - ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
   tags: adoptopenjdk_install
 
 - name: Use adoptopenjdk API if release is not supported by adoptium
   set_fact:
-    api_url: https://api.adoptopenjdk.net
+    api_url: api.adoptopenjdk.net
   when:
     - ! ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
   tags: adoptopenjdk_install
 
-- name: Download Java{{ jdk_version }}
+- name: Download Temurin JDK {{ jdk_version }}
   win_get_url:
-    url: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    url: https://{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
-  when: not java_installed.stat.exists and jdk_version!=10
-  tags: Java_install
-
-# Java 10 is the only version we still need to retrieve from adoptopenjdk
-- name: Download Java{{ jdk_version }} from adoptopenjdk
-  win_get_url:
-    url: {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
-    dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
-  when: not java_installed.stat.exists and jdk_version==10
+  when: not java_installed.stat.exists
   tags: Java_install
 
 - name: Install Java{{ jdk_version }}
