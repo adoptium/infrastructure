@@ -119,6 +119,7 @@ Test_Tool_Packages:
   - libexpat1-dev
   - libcurl4-openssl-dev
   - fakeroot
+  - jq                            # For parsing SBoM during reproducibility tests
   - gnutls-bin
   - libnss3
   - libnss3-tools
