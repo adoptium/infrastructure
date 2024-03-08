@@ -19,35 +19,56 @@ permissions:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: macos-12
+    runs-on: ubuntu-latest
     steps:
 
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-    - name: Install dependencies
+    - name: Install Ansible
       run: |
-        brew install ansible
+        sudo apt-get install ansible
 
-    - name: Install Solaris 10 Box If Not Already Present
+    - name: Install VirtualBox
       run: |
-        if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
+        sudo apt-get install virtualbox
+
+    - name: Install Vagrant
+      run: |
+        sudo apt-get install vagrant
+
+    - name: Cache Solaris10.box.gz
+      id: solaris-10-cache
+      uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+      with:
+        path: Solaris10.box.gz
+        key: sol10box
+
+    - name: Download Solaris 10 Box If Cache Misses
+      if: steps.solaris-10-cache.outputs.cache-hit != 'true'
+      run: |
+        wget https://ci.adoptium.net/userContent/vagrant/Solaris10.box.gz
+
+    - name: Verify Checksum & Add Solaris 10 Box To Vagrant If Cache Misses
+      if: steps.solaris-10-cache.outputs.cache-hit != 'true'
+      run: |
+        CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
+        if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
         then
-          echo "Box Exists - Do Nothing"
+          echo "Checksum OK"
+          gunzip Solaris10.box.gz
+          vagrant box add --name="solaris10" ./Solaris10.box
+          rm Solaris10.box
         else
-          echo "No Box - Download From Jenkins And Import"
-          wget https://ci.adoptium.net/userContent/vagrant/Solaris10.box.gz
-          CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
-          if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
-          then
-            echo "Checksum OK"
-            gunzip Solaris10.box.gz
-            vagrant box add --name="solaris10" ./Solaris10.box
-            rm Solaris10.box
-          else
-            echo "Sum Bad"
-            exit 99;
-          fi
+          echo "Sum Bad"
+          exit 99;
         fi
+
+    - name: Add Solaris 10 Box To Vagrant From Cache
+      if: steps.solaris-10-cache.outputs.cache-hit == 'true'
+      run: |
+        gunzip Solaris10.box.gz
+        vagrant box add --name="solaris10" ./Solaris10.box
+        rm Solaris10.box
 
     - name: Setup Vagrant VM
       run: |
@@ -61,7 +82,9 @@ jobs:
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        [ ! -d $HOME/.ssh ] && mkdir $HOME/.ssh && chmod 700 $HOME/.ssh
         [ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
+        [ ! -d $HOME/.ansible ] && mkdir $HOME/.ansible
         ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
         sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
         awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 60"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
@@ -69,4 +92,4 @@ jobs:
     - name: Run Ansible Playbook
       run: |
         cd ansible
-        ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx --ssh-common-args='-o StrictHostKeyChecking=no -o HostKeyAlgorithms=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
