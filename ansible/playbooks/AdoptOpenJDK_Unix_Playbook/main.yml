@@ -122,12 +122,7 @@
     - role: adoptopenjdk_install  # Current LTS
       jdk_version: 21
       when:
-        - ansible_architecture == "riscv64"
-      tags: build_tools
-    - role: adoptopenjdk_install  # JDK22 Build Bootstrap
-      jdk_version: 21
-      when:
-        - ansible_distribution != "Solaris"
+        - ansible_architecture != "Solaris"
         - ansible_architecture != "armv7l"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure

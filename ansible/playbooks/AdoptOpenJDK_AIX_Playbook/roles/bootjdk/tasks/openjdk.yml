@@ -7,10 +7,10 @@
     os_img: "aix/ppc64/jdk"
     heap: "normal"
     impl: "hotspot"
-    new_baseurl: "https://api.adoptium.net/v3/binary/latest"
-    new_vendor: "eclipse"
-    baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
-    vendor: "adoptopenjdk"
+    adoptium_baseurl: "https://api.adoptium.net/v3/binary/latest"
+    adoptium_vendor: "eclipse"
+    adoptopenjdk_baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
+    adoptopenjdk_vendor: "adoptopenjdk"
     project: "{{ heap }}/{{ vendor }}?project=jdk"
   block:
     - name: Verify space in /usr
@@ -21,9 +21,9 @@
         path: /usr/java{{ jdk }}_64
       register: java_installed
 
-    - name: Download JDK {{ jdk }} binary
+    - name: Download JDK {{ jdk }} binary from api.adoptopenjdk.net
       get_url:
-        url: "{{ baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
+        url: "{{ adoptopenjdk_baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ adoptopenjdk_project }}"
         dest: /tmp/jdk{{ jdk }}.tar.gz
         mode: 0440
         timeout: 25
@@ -31,6 +31,33 @@
       delay: 5
       when:
         - java_installed.stat.isdir is not defined
+        - ! ( jdk == 8 or jdk == 11 or jdk >= 17 )
+      register: openjdk
+
+    - name: Download JDK {{ jdk }} binary from api.adoptium.net
+      get_url:
+        url: "{{ adoptium_baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ adoptium_project }}"
+        dest: /tmp/jdk{{ jdk }}.tar.gz
+        mode: 0440
+        timeout: 25
+      retries: 3
+      delay: 5
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk == 8 or jdk == 11 or jdk >= 17
+      register: openjdk
+
+    - name: Download JDK {{ jdk }} binary
+      get_url:
+        url: "{{ adoptopenjdk_baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
+        dest: /tmp/jdk{{ jdk }}.tar.gz
+        mode: 0440
+        timeout: 25
+      retries: 3
+      delay: 5
+      when:
+        - java_installed.stat.isdir is not defined
+        - jdk < 17
       register: openjdk
 
     - name: Get Signature File Link
