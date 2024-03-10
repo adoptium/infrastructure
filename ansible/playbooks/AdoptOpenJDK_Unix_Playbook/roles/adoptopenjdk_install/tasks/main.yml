@@ -10,15 +10,17 @@
 - name: Use adoptium API if release is available at adoptium
   set_fact:
     api_url: https://api.adoptium.net
+    api_vendor: eclipse
   when:
-    - jdk_version == 8 or jdk_version == 11 or jdk_version | int >= 17
+    - jdk_version == 8 or jdk_version == 11 or ( jdk_version | int >= 17)
   tags: adoptopenjdk_install
 
 - name: Use adoptopenjdk API if release is not supported by adoptium
   set_fact:
     api_url: https://api.adoptopenjdk.net
+    api_vendor: adoptopenjdk
   when:
-    - ! ( jdk_version == 8 or jdk_version == 11 or jdk_version >= 17 )
+    - jdk_version == 10 or jdk_version == 16
   tags: adoptopenjdk_install
 
 - name: Set path variable when jdk_version == 8
@@ -148,21 +150,21 @@
     - ansible_distribution != "MacOSX"
     - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
-    - not (ansible_architecture == "riscv64" and (jdk_version == 21 or jdk_version == 19 or jdk_version == 17 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 17, 19, 21 are special cased
+    - not (ansible_architecture == "riscv64" and (jdk_version == 21 or jdk_version == 20 or jdk_version == 19 or jdk_version == 17 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 17, 19, 21 are special cased
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
     # Api does not return release information for JDK10
   block:
     - name: Get Signature File Link (Linux/Alpine-Linux)
-      shell: curl -s '{{ api_url }}/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
+      shell: curl -s '{{ api_url }}/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor={{ api_vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
         - not (jdk_version == 8 and ansible_architecture == "s390x")
       register: sig_output
 
     - name: Download latest release (Linux/Alpine-Linux)
       get_url:
-        url: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk"
+        url: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk"
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
         mode: 0440
       retries: 3
@@ -173,10 +175,10 @@
     - name: GPG Signature verification (Linux/Alpine-Linux)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
         - not (jdk_version == 8 and ansible_architecture == "s390x")
 
-    - name: Install latest release if one not already installed (Linux/Alpine-Linux)
+    - name: Install latest Adopt JDK{{ jdk_version }} if one not already installed (Linux/Alpine-Linux)
       unarchive:
         src: /tmp/jdk{{ jdk_version }}.tar.gz
         dest: /usr/lib/jvm
@@ -319,7 +321,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (CentOS6)
-      command: wget -q '{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
+      command: wget -q '{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ vendor }}?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
       vars:
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
@@ -328,15 +330,15 @@
       until: adoptopenjdk_download is not failed
 
     - name: Get Signature File Link (CentOS6)
-      shell: curl -s '{{ api_url }}/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
+      shell: curl -s '{{ api_url }}/v3/assets/feature_releases/{{ jdk_version }}/ga?architecture={{ api_architecture }}&heap_size=normal&image_type=jdk&jvm_impl={{ bootjdk }}&os={{ platformLinux }}&page=0&page_size=1&project=jdk&vendor={{ api_vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
       register: sig_output
 
     - name: GPG Signature verification (CentOS6)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
 
     - name: Install latest JDK {{ jdk_version }} release (CentOS6)
       unarchive:
@@ -357,16 +359,16 @@
   block:
     - name: Download latest JDK {{ jdk_version }} release (macOS)
       get_url:
-        url: "{{ api_url }}/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk"
+        url: "{{ api_url }}/v3/installer/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk"
         dest: /tmp/{{ jdk_version }}-installer.pkg
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
 
     - name: Download JDK10 tarball when installer is not available (macOS)
       unarchive:
-        src: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk"
+        src: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/mac/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk"
         remote_src: yes
         dest: /Library/Java/JavaVirtualMachines/
       become: yes
@@ -379,20 +381,20 @@
         - jdk_version == 10
 
     - name: Get Signature File Link (macOS)
-      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=mac&vendor=eclipse' | grep signature_link | grep pkg | awk '{split($0,a,"\""); print a[4]}'
+      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=mac&vendor={{ api_vendor }}' | grep signature_link | grep pkg | awk '{split($0,a,"\""); print a[4]}'
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
       register: sig_output
 
     - name: GPG Signature verification (macOS)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/{{ jdk_version }}-installer.pkg -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
 
     - name: Run installer for JDK {{ jdk_version }} (macOS)
       shell: sudo installer -pkg /tmp/{{ jdk_version }}-installer.pkg -target /
       when:
-        - jdk_version != 10
+        - jdk_version != 10 and jdk_version != 16
 
     # The boot JDK will be installed into a temurin directory. Playbooks, build and (possibly) test scripts will look for an adoptopenjdk directory
     # https://github.com/adoptium/infrastructure/issues/2281#issuecomment-1059322275
@@ -426,12 +428,12 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (Solaris)
-      command: wget {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/eclipse?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
+      command: wget {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
       register: adoptopenjdk_download
       until: adoptopenjdk_download is not failed
 
     - name: Get Signature File Link (Solaris)
-      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
+      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor={{ vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       register: sig_output
 
     - name: GPG Signature verification (Solaris)

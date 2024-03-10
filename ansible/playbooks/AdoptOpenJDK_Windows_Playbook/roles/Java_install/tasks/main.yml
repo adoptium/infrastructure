@@ -12,19 +12,19 @@
   set_fact:
     api_url: api.adoptium.net
   when:
-    - ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+    - jdk_version == 8 or jdk_version == 11 or ( jdk_version | int >= 17)
   tags: adoptopenjdk_install
 
 - name: Use adoptopenjdk API if release is not supported by adoptium
   set_fact:
     api_url: api.adoptopenjdk.net
   when:
-    - ! ( jdk_version == 8 || jdk_version == 11 || jdk_version >= 17 )
+    - jdk_version == 10 or jdk_version == 16
   tags: adoptopenjdk_install
 
 - name: Download Temurin JDK {{ jdk_version }}
   win_get_url:
-    url: https://{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/adoptopenjdk?project=jdk
+    url: https://{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/windows/x64/jdk/{{ bootjdk }}/normal/eclipse?project=jdk
     dest: 'C:\temp\jdk-{{ jdk_version }}.zip'
   when: not java_installed.stat.exists
   tags: Java_install
