@@ -19,7 +19,6 @@
       - '11'
       - '16'
       - '17'
-      - '20'
       - '21'
 
 - name: Set /usr/java8_64 as default

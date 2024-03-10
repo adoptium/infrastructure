@@ -8,17 +8,16 @@
     heap: "normal"
     impl: "hotspot"
     adoptium_baseurl: "https://api.adoptium.net/v3/binary/latest"
-    adoptium_vendor: "eclipse"
     adoptopenjdk_baseurl: "https://api.adoptopenjdk.net/v3/binary/latest"
-    adoptopenjdk_vendor: "adoptopenjdk"
-    project: "{{ heap }}/{{ vendor }}?project=jdk"
+    adoptium_project: "{{ heap }}/eclipse?project=jdk"
+    adoptopenjdk_project: "{{ heap }}/adoptopenjdk?project=jdk"
   block:
     - name: Verify space in /usr
       include_tasks: chfs.yml
 
-    - name: Check for jdk {{ jdk }} availability
+    - name: Check for jdk {{ jdk }} availability in /usr/java{{ jdk }}_64
       stat:
-        path: /usr/java{{ jdk }}_64
+        path: /usr/java{{ jdk }}_64/bin/java
       register: java_installed
 
     - name: Download JDK {{ jdk }} binary from api.adoptopenjdk.net
@@ -30,8 +29,8 @@
       retries: 3
       delay: 5
       when:
-        - java_installed.stat.isdir is not defined
-        - jdk == 10 or jdk == 16 # These are the only two we still use from adoptopenjdk API
+        - not java_installed.stat.exists
+        - jdk == '10' or jdk == '16' # These are the only two we still use from adoptopenjdk API
       register: openjdk
 
     - name: Download JDK {{ jdk }} binary from api.adoptium.net
@@ -43,36 +42,22 @@
       retries: 3
       delay: 5
       when:
-        - java_installed.stat.isdir is not defined
-        - ! ( jdk == 10 or jdk == 16 )
-      register: openjdk
-
-    - name: Download JDK {{ jdk }} binary from api.adoptopenjdk.net
-      get_url:
-        url: "{{ adoptopenjdk_baseurl }}/{{ jdk }}/ga/{{ os_img }}/{{ impl }}/{{ project }}"
-        dest: /tmp/jdk{{ jdk }}.tar.gz
-        mode: 0440
-        timeout: 25
-      retries: 3
-      delay: 5
-      when:
-        - java_installed.stat.isdir is not defined
-        - jdk == 10 or jdk == 16
-
+        - not java_installed.stat.exists
+        - not ( jdk == '10' or jdk == '16' )
       register: openjdk
 
     - name: Get Signature File Link
       shell: curl -s 'https://api.adoptium.net/v3/assets/latest/{{ jdk }}/hotspot?architecture=ppc64&image_type=jdk&os=aix&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       when:
         - jdk != '10' and jdk != '16'
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
       register: sig_output
 
     - name: GPG Signature verification
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
         - jdk != '10' and jdk != '16'
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
 
     - name: Install JDK {{ jdk }} binary
       unarchive:
@@ -80,7 +65,7 @@
         dest: /usr
         remote_src: yes
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
 
     - name: Report HTTP 404 message
       debug:
@@ -94,7 +79,7 @@
         path: /tmp/jdk{{ jdk }}.tar.gz
         state: absent
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
 
     # jdk8 directories do not have a hyphen
     - name: Find java 8 directory
@@ -103,7 +88,7 @@
         paths: /usr
         patterns: 'jdk8u*'
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
         - jdk == '8'
       register: java8_directory
 
@@ -113,7 +98,7 @@
         paths: /usr
         patterns: 'jdk-{{ jdk }}*'
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
         - jdk != '8'
       register: java_directory
 
@@ -126,7 +111,7 @@
       with_items:
         - "{{ java8_directory.files }}"
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
         - jdk == '8'
 
     - name: Symlink to java{{ jdk }}_64
@@ -137,7 +122,7 @@
       with_items:
         - "{{ java_directory.files }}"
       when:
-        - java_installed.stat.isdir is not defined
+        - not java_installed.stat.exists
         - jdk != '8'
   # Defaults for BootJDK API
   # AdoptOpenJDK changes to Adoptium:
