@@ -1,6 +1,6 @@
 ---
 ###############################################################
-# ansible install adopt binary  into /usr/lib/jvm/JDK_VERSION #
+# ansible install adopt binary into /usr/lib/jvm/JDK_VERSION #
 ###############################################################
 
 # Conditions:
