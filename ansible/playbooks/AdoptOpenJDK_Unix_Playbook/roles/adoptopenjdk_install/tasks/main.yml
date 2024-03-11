@@ -321,7 +321,7 @@
   tags: adoptopenjdk_install
   block:
     - name: Download latest JDK {{ jdk_version }} release (CentOS6)
-      command: wget -q '{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ vendor }}?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
+      command: wget -q '{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk' -O /tmp/jdk{{ jdk_version }}.tar.gz
       vars:
         ansible_python_interpreter: /usr/local/python2/bin/python2.7
       retries: 3
@@ -433,7 +433,7 @@
       until: adoptopenjdk_download is not failed
 
     - name: Get Signature File Link (Solaris)
-      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor={{ vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
+      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor={{ api_vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
       register: sig_output
 
     - name: GPG Signature verification (Solaris)
