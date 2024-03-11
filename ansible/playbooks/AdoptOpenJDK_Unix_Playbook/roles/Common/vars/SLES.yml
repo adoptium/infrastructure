@@ -98,6 +98,7 @@ Test_Tool_Packages:
   - xorg-x11-server-extra
   - glibc-locale                  # Internationalization tests
   - gnutls
+  - jq                            # For parsing SBoM during reproducibility tests
   - mozilla-nss
   - mozilla-nss-devel
   - mozilla-nss-tools
