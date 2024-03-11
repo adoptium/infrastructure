@@ -119,6 +119,7 @@
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
+        - ansible_architecture != "armv7l"
       tags: build_tools
     - role: adoptopenjdk_install  # Current LTS
       jdk_version: 21
