@@ -14,6 +14,7 @@ hosts:
           ubuntu2004-x64-1: {ip: 40.121.206.1, user: webmaster, description: jckservices.adoptium.net}
           ubuntu2204-x64-1: {ip: 172.187.163.163, user: adoptopenjdk, description: infra-wazuh-server}
           ubuntu2204-x64-2: {ip: 20.90.182.165, description: trss.adoptium.net}
+          ubuntu2204-x64-3: {ip: 172.187.93.97, description: awx.adoptium.net}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
@@ -82,6 +83,9 @@ hosts:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
 
   - dockerhost:
+
+      - azure:
+          ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
 
       - equinix:
           ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
@@ -158,6 +162,10 @@ hosts:
       - nine:
           macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
           macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
+
+      - scaleway:
+          ubuntu2310-riscv64-1: {ip: 62.210.163.13, user: ubuntu}
+          ubuntu2310-riscv64-2: {ip: 62.210.163.98, user: ubuntu}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
