@@ -1,0 +1,85 @@
+---
+
+- name: Check if Homebrew is already installed
+  stat:
+    path: /usr/local/bin/brew
+  register: b
+  when: ansible_architecture == "x86_64"
+  tags: brew
+
+- name: Check if Homebrew is already installed
+  stat:
+    path: /opt/homebrew/bin/brew
+  register: b
+  when: ansible_architecture == "arm64"
+  tags: brew
+
+- name: Set brew_is_installed
+  set_fact: brew_is_installed="{{ b.stat.exists }}"
+  when: b.stat.exists is defined
+  tags: brew
+
+- name: Install home brew
+  when: not brew_is_installed
+  tags: brew
+  block:
+    - name: Add user j9admin to sudoers
+      template:
+        src: sudoers
+        dest: /etc/sudoers.d/{{ ansible_user }}
+      become: true
+
+    - name: Install home brew
+      shell: |
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+    - name: Check brew installation
+      shell: /usr/local/bin/brew --version
+      register: check_brew
+      ignore_errors: true
+      when: ansible_architecture == "x86_64"
+
+    - name: Set brew_is_installed x86_64
+      set_fact: brew_is_installed="{{ check_brew.rc == 0 }}"
+      when: check_brew.rc is defined
+
+    - name: Check brew installation
+      shell: /opt/homebrew/bin/brew --version
+      register: check_brew
+      ignore_errors: true
+      when: ansible_architecture == "arm64"
+
+    - name: Set brew_is_installed arm64
+      set_fact: brew_is_installed="{{ check_brew.rc == 0 }}"
+      when: check_brew.rc is defined
+
+    - name: Fail brew installation
+      fail:
+        msg: 'brew is not installed! exiting...'
+      when: not brew_is_installed
+
+    - name: Configure brew x86_64
+      blockinfile:
+        state: present
+        insertafter: EOF
+        dest: ~/.zprofile
+        marker: "<!-- added by Ansible -->"
+        content: |
+          eval $(/usr/local/bin/brew shellenv)
+      when: ansible_architecture == "x86_64"
+
+    - name: Configure brew arm64
+      blockinfile:
+        state: present
+        insertafter: EOF
+        dest: ~/.zprofile
+        marker: "<!-- added by Ansible -->"
+        content: |
+          eval $(/opt/homebrew/bin/brew shellenv)
+      when: ansible_architecture == "arm64"
+
+    - name: Remove user j9admin from sudoers
+      file:
+        path: /etc/sudoers.d/{{ ansible_user }}
+        state: absent
+      become: true
