@@ -94,7 +94,7 @@
 - name: Download Visual Studio Community 2022
   win_get_url:
     url: 'https://aka.ms/vs/17/release/vs_Community.exe'
-    checksum: 51d8dc03605a4fa11d445795cb1cc7ea1a518b0b0ce466cdaa805fc6029d7058
+    checksum: 6dfb021f82e9e7f89de632c08a654c0695d7701c3f47bb894508717a9948048f
     checksum_algorithm: sha256
     dest: 'C:\temp\vs_community22.exe'
     force: no

@@ -62,8 +62,6 @@
     - 140.211.168.163 # jck-osuol-ubuntu2004-ppc64le-1
     - 140.211.168.2 # jck-osuol-ubuntu2004-ppc64le-2
     - 213.146.141.66 # jck-linaro-ubuntu2004-aarch64-2
-    - 20.61.136.211 # jck-skytap-aix71-ppc64-1
-    - 20.61.136.213 # jck-skytap-aix71-ppc64-2
     - 20.61.222.79 # jck-skytap-aix72-ppc64-3
     - 20.61.222.106 # jck-skytap-aix72-ppc64-4
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
@@ -74,6 +72,8 @@
     - 207.254.73.168 # gn324-macos11-x86_64
     - 207.254.28.13 # esmv4-macos11-arm64
     - 207.254.28.99 # noh7B-macos12-arm64
+    - 62.210.163.172 # jck-scaleway-ubuntu2310-riscv64-1
+    - 62.210.163.106 # jck-scaleway-ubuntu2310-riscv64-2
 
 - name: Setup iptables
   iptables:

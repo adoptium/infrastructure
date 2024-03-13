@@ -9,20 +9,22 @@
 
 # label_name:
 #   - path/to/file_or_folder
+
 ghActions:
-    - .github/workflows/**/*
+- changed-files:
+  - any-glob-to-any-file: [.github/*]
 doc:
-    - docs/*
-    - '**/*.md'
+- changed-files:
+    - any-glob-to-any-file: [docs/*, '**/*.md']
 Vagrant:
-    - ansible/pbTestScripts/**/*
-    - ansible/vagrant/Vagrantfile*
+- changed-files:
+    - any-glob-to-any-file: [ansible/pbTestScripts/**/*, ansible/vagrant/Vagrantfile*]
 pbTests:
-    - ansible/pbTestScripts/**/*
+- changed-files:
+    - any-glob-to-any-file: [ansible/pbTestScripts/**/*]
 docker:
-    - ansible/docker/Dockerfile*
+- changed-files:
+    - any-glob-to-any-file: [ansible/docker/Dockerfile*]
 ansible:
-    - ansible/playbooks/**/*
-    - ansible/plugins/**/*
-    - ansible/inventory.yml
-    - ansible/ansible.cfg
+- changed-files:
+    - any-glob-to-any-file: [ansible/playbooks/**/*, ansible/plugins/**/*, ansible/inventory.yml, ansible/ansible.cfg]
