@@ -26,7 +26,7 @@
     - gui_disabled.stdout == ''
   tags: disable_gui
 
-# Restart NTPD On Centos 7  after gui disablement 
+# Restart NTPD On Centos 7  after gui disablement
 
 - name: Gather Facts About The Services Present
   service_facts:
