@@ -10,7 +10,7 @@ RUN yum --enablerepo=rhel-7-server-ansible-2-for-system-z-rpms install -y ansibl
 RUN yum clean all
 
 COPY . /ansible
-COPY /usr/local/devkit /usr/local/devkit
+COPY devkit /usr/local/devkit
 
 RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
