@@ -10,6 +10,7 @@ Build_Tool_Packages:
   - automake # for compiling freetype on JDK8u
   - cmake # OpenJ9
   - coreutils
+  - curl
   - gnupg
   - gnu-sed
   - gnu-tar
