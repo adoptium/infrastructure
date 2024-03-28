@@ -94,6 +94,7 @@
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_architecture != "riscv64"
+        - ansible_architecture != "s390x"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
@@ -120,6 +121,7 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
         - ansible_architecture != "armv7l"
+        - ansible_architecture != "s390x"
       tags: build_tools
     - role: adoptopenjdk_install  # Current LTS
       jdk_version: 21
