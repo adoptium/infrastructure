@@ -74,6 +74,7 @@
     - 207.254.28.99 # noh7B-macos12-arm64
     - 62.210.163.172 # jck-scaleway-ubuntu2310-riscv64-1
     - 62.210.163.106 # jck-scaleway-ubuntu2310-riscv64-2
+    - 20.234.51.61 # jck-azure-ubuntu2204-x64-1
 
 - name: Setup iptables
   iptables:
