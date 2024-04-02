@@ -12,7 +12,7 @@
 
 - name: Set filename of devkit tarball
   set_fact:
-    devkit_filename: devkit-{{ devkit_version|replace('-b','-{{ ansible_architecture }}-linux-gnu-b') }}.tar.xz
+    devkit_filename: devkit-{{ devkit_version }}_{{ ansible_architecture }}-linux.tar.xz
   when:
     - devkit_installed.rc != 0
   tags: devkit
@@ -29,16 +29,16 @@
   tags: devkit
 
 # Perhaps this should have the `b01` removed ... Or use a symlink?
-- name: Create /usr/local/devkit/{{ devkit_version }}
+- name: Create /usr/local/devkit
   file:
-    path: /usr/local/devkit/{{ devkit_version }}
+    path: /usr/local/devkit
     state: directory
     mode: '0755'
 
 - name: Extract {{ devkit_filename }} to /usr/local/devkit
   unarchive:
     src: /tmp/devkit.tar.xz
-    dest: /usr/local/devkit/{{ devkit_version }}
+    dest: /usr/local/devkit
     copy: False
   when:
     - devkit_installed.rc != 0
