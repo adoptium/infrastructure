@@ -30,7 +30,7 @@
 
 # Perhaps this should have the `b01` removed ... Or use a symlink?
 - name: Create /usr/local/devkit/{{ devkit_version }}
-  ansible.builtin.file:
+  file:
     path: /usr/local/devkit/{{ devkit_version }}
     state: directory
     mode: '0755'
