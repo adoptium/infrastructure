@@ -33,4 +33,4 @@ ENV \
 # devkit, and the process for that runs as non-root ...
 # Disabled for now as we're going to copy from /usr/local/devkit on the host
 RUN yum clean all
-RUN yum install --downloadonly glibc glibc-headers glibc-devel cups-libs cups-devel libX11 libX11-devel xorg-x11-proto-devel alsa-lib alsa-lib-devel libXext libXext-devel libXtst libXtst-devel libXrender libXrender-devel libXrandr libXrandr-devel freetype freetype-devel libXt libXt-devel libSM libSM-devel libICE libICE-devel libXi libXi-devel libXdmcp libXdmcp-devel libXau libXau-devel libgcc libxcrypt zlib zlib-devel libffi libffi-devel fontconfig fontconfig-devel kernel-headers
+RUN yum reinstall --downloadonly glibc glibc-headers glibc-devel cups-libs cups-devel libX11 libX11-devel xorg-x11-proto-devel alsa-lib alsa-lib-devel libXext libXext-devel libXtst libXtst-devel libXrender libXrender-devel libXrandr libXrandr-devel freetype freetype-devel libXt libXt-devel libSM libSM-devel libICE libICE-devel libXi libXi-devel libXdmcp libXdmcp-devel libXau libXau-devel libgcc libxcrypt zlib zlib-devel libffi libffi-devel fontconfig fontconfig-devel kernel-headers
