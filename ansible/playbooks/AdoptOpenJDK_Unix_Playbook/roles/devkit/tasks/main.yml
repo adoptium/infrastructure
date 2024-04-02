@@ -11,7 +11,7 @@
   tags: devkit
 
 - name: Set filename of devkit tarball
-  set_fact: 
+  set_fact:
     devkit_filename: devkit-{{ devkit_version|replace('-b','-{{ ansible_architecture }}-linux-gnu-b') }}.tar.xz
   when:
     - devkit_installed.rc != 0
