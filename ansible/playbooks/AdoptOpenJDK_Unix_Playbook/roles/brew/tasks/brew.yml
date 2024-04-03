@@ -1,13 +1,13 @@
 ---
 
-- name: Check if Homebrew is already installed
+- name: Check if Homebrew is already installed (x86_64)
   stat:
     path: /usr/local/bin/brew
   register: b
   when: ansible_architecture == "x86_64"
   tags: brew
 
-- name: Check if Homebrew is already installed
+- name: Check if Homebrew is already installed (arm64)
   stat:
     path: /opt/homebrew/bin/brew
   register: b
@@ -23,7 +23,7 @@
   when: not brew_is_installed
   tags: brew
   block:
-    - name: Add user j9admin to sudoers
+    - name: Add ansible user to sudoers
       template:
         src: sudoers
         dest: /etc/sudoers.d/{{ ansible_user }}
@@ -78,7 +78,7 @@
           eval $(/opt/homebrew/bin/brew shellenv)
       when: ansible_architecture == "arm64"
 
-    - name: Remove user j9admin from sudoers
+    - name: Remove user ansible from sudoers
       file:
         path: /etc/sudoers.d/{{ ansible_user }}
         state: absent

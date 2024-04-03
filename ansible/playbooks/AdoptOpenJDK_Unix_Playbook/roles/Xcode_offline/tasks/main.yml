@@ -1,12 +1,12 @@
 ---
 #########################
-# Xcdde offline install #
+# Xcode offline install #
 #########################
 
-# Install Xcode withou need to login with appleID
+# Install Xcode without needing to login with appleID
 # Path /Applications/Xcode.app/
 # Requires the following variable:
-#  xcode_version: 12.4 | 13.1 | 13.2.1 | 13.4 | 14.3.1 | 15.0.1
+#  xcode_version: 12.4 | 13.1 | 13.2.1 | 13.4 | 14.3.1 | 15.0.1 | 15.2
 
 - name: Xcode offline
   include_tasks: xcode_offline.yml
