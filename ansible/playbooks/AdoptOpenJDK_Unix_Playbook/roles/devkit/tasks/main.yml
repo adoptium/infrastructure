@@ -29,16 +29,16 @@
   tags: devkit
 
 # Perhaps this should have the `b01` removed ... Or use a symlink?
-- name: Create /usr/local/devkit
+- name: Create /usr/local/devkit/{{ devkit_version }}
   file:
-    path: /usr/local/devkit
+    path: /usr/local/devkit/{{ devkit_version }}
     state: directory
     mode: '0755'
 
 - name: Extract {{ devkit_filename }} to /usr/local/devkit
   unarchive:
     src: /tmp/devkit.tar.xz
-    dest: /usr/local/devkit
+    dest: /usr/local/devkit/{{ devkit_version }}
     copy: False
   when:
     - devkit_installed.rc != 0
