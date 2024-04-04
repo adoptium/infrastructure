@@ -85,16 +85,30 @@ have at the moment:
 | Dockerfile | Image | Platforms  | Where is this built? | In use?
 |---|---|---|---|---|
 | [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
+| [RHEL7](./ansible/docker/Dockerfile.RHEL7) | n/a - restricted (*) | s390x | [Jenkins](https://ci.adoptium.net/job/rhel7_docker_image_updater/) | Yes
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
 | [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 | [Ubuntu 20.04 (riscv64 only)](./ansible/docker/Dockerfile.Ubuntu2004-riscv64) | [`adoptopenjdk/ubuntu2004_build_image:linux-riscv64`](https://hub.docker.com/r/adoptopenjdk/ubuntu2004_build_image) | linux/riscv64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 
+<details>
+<summary>(*) - Caveats:</summary>
+
+The RHEL7 image creation for s390x has to be run on a RHEL host using a
+container implementation supplied by Red Hat, and we are using RHEL8 for
+this as it has a stable implemention.  The image creation requires the
+following:
+
+1. The host needs to have an active RHEL subscription
+2. The RHEL7 devkit (which cannot be made public) to be available in a tar file under /usr/local on the host as per the name in the Dockerfile
+</details>
+
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
-the ansible playbooks and pushing them up to Docker Hub where they can be
-consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
-defined on the jenkins build pipelines as configured in the
-[pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+the ansible playbooks and - with the exception of the RHEL7 image for s390x -
+pushing them up to Docker Hub where they can be consumed by our jenkins
+build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
+pipelines as configured in the [pipeline_config
+files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
 
 ### Adding a new dockerBuild dockerhub repository
 
