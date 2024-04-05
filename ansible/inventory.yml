@@ -73,9 +73,6 @@ hosts:
           win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
           win2022-x64-1: {ip: 52.118.206.11, user: Administrator}
 
-      - spearhead:
-          freebsd12-x64-1: {ip: 185.131.222.224}
-
   - docker:
 
       - skytap:

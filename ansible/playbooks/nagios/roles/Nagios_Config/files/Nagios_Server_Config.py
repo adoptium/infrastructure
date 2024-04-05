@@ -29,8 +29,7 @@ special_templates = {'test-equinix_esxi-solaris10-x64-1': 'test-solaris-noport-t
 
 ## Define Any Hosts That Should Be Excluded
 
-excluded_hosts = {'build-spearhead-freebsd12-x64-1',
-                  'test-inspira-solaris10u11-sparcv9-1',
+excluded_hosts = {'test-inspira-solaris10u11-sparcv9-1',
                   'build-inspira-solaris10u11-sparcv9-1',
                   'build-inspira-solaris10u11-sparcv9-2',
                   'infrastructure-aws-ubuntu1804-x64-1',
