@@ -34,8 +34,8 @@
 
 - name: Set docker_port variable when non empty
   set_fact:
-    docker_port: "{{ docker_port_output.stdout }}"
+    docker_port: "{{ docker_port_output.stdout | int + 1 }}"
   when: not (docker_port_output.stdout == "")
 
 - name: Run {{ docker_image }} docker container
-  command: docker run --restart unless-stopped -p {{ docker_port | int + 1 }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.PORT aqa_{{ docker_image }}
+  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }} aqa_{{ docker_image }}
