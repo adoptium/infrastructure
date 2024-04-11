@@ -22,14 +22,20 @@
 - name: Build {{ docker_image }} docker images
   command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/
 
-# Without specifying a port here, docker will give the container a random unused port
+# Finds the highest port number already assigned and +1
+- name: Find available port
+  shell: docker ps --format \"\{\{\.Ports\}\}\" | awk -F[:-] '{print $2}' | sort | tail -n 1
+  register: docker_port_output
+
+- name: Set docker_port variable if empty
+  set_fact:
+    docker_port: 32000
+  when: docker_port_output.stdout == ""
+
+- name: Set docker_port variable when non empty
+  set_fact:
+    docker_port: "{{ docker_port_output.stdout | int + 1 }}"
+  when: not (docker_port_output.stdout == "")
+
 - name: Run {{ docker_image }} docker container
-  command: docker run --restart unless-stopped -p 22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.PORT aqa_{{ docker_image }}
-
-# Now we want to rename the running container with the port name
-- name: Find assigned port of {{ docker_image }} container
-  shell: docker port {{ docker_image | upper }}.PORT | head -n 1 | cut -d ':' -f 2
-  register: docker_port
-
-- name: Rename {{ docker_image }} container to {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
-  command: docker rename {{ docker_image | upper }}.PORT {{ docker_image | upper }}.{{ docker_port.stdout_lines[0] }}
+  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }} aqa_{{ docker_image }}
