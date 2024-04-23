@@ -49,7 +49,7 @@ valid = {
   'provider': ('alibaba', 'azure', 'marist', 'osuosl',
         'macstadium', 'macincloud', 'ibmcloud', 'siteox',
         'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'equinix_esxi', 'nine', 'scaleway', 'skytap',
+        'aws', 'inspira', 'equinix_esxi', 'nine', 'rise', 'skytap',
         'hetzner')
 }
 

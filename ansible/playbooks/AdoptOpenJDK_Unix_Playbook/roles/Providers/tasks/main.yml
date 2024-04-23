@@ -67,7 +67,7 @@
     - adoptopenjdk
 
 #####################
-# Marist & Scaleway #
+# Marist & Rise (Scaleway) #
 #####################
 
 # Marist & Scaleway machines need their host template updated for changes to /etc/hosts to persist
@@ -78,7 +78,7 @@
     state: absent
   when:
     - provider_name.rc == 0
-    - (provider_name.stdout == "marist" or provider_name.stdout == "scaleway")
+    - (provider_name.stdout == "marist" or provider_name.stdout == "rise")
   tags:
     - providers
     - adoptopenjdk

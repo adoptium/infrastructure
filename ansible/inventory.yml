@@ -1,7 +1,7 @@
 ---
 
 #
-# AdoptOpenJDK hosts! check the readme on how to add more
+# Eclipse Adoptium hosts! check the readme on how to add more
 # (if its not obvious enough).
 # Initial host names are "os-arch-index" within each stanza
 #
@@ -152,14 +152,18 @@ hosts:
           ubuntu2004-s390x-1: {ip: 148.100.74.240}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
-      # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
-      - nine:
-          macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
-          macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
-
-      - scaleway:
-          ubuntu2310-riscv64-1: {ip: 62.210.163.13, user: ubuntu}
-          ubuntu2310-riscv64-2: {ip: 62.210.163.98, user: ubuntu}
+      # Rise machines are hosted in Scaleway
+      - rise:
+          ubuntu2310-riscv64-1: {ip: 62.210.163.38, user: ubuntu}
+          ubuntu2310-riscv64-2: {ip: 62.210.163.36, user: ubuntu}
+          ubuntu2310-riscv64-3: {ip: 62.210.163.3, user: ubuntu}
+          ubuntu2310-riscv64-4: {ip: 62.210.163.137, user: ubuntu}
+          ubuntu2310-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
+          ubuntu2310-riscv64-6: {ip: 62.210.163.168, user: ubuntu}
+          ubuntu2310-riscv64-7: {ip: 62.210.163.105, user: ubuntu}
+          ubuntu2310-riscv64-8: {ip: 62.210.163.164, user: ubuntu}
+          ubuntu2310-riscv64-9: {ip: 62.210.163.6, user: ubuntu}
+          ubuntu2310-riscv64-10: {ip: 62.210.163.102, user: ubuntu}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
