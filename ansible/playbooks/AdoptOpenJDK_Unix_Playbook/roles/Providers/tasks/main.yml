@@ -68,7 +68,7 @@
 
 ############################
 # Marist & Rise (Scaleway) #
-#####################
+############################
 
 # Marist & Scaleway machines need their host template updated for changes to /etc/hosts to persist
 - name: Update /etc/cloud/cloud.cfg file - To remove update hosts function
