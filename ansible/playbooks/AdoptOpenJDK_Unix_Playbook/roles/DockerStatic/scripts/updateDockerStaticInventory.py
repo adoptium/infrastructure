@@ -18,7 +18,7 @@ def getNodePort(nodeConfig):
         port = nodeConfig[find1:find2]
         return port
     else:
-        return "Port"
+        return "No port"
 
 def getLabel(nodeConfig):
     find1 = nodeConfig.find("<label>") + 7
@@ -30,17 +30,28 @@ def getLabel(nodeConfig):
         return "No labels"
     
 def createServer(username, password):
-    server = jenkins.Jenkins('http://ci.adoptium.net:80', username=username,
-                         password=password)
+    url = "http://ci.adoptium.net:80"
+    server = jenkins.Jenkins(url, username=username,
+                        password=password)
     return server
 
-def main():
+def help():
+    print("Help:\n"
+          "     This script is used to retrieve dockerhost and static docker container information from the Adoptium Jenkins server hosted at https://ci.adoptium.net\n"
+            "     Usage: python3 updateDockerStaticInventory.py $username $jenkinsAPItoken\n"
+            "     The results are dumped into DockerInventory.json in the same directory from which the script was executed\n")
 
+def main():
 # Credentials passed via commandline
-    username, password = sys.argv[1:3]
-    server = createServer(username, password)
-    dockerhosts = []
-    nodes = server.get_nodes()
+    try:
+        username, password = sys.argv[1:3]
+        server = createServer(username, password)
+        dockerhosts = []
+        nodes = server.get_nodes()
+    except ValueError:
+        print("\nERROR:This script takes one username and one api token\n")
+        help()
+        sys.exit(1)
 
 # Get a list of dockerhost machines
     for node in nodes:
@@ -52,7 +63,7 @@ def main():
     dockerhostsFull = []
 
 # Get static docker containers, group with dockerhosts
-    for dockerhost in dockerhosts[0:1]:
+    for dockerhost in dockerhosts:
         print(dockerhost)
         containers = []
         for node in nodes:
@@ -65,12 +76,13 @@ def main():
                     containers.append(nodeObject)
             except jenkins.NotFoundException:
                 continue
+
         dockerhostsFull.append({"name": dockerhost["name"], "ip": dockerhost["ip"], "containers": containers, "containersCount": len(containers)})
 
     print(json.dumps(dockerhostsFull, indent=4))
 
 # Write output to file
-    with open('../dockerhost.json', 'w') as f:
+    with open('../DockerInventory.json', 'w') as f:
         json.dump(dockerhostsFull, f, indent=4)
 
 if __name__ == "__main__":
