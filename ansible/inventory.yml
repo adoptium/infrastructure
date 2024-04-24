@@ -50,9 +50,6 @@ hosts:
       - digitalocean:
           centos69-x64-2: {ip: 167.71.130.191}
 
-      - equinix_esxi:
-          solaris10-x64-1: {ip: 145.40.115.43}
-
       - marist:
           rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
           rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
@@ -131,11 +128,6 @@ hosts:
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
-
-      - equinix_esxi:
-          ubuntu2204-x64-1: {ip: 145.40.115.44, description: Perf machine}
-          ubuntu2204-x64-2: {ip: 145.40.115.46, description: Perf machine}
-          solaris10-x64-1: {ip: 145.40.115.45}
 
       - macincloud:
           macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
