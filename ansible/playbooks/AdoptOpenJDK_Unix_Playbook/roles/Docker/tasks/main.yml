@@ -55,7 +55,7 @@
         use: auto       # automatic select package manager to use yum, apt and so on
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
 
-    - name: Install docker build on Ubuntu 22+
+    - name: Install docker build on Ubuntu 20+
       package:
         name:
           - docker-buildx
