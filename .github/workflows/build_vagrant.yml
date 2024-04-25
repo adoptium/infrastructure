@@ -24,6 +24,9 @@ jobs:
 
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
+    - name: Update Repos
+      run: sudo apt-get update
+      
     - name: Install Ansible
       run: sudo apt-get install ansible
 
@@ -35,7 +38,7 @@ jobs:
 
     - name: Cache Solaris10.box
       id: solaris-10-cache
-      uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+      uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
       with:
         path: Solaris10.box
         key: sol10boxcache

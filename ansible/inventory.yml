@@ -70,12 +70,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
       - ibmcloud:
-          win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
-          win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
           win2022-x64-1: {ip: 52.118.206.11, user: Administrator}
-
-      - spearhead:
-          freebsd12-x64-1: {ip: 185.131.222.224}
 
   - docker:
 
@@ -89,8 +84,6 @@ hosts:
           ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
-          ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
-          ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
           ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
@@ -113,7 +106,7 @@ hosts:
 
       - azure:
           win2016-x64-1: {ip: 52.149.211.210, user: adoptopenjdk}
-          win2019-x64-1: {ip: 20.185.182.137, user: adoptopenjdk}
+          win2019-x64-1: {ip: 13.92.177.186, user: adoptopenjdk}
           win2022-x64-1: {ip: 51.132.234.42, user: adoptopenjdk}
           win2022-x64-2: {ip: 20.26.116.218, user: adoptopenjdk}
           win11-aarch64-1: {ip: 20.4.31.184, user: adoptopenjdk}
@@ -178,5 +171,3 @@ hosts:
           rhel6-x64-1: {ip: 169.48.4.140}
           rhel7-x64-1: {ip: 169.48.4.136}
           ubuntu1604-x64-1: {ip: 169.48.4.141}
-          win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
-          win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}

@@ -16,7 +16,7 @@
 
     - name: Copy xcode file to remote host
       copy:
-        src: Xcode_{{ xcode_version }}.xip
+        src: /Vendor_Files/macOS/files/Xcode_{{ xcode_version }}.xip
         dest: '~'
         force: false
 
