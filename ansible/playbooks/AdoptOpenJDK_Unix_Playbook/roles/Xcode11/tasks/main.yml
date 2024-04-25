@@ -11,7 +11,7 @@
 - name: Check if SAS variable is defined
   set_fact:
     apple_variables: yes
-  when: not xcode11_installed.stat.exists and XCode11.7_SAS_TOKEN is defined
+  when: not xcode11_installed.stat.exists and vars['XCode11.7_SAS_TOKEN'] is defined
 
 - name: Display Information when XCode11.7_SAS_TOKEN is not defined
   debug:

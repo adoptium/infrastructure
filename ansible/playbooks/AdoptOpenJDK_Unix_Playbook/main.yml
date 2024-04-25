@@ -94,6 +94,7 @@
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_architecture != "riscv64"
+        - ansible_architecture != "s390x"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
@@ -113,30 +114,23 @@
       when:
         - ansible_distribution != "Solaris"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK19 Build Bootstrap
-      jdk_version: 18
+    - role: adoptopenjdk_install  # JDK21 Build Bootstrap
+      jdk_version: 20
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
-      tags: build_tools
-    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
-      jdk_version: 19
-      when:
-        - ansible_distribution != "Alpine"
-        - ansible_distribution != "Solaris"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "s390x"
       tags: build_tools
     - role: adoptopenjdk_install  # Current LTS
       jdk_version: 21
       when:
-        - ansible_architecture == "riscv64"
+        - ansible_distribution != "Solaris"
+        - ansible_architecture != "armv7l"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
-    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
-      tags: [nagios_master_config, adoptopenjdk]
-    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
-      tags: [nagios_tunnel, adoptopenjdk]
     - riscv_cross_compiler        # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security

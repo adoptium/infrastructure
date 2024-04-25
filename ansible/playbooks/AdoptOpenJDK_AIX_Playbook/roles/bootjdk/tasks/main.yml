@@ -19,6 +19,7 @@
       - '11'
       - '16'
       - '17'
+      - '21'
 
 - name: Set /usr/java8_64 as default
   file:

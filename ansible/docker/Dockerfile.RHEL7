@@ -1,10 +1,5 @@
 FROM registry.access.redhat.com/rhel7
-# This dockerfile should be built using this from the top level of the repository:
-#  ROSIPW=******* docker build --no-cache -t rhel7_build_image -f ansible/docker/Dockerfile.RHEL7 --build-arg ROSIUSER=******* --secret id=ROSIPW --build-arg git_sha="$(git rev-parse --short HEAD)" `pwd`
-ARG ROSIUSER
-RUN sed -i 's/\(def in_container():\)/\1\n    return False/g' /usr/lib64/python*/*-packages/rhsm/config.py
-RUN --mount=type=secret,id=ROSIPW,required=true subscription-manager register --username=${ROSIUSER} --password="$(cat /run/secrets/ROSIPW)" --auto-attach
-RUN subscription-manager repos --enable rhel-7-for-system-z-optional-rpms
+RUN yum-config-manager --enable rhel-7-for-system-z-optional-rpms
 # ^^ Optional repo needed for Xvfb
 
 ARG git_sha
@@ -15,6 +10,7 @@ RUN yum --enablerepo=rhel-7-server-ansible-2-for-system-z-rpms install -y ansibl
 RUN yum clean all
 
 COPY . /ansible
+COPY devkit /usr/local/devkit
 
 RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
@@ -31,7 +27,10 @@ RUN useradd -c "Jenkins user" -d /home/${user} -u 1002 -g 1003 -m ${user}
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk" \
     JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk" \
-    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
     JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"
-RUN subscription-manager unregister
 
+# While this does bloat the image it is required for building the
+# devkit, and the process for that runs as non-root ...
+# Disabled for now as we're going to copy from /usr/local/devkit on the host
+RUN yum clean all
+RUN yum reinstall --downloadonly glibc glibc-headers glibc-devel cups-libs cups-devel libX11 libX11-devel xorg-x11-proto-devel alsa-lib alsa-lib-devel libXext libXext-devel libXtst libXtst-devel libXrender libXrender-devel libXrandr libXrandr-devel freetype freetype-devel libXt libXt-devel libSM libSM-devel libICE libICE-devel libXi libXi-devel libXdmcp libXdmcp-devel libXau libXau-devel libgcc libxcrypt zlib zlib-devel libffi libffi-devel fontconfig fontconfig-devel kernel-headers

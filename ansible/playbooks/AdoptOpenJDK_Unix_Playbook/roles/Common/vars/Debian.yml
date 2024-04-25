@@ -104,6 +104,7 @@ Test_Tool_Packages:
   - binfmt-support
   - qemu-user-static
   - gnutls-bin
+  - jq                            # For parsing SBoM during reproducibility tests
   - libnss3
   - libnss3-dev
   - libnss3-tools

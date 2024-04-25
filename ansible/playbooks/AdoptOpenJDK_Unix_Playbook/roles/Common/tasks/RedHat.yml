@@ -16,7 +16,6 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
-
 - name: Enable EPEL release for RHEL8 or RHEL6 or RHEL7
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   failed_when: false
@@ -109,6 +108,12 @@
   when:
     - (ansible_distribution_major_version == "8")
   tags: build_tools
+
+- name: Install jq for SBoM parsing for build reproducibility testing
+  package: "name=jq state=latest"
+  when:
+    - ansible_distribution_major_version > "7"
+  tags: test_tools
 
 #################
 # xorg Packages #
