@@ -69,11 +69,11 @@ If you are creating a new container with the intention of replacing a container 
 
 The current static docker inventory is listed in [DockerInventory.json](https://github.com/adoptium/infrastructure/blob/master/ansible/DockerInventory.json).
 
-At the moment we update this file manually by running the [updateDockerStaticInventory.py](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py) script from the ansible/playbooks directory:
+At the moment we update this file manually; we run  the [updateDockerStaticInventory.py](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py) script from the ansible/playbooks directory to find changes in our static docker inventory in jenkins:
 
 ```
 python3 AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py $jenkins-username $jenkins-api-token
 ```
 This script uses [jenkinsapi](https://jenkinsapi.readthedocs.io/en/latest/) which can be installed with `pip install jenkinsapi`.
 
-If there are updates found, open a new branch and commit these changes in a pull request.
+If any changes are found, open a new branch and commit these changes in a pull request.
