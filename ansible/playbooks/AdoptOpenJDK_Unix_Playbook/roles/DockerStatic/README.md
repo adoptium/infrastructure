@@ -74,4 +74,6 @@ At the moment we update this file manually by running the [updateDockerStaticInv
 ```
 python3 AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py $jenkins-username $jenkins-api-token
 ```
+This script uses [jenkinsapi](https://jenkinsapi.readthedocs.io/en/latest/) which can be installed with `pip install jenkinsapi`.
+
 If there are updates found, open a new branch and commit these changes in a pull request.
