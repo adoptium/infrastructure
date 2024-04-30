@@ -55,6 +55,14 @@
         use: auto       # automatic select package manager to use yum, apt and so on
       when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
 
+    - name: Install docker build on Ubuntu 20+
+      package:
+        name:
+          - docker-buildx
+        state: present
+        use: auto       # automatic select package manager to use yum, apt and so on
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
+
     - name: Install for SLES # zypper does not support in package module
       include_tasks: sles.yml
       when:
