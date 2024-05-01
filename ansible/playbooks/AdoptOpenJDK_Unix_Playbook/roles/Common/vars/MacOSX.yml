@@ -8,7 +8,6 @@
 Build_Tool_Packages:
   - autoconf
   - automake # for compiling freetype on JDK8u
-  - cmake # OpenJ9
   - coreutils
   - gnupg
   - gnu-sed
@@ -22,6 +21,7 @@ Build_Tool_Packages_NOT_10_12:
 
 Build_Tool_Casks:
   - packages
+  - cmake # OpenJ9
 
 Test_Tool_Packages:
   - mercurial
