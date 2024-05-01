@@ -64,3 +64,16 @@ If you are creating a new container with the intention of replacing a container 
 
 * The static containers are patched daily using this [script](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) which runs on a daily cron job on each of the dockerhost machines.
 * The script goes into each container and updates every installed package using the container's package manager, yum, apk, apt etc.
+
+## Inventory
+
+The current static docker inventory is listed in [DockerInventory.json](https://github.com/adoptium/infrastructure/blob/master/ansible/DockerInventory.json).
+
+At the moment we update this file manually; we run the [updateDockerStaticInventory.py](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py) script from the ansible/playbooks directory to find changes in our static docker inventory in jenkins:
+
+```
+python3 AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updateDockerStaticInventory.py $jenkins-username $jenkins-api-token
+```
+This script uses [jenkinsapi](https://jenkinsapi.readthedocs.io/en/latest/) which can be installed with `pip install jenkinsapi`.
+
+If any changes are found, open a new branch and commit these changes in a pull request.
