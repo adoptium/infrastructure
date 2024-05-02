@@ -33,7 +33,10 @@ jobs:
 
     - name: Remove Cmake
       run: |
-        brew uninstall cmake
+        sudo rm -rf /usr/local/bin/cmake
+        sudo rm -rf /usr/local/doc/cmake
+        sudo rm -rf /usr/local/man/man1/cmake.1
+        sudo rm -rf /Applications/CMake.app
 
     - name: Run Ansible Playbook
       run: |
