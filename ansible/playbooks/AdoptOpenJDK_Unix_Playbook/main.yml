@@ -129,8 +129,8 @@
         - ansible_distribution != "Solaris"
         - ansible_architecture != "armv7l"
       tags: build_tools
-    - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
-      tags: [nagios_plugins, adoptopenjdk]
+    # - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
+    #  tags: [nagios_plugins, adoptopenjdk]
     - riscv_cross_compiler        # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security
