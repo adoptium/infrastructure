@@ -29,7 +29,7 @@ jobs:
 
     - name: Replace keyserver address with IP address
       run: |
-        sed -i.bak 's/keyserver\.ubuntu\.com/185.125.188.27/g' playbooks/Supporting_Scripts/package_signature_verification.sh
+        sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' playbooks/Supporting_Scripts/package_signature_verification.sh
 
     - name: Run Ansible Playbook
       run: |
