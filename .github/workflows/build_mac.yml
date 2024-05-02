@@ -28,7 +28,8 @@ jobs:
       run: brew install ansible
 
     - name: Replace keyserver address with IP address
-      run: sed -i 's/keyserver\.ubuntu\.com/185.125.188.27/g' playbooks/Supporting_Scripts/package_signature_verification.sh
+      run: |
+        sed -i 's/keyserver\.ubuntu\.com/185.125.188.27/g' playbooks/Supporting_Scripts/package_signature_verification.sh
 
     - name: Run Ansible Playbook
       run: |
