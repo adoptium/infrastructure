@@ -8,7 +8,7 @@
 Build_Tool_Packages:
   - autoconf
   - automake # for compiling freetype on JDK8u
-  - homebrew/cask/cmake # OpenJ9
+  - cmake # OpenJ9
   - coreutils
   - gnupg
   - gnu-sed
