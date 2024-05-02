@@ -4,6 +4,6 @@ on:
   pull_request:
 
 jobs:
-  codefreeze:
+  semgrep_diff:
     uses: adoptium/.github/.github/workflows/semgrep_diff.yml@main
     secrets: inherit
