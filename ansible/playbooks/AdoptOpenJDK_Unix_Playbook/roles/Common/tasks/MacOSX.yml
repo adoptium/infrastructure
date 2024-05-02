@@ -125,20 +125,20 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
-# Install CMAKE Where It Doesnt exist
-- name: Check If Cmake Is installed
-  stat:
-    path: "/opt/homebrew/bin/cmake"
-  register: cmake
-
-- name: Install Cmake
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew:
-    name: "cmake"
-    state: present
-  tags: build_tools
-  when: not cmake.stat.exists
+# # Install CMAKE Where It Doesnt exist
+# - name: Check If Cmake Is installed
+#   stat:
+#     path: "/opt/homebrew/bin/cmake"
+#   register: cmake
+#
+# - name: Install Cmake
+#   become: yes
+#   become_user: "{{ ansible_user }}"
+#   homebrew:
+#     name: "cmake"
+#     state: present
+#   tags: build_tools
+#   when: not cmake.stat.exists
 
 - name: Install Build Tool Packages NOT macOS 10.12
   become: yes

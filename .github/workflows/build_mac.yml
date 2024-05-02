@@ -31,6 +31,10 @@ jobs:
       run: |
         sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
 
+    - name: Remove Cmake
+      run: |
+        brew uninstall cmake
+
     - name: Run Ansible Playbook
       run: |
         echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
