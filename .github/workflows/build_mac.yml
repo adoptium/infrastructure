@@ -5,7 +5,7 @@ on:
     paths:
     - .github/workflows/build_mac.yml
     - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
-    branches:         
+    branches:
     - master
 
 permissions:
@@ -18,14 +18,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: [macos-11]
+          - os: [macos-13]
           - os: [macos-14]
     steps:
 
-    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
     - name: Install dependencies
       run: brew install ansible
+
+    # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
+    # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
+    # Upstream Bug : https://github.com/actions/runner-images/issues/9777
+    - name: Replace keyserver address with IP address
+      run: |
+        sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
 
     - name: Run Ansible Playbook
       run: |
