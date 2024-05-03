@@ -1,0 +1,53 @@
+---
+################################
+# Adoptium devkit installation #
+################################
+
+- name: Check if devkit {{ devkit_version }} is installed
+  shell: /usr/local/devkit/{{ devkit_version }}/bin/gcc --version 2>&1 > /dev/null
+  failed_when: false
+  register: devkit_installed
+  changed_when: False
+  tags: devkit
+
+- name: Set filename of devkit tarball
+  set_fact:
+    devkit_filename: devkit-{{ devkit_version }}-{{ ansible_architecture }}-linux-gnu.tar.xz
+  when:
+    - devkit_installed.rc != 0
+  tags: devkit
+
+- name: Download {{ devkit_filename }}
+  get_url:
+    url: https://github.com/adoptium/devkit-binaries/releases/download/{{ devkit_version }}/{{  devkit_filename }}
+    dest: /tmp/devkit.tar.xz
+    force: no
+    mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
+  when:
+    - devkit_installed.rc != 0
+  tags: devkit
+
+# Perhaps this should have the `b01` removed ... Or use a symlink?
+- name: Create /usr/local/devkit/{{ devkit_version }}
+  file:
+    path: /usr/local/devkit/{{ devkit_version }}
+    state: directory
+    mode: '0755'
+
+- name: Extract {{ devkit_filename }} to /usr/local/devkit
+  unarchive:
+    src: /tmp/devkit.tar.xz
+    dest: /usr/local/devkit/{{ devkit_version }}
+    copy: False
+  when:
+    - devkit_installed.rc != 0
+  tags: devkit
+
+- name: Remove tarball
+  file:
+    path: '/tmp/devkit.tar.xz'
+    state: absent
+  when:
+    - devkit_installed.rc != 0
+  tags: devkit
