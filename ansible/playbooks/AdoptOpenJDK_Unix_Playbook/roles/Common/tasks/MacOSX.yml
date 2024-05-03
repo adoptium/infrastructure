@@ -125,7 +125,7 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
-# Install CMAKE Where It Doesnt exist
+# Install CMAKE Where It Doesn't exist
 - name: Check If Cmake Is installed
   stat:
     path: "/opt/homebrew/bin/cmake"
