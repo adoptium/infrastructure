@@ -27,6 +27,9 @@ jobs:
     - name: Install dependencies
       run: brew install ansible
 
+    # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
+    # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
+    # Upstream Bug : https://github.com/actions/runner-images/issues/9777
     - name: Replace keyserver address with IP address
       run: |
         sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
