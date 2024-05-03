@@ -126,10 +126,15 @@
   tags: build_tools
 
 # Install CMAKE Where It Doesn't exist
-- name: Check If Cmake Is installed
+- name: Check if cmake is installed in /opt/homebrew/bin
   stat:
-    path: "/opt/homebrew/bin/cmake"
-  register: cmake
+    path: /opt/homebrew/bin/cmake
+  register: cmake_homebrew
+
+- name: Check if cmake is installed in /usr/local/bin
+  stat:
+    path: /usr/local/bin/cmake
+  register: cmake_local
 
 - name: Install Cmake
   become: yes
@@ -138,7 +143,7 @@
     name: "cmake"
     state: present
   tags: build_tools
-  when: not cmake.stat.exists
+  when: not (cmake_homebrew.stat.exists or cmake_local.stat.exists)
 
 - name: Install Build Tool Packages NOT macOS 10.12
   become: yes
