@@ -14,8 +14,8 @@ def createServer(username, password):
 def main():
     USERNAME,TOKEN = sys.argv[1:3]
     # USERNAME = 
-    # PASSWORD = 
-    server = createServer(USERNAME, PASSWORD)
+    # TOKEN = 
+    server = createServer(USERNAME, TOKEN)
 
     # testNode = server.get_node_info('build-marist-rhel8-s390x-1')
     # print(testNode)
