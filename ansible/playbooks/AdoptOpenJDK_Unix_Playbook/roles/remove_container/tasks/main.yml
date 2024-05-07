@@ -1,0 +1,34 @@
+# Use provided test-docker list to look up ports
+# On dockerhost machine on which playbook is executed, remove docker containers
+# Run python script to delete jenkins nodes by making POST request to doDelete url
+
+- name: Set delete_nodes_list variable
+  set_fact:
+    delete_nodes_list: "{{ delete_nodes.split(',') | list }}"
+
+- name: Load DockerInventory.json file
+  set_fact:
+    docker_inventory: "{{ lookup('file', '../../DockerInventory.json') | from_json }}"
+
+# - name: Pring docker_inventory
+#   debug:
+#     msg: "{{ docker_inventory }}"
+
+# - name: Get port numbers
+#   debug:
+#     msg: "{{ docker_inventory | to_json | from_json | community.general.json_query(port_query) }}"
+#   vars:
+#     port_query: "[?contains(ip, `{{ inventory_hostname }}`)].containers[?contains(nodeName, `{{ delete_nodes_list[0] }}`)].port"
+
+- name: Get port numbers
+  debug:
+    msg: "{{ docker_inventory | community.general.json_query(port_query) }}"
+  vars:
+    port_query: "[?ip==`{{ inventory_hostname }}`].containers[?nodeName==`{{ delete_nodes_list }}`]"
+  with_items: "{{ delete_nodes_list }}"
+
+  # [?nodeName==`{{ delete_nodes_list[0] }}`].port
+#   register: docker_ports
+
+# - name: Loop through port numbers and delete containers
+#   include_tasks:
