@@ -26,9 +26,13 @@
             {
                 "nodeName": "test-docker-ubuntu2204-x64-2",
                 "port": "32778"
+            },
+            {
+                "nodeName": "test-docker-ubuntu2404-x64-1",
+                "port": "32782"
             }
         ],
-        "containersCount": 6
+        "containersCount": 7
     },
     {
         "name": "dockerhost-azure-ubuntu2204-x64-2",
@@ -43,6 +47,10 @@
                 "port": "32771"
             },
             {
+                "nodeName": "test-docker-amazon2023-x64-1",
+                "port": "32776"
+            },
+            {
                 "nodeName": "test-docker-debian12-x64-3",
                 "port": "32770"
             },
@@ -52,7 +60,7 @@
             },
             {
                 "nodeName": "test-docker-ubuntu2004-x64-4",
-                "port": "32768"
+                "port": "32775"
             },
             {
                 "nodeName": "test-docker-ubuntu2204-x64-6",
@@ -63,7 +71,7 @@
                 "port": "32772"
             }
         ],
-        "containersCount": 7
+        "containersCount": 8
     },
     {
         "name": "dockerhost-equinix-ubuntu2004-armv8-1",
@@ -76,6 +84,14 @@
             {
                 "nodeName": "test-docker-alpine319-armv8-4",
                 "port": "32777"
+            },
+            {
+                "nodeName": "test-docker-amazon2023-armv8l-1",
+                "port": "32779"
+            },
+            {
+                "nodeName": "test-docker-debian12-armv7l-1",
+                "port": "32778"
             },
             {
                 "nodeName": "test-docker-fedora39-armv8l-1",
@@ -122,7 +138,7 @@
                 "port": "32776"
             }
         ],
-        "containersCount": 13
+        "containersCount": 15
     },
     {
         "name": "dockerhost-equinix-ubuntu2204-armv8-1",
@@ -167,9 +183,17 @@
             {
                 "nodeName": "test-docker-ubuntu2204-armv8-3",
                 "port": "32771"
+            },
+            {
+                "nodeName": "test-docker-ubuntu2404-armv7l-1",
+                "port": "32774"
+            },
+            {
+                "nodeName": "test-docker-ubuntu2404-armv8-1",
+                "port": "32773"
             }
         ],
-        "containersCount": 10
+        "containersCount": 12
     },
     {
         "name": "dockerhost-marist-ubuntu2204-s390x-1",
@@ -182,9 +206,13 @@
             {
                 "nodeName": "test-docker-sles15-s390x-1",
                 "port": "32768"
+            },
+            {
+                "nodeName": "test-docker-ubuntu2404-s390x-1",
+                "port": "32770"
             }
         ],
-        "containersCount": 2
+        "containersCount": 3
     },
     {
         "name": "dockerhost-osuosl-ubuntu2004-ppc64le-1",
@@ -225,12 +253,6 @@
         "containersCount": 2
     },
     {
-        "name": "dockerhost-rise-ubuntu2204-aarch64-1",
-        "ip": "34.72.108.242",
-        "containers": [],
-        "containersCount": 0
-    },
-    {
         "name": "dockerhost-skytap-ubuntu2004-ppc64le-1",
         "ip": "20.61.136.212",
         "containers": [
@@ -257,9 +279,13 @@
             {
                 "nodeName": "test-docker-ubuntu2204-ppc64le-2",
                 "port": "32772"
+            },
+            {
+                "nodeName": "test-docker-ubuntu2404-ppc64le-1",
+                "port": "32774"
             }
         ],
-        "containersCount": 6
+        "containersCount": 7
     },
     {
         "name": "dockerhost-skytap-ubuntu2204-x64-1",
@@ -270,26 +296,14 @@
                 "port": "32787"
             },
             {
-                "nodeName": "test-docker-centos7-x64-1",
-                "port": "32782"
-            },
-            {
                 "nodeName": "test-docker-debian12-x64-1",
                 "port": "32778"
             },
             {
-                "nodeName": "test-docker-fedora39-x64-1",
-                "port": "32779"
-            },
-            {
                 "nodeName": "test-docker-ubi8-x64-3",
                 "port": "32790"
-            },
-            {
-                "nodeName": "test-docker-ubuntu2004-x64-3",
-                "port": "32783"
             }
         ],
-        "containersCount": 6
+        "containersCount": 3
     }
 ]
