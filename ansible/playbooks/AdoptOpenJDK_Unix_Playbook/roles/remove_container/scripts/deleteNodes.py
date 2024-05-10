@@ -34,11 +34,11 @@ def deleteJenkinsNode(nodeName, USERNAME, TOKEN):
 
 def main():
     USERNAME,TOKEN = sys.argv[1:3]
-    nodeList = sys.argv[3:]
+    nodeList = sys.argv[3].split(',')
 
     server = createServer(USERNAME, TOKEN)
 
-    with open('ansible/DockerInventory.json') as file:
+    with open('../../DockerInventory.json') as file:
         inventory = json.load(file)
 
     deletedNodesPorts = []
@@ -47,7 +47,7 @@ def main():
     for node in nodeList:
         testNode = server.get_node_info(node)
         if testNode['idle']:
-            deleteJenkinsNode(node, USERNAME, TOKEN)
+            # deleteJenkinsNode(node, USERNAME, TOKEN)
             deletedNodesPorts.append(returnPort(inventory, node))
         else:
             isNotIdleNodes.append(node)

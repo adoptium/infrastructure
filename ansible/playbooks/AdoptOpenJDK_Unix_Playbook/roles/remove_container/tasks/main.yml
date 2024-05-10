@@ -2,9 +2,19 @@
 # On dockerhost machine on which playbook is executed, remove docker containers
 # Run python script to delete jenkins nodes by making POST request to doDelete url
 
-- name: Set delete_nodes_list variable
-  set_fact:
-    delete_nodes_list: "{{ delete_nodes.split(',') | list }}"
+# - name: Set delete_nodes_list variable
+#   set_fact:
+#     delete_nodes_list: "{{ delete_nodes.split(',') | list }}"
 
-# - name: Loop through port numbers and delete containers
-#   include_tasks:
+
+
+- name: Run deleteNodes script
+  script: scripts/deleteNodes.py {{ jenkins_username }} {{ jenkins_api_token }} {{ delete_nodes }}
+  args:
+    executable: python3
+  delegate_to: localhost
+  register: docker_ports
+
+- name: Print docker_ports variable
+  debug:
+    msg: "{{ docker_ports }}"
