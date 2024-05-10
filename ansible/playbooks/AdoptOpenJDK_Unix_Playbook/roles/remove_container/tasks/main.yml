@@ -1,20 +1,20 @@
-# Use provided test-docker list to look up ports
-# On dockerhost machine on which playbook is executed, remove docker containers
-# Run python script to delete jenkins nodes by making POST request to doDelete url
+---
 
-# - name: Set delete_nodes_list variable
-#   set_fact:
-#     delete_nodes_list: "{{ delete_nodes.split(',') | list }}"
-
-
-
+# no_log hides the api_token from the output
 - name: Run deleteNodes script
   script: scripts/deleteNodes.py {{ jenkins_username }} {{ jenkins_api_token }} {{ delete_nodes }}
   args:
     executable: python3
   delegate_to: localhost
+  no_log: true
   register: docker_ports
 
-- name: Print docker_ports variable
-  debug:
-    msg: "{{ docker_ports }}"
+- name: Set docker_ports variable
+  set_fact:
+    ports_list: "{{ docker_ports.stdout_lines[0].split(' ') | list }}"
+
+- name: Run delete_container.yml for every docker port
+  include_tasks: delete_container.yml
+  loop: "{{ ports_list }}"
+  loop_control:
+    loop_var: docker_port

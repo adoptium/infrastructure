@@ -3,9 +3,6 @@ import sys
 import json
 import requests
 
-# Get string of node names from input
-# Look up 
-
 def createServer(username, password):
     url = "http://ci.adoptium.net:80"
     server = jenkins.Jenkins(url, username=username,
@@ -31,6 +28,7 @@ def deleteJenkinsNode(nodeName, USERNAME, TOKEN):
         print(f'\n{nodeName} deleted\n')
     else:
         print(f'\nSomething went wrong. Check to see if {nodeName} is deleted\n')
+        sys.exit(1)
 
 def main():
     USERNAME,TOKEN = sys.argv[1:3]
@@ -47,7 +45,7 @@ def main():
     for node in nodeList:
         testNode = server.get_node_info(node)
         if testNode['idle']:
-            # deleteJenkinsNode(node, USERNAME, TOKEN)
+            deleteJenkinsNode(node, USERNAME, TOKEN)
             deletedNodesPorts.append(returnPort(inventory, node))
         else:
             isNotIdleNodes.append(node)
@@ -55,7 +53,7 @@ def main():
     if len(isNotIdleNodes) > 0:
         print(f'\nList of nodes that were not deleted: {isNotIdleNodes}\n')
 
-    print(f'\nports: {deletedNodesPorts}\n')
+    print(*deletedNodesPorts)
 
 if __name__ == "__main__":
     main()
