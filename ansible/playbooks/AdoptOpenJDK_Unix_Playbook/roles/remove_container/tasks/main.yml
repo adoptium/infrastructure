@@ -1,4 +1,7 @@
 ---
+# The deleteNodes.py script deletes the nodes in Jenkins
+# Ansible then removes the docker containers on the dockerhost
+# If the node is not idle in Jenkins, the node is not deleted
 
 # no_log hides the api_token from the output
 - name: Run deleteNodes script
