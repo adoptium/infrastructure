@@ -70,6 +70,10 @@ ansible-playbook -u root -i hosts AdoptOpenJDK_Unix_Playbook/dockernode.yml -t "
 
 The hosts file should include the dockerhost machine which hosts the docker static nodes. Both the Jenkins nodes and the docker containers will be deleted (as long as the Jenkins nodes are idle).
 
+Use the [DockerInventory.json](https://github.com/adoptium/infrastructure/blob/master/ansible/DockerInventory.json) to lookup the docker static node names and the dockerhost machine to which they belong.
+
+After the playbook deletes the nodes, please update the DockerInventory.json file by following the instructions [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic#inventory).
+
 ## Patching
 
 * The static containers are patched daily using this [script](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) which runs on a daily cron job on each of the dockerhost machines.
