@@ -60,6 +60,16 @@ If you are creating a new container with the intention of replacing a container 
 
 * Instead of creating a new node in Jenkins, simply modify the name and PORT number of the replaced node's entry in Jenkins accordingly
 
+## Retiring a DockerStatic container (automated)
+
+The [remove_container.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/remove_container/tasks/main.yml) role facilitates the removal of DockerStatic containers. Usage:
+
+```
+ansible-playbook -u root -i hosts AdoptOpenJDK_Unix_Playbook/dockernode.yml -t "remove" -e "delete_nodes=$NODE_1,$NODE_2,$NODE_3,..."
+```
+
+The hosts file should include the dockerhost machine which hosts the docker static nodes. Both the Jenkins nodes and the docker containers will be deleted (as long as the Jenkins nodes are idle).
+
 ## Patching
 
 * The static containers are patched daily using this [script](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) which runs on a daily cron job on each of the dockerhost machines.
