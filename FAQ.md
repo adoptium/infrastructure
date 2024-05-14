@@ -201,7 +201,11 @@ an individual test for example:
 `test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 If you then need to run manually on the machine itself (outside jenkins)
-then the process is typically like this:
+then the process is typically like this.  If you're testing a build which
+isn't the latest (such as a previous GA/the last release) it is recommended
+that you check out the appropriate branch for the last release from the
+aqa-tests repository in the first line here to avoid the test material not
+matching the JDK under test which can lead to false failures.
 
 ```sh
 git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
