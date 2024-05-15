@@ -4,7 +4,7 @@ import json
 import requests
 
 def createServer(username, password):
-    url = "https://ci.adoptium.net:80"
+    url = "https://ci.adoptium.net:443"
     server = jenkins.Jenkins(url, username=username,
                         password=password)
     return server
