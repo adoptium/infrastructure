@@ -2,57 +2,29 @@
 ###############
 # WiX Toolset #
 ###############
+- name: Set Wix version variable
+  set_fact:
+    wix_version: 5.0.0
+  tags: Wix
+
 - name: Test if WiX is already installed
   win_stat:
-    path: 'C:\Program Files (x86)\WiX Toolset v3.14\bin\wix.dll'
+    path: 'C:\\Users\{{ Jenkins_Username }}\.dotnet/tools/wix'
   register: wix_installed
   tags: Wix
 
-- name: Download WiX
-  win_get_url:
-    url: https://github.com/wixtoolset/wix3/releases/download/wix314rtm/wix314.exe
-    dest: 'C:\temp\wix.exe'
-    follow_redirects: all
-    checksum: 704439ea88fc9e5a3647eedeeb45943f9a392e3d209f58512280130096847937
-    checksum_algorithm: sha256
-  when: (not wix_installed.stat.exists)
+- name: Test WiX version
+  # generates an output like 5.0.0+41e11442
+  win_shell: wix --version
+  register: installed_wix_version
+  become_user: "{{ Jenkins_Username }}"
+  become: true
+  when: wix_installed.stat.exists
   tags: Wix
 
-- name: Install WiX
-  win_package:
-    path: 'C:\temp\wix.exe'
-    product_id: WiX
-    arguments: /S
-  when: (not wix_installed.stat.exists)
-  tags: Wix
-
-- name: Cleanup WiX
-  win_file:
-    path: 'C:\temp\wix.exe'
-    state: absent
-  failed_when: false
-  tags: Wix
-
-- name: Test if Windows 10 SDK is already installed
-  win_stat:
-    path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-  register: win10_sdk_installed
-  tags: Wix
-
-- name: Download Windows-SDK-10.1.17763.1
-  win_get_url:
-    url: https://download.microsoft.com/download/9/3/9/939441D4-6FBA-48EE-9EF7-402C1AA8B8A7/windowssdk/winsdksetup.exe
-    dest: C:/temp/winSDK10.exe
-  when: not win10_sdk_installed.stat.exists
-  tags: Wix
-
-- name: Install Windows-SDK-10.1.17763.1
-  win_shell: C:/temp/winSDK10.exe /q /norestart
-  when: not win10_sdk_installed.stat.exists
-  tags: Wix
-
-- name: Reboot to complete installation
-  win_reboot:
-    reboot_timeout: 1800
-  when: not win10_sdk_installed.stat.exists
+- name: Install Wix Toolset when not installed or version is not correct
+  win_shell: dotnet tool install --global wix --version {{ wix_version }}
+  become_user: "{{ Jenkins_Username }}"
+  become: true
+  when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
   tags: Wix
