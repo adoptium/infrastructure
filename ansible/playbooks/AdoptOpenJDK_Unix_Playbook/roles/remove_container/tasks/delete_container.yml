@@ -1,0 +1,11 @@
+---
+
+# Get the container ID using the port number found in DockerhostInventory.json
+- name: Get container ID of container running on {{ docker_port }}
+  shell: docker ps | grep {{ docker_port }} | sed 's/ /\n/g' | head -n 1
+  register: docker_container_ID
+
+- name: Stop and remove container {{ docker_container_ID.stdout }}
+  community.docker.docker_container:
+    name: "{{ docker_container_ID.stdout }}"
+    state: absent
