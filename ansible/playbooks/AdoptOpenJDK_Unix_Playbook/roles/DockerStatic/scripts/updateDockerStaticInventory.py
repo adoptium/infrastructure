@@ -30,7 +30,7 @@ def getLabel(nodeConfig):
         return "No labels"
     
 def createServer(username, password):
-    url = "http://ci.adoptium.net:80"
+    url = "https://ci.adoptium.net:443"
     server = jenkins.Jenkins(url, username=username,
                         password=password)
     return server
