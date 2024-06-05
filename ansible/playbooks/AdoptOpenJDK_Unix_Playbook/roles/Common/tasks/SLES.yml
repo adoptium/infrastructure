@@ -87,14 +87,13 @@
 
 - name: Install Git SLES 12 SP5
   when: (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
+  tags: build_tools
   block:
     - name: Test if  Git Is Installed At /usr/local/bin
       shell: /usr/local/bin/git --version >/dev/null
       failed_when: false
       register: git_installed
       changed_when: false
-      tags:
-        - build_tools
 
     - name: Test if git is installed at the correct version
       shell: /usr/local/bin/git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
@@ -102,8 +101,6 @@
         - git_installed.rc == 0
       register: git_version
       changed_when: false
-      tags:
-        - build_tools
 
     - name: Get Git Source
       get_url:
@@ -120,8 +117,6 @@
         chdir: /tmp
       when:
         - (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
-      tags:
-        - build_tools
 
     - name: Compile Git 2.31.0
       shell: |
@@ -131,8 +126,6 @@
         gmake install
       when:
         - (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
-      tags:
-        - build_tools
 
 - name: Install additional build tools for SLES 11
   package: "name={{ item }} state=latest"

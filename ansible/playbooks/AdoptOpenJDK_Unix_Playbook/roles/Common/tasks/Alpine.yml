@@ -31,11 +31,11 @@
 
 - name: Install JDK for x64
   when: ansible_architecture == "x86_64"
+  tags: build_tools
   block:
     - name: Check if zulu-7 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu7
       register: zulu7_installed
-      tags: build_tools
 
     - name: Install latest zulu-7 release if not already installed
       unarchive:
@@ -44,7 +44,6 @@
         remote_src: yes
       when:
         - not zulu7_installed.stat.exists
-      tags: build_tools
 
     - name: Create symlink to point at zulu-7
       file:
@@ -53,12 +52,10 @@
         state: link
       when:
         - not zulu7_installed.stat.exists
-      tags: build_tools
 
     - name: Check if zulu-14 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu14
       register: zulu14_installed
-      tags: build_tools
 
     - name: Install latest zulu-14 release if not already installed
       unarchive:
@@ -67,7 +64,6 @@
         remote_src: yes
       when:
         - not zulu14_installed.stat.exists
-      tags: build_tools
 
     - name: Create symlink to point at zulu-14
       file:
@@ -76,12 +72,10 @@
         state: link
       when:
         - not zulu14_installed.stat.exists
-      tags: build_tools
 
     - name: Check if zulu-15 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu15
       register: zulu15_installed
-      tags: build_tools
 
     - name: Install latest zulu-15 release if not already installed
       unarchive:
@@ -90,7 +84,6 @@
         remote_src: yes
       when:
         - not zulu15_installed.stat.exists
-      tags: build_tools
 
     - name: Create symlink to point at zulu-15
       file:
@@ -99,7 +92,6 @@
         state: link
       when:
         - not zulu15_installed.stat.exists
-      tags: build_tools
 
 - name: Install JDK for aarch64
   when: ansible_architecture == "aarch64"
