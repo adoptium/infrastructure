@@ -157,7 +157,7 @@
                 "port": "32772"
             },
             {
-                "nodeName": "test-docker-debain12-armv8l-1",
+                "nodeName": "test-docker-debian12-armv8l-1",
                 "port": "2231"
             },
             {
