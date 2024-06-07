@@ -2,9 +2,9 @@
 #######################
 # NVidia Cuda Toolkit #
 #######################
-- name: Check if NVidia CUDA toolkit is aready installed
+- name: Check if NVidia CUDA toolkit is already installed
   win_stat:
-    path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0'
+    path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1'
   register: cuda_installed
   tags: NVidia_Cuda_Toolkit
 
