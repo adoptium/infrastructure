@@ -23,7 +23,7 @@ RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
 RUN rpm -i '/tmp/centosrepos.rpm'
 # Modify baseurl for all Centos repos, mainly Appstream, BaseOS and Extras repos
 RUN sed -i 's/#baseurl=http\:\/\/mirror/baseurl=http\:\/\/vault/g' /etc/yum.repos.d/CentOS-Stream-*
-# dnf complains about needing to remove redhat-release
+# dnf complains about needing to remove redhat-release (lets not)
 RUN echo "exclude=redhat-release" >> /etc/dnf/dnf.conf
 RUN dnf -y update
 # New Centos repos installed after update, so baseurl needs to be changed again for new repos
