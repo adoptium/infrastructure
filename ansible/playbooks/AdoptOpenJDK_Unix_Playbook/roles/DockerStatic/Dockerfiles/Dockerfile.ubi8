@@ -29,10 +29,10 @@ RUN dnf -y update
 # New Centos repos installed after update, so baseurl needs to be changed again for new repos
 RUN sed -i 's/#baseurl=http\:\/\/mirror/baseurl=http\:\/\/vault/g' /etc/yum.repos.d/CentOS-Stream-*
 # Get latest jdk17 ga
-RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/ppc64le/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
 # Get sig file for latest jdk17 ga
-RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=ppc64le&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
 RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
 # Install ant via WGET
