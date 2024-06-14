@@ -1,60 +1,54 @@
 ---
 
-- name: Set ansible_architecture to arm if bulidng arm32 containers on arm64
-  set_fact:
-    ansible_architecture: arm
-  when: build_arm is defined and build_arm == "yes"
-
 - name: Set docker build command
   set_fact:
     docker_build_command: "docker build"
+    arm_suffix: ""
 
 - name: Set docker buildx command if building arm container
   set_fact:
     docker_build_command: "docker buildx build --platform linux/v7/arm"
+    arm_suffix: ".ARM32"
+    ansible_architecture: arm
   when: build_arm is defined and build_arm == "yes"
 
-- name: debug
-  debug:
-    msg: "{{ docker_build_command }}"
+# Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
+- name: Transfer dockerfile
+  copy:
+    src: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ docker_image }}"
+    dest: "/tmp/Dockerfile.{{ docker_image }}"
 
-# # Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
-# - name: Transfer dockerfile
-#   copy:
-#     src: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ docker_image }}"
-#     dest: "/tmp/Dockerfile.{{ docker_image }}"
+# For images built on non x86_64 dockerhosts
+- name: Translate architecture in dockerfile
+  replace:
+    dest: /tmp/Dockerfile.{{ docker_image }}
+    regexp: "x64"
+    replace: "{{ ansible_architecture }}"
+  when: ansible_architecture != "x86_64"
 
-# # For images built on non x86_64 dockerhosts
-# - name: Translate architecture in dockerfile
-#   replace:
-#     dest: /tmp/Dockerfile.{{ docker_image }}
-#     regexp: "x64"
-#     replace: "{{ ansible_architecture }}"
-#   when: ansible_architecture != "x86_64"
+- name: Set jenkins authorized_Key in dockerfiles
+  replace:
+    dest: /tmp/Dockerfile.{{ docker_image }}
+    regexp: "Jenkins_User_SSHKey"
+    replace: "{{ Jenkins_User_SSHKey }}"
 
-# - name: Set jenkins authorized_Key in dockerfiles
-#   replace:
-#     dest: /tmp/Dockerfile.{{ docker_image }}
-#     regexp: "Jenkins_User_SSHKey"
-#     replace: "{{ Jenkins_User_SSHKey }}"
+- name: Build {{ docker_image }} docker images {{ docker_build_command }}
+  command: "{{ docker_build_command }} --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }}{{ arm_suffix }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/"
 
-# - name: Build {{ docker_image }} docker images {{ docker_build_command }}
-#   command: "{{ docker_build_command }} --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/"
+# Finds the highest port number already assigned and +1
+- name: Find available port
+  shell: docker ps --format \"\{\{\.Ports\}\}\" | awk -F[:-] '{print $2}' | sort | tail -n 1
+  register: docker_port_output
 
-# # Finds the highest port number already assigned and +1
-# - name: Find available port
-#   shell: docker ps --format \"\{\{\.Ports\}\}\" | awk -F[:-] '{print $2}' | sort | tail -n 1
-#   register: docker_port_output
+- name: Set docker_port variable if empty
+  set_fact:
+    docker_port: 32000
+  when: docker_port_output.stdout == ""
 
-# - name: Set docker_port variable if empty
-#   set_fact:
-#     docker_port: 32000
-#   when: docker_port_output.stdout == ""
+- name: Set docker_port variable when non empty
+  set_fact:
+    docker_port: "{{ docker_port_output.stdout | int + 1 }}"
+  when: not (docker_port_output.stdout == "")
 
-# - name: Set docker_port variable when non empty
-#   set_fact:
-#     docker_port: "{{ docker_port_output.stdout | int + 1 }}"
-#   when: not (docker_port_output.stdout == "")
-
-# - name: Run {{ docker_image }} docker container
-#   command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }} aqa_{{ docker_image }}
+- name: Run {{ docker_image }} docker container
+  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm_suffix }} aqa_{{ docker_image }}{{ arm_suffix }}
