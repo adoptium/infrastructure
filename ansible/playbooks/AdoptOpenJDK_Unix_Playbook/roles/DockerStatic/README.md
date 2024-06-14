@@ -33,7 +33,7 @@ The `dockerhost.yml` playbook can deploy single, multiple and duplicate containe
 
 will deploy 1 Ubuntu 22.04 container, 1 Alpine 3.19 container and 3 Ubuntu 18.04 containers.
 
-If you would like to build an arm32 container on an arm64 dockerhost, pass the `build_arm` variable when running the playbook:
+If you would like to build an arm32 container on an arm64 dockerhost, pass the `build_arm`:
 
 ```
 ansible-playbook -u root -i <host-file> AdoptOpenJDK_Unix_Playbook
