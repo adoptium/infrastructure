@@ -3,7 +3,7 @@
 - name: Set ansible_architecture to arm if bulidng arm32 containers on arm64
   set_fact:
     ansible_architecture: arm
-  when: build_arm is defined
+  when: build_arm is defined and build_arm == "yes"
 
 - name: Set docker build command
   set_fact:
@@ -12,7 +12,7 @@
 - name: Set docker buildx command if building arm container
   set_fact:
     docker_build_command: "docker buildx build --platform linux/v7/arm"
-  when: build_arm is defined
+  when: build_arm is defined and build_arm == "yes"
 
 - name: debug
   debug:
