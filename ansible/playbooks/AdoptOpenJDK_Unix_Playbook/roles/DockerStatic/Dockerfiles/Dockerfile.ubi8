@@ -5,7 +5,7 @@ RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-rele
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Install Additional Repos
 # N.B https is not available for centos mirror, so adding independently verified checksum validation for http downloads
-RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm' -O /tmp/gpgkey.rpm
+RUN wget 'https://vault.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-8-3.el8.noarch.rpm' -O /tmp/gpgkey.rpm
 ARG GPG_CHECKSUM=79cda0505d8dd88b8277c1af9c55021319a0e516df8d24c893d740eac1d74feb
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$GPG_CHECKSUM" ]; then \
@@ -13,7 +13,7 @@ RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
            exit 1; \
        fi
 RUN rpm -i '/tmp/gpgkey.rpm'
-RUN wget 'http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-3.el8.noarch.rpm' -O /tmp/centosrepos.rpm
+RUN wget 'https://vault.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-8-3.el8.noarch.rpm' -O /tmp/centosrepos.rpm
 ARG REPO_CHECKSUM=bd0c7fe3f1f6a08f4658cc0cc9b1c1a91e38f8bf60c3af2ed2ee220523ded269
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$REPO_CHECKSUM" ]; then \
@@ -21,6 +21,13 @@ RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
            exit 1; \
        fi
 RUN rpm -i '/tmp/centosrepos.rpm'
+# Modify baseurl for all Centos repos, mainly Appstream, BaseOS and Extras repos
+RUN sed -i 's/#baseurl=http\:\/\/mirror/baseurl=http\:\/\/vault/g' /etc/yum.repos.d/CentOS-Stream-*
+# dnf complains about needing to remove redhat-release (lets not)
+RUN echo "exclude=redhat-release" >> /etc/dnf/dnf.conf
+RUN dnf -y update
+# New Centos repos installed after update, so baseurl needs to be changed again for new repos
+RUN sed -i 's/#baseurl=http\:\/\/mirror/baseurl=http\:\/\/vault/g' /etc/yum.repos.d/CentOS-Stream-*
 # Get latest jdk17 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
@@ -48,9 +55,9 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils
-RUN yum install -y coreutils --allowerasing
+RUN dnf install -y coreutils --allowerasing
 # Install SSL Test packages
-RUN yum install -y gnutls gnutls-utils libnss3.so nss nss-tools
+RUN dnf install -y gnutls gnutls-utils nss nss-tools
 # ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
