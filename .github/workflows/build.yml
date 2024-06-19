@@ -25,40 +25,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
     - name: Set up Docker Buildx to use cache feature
-      uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # v2.2.1
+      uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
 
     - name: Login to Docker Hub
-      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
+      uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_TOKEN }}
       if: github.ref == 'refs/heads/master'
 
-    - name: Docker Build & Push Centos6 Image to Docker Hub
-      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
+
+    - name: Docker Build CentOS6 Image Test
+      uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
       with:
         file: ./ansible/docker/Dockerfile.CentOS6
         build-args: git_sha=${{ github.sha }}
         tags: adoptopenjdk/centos6_build_image:latest
         cache-from: type=registry,ref=adoptopenjdk/centos6_build_image:latest
         cache-to: type=inline
-        push: ${{ github.ref == 'refs/heads/master' }}
+        push: false
+      if: github.ref != 'refs/heads/master'
+
+    - name: Docker Build & Push Centos6 Image to Docker Hub On Merge
+      uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
+      with:
+        file: ./ansible/docker/Dockerfile.CentOS6
+        build-args: git_sha=${{ github.sha }}
+        tags: adoptopenjdk/centos6_build_image:latest
+        cache-from: type=registry,ref=adoptopenjdk/centos6_build_image:latest
+        cache-to: type=inline
+        push: false
+      if: github.ref == 'refs/heads/master'
 
   build-and-push-alpine3:
     name: Alpine3
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
     - name: Set up Docker Buildx to use cache feature
-      uses: docker/setup-buildx-action@8c0edbc76e98fa90f69d9a2c020dcb50019dc325 # v2.2.1
+      uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
 
     - name: Docker Build Alpine3 Image
-      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
+      uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
       with:
         file: ./ansible/docker/Dockerfile.Alpine3
         build-args: git_sha=${{ github.sha }}

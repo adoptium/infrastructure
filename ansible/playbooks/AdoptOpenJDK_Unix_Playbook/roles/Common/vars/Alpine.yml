@@ -45,6 +45,7 @@ Build_Tool_Packages:
   - numactl-dev                   # OpenJ9
   - pigz                          # Used in preference to gzip for tar.gz'ing
   - sed                           # JDK8u requires GNU sed
+  - strace                        # For SBOM dependency analysis
   - unzip
   - wget
   - which

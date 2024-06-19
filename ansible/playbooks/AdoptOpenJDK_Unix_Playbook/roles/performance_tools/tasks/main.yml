@@ -7,9 +7,8 @@
 ###########################################
 
 - name: Install gdb & valgrind
-  become: yes
+  become: true
   package:
-    update_cache: yes
     name: ['gdb', 'valgrind']
     state: latest
   when: ansible_distribution == "Ubuntu" or
@@ -19,16 +18,15 @@
   tags: performance_tools
 
 - name: Install Perf (except Ubuntu)
-  become: yes
+  become: true
   package:
-    update_cache: yes
     name: perf
     state: latest
   when: ansible_distribution != "Ubuntu"
   tags: performance_tools
 
 - name: Perf installation (Ubuntu)
-  become: yes
+  become: true
   when: ansible_distribution == "Ubuntu"
   tags: performance_tools
   block:
@@ -42,17 +40,29 @@
 
     - name: Install perf (Ubuntu)
       package:
-        update_cache: yes
         name: ['linux-tools-common', 'linux-tools-generic', 'linux-tools-{{ uname.stdout }}']
         state: latest
       when: "'linux-tools-'~uname.stdout in linux_tools.stdout" # ~ -> concatenates string
 
 - name: Install nmon (except Rhel 7/CentOS 7 s390x) #nmon needs epel repo
-  become: yes
+  become: true
   package:
-    update_cache: yes
     name: nmon
     state: latest
   when: not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x" and
         (ansible_distribution == "RedHat" or ansible_distribution == "CentOS"))
   tags: performance_tools
+
+- name: Set ptrace_scope value in Ubuntu
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  tags: performance_tools
+  block:
+    - name: Set ptrace_scope value to 0 in Ubuntu
+      shell: echo 0 | dd of=/proc/sys/kernel/yama/ptrace_scope
+
+    - name: Set ptrace_scope value persistant across reboot
+      lineinfile:
+        path: /etc/sysctl.d/10-ptrace.conf
+        regexp: '^kernel.yama.ptrace_scope'
+        line: kernel.yama.ptrace_scope = 0

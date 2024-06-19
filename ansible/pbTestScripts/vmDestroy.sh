@@ -47,6 +47,8 @@ checkOS() {
                         osToDestroy="U20";;
                 "Ubuntu2104" | "U21" | "u21" )
                         osToDestroy="U21";;
+                "Ubuntu2204" | "U22" | "u22" )
+                        osToDestroy="U22";;
                 "CentOS6" | "centos6" | "C6" | "c6" )
                         osToDestroy="C6" ;;
                 "CentOS7" | "centos7" | "C7" | "c7" )
@@ -63,8 +65,10 @@ checkOS() {
 			osToDestroy="Sol10" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
-                "all" )
-                        osToDestroy="U16 U18 U20 U21 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012" ;;
+  	"Windows2022" | "Win2022" | "W22" | "w22" )
+	                       osToDestroy="W2022";;
+	              "all" )
+                        osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012 W2022" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
@@ -78,6 +82,7 @@ listOS() {
 		- Ubuntu1804
 		- Ubuntu2004
 		- Ubuntu2104
+		- Ubuntu2204
 		- CentOS6
 		- CentOS7
 		- CentOS8
@@ -85,7 +90,8 @@ listOS() {
 		- Debian10
 		- FreeBSD12
 		- Solaris10
-		- Win2012"
+		- Win2012
+		- Win2022"
 	echo
 }
 
@@ -111,8 +117,8 @@ if [[ "$force" == False ]]; then
 		echo "Cancelling ..."
 		exit 1;
 	fi
-fi	
-for OS in $osToDestroy 
+fi
+for OS in $osToDestroy
 do
 	destroyVMs $OS
 done

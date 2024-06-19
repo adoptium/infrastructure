@@ -30,7 +30,9 @@
 
     # These packages are installed using installp - which can enlarge
     # filesystem space, as needed, on demand
-    - openssl
+    - role: openssl3
+      tags: openssl3
+
     - security
 
     # 2. AIX BOS configuration
@@ -64,7 +66,8 @@
     # Note: AIX File system configuration must be run now as RPM based software
     # cannot expand filesystem space on demand
     - aixfs
-    - yum
+    - role: dnf
+      tags: dnf
 
     ## additional OSS packages
     - ant

@@ -72,6 +72,18 @@
       tags: [build_tools]
     - role: gcc_11                # JDK19+
       tags: [build_tools]
+    - role: devkit                # JDK19+
+      devkit_version: gcc-11.3.0-Centos7.9.2009-b02
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
+      tags: [devkit]
+    - role: devkit                # JDK19+
+      devkit_version: gcc-11.3.0-Centos7.6.1810-b02
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "aarch64"
+      tags: [devkit]
     - role: Xcode11
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode11] # JDK 8
@@ -95,6 +107,7 @@
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_architecture != "riscv64"
+        - ansible_architecture != "s390x"
       tags: build_tools
     - role: adoptopenjdk_install  # JDK11 Build Bootstrap
       jdk_version: 10
@@ -108,33 +121,29 @@
       when:
         - (ansible_distribution != "Alpine" or ansible_architecture != "aarch64")
         - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install  # Current LTS
+    - role: adoptopenjdk_install  # Previous LTS
       jdk_version: 17
       when:
         - ansible_distribution != "Solaris"
-        - ansible_architecture != "riscv64"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK19 Build Bootstrap
-      jdk_version: 18
+    - role: adoptopenjdk_install  # JDK21 Build Bootstrap
+      jdk_version: 20
       when:
         - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
         - ansible_architecture != "riscv64"
+        - ansible_architecture != "armv7l"
+        - ansible_architecture != "s390x"
       tags: build_tools
-    - role: adoptopenjdk_install  # JDK20 Build Bootstrap
-      jdk_version: 19
+    - role: adoptopenjdk_install  # Current LTS
+      jdk_version: 21
       when:
-        - ansible_distribution != "Alpine"
         - ansible_distribution != "Solaris"
+        - ansible_architecture != "armv7l"
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
-    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
-      tags: [nagios_master_config, adoptopenjdk]
-    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
-      tags: [nagios_tunnel, adoptopenjdk]
     - riscv_cross_compiler        # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security

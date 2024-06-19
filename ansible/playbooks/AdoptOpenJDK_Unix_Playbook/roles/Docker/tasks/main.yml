@@ -20,7 +20,7 @@
     ################
     # Pre Install  #
     ################
-    - name: Prepare for RHEL/CentOS 7/8
+    - name: Prepare for RHEL/CentOS 7/8/9
       include_tasks: rhel.yml
       when:
         - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
@@ -31,7 +31,7 @@
       when:
         - ansible_distribution == "Ubuntu"
 
-    - name: Prepare for Debian / Raspbian
+    - name: Prepare for Debian/Raspbian
       include_tasks: debian.yml
       when:
         - ansible_distribution == "Debian"
@@ -39,7 +39,7 @@
     ##################
     # Install Docker #
     ##################
-    - name: Install docker based on OS (Ubuntu, RHEL/CentOS 7/8, Debian)
+    - name: Install docker based on OS (Ubuntu, RHEL/CentOS 7/8/9, Debian)
       package:
         name:
           - docker-ce
@@ -51,50 +51,53 @@
       package:
         name:
           - docker.io
-        state: latest   # TODO: Package installs should not use latest
+        state: present
         use: auto       # automatic select package manager to use yum, apt and so on
-      when: ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20) or ansible_distribution == "Debian")
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
 
-    - name: Install for SLES15 # zypper does not support in package module
+    - name: Install docker build on Ubuntu 20+
+      package:
+        name:
+          - docker-buildx
+        state: present
+        use: auto       # automatic select package manager to use yum, apt and so on
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 20)
+
+    - name: Install for SLES # zypper does not support in package module
       include_tasks: sles.yml
       when:
-        - ansible_distribution == "SLES" and ansible_distribution_major_version == "15"
+        - ansible_distribution == "SLES"
 
     ################
     # Post Install #
     ################
-    - name: Add Jenkins user to the docker group for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+    - name: Add Jenkins user to the docker group for Ubuntu, Debian, SLES, CentOS/RHEL 7/8/9
       user:
         name: "{{ Jenkins_Username }}"
         groups: docker
         append: yes
         state: present
-      when:
-        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "15") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
-        - ansible_architecture != "riscv64"
-      tags:
-        - jenkins
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+            ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
+      tags: jenkins
 
-    - name: Add Nagios user to the docker group for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+    - name: Add Nagios user to the docker group for Ubuntu, Debian, SLES, CentOS/RHEL 7/8/9
       user:
         name: nagios
         groups: docker
         append: yes
         state: present
       when:
-        - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "15") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
-        - ansible_architecture != "riscv64"
+        - ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+          ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
         - Nagios_Plugins == "Enabled"
-      tags:
-        - docker
+      tags: docker
 
-- name: Enable and Start Docker Service for Ubuntu, Debian, SLES12, CentOS7  and RHEL7
+- name: Enable and Start Docker Service for Ubuntu, Debian, SLES, CentOS/RHEL 7/8/9
   service:
     name: docker
     state: started
     enabled: yes
-  when:
-    - (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian") or (ansible_distribution == "SLES" and ansible_distribution_major_version == "15") or ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS" ) and ansible_distribution_major_version == "7")
-    - ansible_architecture != "riscv64"
-  tags:
-    - docker
+  when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+        ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
+  tags: docker

@@ -45,6 +45,7 @@ Build_Tool_Packages:
   - numactl-devel                 # OpenJ9
   - openssh-clients               # IBM: cloning over SSH
   - openssl-devel
+  - patch                         # For DevKit creation that runs "patch"
   - perl-DBI
   - perl-devel
   - perl-Digest-SHA
@@ -53,7 +54,9 @@ Build_Tool_Packages:
   - perl-libwww-perl
   - perl-Time-HiRes
   - pigz
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
+  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - which
@@ -69,7 +72,7 @@ Additional_Build_Tools_CentOS7:
   - libstdc++-static
   - ccache
 
-Additional_Build_Tools_CentOS8:
+Additional_Build_Tools_CentOS8_CentOS9Stream:
   - glibc-locale-source
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
@@ -78,7 +81,7 @@ Additional_Build_Tools_CentOS8:
   - cmake
   - ccache
 
-Additional_Build_Tools_NOT_CentOS8:
+Additional_Build_Tools_NOT_CentOS8_CentOS9Stream:
   - lbzip2
   - java-1.7.0-openjdk-devel
   - ntp

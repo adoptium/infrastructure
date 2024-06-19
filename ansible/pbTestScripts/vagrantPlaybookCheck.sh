@@ -98,11 +98,11 @@ checkVars()
 		ls -1 ../vagrant/Vagrantfile.* | cut -d. -f4
 		exit 1
 	fi
-	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
+	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then
 		echo "Unable to test an unbuilt JDK. Ignoring '--test' argument."
 		runTest=false
 	fi
-	#Sets WORKSPACE to home if WORKSPACE is empty or undefined. 
+	#Sets WORKSPACE to home if WORKSPACE is empty or undefined.
 	if [ ! -n "${WORKSPACE:-}" ]; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
 		WORKSPACE=$HOME
@@ -151,7 +151,7 @@ checkVagrantOS()
         local vagrantOSList
         if [[ "$newVagrantFiles" = "true" ]]; then
                 cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible/vagrant
-        else    
+        else
                 cd ${scriptPath%/*}/../vagrant
         fi
         vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
@@ -159,7 +159,7 @@ checkVagrantOS()
                 echo "Vagrantfile Detected"
         elif [[ "$vagrantOS" == "all" ]]; then
                 vagrantOS=$vagrantOSList
-        else    
+        else
                 echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
                 echo $vagrantOSList
                 exit 1
@@ -224,7 +224,7 @@ startVMPlaybook()
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 
-	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
+	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
 	# See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
@@ -235,14 +235,14 @@ startVMPlaybook()
 	# ssh-keygen -R will fail if the known_hosts file does not exist
 	[ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-	
+
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
-	
+
 	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
-		echo PLAYBOOK FAILED 
+		echo PLAYBOOK FAILED
 		exit 1
 	fi
 
@@ -306,7 +306,7 @@ startVMPlaybookWin()
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
         # See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
-	
+
 	# Rearm the evaluation license for 180 days to stop the VMs shutting down
 	# See: https://github.com/adoptium/infrastructure/issues/2056
 	vagrant winrm --shell cmd -c "slmgr.vbs /rearm //b"
@@ -317,7 +317,7 @@ startVMPlaybookWin()
 	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
 	echo "[127.0.0.1]:$vagrantPort" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
-	
+
 	# Changes the value of "hosts" in main.yml
 	sed -i'' -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
@@ -328,17 +328,20 @@ startVMPlaybookWin()
 		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
-	
+	# Add The Ansible WinRM TimeOut Values To The Vars file
+	echo "ansible_winrm_operation_timeout_sec: 600" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+	echo "ansible_winrm_read_timeout_sec: 630" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+
 	gitSha=$(git rev-parse HEAD)
 
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --extra-vars "git_sha=${gitSha}" --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $pbLogPath
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
-		echo PLAYBOOK FAILED 
+		echo PLAYBOOK FAILED
 		exit 1
 	fi
-        
+
 	if [[ "$testNativeBuild" = true ]]; then
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.build_log"
 
@@ -356,14 +359,14 @@ startVMPlaybookWin()
 			echo BUILD FAILED
 			exit 127
 		fi
-	
+
 		if [[ "$runTest" = true ]]; then
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
-			
+
 			# Run a python script to start a test for the built JDK on the Windows VM
 			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
-			if ! grep -q 'FAILED: 0' $testLogPath; then 
+			if ! grep -q 'FAILED: 0' $testLogPath; then
 				echo TEST FAILED
 				exit 127
 			fi
@@ -409,13 +412,14 @@ checkVagrantOS
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
-	if [[ "$OS" == "Win2012" ]] ; then
+	echo OS = $vagrantOS
+	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" ]] ; then
 		startVMPlaybookWin $OS
 	else
 		startVMPlaybook $OS
 	fi
   	if [[ "$vmHalt" == true ]]; then
-                vagrant halt 
+                vagrant halt
 	fi
 done
 destroyVM

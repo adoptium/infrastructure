@@ -126,7 +126,7 @@ playbooks:
 - [gmake role](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/gmake/tasks/main.yml) (GPG verification using [package_signature_verification.sh](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/Supporting_Scripts/package_signature_verification.sh)
 - [NVidia_Cuda_Toolkit role](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/NVidia_Cuda_Toolkit/tasks/main.yml) which performs a SHA256 check of the download
 - The [gcc_11 role](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/gcc_11/tasks/main.yml) is an example of SHA checks when there are multiple downloads for each architecture. It uses checksums stored in a [separate variables file](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/gcc_11/vars/main.yml)
- 
+
 Where possible, if you are modifying a playbook to add something new, please also add information saying what it is needed for (it may be useful to link back to a related PR or issue)
 
 ## Using Vagrant to test your Ansible scripts
@@ -173,6 +173,8 @@ Wherever possible, prefix the commit message with the area which you are changin
 - inventory:
 - github:
 - tools:
+- nagios:
+- wazuh:
 
 ## Further Docs
 

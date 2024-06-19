@@ -11,7 +11,7 @@
 - name: Check if SAS variable is defined
   set_fact:
     apple_variables: yes
-  when: not xcode11_installed.stat.exists and XCode11_7_SAS_TOKEN is defined
+  when: not xcode11_installed.stat.exists and vars['XCode11_7_SAS_TOKEN'] is defined
 
 - name: Display Information when XCode11_7_SAS_TOKEN is not defined
   debug:
@@ -19,21 +19,16 @@
           Skipping Xcode installation"
   when: not xcode11_installed.stat.exists and apple_variables is not defined
 
+- name: Download XCode 11.7 from Azure blob storage
+  get_url:
+    url: "https://ansiblestorageadopt.blob.core.windows.net/xcode11-7/Xcode_11.7.xip?{{ XCode11_7_SAS_TOKEN }}"
+    dest: /tmp/Xcode_11.7.xip
+    mode: 0755
+  when: not xcode11_installed.stat.exists and apple_variables is defined
+
 - name: Install Xcode11.7
   when: not xcode11_installed.stat.exists and apple_variables is defined
   block:
-    - name: Check for /tmp/Xcode_11.7.xip
-      stat:
-        path: /tmp/Xcode_11.7.xip
-      register: xcode11_7_xip
-
-    # Stored in Azure Blob Storage (SAS URL set to expire in 2033)
-    - name: Download XCode 11.7 from Azure blob storage
-      when: not xcode11_7_xip.stat.exists
-      get_url:
-        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode11-7/Xcode_11.7.xip?{{ XCode11_7_SAS_TOKEN }}"
-        dest: /tmp/Xcode_11.7.xip
-        mode: 0755
 
     - name: Extract Xcode11.7
       shell: xip -x /tmp/Xcode_11.7.xip

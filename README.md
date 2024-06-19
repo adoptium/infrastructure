@@ -118,11 +118,11 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
    to identify any potential problems. Allow jenkins to upgrade itself
 5. Redo step 1/2 so that any plugins that were unable to be updated due to
    the older jenkins level can update themselves.
-6. If necessary, and the remediation cannot be performed within the window,
-   identify potentially risky plugins that were held back and create an issue
-   to deal with them in the next cycle.
-
-(TODO: Publish and link to video of an upgrade session)
+6. If necessary, and the remediation cannot be performed within the
+   maintenance window, identify potentially risky plugins that were held
+   back and create an issue to deal with them in the next cycle.
+7. Backup the main war in /usr/share/jenkins to a name with a version suffix
+   in case of corruption to the main jar.
 
 ### Backups
 

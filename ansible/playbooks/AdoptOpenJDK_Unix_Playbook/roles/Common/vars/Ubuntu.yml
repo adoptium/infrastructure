@@ -48,6 +48,7 @@ Build_Tool_Packages:
   - ntp
   - pigz
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-dev
   - wget
   - zip
@@ -118,6 +119,7 @@ Test_Tool_Packages:
   - libexpat1-dev
   - libcurl4-openssl-dev
   - fakeroot
+  - jq                            # For parsing SBoM during reproducibility tests
   - gnutls-bin
   - libnss3
   - libnss3-tools

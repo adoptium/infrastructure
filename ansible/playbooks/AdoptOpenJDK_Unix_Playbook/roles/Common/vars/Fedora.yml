@@ -47,6 +47,7 @@ Build_Tool_Packages:
   - openssl-devel
   - perl-devel
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget
@@ -131,6 +132,7 @@ Test_Tool_Packages:
   - zlib-devel
   - perl-devel
   - expat-devel
+  - jq                            # For parsing SBoM during reproducibility tests
   - libcurl-devel
   - mercurial
   - gnutls

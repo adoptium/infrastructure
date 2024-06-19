@@ -39,6 +39,7 @@ Build_Tool_Packages:
   - ntp
   - numactl
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget

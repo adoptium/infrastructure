@@ -1,0 +1,20 @@
+---
+###############################
+# Adoptium - Ansible Playbook #
+###############################
+# This playbook is used to deploy static docker containers onto dockerhost machines
+# https://github.com/adoptium/infrastructure/issues/3370
+
+- name: Dockernode playbook
+  hosts: all
+  gather_facts: yes
+
+  roles:
+    - role: Debug
+      tags: debug
+    - role: Get_Vendor_Files
+      tags: deploy
+    - role: deploy_container
+      tags: deploy
+    - role: remove_container
+      tags: remove

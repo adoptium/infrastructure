@@ -31,6 +31,8 @@ Most Ansible changes are tested automatically with a series of CI jobs:
 | Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
 | Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 
+Please note that the Centos 6 & Alpine 3 build jobs, build a docker image but DO NOT PUSH to dockerhub. The job has a seperate configuration section to push to dockerhub when a PR is merged, however that function is disabled, and has been superceded by the Jenkins docker image updater job. The code has been left in place for two reasons, the first to allow the ability to re-enable quickly, and also to test the authentication job for the dockerhub credentials. These credentials are stored in GitHub and are managed by the EF infrastructure team.
+
 ## Running the ansible scripts on local machines
 
 The full documentation for running locally is at [ansible/README.md].
@@ -83,16 +85,39 @@ have at the moment:
 | Dockerfile | Image | Platforms  | Where is this built? | In use?
 |---|---|---|---|---|
 | [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
+| [RHEL7](./ansible/docker/Dockerfile.RHEL7) | n/a - restricted (*) | s390x | [Jenkins](https://ci.adoptium.net/job/rhel7_docker_image_updater/) | Yes
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
 | [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 | [Ubuntu 20.04 (riscv64 only)](./ansible/docker/Dockerfile.Ubuntu2004-riscv64) | [`adoptopenjdk/ubuntu2004_build_image:linux-riscv64`](https://hub.docker.com/r/adoptopenjdk/ubuntu2004_build_image) | linux/riscv64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 
+<details>
+<summary>(*) - Caveats:</summary>
+
+The RHEL7 image creation for s390x has to be run on a RHEL host using a
+container implementation supplied by Red Hat, and we are using RHEL8 for
+this as it has a stable implemention.  The image creation requires the
+following:
+
+1. The host needs to have an active RHEL subscription
+2. The RHEL7 devkit (which cannot be made public) to be available in a tar file under /usr/local on the host as per the name in the Dockerfile
+</details>
+
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
-the ansible playbooks and pushing them up to Docker Hub where they can be
-consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
-defined on the jenkins build pipelines as configured in the
-[pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+the ansible playbooks and - with the exception of the RHEL7 image for s390x -
+pushing them up to Docker Hub where they can be consumed by our jenkins
+build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
+pipelines as configured in the [pipeline_config
+files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+
+### Adding a new dockerBuild dockerhub repository
+
+To add a new repository to the [AdoptOpenJDK dockerhub](https://hub.docker.com/u/adoptopenjdk), a user with `owner` privileges must create the repository initially and then give the automated `adoptopenjdkuser` user read and write permissions.
+
+Users with `owner` privileges include:
+- Tim Ellison @tellison
+- George Adams @gadams
+- Martijn Verburg @karianna
 
 ## Adding a new role to the ansible scripts
 
@@ -197,8 +222,10 @@ is more information on running tests yourself in the
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of.
 These are the parameters to pass into a Grinder job in jenkins. If using
-these from the command line as per the example above, the `TARGET` name
-should have an underscore `_` prepended to it.
+these from the command line instead of a Grinder job there are a couple of
+things regarding the information in this table:
+- The `TARGET` name should have an underscore `_` prepended to it (like the shell snippet above)
+- For custom targets, specify it as a JDK_CUSTOM_TARGET variable to make e.g. `make _jdk_custom JDK_CUSTOM_TARGET=java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 | `BUILD_LIST` | `TARGET` | `CUSTOM_TARGET` | What does it test? |
 | --- | --- | --- | --- |
@@ -319,7 +346,7 @@ or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
 
 ## Patching
 
-At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines. 
+At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines.
 The Unix, Windows, MacOS and AIX playbooks are executed weekly onto our [machines](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) to keep them patched and up to date.
 
 For more information see https://github.com/adoptium/infrastructure/wiki/Ansible-AWX#schedules

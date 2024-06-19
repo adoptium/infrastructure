@@ -44,10 +44,13 @@ Build_Tool_Packages:
   - nss-devel
   - nss-tools
   - openssl-devel
+  - patch                         # For DevKit creation that runs "patch"
   - perl-devel
   - perl-IPC-Cmd                  # required for openssl v3 compiles
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
+  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - xz

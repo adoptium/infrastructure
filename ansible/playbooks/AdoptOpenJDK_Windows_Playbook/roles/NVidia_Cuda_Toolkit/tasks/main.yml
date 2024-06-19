@@ -2,9 +2,9 @@
 #######################
 # NVidia Cuda Toolkit #
 #######################
-- name: Check if NVidia CUDA toolkit is aready installed
+- name: Check if NVidia CUDA toolkit is already installed
   win_stat:
-    path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0'
+    path: 'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1'
   register: cuda_installed
   tags: NVidia_Cuda_Toolkit
 
@@ -39,7 +39,7 @@
   tags: NVidia_Cuda_Toolkit
 
 - name: Install NVidia CUDA toolkit - Windows 10
-  win_shell: C:\temp\cuda_9.1.85_win10_network.exe -s compiler_9.1 nvml_dev_9.1
+  win_shell: C:\temp\cuda_9.1.85_win10_network.exe -s nvcc_9.1 nvml_dev_9.1
   when: (not cuda_installed.stat.exists and ansible_distribution_major_version == "10")
   tags: NVidia_Cuda_Toolkit
 

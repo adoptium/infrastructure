@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -k)
       KEY="$2"
-      shift 2 
+      shift 2
       ;;
     -*|--*)
       echo "Unknown option $1"
