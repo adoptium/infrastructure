@@ -24,7 +24,10 @@ jobs:
 
     - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
-    - name: Install dependencies
+    - name: Install Python
+      run: brew install python@3.12 --overwrite
+
+    - name: Install Ansible
       run: brew install ansible
 
     # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
