@@ -1,4 +1,17 @@
 ---
+
+- name: Set docker build command
+  set_fact:
+    docker_build_command: "docker build"
+    arm32_suffix: ""
+
+- name: Set docker buildx command if building arm32 container
+  set_fact:
+    docker_build_command: "docker buildx build --platform linux/v7/arm"
+    arm32_suffix: ".ARM32"
+    ansible_architecture: arm
+  when: build_arm32 is defined and build_arm32 == "yes"
+
 # Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
 - name: Transfer dockerfile
   copy:
@@ -19,8 +32,8 @@
     regexp: "Jenkins_User_SSHKey"
     replace: "{{ Jenkins_User_SSHKey }}"
 
-- name: Build {{ docker_image }} docker images
-  command: docker build --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/
+- name: Build {{ docker_image }} docker images {{ docker_build_command }}
+  command: "{{ docker_build_command }} --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }}{{ arm32_suffix }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/"
 
 # Finds the highest port number already assigned and +1
 - name: Find available port
@@ -38,4 +51,4 @@
   when: not (docker_port_output.stdout == "")
 
 - name: Run {{ docker_image }} docker container
-  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }} aqa_{{ docker_image }}
+  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix }} aqa_{{ docker_image }}{{ arm32_suffix }}
