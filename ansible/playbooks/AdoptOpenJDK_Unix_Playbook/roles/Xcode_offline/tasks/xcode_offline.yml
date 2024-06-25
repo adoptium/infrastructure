@@ -1,0 +1,48 @@
+---
+- name: Check xcode version
+  shell: xcodebuild -version
+  register: xcodebuild_version
+  failed_when: false
+  tags: xcode_offline
+
+- name: Install and configure xcode if not installed
+  when: "'Xcode ' + xcode_version not in xcodebuild_version.stdout"
+  tags: xcode_offline
+  block:
+
+    - name: Display xcode version
+      debug:
+        var: xcodebuild_version
+
+    - name: Copy xcode file to remote host
+      copy:
+        src: Xcode_{{ xcode_version }}.xip
+        dest: '~'
+        force: false
+
+    - name: Install xcode {{ xcode_version }}
+      shell: |
+        xip -x ~/Xcode_{{ xcode_version }}.xip
+      args:
+        chdir: /Applications
+      become: true
+      become_user: "{{ ansible_user }}"
+
+    - name: Configure xcode {{ xcode_version }}
+      become: true
+      shell: |
+        xcode-select -s /Applications/Xcode.app/Contents/Developer
+        xcodebuild -license accept
+
+    - name: Clean up after install Xcode
+      shell: |
+        rm ~/Xcode_{{ xcode_version }}.xip
+
+    - name: Check xcode version
+      shell: xcodebuild -version
+      register: output
+      ignore_errors: true
+
+    - name: Check if xcode version is correct
+      debug:
+        var: output
