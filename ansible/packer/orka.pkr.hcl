@@ -45,6 +45,13 @@ build {
     "macstadium-orka.sonoma-intel"
   ]
 
+  # Ensure ansible package is up to date
+  provisioner "shell" {
+    inline = [
+      "source /Users/admin/.zprofile; brew upgrade ansible",
+    ]
+  }
+
   # Create /tmp/packer-provisioner-ansible-local
   provisioner "shell" {
     inline = [
