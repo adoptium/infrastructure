@@ -9,6 +9,7 @@ Build_Tool_Packages:
   - autoconf
   - automake # for compiling freetype on JDK8u
   - coreutils
+  - git
   - gnupg
   - gnu-sed
   - gnu-tar
