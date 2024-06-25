@@ -22,7 +22,7 @@ jobs:
     # Upstream Bug : https://github.com/actions/runner-images/issues/9777
     - name: Replace keyserver address with IP address
       run: |
-        sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
+        sed -i 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
 
     - name: Install openconnect
       run: sudo apt-get install -y openconnect
