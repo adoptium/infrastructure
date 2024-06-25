@@ -44,7 +44,7 @@
   win_shell: wix --version
   register: installed_wix_version
   become_user: "{{ Jenkins_Username }}"
-  become_method: runas
+  become_method: ansible.builtin.runas
   become: true
   when: wix_installed.stat.exists
   tags: Wix
@@ -52,7 +52,7 @@
 - name: Install Wix Toolset when not installed or version is not correct
   win_shell: dotnet tool install --global wix --version {{ wix_version }}
   become_user: "{{ Jenkins_Username }}"
-  become_method: runas
+  become_method: ansible.builtin.runas
   become: true
   when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
   register: wixinstall_out
