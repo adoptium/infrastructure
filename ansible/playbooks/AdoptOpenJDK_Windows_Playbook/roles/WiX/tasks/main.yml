@@ -55,7 +55,6 @@
   become_method: ansible.builtin.runas
   become: true
   when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
-  register: wixinstall_out
   tags: Wix
 
 - name: Delete downloaded .NET installer
