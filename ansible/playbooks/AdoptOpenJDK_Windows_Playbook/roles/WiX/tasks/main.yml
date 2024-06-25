@@ -63,4 +63,3 @@
     path: 'C:\temp\dotnet-install.exe'
     state: absent
   tags: Wix
-
