@@ -76,6 +76,7 @@
     - 62.210.163.106 # jck-scaleway-ubuntu2310-riscv64-2
     - 20.234.51.61 # jck-azure-ubuntu2204-x64-1
     - 172.178.96.199 # jck-ubuntu-2204-solaris10
+    - 62.210.163.131 # jck-rise-ubuntu2404-risc64-1
 
 - name: Setup iptables
   iptables:

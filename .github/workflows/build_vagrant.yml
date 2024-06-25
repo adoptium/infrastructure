@@ -19,16 +19,29 @@ permissions:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
 
-    - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+    # As Solaris Needs An Older Version Of Ansible/Python
+    # Use Python2 & Pip To Install On Ubuntu 22.04
+    # Rather Than The System Packages
+    
+    - name: Install Python 2
+      run: sudo apt-get install python2
+    
+    - name: Python 2 Get Pip Bootstrap Script
+      run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+
+    - name: Python 2 Get Pip
+      run: sudo python2 get-pip.py
+
+    - name: Install Ansible Using PIP2
+      run: pip2 install ansible
 
     - name: Update Repos
       run: sudo apt-get update
-      
-    - name: Install Ansible
-      run: sudo apt-get install ansible
 
     - name: Install VirtualBox
       run: sudo apt-get install virtualbox

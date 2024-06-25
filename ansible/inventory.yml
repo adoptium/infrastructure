@@ -102,6 +102,7 @@ hosts:
           ubuntu1804-armv8-2: {ip: 114.119.175.125}
 
       - azure:
+          ubuntu2404-x64-1: {ip: 20.115.98.159, user: azureuser}
           win2016-x64-1: {ip: 172.172.147.29, user: adoptopenjdk}
           win2019-x64-1: {ip: 13.92.177.186, user: adoptopenjdk}
           win2022-x64-1: {ip: 51.132.234.42, user: adoptopenjdk}
@@ -128,6 +129,7 @@ hosts:
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
+          ubuntu2404-aarch64-1: {ip: 140.211.169.12, user: ubuntu}
 
       - macincloud:
           macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
