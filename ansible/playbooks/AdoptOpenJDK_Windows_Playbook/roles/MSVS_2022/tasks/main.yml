@@ -64,10 +64,10 @@
     # When Installing From The Layout, We Need To Ensure the x86 installer is not detected.
     - name: Rename x86 Installer When Installing VS2022 from the Adoptium Layout
       win_shell: |
-        Rename-Item -Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer" -NewName "Installer.old"
+        Rename-Item -Path "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer" -NewName "Installer.old"
       args:
         executable: powershell
-        creates: "C:\Program Files (x86)\Microsoft Visual Studio\Installer.old"
+        creates: "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer.old"
       when: (vs2022_layout_ready.stat.exists)
 
     - name: Run Visual Studio 2022 Installer From Layout
