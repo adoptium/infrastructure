@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
     adoptopenjdkW2022.vm.synced_folder ".", "/vagrant"
     adoptopenjdkW2022.vm.network :private_network, type: "dhcp"
     adoptopenjdkW2022.vm.provision "shell", inline: $script, privileged: false
-    adoptopenjdkW2022.disksize.size = '130GB'
+    adoptopenjdkW2022.disksize.size = '131GB'
   end
   config.vm.provider "virtualbox" do |v|
     v.gui = false
