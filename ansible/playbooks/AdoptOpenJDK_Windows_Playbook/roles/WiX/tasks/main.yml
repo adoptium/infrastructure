@@ -13,11 +13,38 @@
   register: wix_installed
   tags: Wix
 
+- name: Test if DotNet SDK is already installed
+  win_stat:
+    path: 'C:\\Program Files\dotnet\dotnet.exe'
+  register: dotnet_installed
+  tags: Wix
+
+- name: Download .NET Installer
+  win_get_url:
+    url: https://download.visualstudio.microsoft.com/download/pr/b6f19ef3-52ca-40b1-b78b-0712d3c8bf4d/426bd0d376479d551ce4d5ac0ecf63a5/dotnet-sdk-8.0.302-win-x64.exe
+    dest: 'C:\temp\dotnet-install.exe'
+    checksum: bc6019e0192edd180ca7b299a16b95327941b0b53806cdb125be194aea12492d
+    checksum_algorithm: sha256
+  when: (not dotnet_installed.stat.exists)
+  tags: Wix
+
+- name: Install .NET SDK If dotnet not installed
+  raw: C:\temp\dotnet-install.exe /quiet
+  when: (not dotnet_installed.stat.exists)
+  tags: Wix
+
+- name: Test if WiX is already installed
+  win_stat:
+    path: 'C:\\Users\{{ Jenkins_Username }}\.dotnet/tools/wix'
+  register: wix_installed
+  tags: Wix
+
 - name: Test WiX version
   # generates an output like 5.0.0+41e11442
   win_shell: wix --version
   register: installed_wix_version
   become_user: "{{ Jenkins_Username }}"
+  become_method: ansible.builtin.runas
   become: true
   when: wix_installed.stat.exists
   tags: Wix
@@ -25,6 +52,13 @@
 - name: Install Wix Toolset when not installed or version is not correct
   win_shell: dotnet tool install --global wix --version {{ wix_version }}
   become_user: "{{ Jenkins_Username }}"
+  become_method: ansible.builtin.runas
   become: true
   when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
+  tags: Wix
+
+- name: Delete downloaded .NET installer
+  win_file:
+    path: 'C:\temp\dotnet-install.exe'
+    state: absent
   tags: Wix
