@@ -25,7 +25,7 @@
 - name: Import GPG Signing Key
   win_shell: |
     C:/cygwin64/bin/bash.exe -c "gpg --batch --import c:/temp/gpgkey.asc"
-  ignore_errors: yes
+  failed_when: false
 
 - name: Get signature file
   win_command: wget -q "{{ signature_link }}" -O sigfile
