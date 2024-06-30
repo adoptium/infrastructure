@@ -27,6 +27,14 @@
     C:/cygwin64/bin/bash.exe -c "gpg --batch --import c:/temp/gpgkey.asc"
   failed_when: false
 
+- name: Re-enable gpgagent
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/gpg-agent"
+  when: true
+
+- name: Re-enable dirmngr
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/dirmngr"
+  when: true
+
 - name: Get signature file
   win_command: wget -q "{{ signature_link }}" -O sigfile
 
@@ -36,12 +44,6 @@
 - name: Remove gnupg directory with Cygwin ( when it didnt exist previously )
   win_shell: C:/cygwin64/bin/bash.exe -c "rm -rf ~/.gnupg"
   when: (not gnupg_check.stat.exists)
-
-- name: Re-enable gpgagent
-  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/gpg-agent"
-
-- name: Re-enable dirmngr
-  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/dirmngr"
 
 - name: Remove Downloaded GPG Key
   win_file:
