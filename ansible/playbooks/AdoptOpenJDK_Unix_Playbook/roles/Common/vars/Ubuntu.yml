@@ -101,7 +101,6 @@ Additional_Build_Tools_riscv64:
   - gcc-10
   - g++-10
   - openjdk-11-jdk
-  - openjdk-17-jdk
   - libatomic1
 
 Additional_Build_Tools_Ubuntu20:
