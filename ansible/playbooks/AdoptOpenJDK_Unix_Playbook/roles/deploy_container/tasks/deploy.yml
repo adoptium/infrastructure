@@ -3,6 +3,7 @@
 - name: Set docker build command
   set_fact:
     docker_build_command: "docker build"
+    docker_run_command: "docker run"
     arm32_suffix: ""
 
 - name: Set docker buildx command if building arm32 container
@@ -10,6 +11,7 @@
     docker_build_command: "docker buildx build --platform linux/v7/arm"
     arm32_suffix: ".ARM32"
     ansible_architecture: arm
+    docker_run_command: "docker run --platform linux/v7/arm"
   when: build_arm32 is defined and build_arm32 == "yes"
 
 # Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
@@ -51,4 +53,4 @@
   when: not (docker_port_output.stdout == "")
 
 - name: Run {{ docker_image }} docker container
-  command: docker run --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus="0-3" --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix }} aqa_{{ docker_image }}{{ arm32_suffix }}
+  command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus='0-3' --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix }} aqa_{{ docker_image }}{{ arm32_suffix }}"
