@@ -3,8 +3,11 @@ FROM centos:7
 ARG git_sha
 ARG user=jenkins
 
-RUN yum -y update; yum -y install epel-release
-RUN yum -y install ansible sudo; yum clean all
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    yum -y update; yum clean all; \
+    yum -y install epel-release; \
+    yum -y install ansible sudo; yum clean all
 
 COPY . /ansible
 
