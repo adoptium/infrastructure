@@ -9,7 +9,7 @@
 
 - name: Test if WiX is already installed
   win_stat:
-    path: 'C:\\Users\{{ Jenkins_Username }}\.dotnet/tools/wix'
+    path: 'C:\\Program Files\\dotnet\\wix.exe'
   register: wix_installed
   tags: Wix
 
@@ -35,7 +35,7 @@
 
 - name: Test if WiX is already installed
   win_stat:
-    path: 'C:\\Users\{{ Jenkins_Username }}\.dotnet/tools/wix'
+    path: 'C:\\Program Files\\dotnet\\wix.exe'
   register: wix_installed
   tags: Wix
 
@@ -43,17 +43,11 @@
   # generates an output like 5.0.0+41e11442
   win_shell: wix --version
   register: installed_wix_version
-  become_user: "{{ Jenkins_Username }}"
-  become_method: ansible.builtin.runas
-  become: true
   when: wix_installed.stat.exists
   tags: Wix
 
 - name: Install Wix Toolset when not installed or version is not correct
-  win_shell: dotnet tool install --global wix --version {{ wix_version }}
-  become_user: "{{ Jenkins_Username }}"
-  become_method: ansible.builtin.runas
-  become: true
+  win_shell: dotnet tool install wix --version {{ wix_version }} --tool-path 'C:\\Program Files\\dotnet'
   when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
   tags: Wix
 
