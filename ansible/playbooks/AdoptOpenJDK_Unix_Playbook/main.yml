@@ -73,13 +73,13 @@
     - role: gcc_11                # JDK19+
       tags: [build_tools]
     - role: devkit                # JDK19+
-      devkit_version: gcc-11.3.0-Centos7.9.2009-b02
+      devkit_version: gcc-11.3.0-Centos7.9.2009-b03
       when:
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
       tags: [devkit]
     - role: devkit                # JDK19+
-      devkit_version: gcc-11.3.0-Centos7.6.1810-b02
+      devkit_version: gcc-11.3.0-Centos7.6.1810-b03
       when:
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "aarch64"
