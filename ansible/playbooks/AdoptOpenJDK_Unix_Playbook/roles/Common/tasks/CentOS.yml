@@ -153,6 +153,45 @@
     - ansible_architecture == "x86_64" and ansible_distribution_major_version == "6"
   tags: build_tools
 
+- name: Change the baseurl for CentOS SCL (CentOS7)
+  lineinfile:
+    path: /etc/yum.repos.d/CentOS-SCLo-scl.repo
+    regexp: '^# baseurl=http://mirror.centos.org/centos/7/sclo/\$basearch/sclo/'
+    line: 'baseurl=https://vault.centos.org/7.9.2009/sclo/$basearch/sclo/'
+    state: present
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+  tags: build_tools
+
+- name: Change the baseurl for CentOS SCL RH (CentOS7)
+  lineinfile:
+    path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+    regexp: '^#baseurl=http://mirror.centos.org/centos/7/sclo/\$basearch/rh/'
+    line: 'baseurl=https://vault.centos.org/7.9.2009/sclo/$basearch/rh/'
+    state: present
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+  tags: build_tools
+
+# - name: Remove the mirrorlist URL for Centos 7 SCL Repositories
+#   shell: |
+#     sed -i -e 's!^mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+#   when:
+#     - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+#   tags: build_tools
+
+- name: Remove the mirrorlist URL for Centos 7 SCL Repositories
+  lineinfile:
+    path: "{{ item }}"
+    regexp: '^mirrorlist'
+    line: '#mirrorlist'
+    state: present
+  with_fileglob:
+    - /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+  tags: build_tools
+
 - name: Install additional build tools for CentOS on x86
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
