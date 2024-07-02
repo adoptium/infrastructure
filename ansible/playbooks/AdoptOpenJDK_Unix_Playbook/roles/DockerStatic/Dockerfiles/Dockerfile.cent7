@@ -56,6 +56,7 @@ RUN cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && mak
 # Remove Git from Yum
 RUN rpm -e --nodeps git
 RUN ln -s /usr/local/bin/git /usr/bin/git
+RUN rm -rf /tmp/git*
 
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
