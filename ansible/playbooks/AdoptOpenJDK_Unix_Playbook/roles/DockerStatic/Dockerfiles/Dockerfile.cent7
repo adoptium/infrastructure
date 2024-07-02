@@ -1,5 +1,21 @@
 FROM centos:7
 
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+
+RUN if [ "$(uname -m)" = "aarch64" ]; then \
+      echo "Running on arm64 architecture"; \
+      sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
+    elif [ "$(uname -m)" = "ppc64le" ]; then \
+      echo "Running on ppc64le architecture"; \
+      sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
+    else \
+      # Default To x64; \
+      echo "Running on another architecture"; \
+      sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    fi
+
+RUN yum -y update; yum clean all; \
+
 RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release
 # Install OpenSSL Packages
 RUN yum install -y gnutls gnutls-utils nss-devel nss-tools
