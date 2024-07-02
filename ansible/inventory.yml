@@ -148,13 +148,13 @@ hosts:
       - rise:
           ubuntu2310-riscv64-1: {ip: 62.210.163.38, user: ubuntu}
           ubuntu2310-riscv64-2: {ip: 62.210.163.36, user: ubuntu}
-          ubuntu2310-riscv64-3: {ip: 62.210.163.3, user: ubuntu}
-          ubuntu2310-riscv64-4: {ip: 62.210.163.137, user: ubuntu}
-          ubuntu2310-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
           ubuntu2404-riscv64-1: {ip: 62.210.163.41, user: ubuntu}
           ubuntu2404-riscv64-2: {ip: 62.210.163.196, user: ubuntu}
           ubuntu2404-riscv64-3: {ip: 62.210.163.99, user: ubuntu}
           ubuntu2404-riscv64-4: {ip: 62.210.163.103, user: ubuntu}
+          ubuntu2404-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
+          ubuntu2404-riscv64-6: {ip: 62.210.163.135, user: ubuntu}
+          ubuntu2404-riscv64-7: {ip: 62.210.163.137, user: ubuntu}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
