@@ -14,9 +14,9 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
       sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
     fi
 
-RUN yum -y update; yum clean all; \
+RUN yum -y update && yum clean all
 
-RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest gettext zlib-devel git curl make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb
 # Install OpenSSL Packages
 RUN yum install -y gnutls gnutls-utils nss-devel nss-tools
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
@@ -45,9 +45,21 @@ RUN mkdir /home/jenkins/.ssh
 RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
+
+# Install Git 2.15.0 from source
+
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz -O /tmp/git-2.15.0.tar.xz
+RUN echo "107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a  /tmp/git-2.15.0.tar.xz" > /tmp/git.256
+RUN sha256sum --check --strict /tmp/git.256
+RUN tar xvf /tmp/git-2.15.0.tar.xz -C /tmp/
+RUN cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j 4 && make install
+# Remove Git from Yum
+RUN rpm -e --nodeps git
+RUN ln -s /usr/local/bin/git /usr/bin/git
+
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
-RUN yum install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot
+RUN yum update -y
 # ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
