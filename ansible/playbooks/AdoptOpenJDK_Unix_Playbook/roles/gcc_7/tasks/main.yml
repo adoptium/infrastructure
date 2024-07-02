@@ -7,7 +7,9 @@
   shell: /usr/local/gcc/bin/gcc-7.5 --version 2>&1 > /dev/null
   failed_when: false
   register: gcc7_installed
-  when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
   changed_when: false
   tags: gcc_7
 
@@ -30,6 +32,7 @@
     checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + gccsuffix) }}"
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
     - gcc7_installed.rc != 0
   tags: gcc_7
 
@@ -40,6 +43,7 @@
     copy: False
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
     - gcc7_installed.rc != 0
   tags: gcc_7
 
@@ -49,6 +53,7 @@
     state: absent
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
     - gcc7_installed.rc != 0
   tags: gcc_7
 
@@ -60,6 +65,7 @@
   register: ccache_symlink
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
   tags: gcc_7
 
 - name: Create symlink for ccache
@@ -69,5 +75,6 @@
     state: link
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE" or (ansible_architecture == "armv7l" and ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or ansible_distribution == "Debian")) or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 22)
+    - ansible_architecture != "riscv64"
     - not ccache_symlink.stat.exists
   tags: gcc_7

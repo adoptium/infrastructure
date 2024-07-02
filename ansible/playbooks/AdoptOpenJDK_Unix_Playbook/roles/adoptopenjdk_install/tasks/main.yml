@@ -150,7 +150,7 @@
     - ansible_distribution != "MacOSX"
     - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
     - ansible_os_family != "Solaris"
-    - not (ansible_architecture == "riscv64" and (jdk_version == 21 or jdk_version == 20 or jdk_version == 19 or jdk_version == 17 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 17, 19, 21 are special cased
+    - not (ansible_architecture == "riscv64" and (jdk_version == 20 or jdk_version == 19 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 19, 20 are not GA
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
     # Api does not return release information for JDK10
@@ -160,6 +160,7 @@
       when:
         - jdk_version != 10 and jdk_version != 16
         - not (jdk_version == 8 and ansible_architecture == "s390x")
+        - not (jdk_version == 11 and ansible_architecture == "riscv64")
       register: sig_output
 
     - name: Download latest release (Linux/Alpine-Linux)
@@ -170,6 +171,7 @@
       retries: 3
       delay: 5
       register: adoptopenjdk_download
+      when: not (jdk_version == 11 and ansible_architecture == "riscv64")
       until: adoptopenjdk_download is not failed
 
     - name: GPG Signature verification (Linux/Alpine-Linux)
@@ -187,98 +189,6 @@
     - name: Remove jdk{{ jdk_version }}.tar.gz (Linux/Alpine-Linux)
       file:
         path: /tmp/jdk{{ jdk_version }}.tar.gz
-        state: absent
-
-# JDK 21 on Linux-riscv64 is a special-case because JDK 21 is the first version that supports
-# RISC-V. There is also no JDK 21 or 20 available on Ubuntu 20.04 that we can use as boot JDK.
-- name: Install JDK {{ jdk_version }} on Linux-riscv64
-  when:
-    - ansible_architecture == "riscv64" and jdk_version == 21
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
-    # Api does not return release information for JDK10
-  block:
-    - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
-      get_url:
-        url: https://api.adoptium.net/v3/binary/version/jdk-21.0.1+12.1-ea-beta/linux/riscv64/jdk/hotspot/normal/adoptium
-        dest: /tmp/jdk21.tar.gz
-        mode: 0440
-        checksum: sha256:45baa6571849e4a93b76156a96a4eb83c0398f410d4542b8039a4e097c7c2161
-      retries: 3
-      delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
-
-    - name: Install latest jdk{{ jdk_version }} release if one not already installed (Linux-riscv64)
-      unarchive:
-        src: /tmp/jdk21.tar.gz
-        dest: /usr/lib/jvm
-        remote_src: yes
-
-    - name: Remove jdk21.tar.gz (Linux-riscv64)
-      file:
-        path: /tmp/jdk21.tar.gz
-        state: absent
-
-# JDK 19 on Linux-riscv64 is a special-case because JDK 19 is the first version that supports
-# RISC-V. There is also no JDK 19 or 20 available on Ubuntu 20.04 that we can use as boot JDK.
-- name: Install JDK {{ jdk_version }} on Linux-riscv64
-  when:
-    - ansible_architecture == "riscv64" and jdk_version == 19
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
-    # Api does not return release information for JDK10
-  block:
-    - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
-      get_url:
-        url: https://ci.adoptium.net/userContent/riscv/jdk19u-riscv64-20231107.glib227.tar.gz
-        dest: /tmp/jdk19.tar.gz
-        mode: 0440
-      retries: 3
-      delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
-
-    - name: Install latest jdk{{ jdk_version }} release if one not already installed (Linux-riscv64)
-      unarchive:
-        src: /tmp/jdk19.tar.gz
-        dest: /usr/lib/jvm
-        remote_src: yes
-
-    - name: Remove jdk19.tar.gz (Linux-riscv64)
-      file:
-        path: /tmp/jdk19.tar.gz
-        state: absent
-
-# JDK 17 on Linux-riscv64 is a special-case because the Ubuntu openjdk-17-jdk package doesn't seem
-# to work on VF2.
-- name: Install JDK {{ jdk_version }} on Linux-riscv64
-  when:
-    - ansible_architecture == "riscv64" and jdk_version == 17
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
-    # Api does not return release information for JDK10
-  block:
-    - name: Download jdk{{ jdk_version }} release (Linux-riscv64)
-      get_url:
-        url: https://ci.adoptium.net/userContent/riscv/jdk17u-riscv64-17.0.9+9-ea-cross-20231221.tar.gz
-        dest: /tmp/jdk17.tar.gz
-        mode: 0440
-        checksum: sha256:7b84db96e69f075dbea49164f866d7296b1f2f7a45961978155505d4fd07b0e4
-      retries: 3
-      delay: 5
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
-
-    - name: Install latest jdk{{ jdk_version }} release if one not already installed (Linux-riscv64)
-      unarchive:
-        src: /tmp/jdk17.tar.gz
-        dest: /usr/lib/jvm
-        remote_src: yes
-
-    - name: Remove jdk17.tar.gz (Linux-riscv64)
-      file:
-        path: /tmp/jdk17.tar.gz
         state: absent
 
 # JDK 11 on Linux-riscv64 is a special-case because the Ubuntu openjdk-11-jdk package is just too
@@ -311,6 +221,7 @@
       file:
         path: /tmp/jdk11.tar.gz
         state: absent
+
 
 # # CentOS6 needs it's own task so it can use a different python interpreter.
 # # See: https://github.com/adoptium/infrastructure/issues/1877
