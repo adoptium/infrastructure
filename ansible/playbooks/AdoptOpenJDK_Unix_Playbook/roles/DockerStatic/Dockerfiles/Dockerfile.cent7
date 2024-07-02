@@ -16,7 +16,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 
 RUN yum -y update && yum clean all
 
-RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest-SHA gettext zlib-devel git curl make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest-SHA perl-Data-Dumper gettext zlib-devel git curl make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb
 # Install OpenSSL Packages
 RUN yum install -y gnutls gnutls-utils nss-devel nss-tools
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
