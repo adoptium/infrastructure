@@ -89,7 +89,7 @@ usage()
   --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
   --skip-more | -sm              Run playbook faster by excluding things not required by buildJDK
-	--use-adopt | -ua              Use the local Adoptium vagrantfile instead of the standard (.Adopt extension on Vagrantfile)
+  --use-adopt | -ua              Use the local Adoptium vagrantfile instead of the standard (.Adopt extension on Vagrantfile)
   --help | -h                    Displays this help message
   -V                             Apply verbose option to 'ansible-playbook', up to '-VVVV'"
 }
@@ -251,9 +251,9 @@ startVMPlaybook()
 
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
 	if [ "$newVagrantFiles" = "true" ]; then
-    ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
 	else
-  	ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
 	fi
 
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
@@ -334,17 +334,17 @@ startVMPlaybookWin()
 
 	if [ "$newVagrantFiles" = "true" ]; then
 	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
-			echo "Use Adoptium Box For Win2022"
-		  ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+	    echo "Use Adoptium Box For Win2022"
+		ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
 	  else
-			ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	    ln -sf vagrant/Vagrantfile.$OS Vagrantfile
 	  fi
 	else
 		if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
-			echo "Use Adoptium Box For Win2022"
-	    ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+		  echo "Use Adoptium Box For Win2022"
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS.Adopt Vagrantfile
 		else
-			ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
 		fi
 	fi
 
