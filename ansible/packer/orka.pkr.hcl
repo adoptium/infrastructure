@@ -47,6 +47,8 @@ build {
 
   # Ensure ansible package is up to date
   provisioner "shell" {
+    # Only needed on arm64 as we rebuild intel base frequently
+    only = ["macstadium-orka.sonoma-arm64"]
     inline = [
       "source /Users/admin/.zprofile; brew upgrade ansible",
     ]
