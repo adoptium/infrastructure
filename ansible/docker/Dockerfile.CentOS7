@@ -9,7 +9,7 @@ RUN if [ "$(uname -m)" == "x86_64" ]; then \
       echo "Running on x64 architecture"; \
       sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
     else \
-      echo "Running on another architecture"; \
+      echo "Running on non-x64 architecture"; \
       sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
     fi
 
