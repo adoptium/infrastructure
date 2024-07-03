@@ -40,8 +40,14 @@ jobs:
     - name: Init Packer
       run: packer init orka.pkr.hcl
       working-directory: ansible/packer
+    
+    - name: Run Packer (base image)
+      # Skip arm64 for now as Xcode download takes too long
+      if: matrix.os != 'sonoma-arm64'
+      run: packer build --only=macstadium-orka.${{ matrix.os }} orka-base.pkr.hcl
+      working-directory: ansible/packer
 
-    - name: Run Packer
+    - name: Run Packer (final image)
       run: packer build --only=macstadium-orka.${{ matrix.os }} orka.pkr.hcl
       working-directory: ansible/packer
       env:
