@@ -90,6 +90,7 @@ Additional_Build_Tools_RHEL7_s390x:
   - glibc.s390                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
+  - yum-utils                     # yumdownloader required for devkit creation
 
 Java_RHEL8:
   - java-1.8.0-openjdk-devel
