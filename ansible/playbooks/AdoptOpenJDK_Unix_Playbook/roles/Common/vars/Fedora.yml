@@ -138,5 +138,6 @@ Test_Tool_Packages:
   - gnutls
   - gnutls-utils
   - libnss3.so
+  - shared-mime-info
   - nss-devel
   - nss-tools

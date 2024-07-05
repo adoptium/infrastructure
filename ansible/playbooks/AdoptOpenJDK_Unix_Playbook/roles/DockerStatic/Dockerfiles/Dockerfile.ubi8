@@ -54,7 +54,7 @@ RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
-RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils
+RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info
 RUN dnf install -y coreutils --allowerasing
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools
