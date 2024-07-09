@@ -11,12 +11,13 @@ SCRIPT
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
-  config.vm.define :adoptopenjdkF35 do |adoptopenjdkF35|
-    adoptopenjdkF35.vm.box = "generic/fedora35"
-    adoptopenjdkF35.vm.synced_folder ".", "/vagrant"
-    adoptopenjdkF35.vm.hostname = "adoptopenjdkF35"
-    adoptopenjdkF35.vm.network :private_network, type: "dhcp"
-    adoptopenjdkF35.vm.provision "shell", inline: $script, privileged: false
+  config.vm.define :adoptopenjdkF40 do |adoptopenjdkF40|
+    adoptopenjdkF40.vm.box = "bento/fedora-40"
+    adoptopenjdkF40.vm.box_version = "202404.23.0"
+    adoptopenjdkF40.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkF40.vm.hostname = "adoptopenjdkF40"
+    adoptopenjdkF40.vm.network :private_network, type: "dhcp"
+    adoptopenjdkF40.vm.provision "shell", inline: $script, privileged: false
   end
   config.vm.provider "virtualbox" do |v|
     v.gui = false
