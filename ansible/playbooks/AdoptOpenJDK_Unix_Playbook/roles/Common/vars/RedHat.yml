@@ -118,5 +118,6 @@ Test_Tool_Packages:
   - mercurial
   - gnutls
   - gnutls-utils
+  - shared-mime-info
   - nss-devel
   - nss-tools

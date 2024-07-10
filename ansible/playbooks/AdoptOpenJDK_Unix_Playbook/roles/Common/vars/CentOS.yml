@@ -116,5 +116,6 @@ Test_Tool_Packages:
   - fakeroot
   - gnutls
   - gnutls-utils
+  - shared-mime-info
   - nss-devel
   - nss-tools
