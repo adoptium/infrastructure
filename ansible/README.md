@@ -106,7 +106,6 @@ The main ones are as follows:
 - AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
 - AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
 - AdoptOpenJDK_AIX_Playbook/main.yml (For AIX systems)
-- AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
 
 There are also various playbooks used to set up other machines in the
 adoptopenjdk infrastructure - generally most end users won't need these but
