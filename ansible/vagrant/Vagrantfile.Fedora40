@@ -2,6 +2,11 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+
+# Install python2, make it the default python
+sudo dnf -y install python2
+sudo ln -s /usr/bin/python2 /usr/bin/python
+
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
