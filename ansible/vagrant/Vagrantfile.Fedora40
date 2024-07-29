@@ -7,7 +7,7 @@ $script = <<SCRIPT
 sudo dnf -y install python3.8
 sudo ln -s /usr/bin/python3.8 /usr/bin/python
 
-#sudo dnf -y install python3-libselinux
+sudo dnf -y install python3-libselinux
 
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
