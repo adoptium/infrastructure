@@ -11,6 +11,7 @@ $script = <<SCRIPT
 
 sudo dnf -y update
 sudo dnf install -y ansible
+sudo dnf install -y python2
 sudo mkdir /ansible
 sudo cp /etc/ansible/ansible.cfg /ansible
 sudo touch /ansible/hosts
