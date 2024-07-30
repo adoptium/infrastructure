@@ -8,8 +8,8 @@ sudo dnf -y install python3.8
 sudo curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
 sudo python3.8 /tmp/get-pip.py
 sudo pip install selinux
-#rm /usr/bin/python3
-#ln -s /usr/bin/python3.8 /usr/bin/python3
+rm /usr/bin/python3
+ln -s /usr/bin/python3.8 /usr/bin/python3
 
 # Put the host machine's IP into the authorised_keys file on the VM
 if [ -r /vagrant/id_rsa.pub ]; then
