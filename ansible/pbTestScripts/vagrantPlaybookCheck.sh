@@ -267,16 +267,15 @@ startVMPlaybook()
 
 	rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
 	echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-
-	# For OSs that require an earlier version of python to be compatible with the version of Ansible on the host
-	if [[ "$OS" == "Fedora40" ]]; then
-		echo "[127.0.0.1]:${vagrantPORT} ansible_python_interpreter=/usr/bin/python3.8" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-	fi
-	
 	# Remove IP from known_hosts if already found
 	# ssh-keygen -R will fail if the known_hosts file does not exist
 	[ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
+
+	# For OSs that require an earlier version of python to be compatible with the version of Ansible on the host
+	if [ "$OS" == "Fedora40" ]; then
+		echo "[127.0.0.1]:${vagrantPORT} ansible_python_interpreter=/usr/bin/python3.8" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+	fi
 
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg

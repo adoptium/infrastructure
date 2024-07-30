@@ -70,7 +70,7 @@ checkOS() {
   	"Windows2022" | "Win2022" | "W22" | "w22" )
 	                       osToDestroy="W2022";;
 	              "all" )
-                        osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012 W2022" ;;
+                        osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 F40 FBSD12 Sol10 W2012 W2022" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
