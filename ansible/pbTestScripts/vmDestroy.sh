@@ -50,19 +50,21 @@ checkOS() {
                 "Ubuntu2204" | "U22" | "u22" )
                         osToDestroy="U22";;
                 "CentOS6" | "centos6" | "C6" | "c6" )
-                        osToDestroy="C6" ;;
+                        osToDestroy="C6";;
                 "CentOS7" | "centos7" | "C7" | "c7" )
-                        osToDestroy="C7" ;;
+                        osToDestroy="C7";;
                 "CentOS8" | "centos8" | "C8" | "c8" )
-                        osToDestroy="C8" ;;
+                        osToDestroy="C8";;
                 "Debian8" | "debian8" | "D7" | "d7" )
-                        osToDestroy="D8" ;;
+                        osToDestroy="D8";;
                 "Debian10" | "debian10" | "D10" | "d10" )
-                        osToDestroy="D10" ;;
+                        osToDestroy="D10";;
+				"Fedora40" | "fedora40" | "F40" | "f40" )
+						osToDestroy="F40"
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
-			osToDestroy="FBSD12" ;;
+			osToDestroy="FBSD12";;
 		"Solaris10" | "solaris10" | "Sol10" | "sol10" )
-			osToDestroy="Sol10" ;;
+			osToDestroy="Sol10";;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
   	"Windows2022" | "Win2022" | "W22" | "w22" )
@@ -83,6 +85,7 @@ listOS() {
 		- Ubuntu2004
 		- Ubuntu2104
 		- Ubuntu2204
+		- Fedora40
 		- CentOS6
 		- CentOS7
 		- CentOS8
