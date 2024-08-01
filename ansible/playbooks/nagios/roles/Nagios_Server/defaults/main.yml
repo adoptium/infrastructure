@@ -33,4 +33,5 @@ task_list:
     - configure_nagios_windows
     - configure_nagios_templates
     - configure_nagios_server_monitoring
+    - configure_nagios_server_crontab
     - restart_nagios_server

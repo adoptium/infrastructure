@@ -1,0 +1,6 @@
+# Add any IP addresses, that need to be excluded from having ssh tunnels created.
+# This file assumes the standard Adoptium inventory file format.
+
+# Excluded Windows Hosts As Windows Hosts Do Not Use SSH
+# 8.208.11.212
+# 8.208.87.18
