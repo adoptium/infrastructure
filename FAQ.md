@@ -108,7 +108,7 @@ the ansible playbooks and - with the exception of the RHEL7 image for s390x -
 pushing them up to Docker Hub where they can be consumed by our jenkins
 build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
 pipelines as configured in the [pipeline_config
-files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+files](https://github.com/adoptium/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
 
 ### Adding a new dockerBuild dockerhub repository
 
