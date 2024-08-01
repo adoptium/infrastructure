@@ -8,6 +8,7 @@
 #########################################
 - name: Allow https apt sources
   package: "name=apt-transport-https state=latest"
+  tags: patch_update
 
 - name: Add the openjdk repository to apt for openjdk7
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
