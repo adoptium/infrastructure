@@ -1,7 +1,7 @@
 ---
 
 #
-# AdoptOpenJDK hosts! check the readme on how to add more
+# Eclipse Adoptium hosts! check the readme on how to add more
 # (if its not obvious enough).
 # Initial host names are "os-arch-index" within each stanza
 #
@@ -46,16 +46,14 @@ hosts:
           win2012r2-x64-2: {ip: 20.108.176.36, user: adoptopenjdk}
           win2022-x64-1: {ip: 172.187.129.163, user: adoptopenjdk}
           win2022-x64-2: {ip: 172.187.176.15, user: adoptopenjdk}
+          win2022-x64-3: {ip: 51.142.8.47, user: adoptopenjdk}
 
       - digitalocean:
           centos69-x64-2: {ip: 167.71.130.191}
 
-      - equinix_esxi:
-          solaris10-x64-1: {ip: 145.40.115.43}
-
       - marist:
           rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
-          rhel79-s390x-2: {ip: 148.100.74.54, user: linux1}
+          rhel8-s390x-1: {ip: 148.100.75.98, user: linux1}
 
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org, 7200-02-04-1914}
@@ -70,12 +68,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
       - ibmcloud:
-          win2012r2-x64-1: {ip: 169.48.4.138, user: Administrator}
-          win2012r2-x64-2: {ip: 169.48.4.142, user: Administrator}
           win2022-x64-1: {ip: 52.118.206.11, user: Administrator}
-
-      - spearhead:
-          freebsd12-x64-1: {ip: 185.131.222.224}
 
   - docker:
 
@@ -89,14 +82,12 @@ hosts:
           ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
-          ubuntu2204-x64-1: {ip: 145.40.113.173, description: Intel Xeon Gold 40 core}
-          ubuntu2004-x64-1: {ip: 145.40.114.58, description: AMD EPYC 7401P 24 core}
           ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
           ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
-          ubuntu2204-aarch64-1: {ip: 140.211.167.67}
+          ubuntu2404-aarch64-1: {ip: 140.211.167.67}
 
       - marist:
           ubuntu2204-s390x-1: {ip: 148.100.74.237, user: linux1}
@@ -112,8 +103,9 @@ hosts:
           ubuntu1804-armv8-2: {ip: 114.119.175.125}
 
       - azure:
-          win2016-x64-1: {ip: 52.149.211.210, user: adoptopenjdk}
-          win2019-x64-1: {ip: 20.185.182.137, user: adoptopenjdk}
+          ubuntu2404-x64-1: {ip: 20.115.98.159, user: azureuser}
+          win2016-x64-1: {ip: 172.172.147.29, user: adoptopenjdk}
+          win2019-x64-1: {ip: 13.92.177.186, user: adoptopenjdk}
           win2022-x64-1: {ip: 51.132.234.42, user: adoptopenjdk}
           win2022-x64-2: {ip: 20.26.116.218, user: adoptopenjdk}
           win11-aarch64-1: {ip: 20.4.31.184, user: adoptopenjdk}
@@ -138,11 +130,7 @@ hosts:
           ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
           ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
           ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
-
-      - equinix_esxi:
-          ubuntu2204-x64-1: {ip: 145.40.115.44, description: Perf machine}
-          ubuntu2204-x64-2: {ip: 145.40.115.46, description: Perf machine}
-          solaris10-x64-1: {ip: 145.40.115.45}
+          ubuntu2404-aarch64-1: {ip: 140.211.169.12, user: ubuntu}
 
       - macincloud:
           macos1201-x64-1: {ip: 216.39.74.137, user: admin, description: DXT437}
@@ -159,14 +147,17 @@ hosts:
           ubuntu2004-s390x-1: {ip: 148.100.74.240}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
-      # Nine machines are behind a firewall. Please contact @sxa or @gdams for access
-      - nine:
-          macos1015-x64-1: {ip: 10.0.40.10, ipv6: "2a02:418:3001:40::10", user: administrator}
-          macos1015-x64-2: {ip: 10.0.40.11, ipv6: "2a02:418:3001:40::11", user: administrator}
-
-      - scaleway:
-          ubuntu2310-riscv64-1: {ip: 62.210.163.13, user: ubuntu}
-          ubuntu2310-riscv64-2: {ip: 62.210.163.98, user: ubuntu}
+      # Rise machines are hosted in Scaleway
+      - rise:
+          ubuntu2310-riscv64-1: {ip: 62.210.163.38, user: ubuntu}
+          ubuntu2310-riscv64-2: {ip: 62.210.163.36, user: ubuntu}
+          ubuntu2404-riscv64-1: {ip: 62.210.163.41, user: ubuntu}
+          ubuntu2404-riscv64-2: {ip: 62.210.163.196, user: ubuntu}
+          ubuntu2404-riscv64-3: {ip: 62.210.163.99, user: ubuntu}
+          ubuntu2404-riscv64-4: {ip: 62.210.163.103, user: ubuntu}
+          ubuntu2404-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
+          ubuntu2404-riscv64-6: {ip: 62.210.163.135, user: ubuntu}
+          ubuntu2404-riscv64-7: {ip: 62.210.163.137, user: ubuntu}
 
       - siteox:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
@@ -178,5 +169,3 @@ hosts:
           rhel6-x64-1: {ip: 169.48.4.140}
           rhel7-x64-1: {ip: 169.48.4.136}
           ubuntu1604-x64-1: {ip: 169.48.4.141}
-          win2012r2-x64-1: {ip: 169.48.4.131, user: Administrator}
-          win2012r2-x64-2: {ip: 169.48.4.139, user: Administrator}

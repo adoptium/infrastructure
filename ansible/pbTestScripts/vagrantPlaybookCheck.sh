@@ -13,6 +13,7 @@ vmHalt=true
 cleanWorkspace=false
 newVagrantFiles=false
 fastMode=false
+useAdopt=false
 skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
@@ -51,6 +52,8 @@ processArgs()
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
 				fastMode=true;;
+			"--use-adopt" | "-ua" )
+				useAdopt=true;;
 			"--build-fork" | "-bf" )
 				buildFork="--fork $1"; shift;;
 			"--build-branch" | "-bb" )
@@ -86,6 +89,7 @@ usage()
   --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
   --skip-more | -sm              Run playbook faster by excluding things not required by buildJDK
+  --use-adopt | -ua              Use the local Adoptium vagrantfile instead of the standard (.Adopt extension on Vagrantfile)
   --help | -h                    Displays this help message
   -V                             Apply verbose option to 'ansible-playbook', up to '-VVVV'"
 }
@@ -134,13 +138,43 @@ checkVars()
 		skipFullSetup=",nvidia_cuda_toolkit"
 		case "$jdkToBuild" in
 			"jdk8" )
-				skipFullSetup="$skipFullSetup,MSVS_2017";
+				skipFullSetup="$skipFullSetup,MSVS_2017,MSVS_2019,MSVS_2022";
 				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1"
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2017,MSVS_2019,MSVS_2022"
+				fi
+				;;
+			"jdk11" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019,MSVS_2022";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019,MSVS_2022"
+				fi
+				;;
+			"jdk17" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2022";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2022"
+				fi
+				;;
+			"jdk21" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+				fi
+				;;
+			"jdk22" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+				fi
+				;;
+			"jdk" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
 				fi
 				;;
                 	*)
-				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013";;
+				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1";;
 		esac
 	fi
 	jdkToBuild="--version $jdkToBuild"
@@ -164,6 +198,7 @@ checkVagrantOS()
                 echo $vagrantOSList
                 exit 1
         fi
+
         # The Windows VM is setup to use 5GB of memory, which can be an issue on machines with only 8GB installed.
         # See: https://github.com/adoptium/infrastructure/pull/1532#issue-481189847
         if [[ "$vagrantOS" == "Win2012" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
@@ -220,6 +255,7 @@ startVMPlaybook()
 	else
 	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
 	fi
+
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
@@ -295,10 +331,21 @@ startVMPlaybookWin()
 	local vagrantPort=
 
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
+
 	if [ "$newVagrantFiles" = "true" ]; then
-	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+	    echo "Use Adoptium Box For Win2022"
+		ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+	  else
+	    ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  fi
 	else
-	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+		if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+		  echo "Use Adoptium Box For Win2022"
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+		else
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+		fi
 	fi
 
 	# Remove the Hosts files if they're found

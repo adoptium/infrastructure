@@ -72,11 +72,24 @@
       tags: [build_tools]
     - role: gcc_11                # JDK19+
       tags: [build_tools]
-    - role: Xcode
-      when: ansible_distribution == "MacOSX"
+    - role: devkit                # JDK19+
+      devkit_version: gcc-11.3.0-Centos7.9.2009-b03
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
+      tags: [devkit]
+    - role: devkit                # JDK19+
+      devkit_version: gcc-11.3.0-Centos7.6.1810-b03
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "aarch64"
+      tags: [devkit]
     - role: Xcode11
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
-      tags: [xcode11]
+      tags: [xcode11] # JDK 8
+    - role: Xcode15
+      when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
+      tags: [xcode15] # JDK 17+
     - role: cmake                 # OpenJ9 / OpenJFX
       when: ansible_distribution != "Solaris" # Compile fails on Solaris
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
@@ -131,10 +144,6 @@
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
-    - role: Nagios_Master_Config  # AdoptOpenJDK Infrastructure
-      tags: [nagios_master_config, adoptopenjdk]
-    - role: Nagios_Tunnel         # AdoptOpenJDK Infrastructure
-      tags: [nagios_tunnel, adoptopenjdk]
     - riscv_cross_compiler        # For building JDK11/J9 on RISC-V architecture
     - Clean_Up
     - Security

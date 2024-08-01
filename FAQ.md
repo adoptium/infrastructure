@@ -100,6 +100,7 @@ following:
 
 1. The host needs to have an active RHEL subscription
 2. The RHEL7 devkit (which cannot be made public) is to be available in a tar file under `/usr/local` on the host as per the name in the Dockerfile.
+
 </details>
 
 When a change lands into master, the relevant dockerfiles are built using
@@ -108,7 +109,8 @@ the ansible playbooks and - with the exception of the RHEL7 image for s390x -
 pushing them up to Docker Hub where they can be consumed by our jenkins
 build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
 pipelines as configured in the [pipeline_config
-files](https://github.com/adoptium/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+  files](https://github.com/adoptium/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+
 
 ### Adding a new dockerBuild dockerhub repository
 
@@ -201,7 +203,11 @@ an individual test for example:
 `test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 If you then need to run manually on the machine itself (outside jenkins)
-then the process is typically like this:
+then the process is typically like this.  To avoid the test material not
+matching the JDK under test which can lead to false failures when you're
+testing a build which isn't the latest (such as a previous GA/the last
+release), it is recommended that you check out the appropriate branch for
+the last release from the aqa-tests repository in the first line here.
 
 ```sh
 git clone https://github.com/adoptium/aqa-tests && cd aqa-tests

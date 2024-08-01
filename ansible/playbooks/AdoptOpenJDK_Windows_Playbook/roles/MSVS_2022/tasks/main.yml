@@ -61,6 +61,15 @@
         dest: C:\TEMP
       when: (vs2022_layout_ready.stat.exists)
 
+    # When Installing From The Layout, We Need To Ensure the x86 installer is not detected.
+    - name: Rename x86 Installer When Installing VS2022 from the Adoptium Layout
+      win_shell: |
+        Rename-Item -Path "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer" -NewName "Installer.old"
+      args:
+        executable: powershell
+        creates: "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer.old"
+      when: (vs2022_layout_ready.stat.exists)
+
     - name: Run Visual Studio 2022 Installer From Layout
       win_shell: |
           Start-Process -Wait -FilePath 'C:\temp\VSLayout2022\vs_community.exe' -ArgumentList '--nocache --quiet --norestart --wait --noweb --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
@@ -94,7 +103,7 @@
 - name: Download Visual Studio Community 2022
   win_get_url:
     url: 'https://aka.ms/vs/17/release/vs_Community.exe'
-    checksum: 6dfb021f82e9e7f89de632c08a654c0695d7701c3f47bb894508717a9948048f
+    checksum: 5d75942b56df540a0325e764e7eb46498ec12e15b73adea05d8aa58d323efd90
     checksum_algorithm: sha256
     dest: 'C:\temp\vs_community22.exe'
     force: no

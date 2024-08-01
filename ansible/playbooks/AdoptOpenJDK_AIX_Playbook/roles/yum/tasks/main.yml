@@ -70,8 +70,6 @@
     - name: Unpack yum bundle
       command:
         cmd: /usr/bin/tar -xf /tmp/yum/yum_bundle.tar -C /tmp/yum
-        # Neither zip nor gtar is not available, disable warning about unpack:
-        warn: false
 
     - name: Install yum bundle
       command: rpm -i /tmp/yum/*.rpm

@@ -31,6 +31,7 @@
   tags: maven
 
 - name: Extract Apache Maven v3.6.3
+  become: true
   unarchive:
    src: /tmp/apache-maven-3.6.3-bin.tar.gz
    dest: /usr/local
@@ -39,6 +40,7 @@
   tags: maven
 
 - name: Create Symlink, Add Maven to PATH
+  become: true
   file:
    src: /usr/local/apache-maven-3.6.3/bin/mvn
    dest: /usr/local/bin/mvn

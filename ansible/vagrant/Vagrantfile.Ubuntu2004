@@ -6,13 +6,16 @@ $script = <<SCRIPT
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
+# Add The PPA Repo To Get Later Version Of ansible
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt update
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
   config.vm.define :adoptopenjdkU20 do |adoptopenjdkU20|
-    adoptopenjdkU20.vm.box = "generic/ubuntu2004"
+    adoptopenjdkU20.vm.box = "bento/ubuntu-20.04"
     adoptopenjdkU20.vm.synced_folder ".", "/vagrant"
     adoptopenjdkU20.vm.hostname = "adoptopenjdkU20"
     adoptopenjdkU20.vm.network :private_network, type: "dhcp"

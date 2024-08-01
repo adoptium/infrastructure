@@ -8,8 +8,8 @@
 Build_Tool_Packages:
   - autoconf
   - automake # for compiling freetype on JDK8u
-  - cmake # OpenJ9
   - coreutils
+  - git
   - gnupg
   - gnu-sed
   - gnu-tar
@@ -26,6 +26,7 @@ Build_Tool_Casks:
 Test_Tool_Packages:
   - mercurial
   - pulseaudio
+  - jq
 
 JCK_Tool_Casks:
   - blackhole-2ch # Used to emulate a line in feed for JCK tests

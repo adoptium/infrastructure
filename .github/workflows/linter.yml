@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
     - name: 'Yamllint'
       uses: karancode/yamllint-github-action@fdef6bc189425ecc84cc4543b2674566c0827053 # v2.1.1
@@ -39,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
     - name: Set up Python 3.x
-      uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
+      uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
         python-version: '3.x'
 
@@ -64,6 +64,5 @@ jobs:
         ansible-playbook playbooks/AdoptOpenJDK_AIX_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/ubuntu-jckservices.yml --syntax-check
-        ansible-playbook playbooks/AdoptOpenJDK_ITW_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/vagrant.yml --syntax-check
         ansible-playbook playbooks/ubuntu-jck.yml --syntax-check

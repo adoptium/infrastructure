@@ -47,9 +47,9 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('alibaba', 'azure', 'marist', 'osuosl',
-        'macstadium', 'macincloud', 'ibmcloud', 'spearhead', 'siteox',
+        'macstadium', 'macincloud', 'ibmcloud', 'siteox',
         'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'equinix_esxi', 'nine', 'scaleway', 'skytap',
+        'aws', 'inspira', 'nine', 'rise', 'skytap',
         'hetzner')
 }
 

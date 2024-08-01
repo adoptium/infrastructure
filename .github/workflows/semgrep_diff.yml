@@ -3,21 +3,10 @@ name: Semgrep Differential Scan
 on:
   pull_request:
 
+permissions:
+  contents: read
+  statuses: write
+  
 jobs:
   semgrep-diff:
-    runs-on: ubuntu-latest
-    container:
-      image: returntocorp/semgrep
-
-    steps:
-      # Step 1: Clone application source code
-      - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          fetch-depth: 0
-
-      # Step 2: Differential scan
-      - name: Differential scan
-        run: |
-          semgrep ci \
-            --config="p/trailofbits"
+    uses: adoptium/.github/.github/workflows/semgrep_diff.yml@main

@@ -26,15 +26,6 @@
     - (ansible_distribution_major_version == "12")
   tags: SUSE_gcc48
 
-- name: Sed change gpgcheck for gcc repo on x86_64
-  replace:
-    path: /etc/zypp/repos.d/devel_gcc.repo
-    regexp: 'gpgcheck=1'
-    replace: "gpgcheck=0"
-  when:
-    - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
-  tags: SUSE_gcc48
-
 # Skipping ansible lint as shell module is required to use the --force-resolution option (lint error 305)
 - name: Install gcc48
   shell: zypper -n in --force-resolution gcc48
@@ -154,7 +145,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: yes
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - (ansible_distribution_major_version == "12" and ansible_architecture == "x86_64")
