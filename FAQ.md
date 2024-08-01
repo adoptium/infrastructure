@@ -99,7 +99,7 @@ this as it has a stable implemention. The image creation requires the
 following:
 
 1. The host needs to have an active RHEL subscription
-2. The RHEL7 devkit (which cannot be made public) to be available in a tar file under /usr/local on the host as per the name in the Dockerfile
+2. The RHEL7 devkit (which cannot be made public) is to be available in a tar file under `/usr/local` on the host as per the name in the Dockerfile.
 </details>
 
 When a change lands into master, the relevant dockerfiles are built using
