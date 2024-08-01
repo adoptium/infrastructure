@@ -95,7 +95,7 @@ have at the moment:
 
 The RHEL7 image creation for s390x has to be run on a RHEL host using a
 container implementation supplied by Red Hat, and we are using RHEL8 for
-this as it has a stable implemention.  The image creation requires the
+this as it has a stable implemention. The image creation requires the
 following:
 
 1. The host needs to have an active RHEL subscription
