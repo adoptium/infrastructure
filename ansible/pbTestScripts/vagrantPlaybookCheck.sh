@@ -275,7 +275,13 @@ startVMPlaybook()
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
-	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
+	if [ "$OS" == "Solaris10" ]; then
+		## Run The Playbook With ssh-rsa algorithms for Solaris 10 Only
+		ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --ssh-extra-args='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa' --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
+	else
+	  ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
+	fi
+
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
 		echo PLAYBOOK FAILED
@@ -286,7 +292,7 @@ startVMPlaybook()
 		# Remove IP from known_hosts as the playbook installs an
 		# alternate sshd which regenerates the host key infra#2244
 		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-		ssh_args="$ssh_args -o StrictHostKeyChecking=no"
+		ssh_args="$ssh_args -o StrictHostKeyChecking=no -o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa"
 	fi
 
 	if [[ "$testNativeBuild" = true ]]; then
