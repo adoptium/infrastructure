@@ -14,6 +14,11 @@
   register: usr_lib_jvm_exists
   tags: build_tools
 
+- name: Checking for default-jvm
+  stat: path=/usr/lib/jvm/default-jvm
+  register: usr_lib_default_jvm_exists
+  tags: build_tools
+
 - name: Creating /usr/lib/jvm if not found
   file:
     path: /usr/lib/jvm
@@ -140,14 +145,14 @@
 
     - name: Install java 11 from Alpine repositories
       package: "name=openjdk11 state=installed"
-      when: not adoptopenjdk11_installed.stat.exists
+      when: ansible_architecture != "aarch64" and not adoptopenjdk11_installed.stat.exists
 
     - name: Create symlink to point at openjdk11
       file:
         src: /usr/lib/jvm/java-11-openjdk
         dest: /usr/lib/jvm/jdk-11
         state: link
-      when: not adoptopenjdk11_installed.stat.exists
+      when: ansible_architecture != "aarch64" and not adoptopenjdk11_installed.stat.exists
 
     - name: Check if zulu-16 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu16
@@ -200,6 +205,19 @@
         state: link
       when:
         - not adoptopenjdk17_installed.stat.exists
+
+    - name: Remove Default JVM For Alpine AARCH64
+      file:
+        path: /usr/lib/jvm/default-jvm
+        state: absent
+      when: ansible_architecture == "aarch64" and usr_lib_default_jvm_exists.stat.exists
+
+    - name: Arm64 Change Default JVM Link to JDK17
+      file:
+        src: '{{ adoptopenjdk17_dir.stdout }}'
+        dest: /usr/lib/jvm/default-jvm
+        state: link
+      when: ansible_architecture == "aarch64"
 
     - name: Check if zulu-18 is already installed in the target location
       stat: path=/usr/lib/jvm/zulu18

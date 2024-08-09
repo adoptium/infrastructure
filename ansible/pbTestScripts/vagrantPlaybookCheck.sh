@@ -13,6 +13,7 @@ vmHalt=true
 cleanWorkspace=false
 newVagrantFiles=false
 fastMode=false
+useAdopt=false
 skipFullSetup=''
 jdkToBuild=''
 buildHotspot=''
@@ -51,6 +52,8 @@ processArgs()
 				newVagrantFiles=true;;
 			"--skip-more" | "-sm" )
 				fastMode=true;;
+			"--use-adopt" | "-ua" )
+				useAdopt=true;;
 			"--build-fork" | "-bf" )
 				buildFork="--fork $1"; shift;;
 			"--build-branch" | "-bb" )
@@ -86,6 +89,7 @@ usage()
   --no-halt | -nh                Option to stop the vagrant VMs halting
   --new-vagrant-files | -nv      Use vagrantfiles from the the specified git repository
   --skip-more | -sm              Run playbook faster by excluding things not required by buildJDK
+  --use-adopt | -ua              Use the local Adoptium vagrantfile instead of the standard (.Adopt extension on Vagrantfile)
   --help | -h                    Displays this help message
   -V                             Apply verbose option to 'ansible-playbook', up to '-VVVV'"
 }
@@ -98,11 +102,11 @@ checkVars()
 		ls -1 ../vagrant/Vagrantfile.* | cut -d. -f4
 		exit 1
 	fi
-	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then 
+	if [[ "$runTest" == true && "$testNativeBuild" == false ]]; then
 		echo "Unable to test an unbuilt JDK. Ignoring '--test' argument."
 		runTest=false
 	fi
-	#Sets WORKSPACE to home if WORKSPACE is empty or undefined. 
+	#Sets WORKSPACE to home if WORKSPACE is empty or undefined.
 	if [ ! -n "${WORKSPACE:-}" ]; then
 		echo "WORKSPACE not found, setting it as environment variable 'HOME'"
 		WORKSPACE=$HOME
@@ -134,13 +138,43 @@ checkVars()
 		skipFullSetup=",nvidia_cuda_toolkit"
 		case "$jdkToBuild" in
 			"jdk8" )
-				skipFullSetup="$skipFullSetup,MSVS_2017";
+				skipFullSetup="$skipFullSetup,MSVS_2017,MSVS_2019,MSVS_2022";
 				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1"
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2017,MSVS_2019,MSVS_2022"
+				fi
+				;;
+			"jdk11" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019,MSVS_2022";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019,MSVS_2022"
+				fi
+				;;
+			"jdk17" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2022";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2022"
+				fi
+				;;
+			"jdk21" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+				fi
+				;;
+			"jdk22" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+				fi
+				;;
+			"jdk" )
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+				if [ "$buildHotspot" != "" ]; then
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
 				fi
 				;;
                 	*)
-				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013";;
+				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1";;
 		esac
 	fi
 	jdkToBuild="--version $jdkToBuild"
@@ -151,7 +185,7 @@ checkVagrantOS()
         local vagrantOSList
         if [[ "$newVagrantFiles" = "true" ]]; then
                 cd ${WORKSPACE}/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible/vagrant
-        else    
+        else
                 cd ${scriptPath%/*}/../vagrant
         fi
         vagrantOSList=$(ls -1 Vagrantfile.* | cut -d. -f 2)
@@ -159,11 +193,12 @@ checkVagrantOS()
                 echo "Vagrantfile Detected"
         elif [[ "$vagrantOS" == "all" ]]; then
                 vagrantOS=$vagrantOSList
-        else    
+        else
                 echo "No Vagrantfile for $vagrantOS available - please select from one of the following"
                 echo $vagrantOSList
                 exit 1
         fi
+
         # The Windows VM is setup to use 5GB of memory, which can be an issue on machines with only 8GB installed.
         # See: https://github.com/adoptium/infrastructure/pull/1532#issue-481189847
         if [[ "$vagrantOS" == "Win2012" && $(free | awk '/Mem:/ { print $2 }') -lt 8000000 ]]; then
@@ -220,11 +255,12 @@ startVMPlaybook()
 	else
 	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
 	fi
+
 	# Copy the machine's ssh key for the VMs to use, after removing prior files
 	rm -f id_rsa.pub id_rsa
 	ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
 
-	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS 
+	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
 	# See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
 	vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
@@ -235,14 +271,14 @@ startVMPlaybook()
 	# ssh-keygen -R will fail if the known_hosts file does not exist
 	[ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-	
+
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
-	
+
 	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
-		echo PLAYBOOK FAILED 
+		echo PLAYBOOK FAILED
 		exit 1
 	fi
 
@@ -295,10 +331,21 @@ startVMPlaybookWin()
 	local vagrantPort=
 
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
+
 	if [ "$newVagrantFiles" = "true" ]; then
-	  ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+	    echo "Use Adoptium Box For Win2022"
+		ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+	  else
+	    ln -sf vagrant/Vagrantfile.$OS Vagrantfile
+	  fi
 	else
-	  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+		if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+		  echo "Use Adoptium Box For Win2022"
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS.Adopt Vagrantfile
+		else
+		  ln -sf ${scriptPath%/*}/../vagrant/Vagrantfile.$OS Vagrantfile
+		fi
 	fi
 
 	# Remove the Hosts files if they're found
@@ -306,7 +353,7 @@ startVMPlaybookWin()
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
         # See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
 	BUILD_ID=dontKillMe vagrant up
-	
+
 	# Rearm the evaluation license for 180 days to stop the VMs shutting down
 	# See: https://github.com/adoptium/infrastructure/issues/2056
 	vagrant winrm --shell cmd -c "slmgr.vbs /rearm //b"
@@ -317,7 +364,7 @@ startVMPlaybookWin()
 	vagrantPort=$(vagrant port |  awk '/5986/ { print $4 }')
 	echo "[127.0.0.1]:$vagrantPort" >> playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
 	echo "This is the content of hosts.win : " && cat playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win
-	
+
 	# Changes the value of "hosts" in main.yml
 	sed -i'' -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
 	# Uncomments and sets the ansible_password to 'vagrant', in adoptopenjdk_variables.yml
@@ -328,17 +375,20 @@ startVMPlaybookWin()
 		# Add the "ansible_winrm_transport" to adoptopenjdk_variables.yml
 		echo -e "\nansible_winrm_transport: credssp" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
 	fi
-	
+	# Add The Ansible WinRM TimeOut Values To The Vars file
+	echo "ansible_winrm_operation_timeout_sec: 600" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+	echo "ansible_winrm_read_timeout_sec: 630" >> playbooks/AdoptOpenJDK_Windows_Playbook/group_vars/all/adoptopenjdk_variables.yml
+
 	gitSha=$(git rev-parse HEAD)
 
 	# Run the ansible playbook on the VM & logs the output.
 	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win -u vagrant --extra-vars "git_sha=${gitSha}" --skip-tags jenkins,adoptopenjdk${skipFullSetup} playbooks/AdoptOpenJDK_Windows_Playbook/main.yml 2>&1 | tee $pbLogPath
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
-		echo PLAYBOOK FAILED 
+		echo PLAYBOOK FAILED
 		exit 1
 	fi
-        
+
 	if [[ "$testNativeBuild" = true ]]; then
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.build_log"
 
@@ -356,14 +406,14 @@ startVMPlaybookWin()
 			echo BUILD FAILED
 			exit 127
 		fi
-	
+
 		if [[ "$runTest" = true ]]; then
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
-			
+
 			# Run a python script to start a test for the built JDK on the Windows VM
 			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 			echo The test finished at : `date +%T`
-			if ! grep -q 'FAILED: 0' $testLogPath; then 
+			if ! grep -q 'FAILED: 0' $testLogPath; then
 				echo TEST FAILED
 				exit 127
 			fi
@@ -409,13 +459,14 @@ checkVagrantOS
 echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
-	if [[ "$OS" == "Win2012" ]] ; then
+	echo OS = $vagrantOS
+	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" ]] ; then
 		startVMPlaybookWin $OS
 	else
 		startVMPlaybook $OS
 	fi
   	if [[ "$vmHalt" == true ]]; then
-                vagrant halt 
+                vagrant halt
 	fi
 done
 destroyVM

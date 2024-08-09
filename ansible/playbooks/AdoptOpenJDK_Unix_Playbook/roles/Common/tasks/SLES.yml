@@ -6,16 +6,10 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
-- name: Add Devel-Tools repository (SLES12, x86_64/ppc64le)
-  zypper_repository:
-    name: devel-tools
-    repo: 'https://download.opensuse.org/repositories/devel:/tools/SLE_12_SP5/'
-    auto_import_keys: yes
-    state: present
-  when:
-    - ansible_distribution_major_version == "12"
-    - (ansible_architecture == "x86_64") or (ansible_architecture == "ppc64le")
-  tags: patch_update
+
+## For SLES12 SP5, it is essential that the system has a valid support agreement in place, and that all
+## the subscription based repos are in place, as these are required to install packages,
+## now that the public repositories are no longer available.
 
 - name: Add Devel-Tools repository (SLES12, s390x)
   zypper_repository:
@@ -29,7 +23,7 @@
 
 - name: Add Devel-Tools repository (SLES15)
   zypper_repository:
-    repo: https://download.opensuse.org/repositories/devel:/tools/15.4/devel:tools.repo
+    repo: https://download.opensuse.org/repositories/devel:/tools/15.5/devel:tools.repo
     auto_import_keys: yes
     state: present
   when:
@@ -154,6 +148,24 @@
     - ansible_architecture == "x86_64"
   tags: build_tools
 
+## Install libelf0-debuginfo-32bit As This Is No Longer Available In Official repos
+
+- name: Download LibElf Debug 32 Bit Version
+  get_url:
+    url: https://ftp5.gwdg.de/pub/opensuse/discontinued/debug/distribution/12.3/repo/oss/suse/x86_64/libelf0-debuginfo-32bit-0.8.13-13.1.1.x86_64.rpm
+    dest: /tmp/libelf0-debuginfo-32bit-0.8.13-13.1.1.x86_64.rpm
+    mode: 0440
+    checksum: sha256:7ac907e5f955c76db7dd36c92a1f2c679add9aa981c9d4901284f7e6b1df835c
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
+- name: Install LibElf Debug 32 Bit Version
+  command: rpm -i /tmp/libelf0-debuginfo-32bit-0.8.13-13.1.1.x86_64.rpm
+  when:
+    - ansible_architecture == "x86_64"
+  tags: build_tools
+
 ########
 # zlib #
 ########
@@ -217,9 +229,9 @@
 
 - name: Download IBM Java 8
   get_url:
-    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.5.7/linux/x86_64/ibm-java-sdk-8.0-5.7-x86_64-archive.bin
+    url: https://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.8.11/linux/x86_64/ibm-java-sdk-8.0-8.11-x86_64-archive.bin
     dest: /tmp/ibm-java.bin
-    validate_certs: no
+    validate_certs: yes
   when:
     - ansible_distribution_major_version == "11"
     - not java8_installed.stat.exists
@@ -291,7 +303,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: yes
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - (ansible_distribution_major_version == "11") or (ansible_distribution_major_version == "12")

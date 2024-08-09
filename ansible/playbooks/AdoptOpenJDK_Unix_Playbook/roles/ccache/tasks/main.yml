@@ -16,7 +16,6 @@
 
 - name: Download ccache.tar.gz
   command: wget -O /tmp/ccache.tar.gz https://github.com/ccache/ccache/releases/download/v{{ ccacheVersion }}/ccache-{{ ccacheVersion }}.tar.gz
-    warn=False
   when: ccache_status.rc != 0
   tags: ccache
 

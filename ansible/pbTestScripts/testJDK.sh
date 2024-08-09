@@ -36,3 +36,26 @@ else
 	$MAKE_COMMAND compile
 	$MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
 fi
+
+# Run SSL Client Tests Linux Only ( Not Solaris / FreeBSD )
+if [[ "$(uname)" == "FreeBSD" ]] || [["$(uname)" == "SunOS"]]; then
+	echo "Skipping SSL Tests As Not Supported"
+else
+	export TESTJAVA=$TEST_JDK_HOME
+	echo DEBUG: TESTJAVA = $TEST_JDK_HOME
+	mkdir -p $HOME/testLocation
+  [ ! -d $HOME/testLocation/ssl-tests ] && git clone https://github.com/rh-openjdk/ssl-tests $HOME/testLocation/ssl-tests
+	cd $HOME/testLocation/ssl-tests/jtreg-wrappers
+	ls -l
+	# Reduce Tests For Alpine/Sles/OpenSuse
+	if [[ "$(uname -v)" =~ .*"Alpine"*. ]] || [[ `cat /etc/os-release|grep -i opensuse|wc -l` -gt 0 ]] || [[ `cat /etc/os-release|grep -i SLES|wc -l` -gt 0 ]] ; then
+		echo "Run Alpine/OpenSuse/Sles SSL Client Tests"
+		./ssl-tests-gnutls-client.sh
+		./ssl-tests-openssl-client.sh
+	else
+		echo "Run Full Set Of SSL Client Tests"
+		./ssl-tests-gnutls-client.sh
+		./ssl-tests-nss-client.sh
+		./ssl-tests-openssl-client.sh
+  fi
+fi

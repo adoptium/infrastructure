@@ -2,6 +2,12 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+# Configure DPKG to be noninteractive
+sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
+sudo dpkg-reconfigure debconf -f noninteractive -p critical
+# Update Repository Addresses For Debian
+sudo sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
+sudo apt-get update
 sudo apt-get install tree -y
 sudo apt-get install software-properties-common -y
 sudo apt-get install gpg -y

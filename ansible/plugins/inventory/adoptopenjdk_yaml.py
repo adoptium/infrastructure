@@ -32,6 +32,7 @@ import sys
 from os import path
 
 import yaml
+
 try:
     import configparser
 except ImportError:
@@ -46,9 +47,9 @@ valid = {
 
   # providers - validated for consistency
   'provider': ('alibaba', 'azure', 'marist', 'osuosl',
-        'macstadium', 'macincloud', 'ibmcloud', 'spearhead', 'siteox',
+        'macstadium', 'macincloud', 'ibmcloud', 'siteox',
         'equinix', 'linaro','digitalocean', 'ibm', 'godaddy',
-        'aws', 'inspira', 'equinix_esxi', 'nine', 'gdams', 'skytap',
+        'aws', 'inspira', 'nine', 'rise', 'skytap',
         'hetzner')
 }
 

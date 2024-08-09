@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkU22 do |adoptopenjdkU22|
+    adoptopenjdkU22.vm.box = "bento/ubuntu-22.04"
+    adoptopenjdkU22.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkU22.vm.hostname = "adoptopenjdkU22"
+    adoptopenjdkU22.vm.network :private_network, type: "dhcp"
+    adoptopenjdkU22.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 4096
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  end
+end

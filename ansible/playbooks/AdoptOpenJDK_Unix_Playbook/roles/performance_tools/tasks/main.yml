@@ -1,0 +1,68 @@
+---
+###########################################
+### Installs gdb, perf, nmon & valgrind ###
+###   On Ubuntu, Rhel, CentOS & SLES    ###
+###########################################
+###            Optional Role            ###
+###########################################
+
+- name: Install gdb & valgrind
+  become: true
+  package:
+    name: ['gdb', 'valgrind']
+    state: latest
+  when: ansible_distribution == "Ubuntu" or
+        ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat" or
+        ansible_distribution == "SLES"
+  tags: performance_tools
+
+- name: Install Perf (except Ubuntu)
+  become: true
+  package:
+    name: perf
+    state: latest
+  when: ansible_distribution != "Ubuntu"
+  tags: performance_tools
+
+- name: Perf installation (Ubuntu)
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  tags: performance_tools
+  block:
+    - name: Get kernel info (Ubuntu) #for perf installation
+      shell: uname -r
+      register: uname
+
+    - name: Check perf for the specific kernel exists or not (Ubuntu)
+      shell: apt search linux-tools-`uname -r` 2>/dev/null #2?/dev/null remove apt cli warning
+      register: linux_tools
+
+    - name: Install perf (Ubuntu)
+      package:
+        name: ['linux-tools-common', 'linux-tools-generic', 'linux-tools-{{ uname.stdout }}']
+        state: latest
+      when: "'linux-tools-'~uname.stdout in linux_tools.stdout" # ~ -> concatenates string
+
+- name: Install nmon (except Rhel 7/CentOS 7 s390x) #nmon needs epel repo
+  become: true
+  package:
+    name: nmon
+    state: latest
+  when: not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x" and
+        (ansible_distribution == "RedHat" or ansible_distribution == "CentOS"))
+  tags: performance_tools
+
+- name: Set ptrace_scope value in Ubuntu
+  become: true
+  when: ansible_distribution == "Ubuntu"
+  tags: performance_tools
+  block:
+    - name: Set ptrace_scope value to 0 in Ubuntu
+      shell: echo 0 | dd of=/proc/sys/kernel/yama/ptrace_scope
+
+    - name: Set ptrace_scope value persistant across reboot
+      lineinfile:
+        path: /etc/sysctl.d/10-ptrace.conf
+        regexp: '^kernel.yama.ptrace_scope'
+        line: kernel.yama.ptrace_scope = 0

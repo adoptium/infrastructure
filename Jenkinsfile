@@ -2,7 +2,15 @@ pipeline {
     agent none
     stages {
         stage('Docker Build') {
-            parallel { 
+            parallel {
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
                 stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
@@ -33,6 +41,14 @@ pipeline {
                     }
                     steps {
                         dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                    }
+                }
+                stage('Ubuntu20.04 riscv64') {
+                    agent {
+                        label "docker&&linux&&riscv64"
+                    }
+                    steps {
+                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
                     }
                 }
                 stage('Alpine3 x64') {
@@ -99,31 +115,37 @@ def dockerManifest() {
 }
 
 def processManifest(gitUrl, registryPrefix='') {
-    git poll: false, url: gitUrl
-    sh '''
-        # Add function to process each image manifest
-        createAndPushManifest() {
-            export TARGET="${1}${2}"
-            docker manifest create $TARGET "$@"
-            shift
-            shift
-            for IMAGE in "$@"; do
-                ARCH=$(echo $IMAGE | rev | cut -d- -f1 | rev)
-                docker manifest annotate $TARGET $IMAGE --arch $ARCH --os linux
-            done
-            docker manifest push $TARGET
-        }
-        # Centos7
-        createAndPushManifest "${registryPrefix}" "adoptopenjdk/centos7_build_image" \
-            "adoptopenjdk/centos7_build_image:linux-amd64" \
-            "adoptopenjdk/centos7_build_image:linux-arm64" \
-            "adoptopenjdk/centos7_build_image:linux-ppc64le"
-        # Ubuntu1604
-        createAndPushManifest "${registryPrefix}" "adoptopenjdk/ubuntu1604_build_image" \
-            "adoptopenjdk/ubuntu1604_build_image:linux-armv7l"
-        # Alpine3
-        createAndPushManifest "${registryPrefix}" "adoptopenjdk/alpine3_build_image" \
-            "adoptopenjdk/alpine3_build_image:linux-amd64" \
-            "adoptopenjdk/alpine3_build_image:linux-arm64"
-    '''
+      git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+      sh '''
+          # Centos6
+          export TARGET="adoptopenjdk/centos6_build_image"
+          AMD64=$TARGET:linux-amd64
+          docker manifest create $TARGET $AMD64
+          docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+          docker manifest push $TARGET
+          # Centos7
+          export TARGET="adoptopenjdk/centos7_build_image"
+          AMD64=$TARGET:linux-amd64
+          ARM64=$TARGET:linux-arm64
+          PPC64LE=$TARGET:linux-ppc64le
+          docker manifest create $TARGET $AMD64 $ARM64 $PPC64LE
+          docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+          docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+          docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+          docker manifest push $TARGET
+          # Ubuntu1604
+          export TARGET="adoptopenjdk/ubuntu1604_build_image"
+          ARMV7L=$TARGET:linux-armv7l
+          docker manifest create $TARGET $ARMV7L
+          docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
+          docker manifest push $TARGET
+          # Alpine3
+          export TARGET="adoptopenjdk/alpine3_build_image"
+          AMD64=$TARGET:linux-amd64
+          ARM64=$TARGET:linux-arm64
+          docker manifest create $TARGET $AMD64 $ARM64
+          docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+          docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+          docker manifest push $TARGET
+      '''
 }

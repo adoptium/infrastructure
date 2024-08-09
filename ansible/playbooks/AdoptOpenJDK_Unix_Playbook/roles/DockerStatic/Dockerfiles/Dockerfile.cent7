@@ -1,0 +1,66 @@
+FROM centos:7
+
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+
+RUN if [ "$(uname -m)" = "aarch64" ]; then \
+      echo "Running on arm64 architecture"; \
+      sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
+    elif [ "$(uname -m)" = "ppc64le" ]; then \
+      echo "Running on ppc64le architecture"; \
+      sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
+    else \
+      # Default To x64; \
+      echo "Running on another architecture"; \
+      sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    fi
+
+RUN yum -y update && yum clean all
+
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest-SHA perl-Data-Dumper gettext zlib-devel git curl curl-devel make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb
+# Install OpenSSL Packages
+RUN yum install -y gnutls gnutls-utils nss-devel nss-tools
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+# Get latest jdk17 ga
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk17 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
+
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
+# Install ant
+RUN wget -q -O /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip'
+RUN wget -q -O /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+RUN echo "2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163  /tmp/ant.zip" > /tmp/ant.sha512
+RUN echo "0fd2771dca2b8b014a4cb3246715b32e20ad5d26754186d82eee781507a183d5e63064890b95eb27c091c93c1209528a0b18a6d7e6901899319492a7610e74ad  /tmp/ant-contrib.tgz" >> /tmp/ant.sha512
+RUN sha512sum --check --strict /tmp/ant.sha512
+RUN ln -s /usr/local/apache-ant-1.10.5/bin/ant /usr/bin/ant
+RUN unzip -q -d /usr/local /tmp/ant.zip
+RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-1.10.5/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
+# Clear up space
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig
+# Set up jenkins user
+RUN useradd -m -d /home/jenkins jenkins
+RUN mkdir /home/jenkins/.ssh
+RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
+RUN chown -R jenkins /home/jenkins/.ssh
+RUN chmod -R og-rwx /home/jenkins/.ssh
+
+# Install Git 2.15.0 from source
+
+RUN wget https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz -O /tmp/git-2.15.0.tar.xz
+RUN echo "107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a  /tmp/git-2.15.0.tar.xz" > /tmp/git.256
+RUN sha256sum --check --strict /tmp/git.256
+RUN tar xvf /tmp/git-2.15.0.tar.xz -C /tmp/
+RUN cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j 4 && make install
+# Remove Git from Yum
+RUN rpm -e --nodeps git
+RUN ln -s /usr/local/bin/git /usr/bin/git
+RUN rm -rf /tmp/git*
+
+# RUN service ssh start
+CMD ["/usr/sbin/sshd","-D"]
+RUN yum update -y
+# ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
+EXPOSE 22
+# Start with docker run -p 2222:22 UUID

@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - bison                         # OpenJ9
   - bzip2
   - ca-certificates
+  - capstone-devel
   - cpio
   - curl
   - cups-devel
@@ -26,8 +27,11 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - gnutls
+  - gnutls-utils
   - libcurl-devel
   - libffi-devel
+  - libnss3.so
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
@@ -38,9 +42,12 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - openssl-devel
   - perl-devel
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget
@@ -125,5 +132,12 @@ Test_Tool_Packages:
   - zlib-devel
   - perl-devel
   - expat-devel
+  - jq                            # For parsing SBoM during reproducibility tests
   - libcurl-devel
   - mercurial
+  - gnutls
+  - gnutls-utils
+  - libnss3.so
+  - shared-mime-info
+  - nss-devel
+  - nss-tools

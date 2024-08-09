@@ -16,7 +16,9 @@ Build_Tool_Packages:
   - g++
   - gcc
   - gettext
+  - gnutls-bin
   - libasound2-dev
+  - libcapstone-dev
   - libcups2-dev
   - libcurl4-openssl-dev
   - libdwarf-dev                  # OpenJ9
@@ -28,6 +30,9 @@ Build_Tool_Packages:
   - libgmp3-dev
   - libmpfr-dev
   - libmpfr-doc
+  - libnss3
+  - libnss3-dev
+  - libnss3-tools
   - libssl-dev
   - libwww-perl
   - libx11-dev
@@ -41,6 +46,7 @@ Build_Tool_Packages:
   - ntp
   - pigz
   - pkg-config
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-dev
   - wget
   - zip
@@ -97,6 +103,11 @@ Test_Tool_Packages:
   - xvfb
   - binfmt-support
   - qemu-user-static
+  - gnutls-bin
+  - jq                            # For parsing SBoM during reproducibility tests
+  - libnss3
+  - libnss3-dev
+  - libnss3-tools
 
 Test_Tool_Packages_x86_64:
   - pulseaudio

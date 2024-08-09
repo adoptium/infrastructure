@@ -59,7 +59,7 @@
     dest: /tmp/openssl-{{ openssl_latest }}.tar.gz
     force: no
     mode: 0755
-    validate_certs: no
+    validate_certs: yes
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu" or ansible_distribution == "SLES")
     - ansible_architecture == "x86_64"

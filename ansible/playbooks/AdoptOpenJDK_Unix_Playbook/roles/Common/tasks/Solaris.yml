@@ -443,7 +443,7 @@
     - not liberica11_installed.stat.exists
   tags: build_tools
 
-- name: Check for /usr/lib/jbm/fallocate.so
+- name: Check for /usr/lib/jvm/fallocate.so
   stat:
     path: /usr/lib/jvm/fallocate.so
   register: fallocate_installed

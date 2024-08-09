@@ -1,0 +1,24 @@
+---
+# The deleteNodes.py script deletes the nodes in Jenkins
+# Ansible then removes the docker containers on the dockerhost via the delete_container role
+# If the node is not idle in Jenkins, the node is not deleted
+
+# no_log hides the api_token from the output
+- name: Run deleteNodes script
+  script: scripts/deleteNodes.py {{ jenkins_username }} {{ jenkins_api_token }} {{ delete_nodes }}
+  args:
+    executable: python3
+  delegate_to: localhost
+  no_log: true
+  register: docker_ports
+
+- name: Set docker_ports variable
+  set_fact:
+    ports_list: "{{ docker_ports.stdout_lines[0].split(' ') | list }}"
+
+# Iterate over each machine, removes container on dockerhost machine
+- name: Run delete_container.yml for every docker port
+  include_tasks: delete_container.yml
+  loop: "{{ ports_list }}"
+  loop_control:
+    loop_var: docker_port

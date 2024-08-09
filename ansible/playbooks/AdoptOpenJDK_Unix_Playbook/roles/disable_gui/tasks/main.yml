@@ -25,3 +25,31 @@
     - desktop_installed.stat.exists
     - gui_disabled.stdout == ''
   tags: disable_gui
+
+# Restart NTPD On Centos 7  after gui disablement
+
+- name: Gather Facts About The Services Present
+  service_facts:
+  tags: disable_gui
+
+- name: Check If NTPD Exists In The Service Facts
+  set_fact:
+    ntpd_entry_exists: "{{ 'ntpd.service' in services }}"
+  when: ansible_facts.services is defined
+  tags: disable_gui
+
+- name: Set Fact Where NTPD Is Not Available As A Service
+  set_fact:
+    ntpd_entry_exists: "false"
+  when: ansible_facts.services is not defined
+  tags: disable_gui
+
+- name: Start NTP for CentOS7 following GUI disablement
+  service:
+    name: ntpd
+    state: restarted
+    enabled: yes
+  when:
+    - ntpd_entry_exists | default(false) | bool
+    - (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+  tags: disable_gui

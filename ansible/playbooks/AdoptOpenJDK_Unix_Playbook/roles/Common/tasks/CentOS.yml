@@ -17,7 +17,7 @@
     name: epel-release
     state: installed
     update_cache: yes
-    validate_certs: no
+    validate_certs: true
   when: ansible_distribution_major_version != "8"
   tags: patch_update
 
@@ -33,6 +33,12 @@
   shell: dnf config-manager --set-enabled powertools
   when:
     - ansible_distribution_major_version == "8"
+  tags: patch_update
+
+- name: Enable CodeReady Builder repo for CentOS9 Stream
+  shell: dnf config-manager --set-enabled crb
+  when:
+    - ansible_distribution_major_version == "9"
   tags: patch_update
 
 - name: Clean dnf cache
@@ -62,17 +68,18 @@
   when: ansible_distribution_major_version == "7"
   tags: build_tools
 
-- name: Install additional build tools for CentOS 8
+- name: Install additional build tools for CentOS 8/9 Stream
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS8 }}"
-  when: ansible_distribution_major_version == "8"
+  with_items: "{{ Additional_Build_Tools_CentOS8_CentOS9Stream }}"
+  when: ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9"
   tags: build_tools
 
-- name: Install additional build tools for NOT CentOS8
+- name: Install additional build tools for NOT CentOS8/9
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8 }}"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_CentOS9Stream }}"
   when:
     - ansible_distribution_major_version != "8"
+    - ansible_distribution_major_version != "9"
   tags: build_tools
 
 - name: Install Libdwarf.h for CentOS8 Stream
@@ -106,6 +113,12 @@
     - ! (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
   tags: build_tools
 
+- name: Install jq for SBoM parsing for build reproducibility testing
+  package: "name=jq state=latest"
+  when:
+    - ansible_distribution_major_version > "7"
+  tags: test_tools
+
 - name: Add devtools-2 to yum repo list for gcc 4.8
   get_url:
     url: https://people.centos.org/tru/devtools-2/devtools-2.repo
@@ -129,6 +142,7 @@
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version != "8"
+    - ansible_distribution_major_version != "9"
   tags: build_tools
 
 - name: Sed change the baseurl for CentOS SCL (CentOS6)
@@ -137,6 +151,45 @@
     sed -i -e 's!^#.*baseurl=http://mirror.centos.org/centos/6/!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-SCLo-scl*.repo
   when:
     - ansible_architecture == "x86_64" and ansible_distribution_major_version == "6"
+  tags: build_tools
+
+- name: Change the baseurl for CentOS SCL (CentOS7)
+  lineinfile:
+    path: /etc/yum.repos.d/CentOS-SCLo-scl.repo
+    regexp: '^# baseurl=http://mirror.centos.org/centos/7/sclo/\$basearch/sclo/'
+    line: 'baseurl=https://vault.centos.org/7.9.2009/sclo/$basearch/sclo/'
+    state: present
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+  tags: build_tools
+
+- name: Change the baseurl for CentOS SCL RH (CentOS7)
+  lineinfile:
+    path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+    regexp: '^#baseurl=http://mirror.centos.org/centos/7/sclo/\$basearch/rh/'
+    line: 'baseurl=https://vault.centos.org/7.9.2009/sclo/$basearch/rh/'
+    state: present
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+  tags: build_tools
+
+# - name: Remove the mirrorlist URL for Centos 7 SCL Repositories
+#   shell: |
+#     sed -i -e 's!^mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+#   when:
+#     - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
+#   tags: build_tools
+
+- name: Remove the mirrorlist URL for Centos 7 SCL Repositories
+  lineinfile:
+    path: "{{ item }}"
+    regexp: '^mirrorlist'
+    line: '#mirrorlist'
+    state: present
+  with_fileglob:
+    - /etc/yum.repos.d/CentOS-SCLo-scl*.repo
+  when:
+    - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
   tags: build_tools
 
 - name: Install additional build tools for CentOS on x86
@@ -182,6 +235,13 @@
     - ansible_distribution_major_version == "6"
   tags: build_tools
 
+- name: Install jq for SBoM parsing for build reproducibility testing
+  package: "name=jq state=latest"
+  when:
+    - ansible_distribution_major_version != "6"
+    - ansible_distribution_major_version != "7"
+  tags: test_tools
+
 ##############################
 # expat on CentOS on x86_64 #
 ##############################
@@ -191,7 +251,7 @@
     dest: /tmp/
     mode: 0440
     timeout: 25
-    validate_certs: no
+    validate_certs: true
     checksum: sha256:d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
   when:
     - ansible_architecture == "x86_64"

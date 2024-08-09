@@ -20,6 +20,8 @@ Build_Tool_Packages:
   - fontconfig-devel
   - freetype-devel
   - gnupg
+  - gnutls
+  - gnutls-utils
   - gcc
   - gcc-c++
   - gettext
@@ -39,11 +41,16 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - openssl-devel
+  - patch                         # For DevKit creation that runs "patch"
   - perl-devel
   - perl-IPC-Cmd                  # required for openssl v3 compiles
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
+  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - xz
@@ -72,6 +79,7 @@ Additional_Build_Tools_RHEL_x86:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
+  - libnss3.so
 
 Additional_Build_Tools_RHEL_ppc64:
   - glibc.ppc                     # a dependency required for executing a 32-bit C binary
@@ -82,6 +90,7 @@ Additional_Build_Tools_RHEL7_s390x:
   - glibc.s390                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.s390              # a dependency required for executing a 32-bit C binary
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
+  - yum-utils                     # yumdownloader required for devkit creation
 
 Java_RHEL8:
   - java-1.8.0-openjdk-devel
@@ -107,3 +116,8 @@ Test_Tool_Packages:
   - expat-devel
   - libcurl-devel
   - mercurial
+  - gnutls
+  - gnutls-utils
+  - shared-mime-info
+  - nss-devel
+  - nss-tools

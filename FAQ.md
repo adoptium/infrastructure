@@ -31,6 +31,8 @@ Most Ansible changes are tested automatically with a series of CI jobs:
 | Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
 | Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 
+Please note that the Centos 6 & Alpine 3 build jobs, build a docker image but DO NOT PUSH to dockerhub. The job has a seperate configuration section to push to dockerhub when a PR is merged, however that function is disabled, and has been superceded by the Jenkins docker image updater job. The code has been left in place for two reasons, the first to allow the ability to re-enable quickly, and also to test the authentication job for the dockerhub credentials. These credentials are stored in GitHub and are managed by the EF infrastructure team.
+
 ## Running the ansible scripts on local machines
 
 The full documentation for running locally is at [ansible/README.md].
@@ -83,15 +85,39 @@ have at the moment:
 | Dockerfile | Image | Platforms  | Where is this built? | In use?
 |---|---|---|---|---|
 | [Centos7](./ansible/docker/Dockerfile.CentOS7) | [`adoptopenjdk/centos7_build_image`](https://hub.docker.com/r/adoptopenjdk/centos7_build_image) | linux on amd64, arm64, ppc64le | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
+| [RHEL7](./ansible/docker/Dockerfile.RHEL7) | n/a - restricted (*) | s390x | [Jenkins](https://ci.adoptium.net/job/rhel7_docker_image_updater/) | Yes
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
 | [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
+| [Ubuntu 20.04 (riscv64 only)](./ansible/docker/Dockerfile.Ubuntu2004-riscv64) | [`adoptopenjdk/ubuntu2004_build_image:linux-riscv64`](https://hub.docker.com/r/adoptopenjdk/ubuntu2004_build_image) | linux/riscv64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
+
+<details>
+<summary>(*) - Caveats:</summary>
+
+The RHEL7 image creation for s390x has to be run on a RHEL host using a
+container implementation supplied by Red Hat, and we are using RHEL8 for
+this as it has a stable implemention.  The image creation requires the
+following:
+
+1. The host needs to have an active RHEL subscription
+2. The RHEL7 devkit (which cannot be made public) to be available in a tar file under /usr/local on the host as per the name in the Dockerfile
+</details>
 
 When a change lands into master, the relevant dockerfiles are built using
 the appropriate CI system listed in the table above by configuring them with
-the ansible playbooks and pushing them up to Docker Hub where they can be
-consumed by our jenkins build agents when the `DOCKER_IMAGE` value is
-defined on the jenkins build pipelines as configured in the
-[pipeline_config files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+the ansible playbooks and - with the exception of the RHEL7 image for s390x -
+pushing them up to Docker Hub where they can be consumed by our jenkins
+build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
+pipelines as configured in the [pipeline_config
+files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+
+### Adding a new dockerBuild dockerhub repository
+
+To add a new repository to the [AdoptOpenJDK dockerhub](https://hub.docker.com/u/adoptopenjdk), a user with `owner` privileges must create the repository initially and then give the automated `adoptopenjdkuser` user read and write permissions.
+
+Users with `owner` privileges include:
+- Tim Ellison @tellison
+- George Adams @gadams
+- Martijn Verburg @karianna
 
 ## Adding a new role to the ansible scripts
 
@@ -175,7 +201,11 @@ an individual test for example:
 `test/jdk/java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 If you then need to run manually on the machine itself (outside jenkins)
-then the process is typically like this:
+then the process is typically like this.  To avoid the test material not
+matching the JDK under test which can lead to false failures when you're
+testing a build which isn't the latest (such as a previous GA/the last
+release), it is recommended that you check out the appropriate branch for
+the last release from the aqa-tests repository in the first line here.
 
 ```sh
 git clone https://github.com/adoptium/aqa-tests && cd aqa-tests
@@ -196,8 +226,10 @@ is more information on running tests yourself in the
 
 A few examples that test specific pieces of infra-related functionality so useful to be aware of.
 These are the parameters to pass into a Grinder job in jenkins. If using
-these from the command line as per the example above, the `TARGET` name
-should have an underscore `_` prepended to it.
+these from the command line instead of a Grinder job there are a couple of
+things regarding the information in this table:
+- The `TARGET` name should have an underscore `_` prepended to it (like the shell snippet above)
+- For custom targets, specify it as a JDK_CUSTOM_TARGET variable to make e.g. `make _jdk_custom JDK_CUSTOM_TARGET=java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 | `BUILD_LIST` | `TARGET` | `CUSTOM_TARGET` | What does it test? |
 | --- | --- | --- | --- |
@@ -210,6 +242,66 @@ should have an underscore `_` prepended to it.
 
 (For the last one, that makes use of the system.custom target added via
 [this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
+
+## Running The SSL Test Suites
+<details>
+<summary>Quick Guide To Running The SSL Test Suites</summary>
+
+As part of the fix for infrastructure [issue 3059](https://github.com/adoptium/infrastructure/issues/3059) several new pre-requisite packages have been added to the Unix playbooks, usually things such as (gnutls, gnutls-utils, libnss3.so, libnssutil3.so, nss-devel, nss-tools) or their O/S specific variants. In order to validate that these tests can run following any changes, the following process can be followed once the playbooks have been run successfully:
+
+N.B. Currently the integration testing for other clients is currently not enabed on non-Linux platforms.
+
+1) Clone The Open JDK ssl test suites
+
+```
+git clone https://github.com/rh-openjdk/ssl-tests
+
+```
+
+2) Download and install the JDK to be tested, and export the TESTJAVA environment variable.
+```
+export TESTJAVA=/home/user/jdk17
+```
+
+3) Execute The 3 Test Suites To Test External clients, from the directory the git clone of the openjdk ssl test suites was carried out:
+```
+cd ssl-tests/jtreg-wrappers
+
+Run each of the following test suites:
+
+./ssl-tests-gnutls-client.sh
+./ssl-tests-nss-client.sh
+./ssl-tests-openssl-client.sh
+```
+
+Each script should produce output similar to the below, with some tests being completed, and others skipped, but as long as the tests run without errors, this can be considered a success.
+
+```
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_DHE_DSS_WITH_AES_256_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDH_RSA_WITH_AES_256_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_256_GCM_SHA384
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_128_GCM_SHA256
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_256_CBC_SHA256
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_128_CBC_SHA256
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_256_CBC_SHA
+PASSED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_RSA_WITH_AES_128_CBC_SHA
+IGNORED: SunJSSE/TLSv1.3: TLSv1.2 + TLS_EMPTY_RENEGOTIATION_INFO_SCSV
+
+```
+
+N.B. Due to a missing pre-requisite binary(tstclnt) not being available in the nss packages on Alpine, OpenSuse or SLES, the ssl-tests-nss-client.sh tests can not be run.
+
+</details>
 
 ## Testing changes
 
@@ -251,11 +343,17 @@ the Adoptium projects, and people can be given "contributor" or
 [the wiki](https://github.com/adoptium/adoptium/wiki/Working-with-Eclipse) for
 the processes around this) to the repositories which are under each Adoptium
 project as per
-[this comment](https://github.com/adoptium/infrastructure/issues/2549#issuecomment-1178903957). 
+[this comment](https://github.com/adoptium/infrastructure/issues/2549#issuecomment-1178903957).
 Most of the relevant ones are under the
 [temurin](https://projects.eclipse.org/projects/adoptium.temurin/who)
 or [aqavit](https://projects.eclipse.org/projects/adoptium.aqavit) projects.
 
+## Patching
+
+At Adoptium we use scheduled jobs within [AWX](https://awx2.adoptopenjdk.net/#/home) to execute our platform playbooks onto our machines.
+The Unix, Windows, MacOS and AIX playbooks are executed weekly onto our [machines](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) to keep them patched and up to date.
+
+For more information see https://github.com/adoptium/infrastructure/wiki/Ansible-AWX#schedules
 
 ## Adding new systems
 

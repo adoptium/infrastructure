@@ -1,0 +1,59 @@
+---
+# Xcode 11.7 is needed to build x64 JDK8 om Arm64 Mac
+# Xcode11.7 can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
+# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
+
+- name: Check if Xcode11.7 is installed
+  stat:
+    path: /Applications/Xcode-11.7.app/
+  register: xcode11_installed
+
+- name: Check if SAS variable is defined
+  set_fact:
+    apple_variables: yes
+  when: not xcode11_installed.stat.exists and vars['XCode11_7_SAS_TOKEN'] is defined
+
+- name: Display Information when XCode11_7_SAS_TOKEN is not defined
+  debug:
+    msg: "XCode11_7_SAS_TOKEN is not defined. Xcode will need to be installed manually.
+          Skipping Xcode installation"
+  when: not xcode11_installed.stat.exists and apple_variables is not defined
+
+- name: Download XCode 11.7 from Azure blob storage
+  get_url:
+    url: "https://ansiblestorageadopt.blob.core.windows.net/xcode11-7/Xcode_11.7.xip?{{ XCode11_7_SAS_TOKEN }}"
+    dest: /tmp/Xcode_11.7.xip
+    mode: 0755
+  when: not xcode11_installed.stat.exists and apple_variables is defined
+
+- name: Install Xcode11.7
+  when: not xcode11_installed.stat.exists and apple_variables is defined
+  block:
+
+    - name: Extract Xcode11.7
+      shell: xip -x /tmp/Xcode_11.7.xip
+      args:
+        chdir: /tmp
+        creates: /tmp/Xcode.app
+
+    - name: Move Xcode11.7 to /Applications directory
+      copy:
+        src: /tmp/Xcode.app
+        dest: /Applications/Xcode-11.7.app/
+        remote_src: true
+
+    - name: Install Rosetta 2
+      command: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      tags:
+        - rosetta
+
+    - name: Select Xcode11.7 as the default Xcode
+      shell: sudo xcode-select --switch /Applications/Xcode-11.7.app
+
+    - name: Accept Xcode license
+      shell: arch -x86_64 sudo xcodebuild -license accept
+
+    - name: Clean up Xcode11.7.xip file
+      file:
+        path: /tmp/Xcode_11.7.xip
+        state: absent

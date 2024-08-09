@@ -2,9 +2,13 @@
 # vi: set ft=ruby :
 
 $script = <<SCRIPT
+sudo sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+sudo sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo
 sudo yum -y update
+sudo yum -y install epel-release
 sudo yum install -y libselinux-python
 sudo yum install -y ansible
+sudo yum clean all
 sudo mkdir /ansible
 sudo cp /etc/ansible/ansible.cfg /ansible
 sudo touch /ansible/hosts

@@ -62,9 +62,8 @@
     - 140.211.168.163 # jck-osuol-ubuntu2004-ppc64le-1
     - 140.211.168.2 # jck-osuol-ubuntu2004-ppc64le-2
     - 213.146.141.66 # jck-linaro-ubuntu2004-aarch64-2
-    - 20.61.136.211 # jck-skytap-aix71-ppc64-1
-    - 20.61.136.213 # jck-skytap-aix71-ppc64-2
     - 20.61.222.79 # jck-skytap-aix72-ppc64-3
+    - 20.61.222.106 # jck-skytap-aix72-ppc64-4
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
@@ -73,6 +72,11 @@
     - 207.254.73.168 # gn324-macos11-x86_64
     - 207.254.28.13 # esmv4-macos11-arm64
     - 207.254.28.99 # noh7B-macos12-arm64
+    - 20.234.51.61 # jck-azure-ubuntu2204-x64-1
+    - 172.178.96.199 # jck-ubuntu-2204-solaris10
+    - 62.210.163.131 # jck-rise-ubuntu2404-risc64-1
+    - 62.210.163.164 # jck-rise-ubuntu2404-risc64-2
+    - 62.210.163.34 # jck-rise-ubuntu2404-risc64-3
 
 - name: Setup iptables
   iptables:
