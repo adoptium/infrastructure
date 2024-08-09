@@ -82,7 +82,7 @@ hosts:
           ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
-          ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+          ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
