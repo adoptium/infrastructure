@@ -64,4 +64,4 @@
   win_reboot:
     reboot_timeout: 1800
   when: not (hostname_output.stdout == "")
-  tags: basic_config
+  tags: basic_config, reboot

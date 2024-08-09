@@ -22,8 +22,9 @@
   tags:
     - shortnames
 
-- name: Enable shortnames on drive C:/
-  win_shell: "fsutil 8dot3name set C: 0"
+# Note that using "set C: 0" did not work in containers
+- name: Enable shortnames
+  win_shell: "fsutil 8dot3name set 0"
   when: (not enabled_shortnames.stdout)
   tags:
     - shortnames

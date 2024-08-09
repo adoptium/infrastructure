@@ -10,7 +10,7 @@
 
 - name: Test if VS 2022 is installed
   win_stat:
-    path: 'C:\Program Files\Microsoft Visual Studio\2022\Community'
+    path: 'C:\Program Files\Microsoft Visual Studio\2022'
   register: vs2022_installed
   tags: adoptopenjdk
 
@@ -95,40 +95,37 @@
 
 - name: Test if VS 2022 is installed(non adopt)
   win_stat:
-    path: 'C:\Program Files\Microsoft Visual Studio\2022\Community'
+    path: 'C:\Program Files\Microsoft Visual Studio\2022'
   register: vs2022_installed
 
 # Download & Install VS2022 When No Layout & Not AdoptOpenJDK
 # This is the target that you're redirected to when you go to https://aka.ms/vs/17/release/vs_community.exe
 - name: Download Visual Studio Community 2022
   win_get_url:
-    url: 'https://aka.ms/vs/17/release/vs_Community.exe'
-    checksum: 44957c393b3c4dcaf1918f086437a520fc3b3dee83dbe786e5d757f331257856
+# https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history
+# 17.7.34302.85    url: 'https://download.visualstudio.microsoft.com/download/pr/47b236ad-5505-4752-9d2b-5cf9795528bc/87684889f46dec53d1452f4a0ff9fec1ac202a97ebed866718d7c0269e814b28/vs_BuildTools.exe'
+    url: 'https://download.visualstudio.microsoft.com/download/pr/1d66edfe-3c83-476b-bf05-e8901c62ba7f/bac71effb5a23d7cd1a81e5f628a0c8dcb7e8a07e0aa7077c853ed84a862dceb/vs_BuildTools.exe' # 17.7.3 = 17.7.34024.191
+    checksum: bac71effb5a23d7cd1a81e5f628a0c8dcb7e8a07e0aa7077c853ed84a862dceb
     checksum_algorithm: sha256
-    dest: 'C:\temp\vs_community22.exe'
+    dest: 'C:\temp\vs_BuildTools22.exe'
     force: no
   when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
 
 - name: Run Visual Studio 2022 Installer From Download
   win_shell: |
-      Start-Process -Wait -FilePath 'C:\temp\vs_community22.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Workload.NativeDesktop --includeRecommended --includeOptional --quiet --norestart'
+      Start-Process -Wait -FilePath 'C:\temp\vs_BuildTools22.exe' -ArgumentList '--wait --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64 --includeRecommended --includeOptional --quiet --norestart'
   args:
     executable: powershell
   when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
   register: vs2022_error
   failed_when: vs2022_error.rc != 0 and vs2022_error.rc != 3010
 
-- name: Install ARM64 components
-  win_shell: Start-Process -FilePath 'C:\temp\vs_community22.exe' -Wait -NoNewWindow -ArgumentList
-    'modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community" --quiet
-    --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.VC.ATL.ARM64 --add Microsoft.VisualStudio.Component.VC.MFC.ARM64'
-  when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
-
+#  Note: If this does not find the files, then the NativeDesktop component was not installed
 - name: Register Visual Studio Community 2022 DIA SDK shared libraries
   win_command: 'regsvr32 /s "{{ item }}"'
   with_items:
-    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\msdia140.dll
-    - C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\bin\amd64\msdia140.dll
+    - C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\DIA SDK\bin\msdia140.dll
+    - C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\DIA SDK\bin\amd64\msdia140.dll
   when: (not vs2022_installed.stat.exists) and (windows_version.stdout_lines[0] | regex_search('^(10\.|11\.|2016|2019|2022)'))
 
 - name: Reboot machine after Visual Studio installation

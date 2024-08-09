@@ -35,4 +35,4 @@
   when:
     - (powershell_output.stdout < '5')
     - hotfix_install.reboot_required
-  tags: WMF
+  tags: WMF,reboot

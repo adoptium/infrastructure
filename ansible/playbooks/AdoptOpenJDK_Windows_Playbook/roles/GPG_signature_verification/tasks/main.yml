@@ -24,7 +24,7 @@
 
 - name: Import GPG Signing Key
   win_shell: |
-    C:/cygwin64/bin/bash.exe -c "gpg --batch --import c:/temp/gpgkey.asc"
+    C:/cygwin64/bin/bash.exe -c "gpg2 --batch --import c:/temp/gpgkey.asc"
   failed_when: false
 
 - name: Re-enable gpgagent
@@ -39,7 +39,7 @@
   win_command: wget -q "{{ signature_link }}" -O sigfile
 
 - name: Verify binary
-  win_shell: C:/cygwin64/bin/bash.exe -c "gpg --verify sigfile {{ file_path }}"
+  win_shell: C:/cygwin64/bin/bash.exe -c "gpg2 --verify sigfile {{ file_path }}"
 
 - name: Remove gnupg directory with Cygwin ( when it didnt exist previously )
   win_shell: C:/cygwin64/bin/bash.exe -c "rm -rf ~/.gnupg"
