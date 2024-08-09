@@ -144,7 +144,7 @@ hosts:
           rhel8-s390x-2: {ip: 148.100.74.2}
           sles12-s390x-2: {ip: 148.100.74.193}
           sles15-s390x-2: {ip: 148.100.74.154, ansible_python_interpreter: /usr/bin/python3}
-          ubuntu2004-s390x-1: {ip: 148.100.74.240}
+          ubuntu2404-s390x-1: {ip: 148.100.75.204}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
       # Rise machines are hosted in Scaleway
