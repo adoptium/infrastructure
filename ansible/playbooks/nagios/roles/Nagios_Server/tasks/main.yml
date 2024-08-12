@@ -52,6 +52,10 @@
   include_tasks: configure_nagios_server_monitoring.yml
   when: '"configure_nagios_server_monitoring" in task_list'
 
+- name: Configure Nagios-Server-Crontab
+  include_tasks: configure_nagios_server_crontab.yml
+  when: '"configure_nagios_server_crontab" in task_list'
+
 - name: Restart Nagios Server
   include_tasks: restart_nagios_server.yml
   when: '"restart_nagios_server" in task_list'
