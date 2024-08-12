@@ -409,8 +409,6 @@
           when: virtualbox_installed.rc != 0
           tags: VBox
 
-
-
       ##########
       #  QEMU  #
       ##########
