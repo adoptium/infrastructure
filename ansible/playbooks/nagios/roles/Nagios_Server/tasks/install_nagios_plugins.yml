@@ -67,3 +67,15 @@
     src: roles/Nagios_Server/files/nagios_server_plugins/check_nagios_sync
     dest: /usr/local/nagios/libexec/check_check_nagios_sync
     mode: 0755
+
+- name: Copy Nagios Server SSH Configuration Plugin
+  copy:
+    src: roles/Nagios_Server/files/nagios_server_plugins/setup_ssh.sh
+    dest: /usr/local/nagios/libexec/setup_ssh.sh
+    mode: 0755
+
+- name: Copy Nagios Server SSH Configuration Plugin Excludes File
+  copy:
+    src: roles/Nagios_Server/files/nagios_server_plugins/excluded_ips.list
+    dest: /usr/local/nagios/libexec/excluded_ips.list
+    mode: 0755
