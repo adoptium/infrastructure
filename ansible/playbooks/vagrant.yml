@@ -415,15 +415,10 @@
       #  QEMU  #
       ##########
 
-        - name: Check to see if QEMU is installed
-          shell: qemu-system-x86_64 --version >/dev/null 2>&1
-          failed_when: false
-          register: qemu_installed
-          tags: QEMU
-
         - name: Install QEMU Packages
           apt:
             name: "{{ packages }}"
+            state: present
             update_cache: yes
           vars:
             packages:
@@ -433,11 +428,11 @@
               - libvirt-clients
               - bridge-utils
               - libvirt-daemon-system
+              - qemu-system-x86_64
               - qemu-system-s390x
               - qemu-system-ppc
               - qemu-system-arm
               - qemu-system-misc
-          when: qemu_installed.rc != 0
           tags: QEMU
 
         ################
