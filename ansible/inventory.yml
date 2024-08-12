@@ -84,7 +84,7 @@ hosts:
           ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
-          ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+          ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
@@ -146,7 +146,7 @@ hosts:
           rhel8-s390x-2: {ip: 148.100.74.2}
           sles12-s390x-2: {ip: 148.100.74.193}
           sles15-s390x-2: {ip: 148.100.74.154, ansible_python_interpreter: /usr/bin/python3}
-          ubuntu2004-s390x-1: {ip: 148.100.74.240}
+          ubuntu2404-s390x-1: {ip: 148.100.75.204}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
       # Rise machines are hosted in Scaleway

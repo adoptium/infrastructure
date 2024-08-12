@@ -1,0 +1,10 @@
+---
+
+- name: Create crontab entry for nagios user if it doesn't exist
+  cron:
+    name: "Run Nagios SSH setup script daily"
+    user: nagios
+    minute: "0"
+    hour: "0"
+    job: "/usr/local/nagios/libexec/setup_ssh.sh"
+    state: present
