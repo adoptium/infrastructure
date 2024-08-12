@@ -43,7 +43,7 @@
               - zlib1g
               - zlib1g-dev
               - python3-pip
-              # - python-dev
+              - python-is-python3
               - build-essential
               - gettext
               - libcurl4-openssl-dev
