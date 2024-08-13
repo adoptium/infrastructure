@@ -450,8 +450,8 @@
           file:
             path: "{{ home_folder }}/.ssh"
             state: directory
-            owner: "{{ Jenkins_Username}}"
-            group: "{{ Jenkins_Username}}"
+            owner: "{{ Jenkins_Username }}"
+            group: "{{ Jenkins_Username }}"
             mode: '0700'
           tags: jenkins_user
 

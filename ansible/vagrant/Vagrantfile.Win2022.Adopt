@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
     v.gui = false
     v.memory = 8192
     v.cpus = 2
-    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
   end
   config.vm.boot_timeout = 600
 end
