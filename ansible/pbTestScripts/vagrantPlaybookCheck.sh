@@ -292,7 +292,8 @@ startVMPlaybook()
 		# Remove IP from known_hosts as the playbook installs an
 		# alternate sshd which regenerates the host key infra#2244
 		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-		ssh_args="$ssh_args -o StrictHostKeyChecking=no -o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa"
+		ssh-keyscan -t rsa -p ${vagrantPORT} -H 127.0.0.1 > ~/.ssh/known_hosts
+		ssh_args="$ssh_args -o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa"
 	fi
 
 	if [[ "$testNativeBuild" = true ]]; then
