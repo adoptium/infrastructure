@@ -432,7 +432,17 @@ startVMPlaybookWin()
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
 
 			# Run a python script to start a test for the built JDK on the Windows VM
-			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+			if [[ $PYTHON_VERSION == *"Python 2."* ]]; then
+					echo "Python 2 detected"
+					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+			elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
+					echo "Python 3 detected"
+					python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+			else
+					echo "Python is not installed or is of an unsupported version."
+					exit 99
+			fi
+
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then
 				echo TEST FAILED
