@@ -7,14 +7,13 @@
 
 # This task doesn't actually matter, aslong as it runs and is registered. The timestamp for the registered variable is used
 - name: Dummy task to get timestamp
-  win_command: whoami
+  win_command: cmd /c echo hello
   register: date_output
 
 # Accounts for cases where playbook executor is windows and its executing on localhost
-- name: Get Latest git commit SHA (Windows Localhost)
-  win_command: git rev-parse HEAD
+- name: Get Latest git commit SHA (Windows local container)
+  win_command: C:\cygwin64\bin\git -C C:/infrastructure rev-parse HEAD
   register: git_output
-  delegate_to: localhost
   ignore_errors: yes
   when:
     - git_sha is not defined

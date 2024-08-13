@@ -81,7 +81,7 @@ hosts:
 
       - azure:
           ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
-          ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
+          ubuntu2404-x64-1: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
           ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
