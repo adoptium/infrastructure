@@ -406,7 +406,22 @@ startVMPlaybookWin()
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/adoptium/infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		## This Needs Amendments To Work With Python 3, so check the current version of python, and run the appropriate script
+
+		# Check the Python version
+		PYTHON_VERSION=$(python -V 2>&1)
+
+		if [[ $PYTHON_VERSION == *"Python 2."* ]]; then
+		    echo "Python 2 detected"
+		    python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
+		    echo "Python 3 detected"
+		    python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		else
+		    echo "Python is not installed or is of an unsupported version."
+				exit 99
+		fi
+
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
