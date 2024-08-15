@@ -36,7 +36,7 @@
   replace:
     path: /etc/environment
     regexp: 'PATH=/usr/bin'
-    replace: 'PATH=/usr/bin:/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:/etc'
+    replace: 'PATH=/usr/bin:/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:'
   tags:
     - login_shell
     - adoptopenjdk
