@@ -7,14 +7,18 @@
     path: /etc/security/login.cfg
     regexp: 'shells = '
     replace: 'shells = /bin/bash,'
-  tags: login_shell
+  tags:
+    - login_shell
+    - adoptopenjdk
 
 - name: Add bash to available login shells
   blockinfile:
     dest: /etc/shells
     block: |
       /bin/bash
-  tags: login_shell
+  tags:
+    - login_shell
+    - adoptopenjdk
 
 # move to role later
 - name: Set variables for global environment
@@ -24,11 +28,15 @@
       AIXTHREAD_HRT=true
       PKG_CONFIG_PATH=/opt/freeware/lib64/pkgconfig:/opt/freeware/lib/pkgconfig
       PERL5LIB=/opt/freemarker/lib/perl5
-  tags: login_shell
+  tags:
+    - login_shell
+    - adoptopenjdk
 
 - name: Add freeware and xlc to PATH for global environment
   replace:
     path: /etc/environment
     regexp: 'PATH=/usr/bin'
-    replace: 'PATH=/opt/freeware/bin:/opt/IBM/xlC/13.1.3/bin:/usr/bin'
-  tags: login_shell
+    replace: 'PATH=/usr/bin:/opt/IBM/xlC/13.1.3/bin:/opt/freeware/bin:/etc'
+  tags:
+    - login_shell
+    - adoptopenjdk
