@@ -418,8 +418,18 @@ startVMPlaybookWin()
 		    python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
 		elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
 		    echo "Python 3 detected"
-				echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
-		    python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+				##echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+		    ##python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+				# Create Powershell Script To Launch Build
+				echo "Set-Location -Path \"C:/tmp\"" > BuildJDK_Tmp.ps1
+				if [ "$buildHotspot" != "" ]; then
+					echo "& sh \"C:/vagrant/pbTestScripts/buildJDKWin.sh\" $buildFork $buildBranch $jdkToBuild --hotspot" >> BuildJDK_Tmp.ps1
+				else
+					echo "& sh \"C:/vagrant/pbTestScripts/buildJDKWin.sh\" $buildFork $buildBranch $jdkToBuild" >> BuildJDK_Tmp.ps1
+				fi
+				# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
+				vagrant winrm -s powershell -e -c 'copy c:/vagrant/BuildJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
+				vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/BuildJDK_Tmp.ps1' | tee $buildLogPath
 		else
 		    echo "Python is not installed or is of an unsupported version."
 				exit 99
@@ -440,8 +450,13 @@ startVMPlaybookWin()
 					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 			elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
 					echo "Python 3 detected"
-					echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
-					python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+					#echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+					#python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+					# Create Powershell Script To Launch Tests
+					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh\"" > testJDK_Tmp.ps1
+					# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
+					vagrant winrm -s powershell -e -c 'copy c:/vagrant/testJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
+					vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/testJDK_Tmp.ps1' | tee $testLogPath
 			else
 					echo "Python is not installed or is of an unsupported version."
 					exit 99
