@@ -88,7 +88,6 @@ EOF
   # Install Xcode
   provisioner "ansible-local" {
     # We only install Xcode on the arm64 VM (build tools is enough for the Intel test VMs)
-    only = ["macstadium-orka.sonoma-arm64"]
     playbook_file = "../playbooks/AdoptOpenJDK_Unix_Playbook/main.yml"
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
