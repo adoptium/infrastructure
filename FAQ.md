@@ -96,11 +96,12 @@ have at the moment:
 
 The RHEL7 image creation for s390x has to be run on a RHEL host using a
 container implementation supplied by Red Hat, and we are using RHEL8 for
-this as it has a stable implemention.  The image creation requires the
+this as it has a stable implemention. The image creation requires the
 following:
 
 1. The host needs to have an active RHEL subscription
-2. The RHEL7 devkit (which cannot be made public) to be available in a tar file under /usr/local on the host as per the name in the Dockerfile
+2. The RHEL7 devkit (which cannot be made public) is to be available in a tar file under `/usr/local` on the host as per the name in the Dockerfile.
+
 </details>
 
 When a change lands into master, the relevant dockerfiles are built using
@@ -109,7 +110,8 @@ the ansible playbooks and - with the exception of the RHEL7 image for s390x -
 pushing them up to Docker Hub where they can be consumed by our jenkins
 build agents when the `DOCKER_IMAGE` value is defined on the jenkins build
 pipelines as configured in the [pipeline_config
-files](https://github.com/AdoptOpenJDK/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+  files](https://github.com/adoptium/ci-jenkins-pipelines/tree/master/pipelines/jobs/configurations).
+
 
 ### Adding a new dockerBuild dockerhub repository
 
