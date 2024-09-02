@@ -120,84 +120,37 @@
           when: default_java.rc != 0
           tags: java
 
-      ##########
-      # Java 17 #
-      ##########
+      ###########
+      # Java 21 #
+      ###########
 
-        - name: Check if jdk-17 is already installed in the target location
-          shell: ls -ld /usr/lib/jvm/jdk-17 >/dev/null 2>&1
+        - name: Check if jdk-21 is already installed in the target location
+          shell: ls -ld /usr/lib/jvm/jdk-21 >/dev/null 2>&1
           failed_when: false
-          register: jdk17_installed
+          register: jdk21_installed
           changed_when: false
           tags: java
 
-        - name: Download the OpenJDK tar.gz file
+        - name: Download the Latest JDK21 OpenJDK tar.gz file via the API
           get_url:
-            url: "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz"
-            dest: "/tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz"
-          when: jdk17_installed.rc != 0
+            url: "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk"
+            dest: "/tmp/JDK21.tar.gz"
+          when: jdk21_installed.rc != 0
           tags: java
 
-        - name: Download the SHA256 checksum file
-          get_url:
-            url: "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz.sha256.txt"
-            dest: "/tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz.sha256.txt"
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Read the expected SHA256 checksum
-          command: cat /tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz.sha256.txt
-          register: sha256_checksum_file
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Extract the expected SHA256 checksum from the file
-          set_fact:
-            expected_sha256: "{{ sha256_checksum_file.stdout.split()[0] }}"
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Calculate the SHA256 checksum of the downloaded file
-          command: sha256sum /tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz
-          register: calculated_sha256
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Extract the actual checksum from the command output
-          set_fact:
-            actual_sha256: "{{ calculated_sha256.stdout.split()[0] }}"
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Validate the checksum
-          assert:
-            that:
-              - actual_sha256 == sha256_checksum_file.stdout.split()[0]
-            fail_msg: "The SHA256 checksum does not match, the file may be corrupted."
-            success_msg: "The SHA256 checksum matches."
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Install JDK17 if one not already installed
+        - name: Install JDK21 if one not already installed
           unarchive:
-            src: /tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz
+            src: /tmp/JDK21.tar.gz
             dest: /usr/lib/jvm
             remote_src: yes
-          when: jdk17_installed.rc != 0
+          when: jdk21_installed.rc != 0
           tags: java
 
         - name: Remove Download JDK
           file:
-            path: /tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz
+            path: /tmp/JDK21.tar.gz
             state: absent
-          when: jdk17_installed.rc != 0
-          tags: java
-
-        - name: Remove Download JDK
-          file:
-            path: /tmp/OpenJDK17U-jdk_x64_linux_hotspot_17.0.9_9.tar.gz.sha256.txt
-            state: absent
-          when: jdk17_installed.rc != 0
+          when: jdk21_installed.rc != 0
           tags: java
 
       ###########
@@ -396,19 +349,6 @@
           when: virtualbox_installed.rc != 0
           tags: VBox
 
-        ## Configure Acceptance For VBox Extension Pack
-
-        - name: Set VirtualBox extension pack license agreement
-          shell: echo virtualbox-ext-pack virtualbox-ext-pack/license select true | sudo debconf-set-selections
-          when: debconf_status.rc != 0
-
-        - name: Install VirtualBox Extension Pack
-          apt:
-            name: "virtualbox-ext-pack"
-            state: present
-          when: virtualbox_installed.rc != 0
-          tags: VBox
-
       ##########
       #  QEMU  #
       ##########
@@ -426,7 +366,7 @@
               - libvirt-clients
               - bridge-utils
               - libvirt-daemon-system
-              - qemu-system-x86_64
+              - qemu-system-x86
               - qemu-system-s390x
               - qemu-system-ppc
               - qemu-system-arm
