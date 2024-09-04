@@ -4,11 +4,15 @@
 #  ------------- Vagrant --------------#
 ########################################
 
-- name: Vagrant play
+- name: Vagrant playbook
   hosts: all
   gather_facts: yes
   remote_user: root
   become: yes
+  vars:
+    # Jenkins User Variables:
+    Jenkins_Username: jenkins
+    # Jenkins_User_SSHKey: "Update This With Jenkins User SSH Key"
 
   tasks:
     - name: Vagrant playbook
@@ -38,15 +42,22 @@
               - tree
               - zlib1g
               - zlib1g-dev
-              - python-pip
-              - python-dev
+              - python3-pip
+              - python-is-python3
               - build-essential
               - gettext
               - libcurl4-openssl-dev
               - sshpass
+              # Pre-Reqs For Vbox
+              - libssl-dev
+              - libvpx-dev
+              - libsdl-ttf2.0-0
+              - evince
 
         - name: Run apt-get upgrade
-          apt: upgrade=safe
+          apt: upgrade=safe update_cache=yes
+          tags: patch_update
+
 
         - name: Pip install winrm modules
           pip:
@@ -107,6 +118,39 @@
             - /bin/java
             - /bin/javac
           when: default_java.rc != 0
+          tags: java
+
+      ###########
+      # Java 21 #
+      ###########
+
+        - name: Check if jdk-21 is already installed in the target location
+          shell: ls -ld /usr/lib/jvm/jdk-21 >/dev/null 2>&1
+          failed_when: false
+          register: jdk21_installed
+          changed_when: false
+          tags: java
+
+        - name: Download the Latest JDK21 OpenJDK tar.gz file via the API
+          get_url:
+            url: "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk"
+            dest: "/tmp/JDK21.tar.gz"
+          when: jdk21_installed.rc != 0
+          tags: java
+
+        - name: Install JDK21 if one not already installed
+          unarchive:
+            src: /tmp/JDK21.tar.gz
+            dest: /usr/lib/jvm
+            remote_src: yes
+          when: jdk21_installed.rc != 0
+          tags: java
+
+        - name: Remove Download JDK
+          file:
+            path: /tmp/JDK21.tar.gz
+            state: absent
+          when: jdk21_installed.rc != 0
           tags: java
 
       ###########
@@ -211,32 +255,56 @@
           register: vagrant_version
           tags: vagrant
 
-        - name: Download Vagrant
-          get_url:
-            url: https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
-            dest: /tmp/vagrant_2.2.5_x86_64.deb
-            checksum: sha256:415f50b93235e761db284c761f6a8240a6ef6762ee3ec7ff869d2bccb1a1cdf7
+        - name: Download and add the HashiCorp GPG key
+          ansible.builtin.get_url:
+            url: https://apt.releases.hashicorp.com/gpg
+            dest: /tmp/hashicorp.gpg
           when:
-            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
           tags: vagrant
 
-        - name: Remove system vagrant if necessary
-          apt:
-            name: vagrant
-            state: absent
-          when: (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
+        - name: Add the HashiCorp GPG key to the keyring
+          ansible.builtin.command:
+            cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp.gpg
+            creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
           tags: vagrant
+
+        - name: Add the HashiCorp repository
+          ansible.builtin.command:
+            cmd: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+            creates: /etc/apt/sources.list.d/hashicorp.list
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+        - name: Update apt package index
+          ansible.builtin.apt:
+            update_cache: yes
 
         - name: Install Vagrant
-          command: dpkg -i /tmp/vagrant_2.2.5_x86_64.deb
-          become: yes
+          ansible.builtin.apt:
+            name: vagrant
+            state: present
           when:
-            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.5', operator='lt'))
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+        - name: Install Vagrant Plugins For WinRM
+          ansible.builtin.apt:
+            name: vagrant
+            state: present
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
           tags: vagrant
 
       ##############
       # VirtualBox #
       ##############
+        - name: Update apt cache
+          apt:
+            update_cache: yes
 
         - name: Check if Virtualbox is installed
           shell: which virtualbox >/dev/null 2>&1
@@ -260,10 +328,24 @@
           when: virtualbox_installed.rc != 0
           tags: VBox
 
-        - name: Install Virtualbox
+        - name: Update apt cache Again
           apt:
-            name: virtualbox-6.0
             update_cache: yes
+          when: virtualbox_installed.rc != 0
+
+        - name: Install linux headers and dkms
+          apt:
+            name:
+              - "linux-headers-{{ ansible_kernel }}"
+              - dkms
+            state: present
+          when: virtualbox_installed.rc != 0
+          tags: VBox
+
+        - name: Install VirtualBox
+          apt:
+            name: "virtualbox"
+            state: present
           when: virtualbox_installed.rc != 0
           tags: VBox
 
@@ -271,55 +353,134 @@
       #  QEMU  #
       ##########
 
-        - name: Check to see if QEMU is installed
-          shell: qemu-system-s390x --version >/dev/null 2>&1
-          failed_when: false
-          register: qemu_installed
-          tags: QEMU
-
-        - name: Add repos to APT
-          apt_repository:
-            repo: '{{ item }}'
-            state: present
-          with_items:
-            - "deb [trusted=yes] http://ftp.uk.debian.org/debian sid main"
-            - "deb [trusted=yes] http://ftp.uk.debian.org/debian experimental main"
-          when: qemu_installed.rc != 0
-          tags: QEMU
-
-        - name: Install QEMU dependencies
+        - name: Install QEMU Packages
           apt:
             name: "{{ packages }}"
+            state: present
             update_cache: yes
           vars:
             packages:
-              - libfdt-dev
-              - libglib2.0-dev
-              - libguestfs-tools
-              - libiscsi-dev
-              - libnfs-dev
-              - libpixman-1-dev
-              - opensbi
-              - qemu-efi-aarch64
-              - qemu-utils
-              - u-boot-qemu
-              - zliblg-dev
-          when: qemu_installed.rc != 0
+              - qemu-kvm
+              - virt-manager
+              - virtinst
+              - libvirt-clients
+              - bridge-utils
+              - libvirt-daemon-system
+              - qemu-system-x86
+              - qemu-system-s390x
+              - qemu-system-ppc
+              - qemu-system-arm
+              - qemu-system-misc
           tags: QEMU
 
-        - name: Extract source code
-          unarchive:
-            src: https://download.qemu.org/qemu-5.0.0.tar.xz
-            dest: /tmp
-            remote_src: yes
-          retries: 3
-          delay: 5
-          register: qemu_download
-          until: qemu_download is not failed
-          when: qemu_installed.rc != 0
-          tags: QEMU
+        ################
+        # Jenkins_User #
+        ################
+        - name: Set Home Folder for Jenkins user
+          set_fact:
+            home_folder: /home/{{ Jenkins_Username }}
+          tags: jenkins_user
 
-        - name: Install QEMU
-          shell: cd /tmp/qemu-5.0.0 && ./configure && make && make install
-          when: qemu_installed.rc != 0
-          tags: QEMU
+        - name: Create Jenkins user
+          action: user name={{ Jenkins_Username }} state=present home={{ home_folder }} shell=/bin/bash
+          failed_when: false
+          tags: jenkins_user
+
+        - name: Create Jenkins SSH Folder
+          file:
+            path: "{{ home_folder }}/.ssh"
+            state: directory
+            owner: "{{ Jenkins_Username }}"
+            group: "{{ Jenkins_Username }}"
+            mode: '0700'
+          tags: jenkins_user
+
+        - name: Add github.com to known_hosts
+          known_hosts:
+            name: github.com
+            key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+            path: "{{ home_folder }}/.ssh/known_hosts"
+            state: present
+          tags: jenkins_user
+
+        - name: Change ownership of jenkins' ~/.ssh/known_hosts
+          file:
+            path: "{{ home_folder }}/.ssh/known_hosts"
+            owner: "{{ Jenkins_Username }}"
+            mode: 0644
+          tags: jenkins_user
+
+        - name: Add Jenkins user to the audio group
+          user: name={{ Jenkins_Username }}
+            groups=audio
+            append=yes
+          tags: jenkins_user
+
+        - name: Set authorized key for Jenkins user
+          authorized_key:
+            user: "{{ Jenkins_Username }}"
+            state: present
+            key: "{{ Jenkins_User_SSHKey }}"
+          tags: jenkins_user
+
+        - name: Pip install winrm modules
+          pip:
+            executable: /usr/bin/pip
+            name: ["requests-credssp", "pywinrm"]
+          become: yes
+          become_user: "{{ Jenkins_Username }}"
+          tags: jenkins_user
+
+        ####################################
+        # Vagrant Plugins For Jenkins User #
+        ####################################
+        ## Vagrant Plugins Are User Specific, So Install As Jenkins User
+
+        - name: Install Vagrant plugin winrm
+          command: vagrant plugin install winrm
+          register: winrm_installed
+          changed_when: "'installed' in winrm_installed.stdout"
+          failed_when: winrm_installed.rc != 0 and "'already installed' not in winrm_installed.stdout"
+          ignore_errors: yes
+          become: yes
+          become_user: "{{ Jenkins_Username }}"
+
+        - name: Install Vagrant plugin winrmfs
+          command: vagrant plugin install winrm-fs
+          register: winrmfs_installed
+          changed_when: "'installed' in winrmfs_installed.stdout"
+          failed_when: winrmfs_installed.rc != 0 and "'already installed' not in winrmfs_installed.stdout"
+          ignore_errors: yes
+          become: yes
+          become_user: "{{ Jenkins_Username }}"
+
+        - name: Install Vagrant plugin winrm-elevated
+          command: vagrant plugin install winrm-elevated
+          register: winrmelevate_installed
+          changed_when: "'installed' in winrmelevate_installed.stdout"
+          failed_when: winrmelevate_installed.rc != 0 and "'already installed' not in winrmelevate_installed.stdout"
+          ignore_errors: yes
+          become: yes
+          become_user: "{{ Jenkins_Username }}"
+
+        - name: Install Vagrant plugin vagrant-disksize
+          command: vagrant plugin install vagrant-disksize
+          register: disksize_installed
+          changed_when: "'installed' in disksize_installed.stdout"
+          failed_when: disksize_installed.rc != 0 and "'already installed' not in disksize_installed.stdout"
+          ignore_errors: yes
+          become: yes
+          become_user: "{{ Jenkins_Username }}"
+
+        - name: Ensure all plugins are installed
+          fail:
+            msg: "Failed to install Vagrant plugins"
+          when: winrm_installed.failed or winrmfs_installed.failed or winrmelevate_installed.failed or disksize_installed.failed
+
+        - name: Output installation results
+          debug:
+            msg: >
+              winrm plugin installation: {{ winrm_installed.stdout }}
+              winrmfs plugin installation: {{ winrmfs_installed.stdout }}
+              winrm-elevated plugin installation: {{ winrmelevate_installed.stdout }}
+              vagrant-disksize plugin installation: {{ disksize_installed.stdout }}
