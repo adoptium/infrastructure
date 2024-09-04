@@ -85,6 +85,7 @@
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
     - NSClient                    # Required For Nagios Monitoring
+    - Incredibuild                # Configure Incredibuild Dashboard Service
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
     - role: Jenkins_Service_Installation # Automate installing the jenkins service
