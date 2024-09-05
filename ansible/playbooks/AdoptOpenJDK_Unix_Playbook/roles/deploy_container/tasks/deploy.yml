@@ -9,7 +9,7 @@
 - name: Set docker buildx command if building arm32 container
   set_fact:
     docker_build_command: "docker buildx build --platform linux/v7/arm"
-    arm32_suffix: ".ARM32"
+    arm32_suffix: ".arm32"
     ansible_architecture: arm
     docker_run_command: "docker run --platform linux/v7/arm"
   when: build_arm32 is defined and build_arm32 == "yes"
@@ -53,4 +53,4 @@
   when: not (docker_port_output.stdout == "")
 
 - name: Run {{ docker_image }} docker container
-  command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus='0-3' --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix }} aqa_{{ docker_image }}{{ arm32_suffix }}"
+  command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus='0-3' --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix | upper }} aqa_{{ docker_image }}{{ arm32_suffix }}"

@@ -15,6 +15,8 @@ hosts:
           ubuntu2204-x64-1: {ip: 172.187.163.163, user: adoptopenjdk, description: infra-wazuh-server}
           ubuntu2204-x64-2: {ip: 20.90.182.165, description: trss.adoptium.net}
           ubuntu2204-x64-3: {ip: 172.187.93.97, description: awx.adoptium.net}
+          ubuntu2204-vagrant-x64-1: {ip: 172.203.178.157, description: VPC-Qemu-1}
+          ubuntu2204-vagrant-x64-2: {ip: 48.217.96.46, description: VPC-Qemu-2}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
@@ -79,10 +81,10 @@ hosts:
 
       - azure:
           ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
-          ubuntu2204-x64-2: {ip: 20.83.24.86, description: 16 cores, 64GB}
+          ubuntu2404-x64-1: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
-          ubuntu2004-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
+          ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
@@ -144,7 +146,7 @@ hosts:
           rhel8-s390x-2: {ip: 148.100.74.2}
           sles12-s390x-2: {ip: 148.100.74.193}
           sles15-s390x-2: {ip: 148.100.74.154, ansible_python_interpreter: /usr/bin/python3}
-          ubuntu2004-s390x-1: {ip: 148.100.74.240}
+          ubuntu2404-s390x-1: {ip: 148.100.75.204}
           ubuntu2204-s390x-1: {ip: 148.100.74.105}
 
       # Rise machines are hosted in Scaleway
