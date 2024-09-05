@@ -275,7 +275,18 @@ startVMPlaybook()
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
-	ansible-playbook $verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup} playbooks/AdoptOpenJDK_Unix_Playbook/main.yml 2>&1 | tee $WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log
+	# Check if the OS is Solaris10 and add specific ssh-rsa algorithms
+	sshargs=""
+	if [ "$OS" == "Solaris10" ]; then
+	    sshargs="--ssh-extra-args='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa'"
+	fi
+
+	# Initialize the args variable with common arguments
+	args="$verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b $sshargs --skip-tags adoptopenjdk,jenkins${skipFullSetup}"
+
+	# Run the ansible playbook with the constructed args
+	eval ansible-playbook $args "playbooks/AdoptOpenJDK_Unix_Playbook/main.yml" 2>&1 | tee "$WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log"
+
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
 		echo PLAYBOOK FAILED
@@ -286,7 +297,8 @@ startVMPlaybook()
 		# Remove IP from known_hosts as the playbook installs an
 		# alternate sshd which regenerates the host key infra#2244
 		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-		ssh_args="$ssh_args -o StrictHostKeyChecking=no"
+		ssh-keyscan -t rsa -p ${vagrantPORT} -H 127.0.0.1 > ~/.ssh/known_hosts
+		ssh_args="$ssh_args -o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa"
 	fi
 
 	if [[ "$testNativeBuild" = true ]]; then
@@ -400,18 +412,61 @@ startVMPlaybookWin()
 
 		# Run a python script to start the build on the Windows VM to give live stdout/stderr
 		# See: https://github.com/adoptium/infrastructure/issues/1296
-		python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		## This Needs Amendments To Work With Python 3, so check the current version of python, and run the appropriate script
+
+		# Check the Python version
+		PYTHON_VERSION=$(python -V 2>&1)
+
+    echo "Starting Build"
+		if [[ $PYTHON_VERSION == *"Python 2."* ]]; then
+		    echo "Python 2 detected"
+		    python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+		elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
+		    echo "Python 3 detected"
+				##echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+		    ##python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -a "$buildFork $buildBranch $jdkToBuild $buildHotspot" -b 2>&1 | tee $buildLogPath
+				# Create Powershell Script To Launch Build
+				echo "Set-Location -Path \"C:/tmp\"" > BuildJDK_Tmp.ps1
+				if [ "$buildHotspot" != "" ]; then
+					echo "& sh \"C:/vagrant/pbTestScripts/buildJDKWin.sh\" $buildFork $buildBranch $jdkToBuild --hotspot" >> BuildJDK_Tmp.ps1
+				else
+					echo "& sh \"C:/vagrant/pbTestScripts/buildJDKWin.sh\" $buildFork $buildBranch $jdkToBuild" >> BuildJDK_Tmp.ps1
+				fi
+				# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
+				vagrant winrm -s powershell -e -c 'copy c:/vagrant/BuildJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
+				vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/BuildJDK_Tmp.ps1' | tee $buildLogPath
+		else
+		    echo "Python is not installed or is of an unsupported version."
+				exit 99
+		fi
+
 		echo The build finished at : `date +%T`
 		if grep -q '] Error' $buildLogPath || grep -q 'configure: error' $buildLogPath; then
 			echo BUILD FAILED
 			exit 127
 		fi
 
+		echo "Starting Tests.."
 		if [[ "$runTest" = true ]]; then
 			local testLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.test_log"
-
 			# Run a python script to start a test for the built JDK on the Windows VM
-			python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+			if [[ $PYTHON_VERSION == *"Python 2."* ]]; then
+					echo "Python 2 detected"
+					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+			elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
+					echo "Python 3 detected"
+					#echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+					#python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+					# Create Powershell Script To Launch Tests
+					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh\"" > testJDK_Tmp.ps1
+					# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
+					vagrant winrm -s powershell -e -c 'copy c:/vagrant/testJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
+					vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/testJDK_Tmp.ps1' | tee $testLogPath
+			else
+					echo "Python is not installed or is of an unsupported version."
+					exit 99
+			fi
+
 			echo The test finished at : `date +%T`
 			if ! grep -q 'FAILED: 0' $testLogPath; then
 				echo TEST FAILED
