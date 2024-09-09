@@ -27,7 +27,7 @@
     backup: yes
   when: incredibuild_conf_file.stat.exists
 
-- name: Stop the IBX Dashboard service if it exists
+- name: Start the IBX Dashboard service if it exists
   ansible.windows.win_service:
     name: IBXDashboard
     state: started
