@@ -12,7 +12,11 @@
   win_get_url:
     url: https://cygwin.com/setup-x86_64.exe
     dest: C:\temp\cygwin.exe
+    force: no
+    checksum: e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8
+    checksum_algorithm: sha256
   when: not cygwin_installed.stat.exists
+  register: cygwin_download
   tags: cygwin
 
 # If you update this with a new package, modify the "Test
