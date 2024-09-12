@@ -93,13 +93,38 @@
     - (ansible_distribution != "Ubuntu" or ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "22") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
   tags: nasm
 
-- name: Running ./configure & make for nasm ( Ubuntu 22+ x64 )
+- name: Running ./configure & make for nasm ( Ubuntu 22 x64 )
   shell: cd /tmp/nasm-2.13.03 && CC={{ CC }} && ./configure -prefix=/usr/local && make install
   environment:
     CC: "{{ CC }}"
     LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
   when:
-    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "22" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "22" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
+  tags: nasm
+
+- name: Copy Nasm Patch ( Ubuntu 24+ )
+  copy:
+    src: files/nasm_patch.patch
+    dest: /tmp/nasm-2.13.03
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "24" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
+  tags: nasm
+
+- name: Apply Patch For NASM ( Ubuntu 24+ x64 )
+  shell: cd /tmp/nasm-2.13.03 && git apply nasm_patch.patch
+  when:
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "24" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
+  tags: nasm
+
+- name: Running ./configure & make for nasm ( Ubuntu 24+ x64 )
+  shell: cd /tmp/nasm-2.13.03 && ./configure -prefix=/usr/local && make install
+  environment:
+    LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
+  when:
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "24" and ansible_architecture == "x86_64") and (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('2.13.03', operator='ne')) )
   tags: nasm
 
 - name: Remove downloaded packages for nasm
