@@ -47,7 +47,6 @@ processArgs() {
 
 usage() {
 	echo "Usage: ./buildJDK.sh <options>
-
 	Options:
 		--version | -v		Specify the JDK version to build
 		--fork | -f             Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
@@ -55,7 +54,6 @@ usage() {
 		--hotspot | -hs		Builds hotspot, default is openj9
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
-
 	If not specified, JDK8-J9 will be built with the standard openjdk-build repo"
 	echo
 }
@@ -173,9 +171,9 @@ fi
 export CONFIGURE_ARGS="--with-native-debug-symbols=none"
 export BUILD_ARGS="--custom-cacerts false"
 
-# For Ubutu24.04 Support - Dont Use gcc-7
+# For Ubuntu24.04 Support - Don't Use gcc-7
 if grep 'noble' /etc/*-release >/dev/null 2>&1; then
-export BUILD_ARGS="--custom-cacerts false --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
+        export BUILD_ARGS="--custom-cacerts false --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
 fi
 
 echo "buildJDK.sh DEBUG:
