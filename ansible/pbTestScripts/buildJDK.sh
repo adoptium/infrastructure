@@ -175,8 +175,7 @@ export BUILD_ARGS="--custom-cacerts false"
 
 # For Ubutu24.04 Support - Dont Use gcc-7
 if grep 'noble' /etc/*-release >/dev/null 2>&1; then
-	export CC=/usr/bin/gcc-13
-	export CXX=/usr/bin/g++-13
+export BUILD_ARGS="--custom-cacerts false --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
 fi
 
 echo "buildJDK.sh DEBUG:
