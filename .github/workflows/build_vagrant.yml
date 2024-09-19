@@ -39,7 +39,7 @@ jobs:
     #   run: pip2 install ansible
 
     - name: Check Python
-      run: sudo apt-get install -y python3.10
+      run: find / -name python
 
     - name: Download and add the HashiCorp GPG key
       run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg -o /tmp/hashicorp.gpg
