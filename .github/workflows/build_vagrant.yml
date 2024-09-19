@@ -28,8 +28,14 @@ jobs:
     # Use Python2 & Pip To Install On Ubuntu 22.04
     # Rather Than The System Packages
 
-    # - name: Install Python 2
-    #   run: sudo apt-get install python2
+    - name: Install Python 2
+      run: sudo add-apt-repository ppa:deadsnakes/ppa
+
+    - name: Update Repos
+      run: sudo apt-get update
+
+    - name: Install Python 2
+      run: sudo apt-get install python2
     #
     # - name: Python 2 Get Pip Bootstrap Script
     #   run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
@@ -115,4 +121,4 @@ jobs:
 
     - name: Run Ansible Playbook
       working-directory: ansible
-      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -e 'ansible_python_interpreter=/usr/bin/python2.7' --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -e 'ansible_python_interpreter=/usr/bin/python2' --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
