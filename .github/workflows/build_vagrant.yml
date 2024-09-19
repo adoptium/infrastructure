@@ -19,7 +19,7 @@ permissions:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
 
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -28,30 +28,17 @@ jobs:
     # Use Python2 & Pip To Install On Ubuntu 22.04
     # Rather Than The System Packages
 
-    #
-    # - name: Python 2 Get Pip Bootstrap Script
-    #   run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
-    #
-    # - name: Python 2 Get Pip
-    #   run: sudo python2 get-pip.py
-    #
-    # - name: Install Ansible Using PIP2
-    #   run: pip2 install ansible
+    - name: Install Python 2
+      run: sudo apt-get install python2
 
-    - name: Download and add the HashiCorp GPG key
-      run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg -o /tmp/hashicorp.gpg
+    - name: Python 2 Get Pip Bootstrap Script
+      run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
 
-    - name: Add the HashiCorp GPG key to the keyring
-      run: sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp.gpg
+    - name: Python 2 Get Pip
+      run: sudo python2 get-pip.py
 
-    - name: Add the HashiCorp repository
-      run: sudo echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-
-# Update apt package index
-# apt-get update
-
-# Install Vagrant
-# apt-get install -y vagrant
+    - name: Install Ansible Using PIP2
+      run: pip2 install ansible
 
     - name: Update Repos
       run: sudo apt-get update
@@ -113,4 +100,4 @@ jobs:
 
     - name: Run Ansible Playbook
       working-directory: ansible
-      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -e 'ansible_python_interpreter=/opt/hostedtoolcache/Python/3.10.15/x64/python' --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
