@@ -38,9 +38,6 @@ jobs:
     # - name: Install Ansible Using PIP2
     #   run: pip2 install ansible
 
-    - name: Check Python
-      run: find / -name python
-
     - name: Download and add the HashiCorp GPG key
       run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg -o /tmp/hashicorp.gpg
 
@@ -116,4 +113,4 @@ jobs:
 
     - name: Run Ansible Playbook
       working-directory: ansible
-      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -e 'ansible_python_interpreter=/usr/bin/python3.10' --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -e 'ansible_python_interpreter=/opt/hostedtoolcache/Python/3.10.15/x64/python' --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
