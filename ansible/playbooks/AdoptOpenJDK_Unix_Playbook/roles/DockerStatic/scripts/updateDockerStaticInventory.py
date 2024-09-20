@@ -69,7 +69,6 @@ def main():
         for node in nodes:
             try:
                 nodeConfig = server.get_node_config(node["name"])
-                nodeIP = getIP(nodeConfig)
                 nodePort = getNodePort(nodeConfig)
                 nodeLabel = getLabel(nodeConfig)
                 if nodeLabel.find(dockerhost["name"]) > -1:
@@ -88,10 +87,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # username, password = sys.argv[1:3]
-    # server = createServer(username, password)
-    # nodeConfig = server.get_node_config("test-docker-ubi8-x64-3")
-    # dockerhost = "dockerhost-skytap-ubuntu2204-x64-1"
-    # label = getLabel(nodeConfig)
-    # print(label)
-    # print(label.find(dockerhost))
