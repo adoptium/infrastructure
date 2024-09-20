@@ -47,7 +47,6 @@ processArgs() {
 
 usage() {
 	echo "Usage: ./buildJDK.sh <options>
-	
 	Options:
 		--version | -v		Specify the JDK version to build
 		--fork | -f             Specify the fork of openjdk-build to build from (Default: adoptopenjdk)
@@ -55,7 +54,6 @@ usage() {
 		--hotspot | -hs		Builds hotspot, default is openj9
 		--clean-workspace | -c 	Removes old openjdk-build folder before cloning
 		--help | -h		Shows this message
-		
 	If not specified, JDK8-J9 will be built with the standard openjdk-build repo"
 	echo
 }
@@ -92,7 +90,7 @@ findJDK7() {
 	if [[ $jdkPath == "" ]]; then
 		jdkPath="/usr/lib/jvm/jdk8"
 	fi
-	
+
 	export JDK7_BOOT_DIR=$jdkPath
 }
 
@@ -165,13 +163,18 @@ if [[ "$(uname -m)" == "armv7l" && "$VARIANT" == "openj9" ]]; then
 fi
 
 if [[ "$JAVA_TO_BUILD" == "jdk8u" ]]; then
-	findJDK7	
+	findJDK7
 fi
 
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC
 # See: https://github.com/adoptium/infrastructure/issues/2033
 export CONFIGURE_ARGS="--with-native-debug-symbols=none"
 export BUILD_ARGS="--custom-cacerts false"
+
+# For Ubuntu24.04 Support - Don't Use gcc-7
+if grep 'noble' /etc/*-release >/dev/null 2>&1; then
+        export BUILD_ARGS="--custom-cacerts false --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
+fi
 
 echo "buildJDK.sh DEBUG:
         TARGET_OS=${TARGET_OS:-}
@@ -185,7 +188,7 @@ echo "buildJDK.sh DEBUG:
         BRANCH=$GIT_BRANCH:-}
         FILENAME=${FILENAME:-}"
 
-cloneRepo 
+cloneRepo
 
 cd $WORKSPACE/openjdk-build
 build-farm/make-adopt-build-farm.sh
