@@ -16,6 +16,10 @@
                 "port": "32784"
             },
             {
+                "nodeName": "test-docker-centos7-x64-1",
+                "port": "No port"
+            },
+            {
                 "nodeName": "test-docker-fedora39-x64-2",
                 "port": "32779"
             },
@@ -40,7 +44,7 @@
                 "port": "32782"
             }
         ],
-        "containersCount": 9
+        "containersCount": 10
     },
     {
         "name": "dockerhost-azure-ubuntu2404-x64-1",
@@ -96,6 +100,12 @@
             }
         ],
         "containersCount": 12
+    },
+    {
+        "name": "dockerhost-azure-win2022-x64-1",
+        "ip": "No ip",
+        "containers": [],
+        "containersCount": 0
     },
     {
         "name": "dockerhost-equinix-ubuntu2204-armv8-1",
@@ -232,7 +242,7 @@
         "containersCount": 15
     },
     {
-        "name": "dockerhost-marist-ubuntu2204-s390x-1",
+        "name": "dockerhost-marist-ubuntu2404-s390x-1",
         "ip": "148.100.74.237",
         "containers": [
             {
@@ -255,7 +265,18 @@
         "containersCount": 4
     },
     {
-        "name": "dockerhost-osuosl-ubuntu2004-ppc64le-1",
+        "name": "dockerhost-osuosl-ubuntu2404-aarch64-1",
+        "ip": "140.211.167.67",
+        "containers": [
+            {
+                "nodeName": "test-docker-ubuntu2404-armv7-1",
+                "port": "32000"
+            }
+        ],
+        "containersCount": 1
+    },
+    {
+        "name": "dockerhost-osuosl-ubuntu2404-ppc64le-1",
         "ip": "140.211.168.214",
         "containers": [
             {
@@ -276,17 +297,6 @@
             }
         ],
         "containersCount": 4
-    },
-    {
-        "name": "dockerhost-osuosl-ubuntu2404-aarch64-1",
-        "ip": "140.211.167.67",
-        "containers": [
-            {
-                "nodeName": "test-docker-ubuntu2404-armv7-1",
-                "port": "32000"
-            }
-        ],
-        "containersCount": 1
     },
     {
         "name": "dockerhost-skytap-ubuntu2004-ppc64le-1",
