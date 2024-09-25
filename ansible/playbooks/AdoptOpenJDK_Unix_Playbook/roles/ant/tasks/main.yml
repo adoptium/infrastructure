@@ -7,7 +7,7 @@
 # ant_version and ant_checksum are set in group_vars/adoptopenjdk_variables.yml
 
 - name: Check if Apache Ant is already installed in custom location /usr/local
-  shell: ls /usr/local/apache-ant-"{{ ant_version }}" >/dev/null 2>&1
+  shell: ls /usr/local/apache-ant-{{ ant_version }} >/dev/null 2>&1
   failed_when: false
   register: ant_installed
   changed_when: false
@@ -17,7 +17,7 @@
 
 - name: Download Apache Ant binaries
   get_url:
-    url: https://archive.apache.org/dist/ant/binaries/apache-ant-"{{ ant_version }}"-bin.zip
+    url: https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip
     dest: /tmp/
     mode: 0440
     timeout: 25
@@ -30,7 +30,7 @@
   tags: ant
 
 - name: Download Apache Ant binaries (macOS) and (Solaris)
-  command: wget https://archive.apache.org/dist/ant/binaries/apache-ant-"{{ ant_version }}"-bin.zip -O /tmp/apache-ant-"{{ ant_version }}"-bin.zip
+  command: wget https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip -O /tmp/apache-ant-{{ ant_version }}-bin.zip
   when:
     - ant_installed.rc != 0
     - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
@@ -45,14 +45,14 @@
   tags: ant
 
 - name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-"{{ ant_version }}"-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip.asc" -k {{ key.apache_ant }}
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-{{ ant_version }}-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip.asc" -k {{ key.apache_ant }}
   when: ant_installed.rc != 0
   tags: ant
 
 - name: Extract ant
   become: true
   unarchive:
-    src: /tmp/apache-ant-"{{ ant_version }}"-bin.zip
+    src: /tmp/apache-ant-{{ ant_version }}-bin.zip
     dest: /usr/local
     copy: false
   when:
@@ -70,7 +70,7 @@
 - name: Create /usr/local/bin/ant symlink
   become: true
   file:
-    src: /usr/local/apache-ant-"{{ ant_version }}"/bin/ant
+    src: /usr/local/apache-ant-{{ ant_version }}/bin/ant
     dest: /usr/local/bin/ant
     state: link
   when:
@@ -82,7 +82,7 @@
     path: "{{ item }}"
     state: absent
   with_items:
-    - /tmp/apache-ant-"{{ ant_version }}"-bin.zip
+    - /tmp/apache-ant-{{ ant_version }}-bin.zip
   when:
     - ant_installed.rc != 0
   failed_when: false
