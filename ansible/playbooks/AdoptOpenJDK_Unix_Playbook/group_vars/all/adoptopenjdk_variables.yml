@@ -33,6 +33,10 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 # Default BootJDK installed
 bootjdk: hotspot
 
+# Version of Ant used
+ant_version: 1.10.15
+ant_checksum: sha512:1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9
+
 # GPG Public Keys
 key:
   curl: 27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2 # Daniel Stenberg <daniel@haxx.se>
