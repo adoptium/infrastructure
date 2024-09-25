@@ -25,8 +25,8 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: alpine3.19
-           dockerfile: "Dockerfile.alp319"
+         - os: alpine3.20
+           dockerfile: "Dockerfile.alp320"
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Test Dockerfile on ${{ matrix.os }}
@@ -59,8 +59,8 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: fedora39
-           dockerfile: "Dockerfile.f39"
+         - os: fedora41
+           dockerfile: "Dockerfile.f41"
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Test Dockerfile on ${{ matrix.os }}
@@ -76,12 +76,12 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: ubuntu18.04
-           dockerfile: "Dockerfile.u1804"
          - os: ubuntu20.04
            dockerfile: "Dockerfile.u2004"
          - os: ubuntu22.04
            dockerfile: "Dockerfile.u2204"
+         - os: ubuntu24.04
+           dockerfile: "Dockerfile.u2404"
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Test Dockerfile on ${{ matrix.os }}
