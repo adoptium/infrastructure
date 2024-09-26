@@ -11,6 +11,7 @@
 - name: Check For Centos8 Stream
   shell: cat /etc/centos-release
   register: relfile_contents
+  tags: build_tools
 
 - name: Enable EPEL release (not CentOS8)
   yum:
@@ -135,7 +136,6 @@
   when:
     - ansible_distribution_major_version == "6"
   tags: build_tools
-
 
 - name: Install CentOS SCL x86_64 repo for gcc7.3
   package: "name=centos-release-scl state=latest"
