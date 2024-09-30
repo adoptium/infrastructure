@@ -91,8 +91,6 @@
     - brew_upgrade
 
 - name: Install brew cu
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: buo/cask-upgrade
     path: "{{ homebrew_path }}"
@@ -100,8 +98,6 @@
     - brew_cu
 
 - name: Add AdoptOpenJDK Java Repo
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: AdoptOpenJDK/openjdk
     path: "{{ homebrew_path }}"
@@ -116,8 +112,6 @@
     - skip_ansible_lint
 
 - name: Install Build Tool Packages
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
     state: present
@@ -137,8 +131,6 @@
   register: cmake_local
 
 - name: Install Cmake
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew:
     name: "cmake"
     state: present
@@ -146,8 +138,6 @@
   when: not (cmake_homebrew.stat.exists or cmake_local.stat.exists)
 
 - name: Install Build Tool Packages NOT macOS 10.12
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
     state: present
@@ -158,8 +148,6 @@
   tags: build_tools
 
 - name: Install Build Tool Casks
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew_cask:
     name: "{{ item }}"
     state: present
@@ -168,8 +156,6 @@
   tags: build_tools
 
 - name: Install Test Tool Packages
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
     state: present
@@ -178,8 +164,6 @@
   tags: test_tools
 
 - name: Install JCK Tool Casks
-  become: yes
-  become_user: "{{ ansible_user }}"
   homebrew_cask:
     name: "{{ item }}"
     state: present
