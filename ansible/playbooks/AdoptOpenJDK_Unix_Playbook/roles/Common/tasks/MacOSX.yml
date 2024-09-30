@@ -108,9 +108,9 @@
 
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
-  become: yes
-  become_user: "{{ ansible_user }}"
-  command: "{{ homebrew_path }}/brew cu -y"
+  homebrew_cask:
+    upgrade_all: yes
+    path: "{{ homebrew_path }}/brew"
   tags:
     - brew_cu
     - skip_ansible_lint
