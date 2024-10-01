@@ -58,7 +58,7 @@ Additional_Build_Tools_NOT_RHEL8:
   - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
   - ntp
 
-Additional_Build_Tools_FEDORA35:
+Additional_Build_Tools_FEDORA35PLUS:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
@@ -136,7 +136,6 @@ Test_Tool_Packages:
   - mercurial
   - gnutls
   - gnutls-utils
-  - libnss3.so
   - shared-mime-info
   - nss-devel
   - nss-tools
