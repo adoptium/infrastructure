@@ -19,7 +19,7 @@ permissions:
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
 
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -27,10 +27,10 @@ jobs:
     # As Solaris Needs An Older Version Of Ansible/Python
     # Use Python2 & Pip To Install On Ubuntu 22.04
     # Rather Than The System Packages
-    
+
     - name: Install Python 2
       run: sudo apt-get install python2
-    
+
     - name: Python 2 Get Pip Bootstrap Script
       run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
 
@@ -40,14 +40,23 @@ jobs:
     - name: Install Ansible Using PIP2
       run: pip2 install ansible
 
-    - name: Update Repos
-      run: sudo apt-get update
-
     - name: Install VirtualBox
       run: sudo apt-get install virtualbox
 
+    - name: Add Hashicorp GPG Key
+      run: wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+    - name: Add Hashicorp Repository
+      run: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+    - name: Update Repos
+      run: sudo apt-get update
+
     - name: Install Vagrant
       run: sudo apt-get install vagrant
+
+    - name: Add User To VBOX group
+      run: sudo usermod -a -G vboxusers $USER
 
     - name: Cache Solaris10.box
       id: solaris-10-cache
@@ -87,7 +96,7 @@ jobs:
         # Copy the machine's ssh key for the VMs to use, after removing prior files
         ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
         vagrant plugin install vagrant-vbguest
-        vagrant up
+        vagrant up --provider=virtualbox
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
