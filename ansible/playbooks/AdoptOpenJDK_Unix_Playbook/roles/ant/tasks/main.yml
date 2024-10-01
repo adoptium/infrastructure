@@ -29,7 +29,9 @@
   tags: ant
 
 - name: Download Apache Ant binaries (macOS) and (Solaris)
-  command: wget https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip -O /tmp/apache-ant-1.10.5-bin.zip
+  get_url:
+    url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip
+    dest: /tmp/apache-ant-1.10.5-bin.zip
   when:
     - ant_installed.rc != 0
     - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
@@ -46,6 +48,8 @@
 - name: GPG Signature verification
   script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-1.10.5-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip.asc" -k {{ key.apache_ant }}
   when: ant_installed.rc != 0
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
   tags: ant
 
 - name: Extract ant
