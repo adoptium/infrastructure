@@ -31,7 +31,6 @@ Build_Tool_Packages:
   - gnutls-utils
   - libcurl-devel
   - libffi-devel
-  - libnss3.so
   - libpng-devel
   - libXext-devel
   - libXi-devel                   # JDK12+ compilation
