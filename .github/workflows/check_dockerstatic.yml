@@ -44,6 +44,8 @@ jobs:
        include:
          - os: centos8
            dockerfile: "Dockerfile.cent8"
+         - os: centos-stream-9
+           dockerfile: "Dockerfile.centstream9"
     steps:
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     - name: Test Dockerfile on ${{ matrix.os }}
