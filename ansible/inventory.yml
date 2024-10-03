@@ -44,8 +44,6 @@ hosts:
           ubuntu1804-armv8-2: {ip: 159.138.100.163}
 
       - azure:
-          win2012r2-x64-1: {ip: 20.108.178.21, user: adoptopenjdk}
-          win2012r2-x64-2: {ip: 20.108.176.36, user: adoptopenjdk}
           win2022-x64-1: {ip: 172.187.129.163, user: adoptopenjdk}
           win2022-x64-2: {ip: 172.187.176.15, user: adoptopenjdk}
           win2022-x64-3: {ip: 51.142.8.47, user: adoptopenjdk}
