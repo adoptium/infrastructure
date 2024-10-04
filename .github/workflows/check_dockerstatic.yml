@@ -28,7 +28,7 @@ jobs:
          - os: alpine3.20
            dockerfile: "Dockerfile.alp320"
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -47,7 +47,7 @@ jobs:
          - os: centos-stream-9
            dockerfile: "Dockerfile.centstream9"
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -64,7 +64,7 @@ jobs:
          - os: fedora41
            dockerfile: "Dockerfile.f41"
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -85,7 +85,7 @@ jobs:
          - os: ubuntu24.04
            dockerfile: "Dockerfile.u2404"
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
