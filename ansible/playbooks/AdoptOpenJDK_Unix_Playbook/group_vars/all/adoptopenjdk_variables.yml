@@ -33,10 +33,14 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 # Default BootJDK installed
 bootjdk: hotspot
 
+# Version of Ant used
+ant_version: 1.10.15
+ant_checksum: sha512:1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9
+
 # GPG Public Keys
 key:
   curl: 27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2 # Daniel Stenberg <daniel@haxx.se>
-  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
+  apache_ant: 0A123C1ED3F13A6A0140E166C71FB765CD9DE313 # Jaikiran Pai <jaikiran@apache.org>
   apache_maven: B02137D875D833D9B23392ECAE5A7FB608A0221C # Robert Scholte <rfscholte@apache.org>
   autoconf: A7A16B4A2527436A # Eric Blake <eblake@redhat.com>
   cmake: EC8FEF3A7BFB4EDA # Brad King <brad.king@kitware.com>
