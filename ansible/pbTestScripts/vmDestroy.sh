@@ -61,9 +61,8 @@ checkOS() {
                         osToDestroy="D8" ;;
                 "Debian10" | "debian10" | "D10" | "d10" )
                         osToDestroy="D10" ;;
-								"Fedora40" | "fedora40" | "F40" | "F40" )
-				                osToDestroy="F40" ;;
-
+                "Fedora40" | "fedora40" | "F40" | "f40" )
+                        osToDestroy="F40" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
 			osToDestroy="FBSD12" ;;
 		"Solaris10" | "solaris10" | "Sol10" | "sol10" )
