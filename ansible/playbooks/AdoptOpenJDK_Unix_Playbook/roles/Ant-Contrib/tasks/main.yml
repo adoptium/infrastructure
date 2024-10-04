@@ -11,7 +11,7 @@
 
 - name: Set ant_lib_dir variable for on {{ ansible_distribution }} {{ ansible_architecture }}
   set_fact:
-    ant_lib_dir: /usr/local/apache-ant-1.10.5/lib
+    ant_lib_dir: /usr/local/apache-ant-"{{ ant_version }}"/lib
   tags: ant-contrib
 
 - name: "Print ant_lib_dir variable"

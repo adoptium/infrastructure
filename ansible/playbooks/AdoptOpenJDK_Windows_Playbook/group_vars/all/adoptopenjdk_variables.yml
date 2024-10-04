@@ -16,9 +16,12 @@ Nagios_Plugins: Disabled
 bootjdk: hotspot
 heapsize: normal
 
+ant_version: 1.10.15
+ant_checksum: 1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9
+
 ## Nagios Server Details
 Nagios_Master_IP: 78.47.239.96
 
 # GPG Public Keys
 key:
-  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
+  apache_ant: 0A123C1ED3F13A6A0140E166C71FB765CD9DE313 # Jaikiran Pai <jaikiran@apache.org>
