@@ -33,9 +33,9 @@ RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk" \
     JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk" \
-    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
-    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
-    JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
-    JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
-    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk10" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk11" \
+    JDK13_BOOT_DIR="/usr/lib/jvm/jdk13" \
+    JDK14_BOOT_DIR="/usr/lib/jvm/jdk14" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk14" \
     JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"
