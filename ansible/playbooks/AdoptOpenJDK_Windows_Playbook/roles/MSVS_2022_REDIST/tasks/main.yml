@@ -1,0 +1,56 @@
+---
+###########################################
+# Visual Studio 2022 Redists Installation #
+###########################################
+- name: Set Windows SDK version
+  set_fact:
+    wsdk_version: "14.40.33807_10.0.26100.0"
+  tags: MSVS_2022_REDIST
+
+- name: Set Windows SDK checksum
+  set_fact:
+    wsdk_checksum: "a29ada15d941a7b2065e9a4273fd6b97df44d089ed2b9f860ded442f7fe69767"
+  tags: MSVS_2022_REDIST
+
+- name: Test if VS 2022 Redists Are installed
+  win_stat:
+    path: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}'
+  register: vs2022sdk_installed
+  tags: MSVS_2022_REDIST
+
+- name: Check if C:\openjdk\devkit exists
+  ansible.windows.win_stat:
+    path: 'c:\openjdk\devkit'
+  register: directory_status
+  tags: MSVS_2022_REDIST
+
+- name: Create  C:\openjdk\devkit if it does not exist
+  ansible.windows.win_file:
+    path: 'c:\openjdk\devkit\'
+    state: directory
+  when: not directory_status.stat.exists
+  tags: MSVS_2022_REDIST
+
+# Download & Install VS2022 Redists From Github
+
+- name: Download Visual Studio 2022 Redists
+  win_get_url:
+    url: 'https://github.com/adoptium/devkit-binaries/releases/download/vs2022_redist_14.40.33807_10.0.26100.0/vs2022_redist_14.40.33807_10.0.26100.0.zip'
+    checksum: "{{ wsdk_checksum }}"
+    checksum_algorithm: sha256
+    dest: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}.zip'
+    force: no
+  tags: MSVS_2022_REDIST
+
+- name: Unzip Visual Studio 2022 Redists
+  win_unzip:
+    src: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}.zip'
+    dest: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}'
+  when: not vs2022sdk_installed.stat.exists
+  tags: MSVS_2022_REDIST
+
+- name: Remove VS2022 redists Download
+  win_file:
+    path: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}.zip'
+    state: absent
+  tags: MSVS_2022_REDIST

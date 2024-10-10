@@ -76,6 +76,8 @@
       tags: MSVS_2019
     - role: MSVS_2022
       tags: MSVS_2022
+    - role: MSVS_2022_REDIST
+      tags: MSVS_2022_REDIST
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - Clang_64bit                 # OpenJ9
