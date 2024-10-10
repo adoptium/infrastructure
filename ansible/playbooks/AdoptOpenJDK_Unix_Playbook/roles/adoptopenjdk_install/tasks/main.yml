@@ -33,7 +33,7 @@
 
 - name: Set path variable when jdk_version != 8
   set_fact:
-    path: /usr/lib/jvm/jdk-{{ jdk_version }}
+    path: /usr/lib/jvm/jdk{{ jdk_version }}
   when:
     - jdk_version != 8
     - ansible_distribution != "MacOSX"
@@ -41,7 +41,7 @@
 
 - name: Set path variable (macOS)
   set_fact:
-    path: "/Library/Java/JavaVirtualMachines/jdk-{{ jdk_version }}"
+    path: "/Library/Java/JavaVirtualMachines/jdk{{ jdk_version }}"
   when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 

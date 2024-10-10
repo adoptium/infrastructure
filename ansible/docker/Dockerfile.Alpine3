@@ -18,12 +18,12 @@ RUN set -eux; \
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/jdk8" \ 
     JDK8_BOOT_DIR="/usr/lib/jvm/jdk8" \
-    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-11" \
-    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk11" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk11" \
     JDK14_BOOT_DIR="/usr/lib/jvm/zulu14" \
     JDK15_BOOT_DIR="/usr/lib/jvm/zulu15" \
     JDK16_BOOT_DIR="/usr/lib/jvm/zulu16" \
-    JDK17_BOOT_DIR="/usr/lib/jvm/jdk-17" \
+    JDK17_BOOT_DIR="/usr/lib/jvm/jdk17" \
     JDK18_BOOT_DIR="/usr/lib/jvm/zulu18" \
     JDKLATEST_BOOT_DIR="/usr/lib/jvm/zulu18" \
     JAVA_HOME="/usr/lib/jvm/jdk8"
