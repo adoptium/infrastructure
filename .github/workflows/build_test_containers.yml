@@ -34,17 +34,21 @@ jobs:
             - name: Get list of changed Dockerfiles
               id: get_changed_files
               run: |
-                changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep ansible/docker/test/Dockerfile)
-                echo "changed_files=$changed_files" >> "$GITHUB_OUTPUT"
+                if [ ${{ github.event_name }} == "push" ]; then
+                    changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep ansible/docker/test/Dockerfile)
+                else
+                    changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep ansible/docker/test/Dockerfile)
+                fi
+                echo "changed_files=$changed_files" >> "$GITHUB_ENV"
 
             # Generate matrix
             - name: Generate matrix
               id: generate_matrix
               run: |
-                matrix=$(jq -n --arg files "$changed_files" '{
-                  include: ($files | split("\n") | map(select(length > 0) | {dockerfile: .}))
+                matrix=$(jq -n --arg files "${changed_files}" '{
+                  "include": ($files | split("\n") | map(select(length > 0) | {dockerfile: .}))
                 }')
-                echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+                echo "matrix<<EOF"$'\n'"$matrix"$'\n'EOF >> $GITHUB_OUTPUT
 
     build-dockerfiles:
         name: Build Dockerfiles
