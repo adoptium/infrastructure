@@ -1,0 +1,69 @@
+name: Docker
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/build_test_containers.yml
+    - ansible/docker/test/Dockerfile*
+    branches:
+    - master
+  push:
+    paths:
+    - .github/workflows/build_test_containers.yml
+    - ansible/docker/test/Dockerfile*
+    branches:
+    - master
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+    generate-matrix:
+        name: Generate Matrix
+        runs-on: ubuntu-latest
+        if: github.repository_owner == 'adoptium'
+        outputs:
+            matrix: ${{ steps.generate_matrix.outputs.matrix }}
+        steps:
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                fetch-depth: 0
+
+            # Get list of changed files in ansible/docker/test/Dockerfile*
+            - name: Get list of changed Dockerfiles
+              id: get_changed_files
+              run: |
+                changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep ansible/docker/test/Dockerfile)
+                echo "changed_files=$changed_files" >> "$GITHUB_OUTPUT"
+
+            # Generate matrix
+            - name: Generate matrix
+              id: generate_matrix
+              run: |
+                matrix=$(jq -n --arg files "$changed_files" '{
+                  include: ($files | split("\n") | map(select(length > 0) | {dockerfile: .}))
+                }')
+                echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+    build-dockerfiles:
+        name: Build Dockerfiles
+        runs-on: ubuntu-latest
+        needs: generate-matrix
+        strategy:
+            matrix: ${{fromJson(needs.generate-matrix.outputs.matrix)}}
+        steps:
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+            # Generate tag name based on the Dockerfile name
+            - name: Set tag name
+              run: echo "TAG_NAME=$(basename ${{ matrix.dockerfile }} | cut -d'.' -f2 | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+            - name: Build Dockerfile
+              run: docker build -t ghcr.io/${{ github.repository_owner }}/test-containers:$TAG_NAME -f ${{ matrix.dockerfile }} .
+
+            - name: Push Dockerfile to ghcr.io
+              if: github.event_name == 'push'
+              run: |
+                echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+                docker push ghcr.io/${{ github.repository_owner }}/test-containers:$TAG_NAME
