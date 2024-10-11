@@ -4,7 +4,7 @@
 ##########
 - name: Test if Java 8 is already installed
   win_stat:
-    path: 'C:\openjdk\jdk-8\bin'
+    path: 'C:\openjdk\jdk8\bin'
   register: java8_installed
   tags: Java8
 
@@ -29,16 +29,16 @@
   tags: Java8
 
 - name: Create symlink to directory without spaces if not already there
-  win_shell: for /D %a in ("C:\Program Files\Java\jdk8*") do IF NOT EXIST "C:\openjdk\jdk-8" MKLINK /D "C:\openjdk\jdk-8" "%a"
+  win_shell: for /D %a in ("C:\Program Files\Java\jdk8*") do IF NOT EXIST "C:\openjdk\jdk8" MKLINK /D "C:\openjdk\jdk8" "%a"
   args:
     executable: cmd.exe
-    creates: 'C:\openjdk\jdk-8'
+    creates: 'C:\openjdk\jdk8'
   tags: Java8
 
 - name: Set JAVA_HOME to version 8
   win_path:
     name: JAVA_HOME
-    elements: C:\openjdk\jdk-8
+    elements: C:\openjdk\jdk8
     scope: machine
     state: present
   when: (not java8_installed.stat.exists)
@@ -47,7 +47,7 @@
 - name: Add JAVA_HOME/bin to Path
   win_path:
     name: Path
-    elements: C:\openjdk\jdk-8\bin
+    elements: C:\openjdk\jdk8\bin
     scope: machine
     state: present
   when: (not java8_installed.stat.exists)
