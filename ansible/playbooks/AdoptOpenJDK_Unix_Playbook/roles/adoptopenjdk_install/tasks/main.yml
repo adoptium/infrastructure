@@ -136,7 +136,7 @@
     - not usr_lib_jvm_exists.stat.exists
   tags: adoptopenjdk_install
 
-- name: Check if jdk-{{ jdk_version }} is already installed in the target location
+- name: Check if jdk{{ jdk_version }} is already installed in the target location
   shell: ls -ld {{ path }} >/dev/null 2>&1
   failed_when: false
   register: adoptopenjdk_installed
@@ -356,7 +356,7 @@
       until: adoptopenjdk_unpack is not failed
 
 - name: Get {{ path }}* full path name
-  shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
+  shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-{{ jdk_version }}* 2>/dev/null | awk '{print $9}'
   register: adoptopenjdk_dir
   changed_when: false
   when:
