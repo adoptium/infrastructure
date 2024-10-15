@@ -9,8 +9,8 @@
   delegate_to: localhost
   run_once: true
 
-- name: Check out AdoptOpenJDK/secrets
-  git: repo=git@github.com:AdoptOpenJDK/secrets.git dest=vendor_files force=true
+- name: Check out adoptium/secrets
+  git: repo=git@github.com:adoptium/secrets.git dest=vendor_files force=true
   delegate_to: localhost
   when:
     - not local_vendor_files.stat.exists
