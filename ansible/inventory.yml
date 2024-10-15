@@ -15,8 +15,6 @@ hosts:
           ubuntu2204-x64-1: {ip: 172.187.163.163, user: adoptopenjdk, description: infra-wazuh-server}
           ubuntu2204-x64-2: {ip: 20.90.182.165, description: trss.adoptium.net}
           ubuntu2204-x64-3: {ip: 172.187.93.97, description: awx.adoptium.net}
-          ubuntu2204-vagrant-x64-1: {ip: 172.203.178.157, description: VPC-Qemu-1}
-          ubuntu2204-vagrant-x64-2: {ip: 48.217.96.46, description: VPC-Qemu-2}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
