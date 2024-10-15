@@ -356,17 +356,21 @@
       until: adoptopenjdk_unpack is not failed
 
 - name: Get {{ path }}* full path name
-  shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-{{ jdk_version }}* 2>/dev/null | awk '{print $9}'
-  register: adoptopenjdk_dir
-  changed_when: false
+  find:
+    paths: /usr/lib/jvm
+    patterns:
+      - "^jdk{{ jdk_version }}*"
+      - "^jdk-{{ jdk_version }}*"
+    use_regex: yes
+    file_type: directory
   when:
     - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
+  register: adoptopenjdk_dir
 
 - name: Create symlink to major version
   file:
-    src: '{{ adoptopenjdk_dir.stdout }}'
+    src: '{{ adoptopenjdk_dir.files[0].path }}'
     dest: '{{ path }}'
     state: link
   when:
@@ -376,7 +380,7 @@
 
 - name: Chown {{ path }}*
   file:
-    path: '{{ adoptopenjdk_dir.stdout }}'
+    path: '{{ adoptopenjdk_dir.files[0].path }}'
     state: directory
     owner: root
     recurse: yes
