@@ -89,7 +89,7 @@ have at the moment:
 | [Centos6](./ansible/docker/Dockerfile.CentOS6) | [`adoptopenjdk/centos6_build_image`](https://hub.docker.com/r/adoptopenjdk/centos6_build_image)| linux/amd64 | [GH Actions](.github/workflows/build.yml) | Yes
 | [Alpine3](./ansible/docker/Dockerfile.Alpine3) | [`adoptopenjdk/alpine3_build_image`](https://hub.docker.com/r/adoptopenjdk/alpine3_build_image) | linux/x64 & linux/arm64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
 | [Ubuntu 20.04 (riscv64 only)](./ansible/docker/Dockerfile.Ubuntu2004-riscv64) | [`adoptopenjdk/ubuntu2004_build_image:linux-riscv64`](https://hub.docker.com/r/adoptopenjdk/ubuntu2004_build_image) | linux/riscv64 | [Jenkins](https://ci.adoptium.net/job/centos7_docker_image_updater/) | Yes
-| [Windows Server 2022](./ansible/docker/Dockerfile.win2022) | n/a - restricted | Windows | No
+| [Windows Server 2022](./ansible/docker/Dockerfile.win2022) | `adoptium.azurecr.io/windows2022_build_image` - restricted | Windows | [GH Actions](.github/workflows/build_windows.yml) | Yes
 
 <details>
 <summary>(*) - Caveats:</summary>
