@@ -284,8 +284,21 @@ startVMPlaybook()
 	# Initialize the args variable with common arguments
 	args="$verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b $sshargs --skip-tags adoptopenjdk,jenkins${skipFullSetup}"
 
-	# Run the ansible playbook with the constructed args
-	eval ansible-playbook $args "playbooks/AdoptOpenJDK_Unix_Playbook/main.yml" 2>&1 | tee "$WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log"
+	## If CentOS6 Delegate Playbook Run To Vagrant Machine Itself For Compatibility
+	if [ "$OS" == "CentOS6" ]; then
+		# Replace Remote Hosts File With Local Version
+		# vagrant ssh --command "cd /vagrant && pwd && echo localhost ansible_connection=local > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx"
+		echo "localhost ansible_connection=local" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+		# SSH into machine and run the ansible playbook with the constructed args
+		vagrant ssh --command "cd /vagrant && eval ansible-playbook $args playbooks/AdoptOpenJDK_Unix_Playbook/main.yml | tee /vagrant/ansible_playbook.log"
+		# Copy The Logfile To The Expected Destination
+		cp ansible_playbook.log "$WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log"
+		# Return The Temporary Hosts File To Orignal
+		echo "[127.0.0.1]:${vagrantPORT}" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+	else
+		# Run the ansible playbook with the constructed args
+		eval ansible-playbook $args "playbooks/AdoptOpenJDK_Unix_Playbook/main.yml" 2>&1 | tee "$WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log"
+	fi
 
 	echo The playbook finished at : `date +%T`
 	if ! grep -q 'unreachable=0.*failed=0' $pbLogPath; then
@@ -293,7 +306,7 @@ startVMPlaybook()
 		exit 1
 	fi
 
-	if [ "$OS" == "Solaris10" ]; then
+	if [ "$OS" == "Solaris10" ] || [ "$OS" == "CentOS6" ]; then
 		# Remove IP from known_hosts as the playbook installs an
 		# alternate sshd which regenerates the host key infra#2244
 		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
