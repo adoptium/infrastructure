@@ -41,7 +41,7 @@ jobs:
         .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
         .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - uses: Vampire/setup-wsl@6f87de3102a29ac6b92800f33bf1e8d9164ac0a1 # v3.1.1
 
