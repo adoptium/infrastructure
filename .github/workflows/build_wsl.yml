@@ -29,7 +29,6 @@ jobs:
     name: Windows
     runs-on: ${{ matrix.os }}
     steps:
-    
     - name: Setup WinRM and Password (checksum verified)
       shell: powershell
       run: |
