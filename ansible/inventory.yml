@@ -19,10 +19,6 @@ hosts:
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
 
-      - equinix:
-          ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
-          ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
-
       - hetzner:
           ubuntu1604-x64-1: {ip: 78.47.239.96, description: nagios.adoptopenjdk.net}
           ubuntu2004-x64-1: {ip: 78.47.239.97, description: ci.adoptium.net}
