@@ -24,7 +24,7 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 ## Related Repositories
 
-* [secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets.
+* [secrets](https://www.github.com/adoptium/secrets/) - A private repo containing encrypted secrets.
 * [openjdk-jenkins-helper](https://www.github.com/adoptopenjdk/openjdk-jenkins-helper/) - A repo containing helper scripts for out Jenkins CI.
 
 ## Important Documentation
