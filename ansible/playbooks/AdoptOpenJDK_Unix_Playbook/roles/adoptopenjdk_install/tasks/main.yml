@@ -360,7 +360,7 @@
     paths: /usr/lib/jvm
     patterns:
       - "^jdk{{ jdk_version }}*"
-      - "^jdk-{{ jdk_version }}*"
+      - "^jdk-{{ jdk_version }}.*"
     use_regex: yes
     file_type: directory
   when:
