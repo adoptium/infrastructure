@@ -4,7 +4,7 @@
 ################
 - name: Test if Java is already installed version {{ jdk_version }}
   win_stat:
-    path: 'C:\openjdk\jdk{{ jdk_version }}\bin'
+    path: 'C:\openjdk\jdk-{{ jdk_version }}\bin'
   register: java_installed
   tags: Java_install
 
@@ -39,10 +39,10 @@
   tags: Java_install
 
 - name: Create symlink to directory without spaces if not already there
-  win_shell: for /D %a in ("C:\Program Files\Java\jdk-{{ jdk_version }}*") do IF NOT EXIST "C:\openjdk\jdk{{ jdk_version }}" MKLINK /D "C:\openjdk\jdk{{ jdk_version }}" "%a"
+  win_shell: for /D %a in ("C:\Program Files\Java\jdk-{{ jdk_version }}*") do IF NOT EXIST "C:\openjdk\jdk-{{ jdk_version }}" MKLINK /D "C:\openjdk\jdk-{{ jdk_version }}" "%a"
   args:
     executable: cmd.exe
-    creates: 'C:\openjdk\jdk{{ jdk_version }}'
+    creates: 'C:\openjdk\jdk-{{ jdk_version }}'
   tags: Java_install
 
 - name: Remove temp zip file
