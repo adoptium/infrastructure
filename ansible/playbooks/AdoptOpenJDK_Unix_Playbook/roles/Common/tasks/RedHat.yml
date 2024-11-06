@@ -16,12 +16,12 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
-- name: Enable EPEL release for RHEL8 or RHEL6 or RHEL7
+- name: Enable EPEL release for RHEL9 or RHEL8 or RHEL6 or RHEL7
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   failed_when: false
   when:
     - ansible_architecture != "s390x"
-    - (ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+    - (ansible_distribution_major_version | int >= 6)
   tags: patch_update
 
 - name: YUM upgrade all packages
@@ -52,11 +52,11 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additional build tools if NOT RHEL 8
+- name: Install additional build tools if NOT RHEL 8 AND RHEL9
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
   when:
-    - (ansible_distribution_major_version != "8")
+    - not (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7
@@ -102,11 +102,11 @@
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   tags: build_tools
 
-- name: Install additional build tools for RHEL 8
+- name: Install additional build tools for RHEL >= 8
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_RHEL8 }}"
   when:
-    - (ansible_distribution_major_version == "8")
+    - (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install jq for SBoM parsing for build reproducibility testing
@@ -136,17 +136,17 @@
   with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
   when:
     - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
-    - not (ansible_distribution_major_version == "8")
+    - not (ansible_distribution_major_version | int >= 8)
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL6_PPC64 }}"
   when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
 
-- name: Install Java when RedHat 8
+- name: Install Java when RedHat 8 and RedHat 9
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL8 }}"
-  when: (ansible_distribution_major_version == "8")
+  when: (ansible_distribution_major_version | int >= 8)
 
 ####################
 # Set default Java #
