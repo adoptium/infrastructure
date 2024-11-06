@@ -33,7 +33,7 @@
 
 - name: Set path variable when jdk_version != 8
   set_fact:
-    path: /usr/lib/jvm/jdk-{{ jdk_version }}
+    path: /usr/lib/jvm/jdk{{ jdk_version }}
   when:
     - jdk_version != 8
     - ansible_distribution != "MacOSX"
@@ -41,7 +41,7 @@
 
 - name: Set path variable (macOS)
   set_fact:
-    path: "/Library/Java/JavaVirtualMachines/jdk-{{ jdk_version }}"
+    path: "/Library/Java/JavaVirtualMachines/jdk{{ jdk_version }}"
   when: ansible_distribution == "MacOSX"
   tags: adoptopenjdk_install
 
@@ -136,7 +136,7 @@
     - not usr_lib_jvm_exists.stat.exists
   tags: adoptopenjdk_install
 
-- name: Check if jdk-{{ jdk_version }} is already installed in the target location
+- name: Check if jdk{{ jdk_version }} is already installed in the target location
   shell: ls -ld {{ path }} >/dev/null 2>&1
   failed_when: false
   register: adoptopenjdk_installed
@@ -356,17 +356,21 @@
       until: adoptopenjdk_unpack is not failed
 
 - name: Get {{ path }}* full path name
-  shell: set -o pipefail | ls -ld {{ path }}* 2>/dev/null | awk '{print $9}'
-  register: adoptopenjdk_dir
-  changed_when: false
+  find:
+    paths: /usr/lib/jvm
+    patterns:
+      - "^jdk{{ jdk_version }}*"
+      - "^jdk-{{ jdk_version }}.*"
+    use_regex: yes
+    file_type: directory
   when:
     - ansible_distribution != "MacOSX"
     - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
+  register: adoptopenjdk_dir
 
 - name: Create symlink to major version
   file:
-    src: '{{ adoptopenjdk_dir.stdout }}'
+    src: '{{ adoptopenjdk_dir.files[0].path }}'
     dest: '{{ path }}'
     state: link
   when:
@@ -376,7 +380,7 @@
 
 - name: Chown {{ path }}*
   file:
-    path: '{{ adoptopenjdk_dir.stdout }}'
+    path: '{{ adoptopenjdk_dir.files[0].path }}'
     state: directory
     owner: root
     recurse: yes
