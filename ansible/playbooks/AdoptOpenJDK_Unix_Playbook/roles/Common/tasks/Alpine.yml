@@ -193,7 +193,7 @@
         - not adoptopenjdk17_installed.stat.exists
 
     - name: Get Temurin jdk17 full path name
-      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk17.* 2>/dev/null | awk '{print $9}'
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-17.* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk17_dir
       when:
         - not adoptopenjdk17_installed.stat.exists
