@@ -137,10 +137,10 @@
       when:
         - not adoptopenjdk8_installed.stat.exists
 
-# Temp: install a non temurin binary until GA or when the jdk-11 alpine aarch64 build job becomes more stable (whichever comes first)
+# Temp: install a non temurin binary until GA or when the jdk11 alpine aarch64 build job becomes more stable (whichever comes first)
 # https://github.com/adoptium/temurin-build/issues/2961
-    - name: Check if jdk-11 is already installed in the target location
-      stat: path=/usr/lib/jvm/jdk-11
+    - name: Check if jdk11 is already installed in the target location
+      stat: path=/usr/lib/jvm/jdk11
       register: adoptopenjdk11_installed
 
     - name: Install java 11 from Alpine repositories
@@ -150,7 +150,7 @@
     - name: Create symlink to point at openjdk11
       file:
         src: /usr/lib/jvm/java-11-openjdk
-        dest: /usr/lib/jvm/jdk-11
+        dest: /usr/lib/jvm/jdk11
         state: link
       when: ansible_architecture != "aarch64" and not adoptopenjdk11_installed.stat.exists
 
@@ -177,10 +177,10 @@
 # Temp. Change to GA binary once theyre available
     - name: Check if Temurin jdk17 is installed
       stat:
-        path: /usr/lib/jvm/jdk-17
+        path: /usr/lib/jvm/jdk17
       register: adoptopenjdk17_installed
 
-    - name: Install Temurin jdk-17 nightly
+    - name: Install Temurin jdk17 nightly
       unarchive:
         src: https://github.com/adoptium/temurin17-binaries/releases/download/jdk17u-2022-05-27-19-32-beta/OpenJDK17U-jdk_aarch64_alpine-linux_hotspot_2022-05-27-17-01.tar.gz
         dest: /usr/lib/jvm
@@ -192,8 +192,8 @@
       when:
         - not adoptopenjdk17_installed.stat.exists
 
-    - name: Get Temurin jdk-17 full path name
-      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk-17.* 2>/dev/null | awk '{print $9}'
+    - name: Get Temurin jdk17 full path name
+      shell: set -o pipefail | ls -ld /usr/lib/jvm/jdk17.* 2>/dev/null | awk '{print $9}'
       register: adoptopenjdk17_dir
       when:
         - not adoptopenjdk17_installed.stat.exists
@@ -201,7 +201,7 @@
     - name: Create symlink to major version
       file:
         src: '{{ adoptopenjdk17_dir.stdout }}'
-        dest: /usr/lib/jvm/jdk-17
+        dest: /usr/lib/jvm/jdk17
         state: link
       when:
         - not adoptopenjdk17_installed.stat.exists
