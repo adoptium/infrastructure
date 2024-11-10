@@ -126,7 +126,7 @@
       jdk_version: 17
       when:
         - ansible_distribution != "Solaris"
-        - (ansible_distribution != "Alpine" and ansible_architecture != "aarch64")
+        - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
       tags: build_tools
     - role: adoptopenjdk_install  # JDK21 Build Bootstrap
       jdk_version: 20
