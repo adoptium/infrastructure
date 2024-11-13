@@ -23,7 +23,8 @@
 
 - name: Add Devel-Tools repository (SLES15)
   zypper_repository:
-    repo: https://download.opensuse.org/repositories/devel:/tools/15.6/devel:tools.repo
+    name: devel-tools
+    repo: 'https://download.opensuse.org/repositories/devel:/tools/15.{{ ansible_distribution_release }}/'
     auto_import_keys: yes
     state: present
   when:
