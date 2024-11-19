@@ -15,6 +15,9 @@ rm -rf /cygdrive/c/tmp/*-test-image
 export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"`
 echo TEST_JDK_HOME=$TEST_JDK_HOME
 
+## Run The Same Tests As Test JDK for Linux
+## Run The Smoke Tests To Ensure The JDK Build OK
+
 cd /cygdrive/c/tmp
 if [ ! -d "testLocation" ];
 then
@@ -22,15 +25,18 @@ then
 	mkdir testLocation
 fi
 cd testLocation
-if [ ! -d "openjdk-tests" ];
-then
-	echo "Git cloning openjdk-tests"
-	git clone https://github.com/adoptopenjdk/openjdk-tests
-fi
-cd openjdk-tests
+git clone https://github.com/adoptium/aqa-tests.git
+pwd
+ls -tr
+cd aqa-tests
+./get.sh --vendor_repos https://github.com/adoptium/temurin-build --vendor_branches master --vendor_dirs /test/functional
+cd aqa-tests/TKG || exit 1
+export BUILD_LIST=functional/buildAndPackage
+$MAKE_COMMAND compile
+$MAKE_COMMAND _extended.functional
 
-./get.sh -T $HOME/testLocation/openjdk-tests -p x64_windows
-cd TKG
-export BUILD_LIST=system
-make compile
-make _extended.system 
+# Run a few subsets of OpenJDK Tests as a shakedown of the built JDK.
+# export BUILD_LIST=openjdk
+# $MAKE_COMMAND compile
+# $MAKE_COMMAND _hotspot_sanity_0
+# $MAKE_COMMAND _jdk_math_0
