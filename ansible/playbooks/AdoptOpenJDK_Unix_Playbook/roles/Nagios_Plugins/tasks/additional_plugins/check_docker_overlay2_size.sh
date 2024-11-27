@@ -8,7 +8,7 @@ DEFAULT_WARN_THRESHOLD=20
 DEFAULT_CRIT_THRESHOLD=40
 
 # Folder to check
-TARGET_DIR="/var/lib/docker/overlay2"
+TARGET_DIR="/var/lib/docker/overlay2/"
 
 # Function to display usage
 usage() {
