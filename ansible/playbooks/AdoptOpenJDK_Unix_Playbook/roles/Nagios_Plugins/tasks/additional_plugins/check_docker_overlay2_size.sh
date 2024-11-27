@@ -4,7 +4,7 @@
 # Allows passing thresholds as parameters
 
 # Default thresholds (in GB)
-DEFAULT_WARN_THRESHOLD=30
+DEFAULT_WARN_THRESHOLD=20
 DEFAULT_CRIT_THRESHOLD=40
 
 # Folder to check
