@@ -107,3 +107,9 @@
     src: roles/Nagios_Plugins/tasks/additional_plugins/check_container_spaces.sh
     dest: /usr/local/nagios/libexec/check_container_spaces.sh
     mode: 0755
+
+- name: Copy Docker Overlay2 Size Plugin
+  copy:
+    src: roles/Nagios_Plugins/tasks/additional_plugins/check_docker_overlay2_size.sh
+    dest: /usr/local/nagios/libexec/check_docker_overlay2_size.sh
+    mode: 0755
