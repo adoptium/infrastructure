@@ -4,20 +4,23 @@
 #######################################
 
 - name: Check if the ibxbuild service exists
-  win_service_info:
+  ansible.windows.win_service_info:
     name: IBXDashboard
   register: service_info
+  tags: incredibuild
 
 - name: Stop the IBX Dashboard service if it exists
-  win_service:
+  ansible.windows.win_service:
     name: IBXDashboard
     state: stopped
   when: service_info.exists
+  tags: incredibuild
 
 - name: Check if incredibuild.conf file exists
   win_stat:
     path: 'C:\Program Files (x86)\IncrediBuild\Dashboard\Apache24\conf\incredibuild.conf'
   register: incredibuild_conf_file
+  tags: incredibuild
 
 - name: Replace APACHE_PORT in incredibuild.conf if file exists
   win_lineinfile:
@@ -26,9 +29,11 @@
     line: 'define APACHE_PORT 31000'
     backup: yes
   when: incredibuild_conf_file.stat.exists
+  tags: incredibuild
 
 - name: Start the IBX Dashboard service if it exists
-  win_service:
+  ansible.windows.win_service:
     name: IBXDashboard
     state: started
   when: service_info.exists
+  tags: incredibuild
