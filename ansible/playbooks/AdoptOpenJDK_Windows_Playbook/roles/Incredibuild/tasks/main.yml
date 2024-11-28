@@ -4,12 +4,12 @@
 #######################################
 
 - name: Check if the ibxbuild service exists
-  ansible.windows.win_service_info:
+  win_service_info:
     name: IBXDashboard
   register: service_info
 
 - name: Stop the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: stopped
   when: service_info.exists
@@ -28,7 +28,7 @@
   when: incredibuild_conf_file.stat.exists
 
 - name: Start the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: started
   when: service_info.exists
