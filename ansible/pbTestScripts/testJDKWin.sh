@@ -30,13 +30,17 @@ pwd
 ls -tr
 cd aqa-tests
 ./get.sh --vendor_repos https://github.com/adoptium/temurin-build --vendor_branches master --vendor_dirs /test/functional
-cd aqa-tests/TKG || exit 1
+pwd
+ls -ltr
+cd TKG || exit 1
+
+## Run The Smoke Tests To Ensure The JDK Build OK
 export BUILD_LIST=functional/buildAndPackage
-$MAKE_COMMAND compile
-$MAKE_COMMAND _extended.functional
+make compile
+make _extended.functional
 
 # Run a few subsets of OpenJDK Tests as a shakedown of the built JDK.
-# export BUILD_LIST=openjdk
-# $MAKE_COMMAND compile
-# $MAKE_COMMAND _hotspot_sanity_0
-# $MAKE_COMMAND _jdk_math_0
+export BUILD_LIST=openjdk
+make compile
+make _hotspot_sanity_0
+make _jdk_math_0
