@@ -34,6 +34,12 @@ $MAKE_COMMAND compile
 $MAKE_COMMAND _hotspot_sanity_0
 $MAKE_COMMAND _jdk_math_0
 
+# Run Some Additional Tests To Test The Playbooks Have Run Properly
+export BUILD_LIST=functional
+$MAKE_COMMAND compile
+$MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
+$MAKE_COMMAND _MBCS_Tests_formatter_ja_JP_linux_0
+
 # Run SSL Client Tests Linux Only ( Not Solaris / FreeBSD )
 if [[ "$(uname)" == "FreeBSD" ]] || [[ "$(uname)" == "SunOS" ]]; then
 	echo "Skipping SSL Tests As Not Supported"
