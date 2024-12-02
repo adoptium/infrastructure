@@ -16,12 +16,11 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
-- name: Enable EPEL release for RHEL9 or RHEL8 or RHEL6 or RHEL7
+- name: Enable EPEL release for RHEL
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   failed_when: false
   when:
     - ansible_architecture != "s390x"
-    - (ansible_distribution_major_version | int >= 6)
   tags: patch_update
 
 - name: YUM upgrade all packages
@@ -52,9 +51,9 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additional build tools if NOT RHEL 8 AND RHEL9
+- name: Install additional build tools if NOT RHEL8 and above 
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
+  with_items: "{{ Additional_Build_Tools_NOT_RHEL8Plus }}"
   when:
     - not (ansible_distribution_major_version | int >= 8)
   tags: build_tools
@@ -102,9 +101,9 @@
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   tags: build_tools
 
-- name: Install additional build tools for RHEL >= 8
+- name: Install additional build tools for RHEL8 and above
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL8 }}"
+  with_items: "{{ Additional_Build_Tools_RHEL8Plus }}"
   when:
     - (ansible_distribution_major_version | int >= 8)
   tags: build_tools
