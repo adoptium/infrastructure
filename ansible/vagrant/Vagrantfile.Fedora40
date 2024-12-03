@@ -6,6 +6,9 @@ $script = <<SCRIPT
 if [ -r /vagrant/id_rsa.pub ]; then
         mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
+sudo dnf install -y cloud-utils-growpart xfsprogs
+sudo growpart /dev/sda 2
+sudo xfs_growfs /
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
@@ -18,6 +21,7 @@ Vagrant.configure("2") do |config|
     adoptopenjdkF40.vm.network :private_network, type: "dhcp"
     adoptopenjdkF40.vm.provision "shell", inline: $script, privileged: false
   end
+  config.disksize.size ="75GB"
   config.vm.provider "virtualbox" do |v|
     v.gui = false
     v.memory = 4196
