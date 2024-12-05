@@ -69,9 +69,9 @@ def main():
         for node in nodes:
             try:
                 nodeConfig = server.get_node_config(node["name"])
-                nodeIP = getIP(nodeConfig)
                 nodePort = getNodePort(nodeConfig)
-                if nodeIP == dockerhost["ip"] and node["name"] != dockerhost["name"]:
+                nodeLabel = getLabel(nodeConfig)
+                if nodeLabel.find(dockerhost["name"]) > -1:
                     nodeObject = {"nodeName": node["name"], "port": nodePort}
                     containers.append(nodeObject)
             except jenkins.NotFoundException:

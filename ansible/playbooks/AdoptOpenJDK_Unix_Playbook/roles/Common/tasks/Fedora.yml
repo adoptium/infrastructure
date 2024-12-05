@@ -94,11 +94,11 @@
     - (ansible_distribution_major_version == "8")
   tags: build_tools
 
-- name: Install additional build tools for FEDORA 35
+- name: Install additional build tools for FEDORA 35+
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_FEDORA35 }}"
+  with_items: "{{ Additional_Build_Tools_FEDORA35PLUS }}"
   when:
-    - (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora")
+    - (ansible_distribution_major_version >= "35" and ansible_distribution == "Fedora")
   tags: build_tools
 
 #################
@@ -123,7 +123,7 @@
   when:
     - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
     - not (ansible_distribution_major_version == "8")
-    - not (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora")
+    - not (ansible_distribution_major_version >= "35" and ansible_distribution == "Fedora")
   tags: install_java
 
 - name: Install Java when RedHat 6 on ppc64

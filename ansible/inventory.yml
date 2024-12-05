@@ -15,15 +15,9 @@ hosts:
           ubuntu2204-x64-1: {ip: 172.187.163.163, user: adoptopenjdk, description: infra-wazuh-server}
           ubuntu2204-x64-2: {ip: 20.90.182.165, description: trss.adoptium.net}
           ubuntu2204-x64-3: {ip: 172.187.93.97, description: awx.adoptium.net}
-          ubuntu2204-vagrant-x64-1: {ip: 172.203.178.157, description: VPC-Qemu-1}
-          ubuntu2204-vagrant-x64-2: {ip: 48.217.96.46, description: VPC-Qemu-2}
 
       - digitalocean:
           ubuntu2004-x64-1: {ip: 178.62.115.224, description: bastillion.adoptopenjdk.net}
-
-      - equinix:
-          ubuntu1604-x64-1: {ip: 147.75.80.219, description: ansible.adoptopenjdk.net}
-          ubuntu2004-x64-1: {ip: 147.75.80.235, description: awx.adoptopenjdk.net}
 
       - hetzner:
           ubuntu1604-x64-1: {ip: 78.47.239.96, description: nagios.adoptopenjdk.net}
@@ -44,8 +38,6 @@ hosts:
           ubuntu1804-armv8-2: {ip: 159.138.100.163}
 
       - azure:
-          win2012r2-x64-1: {ip: 20.108.178.21, user: adoptopenjdk}
-          win2012r2-x64-2: {ip: 20.108.176.36, user: adoptopenjdk}
           win2022-x64-1: {ip: 172.187.129.163, user: adoptopenjdk}
           win2022-x64-2: {ip: 172.187.176.15, user: adoptopenjdk}
           win2022-x64-3: {ip: 51.142.8.47, user: adoptopenjdk}
@@ -81,18 +73,17 @@ hosts:
 
       - azure:
           ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
-          ubuntu2404-x64-1: {ip: 20.83.24.86, description: 16 cores, 64GB}
 
       - equinix:
           ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
           ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
-          ubuntu2004-ppc64le-1: {ip: 140.211.168.214}
+          ubuntu2404-ppc64le-1: {ip: 140.211.168.214}
           ubuntu2404-aarch64-1: {ip: 140.211.167.67}
 
       - marist:
-          ubuntu2204-s390x-1: {ip: 148.100.74.237, user: linux1}
+          ubuntu2404-s390x-1: {ip: 148.100.74.237, user: linux1}
 
       - skytap:
           ubuntu2004-ppc64le-1: {ip: 20.61.136.212, description: 32CPU, 400G}
@@ -110,6 +101,8 @@ hosts:
           win2019-x64-1: {ip: 13.92.177.186, user: adoptopenjdk}
           win2022-x64-1: {ip: 51.132.234.42, user: adoptopenjdk}
           win2022-x64-2: {ip: 20.26.116.218, user: adoptopenjdk}
+          win2022-x64-3: {ip: 20.68.165.213, user: adoptopenjdk}
+          win2022-x64-4: {ip: 20.77.112.43, user: adoptopenjdk}
           win11-aarch64-1: {ip: 20.4.31.184, user: adoptopenjdk}
           win11-aarch64-2: {ip: 108.143.205.79, user: adoptopenjdk}
 

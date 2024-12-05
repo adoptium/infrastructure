@@ -131,4 +131,5 @@ echo "buildJDKWin.sh DEBUG:
 	FILENAME=${FILENAME:-}"
 
 echo "Running $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh"
+export BUILD_ARGS=--create-sbom
 $WORKSPACE/openjdk-build/build-farm/make-adopt-build-farm.sh

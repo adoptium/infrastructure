@@ -18,13 +18,13 @@ Add the user to the correct Infrastructure team:
 - [@adoptopenjdk-infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/adoptopenjdk-infrastructure) - Can be assigned Infra Issues
 - [@jenkins-admins](https://github.com/orgs/AdoptOpenJDK/teams/jenkins-admins) - Super users on Jenkins
 
-### [Secrets](https://github.com/AdoptOpenJDK/secrets)
+### [Secrets](https://github.com/adoptium/secrets)
 
 For [@admin_infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/admin_infrastructure) and
 [@infrastructure](https://github.com/orgs/AdoptOpenJDK/teams/infrastructure) teams only.
 
 - Show user how to access the secrets repo and also how to use dotGPG to read files.
-- Adding a new user to dotGPG can be done following the instructions [here](https://github.com/AdoptOpenJDK/secrets#adding-users.)
+- Adding a new user to dotGPG can be done following the instructions [here](https://github.com/adoptium/secrets#adding-users.)
 
 ## External Services
 

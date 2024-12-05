@@ -20,23 +20,23 @@
 
     - name: Download Apache Ant
       get_url:
-        url: https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
-        dest: /tmp/apache-ant-1.9.9-bin.zip
+        url: https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip
+        dest: /tmp/apache-ant-{{ ant_version }}-bin.zip
         mode: 0440
         timeout: 25
       when: ant.stat.islnk is not defined
 
     - name: GPG Signature verification
-      script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-1.9.9-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip.asc" -k {{ key.apache_ant }}
+      script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-ant-{{ ant_version }}-bin.zip -sl "https://archive.apache.org/dist/ant/binaries/apache-ant-{{ ant_version }}-bin.zip.asc" -k {{ key.apache_ant }}
       when: ant.stat.islnk is not defined
 
     - name: Unarchive Ant
       unarchive:
-        src: /tmp/apache-ant-1.9.9-bin.zip
+        src: /tmp/apache-ant-{{ ant_version }}-bin.zip
         dest: /opt
         copy: False
       when: ant.stat.islnk is not defined
 
     - name: Create symlink for ant
-      file: src=/opt/apache-ant-1.9.9/bin/ant dest=/usr/bin/ant state=link
+      file: src=/opt/apache-ant-{{ ant_version }}/bin/ant dest=/usr/bin/ant state=link
       when: ant.stat.islnk is not defined

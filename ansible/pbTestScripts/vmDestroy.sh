@@ -49,6 +49,8 @@ checkOS() {
                         osToDestroy="U21";;
                 "Ubuntu2204" | "U22" | "u22" )
                         osToDestroy="U22";;
+                "Ubuntu2404" | "U24" | "u24" )
+                        osToDestroy="U24";;
                 "CentOS6" | "centos6" | "C6" | "c6" )
                         osToDestroy="C6" ;;
                 "CentOS7" | "centos7" | "C7" | "c7" )
@@ -59,6 +61,8 @@ checkOS() {
                         osToDestroy="D8" ;;
                 "Debian10" | "debian10" | "D10" | "d10" )
                         osToDestroy="D10" ;;
+                "Fedora40" | "fedora40" | "F40" | "f40" )
+                        osToDestroy="F40" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
 			osToDestroy="FBSD12" ;;
 		"Solaris10" | "solaris10" | "Sol10" | "sol10" )
@@ -68,7 +72,7 @@ checkOS() {
   	"Windows2022" | "Win2022" | "W22" | "w22" )
 	                       osToDestroy="W2022";;
 	              "all" )
-                        osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 FBSD12 Sol10 W2012 W2022" ;;
+                        osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 F40 FBSD12 Sol10 W2012 W2022" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
@@ -83,6 +87,7 @@ listOS() {
 		- Ubuntu2004
 		- Ubuntu2104
 		- Ubuntu2204
+		- Ubuntu2404
 		- CentOS6
 		- CentOS7
 		- CentOS8

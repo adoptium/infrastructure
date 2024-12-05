@@ -14,7 +14,7 @@
     - mount: /var
       size: 4
     - mount: /tmp
-      size: 4
+      size: 5
     - mount: /admin
       size: 1
     - mount: /opt

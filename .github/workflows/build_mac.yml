@@ -22,20 +22,19 @@ jobs:
           - os: [macos-14]
     steps:
 
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Install Python
       run: brew install python@3.12 --overwrite
 
+    - name: Configure dirmgr
+      run: |
+        mkdir -p ~/.gnupg/
+        touch ~/.gnupg/dirmngr.conf
+        echo "standard-resolver" >  ~/.gnupg/dirmngr.conf
+
     - name: Install Ansible
       run: brew install ansible
-
-    # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
-    # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
-    # Upstream Bug : https://github.com/actions/runner-images/issues/9777
-    - name: Replace keyserver address with IP address
-      run: |
-        sed -i '' 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
 
     - name: Run Ansible Playbook
       run: |
