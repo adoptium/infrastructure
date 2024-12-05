@@ -45,6 +45,9 @@ Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
 Asian_Locales: Disabled
 Slack_Notification: Disabled
 
+ant_version: 1.10.15
+ant_checksum: sha512:1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9
+
 key:
-  apache_ant: CE8075A251547BEE249BC151A2115AE15F6B8B72 # Stefan Bodewig <bodewig@apache.org>
+  apache_ant: 0A123C1ED3F13A6A0140E166C71FB765CD9DE313 # Jaikiran Pai <jaikiran@apache.org>
   adoptium: 3B04D753C9050D9A5D343F39843C48A565F8F04B # Adoptium GPG Key (DEB/RPM Signing Key) <temurin-dev@eclipse.org>

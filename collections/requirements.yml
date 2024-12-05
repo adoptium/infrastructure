@@ -1,0 +1,9 @@
+---
+# Required by AWX for the homebrew and zypper operations
+# in curl/GIT_Source roles
+collections:
+  - name: community.general
+    source: https://galaxy.ansible.com
+
+  - name: community.windows
+    source: https://galaxy.ansible.com

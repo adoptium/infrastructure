@@ -1,4 +1,4 @@
-name: Build QEMU
+name: QEMU Playbook Checker
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ jobs:
   build_job:
     if: ${{ github.event.label.name == 'QEMU-playbook-check' }}
     # The host should always be linux
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
 
     strategy:
@@ -30,16 +30,16 @@ jobs:
             distro: ubuntu18.04
           - arch: s390x
             distro: ubuntu18.04
-          # - arch: riscv64
-          #   distro: ubuntu22.04
+          - arch: riscv64
+            distro: ubuntu20.04
           # - arch: armv7
           #   distro: jessie
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run on architecture
-        uses: uraimo/run-on-arch-action@v2.4.0
+        uses: uraimo/run-on-arch-action@5397f9e30a9b62422f302092631c99ae1effcd9e # v2.8.1
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}

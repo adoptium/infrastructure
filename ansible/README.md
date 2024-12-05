@@ -106,7 +106,6 @@ The main ones are as follows:
 - AdoptOpenJDK_Unix_Playbook/main.yml (For all *IX machines including macOS)
 - AdoptOpenJDK_Windows_Playbook/main.yml (Windows systems)
 - AdoptOpenJDK_AIX_Playbook/main.yml (For AIX systems)
-- AdoptOpenJDK_ITW_Playbooks (CentOS or Red Hat only - IcedTea-WEB setup)
 
 There are also various playbooks used to set up other machines in the
 adoptopenjdk infrastructure - generally most end users won't need these but
@@ -150,6 +149,15 @@ Note that when running from inside a `vagrant` instance:
  - the `[/path/to/id_rsa.pub]` can be replaced with `/home/vagrant/.ssh/id_rsa.pub`
 
 This is useful if one or more tasks are failing to execute successfully or if they need to be skipped due to not deemed to be executed in the right environment.
+
+## Enforcing running handlers 
+There are some handlers defined in playbooks, like `sshd` restart, and they will not run unless all tasks in a play succeed.
+
+In order to enforce handlers to be executed anyway, add `--force-handlers` option to command:
+
+```bash
+ansible-playbook -i [/path/to/hosts] --force-handlers -b AdoptOpenJDK_AIX_Playbook/main.yml 
+```
 
 ## Verbose mode, debugging Ansible playbooks
 

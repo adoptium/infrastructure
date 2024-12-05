@@ -4,7 +4,7 @@
 ##########
 - name: Test if Cygwin is already installed
   win_stat:
-    path: 'C:\cygwin64'
+    path: 'C:\cygwin64\bin\jq.exe'
   register: cygwin_installed
   tags: cygwin
 
@@ -12,12 +12,18 @@
   win_get_url:
     url: https://cygwin.com/setup-x86_64.exe
     dest: C:\temp\cygwin.exe
+    force: no
+    checksum: e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8
+    checksum_algorithm: sha256
   when: not cygwin_installed.stat.exists
+  register: cygwin_download
   tags: cygwin
 
+# If you update this with a new package, modify the "Test
+# if installed" to look for something in the new package
 - name: Install Cygwin
   win_shell: |
-    Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bsdtar,cmake,cpio,curl,gcc-core,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
+    Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bsdtar,cmake,cpio,curl,gcc-core,git,gnupg,grep,jq,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
   args:
     executable: powershell
   when: not cygwin_installed.stat.exists

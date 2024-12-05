@@ -26,7 +26,7 @@
     force: no
     checksum: ca6a67fb01c1468f2b510fd2f9eb0750887db3fb49a0302732c1421c85c6627c
     checksum_algorithm: sha256
-  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit")
+  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit" or ansible_architecture == "ARM 64-bit Processor")
   tags: NSClient
 
 - name: Install NSClient
@@ -35,7 +35,7 @@
     creates_path: 'c:\nsclient\nscp.exe'
     state: present
     arguments: /l* C:\temp\nscp.log /quiet INSTALLLOCATION=c:\nsclient CONF_CAN_CHANGE=1 MONITORING_TOOL=none ALLOWED_HOSTS=127.0.0.1,{{ Nagios_Master_IP }} ADD_DEFAULTS=1 CONF_CHECKS=1 CONF_NSCLIENT=1 /quiet
-  when: (not nsclient_installed.stat.exists)
+  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit" or ansible_architecture == "64-bit" or ansible_architecture == "ARM 64-bit Processor")
   tags: NSClient
 
 - name: Enable External Script Options For NSClient
@@ -47,7 +47,7 @@
     - CheckNSCP
     - CheckDisk
     - CheckSystem
-  when: (not nsclient_installed.stat.exists)
+  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit" or ansible_architecture == "64-bit" or ansible_architecture == "ARM 64-bit Processor")
   register: result
   failed_when: (result.rc == 0) or (result.rc == -1)
   tags: NSClient
@@ -56,6 +56,7 @@
   win_service:
     name: nscp
     state: restarted
+  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit" or ansible_architecture == "64-bit" or ansible_architecture == "ARM 64-bit Processor")
   tags: NSClient
 
 - name: Cleanup NSClient
@@ -63,4 +64,5 @@
     path: C:\temp\nscp.msi
     state: absent
   failed_when: false
+  when: (not nsclient_installed.stat.exists) and (ansible_architecture == "32-bit" or ansible_architecture == "64-bit" or ansible_architecture == "ARM 64-bit Processor")
   tags: NSClient

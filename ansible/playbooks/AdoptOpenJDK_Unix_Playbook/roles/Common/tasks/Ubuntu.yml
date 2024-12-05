@@ -24,7 +24,7 @@
 
 - name: Add Azul Zulu GPG Package Signing Key for x86_64
   apt_key:
-    url: http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+    url: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
     state: present
   when:
     - ansible_architecture == "x86_64"
@@ -80,6 +80,20 @@
   with_items: "{{ Additional_Build_Tools_aarch64 }}"
   when:
     - ansible_architecture == "aarch64"
+  tags: build_tools
+
+- name: Install additional build tools for !riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_not_riscv64 }}"
+  when:
+    - ansible_architecture != "riscv64"
+  tags: build_tools
+
+- name: Install additional build tools for riscv64
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  when:
+    - ansible_architecture == "riscv64"
   tags: build_tools
 
 - name: Install additional build tools for Ubuntu 20 +

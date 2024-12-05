@@ -24,7 +24,7 @@ See our current [Chaos Monkey Status](CHAOS_MONKEY.md).
 
 ## Related Repositories
 
-* [secrets](https://www.github.com/adoptopenjdk/secrets/) - A private repo containing encrypted secrets.
+* [secrets](https://www.github.com/adoptium/secrets/) - A private repo containing encrypted secrets.
 * [openjdk-jenkins-helper](https://www.github.com/adoptopenjdk/openjdk-jenkins-helper/) - A repo containing helper scripts for out Jenkins CI.
 
 ## Important Documentation
@@ -111,18 +111,20 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
 ### Jenkins
 
 1. Ensure off-machine backups are working!
-2. Check for plugin updates that will apply to the current version of
+1. Ensure that no non-pipeline jobs are running on the server as they
+   will often hold up restarts
+1. Check for plugin updates that will apply to the current version of
    jenkins (Each plugin should be checked for potential issues in the readme)
-3. Repeat step 1 if necessary until jenkins does not offer any more plugins
-4. Identify new LTS level - check [the release notes](https://www.jenkins.io/doc/upgrade-guide/)
+1. Repeat step 1 if necessary until jenkins does not offer any more plugins
+1. Identify new LTS level - check [the release notes](https://www.jenkins.io/doc/upgrade-guide/)
    to identify any potential problems. Allow jenkins to upgrade itself
-5. Redo step 1/2 so that any plugins that were unable to be updated due to
+1. Redo step 1/2 so that any plugins that were unable to be updated due to
    the older jenkins level can update themselves.
-6. If necessary, and the remediation cannot be performed within the window,
-   identify potentially risky plugins that were held back and create an issue
-   to deal with them in the next cycle.
-
-(TODO: Publish and link to video of an upgrade session)
+1. If necessary, and the remediation cannot be performed within the
+   maintenance window, identify potentially risky plugins that were held
+   back and create an issue to deal with them in the next cycle.
+1. Backup the main war in /usr/share/jenkins to a name with a version suffix
+   in case of corruption to the main jar.
 
 ### Backups
 

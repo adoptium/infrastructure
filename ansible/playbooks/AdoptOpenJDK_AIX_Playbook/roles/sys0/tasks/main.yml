@@ -1,0 +1,13 @@
+---
+############################
+# Enable full core support #
+############################
+- name: Ensure full AIX core files are enabled
+  command: chdev -l sys0 -a fullcore=true
+  changed_when: false
+  tags: sys0
+
+- name: Ensure maxuproc is 512
+  command: chdev -l sys0 -a maxuproc=512
+  changed_when: false
+  tags: sys0

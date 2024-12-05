@@ -6,6 +6,10 @@ labels: 'Temp Infra Access'
 assignees: 'sxa'
 
 ---
+**NOTE: THIS ISSUE SHOULD NOT BE CLOSED BY THE ORIGINATOR IF ACCESS IS GRANTED**.
+When the access is no longer needed please add a comment and a member
+of the infrastructure team will revoke it and close the issue.
+
 Required access level (Delete as appropriate). Note that you should only
 request the minimum level that is required to solve your problem
 

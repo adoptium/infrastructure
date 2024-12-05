@@ -12,7 +12,7 @@
 # Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
 # Run powershell as the Administrator
 # If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/adoptium/infrastructure/issues/1858
-# wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
 # .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 # .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 # .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
@@ -22,7 +22,7 @@
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
 - name: Ansible Windows playbook
-  hosts: "{{ Groups | default('build*win*:test*win*') }}"
+  hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
     - name: Load Standard Variables
@@ -50,7 +50,6 @@
     - CodesignCert
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
-    - Firefox
     - Strawberry_Perl             # Testing
 #    - Freemarker                  # OpenJ9"
     - GIT
@@ -60,18 +59,25 @@
       jdk_version: 10
     - role: Java_install          # For Gradle
       jdk_version: 11
-    - role: Java_install          # JDK16 build bootstrap
-      jdk_version: 15
-    - role: Java_install          # JDK17 build bootstrap
+    - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 16
-    - role: Java_install
+    - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 17
+    - role: Java_install          # Bootstrap for JDK21
+      jdk_version: 20
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 21
     - ANT                         # Testing
     - role: MSVS_2013
       when: ansible_architecture == "64-bit"
     - role: MSVS_2017             # OpenJ9
       when: ansible_architecture == "64-bit"
-    - MSVS_2019                   # OpenJ9
+    - role: MSVS_2019                   # OpenJ9
+      tags: MSVS_2019
+    - role: MSVS_2022
+      tags: MSVS_2022
+    - role: MSVS_2022_REDIST
+      tags: MSVS_2022_REDIST
     - NVidia_Cuda_Toolkit         # OpenJ9
     - NTP_TIME
     - Clang_64bit                 # OpenJ9
@@ -81,13 +87,12 @@
     - IcedTea-Web                 # For Jenkins webstart
     - WiX                         # For creating installers
     - NSClient                    # Required For Nagios Monitoring
+    - Incredibuild                # Configure Incredibuild Dashboard Service
     - shortNames
     - Dragonwell                  # Dragonwell bootstrap image
     - role: Jenkins_Service_Installation # Automate installing the jenkins service
       tags: [jenkins, adoptopenjdk]
       when: jenkins_secret is defined  # Only run if jenkins_secret is defined
-    - role: Thunderbird
-      tags: [Thunderbird, jck, adoptopenjdk]
     - role: logs
       position: "End"
       tags: always

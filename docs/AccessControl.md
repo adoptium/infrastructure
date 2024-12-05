@@ -117,7 +117,6 @@ on this.
 RDP and a password) at present since users typically have access to those
 elsewhere, but a similar process could be followed for those.*
 
-
 ## Infrastructure providers
 
 Access to infrastructure providers to be able to provision and/or reset can
@@ -138,6 +137,82 @@ the Adoptium org, and grant access to the `infrastructure` Group (or
 `adopt-infra-admins` for some of the providers)
 
 **Offboarding** Remove access, change relevant passwords.
+
+## GitHub repositories and projects
+
+The top level [Adoptium](https://projects.eclipse.org/projects/adoptium)
+project at Eclipse has several sub-projects which are visible on the right
+hand side of that page.
+
+For the purposes of the main Temurin deliverable and the visibility on the
+website we have the top level project, the
+[Eclipse Temurin](https://projects.eclipse.org/projects/adoptium.temurin)
+subproject and also
+[Eclipse AQAvit](https://projects.eclipse.org/projects/adoptium.aqavit).
+There is also a project for the Temurin Compliance project used for the TCK
+execution, but that is out of scope for the purposes of this document.
+
+Underneath each of these projects we have a number of GitHub projects which
+are access controlled based on the membership of the projects. For each of
+the three projects above you can add `/developer` to the URL, or click
+"Developer Resources" to show the complete list of associated GitHub
+repositories for each project.
+
+Access to these projects is controlled by Eclipse's election processes. For
+infromation checkout the "Process for adding new committers" section of
+https://github.com/adoptium/adoptium/wiki/Working-with-Eclipse
+
+### [adoptium](https://projects.eclipse.org/projects/adoptium)
+
+Contains the [top level adoptium repository](https://github.com/adoptium/adoptium),
+[the API](https://github.com/adoptium/api.adoptium.net), the
+[status dashboard](https://github.com/adoptium/dash.adoptium.net), plus a
+few obsolete ones
+
+### [adoptium.temurin](https://projects.eclipse.org/projects/adoptium.temurin)
+
+This contains our mirrors of the upstream openjdk source repositories
+(jdkXXu), our
+binaries repositories for the built projects (temurinXX-binaries) plus
+everything required to build and ship the code. This includes:
+
+- [temurin](https://github.com/adoptium/temurin) used for project level administrative tasks including the status issues and retrospectives.
+- [mirror scripts](https://github.com/adoptium/mirror-scripts) used for keeping the mirrors of the upstream openjdk source up to date
+- [ci-jenkins-pipelines](https://github.com/adoptium/ci-jenkins-pipelines) which contains the definitions of the jenkins jobs used for building
+- [temurin-build](https://github.com/adoptium/temurin-build) which are the scripts used to build Temurin (invoked from the pipelines in ci-jenkins-pipelines) and the smoke tests
+- [installer](https://github.com/adoptium/installer) used for creating the platform native installers (MSI/PKG/RPM/DEB)
+- [infrastructure](https://github.com/adoptium/infrastructure) contains the ansible playbooks and related machine setup information and automation
+- [github-release-scripts](https://github.com/adoptium/github-release-scripts) used for releasing the binaries to GitHub when they have been built
+- [adoptium-support](https://github.com/adoptium/adoptium-support) for Temurin users to ask support questions
+- [build-jdk](https://github.com/adoptium/build-jdk) - GitHub action to build a JDK using the scripts in temurin-build
+
+### [adoptium.aqavit](https://projects.eclipse.org/projects/adoptium.aqavit)
+
+- [aqa-test-tools](https://github.com/adoptium/aqa-test-tools) Various tools utilised by the AQAvit test team, including the TRSS server used for providing test execution summaries
+- [aqa-tests](https://github.com/adoptium/aqa-tests) Top level automation used for testing java implementations
+- [TKG](https://github.com/adoptium/TKG) TestKitGen test harness used by aqa-tests automation
+- [STF](https://github.com/adoptium/STF) The System Test Framework used by test cases in the aqa-systemtest repository
+- [aqa-systemtest](https://github.com/adoptium/aqa-systemtest) A set of system/stress tests that run under the aqa automation
+- [bunblebench](https://github.com/adoptium/bumblebench) Microbenchmarking framework
+- [run-aqa](https://github.com/adoptium/run-aqa) A GitHub action to run aqa tests against a JDK implementation
+
+### Others
+
+The [repository used for the adoptium.net website](https://github.com/adoptium/adoptium.net)
+including the blog is under an independent ACL.
+
+### Otterdog
+
+Otterdog is an Eclipse Foundation tool for managing access control to GitHub
+repositories.  It stores the configuration as code and allows members of the
+Adoptium projects to request changes to the setup of the repositories or
+create new ones by submitting pull requests to
+https://github.com/adoptium/.eclipsefdn/blob/main/otterdog/adoptium.jsonnet
+
+You can look at the PRs in that repository for examples of the sorts of
+changes that can be made using Otterdog.
+
+For more information on the tool, see https://adoptium.github.io/.eclipsefdn
 
 ## secrets / dotgpg
 
@@ -162,7 +237,7 @@ Change any credentials which the user had access to.
 
 ## Third party services
 
-Currently access to these are granted on a case by case basis.  These
-include dockerhub, CloudFlare, JFrog,  and others.  We are finalising the
-migration to BitWarden so this section will be updated later :-)
+There are a number of services which the project uses and the credentials
+for those are stored in the `External Services` group in BitWarden.  These
+include fastly, CloudFlare, JFrog, and the Uptime Robot account.
 

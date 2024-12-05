@@ -20,15 +20,19 @@ do
 	#echo "ID = "$containerID
 	workspaceSpace=$(docker exec $containerID sh -c "if [ -d /home/jenkins/workspace ] ; then du -s /home/jenkins/workspace | awk '{print $3}' ; else echo 0 ; fi" 2> /dev/null)
 	workSpace=`echo $workspaceSpace|cut -d" " -f1`
+	## Allow For Container With No Workspace
+	if [ -z $workSpace ]; then
+                workSpace=0
+        fi
 
 	## Create Lists Of Errors And Warnings
-	if [ $workSpace -gt $ErrorThreshold ]
+	if (( $workSpace > $ErrorThreshold ))
 	then
 		## Add Container Name To ErrorList
 		ErrorList="$ErrorList,$containerName,$containerID"
 		# echo "Errors In "$ErrorList
 	else
-		if [ $workSpace -gt $WarnThreshold ] && [ $workSpace -lt $ErrorThreshold ]
+		if (( $workSpace > $WarnThreshold )) && (( $workSpace < $ErrorThreshold ))
 		then
 			WarnList="$WarnList,$containerName,$containerID"
 			#echo "Warnings In "$WarnList

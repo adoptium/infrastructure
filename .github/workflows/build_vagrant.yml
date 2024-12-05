@@ -8,59 +8,105 @@ on:
     branches:
     - master
 
+# Cancel existing runs if user makes another push.
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
 jobs:
   build-solaris:
     name: Solaris
-    runs-on: macos-12
+    runs-on: ubuntu-20.04
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: Install dependencies
-      run: |
-        brew install ansible
+    # As Solaris Needs An Older Version Of Ansible/Python
+    # Use Python2 & Pip To Install On Ubuntu 22.04
+    # Rather Than The System Packages
 
-    - name: Install Solaris 10 Box If Not Already Present
+    - name: Install Python 2
+      run: sudo apt-get install python2
+
+    - name: Python 2 Get Pip Bootstrap Script
+      run: curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+
+    - name: Python 2 Get Pip
+      run: sudo python2 get-pip.py
+
+    - name: Install Ansible Using PIP2
+      run: pip2 install ansible
+
+    - name: Install VirtualBox
+      run: sudo apt-get install virtualbox
+
+    - name: Add Hashicorp GPG Key
+      run: wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+    - name: Add Hashicorp Repository
+      run: echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+    - name: Update Repos
+      run: sudo apt-get update
+
+    - name: Install Vagrant
+      run: sudo apt-get install vagrant
+
+    - name: Add User To VBOX group
+      run: sudo usermod -a -G vboxusers $USER
+
+    - name: Cache Solaris10.box
+      id: solaris-10-cache
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+      with:
+        path: Solaris10.box
+        key: sol10boxcache
+
+    - name: Download Solaris 10 Box If Cache Misses
+      if: steps.solaris-10-cache.outputs.cache-hit != 'true'
+      run: wget https://ci.adoptium.net/userContent/vagrant/Solaris10.box.gz
+
+    - name: Verify Checksum If Cache Misses
+      if: steps.solaris-10-cache.outputs.cache-hit != 'true'
       run: |
-        if [ `vagrant box list|grep ^solaris10|wc -l` -gt 0 ]
+        CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
+        if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
         then
-          echo "Box Exists - Do Nothing"
+          echo "Checksum OK"
         else
-          echo "No Box - Download From Jenkins And Import"
-          wget https://ci.adoptium.net/userContent/vagrant/Solaris10.box.gz
-          CKSUM=`shasum -a 256 ./Solaris10.box.gz|cut -d" " -f1`
-          if [ "$CKSUM" = "0879215f4bf03f5e125addb139d0b5a49a4f8a258297b765cf1f22a8a7ee3309" ]
-          then
-            echo "Checksum OK"
-            gunzip Solaris10.box.gz
-            vagrant box add --name="solaris10" ./Solaris10.box
-            rm Solaris10.box
-          else
-            echo "Sum Bad"
-            exit 99;
-          fi
+          echo "Sum Bad"
+          exit 99;
         fi
 
+    - name: Extract Solaris10.box.gz If Cache Misses
+      if: steps.solaris-10-cache.outputs.cache-hit != 'true'
+      run: gunzip Solaris10.box.gz
+
+    - name: Add Solaris 10 Box To Vagrant
+      run: vagrant box add --name="solaris10" ./Solaris10.box
+
     - name: Setup Vagrant VM
+      working-directory: ansible
       run: |
-        cd ansible
         ln -sf vagrant/Vagrantfile.Solaris10 Vagrantfile
         rm -f id_rsa.pub id_rsa
         # Copy the machine's ssh key for the VMs to use, after removing prior files
         ssh-keygen -q -f $PWD/id_rsa -t rsa -N ''
-        vagrant up
+        vagrant plugin install vagrant-vbguest
+        vagrant up --provider=virtualbox
         vagrantPORT=$(vagrant port | grep host | awk '{ print $4 }')
         rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
         echo "[127.0.0.1]:${vagrantPORT}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
+        [ ! -d $HOME/.ssh ] && mkdir $HOME/.ssh && chmod 700 $HOME/.ssh
         [ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
+        [ ! -d $HOME/.ansible ] && mkdir $HOME/.ansible
         ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
         sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
         awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "timeout = 60"; print "remote_tmp = $HOME/.ansible/tmp"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
     - name: Run Ansible Playbook
-      run: |
-        cd ansible
-        ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+      working-directory: ansible
+      run: ansible-playbook -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx --ssh-common-args='-o HostKeyAlgorithms=ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519 -o PubKeyAcceptedKeyTypes=ssh-rsa' -u vagrant -b --skip-tags adoptopenjdk,cups playbooks/AdoptOpenJDK_Unix_Playbook/main.yml

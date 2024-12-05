@@ -16,7 +16,7 @@
     description: docker repository
     baseurl: "https://download.docker.com/linux/centos/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/stable"
     enabled: true
-    gpgcheck: false
+    gpgcheck: true
   when:
     - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
 
@@ -26,6 +26,6 @@
     description: docker YUM repo s390x
     baseurl: https://download.docker.com/linux/rhel/{{ ansible_distribution_major_version }}/s390x/stable/
     enabled: true
-    gpgcheck: false
+    gpgcheck: true
   when:
     - ansible_architecture == "s390x"

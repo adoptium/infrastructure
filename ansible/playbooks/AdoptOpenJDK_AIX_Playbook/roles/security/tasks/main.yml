@@ -26,3 +26,25 @@
       register: _installp
       changed_when: _installp.rc == 0
       when: _lslpp.rc == 0
+
+- name: Enable X11Forwarding
+  notify:
+    - Restart sshd
+  block:
+    - name: Make sure X11Forwarding is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?X11Forwarding'
+        line: 'X11Forwarding yes'
+
+    - name: Make sure X11DisplayOffset is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?X11DisplayOffset'
+        line: 'X11DisplayOffset 10'
+
+    - name: Make sure X11UseLocalhost is in sshd_config
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#X11UseLocalhost'
+        line: 'X11UseLocalhost yes'

@@ -1,0 +1,56 @@
+name: Packer
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+    - .github/workflows/packer.yml
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/**
+    - ansible/packer/**
+    branches:
+    - master
+
+jobs:
+  packer:
+    name: Update macOS Orka Image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [sonoma-arm64, sonoma-intel]
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
+    # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
+    # Upstream Bug : https://github.com/actions/runner-images/issues/9777
+    - name: Replace keyserver address with IP address
+      run: |
+        sed -i 's/keyserver\.ubuntu\.com/185.125.188.27/g' ansible/playbooks/Supporting_Scripts/package_signature_verification.sh
+
+    - name: Install openconnect
+      run: sudo apt-get install -y openconnect
+
+    - name: Connect to Orka VPN
+      run: |
+        echo ${{ secrets.ORKA_VPN_PASSWORD }} | sudo openconnect 207.254.69.34 \
+        --protocol=anyconnect --user=${{ secrets.ORKA_VPN_USERNAME }} \
+        --passwd-on-stdin --background \
+        --servercert ${{ secrets.ORKA_VPN_SERVER_CERT }}
+
+    - name: Init Packer
+      run: packer init orka.pkr.hcl
+      working-directory: ansible/packer
+    
+    - name: Run Packer (base image)
+      # Skip arm64 for now as Xcode download takes too long
+      if: matrix.os != 'sonoma-arm64'
+      run: packer build --only=macstadium-orka.${{ matrix.os }} orka-base.pkr.hcl
+      working-directory: ansible/packer
+      env:
+        ORKA_TOKEN: ${{ secrets.ORKA_TOKEN }}
+
+    - name: Run Packer (final image)
+      run: packer build --only=macstadium-orka.${{ matrix.os }} orka.pkr.hcl
+      working-directory: ansible/packer
+      env:
+        ORKA_TOKEN: ${{ secrets.ORKA_TOKEN }}

@@ -370,12 +370,7 @@
   tags: build_tools
 
 - name: Check if Liberica 11 is already installed in the target location
-  stat: path=/usr/lib/jvm/bell-jdk-11/bin/java
-  register: liberica11_installed
-  tags: build_tools
-
-- name: Check if Liberica 11 is already installed in the target location
-  stat: path=/usr/lib/jvm/bell-jdk-11/bin/java
+  stat: path=/usr/lib/jvm/jdk-11/bin/java
   register: liberica11_installed
   tags: build_tools
 
@@ -448,7 +443,7 @@
     - not liberica11_installed.stat.exists
   tags: build_tools
 
-- name: Check for /usr/lib/jbm/fallocate.so
+- name: Check for /usr/lib/jvm/fallocate.so
   stat:
     path: /usr/lib/jvm/fallocate.so
   register: fallocate_installed

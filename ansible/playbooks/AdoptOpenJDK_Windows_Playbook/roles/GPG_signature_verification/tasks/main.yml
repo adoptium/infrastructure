@@ -13,15 +13,39 @@
 - name: Fix Permissions
   win_shell: C:/cygwin64/bin/bash.exe -c "chmod og-rwx ~/.gnupg"
 
-- name: Import GPG Key
-  win_command: gpg --keyserver keyserver.ubuntu.com --recv-keys "{{ GPG_key }}"
+- name: Download GPG Signing Key
+  win_command: curl -sSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x{{ GPG_key }}" -o c:\temp\gpgkey.asc
+
+- name: Temporarily Disable gpgagent
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 400 /usr/bin/gpg-agent"
+
+- name: Temporarily Disable dirmngr
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 400 /usr/bin/dirmngr"
+
+- name: Import GPG Signing Key
+  win_shell: |
+    C:/cygwin64/bin/bash.exe -c "gpg2 --batch --import c:/temp/gpgkey.asc"
+  failed_when: false
+
+- name: Re-enable gpgagent
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/gpg-agent"
+  when: true
+
+- name: Re-enable dirmngr
+  win_shell: C:/cygwin64/bin/bash.exe -c "chmod 755 /usr/bin/dirmngr"
+  when: true
 
 - name: Get signature file
   win_command: wget -q "{{ signature_link }}" -O sigfile
 
 - name: Verify binary
-  win_command: gpg --verify sigfile {{ file_path }}
+  win_shell: C:/cygwin64/bin/bash.exe -c "gpg2 --verify sigfile {{ file_path }}"
 
 - name: Remove gnupg directory with Cygwin ( when it didnt exist previously )
   win_shell: C:/cygwin64/bin/bash.exe -c "rm -rf ~/.gnupg"
   when: (not gnupg_check.stat.exists)
+
+- name: Remove Downloaded GPG Key
+  win_file:
+    path: c:\temp\gpgkey.asc
+    state: absent

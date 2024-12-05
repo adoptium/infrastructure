@@ -22,8 +22,9 @@
   tags:
     - shortnames
 
-- name: Enable shortnames on drive C:/
-  win_shell: "fsutil 8dot3name set C: 0"
+# Note that using "set C: 0" did not work in containers
+- name: Enable shortnames
+  win_shell: "fsutil 8dot3name set 0"
   when: (not enabled_shortnames.stdout)
   tags:
     - shortnames
@@ -31,7 +32,6 @@
 - name: Create 8dot3 shortnames
   script: scripts/shortName.ps1 "{{ item.name }}" "{{ item.shortname }}"
   with_items:
-    - {name: "WiX Toolset v3.14", shortname: "WIXTOO~1.14"}
     - {name: "Microsoft Visual Studio", shortname: "MIB055~1"}
     - {name: "Microsoft Visual Studio 9.0", shortname: "MICROS~2.0"}
     - {name: "Microsoft Visual Studio 10.0", shortname: "MICROS~3.0"}

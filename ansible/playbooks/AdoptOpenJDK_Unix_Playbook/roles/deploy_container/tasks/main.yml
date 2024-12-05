@@ -1,0 +1,25 @@
+---
+# This task verifies the docker_images arguments passed into the playbook
+# Then runs the deploy.yml task to build and run each image on the dockerhost
+- name: Set docker images list variable
+  set_fact:
+    docker_images_list: "{{ docker_images.split(',') | list }}"
+
+- name: Check if dockerfile exists
+  delegate_to: localhost
+  stat:
+    path: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ item }}"
+  loop: "{{ docker_images_list }}"
+  register: dockerfiles_exist
+
+- name: Fail if dockerfile does not exist
+  fail:
+    msg: "{{ item.invocation.module_args.path }} does not exist"
+  when: not item.stat.exists
+  loop: "{{ dockerfiles_exist.results }}"
+
+- name: Run deploy.yml for every docker image
+  include_tasks: deploy.yml
+  loop: "{{ docker_images_list }}"
+  loop_control:
+    loop_var: docker_image

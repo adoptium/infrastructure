@@ -25,16 +25,10 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: alpine13.1
-           dockerfile: "Dockerfile.alp311"
-         - os: alpine13.2
-           dockerfile: "Dockerfile.alp312"
-         - os: alpine13.3
-           dockerfile: "Dockerfile.alp313"
-         - os: alpine13.4
-           dockerfile: "Dockerfile.alp314"
+         - os: alpine3.20
+           dockerfile: "Dockerfile.alp320"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -50,8 +44,10 @@ jobs:
        include:
          - os: centos8
            dockerfile: "Dockerfile.cent8"
+         - os: centos-stream-9
+           dockerfile: "Dockerfile.centstream9"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -65,14 +61,10 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: fedora33
-           dockerfile: "Dockerfile.f33"
-         - os: fedora34
-           dockerfile: "Dockerfile.f34"
-         - os: fedora35
-           dockerfile: "Dockerfile.f35"
+         - os: fedora41
+           dockerfile: "Dockerfile.f41"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}
@@ -86,16 +78,14 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: ubuntu16.04
-           dockerfile: "Dockerfile.u1604"
-         - os: ubuntu18.04
-           dockerfile: "Dockerfile.u1804"
          - os: ubuntu20.04
            dockerfile: "Dockerfile.u2004"
-         - os: ubuntu21.04
-           dockerfile: "Dockerfile.u2104"
+         - os: ubuntu22.04
+           dockerfile: "Dockerfile.u2204"
+         - os: ubuntu24.04
+           dockerfile: "Dockerfile.u2404"
     steps:
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Test Dockerfile on ${{ matrix.os }}
       env:
         DOCKERFILE: ${{ matrix.dockerfile }}

@@ -2,7 +2,15 @@ pipeline {
     agent none
     stages {
         stage('Docker Build') {
-            parallel { 
+            parallel {
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
                 stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
@@ -33,6 +41,14 @@ pipeline {
                     }
                     steps {
                         dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                    }
+                }
+                stage('Ubuntu20.04 riscv64') {
+                    agent {
+                        label "docker&&linux&&riscv64"
+                    }
+                    steps {
+                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
                     }
                 }
                 stage('Alpine3 x64') {
@@ -83,6 +99,12 @@ def dockerManifest() {
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
         git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
         sh '''
+            # Centos6
+            export TARGET="adoptopenjdk/centos6_build_image"
+            AMD64=$TARGET:linux-amd64
+            docker manifest create $TARGET $AMD64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest push $TARGET
             # Centos7
             export TARGET="adoptopenjdk/centos7_build_image"
             AMD64=$TARGET:linux-amd64

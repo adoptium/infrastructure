@@ -1,0 +1,27 @@
+FROM riscv64/ubuntu:20.04
+
+ARG user=jenkins
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update
+RUN apt-get -y install git curl ansible gpg
+
+COPY . /ansible
+
+RUN echo "localhost ansible_connection=local" > /ansible/hosts
+
+RUN set -eux; \
+ cd /ansible; \
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,ntp_time"
+
+RUN rm -rf /ansible
+
+RUN groupadd -g 1000 ${user}
+RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
+
+ENV \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk11" \
+    JDK17_BOOT_DIR="/usr/lib/jvm/jdk17" \
+    JDK19_BOOT_DIR="/usr/lib/jvm/jdk19" \
+    JDK21_BOOT_DIR="/usr/lib/jvm/jdk21" \
+    JAVA_HOME="/usr/lib/jvm/jdk11"

@@ -1,0 +1,47 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip gnupg curl
+
+ARG ant_version="1.10.15"
+ARG ant_512checksum="1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9"
+
+# Get latest jdk17 ga
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk17.tar.gz
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk17 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk17.sig
+RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
+
+# Install ant
+RUN wget -q -O /tmp/ant.zip "https://archive.apache.org/dist/ant/binaries/apache-ant-$ant_version-bin.zip"
+RUN wget -q -O /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz
+RUN echo "$ant_512checksum  /tmp/ant.zip" > /tmp/ant.sha512
+RUN echo "0fd2771dca2b8b014a4cb3246715b32e20ad5d26754186d82eee781507a183d5e63064890b95eb27c091c93c1209528a0b18a6d7e6901899319492a7610e74ad  /tmp/ant-contrib.tgz" >> /tmp/ant.sha512
+RUN sha512sum --check --strict /tmp/ant.sha512
+RUN ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
+RUN unzip -q -d /usr/local /tmp/ant.zip
+RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-$ant_version/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
+
+# Clear up space
+RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig
+
+# Set up jenkins user
+RUN useradd -m -d /home/jenkins jenkins
+RUN mkdir /home/jenkins/.ssh
+RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
+RUN chown -R jenkins /home/jenkins/.ssh
+RUN chmod -R og-rwx /home/jenkins/.ssh
+
+RUN service ssh start
+CMD ["/usr/sbin/sshd","-D"]
+
+RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6 locales fontconfig fakeroot
+# Install SSL Test packages
+RUN apt-get install -qq -y gnutls-bin libnss3 libnss3-tools libnss3-dev pkg-config
+
+RUN locale-gen en_US.utf8
+
+EXPOSE 22
+# Start with docker run -p 2226:22 UUID

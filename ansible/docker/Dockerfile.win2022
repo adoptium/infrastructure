@@ -1,0 +1,58 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# Specify this with --build-arg PW=SomePassword
+ARG PW=T3mp=Passwd
+
+# Download Cygwin Bootstrapper & Verify Its Checksum
+RUN powershell -Command \
+    "wget -UseBasicParsing https://cygwin.com/setup-x86_64.exe -OutFile setup-x86_64.exe; \
+    $expectedChecksum = 'e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8'; \
+    $fileChecksum = CertUtil -hashfile setup-x86_64.exe SHA256 | Select-String -Pattern '([A-Fa-f0-9]{64})' | ForEach-Object { $_.Matches[0].Groups[1].Value }; \
+    if ($fileChecksum -ne $expectedChecksum) { \
+        Write-Host 'Checksum verification failed!' -ForegroundColor Red; \
+        Remove-Item setup-x86_64.exe; \
+        exit 1; \
+    } else { \
+        Write-Host 'Checksum verification succeeded!' -ForegroundColor Green; \
+    }"
+
+# Set up cygwin with git and ansible as a bootstrap, and add to system default path
+RUN setup-x86_64.exe --packages git,ansible --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode & \
+    C:\cygwin64\bin\git config --system core.autocrlf false & \
+    del setup-x86_64.exe & \
+    setx PATH "c:\cygwin64\bin;%PATH%" & \
+    mkdir c:\temp
+
+# Download Ansible Config Script & Verify Its Checksum
+RUN powershell -Command \
+    "wget https://raw.githubusercontent.com/ansible/ansible/dd4c56e4d68664e4a50292aa19ea61b15c92287c/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile ConfigureRemotingForAnsible.ps1; \
+    $expectedChecksum = '201ad16584f79292044dc21c78c6688dce07f94d769f5e69631b46c3c13036fc'; \
+    $fileChecksum = CertUtil -hashfile ConfigureRemotingForAnsible.ps1 SHA256 | Select-String -Pattern '([A-Fa-f0-9]{64})' | ForEach-Object { $_.Matches[0].Groups[1].Value }; \
+    if ($fileChecksum -ne $expectedChecksum) { \
+        Write-Host 'Checksum verification failed!' -ForegroundColor Red; \
+        Remove-Item ConfigureRemotingForAnsible.ps1; \
+        exit 1; \
+    } else { \
+        Write-Host 'Checksum verification succeeded!' -ForegroundColor Green; \
+    }"
+
+# Set up WinRM for the ansible connection
+RUN PowerShell .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999 & \
+    PowerShell .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP & \
+    PowerShell .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert & \
+    PowerShell .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+
+# Set up WinRM user, clone and run the playbook, then delete the user so it's not in any layer
+ENV TERM=dumb
+
+RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & net localgroup "Remote Management Users" ansible /ADD & \
+    C:\cygwin64\bin\git clone https://github.com/sxa/infrastructure -b windows_docker_support c:/infrastructure & \
+    sed -i -e 's/hosts: .*/hosts: localhost/' infrastructure/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
+    echo localhost ansible_connection=winrm > infrastructure/ansible/hosts & \
+    cd infrastructure\ansible & \
+    C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
+    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
+    net user ansible /DELETE
+
+ENTRYPOINT ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
+USER ContainerUser

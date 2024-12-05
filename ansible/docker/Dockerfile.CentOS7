@@ -3,8 +3,19 @@ FROM centos:7
 ARG git_sha
 ARG user=jenkins
 
-RUN yum -y update; yum -y install epel-release
-RUN yum -y install ansible sudo; yum clean all
+RUN sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+
+RUN if [ "$(uname -m)" == "x86_64" ]; then \
+      echo "Running on x64 architecture"; \
+      sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/7.9.2009/!g' /etc/yum.repos.d/CentOS-Base.repo; \
+    else \
+      echo "Running on non-x64 architecture"; \
+      sed -i 's|#baseurl=http://mirror.centos.org/altarch/\$releasever/|baseurl=http://vault.centos.org/altarch/7.9.2009/|' /etc/yum.repos.d/CentOS-Base.repo; \
+    fi
+
+RUN yum -y update; yum clean all; \
+    yum -y install epel-release; \
+    yum -y install ansible sudo; yum clean all
 
 COPY . /ansible
 
@@ -22,9 +33,9 @@ RUN useradd -c "Jenkins user" -d /home/${user} -u 1000 -g 1000 -m ${user}
 ENV \
     JDK7_BOOT_DIR="/usr/lib/jvm/java-1.7.0-openjdk" \
     JDK8_BOOT_DIR="/usr/lib/jvm/java-1.8.0-openjdk" \
-    JDK10_BOOT_DIR="/usr/lib/jvm/jdk-10" \
-    JDK11_BOOT_DIR="/usr/lib/jvm/jdk-11" \
-    JDK13_BOOT_DIR="/usr/lib/jvm/jdk-13" \
-    JDK14_BOOT_DIR="/usr/lib/jvm/jdk-14" \
-    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk-14" \
+    JDK10_BOOT_DIR="/usr/lib/jvm/jdk10" \
+    JDK11_BOOT_DIR="/usr/lib/jvm/jdk11" \
+    JDK13_BOOT_DIR="/usr/lib/jvm/jdk13" \
+    JDK14_BOOT_DIR="/usr/lib/jvm/jdk14" \
+    JDKLATEST_BOOT_DIR="/usr/lib/jvm/jdk14" \
     JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk"

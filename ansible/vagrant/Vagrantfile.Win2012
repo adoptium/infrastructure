@@ -11,7 +11,7 @@ Start-Process powershell -Verb runAs
 # Windows 2012r2 needs to be forced to use TLS1.2, see: https://github.com/adoptium/infrastructure/issues/1858
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-wget https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 .\\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
@@ -51,4 +51,5 @@ Vagrant.configure("2") do |config|
     v.memory = 5120
     v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
   end
+  config.vm.boot_timeout = 600
 end

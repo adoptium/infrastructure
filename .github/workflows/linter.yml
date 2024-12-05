@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: 'Yamllint'
-      uses: karancode/yamllint-github-action@dd59165b84d90d37fc919c3c7dd84c7e37cd6bfb # v2.0.0
+      uses: karancode/yamllint-github-action@fdef6bc189425ecc84cc4543b2674566c0827053 # v2.1.1
       with:
         yamllint_comment: true
       env:
@@ -39,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Set up Python 3.x
-      uses: actions/setup-python@75f3110429a8c05be0e1bf360334e4cced2b63fa # v2.3.3
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
         python-version: '3.x'
 
@@ -64,6 +64,5 @@ jobs:
         ansible-playbook playbooks/AdoptOpenJDK_AIX_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/AdoptOpenJDK_Windows_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/AdoptOpenJDK_Unix_Playbook/ubuntu-jckservices.yml --syntax-check
-        ansible-playbook playbooks/AdoptOpenJDK_ITW_Playbook/main.yml --syntax-check
         ansible-playbook playbooks/vagrant.yml --syntax-check
         ansible-playbook playbooks/ubuntu-jck.yml --syntax-check

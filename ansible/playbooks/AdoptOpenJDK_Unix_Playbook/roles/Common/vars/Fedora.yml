@@ -11,6 +11,7 @@ Build_Tool_Packages:
   - bison                         # OpenJ9
   - bzip2
   - ca-certificates
+  - capstone-devel
   - cpio
   - curl
   - cups-devel
@@ -26,6 +27,8 @@ Build_Tool_Packages:
   - glibc-common
   - glibc-devel
   - gmp-devel
+  - gnutls
+  - gnutls-utils
   - libcurl-devel
   - libffi-devel
   - libpng-devel
@@ -38,9 +41,12 @@ Build_Tool_Packages:
   - make
   - mesa-libGL-devel
   - mpfr-devel
+  - nss-devel
+  - nss-tools
   - openssl-devel
   - perl-devel
   - pkgconfig
+  - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
   - unzip
   - wget
@@ -52,7 +58,7 @@ Additional_Build_Tools_NOT_RHEL8:
   - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
   - ntp
 
-Additional_Build_Tools_FEDORA35:
+Additional_Build_Tools_FEDORA35PLUS:
   - glibc.i686                    # a dependency required for executing a 32-bit C binary
   - glibc-devel.i686              # a dependency required for executing a 32-bit C binary
   - libstdc++.i686                # a dependency required for executing a 32-bit C binary
@@ -125,5 +131,11 @@ Test_Tool_Packages:
   - zlib-devel
   - perl-devel
   - expat-devel
+  - jq                            # For parsing SBoM during reproducibility tests
   - libcurl-devel
   - mercurial
+  - gnutls
+  - gnutls-utils
+  - shared-mime-info
+  - nss-devel
+  - nss-tools

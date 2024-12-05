@@ -35,6 +35,9 @@ RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 
 RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6 locales fontconfig fakeroot
+# Install SSL Test packages
+RUN apt-get install -qq -y gnutls-bin libnss3 libnss3-tools libnss3-dev pkg-config
+
 RUN locale-gen en_US.utf8
 
 EXPOSE 22

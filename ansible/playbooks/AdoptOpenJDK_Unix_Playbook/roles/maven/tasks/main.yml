@@ -14,23 +14,24 @@
 
 - name: Download Apache Maven v3.6.3
   get_url:
-   url: https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+   url: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
    dest: /tmp/
    checksum: sha512:c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
   when: maven_installed.rc != 0 and ansible_distribution != "Solaris"
   tags: maven
 
 - name: Download Apache Maven v3.6.3 (Solaris)
-  command: wget https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -O /tmp/apache-maven-3.6.3-bin.tar.gz
+  command: wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -O /tmp/apache-maven-3.6.3-bin.tar.gz
   when: maven_installed.rc != 0 and ansible_distribution == "Solaris"
   tags: maven
 
 - name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-maven-3.6.3-bin.tar.gz -sl "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz.asc" -k {{ key.apache_maven }}
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/apache-maven-3.6.3-bin.tar.gz -sl "https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz.asc" -k {{ key.apache_maven }}
   when: maven_installed.rc != 0
   tags: maven
 
 - name: Extract Apache Maven v3.6.3
+  become: true
   unarchive:
    src: /tmp/apache-maven-3.6.3-bin.tar.gz
    dest: /usr/local
@@ -39,6 +40,7 @@
   tags: maven
 
 - name: Create Symlink, Add Maven to PATH
+  become: true
   file:
    src: /usr/local/apache-maven-3.6.3/bin/mvn
    dest: /usr/local/bin/mvn

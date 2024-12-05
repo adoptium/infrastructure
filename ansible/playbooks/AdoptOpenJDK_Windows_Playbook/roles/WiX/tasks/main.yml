@@ -2,57 +2,57 @@
 ###############
 # WiX Toolset #
 ###############
+- name: Set Wix version variable
+  set_fact:
+    wix_version: 5.0.0
+  tags: Wix
+
 - name: Test if WiX is already installed
   win_stat:
-    path: 'C:\Program Files (x86)\WiX Toolset v3.14\bin\wix.dll'
+    path: 'C:\\Program Files\\dotnet\\wix.exe'
   register: wix_installed
   tags: Wix
 
-- name: Download WiX
-  win_get_url:
-    url: https://wixtoolset.org/downloads/v3.14.0.3910/wix314.exe
-    dest: 'C:\temp\wix.exe'
-    follow_redirects: all
-    checksum: f333d4cf132f03b75222aa107633d28ce5ba8d612892b38cfc2ddc4cd92ad6de
-    checksum_algorithm: sha256
-  when: (not wix_installed.stat.exists)
-  tags: Wix
-
-- name: Install WiX
-  win_package:
-    path: 'C:\temp\wix.exe'
-    product_id: WiX
-    arguments: /S
-  when: (not wix_installed.stat.exists)
-  tags: Wix
-
-- name: Cleanup WiX
-  win_file:
-    path: 'C:\temp\wix.exe'
-    state: absent
-  failed_when: false
-  tags: Wix
-
-- name: Test if Windows 10 SDK is already installed
+- name: Test if DotNet SDK is already installed
   win_stat:
-    path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-  register: win10_sdk_installed
+    path: 'C:\\Program Files\dotnet\dotnet.exe'
+  register: dotnet_installed
   tags: Wix
 
-- name: Download Windows-SDK-10.1.17763.1
+- name: Download .NET Installer
   win_get_url:
-    url: https://download.microsoft.com/download/9/3/9/939441D4-6FBA-48EE-9EF7-402C1AA8B8A7/windowssdk/winsdksetup.exe
-    dest: C:/temp/winSDK10.exe
-  when: not win10_sdk_installed.stat.exists
+    url: https://download.visualstudio.microsoft.com/download/pr/b6f19ef3-52ca-40b1-b78b-0712d3c8bf4d/426bd0d376479d551ce4d5ac0ecf63a5/dotnet-sdk-8.0.302-win-x64.exe
+    dest: 'C:\temp\dotnet-install.exe'
+    checksum: bc6019e0192edd180ca7b299a16b95327941b0b53806cdb125be194aea12492d
+    checksum_algorithm: sha256
+  when: (not dotnet_installed.stat.exists)
   tags: Wix
 
-- name: Install Windows-SDK-10.1.17763.1
-  win_shell: C:/temp/winSDK10.exe /q /norestart
-  when: not win10_sdk_installed.stat.exists
+- name: Install .NET SDK If dotnet not installed
+  raw: C:\temp\dotnet-install.exe /quiet
+  when: (not dotnet_installed.stat.exists)
   tags: Wix
 
-- name: Reboot to complete installation
-  win_reboot:
-    reboot_timeout: 1800
-  when: not win10_sdk_installed.stat.exists
+- name: Test if WiX is already installed
+  win_stat:
+    path: 'C:\\Program Files\\dotnet\\wix.exe'
+  register: wix_installed
+  tags: Wix
+
+- name: Test WiX version
+  # generates an output like 5.0.0+41e11442
+  win_shell: wix --version
+  register: installed_wix_version
+  when: wix_installed.stat.exists
+  tags: Wix
+
+- name: Install Wix Toolset when not installed or version is not correct
+  win_shell: dotnet tool install wix --version {{ wix_version }} --tool-path 'C:\\Program Files\\dotnet'
+  when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
+  tags: Wix
+
+- name: Delete downloaded .NET installer
+  win_file:
+    path: 'C:\temp\dotnet-install.exe'
+    state: absent
   tags: Wix

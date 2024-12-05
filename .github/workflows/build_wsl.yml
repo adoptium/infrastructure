@@ -29,21 +29,29 @@ jobs:
     name: Windows
     runs-on: ${{ matrix.os }}
     steps:
-
-    - name: Setup WinRM and Password
+    - name: Setup WinRM and Password (checksum verified)
       shell: powershell
       run: |
         Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "Ansible_password123!" -Force)
         New-NetFirewallRule -DisplayName "ALLOW TCP PORT 5986" -Direction inbound -Profile Any -Action Allow -LocalPort 5986 -Protocol TCP
-        Invoke-WebRequest https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
-        .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
-        .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
-        .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
-        .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+        Invoke-WebRequest https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+        $expectedChecksum = "EBA72DF06E3E77709595F75D1D5B4D95B06602429DD2A3F7867406DF875B0C70"
+        $actualChecksum = Get-FileHash -Path ".\ConfigureRemotingForAnsible.ps1" -Algorithm SHA256 | Select-Object -ExpandProperty Hash        
+        if ($actualChecksum -ne $expectedChecksum) {
+            Write-Output "Checksum mismatch"
+            Write-Output "Actual Checksum: $actualChecksum"
+            Write-Output "Expect Checksum: $expectedChecksum"
+            exit 1
+        } else {
+            .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
+            .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+            .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+            .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck       
+        }
 
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - uses: Vampire/setup-wsl@230f54c1aaf45965739002df30b3e4de43349a37 # v1.3.4
+    - uses: Vampire/setup-wsl@23f94bc31caaddc08bd1230a00b89f872633d8d7 # v3.1.3
 
     - name: Install dependencies
       run: |
