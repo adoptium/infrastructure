@@ -137,16 +137,19 @@
   when:
     - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
     - not (ansible_distribution_major_version == "8")
+  tags: install_java
 
 - name: Install Java when RedHat 6 on ppc64
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL6_PPC64 }}"
   when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
+  tags: install_java
 
 - name: Install Java when RedHat 8
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_RHEL8 }}"
   when: (ansible_distribution_major_version == "8")
+  tags: install_java
 
 ####################
 # Set default Java #
