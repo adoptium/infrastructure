@@ -16,11 +16,10 @@ RUN powershell -Command \
         Write-Host 'Checksum verification succeeded!' -ForegroundColor Green; \
     }"
 
-# Set up cygwin with git and ansible as a bootstrap, and add to system default path
-RUN setup-x86_64.exe --packages git,ansible --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode & \
-    C:\cygwin64\bin\git config --system core.autocrlf false & \
-    del setup-x86_64.exe & \
-    setx PATH "c:\cygwin64\bin;%PATH%" & \
+# Set up cygwin with ansible as a bootstrap, and add to system default path
+RUN setup-x86_64.exe --packages ansible --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode && \
+    del setup-x86_64.exe && \
+    setx PATH "c:\cygwin64\bin;%PATH%" && \
     mkdir c:\temp
 
 # Download Ansible Config Script & Verify Its Checksum
@@ -45,13 +44,14 @@ RUN PowerShell .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999 & \
 # Set up WinRM user, clone and run the playbook, then delete the user so it's not in any layer
 ENV TERM=dumb
 
-RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & net localgroup "Remote Management Users" ansible /ADD & \
-    C:\cygwin64\bin\git clone https://github.com/sxa/infrastructure -b windows_docker_support c:/infrastructure & \
-    sed -i -e 's/hosts: .*/hosts: localhost/' infrastructure/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
-    echo localhost ansible_connection=winrm > infrastructure/ansible/hosts & \
-    cd infrastructure\ansible & \
+COPY . infrastructure
+
+RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & net localgroup "Remote Management Users" ansible /ADD && \
+    sed -i -e 's/hosts: .*/hosts: localhost/' infrastructure/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml && \
+    echo localhost ansible_connection=winrm > infrastructure/ansible/hosts && \
+    cd infrastructure\ansible && \
     C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
-    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
+    --skip-tags=adoptopenjdk,reboot,Windows_Updates,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019,NVidia_Cuda_Toolkit,clang_64bit,clang_32bit,nasm,Rust,IcedTea-Web playbooks/AdoptOpenJDK_Windows_Playbook/main.yml && \
     net user ansible /DELETE
 
 ENTRYPOINT ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
