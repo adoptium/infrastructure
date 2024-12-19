@@ -4,12 +4,12 @@
 ###########################################
 - name: Set Windows SDK version
   set_fact:
-    wsdk_version: "14.40.33807_10.0.26100.0"
+    wsdk_version: "14.40.33807_10.0.26100.1742"
   tags: MSVS_2022_REDIST
 
 - name: Set Windows SDK checksum
   set_fact:
-    wsdk_checksum: "a29ada15d941a7b2065e9a4273fd6b97df44d089ed2b9f860ded442f7fe69767"
+    wsdk_checksum: "ac6060f5f8a952f59faef20e53d124c2c267264109f3f6fabeb2b7aefb3e3c62"
   tags: MSVS_2022_REDIST
 
 - name: Test if VS 2022 Redists Are installed
@@ -35,7 +35,7 @@
 
 - name: Download Visual Studio 2022 Redists
   win_get_url:
-    url: 'https://github.com/adoptium/devkit-binaries/releases/download/vs2022_redist_14.40.33807_10.0.26100.0/vs2022_redist_14.40.33807_10.0.26100.0.zip'
+    url: 'https://github.com/adoptium/devkit-binaries/releases/download/vs2022_redist_14.40.33807_10.0.26100.1742/vs2022_redist_14.40.33807_10.0.26100.1742.zip'
     checksum: "{{ wsdk_checksum }}"
     checksum_algorithm: sha256
     dest: 'c:\openjdk\devkit\vs2022_redist_{{ wsdk_version }}.zip'
