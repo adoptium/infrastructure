@@ -6,13 +6,15 @@ A verbose description of our static docker container system can be found in the 
 The DockerStatic ansible role provides allows us to automate the setup of our dockerhost machines using the [dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml) playbook.
 
 ## Our current Dockerhost machines
-* [docker-packet-ubuntu2004-amd-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-amd-1/)
-* [docker-packet-ubuntu2004-intel-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-intel-1/)
-* [docker-packet-ubuntu2004-armv8-1](https://ci.adoptium.net/computer/docker-packet-ubuntu2004-armv8-1/)
-* [dockerhost-equinix-ubuntu2004-armv8-1](https://ci.adoptium.net/computer/dockerhost-equinix-ubuntu2004-armv8-1/)
+* [dockerhost-azure-ubuntu2204-x64-1](https://ci.adoptium.net/computer/dockerhost-azure-ubuntu2204-x64-1/)
+* [dockerhost-equinix-ubuntu2204-armv8-1](https://ci.adoptium.net/computer/dockerhost-equinix-ubuntu2204-armv8-1/)
+* [dockerhost-equinix-ubuntu2404-armv8-1](https://ci.adoptium.net/computer/dockerhost-equinix-ubuntu2404-armv8-1/)
+* [dockerhost-marist-ubuntu2404-s390x-1](https://ci.adoptium.net/computer/dockerhost-marist-ubuntu2404-s390x-1/)
+* [dockerhost-osuosl-ubuntu2404-ppc64le-1](https://ci.adoptium.net/computer/dockerhost-osuosl-ubuntu2404-ppc64le-1/)
+* [dockerhost-skytap-ubuntu2004-ppc64le-1](https://ci.adoptium.net/computer/dockerhost-skytap-ubuntu2004-ppc64le-1/)
+* [dockerhost-skytap-ubuntu2204-x64-1](https://ci.adoptium.net/computer/dockerhost-skytap-ubuntu2204-x64-1/) (Generally offline)
 
-
-## Setting up a new DockerStatic container (recommended)
+## Setting up a new DockerStatic container with ansible (recommended method)
 
 The [dockerhost.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockernode.yml) playbook is used to deploy docker containers onto our dockerhost machines. 
 
@@ -23,7 +25,7 @@ ansible-playbook -u root -i <host-file> AdoptOpenJDK_Unix_Playbook
 /dockernode.yml -t "deploy" -e "docker_images=u2204,alp319,deb12"
 ```
 
-The `docker_images` variable is where the user can specifiy which docker containers to deploy, using the dockerfiles avaiable [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles) (which do get updated regularly).
+The `docker_images` variable is where the user can specify which docker containers to deploy, using the dockerfiles avaiable [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles) (which do get updated regularly).
 
 The `dockerhost.yml` playbook can deploy single, multiple and duplicate containers, for example
 
