@@ -51,7 +51,7 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additional build tools if NOT RHEL8 and above 
+- name: Install additional build tools if NOT RHEL8 and above
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_NOT_RHEL8Plus }}"
   when:

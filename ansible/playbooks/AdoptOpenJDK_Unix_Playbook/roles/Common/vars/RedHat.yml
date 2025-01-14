@@ -93,7 +93,7 @@ Additional_Build_Tools_RHEL7_s390x:
   - yum-utils                     # yumdownloader required for devkit creation
 
 Java_RHEL8Plus:
-  - java-1.8.0-openjdk-devel
+  - java-21-openjdk-devel
 
 Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
   - java-1.7.0-openjdk-devel
