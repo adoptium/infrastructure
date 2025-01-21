@@ -31,8 +31,3 @@
         state: present
         regexp: '^zeus'
         line: 'zeus ALL=(ALL) NOPASSWD: ALL'
-
-- name: Warn about missing authorization for zeus
-  debug:
-    msg: "{{ Zeus_User_SSHKey }} not included in authorizedkeys"
-  when: Superuser_Account == "Enabled" and zeus_pubkey.skipped

@@ -118,12 +118,14 @@
   with_items: "{{ Additional_Packages_Ubuntu16 }}"
   when:
     - ansible_distribution_major_version == "16"
+  tags: test_tools
 
 - name: Install additional Packages specific to Ubuntu 18
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Packages_Ubuntu18 }}"
   when:
     - ansible_distribution_major_version == "18"
+  tags: test_tools
 
 - name: Download LibFFI6 v3.2.1_8 For Ubuntu 20 or 22 on S390X
   get_url:
@@ -135,12 +137,14 @@
   when:
     - (ansible_distribution_major_version == "20" and ansible_architecture == "s390x") or
       (ansible_distribution_major_version == "22" and ansible_architecture == "s390x")
+  tags: test_tools
 
 - name: Install LibFFI6 v3.2.1_8 For Ubuntu 20 or 22 on S390X
   apt: deb="/tmp/libffi6_3.2.1-8_s390x.deb"
   when:
     - (ansible_distribution_major_version == "20" and ansible_architecture == "s390x") or
       (ansible_distribution_major_version == "22" and ansible_architecture == "s390x")
+  tags: test_tools
 
 ####################
 # Set default Java #
