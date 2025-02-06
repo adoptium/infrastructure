@@ -14,6 +14,7 @@ Build_Tool_Packages:
   - cpio
   - curl
   - cups-devel
+  - diffutils
   - elfutils-libelf-devel
   - file
   - flex                          # OpenJ9
@@ -71,6 +72,7 @@ gcc48_devtoolset_compiler:
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
   - ccache
+  - procps-ng
 
 Additional_Build_Tools_CentOS8_CentOS9Stream:
   - glibc-locale-source
@@ -80,6 +82,7 @@ Additional_Build_Tools_CentOS8_CentOS9Stream:
   - git
   - cmake
   - ccache
+  - procps-ng
 
 Additional_Build_Tools_NOT_CentOS8_CentOS9Stream:
   - lbzip2
