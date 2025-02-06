@@ -13,7 +13,6 @@ Build_Tool_Packages:
   - ca-certificates
   - capstone-devel
   - cpio
-  - curl
   - cups-devel
   - diffutils
   - elfutils-libelf-devel
