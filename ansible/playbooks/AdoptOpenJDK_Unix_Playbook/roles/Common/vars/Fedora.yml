@@ -15,6 +15,7 @@ Build_Tool_Packages:
   - cpio
   - curl
   - cups-devel
+  - diffutils
   - elfutils-libelf-devel
   - flex                          # OpenJ9
   - fontconfig-devel
@@ -44,6 +45,7 @@ Build_Tool_Packages:
   - nss-devel
   - nss-tools
   - openssl-devel
+  - procps-ng
   - perl-devel
   - pkgconfig
   - strace                        # For SBOM dependency analysis
