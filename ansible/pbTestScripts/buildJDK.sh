@@ -191,5 +191,5 @@ echo "buildJDK.sh DEBUG:
 cloneRepo
 
 cd $WORKSPACE/openjdk-build
-export BUILD_ARGS=--create-sbom
+export BUILD_ARGS+=" --create-sbom"
 build-farm/make-adopt-build-farm.sh
