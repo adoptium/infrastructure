@@ -8,10 +8,10 @@
 
 - name: Set docker buildx command if building arm32 container
   set_fact:
-    docker_build_command: "docker buildx build --platform linux/v7/arm"
+    docker_build_command: "docker buildx build --platform linux/arm/v7"
     arm32_suffix: ".arm32"
     ansible_architecture: arm
-    docker_run_command: "docker run --platform linux/v7/arm"
+    docker_run_command: "docker run --platform linux/arm/v7"
   when: build_arm32 is defined and build_arm32 == "yes"
 
 # Dockerfiles are transferred from the controller node onto the dockerhost to be used to build and run docker containers
