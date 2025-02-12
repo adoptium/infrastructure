@@ -2,6 +2,7 @@
 #######################
 # NVidia_Cuda_Toolkit #
 #######################
+
 - name: Check if NVidia CUDA toolkit is already installed
   stat:
     path: /usr/local/cuda-9.0
@@ -21,6 +22,29 @@
     - cuda_installed.stat.isdir is not defined
     - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"))
     - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le")
+    - ansible_distribution != "CentOS" or ansible_distribution_major_version | int != 6
+  tags: nvidia_cuda_toolkit
+
+- name: Download Nvidia Cuda for CentOS 6
+  shell: "wget -q -O /tmp/cuda9_linux-run https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run"
+  args:
+    warn: false
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"))
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le")
+    - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 6
+  tags: nvidia_cuda_toolkit
+
+- name: Verify checksum for CentOS 6 Nvdia Cuda download ...
+  shell: sha256sum /tmp/cuda9_linux-run
+  register: checksum_result
+  failed_when: "'96863423feaa50b5c1c5e1b9ec537ef7ba77576a3986652351ae43e66bcd080c' not in checksum_result.stdout"
+  when:
+    - cuda_installed.stat.isdir is not defined
+    - (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "16") or (ansible_distribution == "RedHat" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7")) or (ansible_distribution == "CentOS" and (ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"))
+    - (ansible_architecture == "x86_64" or ansible_architecture == "ppc64le")
+    - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 6
   tags: nvidia_cuda_toolkit
 
 - name: Install NVidia CUDA toolkit
