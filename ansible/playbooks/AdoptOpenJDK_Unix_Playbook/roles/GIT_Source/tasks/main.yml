@@ -42,6 +42,7 @@
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
     - ansible_distribution != "FreeBSD"
     - ansible_distribution != "CentOS" or ansible_distribution_major_version | int != 6
+    - ansible_distribution != "RedHat" or ansible_distribution_major_version | int != 6
   tags: git_source
 
 - name: Download git source for CentOS 6
@@ -50,7 +51,8 @@
     warn: false
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
-    - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 6
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+    - ansible_distribution_major_version | int == 6
   tags: git_source
 
 - name: Verify checksum for CentOS 6 Git Source download ...
@@ -59,7 +61,8 @@
   failed_when: "'107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a' not in checksum_result.stdout"
   when:
     - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
-    - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 6
+    - (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+    - ansible_distribution_major_version | int == 6
   tags: git_source
 
 - name: Extract git source
