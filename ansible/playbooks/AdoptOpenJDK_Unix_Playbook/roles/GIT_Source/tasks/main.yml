@@ -53,7 +53,7 @@
     - ansible_distribution == "CentOS" and ansible_distribution_major_version | int == 6
   tags: git_source
 
-- name: Verify checksum for CentOS 6 Git Source  download ...
+- name: Verify checksum for CentOS 6 Git Source download ...
   shell: sha256sum /tmp/git-2.15.0.tar.xz
   register: checksum_result
   failed_when: "'107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a' not in checksum_result.stdout"
