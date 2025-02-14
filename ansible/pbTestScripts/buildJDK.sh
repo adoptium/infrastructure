@@ -169,11 +169,11 @@ fi
 # Don't build the debug-images as it takes too much space, and doesn't benefit VPC
 # See: https://github.com/adoptium/infrastructure/issues/2033
 export CONFIGURE_ARGS="--with-native-debug-symbols=none"
-export BUILD_ARGS="--custom-cacerts false"
+export BUILD_ARGS="--custom-cacerts false --create-sbom"
 
 # For Ubuntu24.04 Support - Don't Use gcc-7
 if grep 'noble' /etc/*-release >/dev/null 2>&1; then
-        export BUILD_ARGS="--custom-cacerts false --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
+        export BUILD_ARGS="${BUILD_ARGS} --use-adoptium-devkit gcc-11.3.0-Centos7.9.2009-b03"
 fi
 
 echo "buildJDK.sh DEBUG:
@@ -191,5 +191,4 @@ echo "buildJDK.sh DEBUG:
 cloneRepo
 
 cd $WORKSPACE/openjdk-build
-export BUILD_ARGS+=" --create-sbom"
 build-farm/make-adopt-build-farm.sh
