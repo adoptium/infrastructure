@@ -84,6 +84,11 @@
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "aarch64"
       tags: [devkit]
+    - role: devkit                # This is temporary until we auto-build the devkit on this platform in jenkins
+      devkit_version: riscv64-linux-gnu-to-riscv64-linux-gnu
+      when:
+        - ansible_architecture == "riscv64"
+      tags: [devkit]
     - role: Xcode11
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode11] # JDK 8

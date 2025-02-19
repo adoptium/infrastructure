@@ -26,6 +26,19 @@
     checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
   when:
     - devkit_installed.rc != 0
+    - ansible_architecture != "riscv64"
+  tags: devkit
+
+- name: Download evaluation devkit for riscv64
+  get_url:
+    url: https://ci.adoptium.net/userContent/devkit/devkit.riscv64.GCC142.F27F28.scaleway9.tar.xz
+    dest: /tmp/devkit.tar.xz
+    force: no
+    mode: 0644
+    checksum: "sha256:b1ded6f28dfe3260e0b061fbede07e9f754ca218278c26bdfb9af4f0f6bffcea"
+  when:
+    - devkit_installed.rc != 0
+    - ansible_architecture == "riscv64"
   tags: devkit
 
 # Perhaps this should have the `b01` removed ... Or use a symlink?
