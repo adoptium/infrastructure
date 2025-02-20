@@ -244,7 +244,23 @@ things regarding the information in this table:
 (For the last one, that makes use of the system.custom target added via
 [this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
 
-## Running The SSL Test Suites
+### Notes for the Smoke Tests
+
+The smoke tests (which run after the build, but *before* the main AQA jobs)
+need some special configuration and deviate from what is listed above
+because they come from a non-default repository (temurin-build).  To run
+those you will need to run `extended.functional` but including the the
+following parameters to `get.sh`:
+
+```
+./get.sh --vendor_repos https://github.com/adoptium/temurin-build \
+         --vendor_branches master --vendor_dirs /test/functional
+cd TKG
+make compile
+make _extended.functional
+```
+
+### Running The SSL Test Suites
 <details>
 <summary>Quick Guide To Running The SSL Test Suites</summary>
 
