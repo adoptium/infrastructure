@@ -158,7 +158,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
 
       - skytap:
-          ubuntu2004-ppc64le-1: {ip: 20.61.136.210}
+          ubuntu2404-ppc64le-1: {ip: 20.61.136.211}
 
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}
