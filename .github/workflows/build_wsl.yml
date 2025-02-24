@@ -51,7 +51,7 @@ jobs:
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - uses: Vampire/setup-wsl@5ff2c045a05fd477a71b5419d50c5a228a52468e # v4.1
+    - uses: Vampire/setup-wsl@79d85ead05e70e4ba1e1e83367db6e0ccb89b578 # v4.1
       with:
         wsl-version: 1
 
