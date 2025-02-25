@@ -120,11 +120,11 @@ hosts:
           aix73-ppc64-1: {ip: 140.211.9.10, description: p8-aix1-adopt01.osuosl.org, 7300-01-02-2320}
           centos74-ppc64le-1: {ip: 140.211.168.228, user: centos}
           centos74-ppc64le-2: {ip: 140.211.168.217, user: centos}
-          ubuntu1604-ppc64le-1: {ip: 140.211.168.227, user: ubuntu}
-          ubuntu1604-ppc64le-2: {ip: 140.211.168.190, user: ubuntu}
-          ubuntu1804-ppc64le-1: {ip: 140.211.168.5, user: ubuntu}
-          ubuntu1804-ppc64le-2: {ip: 140.211.168.8, user: ubuntu}
-          ubuntu2004-ppc64le-1: {ip: 140.211.168.235, user: ubuntu}
+          ubuntu2404-ppc64le-1: {ip: 140.211.10.70, user: ubuntu}
+          ubuntu2404-ppc64le-2: {ip: 140.211.168.207, user: ubuntu}
+          ubuntu2404-ppc64le-3: {ip: 140.211.168.177, user: ubuntu}
+          ubuntu2404-ppc64le-4: {ip: 140.211.168.222, user: ubuntu}
+          ubuntu2404-ppc64le-5: {ip: 140.211.168.239, user: ubuntu}
           ubuntu2404-aarch64-1: {ip: 140.211.169.12, user: ubuntu}
 
       - macincloud:
@@ -158,7 +158,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
 
       - skytap:
-          ubuntu2004-ppc64le-1: {ip: 20.61.136.210}
+          ubuntu2404-ppc64le-1: {ip: 20.61.136.211}
 
       - ibmcloud:
           rhel6-x64-1: {ip: 169.48.4.140}
