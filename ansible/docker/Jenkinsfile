@@ -3,14 +3,14 @@ pipeline {
     stages {
         stage('Docker Build') {
             parallel {
-//                stage('CentOS6 x64') {
-//                    agent {
-//                        label "dockerBuild&&linux&&x64"
-//                    } 
-//                    steps {
-//                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
-//                    }
-//                }
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
                 stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
@@ -100,11 +100,11 @@ def dockerManifest() {
         git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
             # Centos6
-#            export TARGET="ghcr.io/adoptium/adoptium_build_image:centos6"
-#            AMD64=${TARGET}_linux-amd64
-#            docker manifest create $TARGET $AMD64
-#            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
-#            docker manifest push $TARGET
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:centos6"
+            AMD64=${TARGET}_linux-amd64
+            docker manifest create $TARGET $AMD64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest push $TARGET
             # Centos7
             export TARGET="ghcr.io/adoptium/adoptium_build_image:centos7"
             AMD64=${TARGET}_linux-amd64
