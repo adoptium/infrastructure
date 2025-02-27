@@ -100,11 +100,11 @@ def dockerManifest() {
         git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
         sh '''
             # Centos6
-            export TARGET="adoptopenjdk/centos6_build_image"
-            AMD64=$TARGET:linux-amd64
-            docker manifest create $TARGET $AMD64
-            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
-            docker manifest push $TARGET
+            #export TARGET="adoptopenjdk/centos6_build_image"
+            #AMD64=$TARGET:linux-amd64
+            #docker manifest create $TARGET $AMD64
+            #docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            #docker manifest push $TARGET
             # Centos7
             export TARGET="adoptopenjdk/centos7_build_image"
             AMD64=$TARGET:linux-amd64
