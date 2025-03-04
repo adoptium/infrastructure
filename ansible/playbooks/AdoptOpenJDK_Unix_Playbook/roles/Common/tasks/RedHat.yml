@@ -128,6 +128,17 @@
   when: (ansible_architecture == "s390x")
   tags: test_tools
 
+#####################
+# Configure Weston #
+#####################
+- name: Install weston related packages(RedHat 10)
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ Additional_Test_Tool_Packages_RHEL10 }}"
+  when: ansible_distribution_major_version > "9"
+  tags: test_tools
+
 ################
 # Install Java #
 ################
