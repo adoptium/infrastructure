@@ -4,7 +4,7 @@
 ###############
 - name: Set Wix version variable
   set_fact:
-    wix_version: 5.0.0
+    wix_version: 5.0.2
   tags: Wix
 
 - name: Test if WiX is already installed
