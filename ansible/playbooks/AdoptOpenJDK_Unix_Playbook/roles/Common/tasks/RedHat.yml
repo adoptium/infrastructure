@@ -16,12 +16,11 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
-- name: Enable EPEL release for RHEL8 or RHEL6 or RHEL7
+- name: Enable EPEL release for RHEL
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   failed_when: false
-  when:
-    - ansible_architecture != "s390x"
-    - (ansible_distribution_major_version == "8") or (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
+  when: (ansible_distribution_major_version == "7" and ansible_architecture != "s390x") or
+        (ansible_distribution_major_version == "6" and (ansible_architecture != "s390x" or ansible_architecture != "ppc64le")
   tags: patch_update
 
 - name: YUM upgrade all packages
