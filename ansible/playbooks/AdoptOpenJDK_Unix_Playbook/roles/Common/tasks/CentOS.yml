@@ -273,14 +273,23 @@
     - ansible_architecture == "x86_64"
   tags: expat
 
-#####################
-# Configure Weston #
-#####################
-- name: Install weston related packages(CentOS 10)
+#################
+# xorg Packages #
+#################
+- name: Install xorg-x11-server-Xvfb (< CentOS10)
+  package:
+    name: xorg-x11-server-Xvfb
+    state: latest
+  when: ansible_distribution_major_version < "10"
+
+#############################
+# Configure Wayland(Weston) #
+#############################
+- name: Install Wayland related packages (>= CentOS10)
   package:
     name: "{{ item }}"
     state: latest
-  with_items: "{{ Additional_Test_Tool_Packages_CentOS10 }}"
+  with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
   when: ansible_distribution_major_version > "9"
   tags: test_tools
 

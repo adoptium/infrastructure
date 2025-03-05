@@ -110,7 +110,6 @@ Test_Tool_Packages:
   - perl-Time-HiRes
   - perl-Test-Simple
   - xorg-x11-xauth
-  - xorg-x11-server-Xvfb
   - zlib-devel
   - perl-devel
   - expat-devel
@@ -122,7 +121,9 @@ Test_Tool_Packages:
   - nss-devel
   - nss-tools
 
-Additional_Test_Tool_Packages_RHEL10:
+Additional_Test_Tool
+
+Additional_Test_Tool_Packages_Wayland:
   - weston
   - wayland-utils
   - xorg-x11-server-Xwayland
