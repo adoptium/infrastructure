@@ -281,6 +281,7 @@
     name: xorg-x11-server-Xvfb
     state: latest
   when: ansible_distribution_major_version < "10"
+  tags: test_tools
 
 #############################
 # Configure Wayland(Weston) #
