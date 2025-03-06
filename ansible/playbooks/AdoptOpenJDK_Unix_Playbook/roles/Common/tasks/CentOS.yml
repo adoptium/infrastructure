@@ -280,7 +280,7 @@
   package:
     name: xorg-x11-server-Xvfb
     state: latest
-  when: ansible_distribution_major_version < "10"
+  when: ansible_distribution_major_version | int < 10
   tags: test_tools
 
 #############################
@@ -291,7 +291,7 @@
     name: "{{ item }}"
     state: latest
   with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
-  when: ansible_distribution_major_version > "9"
+  when: ansible_distribution_major_version | int > 9
   tags: test_tools
 
 ####################

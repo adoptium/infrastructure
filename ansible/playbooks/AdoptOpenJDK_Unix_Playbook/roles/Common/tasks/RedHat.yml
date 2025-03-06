@@ -119,7 +119,7 @@
 #################
 - name: Install x11 packages (< RHEL10)
   tags: test_tools
-  when: ansible_distribution_major_version < "10"
+  when: ansible_distribution_major_version | int < 10
   block:
     - name: Install xorg-x11-server-Xvfb (< RHEL10)
       package:
@@ -142,7 +142,7 @@
     name: "{{ item }}"
     state: latest
   with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
-  when: ansible_distribution_major_version > "9"
+  when: ansible_distribution_major_version | int > 9
   tags: test_tools
 
 ################
