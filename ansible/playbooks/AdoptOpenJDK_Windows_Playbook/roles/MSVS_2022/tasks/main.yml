@@ -100,7 +100,7 @@
 
 # Download & Install VS2022 When No Layout & Not AdoptOpenJDK
 # This is the target that you're redirected to when you go to https://aka.ms/vs/17/release/vs_community.exe
-- name: Download Visual Studio Community 2022
+- name: Download Visual Studio Build Tools 2022
   win_get_url:
 # https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history
 # 17.7.34302.85    url: 'https://download.visualstudio.microsoft.com/download/pr/47b236ad-5505-4752-9d2b-5cf9795528bc/87684889f46dec53d1452f4a0ff9fec1ac202a97ebed866718d7c0269e814b28/vs_BuildTools.exe'
