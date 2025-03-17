@@ -71,22 +71,30 @@ pipeline {
         }
         stage('Docker Manifest') {
             agent {
-//                label "dockerBuild&&linux&&x64"
+                label "dockerBuild&&linux&&x64"
+            } 
+            environment {
+                DOCKER_CLI_EXPERIMENTAL = "enabled"
+            }
+            steps {
+                dockerManifest()
+            }
+        }
+        stage('cosign') {
+            agent {
                 label "cosign"
             } 
             environment {
                 DOCKER_CLI_EXPERIMENTAL = "enabled"
             }
             steps {
-//                unstash name: 'sha256sums'
+                  sh "rm -vf *.sha256"
                   copyArtifacts( projectName: '${JOB_NAME}', selector: specific("${BUILD_ID}"), flatten: true )
-//            filter: "CrossCompiledVersionOuts/${copyFileFilter}",
-//            target: 'workspace/target/metadata',
-//            flatten: true
-                sh "ls -ld *.sha256"
-                dockerManifest()
+                  sh "ls -ld *.sha256"
+                  cosign()
             }
         }
+
     } 
 } 
 
@@ -142,7 +150,22 @@ def dockerManifest() {
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
             docker manifest push $TARGET
-            curl -sSL -X POST   --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token   --header "Content-Type: application/x-www-form-urlencoded"   --data @/home/jenkins/idp.txt   | jq -r ".access_token"   | head -c -1 > token.txt
+            #curl -sSL -X POST   --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token   --header "Content-Type: application/x-www-form-urlencoded"   --data @/home/jenkins/idp.txt   | jq -r ".access_token"   | head -c -1 > token.txt
+            #for IMAGE_SHA in *.sha256; do 
+            #  IMAGE="$(cat $IMAGE_SHA)"
+            #  echo "Running cosign against image $IMAGE"
+            #  cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt --upload=true --tlog-upload=true -y
+            #  cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --certificate-identity=temurin-bot@eclipse.org
+            #done
+            #rm -vf token.txt
+        '''
+    }
+}
+def cosign() { 
+    // dockerhub is the ID of the credentials stored in Jenkins
+//    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+//        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+        sh '''
             for IMAGE_SHA in *.sha256; do 
               IMAGE="$(cat $IMAGE_SHA)"
               echo "Running cosign against image $IMAGE"
@@ -151,5 +174,5 @@ def dockerManifest() {
             done
             rm -vf token.txt
         '''
-    }
+//    }
 }
