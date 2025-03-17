@@ -110,8 +110,6 @@ def dockerBuild(architecture, distro, dockerfile) {
         dockerImage.push()
         sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
         archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
-        stash name: 'sha256sums', includes: "*.sha256"
-//        stash name: "${distro}_linux-${architecture}.sha256", includes: "*.sha256"
     }
 }
 
@@ -163,8 +161,8 @@ def dockerManifest() {
 }
 def cosign() { 
     // dockerhub is the ID of the credentials stored in Jenkins
-//    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
-//        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
             for IMAGE_SHA in *.sha256; do 
               IMAGE="$(cat $IMAGE_SHA)"
@@ -174,5 +172,5 @@ def cosign() {
             done
             rm -vf token.txt
         '''
-//    }
+    }
 }
