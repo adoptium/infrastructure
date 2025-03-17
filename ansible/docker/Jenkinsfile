@@ -78,7 +78,10 @@ pipeline {
             }
             steps {
 //                unstash name: 'sha256sums'
-                unarchive
+                  copyArtifacts( projectName: '${JOB_NAME}', selector: context.specific("${BUILD_ID}"), flatten: true )
+//            filter: "CrossCompiledVersionOuts/${copyFileFilter}",
+//            target: 'workspace/target/metadata',
+//            flatten: true
                 sh "find . -type f -print"
                 dockerManifest()
             }
