@@ -77,7 +77,8 @@ pipeline {
                 DOCKER_CLI_EXPERIMENTAL = "enabled"
             }
             steps {
-                unstash name: 'sha256sums'
+//                unstash name: 'sha256sums'
+                unarchive
                 sh "find . -type f -print"
                 dockerManifest()
             }
@@ -97,7 +98,7 @@ def dockerBuild(architecture, distro, dockerfile) {
         sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:ubuntu1604_linux-armv7l > ${distro}_linux-${architecture}.sha256"
         archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
         stash name: 'sha256sums', includes: "*.sha256"
-        stash name: "${distro}_linux-${architecture}.sha256", includes: "*.sha256"
+//        stash name: "${distro}_linux-${architecture}.sha256", includes: "*.sha256"
     }
 }
 
