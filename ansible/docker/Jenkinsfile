@@ -78,7 +78,7 @@ pipeline {
             }
             steps {
 //                unstash name: 'sha256sums'
-                  copyArtifacts( projectName: '${JOB_NAME}', selector: context.specific("${BUILD_ID}"), flatten: true )
+                  copyArtifacts( projectName: '${JOB_NAME}', selector: specific("${BUILD_ID}"), flatten: true )
 //            filter: "CrossCompiledVersionOuts/${copyFileFilter}",
 //            target: 'workspace/target/metadata',
 //            flatten: true
@@ -90,6 +90,7 @@ pipeline {
 } 
 
 def dockerBuild(architecture, distro, dockerfile) {
+    sh "rm -vf *.sha256"
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
     def git_sha = "${env.GIT_COMMIT.trim()}"
     dockerImage = docker.build("ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture",
@@ -98,7 +99,7 @@ def dockerBuild(architecture, distro, dockerfile) {
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         dockerImage.push()
-        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:ubuntu1604_linux-armv7l > ${distro}_linux-${architecture}.sha256"
+        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
         archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
         stash name: 'sha256sums', includes: "*.sha256"
 //        stash name: "${distro}_linux-${architecture}.sha256", includes: "*.sha256"
