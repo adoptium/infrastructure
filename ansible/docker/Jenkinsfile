@@ -146,7 +146,7 @@ def dockerManifest() {
             for IMAGE_SHA in *.sha256; do 
               IMAGE="$(cat $IMAGE_SHA)"
               echo "Running costign against image $IMAGE"
-              cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt --upload=false
+              cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt --upload=false --tlog-upload=false
               cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --certificate-identity=temurin-bot@eclipse.org
             done
             rm -vf token.txt
