@@ -3,22 +3,22 @@ pipeline {
     stages {
         stage('Docker Build') {
             parallel {
-                stage('CentOS6 x64') {
-                    agent {
-                        label "dockerBuild&&linux&&x64"
-                    } 
-                    steps {
-                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
-                    }
-                }
-                stage('CentOS7 x64') {
-                    agent {
-                        label "dockerBuild&&linux&&x64"
-                    } 
-                    steps {
-                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
-                    }
-                }
+//                stage('CentOS6 x64') {
+//                    agent {
+//                        label "dockerBuild&&linux&&x64"
+//                    } 
+//                    steps {
+//                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+//                    }
+//                }
+//                stage('CentOS7 x64') {
+//                    agent {
+//                        label "dockerBuild&&linux&&x64"
+//                    } 
+//                    steps {
+//                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
+//                    }
+//                }
                 stage('CentOS7 aarch64') {
                     agent {
                         label "dockerBuild&&linux&&aarch64"
@@ -27,38 +27,38 @@ pipeline {
                         dockerBuild('arm64', 'centos7', 'Dockerfile.CentOS7')
                     }
                 }
-                stage('CentOS7 ppc64le') {
-                    agent {
-                        label "dockerBuild&&linux&&ppc64le"
-                    }
-                    steps {
-                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
-                    }
-                }
-                stage('Ubuntu16.04 armv7l') {
-                    agent {
-                        label "docker&&linux&&armv7l"
-                    }
-                    steps {
-                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
-                    }
-                }
-                stage('Ubuntu20.04 riscv64') {
-                    agent {
-                        label "docker&&linux&&riscv64"
-                    }
-                    steps {
-                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
-                    }
-                }
-                stage('Alpine3 x64') {
-                    agent {
-                        label "dockerBuild&&linux&&x64"
-                    }
-                    steps {
-                        dockerBuild('amd64', 'alpine3', 'Dockerfile.Alpine3')
-                    }
-                }
+//                stage('CentOS7 ppc64le') {
+//                    agent {
+//                        label "dockerBuild&&linux&&ppc64le"
+//                    }
+//                    steps {
+//                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
+//                    }
+//                }
+//                stage('Ubuntu16.04 armv7l') {
+//                    agent {
+//                        label "docker&&linux&&armv7l"
+//                    }
+//                    steps {
+//                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+//                    }
+//                }
+//                stage('Ubuntu20.04 riscv64') {
+//                    agent {
+//                        label "docker&&linux&&riscv64"
+//                    }
+//                    steps {
+//                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
+//                    }
+//                }
+//                stage('Alpine3 x64') {
+//                    agent {
+//                        label "dockerBuild&&linux&&x64"
+//                    }
+//                    steps {
+//                        dockerBuild('amd64', 'alpine3', 'Dockerfile.Alpine3')
+//                    }
+//                }
                 stage('Alpine3 aarch64') {
                     agent {
                         label "dockerBuild&&linux&&aarch64"
@@ -77,6 +77,8 @@ pipeline {
                 DOCKER_CLI_EXPERIMENTAL = "enabled"
             }
             steps {
+                unstash name: 'sha256sums'
+                sh "find . -type f -print"
                 dockerManifest()
             }
         }
@@ -88,9 +90,14 @@ def dockerBuild(architecture, distro, dockerfile) {
     def git_sha = "${env.GIT_COMMIT.trim()}"
     dockerImage = docker.build("ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture",
         "--build-arg git_sha=$git_sha -f ansible/docker/$dockerfile .")
+    sh "docker inspect ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture | head"
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         dockerImage.push()
+        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:ubuntu1604_linux-armv7l > ${distro}_linux-${architecture}.sha256"
+        stash name: '${distro}_linux-${architecture}.sha256', includes: "**/*.sha256"
+        stash name: 'sha256sums', includes: "**/*.sha256"
+        archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
     }
 }
 
