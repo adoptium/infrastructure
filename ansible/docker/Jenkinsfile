@@ -3,54 +3,54 @@ pipeline {
     stages {
         stage('Docker Build') {
             parallel {
-//                stage('CentOS6 x64') {
-//                    agent {
-//                        label "dockerBuild&&linux&&x64"
-//                    } 
-//                    steps {
-//                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
-//                    }
-//                }
-//                stage('CentOS7 x64') {
-//                    agent {
-//                        label "dockerBuild&&linux&&x64"
-//                    } 
-//                    steps {
-//                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
-//                    }
-//                }
-//                stage('CentOS7 aarch64') {
-//                    agent {
-//                        label "dockerBuild&&linux&&aarch64"
-//                    }
-//                    steps {
-//                        dockerBuild('arm64', 'centos7', 'Dockerfile.CentOS7')
-//                    }
-//                }
-//                stage('CentOS7 ppc64le') {
-//                    agent {
-//                        label "dockerBuild&&linux&&ppc64le"
-//                    }
-//                    steps {
-//                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
-//                    }
-//                }
-//                stage('Ubuntu16.04 armv7l') {
-//                    agent {
-//                        label "docker&&linux&&armv7l"
-//                    }
-//                    steps {
-//                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
-//                    }
-//                }
-//                stage('Ubuntu20.04 riscv64') {
-//                    agent {
-//                        label "docker&&linux&&riscv64"
-//                    }
-//                    steps {
-//                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
-//                    }
-//                }
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
+                stage('CentOS7 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('CentOS7 aarch64') {
+                    agent {
+                        label "dockerBuild&&linux&&aarch64"
+                    }
+                    steps {
+                        dockerBuild('arm64', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('CentOS7 ppc64le') {
+                    agent {
+                        label "dockerBuild&&linux&&ppc64le"
+                    }
+                    steps {
+                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('Ubuntu16.04 armv7l') {
+                    agent {
+                        label "docker&&linux&&armv7l"
+                    }
+                    steps {
+                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                    }
+                }
+                stage('Ubuntu20.04 riscv64') {
+                    agent {
+                        label "docker&&linux&&riscv64"
+                    }
+                    steps {
+                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
+                    }
+                }
                 stage('Alpine3 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
@@ -164,7 +164,7 @@ def cosign() {
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
-            curl -sSL -X POST   --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token   --header "Content-Type: application/x-www-form-urlencoded"   --data @/home/jenkins/idp.txt   | jq -r ".access_token"   | head -c -1 > token.txt
+            curl -sSL -X POST --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token" | head -c -1 > token.txt
             for IMAGE_SHA in *.sha256; do 
               IMAGE="$(cat $IMAGE_SHA)"
               echo "Running cosign against image $IMAGE"
