@@ -62,7 +62,6 @@ Test_Tool_Packages:
   - curl-dev
   - openssl
   - openssl-dev
-  - mercurial
   - xauth
   - xorg-server
   - xvfb

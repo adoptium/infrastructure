@@ -38,7 +38,6 @@ gcc_compiler:
   - gcc48
 
 Test_Tool_Packages:
-  - mercurial
   - perl5
   - xauth
   - xorg
