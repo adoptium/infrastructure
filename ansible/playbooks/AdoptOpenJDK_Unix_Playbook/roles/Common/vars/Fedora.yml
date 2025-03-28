@@ -133,7 +133,6 @@ Test_Tool_Packages:
   - expat-devel
   - jq                            # For parsing SBoM during reproducibility tests
   - libcurl-devel
-  - mercurial
   - gnutls
   - gnutls-utils
   - shared-mime-info
