@@ -108,7 +108,6 @@ Test_Tool_Packages:
   - perl-devel
   - libcurl-devel
   - openssl-devel
-  - mercurial
   - perl
   - perl-Test-Simple
   - xorg-x11-xauth
