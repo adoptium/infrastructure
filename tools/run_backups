@@ -64,7 +64,7 @@ if [ "$DOW" -eq 0 ]; then
     mongodump --archive --db=exampleDb \
   | xz > trss/trss."$(date +%Y%m%d)".xz
 
-  echo ""$(date +%T)" : Cleaning up old full backups (keeping last 4)..."
+  echo "$(date +%T) : Cleaning up old full backups (keeping last 4)..."
   FULL_BACKUPS=$(find trss -maxdepth 1 -name 'trss.[0-9]*.xz' | sort)
   FULL_COUNT=$(echo "$FULL_BACKUPS" | wc -l)
   if [ "$FULL_COUNT" -gt 4 ]; then
