@@ -48,49 +48,48 @@ LOCKFILE="/tmp/trss-backup.lock"
 if ssh "$TRSS_REMOTE_HOST" "[ -f $LOCKFILE ]"; then
   echo ""$(date +%T)" : Remote backup lock already present, exiting..."
   exit 1
-fi
-
-# Set remote lock
-ssh "$TRSS_REMOTE_HOST" "touch $LOCKFILE"
-trap 'ssh "$TRSS_REMOTE_HOST" "rm -f $LOCKFILE"' EXIT
-
-echo "$(date +%T)" : Lock acquired at $LOCKFILE
-
-DOW=$(date +%w)  # 0 = Sunday
-
-if [ "$DOW" -eq 0 ]; then
-  echo "$(date +%T) : Performing full weekly backup of TRSS..."
-  ssh "$TRSS_REMOTE_HOST" docker exec aqa-test-tools-mongo-1 \
-    mongodump --archive --db=exampleDb \
-  | xz > trss/trss."$(date +%Y%m%d)".xz
-
-  echo "$(date +%T) : Cleaning up old full backups (keeping last 4)..."
-  FULL_BACKUPS=$(find trss -maxdepth 1 -name 'trss.[0-9]*.xz' | sort)
-  FULL_COUNT=$(echo "$FULL_BACKUPS" | wc -l)
-  if [ "$FULL_COUNT" -gt 4 ]; then
-    echo "$FULL_BACKUPS" | head -n $(($FULL_COUNT - 4)) | xargs -r rm -v
-  fi
 else
-  LAST_SUNDAY=$(date -d last-sunday +%Y-%m-%dT00:00:00Z)
-  echo "$(date +%T)" : Performing simulated daily incremental TRSS backup since $LAST_SUNDAY...
+  # Set remote lock
+  ssh "$TRSS_REMOTE_HOST" "touch $LOCKFILE"
+  trap 'ssh "$TRSS_REMOTE_HOST" "rm -f $LOCKFILE"' EXIT
 
-  for collection in ApplicationTests auditLogs testResults; do
-    echo ""$(date +%T)" : Dumping updated documents from $collection..."
-    ssh "$TRSS_REMOTE_HOST" docker exec aqa-test-tools-mongo-1 bash -c \
-    "mongodump --db=exampleDb --collection=$collection \
-     --query='{ \"timestamp\": { \"\$gte\": { \"\$date\": \"$LAST_SUNDAY\" } } }' \
-     --archive --gzip" \
-    | xz > trss/trss.incr.${collection}."$(date +%Y%m%d)".archive.xz
+  echo "$(date +%T)" : Lock acquired at $LOCKFILE
+  DOW=$(date +%w)  # 0 = Sunday
 
-    echo "$(date +%T) : Cleaning up old incremental backups for $collection (keeping last 7)..."
-    INCR_BACKUPS=$(find trss -maxdepth 1 -name "trss.incr.${collection}.*.archive.xz" | sort)
-    INCR_COUNT=$(echo "$INCR_BACKUPS" | wc -l)
-    if [ "$INCR_COUNT" -gt 7 ]; then
-      echo "$INCR_BACKUPS" | head -n $(($INCR_COUNT - 7)) | xargs -r rm -v
+  if [ "$DOW" -eq 0 ]; then
+    echo "$(date +%T) : Performing full weekly backup of TRSS..."
+    ssh "$TRSS_REMOTE_HOST" docker exec aqa-test-tools-mongo-1 \
+      mongodump --archive --db=exampleDb \
+    | xz > trss/trss."$(date +%Y%m%d)".xz
+
+    echo "$(date +%T) : Cleaning up old full backups (keeping last 4)..."
+    FULL_BACKUPS=$(find trss -maxdepth 1 -name 'trss.[0-9]*.xz' | sort)
+    FULL_COUNT=$(echo "$FULL_BACKUPS" | wc -l)
+    if [ "$FULL_COUNT" -gt 4 ]; then
+      echo "$FULL_BACKUPS" | head -n $(($FULL_COUNT - 4)) | xargs -r rm -v
     fi
-  done
+  else
+    LAST_SUNDAY=$(date -d last-sunday +%Y-%m-%dT00:00:00Z)
+    echo "$(date +%T)" : Performing simulated daily incremental TRSS backup since $LAST_SUNDAY...
+
+    for collection in ApplicationTests auditLogs testResults; do
+      echo ""$(date +%T)" : Dumping updated documents from $collection..."
+      ssh "$TRSS_REMOTE_HOST" docker exec aqa-test-tools-mongo-1 bash -c \
+      "mongodump --db=exampleDb --collection=$collection \
+       --query='{ \"timestamp\": { \"\$gte\": { \"\$date\": \"$LAST_SUNDAY\" } } }' \
+       --archive --gzip" \
+      > trss/trss.incr.${collection}."$(date +%Y%m%d)".archive.gz
+
+      echo "$(date +%T) : Cleaning up old incremental backups for $collection (keeping last 7)..."
+      INCR_BACKUPS=$(find trss -maxdepth 1 -name "trss.incr.${collection}.*.archive.xz" | sort)
+      INCR_COUNT=$(echo "$INCR_BACKUPS" | wc -l)
+      if [ "$INCR_COUNT" -gt 7 ]; then
+        echo "$INCR_BACKUPS" | head -n $(($INCR_COUNT - 7)) | xargs -r rm -v
+      fi
+    done
+  fi
+  echo "$(date +%T)" : TRSS backup complete. Remote lock released..
 fi
-echo "$(date +%T)" : TRSS backup complete. Remote lock released..
 
 echo $(date +%T) : Backing up jenkins userContent via rsync
 rsync -arv jenkins@ci.adoptium.net:userContent jenkins
