@@ -59,7 +59,7 @@ echo "$(date +%T)" : Lock acquired at $LOCKFILE
 DOW=$(date +%w)  # 0 = Sunday
 
 if [ "$DOW" -eq 0 ]; then
-  echo ""$(date +%T)" : Performing full weekly backup of TRSS..."
+  echo "$(date +%T) : Performing full weekly backup of TRSS..."
   ssh "$TRSS_REMOTE_HOST" docker exec aqa-test-tools-mongo-1 \
     mongodump --archive --db=exampleDb \
   | xz > trss/trss."$(date +%Y%m%d)".xz
