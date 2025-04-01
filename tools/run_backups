@@ -40,7 +40,7 @@ tar czf bastillion/bastillion.$(date +%Y%m%d).tar.gz -C /home/bastillion Bastill
 # Weekly Full Backup On Sunday
 # TRSS Restart Script Scheduled On TRSS @ 5am Sunday
 
-echo ""$(date +%T)" : Starting TRSS backup with remote lock..."
+echo "$(date +%T) : Starting TRSS backup with remote lock..."
 TRSS_REMOTE_HOST="backups@20.90.182.165"
 LOCKFILE="/tmp/trss-backup.lock"
 
