@@ -45,15 +45,21 @@ TRSS_REMOTE_HOST="backups@20.90.182.165"
 LOCKFILE="/tmp/trss-backup.lock"
 
 # Check for existing lock
+
 if ssh "$TRSS_REMOTE_HOST" "[ -f $LOCKFILE ]"; then
-  echo ""$(date +%T)" : Remote backup lock already present, exiting..."
+  echo "$(date +%T) : Remote backup lock already present, exiting..."
   exit 1
 else
-  # Set remote lock
+  echo "$(date +%T) : Lock acquired at $LOCKFILE"
   ssh "$TRSS_REMOTE_HOST" "touch $LOCKFILE"
-  trap 'ssh "$TRSS_REMOTE_HOST" "rm -f $LOCKFILE"' EXIT
 
-  echo "$(date +%T)" : Lock acquired at $LOCKFILE
+  # Ensure remote lock is always removed on script exit or interruption
+  cleanup() {
+    echo "$(date +%T) : Cleaning up remote lock..."
+    ssh "$TRSS_REMOTE_HOST" "rm -f $LOCKFILE"
+  }
+  trap cleanup EXIT INT TERM
+
   DOW=$(date +%w)  # 0 = Sunday
 
   if [ "$DOW" -eq 0 ]; then
