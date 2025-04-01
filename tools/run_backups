@@ -82,7 +82,7 @@ else
      --archive --gzip" \
     | xz > trss/trss.incr.${collection}."$(date +%Y%m%d)".archive.xz
 
-    echo ""$(date +%T)" : Cleaning up old incremental backups for $collection (keeping last 7)..."
+    echo "$(date +%T) : Cleaning up old incremental backups for $collection (keeping last 7)..."
     INCR_BACKUPS=$(find trss -maxdepth 1 -name "trss.incr.${collection}.*.archive.xz" | sort)
     INCR_COUNT=$(echo "$INCR_BACKUPS" | wc -l)
     if [ "$INCR_COUNT" -gt 7 ]; then
