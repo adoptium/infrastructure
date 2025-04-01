@@ -4,7 +4,7 @@ cd /home/backups || exit 1
 echo $(date +%T) : Starting backups of jenkins config.xml files ...
 ssh jenkins@ci.adoptium.net 'ls -1 /home/jenkins/.jenkins/plugins/*.?pi | while read FILENAME; do basename $FILENAME ; unzip -p $FILENAME META-INF/MANIFEST.MF | sort -d | grep "Short-Name\|Long-Name\|Plugin-Version" ; echo --- ; done > /home/jenkins/.jenkins/pluginVersions.txt'
 ssh jenkins@ci.adoptium.net 'find . \( -name config.xml -o -name pluginVersions.txt \) | grep -v config-history | tar czf - -T -' > jenkins/jenkins.$(date +%Y%m%d).tar.gz
-ssh jenkins@ci.adoptium.net
+
 #echo $(date +%T) : I would delete $(ls -1 jenkins/jenkins.*.gz | grep -v 20....01.tar.gz | head -n -3)
 rm -v $(ls -1 jenkins/jenkins.*.gz | grep -v 20....01.tar.gz | head -n -3)
 echo $(date +%T) : Backup up jenkins thin backup file if there has is one ...
@@ -54,7 +54,7 @@ fi
 ssh "$TRSS_REMOTE_HOST" "touch $LOCKFILE"
 trap 'ssh "$TRSS_REMOTE_HOST" "rm -f $LOCKFILE"' EXIT
 
-echo ""$(date +%T)" : Lock acquired at $LOCKFILE"
+echo "$(date +%T)" : Lock acquired at $LOCKFILE
 
 DOW=$(date +%w)  # 0 = Sunday
 
@@ -90,7 +90,7 @@ else
     fi
   done
 fi
-echo ""$(date +%T)" : TRSS backup complete. Remote lock released.."
+echo "$(date +%T)" : TRSS backup complete. Remote lock released..
 
 echo $(date +%T) : Backing up jenkins userContent via rsync
 rsync -arv jenkins@ci.adoptium.net:userContent jenkins
