@@ -96,7 +96,7 @@
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode15] # JDK 17+
     - role: cmake                 # OpenJ9 / OpenJFX
-      when: ansible_distribution != "Solaris" # Compile fails on Solaris
+      when: ansible_distribution != "Solaris" and ansible_distribution != "Alpine"
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
     - role: capstone
       tags: [build_tools]
