@@ -4,7 +4,7 @@
 # -------- Ubuntu 20 (tested on x64) -------- #
 ###############################################
 
-- name: Ansibl JCK Services Playbook
+- name: Ansible JCK Services Playbook
   hosts: all
   gather_facts: yes
   tasks:
