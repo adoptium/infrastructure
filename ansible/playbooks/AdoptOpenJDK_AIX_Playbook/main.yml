@@ -53,9 +53,6 @@
     # Likewise, the xlc files may also need the Ansible unarchive and
     # need to be evaluated after the CORE OSS software has been installed.
     - X11
-    ## verify/install licensed IBM compilers
-    - xlc_v13
-    - xlc_v16
 
     # 4. Core OSS installation
 
@@ -68,6 +65,10 @@
     - aixfs
     - role: dnf
       tags: dnf
+
+    ## verify/install licensed IBM compilers
+    - xlc_v13
+    - xlc_v16
 
     ## additional OSS packages
     - ant
