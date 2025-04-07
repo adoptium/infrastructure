@@ -53,9 +53,9 @@
         path: /tmp/dnf_aixtoolbox.sh
 
 # See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836343656
-- name: Dnf module needs /opt/freeware/libexec/python3 as its ansible_python_interpreter
+- name: Dnf module needs /opt/freeware/bin/python3 as its ansible_python_interpreter
   vars:
-    ansible_python_interpreter: /opt/freeware/libexec/python3
+    ansible_python_interpreter: /opt/freeware/bin/python3
   block:
     # See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836227877
     - name: Remove yum-utils before dnf update
