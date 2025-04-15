@@ -53,25 +53,28 @@
         path: /tmp/dnf_aixtoolbox.sh
 
 # See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836343656
-- name: Dnf module needs /opt/freeware/bin/python3 as its ansible_python_interpreter
+- name: Dnf module needs /opt/freeware/libexec/python3 as its ansible_python_interpreter
   vars:
-    ansible_python_interpreter: /opt/freeware/bin/python3
+    ansible_python_interpreter: /opt/freeware/libexec/python3
   block:
     # See https://github.com/adoptium/infrastructure/pull/3271#issuecomment-1836227877
     - name: Remove yum-utils before dnf update
       dnf:
         name: yum-utils
         state: absent
+        use_backend: dnf
 
     - name: Update dnf
       dnf:
         update_cache: true
         name: '*'
         state: latest
+        use_backend: dnf
 
     - name: Install packages
       dnf:
         state: present
+        use_backend: dnf
         update_cache: yes
         disable_excludes: all
         name:
@@ -129,6 +132,7 @@
         state: present
         update_cache: yes
         disable_excludes: all
+        use_backend: dnf
       tags:
         - rpm_install
         - cmake
@@ -147,6 +151,7 @@
     - name: Remove packages - in case installed historically, or by accident
       dnf:
         state: absent
+        use_backend: dnf
         name:
           - libXrender-devel
           - libXrender
