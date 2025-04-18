@@ -69,11 +69,9 @@
   tags: ant-contrib
 
 - name: Download ant-contrib (macOS) and (Solaris)
-  command: wget https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz -O /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
-  retries: 3
-  delay: 5
-  register: antContrib_download
-  until: antContrib_download is not failed
+  get_url:
+    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz?viasf=1
+    dest: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
   when:
     - not antcontrib_status.stat.exists
     - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
@@ -84,7 +82,16 @@
     src: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
     dest: /tmp/
     copy: False
-  when: not antcontrib_status.stat.exists
+  when:
+    - not antcontrib_status.stat.exists
+    - ansible_distribution != "MacOSX"
+  tags: ant-contrib
+
+- name: Extract ant-contrib MACOS
+  command: tar -xvf /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz -C /tmp
+  when:
+    - not antcontrib_status.stat.exists
+    - ansible_distribution == "MacOSX"
   tags: ant-contrib
 
 - name: Move ant-contrib.jar to ant lib folder
