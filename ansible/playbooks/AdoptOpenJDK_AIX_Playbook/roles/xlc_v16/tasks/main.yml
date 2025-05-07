@@ -18,7 +18,6 @@
         dest: /tmp
         remote_src: false
       register: _vendor_copied
-      failed_when: false
 
     - name: Install IBM XLC16 - installp
       command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/usr/sys/inst.images all
