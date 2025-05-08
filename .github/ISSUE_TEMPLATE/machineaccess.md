@@ -3,7 +3,6 @@ name: ⌨️  Request access to a machine
 about: Request access to an AdoptOpenJDK machine or set of machines
 title: Access request for <your username>
 labels: 'Temp Infra Access'
-assignees: 'sxa'
 
 ---
 **NOTE: THIS ISSUE SHOULD NOT BE CLOSED BY THE ORIGINATOR IF ACCESS IS GRANTED**.
