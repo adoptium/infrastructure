@@ -113,6 +113,8 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
 1. Ensure off-machine backups are working!
 1. Ensure that no non-pipeline jobs are running on the server as they
    will often hold up restarts
+1. Create a tarball backup of the main config.xml and plugins.xml so they
+   can be quickly restored in the event of upgrade problems: `tar czf /home/jenkins/jenkinsbackup.$(date +%Y%m%d).tar.gz -C ~jenkins config.xml plugins`
 1. Check for plugin updates that will apply to the current version of
    jenkins (Each plugin should be checked for potential issues in the readme)
 1. Repeat step 1 if necessary until jenkins does not offer any more plugins
