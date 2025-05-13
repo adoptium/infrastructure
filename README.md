@@ -127,6 +127,7 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
    back and create an issue to deal with them in the next cycle.
 1. Backup the main war in /usr/share/jenkins to a name with a version suffix
    in case of corruption to the main jar.
+1. Once the upgrade is done, restart agents which do not auto-restart such as the windows ones not running as s service
 
 ### Backups
 
