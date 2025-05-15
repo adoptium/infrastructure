@@ -12,8 +12,8 @@ Build_Tool_Packages:
   - bzip2
   - ca-certificates
   - cpio
-  - curl
   - cups-devel
+  - diffutils
   - elfutils-libelf-devel
   - file
   - flex                          # OpenJ9
@@ -68,9 +68,11 @@ Additional_Build_Tools_RHEL8:
   - glibc-langpack-zh             # required for creating Chinese locales
   - git
   - cmake
+  - procps-ng
 
 Additional_Build_Tools_RHEL7:
   - libstdc++-static
+  - procps-ng
 
 Additional_Build_Tools_RHEL7_PPC64LE:
   - libstdc++
