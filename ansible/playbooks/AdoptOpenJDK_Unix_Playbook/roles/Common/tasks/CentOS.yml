@@ -72,7 +72,7 @@
 - name: Install additional build tools for CentOS 8/9 Stream
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS8_CentOS9Stream }}"
-  when: ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9"
+  when: ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9" or ansible_distribution_major_version == "10"
   tags: build_tools
 
 - name: Install additional build tools for NOT CentOS8/9
@@ -81,6 +81,8 @@
   when:
     - ansible_distribution_major_version != "8"
     - ansible_distribution_major_version != "9"
+    - ansible_distribution_major_version != "10"
+
   tags: build_tools
 
 - name: Install Libdwarf.h for CentOS8 Stream

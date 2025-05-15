@@ -28,7 +28,7 @@ Build_Tool_Packages:
   - gmp-devel
   - gnutls
   - gnutls-utils
-  - java-1.8.0-openjdk-devel
+#  - java-1.8.0-openjdk-devel
   - libcurl-devel
   - libpng-devel
   - libXext-devel
@@ -56,7 +56,7 @@ Build_Tool_Packages:
   - pigz
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
-  - texinfo                       # For DevKit creation (binutils build)
+#  - texinfo                       # For DevKit creation (binutils build)
   - unzip
   - wget
   - which
@@ -112,7 +112,7 @@ Test_Tool_Packages:
   - perl
   - perl-Test-Simple
   - xorg-x11-xauth
-  - xorg-x11-server-Xvfb
+#  - xorg-x11-server-Xvfb
   - fakeroot
   - gnutls
   - gnutls-utils
