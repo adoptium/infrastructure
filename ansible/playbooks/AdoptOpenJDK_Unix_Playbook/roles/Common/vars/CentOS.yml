@@ -86,6 +86,7 @@ Additional_Build_Tools_CentOS8_Plus:
 Additional_Build_Tools_NOT_CentOS8_CentOS9Stream:
   - lbzip2
   - java-1.7.0-openjdk-devel
+  - java-1.8.0-openjdk-devel
   - ntp
 
 Additional_Build_Tools_CentOS_x86:
