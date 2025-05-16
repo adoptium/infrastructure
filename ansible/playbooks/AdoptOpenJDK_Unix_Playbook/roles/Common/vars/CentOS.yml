@@ -109,6 +109,7 @@ Additional_Test_Tools_CentOS10_Plus:
 
 Additional_Test_Tools_PreCentOS10:
   - xorg-x11-server-Xvfb
+  - java-1.8.0-openjdk-devel
   
 Test_Tool_Packages:
   - gcc
