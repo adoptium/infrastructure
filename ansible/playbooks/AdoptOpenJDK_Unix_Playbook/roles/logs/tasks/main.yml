@@ -1,6 +1,23 @@
 ---
 # Updates $HOME/ansible.log with the date and time of latest ansible playbook run
 
+- name: Are we later than C6
+  shell: echo We are later than CentOS6
+  when: ansible_distribution_major_version| int > 6
+
+- name: Are we earlier than C10
+  shell: echo We are later than CentOS10
+  when: ansible_distribution_major_version| int < 10
+
+- name: Are we between C6 and C10
+  shell: echo We are between C6 and C10
+  when:
+   - ansible_distribution_major_version| int > 6
+   - ansible_distribution_major_version| int < 10
+  
+#- name: Break
+#  shell: /bin/false
+
 - name: Set Log path
   set_fact:
     log_path: /var/log
