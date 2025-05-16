@@ -17,9 +17,11 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN ansible-playbook --version
 
+RUN dnf -y install epel-release
+
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit"
 
 RUN rm -rf /ansible; dnf remove ansible; dnf clean all
 

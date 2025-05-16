@@ -39,7 +39,7 @@
 - name: Enable CodeReady Builder repo for CentOS9 Stream
   shell: dnf config-manager --set-enabled crb
   when:
-    - ansible_distribution_major_version == "9"
+  when: ansible_distribution_major_version|int > 8
   tags: patch_update
 
 - name: Clean dnf cache
@@ -69,26 +69,39 @@
   when: ansible_distribution_major_version == "7"
   tags: build_tools
 
-- name: Install additional build tools for CentOS 8/9 Stream
+- name: Install additional build tools for CentOS 8+
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS8_CentOS9Stream }}"
-  when: ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9" or ansible_distribution_major_version == "10"
+  with_items: "{{ Additional_Build_Tools_CentOS8_Plus }}"
+  when: ansible_distribution_major_version|int > 7
   tags: build_tools
 
 - name: Install additional build tools for NOT CentOS8/9
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_NOT_CentOS8_CentOS9Stream }}"
-  when:
-    - ansible_distribution_major_version != "8"
-    - ansible_distribution_major_version != "9"
-    - ansible_distribution_major_version != "10"
-
+  when: ansible_distribution_major_version|int < 8
   tags: build_tools
 
-- name: Install Libdwarf.h for CentOS8 Stream
+- name: Install additional test tools for CentOS 10+ e.g. weston
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Test_Tools_CentOS10_Plus }}"
+  when: ansible_distribution_major_version|int > 9
+  tags: test_tools
+
+- name: Install additional tools for CentOS pre-10
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Test_Tools_PreCentOS10 }}"
+  when: ansible_distribution_major_version|int < 10
+  tags: test_tools
+
+- name: Install libdwarf.h for CentOS8 Stream
   shell: dnf --enablerepo=powertools install libdwarf-devel -y
   when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
   tags: build_tools
+
+#- name: Install texinfo for CentOS10+
+#  shell: dnf --enablerepo=crb install texinfo -y
+#  when: ansible_distribution_major_version|int > 10
+#  tags: build_tools
 
 - name: Install additional build tools for CentOS 8 Stream
   package: "name={{ item }} state=latest"
@@ -119,7 +132,7 @@
 - name: Install jq for SBoM parsing for build reproducibility testing
   package: "name=jq state=latest"
   when:
-    - ansible_distribution_major_version > "7"
+    - ansible_distribution_major_version|int > 7
   tags: test_tools
 
 - name: Add devtools-2 to yum repo list for gcc 4.8
@@ -304,7 +317,8 @@
     name: java
     path: "{{ jre_path.stat.lnk_source }}/bin/java"
   when:
-    - ansible_distribution_major_version > "6"
+    - ansible_distribution_major_version|int > 6
+    - ansible_distribution_major_version|int < 10
   tags: default_java
 
 - name: Set Default JDK (CentOS 6)
@@ -320,7 +334,8 @@
     name: javac
     path: "{{ jdk_path.stat.lnk_source }}/bin/javac"
   when:
-    - ansible_distribution_major_version > "6"
+    - ansible_distribution_major_version != "6"
+    - ansible_distribution_major_version != "10"
   tags: default_java
 
 ###########

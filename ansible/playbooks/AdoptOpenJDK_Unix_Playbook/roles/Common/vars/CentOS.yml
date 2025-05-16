@@ -29,7 +29,6 @@ Build_Tool_Packages:
   - gmp-devel
   - gnutls
   - gnutls-utils
-#  - java-1.8.0-openjdk-devel
   - libcurl-devel
   - libpng-devel
   - libXext-devel
@@ -57,7 +56,7 @@ Build_Tool_Packages:
   - pigz
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
-#  - texinfo                       # For DevKit creation (binutils build)
+  - texinfo
   - unzip
   - wget
   - which
@@ -74,7 +73,7 @@ Additional_Build_Tools_CentOS7:
   - ccache
   - procps-ng
 
-Additional_Build_Tools_CentOS8_CentOS9Stream:
+Additional_Build_Tools_CentOS8_Plus:
   - glibc-locale-source
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
@@ -103,6 +102,13 @@ Additional_Build_Tools_CentOS8_Stream:
 Additional_Build_Tools_NOT_CentOS8_Stream:
   - libdwarf-devel                # OpenJ9
 
+Additional_Test_Tools_CentOS10_Plus:
+  - weston
+  - xwayland-run
+
+Additional_Test_Tools_PreCentOS10:
+  - xorg-x11-server-Xvfb
+  
 Test_Tool_Packages:
   - gcc
   - gcc-c++
@@ -115,7 +121,6 @@ Test_Tool_Packages:
   - perl
   - perl-Test-Simple
   - xorg-x11-xauth
-#  - xorg-x11-server-Xvfb
   - fakeroot
   - gnutls
   - gnutls-utils
