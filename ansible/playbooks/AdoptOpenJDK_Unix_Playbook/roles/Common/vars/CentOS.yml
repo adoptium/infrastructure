@@ -12,7 +12,6 @@ Build_Tool_Packages:
   - bzip2
   - ca-certificates
   - cpio
-  - curl
   - cups-devel
   - diffutils
   - elfutils-libelf-devel
