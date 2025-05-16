@@ -336,7 +336,7 @@
     path: "{{ jdk_path.stat.lnk_source }}/bin/javac"
   when:
     - ansible_distribution_major_version|int > 6
-    - ansible_distribution_major_version|int < 10
+    - ansible_distribution_major_version|int < 9
   tags: default_java
 
 ###########
