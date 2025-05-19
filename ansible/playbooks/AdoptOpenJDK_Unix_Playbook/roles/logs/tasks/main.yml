@@ -1,38 +1,21 @@
 ---
 # Updates $HOME/ansible.log with the date and time of latest ansible playbook run
 
-- name: Are we later than C6
-  shell: echo We are later than CentOS6
-  when: ansible_distribution_major_version| int > 6
-
-- name: Are we earlier than C10
-  shell: echo We are later than CentOS10
-  when: ansible_distribution_major_version| int < 10
-
-- name: Are we between C6 and C10
-  shell: echo We are between C6 and C10
-  when:
-   - ansible_distribution_major_version| int > 6
-   - ansible_distribution_major_version| int < 10
-  
-#- name: Break
-#  shell: /bin/false
-
 - name: Set Log path
   set_fact:
-    log_path: /var/log
+   log_path: /var/log
 
 - name: Set variables (MacOS)
   set_fact:
-    user_group: "staff"
+   user_group: "staff"
   when:
-    - ansible_distribution == "MacOSX"
+   - ansible_distribution == "MacOSX"
 
 - name: Set variables (Not MacOS)
   set_fact:
-    user_group: "root"
+   user_group: "root"
   when:
-    - ansible_distribution != "MacOSX"
+   - ansible_distribution != "MacOSX"
 
 - name: Get Date and Time
   shell: date +%Y-%m-%d\ %H:%M:%S
@@ -47,16 +30,16 @@
 
 - name: Set git_output to git_sha
   set_fact:
-    git_sha: "{{ git_output.stdout }}"
+   git_sha: "{{ git_output.stdout }}"
   when: git_sha is not defined
 
 - name: Update Log File
   lineinfile:
-    owner: root
-    group: "{{ user_group }}"
-    create: yes
-    path: "{{ log_path }}/ansible.log"
-    insertafter: EOF
-    line: "{{ position }} {{ date_output.stdout }} {{ git_sha }}"
+   owner: root
+   group: "{{ user_group }}"
+   create: yes
+   path: "{{ log_path }}/ansible.log"
+   insertafter: EOF
+   line: "{{ position }} {{ date_output.stdout }} {{ git_sha }}"
   become: yes
   become_user: root
