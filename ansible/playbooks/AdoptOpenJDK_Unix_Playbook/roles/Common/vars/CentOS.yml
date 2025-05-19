@@ -12,8 +12,8 @@ Build_Tool_Packages:
   - bzip2
   - ca-certificates
   - cpio
-  - curl
   - cups-devel
+  - diffutils
   - elfutils-libelf-devel
   - file
   - flex                          # OpenJ9
@@ -71,6 +71,7 @@ gcc48_devtoolset_compiler:
 Additional_Build_Tools_CentOS7:
   - libstdc++-static
   - ccache
+  - procps-ng
 
 Additional_Build_Tools_CentOS8_CentOS9Stream:
   - glibc-locale-source
@@ -80,6 +81,7 @@ Additional_Build_Tools_CentOS8_CentOS9Stream:
   - git
   - cmake
   - ccache
+  - procps-ng
 
 Additional_Build_Tools_NOT_CentOS8_CentOS9Stream:
   - lbzip2
@@ -108,14 +110,17 @@ Test_Tool_Packages:
   - perl-devel
   - libcurl-devel
   - openssl-devel
-  - mercurial
   - perl
   - perl-Test-Simple
   - xorg-x11-xauth
-  - xorg-x11-server-Xvfb
   - fakeroot
   - gnutls
   - gnutls-utils
   - shared-mime-info
   - nss-devel
   - nss-tools
+
+Additional_Test_Tool_Packages_Wayland:
+  - weston
+  - wayland-utils
+  - xorg-x11-server-Xwayland

@@ -84,6 +84,11 @@
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "aarch64"
       tags: [devkit]
+    - role: devkit                # JDK19+
+      devkit_version: gcc-14.2.0-Fedora_28-b00
+      when:
+        - ansible_architecture == "riscv64"
+      tags: [devkit]
     - role: Xcode11
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode11] # JDK 8
@@ -91,7 +96,7 @@
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode15] # JDK 17+
     - role: cmake                 # OpenJ9 / OpenJFX
-      when: ansible_distribution != "Solaris" # Compile fails on Solaris
+      when: ansible_distribution != "Solaris" and ansible_distribution != "Alpine"
       tags: [build_tools, build_tools_openj9, build_tools_openjfx]
     - role: capstone
       tags: [build_tools]

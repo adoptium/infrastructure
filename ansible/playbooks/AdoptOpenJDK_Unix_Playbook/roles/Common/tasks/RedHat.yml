@@ -117,14 +117,32 @@
 #################
 # xorg Packages #
 #################
-- name: Install xorg-x11-server-Xorg if host is x86_64
-  yum: name=xorg-x11-server-Xorg state=installed
-  when: (ansible_architecture == "x86_64")
+- name: Install x11 packages (< RHEL10)
   tags: test_tools
+  when: ansible_distribution_major_version | int < 10
+  block:
+    - name: Install xorg-x11-server-Xvfb (< RHEL10)
+      package:
+        name: xorg-x11-server-Xvfb
+        state: latest
 
-- name: Install xorg-x11-server-common if host is s390x
-  yum: name=xorg-x11-server-common state=installed
-  when: (ansible_architecture == "s390x")
+    - name: Install xorg-x11-server-Xorg if host is x86_64 and < RHEL10
+      yum: name=xorg-x11-server-Xorg state=installed
+      when: ansible_architecture == "x86_64"
+
+    - name: Install xorg-x11-server-common if host is s390x and < RHEL10
+      yum: name=xorg-x11-server-common state=installed
+      when: ansible_architecture == "s390x"
+
+#############################
+# Configure Wayland(Weston) #
+#############################
+- name: Install Wayland related packages (>= RHEL10)
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
+  when: ansible_distribution_major_version | int > 9
   tags: test_tools
 
 ################

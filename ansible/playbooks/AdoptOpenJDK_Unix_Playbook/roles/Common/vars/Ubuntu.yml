@@ -46,10 +46,14 @@ Build_Tool_Packages:
   - libxtst-dev
   - make
   - ntp
+  - patch                         # For Devkit creation which runs "patch"
   - pigz
   - pkg-config
+  - rpm                           # For Fedora/CentOS devkit creation on Ubuntu hosts
+  - rpm2cpio                      # For Fedora/CentOS devkit creation on Ubuntu hosts
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-dev
+  - texinfo                       # For Devkit creation (binutils build)
   - wget
   - zip
 

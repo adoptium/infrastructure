@@ -24,7 +24,6 @@ Build_Tool_Casks:
   - packages
 
 Test_Tool_Packages:
-  - mercurial
   - pulseaudio
   - jq
 
