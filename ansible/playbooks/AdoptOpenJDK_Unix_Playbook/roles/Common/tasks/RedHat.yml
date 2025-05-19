@@ -162,7 +162,7 @@
 
 - name: Find Default JDK
   stat:
-    path: /usr/lib/jvm/java-1.8.0
+    path: /usr/lib/jvm/java-21-openjdk
   register: jdk_path
   tags: default_java
 
