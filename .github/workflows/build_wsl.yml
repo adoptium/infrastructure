@@ -36,7 +36,7 @@ jobs:
         New-NetFirewallRule -DisplayName "ALLOW TCP PORT 5986" -Direction inbound -Profile Any -Action Allow -LocalPort 5986 -Protocol TCP
         Invoke-WebRequest https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
         $expectedChecksum = "EBA72DF06E3E77709595F75D1D5B4D95B06602429DD2A3F7867406DF875B0C70"
-        $actualChecksum = Get-FileHash -Path ".\ConfigureRemotingForAnsible.ps1" -Algorithm SHA256 | Select-Object -ExpandProperty Hash        
+        $actualChecksum = Get-FileHash -Path ".\ConfigureRemotingForAnsible.ps1" -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         if ($actualChecksum -ne $expectedChecksum) {
             Write-Output "Checksum mismatch"
             Write-Output "Actual Checksum: $actualChecksum"
@@ -46,12 +46,14 @@ jobs:
             .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
             .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
             .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
-            .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck       
+            .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
         }
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - uses: Vampire/setup-wsl@23f94bc31caaddc08bd1230a00b89f872633d8d7 # v3.1.3
+    - uses: Vampire/setup-wsl@f40fb59d850112c9a292b0218bca8271305b9127 # v5.0.0
+      with:
+        wsl-version: 1
 
     - name: Install dependencies
       run: |

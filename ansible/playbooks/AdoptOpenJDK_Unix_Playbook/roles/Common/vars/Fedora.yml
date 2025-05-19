@@ -13,7 +13,6 @@ Build_Tool_Packages:
   - ca-certificates
   - capstone-devel
   - cpio
-  - curl
   - cups-devel
   - diffutils
   - elfutils-libelf-devel
@@ -135,7 +134,6 @@ Test_Tool_Packages:
   - expat-devel
   - jq                            # For parsing SBoM during reproducibility tests
   - libcurl-devel
-  - mercurial
   - gnutls
   - gnutls-utils
   - shared-mime-info

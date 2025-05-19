@@ -118,7 +118,6 @@ Test_Tool_Packages:
   - perl-devel
   - libcurl-devel
   - openssl-devel
-  - mercurial
   - perl
   - perl-Test-Simple
   - xorg-x11-xauth
@@ -128,3 +127,8 @@ Test_Tool_Packages:
   - shared-mime-info
   - nss-devel
   - nss-tools
+
+Additional_Test_Tool_Packages_Wayland:
+  - weston
+  - wayland-utils
+  - xorg-x11-server-Xwayland
