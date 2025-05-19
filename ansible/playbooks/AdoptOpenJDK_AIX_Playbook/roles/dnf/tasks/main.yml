@@ -62,16 +62,19 @@
       dnf:
         name: yum-utils
         state: absent
+        use_backend: dnf
 
     - name: Update dnf
       dnf:
         update_cache: true
         name: '*'
         state: latest
+        use_backend: dnf
 
     - name: Install packages
       dnf:
         state: present
+        use_backend: dnf
         update_cache: yes
         disable_excludes: all
         name:
@@ -129,6 +132,7 @@
         state: present
         update_cache: yes
         disable_excludes: all
+        use_backend: dnf
       tags:
         - rpm_install
         - cmake
@@ -147,6 +151,7 @@
     - name: Remove packages - in case installed historically, or by accident
       dnf:
         state: absent
+        use_backend: dnf
         name:
           - libXrender-devel
           - libXrender

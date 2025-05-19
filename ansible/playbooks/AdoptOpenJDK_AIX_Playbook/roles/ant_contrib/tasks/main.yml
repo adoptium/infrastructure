@@ -11,7 +11,7 @@
   block:
     - name: Checking for ant-contrib availability
       stat:
-        path: /opt/apache-ant-1.9.9/lib/ant-contrib.jar
+        path: /opt/apache-ant-{{ ant_version }}/lib/ant-contrib.jar
       register: antcontrib
 
     - name: "Debug ant-contrib.jar installed, skipping download"
@@ -27,7 +27,7 @@
       when: not antcontrib.stat.exists
 
     - name: Move ant-contrib.jar to lib folder
-      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-1.9.9/lib/
+      command: mv /tmp/ant-contrib/lib/ant-contrib.jar /opt/apache-ant-{{ ant_version }}/lib/
       when: not antcontrib.stat.exists
 
     - name: Clean ant-contrib tmp files
