@@ -90,6 +90,6 @@
     state: restarted
     enabled: yes
   when:
-    - (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8)) or
       (ansible_distribution == "SLES" and ansible_distribution_major_version == "15")
   tags: ntp_time
