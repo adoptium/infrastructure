@@ -117,6 +117,7 @@ Test_Tool_Packages:
   - zlib-devel
   - perl-devel
   - libcurl-devel
+  - openssl
   - openssl-devel
   - perl
   - perl-Test-Simple
