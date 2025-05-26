@@ -162,7 +162,7 @@
 # Install Java #
 ################
 
-- name: Install Java when below Rhel8 
+- name: Install Java when below Rhel8
   package: "name={{ item }} state=latest"
   with_items: "{{ Java_NOT_RHEL8Plus }}"
   when:
