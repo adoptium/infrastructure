@@ -97,13 +97,17 @@ Additional_Build_Tools_RHEL7_s390x:
 Java_RHEL8Plus:
   - java-1.8.0-openjdk-devel
 
-Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
+Java_NOT_RHEL8Plus:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
 
-Java_RHEL6_PPC64:
-  - java-1.7.0-ibm-devel
-  - java-1.8.0-ibm-devel
+#Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
+#  - java-1.7.0-openjdk-devel
+#  - java-1.8.0-openjdk-devel
+#
+#Java_RHEL6_PPC64:
+#  - java-1.7.0-ibm-devel
+#  - java-1.8.0-ibm-devel
 
 Test_Tool_Packages:
   - acl
