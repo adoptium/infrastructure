@@ -46,12 +46,7 @@
   when: wix_installed.stat.exists
   tags: Wix
 
-- name: Install Wix Toolset when not installed or version is not correct
-  win_shell: dotnet tool install wix --version {{ wix_version }} --tool-path 'C:\\Program Files\\dotnet'
-  when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
-  tags: Wix
-
-- name: Ensure WiX Toolset version is correct (install or update)
+- name: Install Wix Toolset when not installed or update when version is not correct
   win_shell: |
     if (dotnet tool list --tool-path 'C:\\Program Files\\dotnet' | Select-String wix) {
       dotnet tool update wix --version {{ wix_version }} --tool-path 'C:\\Program Files\\dotnet'
