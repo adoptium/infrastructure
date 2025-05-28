@@ -16,11 +16,24 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
+- name: Import EPEL GPG key
+  rpm_key:
+    state: present
+    key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+  tags: patch_update
+
 - name: Enable EPEL release for RHEL
   yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   failed_when: false
-  when: not ((ansible_distribution_major_version == "7" and ansible_architecture == "s390x") or
-        (ansible_distribution_major_version == "6" and (ansible_architecture == "s390x" or ansible_architecture == "ppc64le")))
+  when:
+    - ansible_architecture != "s390x"
+  tags: patch_update
+
+- name: Enable CodeReady Builder repos on Rhel8Plus
+  shell: |
+    subscription-manager repos --enable codeready-builder-for-rhel-{{ ansible_distribution_major_version }}-$(arch)-rpms
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: patch_update
 
 - name: YUM upgrade all packages
@@ -51,11 +64,11 @@
 ##########################
 # Additional build tools #
 ##########################
-- name: Install additional build tools if NOT RHEL 8
+- name: Install additional build tools if NOT RHEL8 and above
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
+  with_items: "{{ Additional_Build_Tools_NOT_RHEL8Plus }}"
   when:
-    - (ansible_distribution_major_version != "8")
+    - not (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7
@@ -101,11 +114,11 @@
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   tags: build_tools
 
-- name: Install additional build tools for RHEL 8
+- name: Install additional build tools for RHEL8 and above
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL8 }}"
+  with_items: "{{ Additional_Build_Tools_RHEL8Plus }}"
   when:
-    - (ansible_distribution_major_version == "8")
+    - (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install jq for SBoM parsing for build reproducibility testing
@@ -148,24 +161,18 @@
 ################
 # Install Java #
 ################
-- name: Install Java (Not RedHat 6 on ppc64)
+
+- name: Install Java when below Rhel8
   package: "name={{ item }} state=latest"
-  with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
+  with_items: "{{ Java_NOT_RHEL8Plus }}"
   when:
-    - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
-    - not (ansible_distribution_major_version == "8")
+    - not (ansible_distribution_major_version | int >= 8)
   tags: install_java
 
-- name: Install Java when RedHat 6 on ppc64
+- name: Install Java when RedHat 8 and above
   package: "name={{ item }} state=latest"
-  with_items: "{{ Java_RHEL6_PPC64 }}"
-  when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
-  tags: install_java
-
-- name: Install Java when RedHat 8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_RHEL8 }}"
-  when: (ansible_distribution_major_version == "8")
+  with_items: "{{ Java_RHEL8Plus }}"
+  when: (ansible_distribution_major_version | int >= 8)
   tags: install_java
 
 ####################

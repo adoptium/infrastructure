@@ -56,12 +56,12 @@ Build_Tool_Packages:
   - xz
   - zip
 
-Additional_Build_Tools_NOT_RHEL8:
+Additional_Build_Tools_NOT_RHEL8Plus:
   - libdwarf-devel                # now in CodeReady Linux Builder (CRB) repo
   - libmpc-devel                  # now in CodeReady Linux Builder (CRB) repo
   - ntp                           # in RHEL8, ntp package is replaced by chrony
 
-Additional_Build_Tools_RHEL8:
+Additional_Build_Tools_RHEL8Plus:
   - glibc-locale-source
   - glibc-langpack-ja             # required for creating Japanese locales
   - glibc-langpack-ko             # required for creating Korean locales
@@ -94,16 +94,12 @@ Additional_Build_Tools_RHEL7_s390x:
   - libstdc++.s390                # a dependency required for executing a 32-bit C binary
   - yum-utils                     # yumdownloader required for devkit creation
 
-Java_RHEL8:
+Java_RHEL8Plus:
   - java-1.8.0-openjdk-devel
 
-Java_NOT_RHEL6_PPC64:             # Not RHEL8 either
+Java_NOT_RHEL8Plus:
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel
-
-Java_RHEL6_PPC64:
-  - java-1.7.0-ibm-devel
-  - java-1.8.0-ibm-devel
 
 Test_Tool_Packages:
   - acl
