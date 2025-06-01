@@ -212,6 +212,7 @@
     mode: 0644
     owner: root
     group: wheel
+  become: true
   tags:
     - kernel_tuning
 
@@ -222,6 +223,7 @@
       kern.sysv.shmmax=125839605760
       kern.sysv.shmall=30722560
   register: kernel
+  become: true
   tags:
     - kernel_tuning
 
@@ -232,6 +234,7 @@
     mode: 0774
     owner: root
     group: staff
+  become: true
   tags:
     - core_dumps
 
@@ -240,6 +243,7 @@
   reboot:
     reboot_timeout: 3600
   when: kernel.changed
+  become: true
   tags:
     - kernel_tuning
     - skip_ansible_lint
