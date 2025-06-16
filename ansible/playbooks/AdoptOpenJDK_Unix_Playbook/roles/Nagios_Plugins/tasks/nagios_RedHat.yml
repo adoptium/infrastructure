@@ -23,6 +23,7 @@
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
     - not (ansible_distribution_major_version == "8" and ansible_architecture == "x86_64")
+    - not (ansible_distribution_major_version == "10")
   tags: nagios_plugins
 
 - name: Install nagios-plugins (RHEL8/x64)
@@ -41,6 +42,7 @@
   when:
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not (ansible_distribution_major_version == "10")
   tags: nagios_plugins
 
 - name: Check if plugins folder is where its expected
@@ -54,6 +56,7 @@
   when:
     - ansible_distribution_major_version != "6"
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+    - not (ansible_distribution_major_version == "10")
     - not plugins_folder.stat.exists
   tags: nagios_plugins
 
@@ -73,6 +76,7 @@
     timeout: 25
     checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
   when:
+    - not (ansible_distribution_major_version == "10")
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
 
@@ -82,6 +86,7 @@
     dest: /tmp/
     copy: False
   when:
+    - not (ansible_distribution_major_version == "10")
 #      - ansible_distribution_major_version == "6"
     - not folder_nagios.stat.exists
 
@@ -89,7 +94,36 @@
   shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
   become: yes
   when:
+    - not (ansible_distribution_major_version == "10")
 #      - ansible_distribution_major_version == "6"
+    - not folder_nagios.stat.exists
+
+# Download Nagios Plugins For RHEL10
+- name: Download nagios-plugins for RHEL10+
+  get_url:
+    url: https://nagios-plugins.org/download/nagios-plugins-2.4.9.tar.gz
+    dest: /tmp/
+    mode: 0440
+    timeout: 25
+    checksum: sha256:74da12037c0ab62ad34f9d9f00f475c472cef0913d2ffa9810c17fef101cd5cf
+  when:
+    - ansible_distribution_major_version >= "10"
+    - not folder_nagios.stat.exists
+
+- name: Extract nagios-plugins for RHEL10+
+  unarchive:
+    src: /tmp/nagios-plugins-2.4.9.tar.gz
+    dest: /tmp/
+    copy: False
+  when:
+    - ansible_distribution_major_version >= "10"
+    - not folder_nagios.stat.exists
+
+- name: Configure, make and make install nagios-plugins
+  shell: cd /tmp/nagios-plugins-2.4.9/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
+  become: yes
+  when:
+    - ansible_distribution_major_version >= "10"
     - not folder_nagios.stat.exists
 
 ##############################
