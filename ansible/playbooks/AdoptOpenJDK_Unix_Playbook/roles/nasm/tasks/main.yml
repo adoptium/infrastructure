@@ -87,7 +87,7 @@
     dest: /tmp/
     copy: False
   when:
-    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare('{{ nasm_version }}', operator='ne')) )
+    - (nasm_installed.rc is defined) and ((nasm_installed.rc != 0 ) or (nasm_installed.rc == 0 and nasm.stdout is version_compare(nasm_version, operator='ne')))
   tags: nasm
 
 - name: Running ./configure & make for nasm ( Not Ubuntu 22+ and not Fedora 35+ )
@@ -99,7 +99,7 @@
     - (ansible_distribution != "Fedora") or (ansible_distribution == "Fedora" and ansible_distribution_major_version | int < 35)
     - (ansible_distribution != "RedHat") or (ansible_distribution == "RedHat" and ansible_distribution_major_version | int < 10)
     - nasm_installed.rc is defined
-    - (nasm_installed.rc != 0 or (nasm_installed.rc == 0 and nasm.stdout is version_compare('{{ nasm_version }}', operator='ne')))
+    - (nasm_installed.rc != 0 or (nasm_installed.rc == 0 and nasm.stdout is version_compare(nasm_version, operator='ne')))
   tags: nasm
 
 - name: Running ./configure & make for nasm ( Ubuntu 22 x64 )
