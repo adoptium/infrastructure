@@ -68,75 +68,60 @@
     path: /usr/local/nagios
   register: folder_nagios
 
-- name: Download nagios-plugins
+- name: Set plugin version/checksum fact (RHEL < 10)
+  set_fact:
+    plugin_version: "2.2.1"
+    plugin_checksum: "sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18"
+  when: ansible_distribution_major_version | int < 10
+  tags: nagios_plugins
+
+- name: Set plugin version/checksum fact (RHEL >= 10)
+  set_fact:
+    plugin_version: "2.4.9"
+    plugin_checksum: "sha256:74da12037c0ab62ad34f9d9f00f475c472cef0913d2ffa9810c17fef101cd5cf"
+  when: ansible_distribution_major_version | int >= 10
+  tags: nagios_plugins
+
+- name: Download nagios-plugins source
   get_url:
-    url: https://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+    url: "https://nagios-plugins.org/download/nagios-plugins-{{ plugin_version }}.tar.gz"
     dest: /tmp/
-    mode: 0440
+    mode: '0440'
     timeout: 25
-    checksum: sha256:647c0ba4583d891c965fc29b77c4ccfeccc21f409fdf259cb8af52cb39c21e18
-  when:
-    - not (ansible_distribution_major_version == "10")
-#      - ansible_distribution_major_version == "6"
-    - not folder_nagios.stat.exists
+    checksum: "{{ plugin_checksum }}"
+  when: not folder_nagios.stat.exists
+  tags: nagios_plugins
 
 - name: Extract nagios-plugins
   unarchive:
-    src: /tmp/nagios-plugins-2.2.1.tar.gz
+    src: "/tmp/nagios-plugins-{{ plugin_version }}.tar.gz"
     dest: /tmp/
-    copy: False
-  when:
-    - not (ansible_distribution_major_version == "10")
-#      - ansible_distribution_major_version == "6"
-    - not folder_nagios.stat.exists
+    remote_src: yes
+  when: not folder_nagios.stat.exists
+  tags: nagios_plugins
 
-- name: Configure, make and make install nagios-plugins
-  shell: cd /tmp/nagios-plugins-2.2.1/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-  become: yes
-  when:
-    - not (ansible_distribution_major_version == "10")
-#      - ansible_distribution_major_version == "6"
-    - not folder_nagios.stat.exists
-
-# Download Nagios Plugins For RHEL10
-- name: Download nagios-plugins for RHEL10+
-  get_url:
-    url: https://nagios-plugins.org/download/nagios-plugins-2.4.9.tar.gz
-    dest: /tmp/
-    mode: 0440
-    timeout: 25
-    checksum: sha256:74da12037c0ab62ad34f9d9f00f475c472cef0913d2ffa9810c17fef101cd5cf
-  when:
-    - ansible_distribution_major_version >= "10"
-    - not folder_nagios.stat.exists
-
-- name: Extract nagios-plugins for RHEL10+
-  unarchive:
-    src: /tmp/nagios-plugins-2.4.9.tar.gz
-    dest: /tmp/
-    copy: False
-  when:
-    - ansible_distribution_major_version >= "10"
-    - not folder_nagios.stat.exists
-
-- name: Configure, make and make install nagios-plugins
-  shell: cd /tmp/nagios-plugins-2.4.9/ && ./configure --prefix=/usr/local/nagios && make -j {{ ansible_processor_vcpus }} && make install
-  become: yes
-  when:
-    - ansible_distribution_major_version >= "10"
-    - not folder_nagios.stat.exists
+- name: Compile and install nagios-plugins
+  shell: |
+    cd /tmp/nagios-plugins-{{ plugin_version }} && \
+    ./configure --prefix=/usr/local/nagios && \
+    make -j {{ ansible_processor_vcpus }} && \
+    make install
+  args:
+    chdir: "/tmp/nagios-plugins-{{ plugin_version }}"
+  become: true
+  when: not folder_nagios.stat.exists
+  tags: nagios_plugins
 
 ##############################
 # Install additional plugins #
 ##############################
-- name: Copy check_yum plugin
-  copy:
-    src: roles/Nagios_Plugins/tasks/additional_plugins/check_yum
-    dest: /usr/local/nagios/libexec/check_yum
-    mode: 0755
 
-- name: Copy check_ntp_timesync plugin
+- name: Install custom Nagios plugin scripts
   copy:
-    src: roles/Nagios_Plugins/tasks/additional_plugins/check_ntp_timesync
-    dest: /usr/local/nagios/libexec/check_ntp_timesync
-    mode: 0755
+    src: "roles/Nagios_Plugins/tasks/additional_plugins/{{ item }}"
+    dest: "/usr/local/nagios/libexec/{{ item }}"
+    mode: '0755'
+  loop:
+    - check_yum
+    - check_ntp_timesync
+  tags: nagios_plugins
