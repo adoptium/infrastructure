@@ -97,6 +97,15 @@
   with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
   when:
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int < 10
+  tags: build_tools
+
+- name: Install additional build tools for RHEL10+ on x86
+  package: "name={{ item }} state=latest"
+  with_items: "{{ Additional_Build_Tools_RHEL10plus_x86 }}"
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int >= 10
   tags: build_tools
 
 - name: Install additional build tools for RHEL on ppc64

@@ -84,6 +84,9 @@ Additional_Build_Tools_RHEL_x86:
   - libnss3.so
   - nss
 
+Additional_Build_Tools_RHEL10plus_x86:
+  - nss
+
 Additional_Build_Tools_RHEL_ppc64:
   - glibc.ppc                     # a dependency required for executing a 32-bit C binary
   - glibc-devel.ppc               # a dependency required for executing a 32-bit C binary
