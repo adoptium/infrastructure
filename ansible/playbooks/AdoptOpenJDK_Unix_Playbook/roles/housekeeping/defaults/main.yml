@@ -1,0 +1,10 @@
+---
+# Where to place the script on the remote host
+script_dest: /usr/local/bin/housekeep_docker.sh
+
+# Mode passed to the script: “check” (dry-run) or “delete” (clean up)
+script_action: check      # override at playbook/host/group level when ready
+
+# Cron schedule (02:30 every night by default)
+cron_minute: "30"
+cron_hour: "2"
