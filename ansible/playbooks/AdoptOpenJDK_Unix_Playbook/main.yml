@@ -72,6 +72,8 @@
       tags: [build_tools]
     - role: gcc_11                # JDK19+
       tags: [build_tools]
+    - role: gcc_13
+      tags: [build_tools]
     - role: devkit                # JDK19+
       devkit_version: gcc-11.3.0-Centos7.9.2009-b03
       when:
