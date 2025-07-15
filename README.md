@@ -128,6 +128,7 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
 1. Backup the main war in /usr/share/jenkins to a name with a version suffix
    in case of corruption to the main jar.
 1. Once the upgrade is done, restart agents which do not auto-restart such as the Windows ones not running as a service
+1. Once the upgrade is done, check the Azure cloud plugin configuration, particularly the network security group configuration
 
 ### Backups
 
