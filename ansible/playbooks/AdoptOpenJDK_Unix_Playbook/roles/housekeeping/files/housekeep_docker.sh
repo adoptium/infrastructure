@@ -77,6 +77,22 @@ if [ "$CLI" = "podman" ]; then
     echo "Using Podman with runtime $OCI"
 fi
 
+# Check the version of docker has "until" support
+check_until_filter_support() {
+    # Try a harmless command using "until", suppress output
+    if ! $CLI images --filter "until=1h" --format '{{.Repository}}' >/dev/null 2>&1; then
+        echo "Warning: $CLI does not support '--filter until=...'. Falling back to no age filtering."
+        return 1
+    fi
+    return 0
+}
+
+if check_until_filter_support; then
+    USE_UNTIL_FILTER=true
+else
+    USE_UNTIL_FILTER=false
+fi
+
 ##########################################################
 # 2. Helper Functions
 ##########################################################
@@ -98,6 +114,14 @@ prefix_match() {             # prefix_match STRING  → 0 if matches any exclude
     return 1
 }
 
+check_until_filter_support() {
+    # Try a harmless command using "until", suppress output
+    if ! $CLI images --filter "until=1h" --format '{{.Repository}}' >/dev/null 2>&1; then
+        echo "Warning: $CLI does not support '--filter until=...'. Falling back to no age filtering."
+        return 1
+    fi
+    return 0
+}
 # Define Default Time Period Macros For CLI
 
 SIX_MONTHS=4320h
@@ -116,11 +140,16 @@ trap 'rm -f "$IMAGES" "$CONTAINERS" "$OLD_CONTAINERS"' EXIT INT TERM
 ##########################################################
 
 echo "Scanning for images older than $SIX_MONTHS ..."
-$CLI images --filter "until=$SIX_MONTHS" \
-            --format '{{.Repository}}:{{.Tag}} {{.ID}} {{.CreatedAt}}' \
-            > "${IMAGES}.all"
+if [ "$USE_UNTIL_FILTER" = true ]; then
+    $CLI images --filter "until=$SIX_MONTHS" \
+                --format '{{.Repository}}:{{.Tag}} {{.ID}} {{.CreatedAt}}' \
+                > "${IMAGES}.all"
+else
+    echo "Skipping age filter for images due to unsupported 'until' filter"
+    $CLI images --format '{{.Repository}}:{{.Tag}} {{.ID}} {{.CreatedAt}}' \
+                > "${IMAGES}.all"
+fi
 
-> "$IMAGES"
 while read repo_tag image_id created; do
     if prefix_match "$repo_tag"; then
         echo "Keeping image $repo_tag (matches exclude list)"
@@ -208,7 +237,12 @@ echo
 # 7. Other prune operations (skip image prune if exclusions present)
 ##########################################################
 echo "Pruning builder cache older than $TWO_WEEKS ..."
-run builder prune --filter "until=$TWO_WEEKS" -af
+if [ "$USE_UNTIL_FILTER" = true ]; then
+    run builder prune --filter "until=$TWO_WEEKS" -af
+else
+    echo "Skipping builder cache age filter (unsupported)"
+    run builder prune -af
+fi
 echo
 
 if [ "$EXCLUDE_PREFIXES" = "$DEFAULT_EXCLUDES" ]; then
