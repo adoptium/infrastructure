@@ -1,0 +1,46 @@
+---
+##########
+# gcc_13 #
+##########
+
+- name: Check if gcc 13.2 is installed on RHEL/CentOS/Ubuntu16
+  shell: /usr/local/gcc13/bin/gcc-13.2 --version 2>&1 > /dev/null
+  failed_when: false
+  register: gcc13_installed
+  when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+  changed_when: False
+  tags: gcc_13
+
+- name: Download Adoptium gcc-13.2 binary
+  get_url:
+    url: https://ci.adoptium.net/userContent/gcc/gcc132.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-13.tar.xz'
+    force: no
+    mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc13_installed.rc != 0
+  tags: gcc_13
+
+- name: Extract AdoptOpenJDK gcc-13 binary to /usr/local/gcc13
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-13.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc13_installed.rc != 0
+  tags: gcc_13
+
+- name: Remove downloaded gcc 13 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-13.tar.xz'
+    state: absent
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc13_installed.rc != 0
+  tags: gcc_13
