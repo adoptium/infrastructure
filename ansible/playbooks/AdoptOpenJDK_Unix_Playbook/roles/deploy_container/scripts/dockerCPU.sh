@@ -1,4 +1,9 @@
 #!/usr/bin/bash
+
+# Usage - Script takes one argument, the number of cpus for the docker container
+# ie bash dockerCPU.sh 4
+# Argument cannot be 0 or greater than the number of CPUs on the machine
+
 set -eu
 
 cpu_limit=$1
