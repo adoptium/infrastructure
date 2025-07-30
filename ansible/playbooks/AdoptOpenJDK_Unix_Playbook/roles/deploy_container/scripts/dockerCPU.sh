@@ -14,7 +14,7 @@ fi
 
 for i in $(seq 0 $(($cpu_limit - 1)));
 do
-        cpus_to_use="$cpus_to_use,$((($i + $start_cpu) % $max_cpus))"
+    cpus_to_use="$cpus_to_use,$((($i + $start_cpu) % $max_cpus))"
 done
 
 echo $cpus_to_use | awk '{sub(",","")}1'
