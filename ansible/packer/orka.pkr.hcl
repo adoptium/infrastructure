@@ -50,14 +50,14 @@ build {
     # Only needed on arm64 as we rebuild intel base frequently
     only = ["macstadium-orka.sonoma-arm64"]
     inline = [
-      "source /Users/admin/.zprofile; brew upgrade ansible",
+      "source /Users/admin/.zprofile; brew upgrade ansible"
     ]
   }
 
   # Create /tmp/packer-provisioner-ansible-local
   provisioner "shell" {
     inline = [
-      "mkdir -p /tmp/packer-provisioner-ansible-local",
+      "mkdir -p /tmp/packer-provisioner-ansible-local"
     ]
   }
 
@@ -76,5 +76,13 @@ build {
       "--skip-tags=hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
+  }
+
+  # Set xcode-select to / to ensure we're always resetting to the command line tools
+  provisioner "shell" {
+    only = ["macstadium-orka.sonoma-arm64"]
+    inline = [
+      "sudo xcode-select --switch /"
+    ]
   }
 }
