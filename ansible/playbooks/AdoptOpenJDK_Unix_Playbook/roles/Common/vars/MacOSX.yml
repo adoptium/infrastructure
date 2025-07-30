@@ -16,6 +16,7 @@ Build_Tool_Packages:
   - nasm # openj9 jdk13+
   - wget
   - bash # OpenJ9 needs bash v4 or later
+  - make
 
 Build_Tool_Packages_NOT_10_12:
   - ccache # ccache is no longer working on macOS 10.12

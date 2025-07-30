@@ -118,13 +118,6 @@
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
-- name: Add AdoptOpenJDK Java Repo
-  become: true
-  become_user: "{{ ansible_user }}"
-  homebrew_tap:
-    name: AdoptOpenJDK/openjdk
-    path: "{{ homebrew_path }}"
-
 # Install CMAKE Where It Doesn't exist
 - name: Check if cmake is installed in /opt/homebrew/bin
   stat:
