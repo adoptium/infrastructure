@@ -77,4 +77,12 @@ build {
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }
+
+  # Set xcode-select to / to ensure we're always resetting to the command line tools
+  provisioner "shell" {
+    only = ["macstadium-orka.sonoma-arm64"]
+    inline = [
+      "sudo xcode-select --switch /",
+    ]
+  }
 }
