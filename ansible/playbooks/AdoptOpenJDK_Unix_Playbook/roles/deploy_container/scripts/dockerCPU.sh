@@ -3,6 +3,7 @@
 # Usage - Script takes one argument, the number of cpus for the docker container
 # ie bash dockerCPU.sh 4
 # Argument cannot be 0 or greater than the number of CPUs on the machine
+# If /var/log/docker_cpu does not exist, run: echo 0 > /var/log/docker_cpu
 
 set -eu
 
