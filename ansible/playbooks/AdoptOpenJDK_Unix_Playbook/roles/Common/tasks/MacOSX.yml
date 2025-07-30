@@ -34,7 +34,7 @@
   when: ansible_architecture == "arm64"
 
 - name: Configure system-wide Bash profile
-  become: yes
+  become: true
   copy:
     src: files/macos/profile
     dest: /etc/profile
@@ -42,7 +42,7 @@
     group: wheel
 
 - name: Ensure that directory for system-wide profile extensions is present
-  become: yes
+  become: true
   file:
     path: /etc/profile.d
     owner: root
@@ -71,7 +71,7 @@
   register: brew
 
 - name: Install Homebrew
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   script: scripts/install-homebrew.sh
   when: not brew.stat.exists
@@ -81,7 +81,7 @@
   tags: adoptopenjdk
 
 - name: Upgrade installed packages
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew:
     upgrade_all: yes
@@ -91,7 +91,7 @@
     - brew_upgrade
 
 - name: Install brew cu
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew_tap:
     name: buo/cask-upgrade
@@ -99,16 +99,9 @@
   tags:
     - brew_cu
 
-- name: Add AdoptOpenJDK Java Repo
-  become: yes
-  become_user: "{{ ansible_user }}"
-  homebrew_tap:
-    name: AdoptOpenJDK/openjdk
-    path: "{{ homebrew_path }}"
-
 # Skipping linting as no situation where this can't run (lint error 301)
 - name: Update Casks
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   command: "{{ homebrew_path }}/brew cu -y"
   tags:
@@ -116,7 +109,7 @@
     - skip_ansible_lint
 
 - name: Install Build Tool Packages
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
@@ -124,6 +117,13 @@
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
+
+- name: Add AdoptOpenJDK Java Repo
+  become: true
+  become_user: "{{ ansible_user }}"
+  homebrew_tap:
+    name: AdoptOpenJDK/openjdk
+    path: "{{ homebrew_path }}"
 
 # Install CMAKE Where It Doesn't exist
 - name: Check if cmake is installed in /opt/homebrew/bin
@@ -137,7 +137,7 @@
   register: cmake_local
 
 - name: Install Cmake
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew:
     name: "cmake"
@@ -146,7 +146,7 @@
   when: not (cmake_homebrew.stat.exists or cmake_local.stat.exists)
 
 - name: Install Build Tool Packages NOT macOS 10.12
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
@@ -158,7 +158,7 @@
   tags: build_tools
 
 - name: Install Build Tool Casks
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew_cask:
     name: "{{ item }}"
@@ -168,7 +168,7 @@
   tags: build_tools
 
 - name: Install Test Tool Packages
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew:
     name: "{{ item }}"
@@ -178,7 +178,7 @@
   tags: test_tools
 
 - name: Install JCK Tool Casks
-  become: yes
+  become: true
   become_user: "{{ ansible_user }}"
   homebrew_cask:
     name: "{{ item }}"
