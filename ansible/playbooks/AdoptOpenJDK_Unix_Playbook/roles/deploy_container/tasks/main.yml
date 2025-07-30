@@ -12,7 +12,7 @@
 - name: Fail if cpu_limit exceeds number of cpus on the dockerhost
   fail:
     msg: "{{ cpu_limit }} is greater than the number of cpus on the dockerhost: {{ ansible_processor_vcpus }}"
-  when: "{{ cpu_limit }} > {{ ansible_processor_vcpus }}"
+  when: cpu_limit | int > ansible_processor_vcpus
 
 - name: Check if dockerfile exists
   delegate_to: localhost

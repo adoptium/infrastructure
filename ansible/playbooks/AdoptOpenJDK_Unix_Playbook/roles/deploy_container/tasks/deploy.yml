@@ -2,7 +2,7 @@
 
 - name: Check if docker_cpu file exists
   stat:
-    path: /var/log/docker_cpu 
+    path: /var/log/docker_cpu
   register: docker_cpu_file
 
 - name: Create cpu file if it doesnt exist
