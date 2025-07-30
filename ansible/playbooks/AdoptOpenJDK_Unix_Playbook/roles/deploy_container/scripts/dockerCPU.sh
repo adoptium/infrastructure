@@ -23,5 +23,6 @@ do
     cpus_to_use="$cpus_to_use,$((($i + $start_cpu) % $max_cpus))"
 done
 
+# Output: comma separated list of cpus to use, and next cpu to use
 echo $cpus_to_use | awk '{sub(",","")}1'
 echo $(((${cpus_to_use: -1} + 1) % $max_cpus))
