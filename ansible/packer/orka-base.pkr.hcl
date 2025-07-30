@@ -23,8 +23,8 @@ variable "XCode11_7_SAS_TOKEN" {
   default = env("XCode11_7_SAS_TOKEN")
 }
 
-variable "XCode15_0_1_SAS_TOKEN" {
-  default = env("XCode15_0_1_SAS_TOKEN")
+variable "XCode15_2_SAS_TOKEN" {
+  default = env("XCode15_2_SAS_TOKEN")
 }
 
 source "macstadium-orka" "sonoma-arm64" {
@@ -94,7 +94,7 @@ EOF
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
       "--extra-vars", "XCode11_7_SAS_TOKEN=\"${var.XCode11_7_SAS_TOKEN}\"",
-      "--extra-vars", "XCode15_0_1_SAS_TOKEN=\"${var.XCode15_0_1_SAS_TOKEN}\"",
+      "--extra-vars", "XCode15_2_SAS_TOKEN=\"${var.XCode15_2_SAS_TOKEN}\"",
       "--tags", "xcode11,xcode15"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
