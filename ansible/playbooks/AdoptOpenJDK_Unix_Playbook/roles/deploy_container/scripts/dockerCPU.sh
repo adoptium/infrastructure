@@ -1,9 +1,3 @@
-# Reads /var/log/dockerCPU.sh to get start_cpu
-# Input is number of cpus to use: cpu_limit
-# Uses cpu_limit and start_cpu to determine which cpus to use in the docker container
-# If it goes over the max cpus on the machine, it should loop back to 0
-#    ie if cpu_limit is 4, start_cpu is 6 and max cpus is 8, the script will output 6,7,1,2
-
 #!/usr/bin/bash
 set -eu
 
@@ -18,12 +12,10 @@ then
     exit 1
 fi
 
-for i in $(seq 1 $cpu_limit);
+for i in $(seq 0 $(($cpu_limit - 1)));
 do
         cpus_to_use="$cpus_to_use,$((($i + $start_cpu) % $max_cpus))"
 done
 
-# List of cpus, remove first comma
 echo $cpus_to_use | awk '{sub(",","")}1'
-# Last cpu used, used to update /var/log/dockerCPU.sh
-echo ((${cpus_to_use: -1} + 1) % $max_cpus)
+echo $(((${cpus_to_use: -1} + 1) % $max_cpus))
