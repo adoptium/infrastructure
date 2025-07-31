@@ -8,7 +8,7 @@
 set -eu
 
 cpu_limit=$1
-start_cpu=$(tail -n 1 /var/log/docker_cpu)
+start_cpu=$(tail -n 1 /etc/adoptium_docker_cpu)
 max_cpus=$(lscpu | grep "CPU(s):" | head -n 1 | awk '{split($0,a," "); print a[2]}')
 cpus_to_use=""
 
