@@ -14,6 +14,11 @@ if [ ! -f /etc/adoptium_docker_cpu ]; then
     exit 1
 fi
 
+if ! [[ "$cpu_limit" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: Argument must be a single integer greater than 0"
+    exit 1
+fi
+
 start_cpu=$(tail -n 1 /etc/adoptium_docker_cpu)
 max_cpus=$(lscpu | grep "CPU(s):" | head -n 1 | sed 's/.* //')
 
