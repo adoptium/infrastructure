@@ -1,59 +1,69 @@
 ---
-# Xcode 15.0.1 is needed to build JDK 17+
-# Xcode 15.0.1 can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
-# See https://github.com/adoptium/infrastructure/issues/2536#issuecomment-1708716478
+- name: Set Xcode base variables
+  set_fact:
+    xcode_version: "15.2"
+    xcode_app: "Xcode.app"
 
-- name: Check if Xcode15.0.1 is installed
+- name: Set Xcode derived variables
+  set_fact:
+    xcode_xip: "Xcode_{{ xcode_version }}.xip"
+    xcode_xip_path: "/tmp/Xcode_{{ xcode_version }}.xip"
+    xcode_app_tmp_path: "/tmp/{{ xcode_app }}"
+    xcode_app_dest_path: "/Applications/{{ xcode_app }}"
+    xcode_sas_token_var: "XCode{{ xcode_version | replace('.', '_') }}_SAS_TOKEN"
+
+# Xcode {{ xcode_version }} is needed to build JDK 17+
+# Xcode {{ xcode_version }} can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
+
+- name: Check if Xcode is installed
   stat:
-    path: /Applications/Xcode.app
-  register: xcode15_installed
+    path: "{{ xcode_app_dest_path }}"
+  register: xcode_installed
 
 - name: Check if SAS variable is defined
   set_fact:
     apple_variables: yes
-  when: not xcode15_installed.stat.exists and XCode15_0_1_SAS_TOKEN is defined
+  when: not xcode_installed.stat.exists and (lookup('vars', xcode_sas_token_var, default=None) is not none)
 
-- name: Display Information when XCode15_0_1_SAS_TOKEN is not defined
+- name: Display Information when SAS token is not defined
   debug:
-    msg: "XCode15_0_1_SAS_TOKEN is not defined. Xcode will need to be installed manually.
-          Skipping Xcode installation"
-  when: not xcode15_installed.stat.exists and apple_variables is not defined
+    msg: "{{ xcode_sas_token_var }} is not defined. Xcode will need to be installed manually. Skipping Xcode installation"
+  when: not xcode_installed.stat.exists and apple_variables is not defined
 
-- name: Install Xcode15.0.1
-  when: not xcode15_installed.stat.exists and apple_variables is defined
+- name: Install Xcode
+  when: not xcode_installed.stat.exists and apple_variables is defined
   block:
-    - name: Check for /tmp/Xcode_15.0.1.xip
+    - name: Check for {{ xcode_xip_path }}
       stat:
-        path: /tmp/Xcode_15.0.1.xip
-      register: xcode15_0_1_xip
+        path: "{{ xcode_xip_path }}"
+      register: xcode_xip_file
 
-    # Stored in Azure Blob Storage (SAS URL set to expire in 2033)
-    - name: Download XCode 15.0.1 from Azure blob storage
-      when: not xcode15_0_1_xip.stat.exists
+    - name: Download Xcode from Azure blob storage
+      when: not xcode_xip_file.stat.exists
       get_url:
-        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode-15-0-1/Xcode_15.0.1.xip?{{ XCode15_0_1_SAS_TOKEN }}"
-        dest: /tmp/Xcode_15.0.1.xip
+        url: "https://ansiblestorageadopt.blob.core.windows.net/xcode-{{ xcode_version | replace('.', '-') }}/{{ xcode_xip }}?{{ lookup('vars', xcode_sas_token_var) }}"
+        dest: "{{ xcode_xip_path }}"
         mode: 0755
 
-    - name: Extract Xcode15.0.1
-      shell: xip -x /tmp/Xcode_15.0.1.xip
+    - name: Extract Xcode
+      shell: xip -x "{{ xcode_xip_path }}"
       args:
         chdir: /tmp
-        creates: /tmp/Xcode.app
+        creates: "{{ xcode_app_tmp_path }}"
 
-    - name: Move Xcode15.0.1 to /Applications directory
+    - name: Move Xcode to /Applications directory
       copy:
-        src: /tmp/Xcode.app
-        dest: /Applications/Xcode.app/
+        src: "{{ xcode_app_tmp_path }}"
+        dest: "{{ xcode_app_dest_path }}"
         remote_src: true
 
-    - name: Select Xcode15.0.1 as the default Xcode
-      shell: sudo xcode-select --switch /Applications/Xcode.app
+    - name: Select Xcode as the default Xcode
+      shell: sudo xcode-select --switch "{{ xcode_app_dest_path }}"
 
     - name: Accept Xcode license
       shell: arch -x86_64 sudo xcodebuild -license accept
 
-    - name: Clean up Xcode15.0.1.xip file
+    - name: Clean up Xcode.xip file
       file:
-        path: /tmp/Xcode_15.0.1.xip
+        path: "{{ xcode_xip_path }}"
         state: absent

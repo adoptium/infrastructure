@@ -39,7 +39,7 @@
     - name: Move Xcode11.7 to /Applications directory
       copy:
         src: /tmp/Xcode.app
-        dest: /Applications/Xcode-11.7.app/
+        dest: /Applications/Xcode-11.7.app
         remote_src: true
 
     - name: Install Rosetta 2

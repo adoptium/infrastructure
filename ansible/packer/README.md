@@ -12,7 +12,7 @@ This repository contains two Packer configuration files used for building virtua
 
 - [Packer](https://www.packer.io/downloads) installed on your system.
 - Access to a MacStadium Orka environment (via VPN).
-- Required environment variables set (`ORKA_TOKEN`, `XCode11_7_SAS_TOKEN`, `XCode15_0_1_SAS_TOKEN`).
+- Required environment variables set (`ORKA_TOKEN`, `XCode11_7_SAS_TOKEN`, `XCode15_2_SAS_TOKEN`).
 
 ## Setup and Usage
 
@@ -23,7 +23,7 @@ Set the necessary environment variables:
 ```bash
 export ORKA_TOKEN="your-orka-token"
 export XCode11_7_SAS_TOKEN="your-xcode11.7-token"
-export XCode15_0_1_SAS_TOKEN="your-xcode15.0.1-token"
+export XCode15_2_SAS_TOKEN="your-xcode15.2-token"
 ```
 
 ### Running the Packer Builds
