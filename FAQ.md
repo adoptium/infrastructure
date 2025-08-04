@@ -230,7 +230,7 @@ These are the parameters to pass into a Grinder job in jenkins. If using
 these from the command line instead of a Grinder job there are a couple of
 things regarding the information in this table:
 - The `TARGET` name should have an underscore `_` prepended to it (like the shell snippet above)
-- For custom targets, specify it as a JDK_CUSTOM_TARGET variable to make e.g. `make _jdk_custom JDK_CUSTOM_TARGET=java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
+- For custom targets, specify it as a JDK_CUSTOM_TARGET or HOTSPOT_CUSTOM_TARGET variable to make e.g. `make _jdk_custom JDK_CUSTOM_TARGET=java/lang/invoke/lambda/LambdaFileEncodingSerialization.java`
 
 | `BUILD_LIST` | `TARGET` | `CUSTOM_TARGET` | What does it test? |
 | --- | --- | --- | --- |
@@ -239,10 +239,22 @@ things regarding the information in this table:
 | `openjdk` | `jdk_custom` | `java/lang/invoke/lambda/LambdaFileEncodingSerialization.java` | en_US.UTF8 locale required
 | `openjdk` | `jdk_custom` | `java/lang/ProcessHandle/InfoTest.java.InfoTest` | [Fails if 'sleep' invokes another process](https://github.com/adoptium/infrastructure/pull/2557#issuecomment-1135009749)
 | `openjdk` | `jdk_custom` | `javax/imageio/plugins/shared/ImageWriterCompressionTest.java` | Requires fontconfig on linux |
+| `openjdk` | `hotspot_custom` | `runtime/ErrorHandling/CreateCoredumpOnCrash.java` | Example of hotspot_custom coredump test
 | `system` | `system_custom` | `-test=MixedLoadTest -test-args=timeLimit=10m` | Run a longer systemtest |
 
 (For the last one, that makes use of the system.custom target added via
 [this PR](https://github.com/AdoptOpenJDK/openjdk-tests/pull/2234))
+
+If you are unsure whether an openjdk test should be run with `jdk_custom`
+or `hotspot_custom` look at the test path in the repository - if it's under
+[test/hotspot](https://github.com/openjdk/jdk/tree/master/test/hotspot) (Or
+[hotspot/test](https://github.com/openjdk/jdk8u-dev/tree/master/hotspot/test) for JDK8) then use `hotspot_custom`. Otherwise if it is under
+[test/jdk](https://github.com/openjdk/jdk/tree/master/test/jdk) (Or
+[jdk/test](https://github.com/openjdk/jdk8u-dev/tree/master/jdk/test) for JDK8) then use `jdk_custom`.
+[Reference](https://github.com/adoptium/infrastructure/issues/3745#issuecomment-2513021547)
+
+Once you've run it you can usually look at the results by searching for the
+corresponding `.jtr` text results file: `find . -name \*.jtr -print`.
 
 ### Notes for the Smoke Tests
 
