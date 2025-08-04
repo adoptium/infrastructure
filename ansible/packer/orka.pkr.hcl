@@ -50,14 +50,14 @@ build {
     # Only needed on arm64 as we rebuild intel base frequently
     only = ["macstadium-orka.sonoma-arm64"]
     inline = [
-      "source /Users/admin/.zprofile; brew upgrade ansible",
+      "source /Users/admin/.zprofile; brew upgrade ansible"
     ]
   }
 
   # Create /tmp/packer-provisioner-ansible-local
   provisioner "shell" {
     inline = [
-      "mkdir -p /tmp/packer-provisioner-ansible-local",
+      "mkdir -p /tmp/packer-provisioner-ansible-local"
     ]
   }
 
