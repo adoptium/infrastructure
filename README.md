@@ -130,6 +130,7 @@ to do an out-of-bound patch if a sufficientl sever issue is identified.
    in case of corruption to the main jar.
 1. Once the upgrade is done, restart agents which do not auto-restart such as the Windows ones not running as a service
 1. Once the upgrade is done, check the Azure cloud plugin configuration, particularly the network security group configuration
+1. Post a message in the #infrastructure slack channel announcing the completion of the upgrade and including a link to the appropriate "upgrade guide(s)" with the change information.
 
 ### Backups
 
