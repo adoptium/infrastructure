@@ -159,6 +159,9 @@
     - IPv6
     - role: disable_gui
       tags: adoptopenjdk
+    - role: housekeeping           # override mode when needed
+      vars:
+        script_action: check              # check/delete
     - role: logs
       position: "End"
       tags: always
