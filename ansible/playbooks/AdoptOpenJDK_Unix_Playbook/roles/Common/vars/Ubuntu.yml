@@ -106,6 +106,7 @@ Additional_Build_Tools_riscv64:
   - g++-10
   - openjdk-11-jdk
   - libatomic1
+  - cron
 
 Additional_Build_Tools_Ubuntu20:
   - cmake
