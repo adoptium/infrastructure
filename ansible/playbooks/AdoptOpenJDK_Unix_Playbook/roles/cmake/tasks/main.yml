@@ -33,7 +33,7 @@
     mode: 0440
     force: no
     validate_certs: no
-    checksum: sha256:8f864e9f78917de3e1483e256270daabc4a321741592c5b36af028e72bff87f5
+    checksum: sha256:0678d74a45832cacaea053d85a5685f3ed8352475e6ddf9fcb742ffca00199b5
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
