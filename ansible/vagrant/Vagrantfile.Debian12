@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Configure DPKG to be noninteractive
+sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
+sudo dpkg-reconfigure debconf -f noninteractive -p critical
+# Update Repository Addresses For Debian
+sudo apt-get update
+sudo apt-get install tree -y
+sudo apt-get install software-properties-common -y
+sudo apt-get install gpg -y
+
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkD12 do |adoptopenjdkD12|
+    adoptopenjdkD12.vm.box = "debian/bookworm64"
+    adoptopenjdkD12.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkD12.vm.hostname = "adoptopenjdkD12"
+    adoptopenjdkD12.vm.network :private_network, type: "dhcp"
+    adoptopenjdkD12.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 2560
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+  end
+end
