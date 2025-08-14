@@ -81,6 +81,7 @@ jobs:
         ls -la /usr/local/apache-ant-1.10.15/lib/
         ls -la /opt/homebrew/bin/ant
         echo $PATH
+        /opt/homebrew/bin/brew install ant-contrib
 
     - name: Run sanity openjdk test
       run: |
