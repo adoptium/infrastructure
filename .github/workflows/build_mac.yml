@@ -75,14 +75,6 @@ jobs:
         cd ansible
         sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
 
-    - name: Debug
-      run: |
-        ls -la /usr/local/apache-ant-1.10.15/lib/ant-contrib.jar
-        ls -la /usr/local/apache-ant-1.10.15/lib/
-        ls -la /opt/homebrew/bin/ant
-        echo $PATH
-        /opt/homebrew/bin/brew install ant-contrib
-
     - name: Run sanity openjdk test
       run: |
         cd ~ && mkdir jdk21
@@ -92,6 +84,6 @@ jobs:
         export TEST_JDK_HOME=$PWD/jdk21/Contents/Home
         export NATIVE_TEST_LIBS=$PWD/jdk21_testimage
         git clone https://github.com/adoptium/aqa-tests.git
-        cd aqa-tests && ./get.sh
+        cd aqa-tests && ./get.sh --sdk_resource releases
         export BUILD_LIST=openjdk
         cd TKG && make compile && make _sanity.openjdk
