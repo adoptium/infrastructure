@@ -42,7 +42,7 @@
 
 # The checksum file of the download is checked, not the binary itself. The checksum in the download step is equal to the one in the file
 - name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -fl "https://github.com/Kitware/CMake/releases/download/v{{ cmake_version }}/cmake-{{ cmake_version }}-SHA-256.txt" -sl "https://github.com/Kitware/CMake/releases/download/v{{ cmake_version }}/cmake-{{ cmake_version }}-SHA-256.txt.asc" -k {{ key.cmake }}
+  script: ../Supporting_Scripts/package_signature_verification.sh -fl "https://github.com/Kitware/CMake/releases/download/v{{ cmakeVersion }}/cmake-{{ cmakeVersion }}-SHA-256.txt" -sl "https://github.com/Kitware/CMake/releases/download/v{{ cmakeVersion }}/cmake-{{ cmakeVersion }}-SHA-256.txt.asc" -k {{ key.cmake }}
   when:
     - (cmake_installed.rc != 0 ) or (cmake_installed.rc == 0 and cmake_version.stdout is version_compare(cmakeVersion, operator='lt'))
     - ansible_architecture != "armv7l"
