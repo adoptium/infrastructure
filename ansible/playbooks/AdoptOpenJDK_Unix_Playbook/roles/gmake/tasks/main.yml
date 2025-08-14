@@ -33,7 +33,7 @@
 
 - name: Download make {{ makeVersion }} source
   get_url:
-    url: https://ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
+    url: https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/make/make-{{ makeVersion }}.tar.gz
     dest: /tmp/make-{{ makeVersion }}.tar.gz
     mode: 0440
     checksum: sha256:{{ makeVersionSHA }}
@@ -46,7 +46,7 @@
   tags: goodmake_source
 
 - name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/make-{{ makeVersion }}.tar.gz -sl "https://ftp.gnu.org/gnu/make/make-4.1.tar.gz.sig" -k {{ key.gmake }}
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/make-{{ makeVersion }}.tar.gz -sl "https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/make/make-4.1.tar.gz.sig" -k {{ key.gmake }}
   when:
     - ((((ansible_distribution == "SLES" or ansible_distribution == "openSUSE") and ansible_distribution_major_version == "12") or
       (ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14")) and
