@@ -79,6 +79,7 @@ jobs:
       run: |
         ls -la /usr/local/apache-ant-1.10.15/lib/ant-contrib.jar
         ls -la /usr/local/apache-ant-1.10.15/lib/
+        which ant
 
     - name: Run sanity openjdk test
       run: |
