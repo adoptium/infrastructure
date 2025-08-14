@@ -76,7 +76,9 @@ jobs:
         sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
 
     - name: Debug
-      run: ls -la /usr/local/apache-ant-1.10.15/lib/ant-contrib.jar
+      run: |
+        ls -la /usr/local/apache-ant-1.10.15/lib/ant-contrib.jar
+        ls -la /usr/local/apache-ant-1.10.15/lib/
 
     - name: Run sanity openjdk test
       run: |
