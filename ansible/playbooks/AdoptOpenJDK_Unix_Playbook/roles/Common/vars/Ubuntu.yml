@@ -45,6 +45,7 @@ Build_Tool_Packages:
   - libxrender-dev
   - libxt-dev
   - libxtst-dev
+  - linux-libc-dev                # Required for binutils 2.43 build in jdk25u devkit
   - make
   - ntp
   - patch                         # For Devkit creation which runs "patch"
