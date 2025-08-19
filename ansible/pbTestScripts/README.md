@@ -20,8 +20,8 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * CentOS8
 * Debian11
 * Debian12
-* FreeBSD12
 * Solaris10
+* Windows Server 2012 R2
 * Windows Server 2022
 
 These machines will then have the playbooks ran on them, with additional options to build JDKXX and test it.
