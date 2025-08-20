@@ -1,5 +1,5 @@
 ---
-# Note - this has "." converted to "-" in the strings because ansible-lint objects to "."
+# Note - this has "." and "-" converted to "_" in the strings because ansible-lint objects to "."
 csum_x86_64_gcc_11_3_0_Centos7_9_2009_b03: 97373a8e9efa47fd3748215a7739f3c149e36f3f2eeddf772dc51c8a35525b4c
 csum_aarch64_gcc_11_3_0_Centos7_6_1810_b03: e53c18b752cb0e6070e5277bf1eee24d2ad931d0f46b1de203e8180fed5e315c
 csum_ppc64le_gcc_11_3_0_Centos7_9_2009_b03: c3aa6b87dba9c76cd7c839354c564cc0370cce77af396483bad63da884267172
