@@ -12,37 +12,37 @@ permissions:
   contents: read
 
 jobs:
-  build-macos:
-    name: macOS
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: [macos-13]
-          - os: [macos-14]
-      fail-fast: false
-    steps:
+  # build-macos:
+  #   name: macOS
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - os: [macos-13]
+  #         - os: [macos-14]
+  #     fail-fast: false
+  #   steps:
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+  #   - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: Install Python
-      run: brew install python@3.12 --overwrite
+  #   - name: Install Python
+  #     run: brew install python@3.12 --overwrite
 
-    - name: Configure dirmgr
-      run: |
-        mkdir -p ~/.gnupg/
-        touch ~/.gnupg/dirmngr.conf
-        echo "standard-resolver" >  ~/.gnupg/dirmngr.conf
+  #   - name: Configure dirmgr
+  #     run: |
+  #       mkdir -p ~/.gnupg/
+  #       touch ~/.gnupg/dirmngr.conf
+  #       echo "standard-resolver" >  ~/.gnupg/dirmngr.conf
 
-    - name: Install Ansible
-      run: brew install ansible
+  #   - name: Install Ansible
+  #     run: brew install ansible
 
-    - name: Run Ansible Playbook
-      run: |
-        echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
-        set -eux
-        cd ansible
-        sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
+  #   - name: Run Ansible Playbook
+  #     run: |
+  #       echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+  #       set -eux
+  #       cd ansible
+  #       sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
 
   build-macos15:
     name: macOS15 Sanity JDK ${{ matrix.jdk }}
@@ -80,6 +80,12 @@ jobs:
 
     - name: Install ant-contrib via brew
       run: /opt/homebrew/bin/brew install ant-contrib
+
+    - name: Debug - Check which GCC
+      run: |
+        which gcc
+        gcc -v
+        xcode-select -p
 
     - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
