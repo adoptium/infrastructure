@@ -50,7 +50,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - jdk: [11, 17, 21, 24]
+          - jdk: 11
+          - jdk: 17
+          - jdk: 21
+          - jdk: 24
       fail-fast: false
     steps:
 
