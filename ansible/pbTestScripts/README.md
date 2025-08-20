@@ -12,7 +12,6 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * Ubuntu 16.04
 * Ubuntu 18.04
 * Ubuntu 20.04
-* Ubuntu 21.04
 * Ubuntu 22.04
 * Ubuntu 24.04
 * CentOS6
@@ -20,6 +19,7 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * CentOS8
 * Debian11
 * Debian12
+* Fedora 40
 * Solaris10
 * Windows Server 2012 R2
 * Windows Server 2022
