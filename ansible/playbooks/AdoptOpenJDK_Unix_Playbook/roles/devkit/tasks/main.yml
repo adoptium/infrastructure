@@ -23,7 +23,7 @@
     dest: /tmp/devkit.tar.xz
     force: no
     mode: 0644
-    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + devkit_version) | replace('.','-')}}"
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + devkit_version | replace('.','-'))}}"
   when:
     - devkit_installed.rc != 0
   tags: devkit
