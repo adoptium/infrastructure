@@ -45,12 +45,12 @@ jobs:
         sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
 
   build-macos15:
-    name: macOS15
-    runs-on: ${{ matrix.os }}
+    name: macOS15 Sanity JDK ${{ matrix.jdk }}
+    runs-on: macos-15
     strategy:
       matrix:
         include:
-          - os: [macos-15]
+          - jdk: [11, 17, 21, 24]
       fail-fast: false
     steps:
 
@@ -78,14 +78,14 @@ jobs:
     - name: Install ant-contrib via brew
       run: /opt/homebrew/bin/brew install ant-contrib
 
-    - name: Run sanity openjdk test
+    - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
-        cd ~ && mkdir jdk21
-        wget -O jdk21.tar.gz -q "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.8%2B9/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.8_9.tar.gz" && tar xvzf jdk21.tar.gz -C ./jdk21 --strip-components=1
-        mkdir jdk21_testimage
-        wget -O jdk21.testimage.tar.gz -q "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.8%2B9/OpenJDK21U-testimage_aarch64_mac_hotspot_21.0.8_9.tar.gz" && tar xvzf jdk21.testimage.tar.gz -C ./jdk21_testimage --strip-components=1
-        export TEST_JDK_HOME=$PWD/jdk21/Contents/Home
-        export TESTIMAGE_PATH=$PWD/jdk21_testimage
+        cd ~ && mkdir jdk${{ matrix.jdk }}
+        wget -O jdk${{ matrix.jdk }}.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/jdk/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
+        mkdir jdk${{ matrix.jdk }}_testimage
+        wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/testimage/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
+        export TEST_JDK_HOME=$PWD/jdk${{ matrix.jdk }}/Contents/Home
+        export TESTIMAGE_PATH=$PWD/jdk${{ matrix.jdk }}_testimage
         git clone https://github.com/adoptium/aqa-tests.git
         cd aqa-tests && ./get.sh
         export BUILD_LIST=openjdk
