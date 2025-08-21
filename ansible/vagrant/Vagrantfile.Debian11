@@ -3,8 +3,7 @@
 
 $script = <<SCRIPT
 # Configure DPKG to be noninteractive
-sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
-sudo dpkg-reconfigure debconf -f noninteractive -p critical
+ENV DEBIAN_FRONTEND=noninteractive 
 # Update Repository Addresses For Debian
 sudo apt-get update
 sudo apt-get install tree -y
