@@ -86,6 +86,8 @@ jobs:
         which gcc
         gcc -v
         xcode-select -p
+        find `xcode-select -p` -name "*ubsan*"
+        find `xcode-select -p` -name "*asan*"
 
     - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
