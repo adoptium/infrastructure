@@ -12,14 +12,48 @@ permissions:
   contents: read
 
 jobs:
-  build-macos:
-    name: macOS
-    runs-on: ${{ matrix.os }}
+  # build-macos:
+  #   name: macOS
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - os: [macos-13]
+  #         - os: [macos-14]
+  #     fail-fast: false
+  #   steps:
+
+  #   - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+  #   - name: Install Python
+  #     run: brew install python@3.12 --overwrite
+
+  #   - name: Configure dirmgr
+  #     run: |
+  #       mkdir -p ~/.gnupg/
+  #       touch ~/.gnupg/dirmngr.conf
+  #       echo "standard-resolver" >  ~/.gnupg/dirmngr.conf
+
+  #   - name: Install Ansible
+  #     run: brew install ansible
+
+  #   - name: Run Ansible Playbook
+  #     run: |
+  #       echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+  #       set -eux
+  #       cd ansible
+  #       sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
+
+  build-macos15:
+    name: macOS15 Sanity JDK ${{ matrix.jdk }}
+    runs-on: macos-15
     strategy:
       matrix:
         include:
-          - os: [macos-13]
-          - os: [macos-14]
+          - jdk: 11
+          - jdk: 17
+          - jdk: 21
+          - jdk: 24
       fail-fast: false
     steps:
 
@@ -43,3 +77,27 @@ jobs:
         set -eux
         cd ansible
         sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
+
+    - name: Install ant-contrib via brew
+      run: /opt/homebrew/bin/brew install ant-contrib
+
+    - name: Debug - Check which GCC
+      run: |
+        which gcc
+        gcc -v
+        xcode-select -p
+        find `xcode-select -p` -name "*ubsan*"
+        find `xcode-select -p` -name "*asan*"
+
+    - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
+      run: |
+        cd ~ && mkdir jdk${{ matrix.jdk }}
+        wget -O jdk${{ matrix.jdk }}.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/jdk/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
+        mkdir jdk${{ matrix.jdk }}_testimage
+        wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/testimage/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
+        export TEST_JDK_HOME=$PWD/jdk${{ matrix.jdk }}/Contents/Home
+        export TESTIMAGE_PATH=$PWD/jdk${{ matrix.jdk }}_testimage
+        git clone https://github.com/adoptium/aqa-tests.git
+        cd aqa-tests && ./get.sh
+        export BUILD_LIST=openjdk
+        cd TKG && make compile && make _sanity.openjdk
