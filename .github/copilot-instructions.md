@@ -27,6 +27,7 @@ The Adoptium Infrastructure repository manages build farm infrastructure using A
 #### Docker Container Testing
 - Docker builds take 15-45+ minutes depending on the target OS. NEVER CANCEL Docker builds.
 - Test Docker build: `docker build -f ansible/docker/Dockerfile.Alpine3 . --build-arg git_sha=test`
+- **ACTUAL MEASURED TIME**: Alpine3 build attempted ~5 minutes before failing on network issues (expected in restricted environments)
 - Production builds run via GitHub Actions workflows in `.github/workflows/build.yml`
 
 #### Vagrant Testing (if available)
@@ -38,7 +39,7 @@ The Adoptium Infrastructure repository manages build farm infrastructure using A
 ## Timeout Requirements and Build Times
 
 ### CRITICAL: NEVER CANCEL these long-running operations:
-- **Docker builds**: 15-45 minutes (set timeout to 60+ minutes)
+- **Docker builds**: 15-45 minutes (set timeout to 60+ minutes, measured 5+ minutes before network failure)
 - **Vagrant playbook tests**: 60-90 minutes (set timeout to 120+ minutes) 
 - **Ansible playbook execution**: 30-60 minutes (set timeout to 90+ minutes)
 - **JDK builds in test scenarios**: 45+ minutes (set timeout to 90+ minutes)
@@ -128,11 +129,18 @@ ansible-lint --offline
 - `ansible-lint` requires internet for Galaxy collections - use `--offline` flag
 - Full playbook execution requires `community.general` and `community.windows` collections
 - Docker builds work offline but may need base image downloads
+- **Docker build failures**: Network issues with older base images (Alpine 3.15) are common in restricted environments
 
 ### Platform-Specific Notes:
 - macOS requires manual sudoers configuration (see `ansible/MANUAL_STEPS.md`)
 - Windows playbooks require WinRM configuration
 - AIX has special requirements documented in playbooks
+
+### Troubleshooting Common Issues:
+- **"No module named 'ansible_collections.community'"**: Expected when running offline, use `--offline` flag
+- **"couldn't resolve module/action"**: Missing collections, expected in offline environments
+- **Docker build network errors**: Expected in restricted network environments, builds work in CI
+- **Long operation timeouts**: Normal for infrastructure operations, always set high timeout values
 
 ## Commit Message Conventions
 
