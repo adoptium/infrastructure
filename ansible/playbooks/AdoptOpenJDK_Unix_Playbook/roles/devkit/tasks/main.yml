@@ -19,7 +19,7 @@
 
 - name: Download {{ devkit_filename }}
   get_url:
-    url: https://github.com/adoptium/devkit-binaries/releases/download/{{ devkit_version }}/{{  devkit_filename }}
+    url: https://github.com/adoptium/devkit-binaries/releases/download/{{ devkit_version }}/{{ devkit_filename }}
     dest: /tmp/devkit.tar.xz
     force: no
     mode: 0644
