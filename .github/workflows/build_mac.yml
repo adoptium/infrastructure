@@ -50,6 +50,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - jdk: 8 # Only on x64
           - jdk: 11
           - jdk: 17
           - jdk: 21
