@@ -46,7 +46,7 @@ jobs:
 
   build-macos15:
     name: macOS15 Sanity JDK ${{ matrix.jdk }}
-    runs-on: macos-15
+    runs-on: macos-15-large
     strategy:
       matrix:
         include:
