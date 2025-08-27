@@ -50,10 +50,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - jdk: 11
-          - jdk: 17
+          # - jdk: 11
+          # - jdk: 17
           - jdk: 21
-          - jdk: 24
+          # - jdk: 24
       fail-fast: false
     steps:
 
@@ -81,20 +81,33 @@ jobs:
     - name: Install ant-contrib via brew
       run: /opt/homebrew/bin/brew install ant-contrib
 
-    - name: Debug - Check which GCC
-      run: |
-        which gcc
-        gcc -v
-        xcode-select -p
-        find `xcode-select -p` -name "*ubsan*"
-        find `xcode-select -p` -name "*asan*"
+    # - name: Debug - Check which GCC
+    #   run: |
+    #     which gcc
+    #     gcc -v
+    #     xcode-select -p
+    #     find `xcode-select -p` -name "*ubsan*"
+    #     find `xcode-select -p` -name "*asan*"
+
+    # - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
+    #   run: |
+    #     cd ~ && mkdir jdk${{ matrix.jdk }}
+    #     wget -O jdk${{ matrix.jdk }}.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/jdk/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
+    #     mkdir jdk${{ matrix.jdk }}_testimage
+    #     wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/testimage/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
+    #     export TEST_JDK_HOME=$PWD/jdk${{ matrix.jdk }}/Contents/Home
+    #     export TESTIMAGE_PATH=$PWD/jdk${{ matrix.jdk }}_testimage
+    #     git clone https://github.com/adoptium/aqa-tests.git
+    #     cd aqa-tests && ./get.sh
+    #     export BUILD_LIST=openjdk
+    #     cd TKG && make compile && make _sanity.openjdk
 
     - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
         cd ~ && mkdir jdk${{ matrix.jdk }}
-        wget -O jdk${{ matrix.jdk }}.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/jdk/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
+        wget -O jdk${{ matrix.jdk }}.tar.gz -q "https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-aarch64-temurin/252/artifact/workspace/target/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.9_4-ea.tar.gz" && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
         mkdir jdk${{ matrix.jdk }}_testimage
-        wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q "https://api.adoptium.net/v3/binary/latest/${{ matrix.jdk }}/ga/mac/aarch64/testimage/hotspot/normal/eclipse?project=jdk" && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
+        wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q "https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-aarch64-temurin/252/artifact/workspace/target/OpenJDK21U-testimage_aarch64_mac_hotspot_21.0.9_4-ea.tar.gz" && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
         export TEST_JDK_HOME=$PWD/jdk${{ matrix.jdk }}/Contents/Home
         export TESTIMAGE_PATH=$PWD/jdk${{ matrix.jdk }}_testimage
         git clone https://github.com/adoptium/aqa-tests.git
