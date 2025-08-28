@@ -52,8 +52,8 @@ jobs:
         include:
           - jdk: 11
           - jdk: 17
-          # - jdk: 21
-          # - jdk: 24
+          - jdk: 21
+          - jdk: 24
       fail-fast: false
     steps:
 
@@ -92,10 +92,14 @@ jobs:
     - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
         cd ~ && mkdir jdk${{ matrix.jdk }}
-        export JDK11_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-aarch64-temurin/383/artifact/workspace/target/OpenJDK11U-jdk_aarch64_mac_hotspot_11.0.29_3-ea.tar.gz"
-        export JDK11_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-aarch64-temurin/383/artifact/workspace/target/OpenJDK11U-testimage_aarch64_mac_hotspot_11.0.29_3-ea.tar.gz"
+        export JDK11_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-aarch64-temurin/383/artifact/workspace/target/OpenJDK11U-jdk_aarch64_mac_hotspot_11.0.29_4-ea.tar.gz"
+        export JDK11_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-aarch64-temurin/383/artifact/workspace/target/OpenJDK11U-testimage_aarch64_mac_hotspot_11.0.29_4-ea.tar.gz"
         export JDK17_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk17u/job/jdk17u-mac-aarch64-temurin/528/artifact/workspace/target/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.17_4-ea.tar.gz"
         export JDK17_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk17u/job/jdk17u-mac-aarch64-temurin/528/artifact/workspace/target/OpenJDK17U-testimage_aarch64_mac_hotspot_17.0.17_4-ea.tar.gz"
+        export JDK21_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-aarch64-temurin/253/artifact/workspace/target/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.9_5-ea.tar.gz"
+        export JDK21_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-aarch64-temurin/253/artifact/workspace/target/OpenJDK21U-testimage_aarch64_mac_hotspot_21.0.9_5-ea.tar.gz"
+        export JDK24_URL="https://api.adoptium.net/v3/binary/latest/24/ga/mac/aarch64/jdk/hotspot/normal/eclipse?project=jdk"
+        export JDK24_TEST_URL="https://api.adoptium.net/v3/binary/latest/24/ga/mac/aarch64/testimage/hotspot/normal/eclipse?project=jdk"
         wget -O jdk${{ matrix.jdk }}.tar.gz -q $JDK${{ matrix.jdk }}_URL && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
         mkdir jdk${{ matrix.jdk }}_testimage
         wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q $JDK${{ matrix.jdk }}_TEST_URL && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
