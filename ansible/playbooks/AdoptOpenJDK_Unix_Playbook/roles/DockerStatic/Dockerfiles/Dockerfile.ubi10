@@ -58,6 +58,6 @@ RUN dnf install -y openssh-server
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
-ENTRYPOINT /bin/bash
+# ENTRYPOINT /bin/bash
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
