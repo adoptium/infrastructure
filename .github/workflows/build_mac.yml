@@ -116,7 +116,7 @@ jobs:
     #     cd TKG && make compile && make _sanity.openjdk
 
   build-macos15-x64:
-    name: macOS15 Sanity JDK ${{ matrix.jdk }}
+    name: macOS15 Sanity JDK ${{ matrix.jdk }} x64
     runs-on: macos-15
     strategy:
       matrix:
