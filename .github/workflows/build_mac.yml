@@ -81,14 +81,6 @@ jobs:
     - name: Install ant-contrib via brew
       run: /opt/homebrew/bin/brew install ant-contrib
 
-    # - name: Debug - Check which GCC
-    #   run: |
-    #     which gcc
-    #     gcc -v
-    #     xcode-select -p
-    #     find `xcode-select -p` -name "*ubsan*"
-    #     find `xcode-select -p` -name "*asan*"
-
     - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
       run: |
         cd ~ && mkdir jdk${{ matrix.jdk }}
@@ -122,3 +114,63 @@ jobs:
     #     cd aqa-tests && ./get.sh
     #     export BUILD_LIST=openjdk
     #     cd TKG && make compile && make _sanity.openjdk
+
+  build-macos15-x64:
+    name: macOS15 Sanity JDK ${{ matrix.jdk }}
+    runs-on: macos-15
+    strategy:
+      matrix:
+        include:
+          # - jdk: 8
+          - jdk: 11
+          - jdk: 17
+          - jdk: 21
+          - jdk: 24
+      fail-fast: false
+    steps:
+
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Install Python
+      run: brew install python@3.12 --overwrite
+
+    - name: Configure dirmgr
+      run: |
+        mkdir -p ~/.gnupg/
+        touch ~/.gnupg/dirmngr.conf
+        echo "standard-resolver" >  ~/.gnupg/dirmngr.conf
+
+    - name: Install Ansible
+      run: brew install ansible
+
+    - name: Run Ansible Playbook
+      run: |
+        echo "localhost ansible_user=runner ansible_connection=local" > ansible/hosts
+        set -eux
+        cd ansible
+        sudo ansible-playbook -i hosts playbooks/AdoptOpenJDK_Unix_Playbook/main.yml --skip-tags="hosts_file,hostname,brew_upgrade,brew_cu,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,crontab"
+
+    - name: Install ant-contrib via brew
+      run: arch -x86_64 brew install ant-contrib
+
+    - name: Run sanity openjdk test for JDK ${{ matrix.jdk }}
+      run: |
+        cd ~ && mkdir jdk${{ matrix.jdk }}
+        export JDK8_URL="https://api.adoptium.net/v3/binary/latest/8/ga/mac/x64/jdk/hotspot/normal/eclipse?project=jdk"
+        export JDK11_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-x64-temurin/432/artifact/workspace/target/OpenJDK11U-jdk_x64_mac_hotspot_11.0.29_4-ea.tar.gz"
+        export JDK11_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk11u/job/jdk11u-mac-x64-temurin/432/artifact/workspace/target/OpenJDK11U-testimage_x64_mac_hotspot_11.0.29_4-ea.tar.gz"
+        export JDK17_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk17u/job/jdk17u-mac-x64-temurin/584/artifact/workspace/target/OpenJDK17U-jdk_x64_mac_hotspot_17.0.17_5-ea.tar.gz"
+        export JDK17_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk17u/job/jdk17u-mac-x64-temurin/584/artifact/workspace/target/OpenJDK17U-testimage_x64_mac_hotspot_17.0.17_5-ea.tar.gz"
+        export JDK21_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-x64-temurin/225/artifact/workspace/target/OpenJDK21U-jdk_x64_mac_hotspot_21.0.9_5-ea.tar.gz"
+        export JDK21_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk21u/job/jdk21u-mac-x64-temurin/225/artifact/workspace/target/OpenJDK21U-testimage_x64_mac_hotspot_21.0.9_5-ea.tar.gz"
+        export JDK24_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk24u/job/jdk24u-mac-x64-temurin/20/artifact/workspace/target/OpenJDK24U-jdk_x64_mac_hotspot_2025-08-16-12-05.tar.gz"
+        export JDK24_TEST_URL="https://ci.adoptium.net/job/build-scripts/job/jobs/job/jdk24u/job/jdk24u-mac-x64-temurin/20/artifact/workspace/target/OpenJDK24U-testimage_x64_mac_hotspot_2025-08-16-12-05.tar.gz"
+        wget -O jdk${{ matrix.jdk }}.tar.gz -q $JDK${{ matrix.jdk }}_URL && tar xvzf jdk${{ matrix.jdk }}.tar.gz -C ./jdk${{ matrix.jdk }} --strip-components=1
+        mkdir jdk${{ matrix.jdk }}_testimage
+        wget -O jdk${{ matrix.jdk }}.testimage.tar.gz -q $JDK${{ matrix.jdk }}_TEST_URL && tar xvzf jdk${{ matrix.jdk }}.testimage.tar.gz -C ./jdk${{ matrix.jdk }}_testimage --strip-components=1
+        export TEST_JDK_HOME=$PWD/jdk${{ matrix.jdk }}/Contents/Home
+        export TESTIMAGE_PATH=$PWD/jdk${{ matrix.jdk }}_testimage
+        git clone https://github.com/adoptium/aqa-tests.git
+        cd aqa-tests && ./get.sh
+        export BUILD_LIST=openjdk
+        cd TKG && arch -x86_64 make compile && arch -x86_64 make _sanity.openjdk
