@@ -118,6 +118,7 @@ jobs:
   build-macos15-x64:
     name: macOS15 Sanity JDK ${{ matrix.jdk }} x64
     runs-on: macos-15
+    timeout-minutes: 720
     strategy:
       matrix:
         include:
