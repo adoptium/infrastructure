@@ -47,6 +47,8 @@ RUN useradd -m -d /home/jenkins jenkins && \
     echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys && \
     chown -R jenkins /home/jenkins/.ssh /home/jenkins/.xdg-runtime && \
     chmod -R og-rwx  /home/jenkins/.ssh /home/jenkins/.xdg-runtime
+# Required for weston
+RUN su jenkins -c "mkdir -m 0755 /tmp/.X11-unix"
 
 RUN dnf install -y perl
 # turbojpeg needed as prereq for weston but it's not the UBI CRB repo so pull from CS10 one
