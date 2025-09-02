@@ -1,4 +1,5 @@
-FROM quay.io/almalinuxorg/10-base:10
+FROM ghcr.io/almalinux/10-base:10.0-20250825@sha256:b59938ea3b263a747fa989622dd8bcba59f7cad9878be108c1de21e7db08daef
+# Using SHA because quay.io/almalinuxorg/10-base:10 might pull the x86-64-v3 version
 
 ARG ant_version="1.10.15"
 ARG ant_512checksum="1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9"
