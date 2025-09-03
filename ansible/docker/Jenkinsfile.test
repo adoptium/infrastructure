@@ -1,0 +1,122 @@
+pipeline {
+    agent none
+    stages {
+        stage('Docker Build') {
+            parallel {
+                stage('Ubuntu24.04 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'ubuntu2404', 'Dockerfile.u2404')
+                    }
+                }
+                stage('UBI10 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    } 
+                    steps {
+                        dockerBuild('amd64', 'ubi10', 'Dockerfile.ubi10')
+                    }
+                }
+//               stage('UBI10 aarch64') {
+//                   agent {
+//                       label "dockerBuild&&linux&&aarch64"
+//                   }
+//                   steps {
+//                       dockerBuild('arm64', 'ubi10', 'Dockerfile.ubi10')
+//                   }
+//               }
+//               stage('UBI10 ppc64le') {
+//                   agent {
+//                       label "dockerBuild&&linux&&ppc64le"
+//                   }
+//                   steps {
+//                       dockerBuild('ppc64le', 'ubi10', 'Dockerfile.ubi10')
+//                   }
+//               }
+            }
+        }
+        stage('Docker Manifest') {
+            agent {
+                label "dockerBuild&&linux&&x64"
+            } 
+            environment {
+                DOCKER_CLI_EXPERIMENTAL = "enabled"
+            }
+            steps {
+                dockerManifest()
+            }
+        }
+        stage('cosign') {
+            agent {
+                label "cosign"
+            }
+            environment {
+                DOCKER_CLI_EXPERIMENTAL = "enabled"
+            }
+            steps {
+                  sh "rm -vf *.sha256"
+                  copyArtifacts( projectName: '${JOB_NAME}', selector: specific("${BUILD_ID}"), flatten: true )
+                  sh "ls -ld *.sha256"
+                  cosign()
+            }
+        }
+
+    } 
+} 
+
+def dockerBuild(architecture, distro, staticdockerfile) {
+    sh "rm -vf *.sha256"
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    dockerImage = docker.build("ghcr.io/adoptium/adoptium_test_image:${distro}_linux-$architecture",
+        "-f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/$staticdockerfile .")
+    // dockerhub is the ID of the credentials stored in Jenkins 
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        dockerImage.push()
+        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_test_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
+        archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
+    }
+}
+
+def dockerManifest() { 
+    // dockerhub is the ID of the credentials stored in Jenkins
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+        sh '''
+            # Ubuntu 24.04
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:ubuntu24.04"
+            AMD64=${TARGET}_linux-amd64
+            docker manifest create $TARGET $AMD64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+//            docker manifest push $TARGET
+            # UBI10
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:ubi10"
+            AMD64=${TARGET}_linux-amd64
+//           ARM64=${TARGET}_linux-arm64
+//           PPC64LE=${TARGET}_linux-ppc64le
+            docker manifest create $TARGET $AMD64 # $ARM64 $PPC64LE
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+//           docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+//            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+//            docker manifest push $TARGET
+        '''
+    }
+}
+def cosign() {
+    // dockerhub is the ID of the credentials stored in Jenkins
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+        sh '''
+            curl -sSL -X POST --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token" | head -c -1 > token.txt
+            for IMAGE_SHA in *.sha256; do
+              IMAGE="$(cat $IMAGE_SHA)"
+              echo "Running cosign against image $IMAGE"
+              cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt -y
+              cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --certificate-identity=temurin-bot@eclipse.org
+            done
+            rm -vf token.txt
+        '''
+    }
+}
