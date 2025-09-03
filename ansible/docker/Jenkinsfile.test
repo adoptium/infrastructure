@@ -70,12 +70,12 @@ def dockerBuild(architecture, distro, staticdockerfile) {
     sh "rm -vf *.sha256"
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
     def git_sha = "${env.GIT_COMMIT.trim()}"
-    dockerImage = docker.build("ghcr.io/adoptium/adoptium_test_image:${distro}_linux-$architecture",
+    dockerImage = docker.build("ghcr.io/adoptium/test_containers:${distro}",
         "-f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/$staticdockerfile .")
     // dockerhub is the ID of the credentials stored in Jenkins 
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         dockerImage.push()
-        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_test_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
+        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/test_containers:${distro} > ${distro}_linux-${architecture}.sha256"
         archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
     }
 }
@@ -86,13 +86,13 @@ def dockerManifest() {
         git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
             # Ubuntu 24.04
-            export TARGET="ghcr.io/adoptium/adoptium_build_image:ubuntu24.04"
+            export TARGET="ghcr.io/adoptium/test_containers:ubuntu2404"
             AMD64=${TARGET}_linux-amd64
             docker manifest create $TARGET $AMD64
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
 //            docker manifest push $TARGET
             # UBI10
-            export TARGET="ghcr.io/adoptium/adoptium_build_image:ubi10"
+            export TARGET="ghcr.io/adoptium/test_containers:ubi10"
             AMD64=${TARGET}_linux-amd64
 //           ARM64=${TARGET}_linux-arm64
 //           PPC64LE=${TARGET}_linux-ppc64le
