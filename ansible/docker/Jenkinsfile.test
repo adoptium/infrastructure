@@ -88,19 +88,19 @@ def dockerManifest() {
             # Ubuntu 24.04
             export TARGET="ghcr.io/adoptium/test_containers:ubuntu2404"
             AMD64=${TARGET}_linux-amd64
-            docker manifest create $TARGET # $AMD64
+            docker manifest create $TARGET $AMD64
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
-//            docker manifest push $TARGET
+            docker manifest push $TARGET
             # UBI10
             export TARGET="ghcr.io/adoptium/test_containers:ubi10"
             AMD64=${TARGET}_linux-amd64
 //           ARM64=${TARGET}_linux-arm64
 //           PPC64LE=${TARGET}_linux-ppc64le
-            docker manifest create $TARGET # $AMD64 # $ARM64 $PPC64LE
+            docker manifest create $TARGET $AMD64 # $ARM64 $PPC64LE
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
 //           docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
 //            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
-//            docker manifest push $TARGET
+            docker manifest push $TARGET
         '''
     }
 }
