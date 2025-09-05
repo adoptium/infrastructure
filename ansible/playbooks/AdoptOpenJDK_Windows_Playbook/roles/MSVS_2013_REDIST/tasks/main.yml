@@ -1,0 +1,63 @@
+---
+###################################################
+# Visual Studio 2013 Runtime Redists Installation #
+###################################################
+# N.B. This is required as a dependency for the hadoop tests
+# Previously installed as part of VS2017
+
+# Detect 64-bit Windows As these redists are not required on Arm64
+- name: Detect 64-bit Windows
+  set_fact:
+    is_64bit: >-
+      {{ (ansible_facts.architecture2 | default('') | lower == 'x86_64')
+         or (ansible_env.PROCESSOR_ARCHITECTURE | default('') | lower == 'amd64')
+         or (ansible_facts.architecture | default('') | lower == '64-bit') }}
+
+- name: Download VC++ 2013 x86 redistributable
+  win_get_url:
+    url: "https://download.microsoft.com/download/C/C/2/CC2DF5F8-4454-44B4-802D-5EA68D086676/vcredist_x86.exe"
+    checksum: "3fd0a926dbcc5306e1b3e529637ab3e698070c6e93b5de7f6ba05d691349ef78"
+    checksum_algorithm: sha256
+    dest: "C:\\temp\\vcredist_2013_x86.exe"
+    force: no
+  when: is_64bit
+  tags: MSVS_2013_REDIST
+
+- name: Download VC++ 2013 x64 redistributable
+  win_get_url:
+    url: "https://download.microsoft.com/download/C/C/2/CC2DF5F8-4454-44B4-802D-5EA68D086676/vcredist_x64.exe"
+    checksum: "8588eb697eb2049344e6206d2b66ff63104f1c55e553621ab8ecc504d6b9e9d4"
+    checksum_algorithm: sha256
+    dest: "C:\\temp\\vcredist_2013_x64.exe"
+    force: no
+  when: is_64bit
+  tags: MSVS_2013_REDIST
+
+- name: Run MSVS 2013 Redist x86 Installer From Download
+  win_shell: |
+      Start-Process -Wait -FilePath 'C:\temp\vcredist_2013_x86.exe' -ArgumentList '/quiet', '/norestart', '/log c:\temp\vc2013_redist_x86_install.log'
+  args:
+    executable: powershell
+  register: vs2013_x86_error
+  failed_when: vs2013_x86_error.rc != 0 and vs2013_x86_error.rc != 1
+  when: is_64bit
+  tags: MSVS_2013_REDIST
+
+- name: Run MSVS 2013 Redist x64 Installer From Download
+  win_shell: |
+      Start-Process -Wait -FilePath 'C:\temp\vcredist_2013_x64.exe' -ArgumentList '/quiet', '/norestart', '/log c:\temp\vc2013_redist_x64_install.log'
+  args:
+    executable: powershell
+  register: vs2013_x64_error
+  failed_when: vs2013_x64_error.rc != 0 and vs2013_x64_error.rc != 1
+  when: is_64bit
+  tags: MSVS_2013_REDIST
+
+- name: Remove VS2013 redists downloads
+  win_file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - 'C:\temp\vcredist_2013_x86.exe'
+    - 'C:\temp\vcredist_2013_x64.exe'
+  tags: MSVS_2013_REDIST
