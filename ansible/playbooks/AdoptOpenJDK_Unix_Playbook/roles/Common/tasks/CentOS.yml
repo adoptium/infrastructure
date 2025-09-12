@@ -157,8 +157,7 @@
   package: "name=centos-release-scl state=latest"
   when:
     - ansible_architecture == "x86_64"
-    - ansible_distribution_major_version != "8"
-    - ansible_distribution_major_version != "9"
+    - ansible_distribution_major_version | int < 8
   tags: build_tools
 
 - name: Sed change the baseurl for CentOS SCL (CentOS6)
