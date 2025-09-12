@@ -528,7 +528,7 @@ echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
 	echo OS = $vagrantOS
-	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" ]] ; then
+	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" || "$OS" == "Win2025" ]] ; then
 		startVMPlaybookWin $OS
 	else
 		startVMPlaybook $OS

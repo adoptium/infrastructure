@@ -9,7 +9,7 @@ $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 
 
-wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+wget https://raw.githubusercontent.com/ansible/ansible/38e50c9f819a045ea4d40068f83e78adbfaf2e68/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
 .\\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
