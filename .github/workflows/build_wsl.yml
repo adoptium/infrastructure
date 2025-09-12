@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025]
     name: Windows
     runs-on: ${{ matrix.os }}
     steps:
@@ -61,6 +61,54 @@ jobs:
         sudo apt-get update
         sudo apt install -y ansible
 
+    # Prep only on Windows 2025: install VC++ redists required by msdia140.dll
+    - name: Prep DIA deps (Windows 2025 only)
+      if: ${{ runner.os == 'Windows' && matrix.os == 'windows-2025' }}
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        function Have([string]$p) { Test-Path $p }
+        $x64 = "$env:WINDIR\System32\vcruntime140.dll"
+        $x86 = "$env:WINDIR\SysWOW64\vcruntime140.dll"
+        if ((Have $x64) -and (Have $x86)) {
+          Write-Host "VC++ 2015–2022 redists already present (x64 + x86)."
+          return
+        }
+        # 1) Try winget (preferred on GH runners)
+        $winget = (Get-Command winget -ErrorAction SilentlyContinue)?.Source
+        if ($winget) {
+          if (-not (Have $x64)) {
+            & $winget install --id "Microsoft.VCRedist.2015+.x64" --silent --accept-package-agreements --accept-source-agreements --disable-interactivity || $null
+          }
+          if (-not (Have $x86)) {
+            & $winget install --id "Microsoft.VCRedist.2015+.x86" --silent --accept-package-agreements --accept-source-agreements --disable-interactivity || $null
+          }
+          Start-Sleep 2
+        }
+
+        # 2) Fallback to official Microsoft installers if anything still missing
+        if (-not (Have $x64) -or -not (Have $x86)) {
+          $tmp = Join-Path $env:TEMP 'vcredist'; New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+          if (-not (Have $x64)) {
+            $x64Url = 'https://aka.ms/vs/17/release/vc_redist.x64.exe'
+            $x64Exe = Join-Path $tmp 'vc_redist.x64.exe'
+            Invoke-WebRequest -Uri $x64Url -OutFile $x64Exe -UseBasicParsing
+            Start-Process -FilePath $x64Exe -ArgumentList '/quiet /norestart' -Wait
+          }
+          if (-not (Have $x86)) {
+            $x86Url = 'https://aka.ms/vs/17/release/vc_redist.x86.exe'
+            $x86Exe = Join-Path $tmp 'vc_redist.x86.exe'
+            Invoke-WebRequest -Uri $x86Url -OutFile $x86Exe -UseBasicParsing
+            Start-Process -FilePath $x86Exe -ArgumentList '/quiet /norestart' -Wait
+          }
+        }
+
+        if ((Have $x64) -and (Have $x86)) {
+          Write-Host "VC++ 2015–2022 redists present (x64 + x86)."
+        } else {
+          Write-Warning "VC++ 2015–2022 redists not fully present; Ansible registration may still fail."
+        }
+
     - name: Setup Hosts file
       working-directory: ansible
       run: |
@@ -80,4 +128,5 @@ jobs:
       run: |
         export ANSIBLE_CONFIG=./ansible.cfg
         # Skip MSVS_2013 until https://github.com/adoptium/infrastructure/issues/2178 is fixed
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        # Windows 2025 runner already has MSVS_2022 installed so will be skipped in the playbook execution.
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,MSVS_2019 reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml

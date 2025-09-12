@@ -138,42 +138,42 @@ checkVars()
 		skipFullSetup=",nvidia_cuda_toolkit"
 		case "$jdkToBuild" in
 			"jdk8" )
-				skipFullSetup="$skipFullSetup,MSVS_2017,MSVS_2019,MSVS_2022";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2017,MSVS_2019,MSVS_2022"
-				fi
+			  skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
+			  if [ "$buildHotspot" != "" ]; then
+				  skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2017,MSVS_2019"
+			  fi
 				;;
 			"jdk11" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019,MSVS_2022";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019,MSVS_2022"
-				fi
+			  skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
+			  if [ "$buildHotspot" != "" ]; then
+				  skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
+			  fi
 				;;
 			"jdk17" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2022";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2022"
-				fi
+			  skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017";
+			  if [ "$buildHotspot" != "" ]; then
+				  skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017"
+			  fi
 				;;
 			"jdk21" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
+			   skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+			   if [ "$buildHotspot" != "" ]; then
+				   skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+			   fi
 				;;
 			"jdk22" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
+			  skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+			  if [ "$buildHotspot" != "" ]; then
+				  skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+			  fi
 				;;
 			"jdk" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
+			  skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+			  if [ "$buildHotspot" != "" ]; then
+				  skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+			  fi
 				;;
-                	*)
+           *)
 				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1";;
 		esac
 	fi
@@ -358,7 +358,7 @@ startVMPlaybookWin()
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
 
 	if [ "$newVagrantFiles" = "true" ]; then
-	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" || "$OS" == "Win2025" ]]; then
 	    echo "Use Adoptium Box For Win2022"
 		ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
 	  else
@@ -528,10 +528,15 @@ echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
 	echo OS = $vagrantOS
-	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" ]] ; then
-		startVMPlaybookWin $OS
+	echo "Debug SF01"
+	echo "OS : $OS"
+	printf '%q\n' "$OS"
+	echo "Debug SF01"
+
+	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" || "$OS" == "Win2025" ]]; then
+		startVMPlaybookWin "$OS"
 	else
-		startVMPlaybook $OS
+		startVMPlaybook "$OS"
 	fi
   	if [[ "$vmHalt" == true ]]; then
                 vagrant halt
