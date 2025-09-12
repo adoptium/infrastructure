@@ -163,7 +163,7 @@
         - not (jdk_version == 11 and ansible_architecture == "riscv64")
       register: sig_output
 
-    - name: Download latest release (Linux/Alpine-Linux)
+    - name: Download latest Temurin {{ jdk_version }} release (Linux/Alpine-Linux)
       get_url:
         url: "{{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/{{ platformLinux }}/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk"
         dest: /tmp/jdk{{ jdk_version }}.tar.gz
