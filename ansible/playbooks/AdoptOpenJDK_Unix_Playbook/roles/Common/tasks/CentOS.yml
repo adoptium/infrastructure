@@ -79,9 +79,9 @@
 
 - name: Install additional build tools when NOT CentOS8+
   package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_CentOS9Stream }}"
+  with_items: "{{ Additional_Build_Tools_NOT_CentOS8plus }}"
   when:
-    - ansible_distribution_major_version|int < 8
+    - ansible_distribution_major_version | int < 8
   tags: build_tools
 
 - name: Install additional test tools for CentOS 10+ e.g. weston
@@ -207,11 +207,12 @@
     - ansible_architecture == "x86_64" and ansible_distribution_major_version == "7"
   tags: build_tools
 
-- name: Install additional build tools for CentOS on x86
+- name: Install additional build tools for CentOS on x86 for EL<10 (Not 32-bit support)
   package: "name={{ item }} state=latest"
   with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
   when:
     - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int < 10
   tags: build_tools
 
 - name: Create symlink for /opt/rh/devtoolset-2/root/usr/bin/gcc to gcc
