@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: [windows-2022, windows-2025]
     name: Windows
     runs-on: ${{ matrix.os }}
     steps:
@@ -80,4 +80,4 @@ jobs:
       run: |
         export ANSIBLE_CONFIG=./ansible.cfg
         # Skip MSVS_2013 until https://github.com/adoptium/infrastructure/issues/2178 is fixed
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,MSVS_2017,MSVS_2019,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
