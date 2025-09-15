@@ -1,0 +1,48 @@
+name: Docker (Windows)
+
+on:
+  pull_request:
+    paths:
+    - .github/workflows/build_windows.yml
+    - ansible/docker/Dockerfile.win2022
+    branches:
+    - master
+  push:
+    paths:
+    - .github/workflows/build_windows.yml
+    - ansible/docker/Dockerfile.win2022
+    branches:
+    - master
+
+# Cancel existing runs if user makes another push.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+    build:
+        if: startsWith(github.repository, 'adoptium/')
+        runs-on: windows-latest
+        steps:
+          - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+          - name: Login to our Azure subscription
+            if: github.ref == 'refs/heads/master'
+            uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
+            with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID_OIDC }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          - name: Build container image
+            run: docker build -t adoptium.azurecr.io/windows2022_build_image:latest -f ansible/docker/Dockerfile.win2022 .
+
+          - name: Push container image to ACR
+            if: github.ref == 'refs/heads/master'
+            run: |
+                az acr login --name adoptium
+                docker push adoptium.azurecr.io/windows2022_build_image:latest

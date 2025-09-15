@@ -3,16 +3,19 @@
 # Incredibuild - Configuration Tasks  #
 #######################################
 
-- name: Check if the ibxbuild service exists
-  ansible.windows.win_service_info:
-    name: IBXDashboard
+- name: Check if the IBXDashboard service exists
+  win_shell: |
+    if (Get-Service -Name 'IBXDashboard' -ErrorAction SilentlyContinue) {
+      Write-Host "exists"
+    }
   register: service_info
+  changed_when: false
 
 - name: Stop the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: stopped
-  when: service_info.exists
+  when: "'exists' in service_info.stdout"
 
 - name: Check if incredibuild.conf file exists
   win_stat:
@@ -28,7 +31,7 @@
   when: incredibuild_conf_file.stat.exists
 
 - name: Start the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: started
-  when: service_info.exists
+  when: "'exists' in service_info.stdout"
