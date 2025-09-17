@@ -166,6 +166,7 @@ checkVars()
 							if [ "$buildHotspot" != "" ]; then
 								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
 							fi
+							;;
 						"jdk25" )
 							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
 							if [ "$buildHotspot" != "" ]; then
