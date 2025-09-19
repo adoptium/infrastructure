@@ -256,6 +256,10 @@
       <false/>
       </dict>
       </plist>
+  tags: kernel_tuning
+
+- name: Load limit.core.plist file with launchctl
+  command: sudo launchctl load -w /Library/LaunchDaemons/limit.core.plist
   register: core
   tags: kernel_tuning
 
