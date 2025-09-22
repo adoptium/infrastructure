@@ -159,13 +159,21 @@
 #############################
 # Configure Wayland(Weston) #
 #############################
-- name: Install Wayland related packages (>= RHEL10)
-  package:
-    name: "{{ item }}"
-    state: latest
-  with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
-  when: ansible_distribution_major_version | int > 9
+- name: Configure Wayland (>= Rhel10)
   tags: test_tools
+  when: ansible_distribution_major_version | int > 9
+  block:
+    - name: Install Wayland related packages (>= Rhel10)
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
+
+    - name: Configure .X11-Unix folder
+      file:
+        path: /tmp/.X11-unix
+        state: directory
+        mode: "0777"
 
 ################
 # Install Java #
