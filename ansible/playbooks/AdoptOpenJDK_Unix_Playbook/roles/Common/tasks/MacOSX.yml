@@ -256,18 +256,15 @@
       <false/>
       </dict>
       </plist>
-  tags: kernel_tuning
 
 - name: Load limit.core.plist file with launchctl
   command: sudo launchctl load -w /Library/LaunchDaemons/limit.core.plist
-  register: core
-  tags: kernel_tuning
 
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:
     reboot_timeout: 3600
-  when: kernel.changed or core.changed
+  when: kernel.changed
   tags:
     - kernel_tuning
     - skip_ansible_lint
