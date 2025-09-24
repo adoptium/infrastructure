@@ -8,7 +8,6 @@
 $script = <<SCRIPT
 Start-Process powershell -Verb runAs
 
-
 wget https://raw.githubusercontent.com/ansible/ansible/38e50c9f819a045ea4d40068f83e78adbfaf2e68/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
 .\\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
 .\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
@@ -35,18 +34,20 @@ SCRIPT
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
-  config.vm.define :adoptopenjdkW2022 do |adoptopenjdkW2022|
-    adoptopenjdkW2022.vm.box = "gusztavvargadr/windows-server-2022-standard-core"
-    adoptopenjdkW2022.vm.hostname = "adoptopenjdkW2022"
-    adoptopenjdkW2022.vm.communicator = "winrm"
-    adoptopenjdkW2022.vm.synced_folder ".", "/vagrant"
-    adoptopenjdkW2022.vm.network :private_network, type: "dhcp"
-    adoptopenjdkW2022.vm.provision "shell", inline: $script, privileged: false
-    adoptopenjdkW2022.disksize.size = '130GB'
+  config.vm.define :adoptopenjdkW2025 do |adoptopenjdkW2025|
+    adoptopenjdkW2025.vm.box = "gusztavvargadr/windows-server-2025-standard"
+    adoptopenjdkW2025.vm.hostname = "adoptopenjdkW2025"
+    adoptopenjdkW2025.vm.communicator = "winrm"
+    adoptopenjdkW2025.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW2025.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW2025.vm.provision "shell", inline: $script, privileged: false
+    adoptopenjdkW2025.disksize.size = '130GB'
   end
   config.vm.provider "virtualbox" do |v|
     v.gui = false
-    v.memory = 5120
-    v.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
+    v.memory = 8192
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "60"]
   end
+  config.vm.boot_timeout = 800
 end
