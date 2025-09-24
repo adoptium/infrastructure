@@ -138,21 +138,21 @@ checkVars()
 		skipFullSetup=",nvidia_cuda_toolkit"
 		case "$jdkToBuild" in
 			"jdk8" )
-				skipFullSetup="$skipFullSetup,MSVS_2017,MSVS_2019,MSVS_2022";
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
 				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2017,MSVS_2019,MSVS_2022"
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
 				fi
 				;;
 			"jdk11" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019,MSVS_2022";
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
 				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019,MSVS_2022"
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
 				fi
 				;;
 			"jdk17" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2022";
+				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017";
 				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2022"
+					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017"
 				fi
 				;;
 			"jdk21" )
