@@ -316,7 +316,7 @@
       file:
         path: /tmp/.X11-unix
         state: directory
-        mode: "0777"
+        mode: "1777"
 
 ####################
 # Set Default Java #
