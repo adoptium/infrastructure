@@ -9,7 +9,11 @@ rm -rf /cygdrive/c/tmp/*-jre
 rm -rf /cygdrive/c/tmp/*-test-image
 
 #Identify The JDK
-
+echo "Debug SF01"
+ls -ltr c:/tmp/
+echo "Cygwin"
+ls -ltr /cygdrive/c/tmp
+echo "End Debug"
 # Set Test JDK HOME To The Relocated JDK
 # export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
 export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"|grep -v "jmods"`
