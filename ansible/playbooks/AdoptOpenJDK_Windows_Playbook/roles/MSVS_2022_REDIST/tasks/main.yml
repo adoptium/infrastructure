@@ -19,13 +19,13 @@
   tags: MSVS_2022_REDIST
 
 - name: Check if C:\openjdk\devkit exists
-  ansible.windows.win_stat:
+  win_stat:
     path: 'c:\openjdk\devkit'
   register: directory_status
   tags: MSVS_2022_REDIST
 
 - name: Create  C:\openjdk\devkit if it does not exist
-  ansible.windows.win_file:
+  win_file:
     path: 'c:\openjdk\devkit\'
     state: directory
   when: not directory_status.stat.exists
