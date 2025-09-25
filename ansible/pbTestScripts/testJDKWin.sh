@@ -16,7 +16,7 @@ ls -ltr /cygdrive/c/tmp
 echo "End Debug"
 # Set Test JDK HOME To The Relocated JDK
 # export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
-export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"|grep -v "jmods"`
+export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"|grep -v "jmods"|grep "+"`
 echo TEST_JDK_HOME=$TEST_JDK_HOME
 
 ## Run The Same Tests As Test JDK for Linux
