@@ -28,7 +28,7 @@ variable "XCode15_2_SAS_TOKEN" {
 }
 
 source "macstadium-orka" "sequoia-arm64" {
-  source_image = "90gbsequoiassh-15-4.img"
+  source_image = "sequoialatest"
   image_name = "sequoia-arm64-base"
   image_description = "Base image with sudoers setup and xcode/brew/ansible installed"
   image_force_overwrite = true

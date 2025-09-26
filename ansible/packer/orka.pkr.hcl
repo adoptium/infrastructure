@@ -20,7 +20,7 @@ variable "ORKA_ENDPOINT" {
 }
 
 source "macstadium-orka" "sequoia-arm64" {
-  source_image = "sequoia-arm64-basee"
+  source_image = "sequoia-arm64-base"
   image_name = "adoptium-sequoia-arm64"
   image_description = "Adoptium Sequoia ARM64 image with full ansible playbook run"
   image_force_overwrite = true
