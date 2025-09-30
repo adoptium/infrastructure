@@ -80,8 +80,8 @@
     - (btrfs_fs_found == True) and not (swap_exists.stat.exists)
   tags: swap_file
 
-- name: Create/Populate swap file - via DD
-  command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=8"
+- name: Create/Populate 4GiB swap file - via DD
+  command: "dd if=/dev/zero of=/{{ swap_path }} bs=250M count=16"
   when:
     not (swap_exists.stat.exists)
   tags: swap_file
