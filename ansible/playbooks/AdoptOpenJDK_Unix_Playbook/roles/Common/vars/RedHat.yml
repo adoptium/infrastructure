@@ -47,6 +47,7 @@ Build_Tool_Packages:
   - patch                         # For DevKit creation that runs "patch"
   - perl-devel
   - perl-IPC-Cmd                  # required for openssl v3 compiles
+  - perl-Time-Piece               # required for openssl v3.5.3+ compiles
   - pkgconfig
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
