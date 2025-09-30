@@ -70,7 +70,7 @@ build {
   # Ensure ansible package is up to date
   provisioner "shell" {
     # Only needed on arm64 as we rebuild intel base frequently
-    only = ["macstadium-orka.sonoma-arm64"]
+    only = ["macstadium-orka.sonoma-arm64", "macstadium-orka.sequoia-arm64"]
     inline = [
       "source /Users/admin/.zprofile; brew upgrade ansible"
     ]
@@ -90,12 +90,13 @@ build {
   }
 
   # Run ansible playbook
+  # xcode11 and 15 are skipped because they should run only in the orka-base.pkr.hcl stage
   provisioner "ansible-local" {
     playbook_file = "../playbooks/AdoptOpenJDK_Unix_Playbook/main.yml"
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--skip-tags=hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
+      "--skip-tags=xcode11,xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }
