@@ -39,13 +39,13 @@ jobs:
         --servercert ${{ secrets.ORKA_VPN_SERVER_CERT }}
 
     - name: Init Packer base
-      if: matrix.os != 'sonoma-arm64' || 'sequoia-arm64'
+      if: ${{ matrix.os != 'sonoma-arm64' && matrix.os != 'sequoia-arm64' }}
       run: packer init orka-base.pkr.hcl
       working-directory: ansible/packer
     
     - name: Run Packer (base image)
       # Skip arm64 for now as Xcode download takes too long
-      if: matrix.os != 'sonoma-arm64' || 'sequoia-arm64'
+      if: ${{ matrix.os != 'sonoma-arm64' && matrix.os != 'sequoia-arm64' }}
       run: packer build --only=macstadium-orka.${{ matrix.os }} orka-base.pkr.hcl
       working-directory: ansible/packer
       env:
