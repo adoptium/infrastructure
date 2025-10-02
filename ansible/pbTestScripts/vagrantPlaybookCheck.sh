@@ -134,6 +134,7 @@ checkVars()
                 echo "Can't find vagrant-rsync-back plugin, installing . . ."
                 vagrant plugin install vagrant-rsync-back
         fi
+
 				if [[ "$fastMode" == true ]]; then
 					skipFullSetup=",nvidia_cuda_toolkit"
 					case "$jdkToBuild" in
