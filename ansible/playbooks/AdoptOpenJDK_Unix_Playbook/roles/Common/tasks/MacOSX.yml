@@ -247,8 +247,8 @@
       <string>launchctl</string>
       <string>limit</string>
       <string>core</string>
-      <string>unlimited</string>
-      <string>unlimited</string>
+      <string>8388608</string>
+      <string>8388608</string>
       </array>
       <key>RunAtLoad</key>
       <true/>
