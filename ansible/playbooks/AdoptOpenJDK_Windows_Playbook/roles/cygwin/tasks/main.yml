@@ -2,28 +2,73 @@
 ##########
 # cygwin #
 ##########
-- name: Test if Cygwin is already installed
+- name: Test if Cygwin is already installed (jq.exe as marker)
   win_stat:
-    path: 'C:\cygwin64\bin\jq.exe'
+    path: "{{ Cygwin_INST_DIR }}\\bin\\jq.exe"
   register: cygwin_installed
+  tags: cygwin
+
+- name: Ensure temp and package directories exist
+  win_file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "C:\\temp"
+    - "{{ Cygwin_PACKAGE_DIR }}"
+    - "{{ Cygwin_CACHE_DIR }}"
   tags: cygwin
 
 - name: Retrieve Cygwin setup
   win_get_url:
-    url: https://cygwin.com/setup-x86_64.exe
-    dest: C:\temp\cygwin.exe
+    url: "https://cygwin.com/setup-x86_64.exe"
+    dest: "C:\\temp\\cygwin.exe"
     force: no
-    checksum: 46993d76d756bde18564f72a4ee07384cd82b447527ca406c8bfc034cb05c664
+    checksum: "46993d76d756bde18564f72a4ee07384cd82b447527ca406c8bfc034cb05c664"
     checksum_algorithm: sha256
   when: not cygwin_installed.stat.exists
   register: cygwin_download
   tags: cygwin
 
-# If you update this with a new package, modify the "Test
-# if installed" to look for something in the new package
-- name: Install Cygwin
+- name: Retrieve Cygwin Package Cache
+  win_get_url:
+    url: "https://ci.adoptium.net/userContent/cygwin/cygwin_cache_20240825.zip"
+    dest: "C:\\temp\\cygwin_cache.zip"
+    force: no
+    checksum: "a2ec4dfbc67272312817228afb2bbff6f4ffc44df6088169ac11f191af00ec21"
+    checksum_algorithm: sha256
+  when: not cygwin_installed.stat.exists
+  register: cygwin_cache_download
+  tags: cygwin
+
+# Unzip Cygwin Cache
+- name: Unzip Cygwin Cache
+  win_unzip:
+    src: C:\TEMP\cygwin_cache.zip
+    dest: "{{ Cygwin_CACHE_DIR }}"
+  when: not cygwin_installed.stat.exists
+  tags: cygwin
+
+# Install strictly from the local cache (NO internet)
+# Change How The Args Are Parsed To Improve PS Interpretation
+- name: Install Cygwin From The Package Cache
   win_shell: |
-    Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bsdtar,cmake,cpio,curl,gcc-core,git,gnupg,grep,jq,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
+    $setup = 'C:\temp\cygwin.exe'
+    $list  = @(
+      '--quiet-mode',
+      '--local-install',
+      '--delete-orphans',
+      '--only-site',
+      '--no-verify',
+      '--no-version-check',
+      '--root', '{{ Cygwin_INST_DIR }}',
+      '--local-package-dir', '{{ Cygwin_CACHE_DIR }}',
+      '--site', 'file:///{{ Cygwin_CACHE_DIR_POSIX }}',
+      '--packages', 'autoconf,automake,bsdtar,cmake,cpio,curl,gcc-core,git,gnupg,gnupg2,grep,jq,libtool,make,mingw64-x86_64-gcc-core,perl,rsync,unzip,wget,zip'
+    ) | ForEach-Object { if ($_ -match '\s') { '"{0}"' -f $_ } else { $_ } }
+
+    $argString = $list -join ' '
+    $p = Start-Process -FilePath $setup -ArgumentList $argString -NoNewWindow -Wait -PassThru
+    if ($p.ExitCode -ne 0) { throw "Cygwin install from cache failed (exit $($p.ExitCode))" }
   args:
     executable: powershell
   when: not cygwin_installed.stat.exists
