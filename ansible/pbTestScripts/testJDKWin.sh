@@ -9,13 +9,7 @@ rm -rf /cygdrive/c/tmp/*-jre
 rm -rf /cygdrive/c/tmp/*-test-image
 
 #Identify The JDK
-echo "Debug SF01"
-ls -ltr c:/tmp/
-echo "Cygwin"
-ls -ltr /cygdrive/c/tmp
-echo "End Debug"
 # Set Test JDK HOME To The Relocated JDK
-# export TEST_JDK_HOME=C:/cygwin64$(find ~ -maxdepth 1 -type d -name "*jdk*"|grep -v ".*jre"| grep -v ".*-image")
 export TEST_JDK_HOME=`ls -d c:/tmp/jdk*|grep -v "static"|grep -v "debug"|grep -v "jre"|grep -v "test-image"|grep -v "jmods"|grep '[+b]'`
 echo TEST_JDK_HOME=$TEST_JDK_HOME
 
@@ -51,5 +45,6 @@ make _jdk_math_0
 
 # Run Some Additional Tests To Test The Playbooks Have Run Properly
 export BUILD_LIST=functional
+make compile
 make _MBCS_Tests_pref_ja_windows_0
 make _MBCS_Tests_formatter_ja_windows_0

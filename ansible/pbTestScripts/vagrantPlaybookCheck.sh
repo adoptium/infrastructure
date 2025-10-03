@@ -472,14 +472,13 @@ startVMPlaybookWin()
 			# Run a python script to start a test for the built JDK on the Windows VM
 			if [[ $PYTHON_VERSION == *"Python 2."* ]]; then
 					echo "Python 2 detected"
-					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
+					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$jdkToBuild" -t 2>&1 | tee $testLogPath
 			elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
 					echo "Python 3 detected"
-					#echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
-					#python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
-					# Create Powershell Script To Launch Tests
-					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh \"" > testJDK_Tmp.ps1
-					# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
+					echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+					# Create Powershell Script To Launch Build
+					echo "Set-Location -Path \"C:/tmp\"" > testJDK_Tmp.ps1
+					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh\" $jdkToBuild" >> testJDK_Tmp.ps1
 					vagrant winrm -s powershell -e -c 'copy c:/vagrant/testJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
 					vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/testJDK_Tmp.ps1' | tee $testLogPath
 			else
@@ -535,10 +534,7 @@ echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
 	echo OS = $vagrantOS
-	echo "Debug SF01"
 	echo "OS : $OS"
-	printf '%q\n' "$OS"
-	echo "Debug SF01"
 
 	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" || "$OS" == "Win2025" ]]; then
 		startVMPlaybookWin "$OS"
