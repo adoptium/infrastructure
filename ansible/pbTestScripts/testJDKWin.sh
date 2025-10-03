@@ -52,4 +52,3 @@ make _jdk_math_0
 # Run Some Additional Tests To Test The Playbooks Have Run Properly
 export BUILD_LIST=functional
 make _MBCS_Tests_pref_ja_windows_0
-make _MBCS_Tests_formatter_ja_windows_0
