@@ -228,6 +228,39 @@
   tags:
     - core_dumps
 
+- name: Create limit.core.plist file in /Library/LaunchDaemons
+  copy:
+    dest: /Library/LaunchDaemons/limit.core.plist
+    owner: root
+    group: wheel
+    mode: 0644
+    content: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+      <key>Label</key>
+      <string>limit.core</string>
+      <key>ProgramArguments</key>
+      <array>
+      <string>launchctl</string>
+      <string>limit</string>
+      <string>core</string>
+      <string>8388608</string>
+      <string>8388608</string>
+      </array>
+      <key>RunAtLoad</key>
+      <true/>
+      <key>ServiceIPC</key>
+      <false/>
+      </dict>
+      </plist>
+  become: true
+
+- name: Load limit.core.plist file with launchctl
+  command: sudo launchctl load -w /Library/LaunchDaemons/limit.core.plist
+
 # Skipping linting as not to introduce handlers into task-only playbooks (lint error 503)
 - name: Reboot macOS after tweaking kernel tuning parameters
   reboot:
