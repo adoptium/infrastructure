@@ -134,50 +134,57 @@ checkVars()
                 echo "Can't find vagrant-rsync-back plugin, installing . . ."
                 vagrant plugin install vagrant-rsync-back
         fi
-	if [[ "$fastMode" == true ]]; then
-		skipFullSetup=",nvidia_cuda_toolkit"
-		case "$jdkToBuild" in
-			"jdk8" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
+
+				if [[ "$fastMode" == true ]]; then
+					skipFullSetup=",nvidia_cuda_toolkit"
+					case "$jdkToBuild" in
+						"jdk8" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
+							fi
+							;;
+						"jdk11" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
+							fi
+							;;
+						"jdk17" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017"
+							fi
+							;;
+						"jdk21" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+							fi
+							;;
+						"jdk22" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+							fi
+							;;
+						"jdk25" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+							fi
+							;;
+						"jdk" )
+							skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
+							if [ "$buildHotspot" != "" ]; then
+								skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
+							fi
+							;;
+			                	*)
+							skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1";;
+					esac
 				fi
-				;;
-			"jdk11" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2019"
-				fi
-				;;
-			"jdk17" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017"
-				fi
-				;;
-			"jdk21" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
-				;;
-			"jdk22" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
-				;;
-			"jdk" )
-				skipFullSetup="$skipFullSetup,MSVS_2013,MSVS_2017,MSVS_2019";
-				if [ "$buildHotspot" != "" ]; then
-					skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1,MSVS_2013,MSVS_2017,MSVS_2019"
-				fi
-				;;
-                	*)
-				skipFullSetup="$skipFullSetup,MSVS_2010,VS2010_SP1";;
-		esac
-	fi
-	jdkToBuild="--version $jdkToBuild"
+				jdkToBuild="--version $jdkToBuild"
 }
 
 checkVagrantOS()
@@ -358,7 +365,7 @@ startVMPlaybookWin()
 	cd $WORKSPACE/adoptopenjdkPBTests/${gitFork}-${newGitBranch}/ansible
 
 	if [ "$newVagrantFiles" = "true" ]; then
-	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" ]]; then
+	  if [[ "$useAdopt" == "true" ]] && [[ "$OS" == "Win2022" || "$OS" == "Win2025" ]]; then
 	    echo "Use Adoptium Box For Win2022"
 		ln -sf vagrant/Vagrantfile.$OS.Adopt Vagrantfile
 	  else
@@ -471,7 +478,12 @@ startVMPlaybookWin()
 					#echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
 					#python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 					# Create Powershell Script To Launch Tests
-					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh\"" > testJDK_Tmp.ps1
+					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh \"" > testJDK_Tmp.ps1
+					echo "SF02 - Debug Start"
+					echo ""
+					pwd
+					ls -ltr
+					echo "SF02 - Debug END"
 					# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
 					vagrant winrm -s powershell -e -c 'copy c:/vagrant/testJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
 					vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/testJDK_Tmp.ps1' | tee $testLogPath
@@ -528,10 +540,15 @@ echo "Testing on the following OSs: $vagrantOS"
 for OS in $vagrantOS
 do
 	echo OS = $vagrantOS
-	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" ]] ; then
-		startVMPlaybookWin $OS
+	echo "Debug SF01"
+	echo "OS : $OS"
+	printf '%q\n' "$OS"
+	echo "Debug SF01"
+
+	if [[ "$OS" == "Win2012" || "$OS" == "Win2022" || "$OS" == "Win2025" ]]; then
+		startVMPlaybookWin "$OS"
 	else
-		startVMPlaybook $OS
+		startVMPlaybook "$OS"
 	fi
   	if [[ "$vmHalt" == true ]]; then
                 vagrant halt

@@ -34,14 +34,14 @@ SCRIPT
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
-  config.vm.define :adoptopenjdkW2022 do |adoptopenjdkW2022|
-    adoptopenjdkW2022.vm.box = "adoptium/windows2022"
-    adoptopenjdkW2022.vm.hostname = "adoptopenjdkW2022"
-    adoptopenjdkW2022.vm.communicator = "winrm"
-    adoptopenjdkW2022.vm.synced_folder ".", "/vagrant"
-    adoptopenjdkW2022.vm.network :private_network, type: "dhcp"
-    adoptopenjdkW2022.vm.provision "shell", inline: $script, privileged: false
-    adoptopenjdkW2022.disksize.size = '131GB'
+  config.vm.define :adoptopenjdkW2025 do |adoptopenjdkW2025|
+    adoptopenjdkW2025.vm.box = "gusztavvargadr/windows-server-2025-standard"
+    adoptopenjdkW2025.vm.hostname = "adoptopenjdkW2025"
+    adoptopenjdkW2025.vm.communicator = "winrm"
+    adoptopenjdkW2025.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW2025.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW2025.vm.provision "shell", inline: $script, privileged: false
+    adoptopenjdkW2025.disksize.size = '130GB'
   end
   config.vm.provider "virtualbox" do |v|
     v.gui = false
@@ -49,5 +49,5 @@ Vagrant.configure("2") do |config|
     v.cpus = 3
     v.customize ["modifyvm", :id, "--cpuexecutioncap", "65"]
   end
-  config.vm.boot_timeout = 600
+  config.vm.boot_timeout = 800
 end
