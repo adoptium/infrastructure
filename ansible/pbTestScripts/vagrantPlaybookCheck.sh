@@ -479,6 +479,11 @@ startVMPlaybookWin()
 					#python pbTestScripts/startScriptWin_v2.py -i "127.0.0.1:$vagrantPort" -t 2>&1 | tee $testLogPath
 					# Create Powershell Script To Launch Tests
 					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh \"" > testJDK_Tmp.ps1
+					echo "SF02 - Debug Start"
+					echo ""
+					pwd
+					ls -ltr
+					echo "SF02 - Debug END"
 					# Copy PowerShell Script From Vagrant Share For Performance Reasons & Launch
 					vagrant winrm -s powershell -e -c 'copy c:/vagrant/testJDK_Tmp.ps1 c:/tmp; cd c:/tmp; pwd; ls'
 					vagrant winrm -e -c 'powershell -ExecutionPolicy Bypass -File c:/tmp/testJDK_Tmp.ps1' | tee $testLogPath
