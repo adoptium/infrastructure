@@ -19,6 +19,26 @@ variable "ORKA_ENDPOINT" {
   default = "http://10.221.188.20"
 }
 
+source "macstadium-orka" "sequoia-arm64" {
+  source_image = "sequoia-arm64-base"
+  image_name = "adoptium-sequoia-arm64"
+  image_description = "Adoptium Sequoia ARM64 image with full ansible playbook run"
+  image_force_overwrite = true
+  orka_endpoint = var.ORKA_ENDPOINT
+  orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sequoia-arm64-builder"
+}
+
+source "macstadium-orka" "sequoia-intel" {
+  source_image = "sequoia-intel-base"
+  image_name = "adoptium-sequoia-intel"
+  image_description = "Adoptium Sequoia Intel image with full ansible playbook run"
+  image_force_overwrite = true
+  orka_endpoint = var.ORKA_ENDPOINT
+  orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sequoia-intel-builder"
+}
+
 source "macstadium-orka" "sonoma-arm64" {
   source_image = "sonoma-arm64-base"
   image_name = "adoptium-sonoma-arm64"
@@ -32,7 +52,7 @@ source "macstadium-orka" "sonoma-arm64" {
 source "macstadium-orka" "sonoma-intel" {
   source_image = "sonoma-intel-base"
   image_name = "adoptium-sonoma-intel"
-  image_description = "Base image with sudoers setup and brew/ansible installed"
+  image_description = "Adoptium Sonoma Intel image with full ansible playbook run"
   image_force_overwrite = true
   orka_endpoint = var.ORKA_ENDPOINT
   orka_auth_token = var.ORKA_TOKEN
@@ -41,6 +61,8 @@ source "macstadium-orka" "sonoma-intel" {
 
 build {
   sources = [
+    "macstadium-orka.sequoia-arm64",
+    "macstadium-orka.sequoia-intel",
     "macstadium-orka.sonoma-arm64",
     "macstadium-orka.sonoma-intel"
   ]
@@ -48,7 +70,7 @@ build {
   # Ensure ansible package is up to date
   provisioner "shell" {
     # Only needed on arm64 as we rebuild intel base frequently
-    only = ["macstadium-orka.sonoma-arm64"]
+    only = ["macstadium-orka.sonoma-arm64", "macstadium-orka.sequoia-arm64"]
     inline = [
       "source /Users/admin/.zprofile; brew upgrade ansible"
     ]
@@ -68,12 +90,13 @@ build {
   }
 
   # Run ansible playbook
+  # xcode11 and 15 are skipped because they should run only in the orka-base.pkr.hcl stage
   provisioner "ansible-local" {
     playbook_file = "../playbooks/AdoptOpenJDK_Unix_Playbook/main.yml"
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--skip-tags=hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
+      "--skip-tags=xcode11,xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }

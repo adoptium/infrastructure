@@ -27,6 +27,26 @@ variable "XCode15_2_SAS_TOKEN" {
   default = env("XCode15_2_SAS_TOKEN")
 }
 
+source "macstadium-orka" "sequoia-arm64" {
+  source_image = "sequoialatest"
+  image_name = "sequoia-arm64-base"
+  image_description = "Base image with sudoers setup and xcode/brew/ansible installed"
+  image_force_overwrite = true
+  orka_endpoint = var.ORKA_ENDPOINT
+  orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sequoia-arm64-builder"
+}
+
+source "macstadium-orka" "sequoia-intel" {
+  source_image = "90gbsequoiassh-15-4.img"
+  image_name = "sequoia-intel-base"
+  image_description = "Base image with sudoers setup and xcode/brew/ansible installed"
+  image_force_overwrite = true
+  orka_endpoint = var.ORKA_ENDPOINT
+  orka_auth_token = var.ORKA_TOKEN
+  orka_vm_builder_name = "sequoia-intel-builder"
+}
+
 source "macstadium-orka" "sonoma-arm64" {
   source_image = "sonoma-90gb-orka3-arm"
   image_name = "sonoma-arm64-base"
@@ -50,6 +70,8 @@ source "macstadium-orka" "sonoma-intel" {
 # Generate the base image for the sonoma-arm64 VMs which we will use to run the ansible playbook
 build {
   sources = [
+    "macstadium-orka.sequoia-intel",
+    "macstadium-orka.sequoia-arm64",
     "macstadium-orka.sonoma-arm64",
     "macstadium-orka.sonoma-intel"
   ]
