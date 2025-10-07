@@ -4,9 +4,9 @@ This repository contains two Packer configuration files used for building virtua
 
 ## Configuration Files
 
-1. Base Image Creation (`orka-base.pkr.hcl`): This file is used to create a base image for sonoma-arm64 VMs. It installs Homebrew, Ansible, and specific versions of Xcode.
+1. Base Image Creation (`orka-base.pkr.hcl`): This file is used to create a base image for sonoma and sequoia arm64 and intel VMs. It installs Homebrew, Ansible, and specific versions of Xcode (only on arm64).
 
-1. Adoptium Image Creation (`orka.pkr.hcl`): This configuration builds upon the base image to create an Adoptium Sonoma ARM64 and Intel image, with a full Ansible playbook run excluding certain tags.
+2. Adoptium Image Creation (`orka.pkr.hcl`): This configuration builds upon the base image to create an Adoptium Sonoma and Sequoia ARM64 and Intel images, with a full Ansible playbook run excluding certain tags.
 
 ## Prerequisites
 
@@ -28,20 +28,24 @@ export XCode15_2_SAS_TOKEN="your-xcode15.2-token"
 
 ### Running the Packer Builds
 
+Below are instructions to build adoptium orka macos images. We first build a base image, which has only xcode installed, and then we build upon this base image by building a final image, which includes the rest of the ansible playbook. At the end of the build the produced image is automatically pushed to our orka cluster. 
+
+Use `sonoma` or `sequoia` in place of `MACOS` and `intel` or `arm64` in place of `ARCH`. All commands must be run from the `ansible/packer` directory.
+
 1. Building the Base image
 
 ```bash
-packer init .
-packer build orka-base.pkr.hcl
+packer init orka-base.pkr.hcl
+packer build --only=macstadium-orka.MACOS-ARCH orka-base.pkr.hcl
 ```
 
-This will create the base image for sonoma-arm64 and somoma-intel VMs. The base step has a pause which allows users to manually make any required changes and then resume the build.
+The base step has a pause which allows users to manually make any required changes and then resume the build.
 
-1. Building the Adoptium image
+2. Building the Adoptium image
 
 The Adoptium image depends on the base image. This generates the images that we use in Jenkins and contains the full set of dependencies.
 
 ```bash
-packer init .
-packer build orka.pkr.hcl
+packer init orka.pkr.hcl
+packer build --only=macstadium-orka.MACOS-ARCH orka.pkr.hcl
 ```
