@@ -6,7 +6,7 @@ ARG PW=T3mp=Passwd
 # Download Cygwin Bootstrapper & Verify Its Checksum
 RUN powershell -Command \
     "wget -UseBasicParsing https://cygwin.com/setup-x86_64.exe -OutFile setup-x86_64.exe; \
-    $expectedChecksum = 'e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8'; \
+    $expectedChecksum = '46993d76d756bde18564f72a4ee07384cd82b447527ca406c8bfc034cb05c664'; \
     $fileChecksum = CertUtil -hashfile setup-x86_64.exe SHA256 | Select-String -Pattern '([A-Fa-f0-9]{64})' | ForEach-Object { $_.Matches[0].Groups[1].Value }; \
     if ($fileChecksum -ne $expectedChecksum) { \
         Write-Host 'Checksum verification failed!' -ForegroundColor Red; \
