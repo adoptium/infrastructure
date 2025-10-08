@@ -64,8 +64,13 @@
   tags: ANT
 
 - name: Download ant-contrib
-  win_shell: c:\cygwin64\bin\curl -L -o /cygdrive/c/temp/ant-contrib.zip https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
-  when: (not ant_contrib_installed.stat.exists)
+  win_get_url:
+    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
+    dest: c:\temp\ant-contrib.zip
+    force: no
+    checksum: 22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc
+    checksum_algorithm: sha256
+    when: (not ant_contrib_installed.stat.exists)
   tags: ANT
 
 - name: Unzip ant-contrib
