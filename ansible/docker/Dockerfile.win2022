@@ -17,7 +17,7 @@ RUN powershell -Command \
     }"
 
 # Set up cygwin with ansible as a bootstrap, and add to system default path
-RUN setup-x86_64.exe --packages ansible --download --local-install --delete-orphans --site https://cygwin.mirror.constant.com --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode && \
+RUN setup-x86_64.exe --packages ansible --download --local-install --delete-orphans --site  https://cygwin.mirror.constant.com --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode && \
     del setup-x86_64.exe && \
     setx PATH "c:\cygwin64\bin;%PATH%" && \
     mkdir c:\temp
