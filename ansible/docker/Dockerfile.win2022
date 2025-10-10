@@ -50,7 +50,7 @@ RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & 
     sed -i -e 's/hosts: .*/hosts: localhost/' infrastructure/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml && \
     echo localhost ansible_connection=winrm > infrastructure/ansible/hosts && \
     cd infrastructure\ansible && \
-    C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
+    C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -vv -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
     --skip-tags=adoptopenjdk,reboot,Windows_Updates,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019,NVidia_Cuda_Toolkit,clang_64bit,clang_32bit,nasm,Rust,IcedTea-Web playbooks/AdoptOpenJDK_Windows_Playbook/main.yml && \
     net user ansible /DELETE
 

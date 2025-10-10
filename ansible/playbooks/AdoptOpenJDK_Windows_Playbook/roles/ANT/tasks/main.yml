@@ -78,6 +78,9 @@
 - name: SHAsum of ant-contrib.jar
   win_shell: sha256sum c:\temp\ant-contrib.zip
 
+- name: dir of ant-contrib.jar
+  win_shell: dir c:\temp\ant-contrib.zip
+
 - name: Unzip ant-contrib
   win_unzip:
     src: c:\temp\ant-contrib.zip
