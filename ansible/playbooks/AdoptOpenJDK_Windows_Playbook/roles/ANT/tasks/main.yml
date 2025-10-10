@@ -64,7 +64,7 @@
   tags: ANT
 
 - name: Download ant-contrib with curl
-  win_shell: curl -O c:\temp\ant-contrib.zip https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
+  win_shell: curl -Lo c:\temp\ant-contrib.zip https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
 #- name: Download ant-contrib
 #  win_get_url:
 #    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
