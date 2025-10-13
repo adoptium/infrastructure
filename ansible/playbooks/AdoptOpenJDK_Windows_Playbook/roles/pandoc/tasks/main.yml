@@ -1,0 +1,98 @@
+#####################################################
+# Pandoc - Used For Generating Man Pages in JDK24+  #
+#####################################################
+
+- name: Install/ensure Pandoc (Windows)
+  tags: pandoc
+  vars:
+    pandoc_version: "3.8.2"
+    pandoc_arch: "windows-x86_64"
+    pandoc_checksum: "3bcdc5c77ae5bd5406100c2c4bfdc8d17d5e4d756ad35f1791aa805282dcb33e"
+    pandoc_base_url: "https://github.com/jgm/pandoc/releases/download"
+    pandoc_zip_name: "pandoc-{{ pandoc_version }}-{{ pandoc_arch }}.zip"
+    pandoc_zip_path: "C:\\temp\\{{ pandoc_zip_name }}"
+  block:
+    - name: Ensure temp dir exists
+      win_file:
+        path: "C:\\temp"
+        state: directory
+
+    - name: Check if Pandoc is already installed
+      win_stat:
+        path: "c:\\pandoc\\pandoc.exe"
+      register: pandoc_installed
+
+    - name: Download Pandoc distribution (only if not installed)
+      win_get_url:
+        url: "{{ pandoc_base_url }}/{{ pandoc_version }}/{{ pandoc_zip_name }}"
+        dest: "c:\\temp\\pandoc.zip"
+        force: no
+        checksum: "{{ pandoc_checksum }}"
+        checksum_algorithm: sha256
+      register: pandoc_download
+      when: not pandoc_installed.stat.exists
+
+    - name: Ensure install root exists
+      win_file:
+        path: "c:\\pandoc"
+        state: directory
+      when: not pandoc_installed.stat.exists
+
+    - name: Unzip Pandoc distribution
+      win_unzip:
+        src: "c:\\temp\\pandoc.zip"
+        dest: "c:\\pandoc"
+      when: not pandoc_installed.stat.exists
+
+    # Pandoc zip expands into a versioned subfolder; locate the actual exe
+    - name: Locate pandoc.exe within install root
+      win_find:
+        paths: "c:\\pandoc"
+        patterns: "pandoc.exe"
+        recurse: yes
+        file_type: file
+      register: pandoc_find
+      when: not pandoc_installed.stat.exists
+
+    - name: Flatten Pandoc install (copy up one level)
+      win_command: >
+        cmd.exe /c robocopy
+        "c:\\pandoc\\pandoc-{{ pandoc_version }}"
+        "c:\\pandoc"
+        * /E /MOVE /NFL /NDL /NJH /NJS /NP
+      register: _flatten
+      changed_when: (_flatten.rc | int) > 0 and (_flatten.rc | int) < 8
+      failed_when: (_flatten.rc | int) >= 8
+
+    # Remove the now-empty versioned dir
+    - name: Remove empty versioned dir if present
+      win_file:
+        path: "c:\\pandoc\\pandoc-{{ pandoc_version }}"
+        state: absent
+      when: not pandoc_installed.stat.exists
+      tags: pandoc
+
+    - name: Verify final pandoc.exe location
+      win_stat:
+        path: "c:\\pandoc\\pandoc.exe"
+      register: pandoc_final
+      when: not pandoc_installed.stat.exists
+      failed_when: not pandoc_final.stat.exists
+      tags: pandoc
+
+    - name: Add Pandoc to PATH
+      win_path:
+        elements:
+          - 'C:\pandoc'
+        state: present
+      when: not pandoc_installed.stat.exists
+      tags: pandoc
+
+    - name: Remove downloaded archive (cleanup)
+      win_file:
+        path: "c:\\temp\\pandoc.zip"
+        state: absent
+      when:
+        - pandoc_download is defined
+        - pandoc_download is succeeded
+      tags: pandoc
