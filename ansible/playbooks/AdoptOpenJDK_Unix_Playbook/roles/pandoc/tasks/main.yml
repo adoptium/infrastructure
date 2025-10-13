@@ -1,0 +1,217 @@
+---
+##################################################
+# Pandoc Install (Linux + macOS)
+# For generating man pages in JDK24+
+##################################################
+
+- name: Install Pandoc
+  block:
+    # Work out the platform (OS + arch) and support status ( arm64e reported on gha runners )
+    - name: Normalize architecture to Pandoc naming (amd64/arm64)
+      set_fact:
+        arch_normalized: >-
+          {{ ({
+               'x86_64':  'amd64',
+               'amd64':   'amd64',
+               'aarch64': 'arm64',
+               'arm64':   'arm64',
+               'arm64e':  'arm64'
+             })[ansible_architecture] | default(ansible_architecture) }}
+      changed_when: false
+      tags: pandoc
+
+    - name: Build platform key from architecture and system
+      set_fact:
+        platform_key: "{{ ansible_system }}:{{ arch_normalized }}"
+      changed_when: false
+      tags: pandoc
+
+    - name: Determine if this platform is supported and select download
+      set_fact:
+        supported: "{{ platform_key in pandoc_downloads }}"
+        download: "{{ pandoc_downloads[platform_key] if (platform_key in pandoc_downloads) else {} }}"
+      changed_when: false
+      tags: pandoc
+
+    - name: Skip on unsupported platforms
+      when: not supported
+      debug:
+        msg: "Skipping Pandoc: unsupported {{ ansible_system }}/{{ ansible_architecture }} (key: {{ platform_key }})"
+      changed_when: false
+      tags: pandoc
+
+    # Build paths and URLs for downloads
+    - name: Set Correct Pandoc Download Parameters (name, sha, URL)
+      when: supported
+      set_fact:
+        archive_name: "{{ download.filename }}"
+        archive_sha: "sha256:{{ download.sha256 }}"
+        download_url: "{{ pandoc_base_url }}/{{ pandoc_version }}/{{ download.filename }}"
+      changed_when: false
+      tags: pandoc
+
+    - name: Set Pandoc Base Directory Paths
+      when: supported
+      set_fact:
+        install_dir: "{{ pandoc_install_root }}/pandoc-{{ pandoc_version }}"
+        download_dir: "/tmp/pandoc-{{ pandoc_version }}"
+      changed_when: false
+      tags: pandoc
+
+    - name: Derive local file paths (archive & unified bin path)
+      when: supported
+      set_fact:
+        archive_path: "{{ download_dir }}/{{ archive_name }}"
+        bin_path: "{{ install_dir }}/bin/pandoc"
+        mac_inner: "{{ install_dir }}/pandoc-{{ pandoc_version }}-{{ arch_normalized }}"
+      changed_when: false
+      tags: pandoc
+
+    - name: Check existing Pandoc version in PATH
+      when: supported
+      become: true
+      command: "{{ pandoc_bin_dir }}/pandoc --version"
+      register: pandoc_check
+      changed_when: false
+      failed_when: false
+      tags: pandoc
+
+    - name: Decide whether we need to install
+      when: supported
+      set_fact:
+        need_install: "{{ (pandoc_check.rc != 0) or (pandoc_version not in (pandoc_check.stdout | default(''))) }}"
+      changed_when: false
+      tags: pandoc
+
+    # Download + unpack Pandoc (only when needed)
+    - name: Ensure download directory exists
+      when: [supported, need_install]
+      become: true
+      file:
+        path: "{{ download_dir }}"
+        state: directory
+        mode: "0755"
+      tags: pandoc
+
+    - name: Download Pandoc archive
+      when: [supported, need_install]
+      become: true
+      get_url:
+        url: "{{ download_url }}"
+        dest: "{{ archive_path }}"
+        mode: "0644"
+        checksum: "{{ archive_sha }}"
+      tags: pandoc
+
+    - name: Create install directory
+      when: [supported, need_install]
+      become: true
+      file:
+        path: "{{ install_dir }}"
+        state: directory
+        mode: "0755"
+      tags: pandoc
+
+    # macOS uses .zip (extracts to {{ mac_inner }})
+    - name: Unpack Pandoc on macOS
+      when:
+        - supported
+        - need_install
+        - ansible_system == "Darwin"
+      become: true
+      unarchive:
+        src: "{{ archive_path }}"
+        dest: "{{ install_dir }}"
+        remote_src: true
+      tags: pandoc
+
+    # Linux uses .tar.gz (strip the top-level folder so bin/ is directly under install_dir)
+    - name: Unpack Pandoc on Linux
+      when:
+        - supported
+        - need_install
+        - ansible_system == "Linux"
+      become: true
+      unarchive:
+        src: "{{ archive_path }}"
+        dest: "{{ install_dir }}"
+        remote_src: true
+        extra_opts: ["--strip-components=1"]
+      tags: pandoc
+
+    # Normalise macOS layout to match Linux
+
+    - name: Ensure macOS bin symlink exists (bin -> mac_inner/bin)
+      when:
+        - supported
+        - need_install
+        - ansible_system == "Darwin"
+      become: true
+      file:
+        src: "{{ mac_inner }}/bin"
+        dest: "{{ install_dir }}/bin"
+        state: link
+        force: true
+        follow: false
+      tags: pandoc
+
+    - name: Ensure macOS share symlink exists (share -> mac_inner/share)
+      when:
+        - supported
+        - need_install
+        - ansible_system == "Darwin"
+      become: true
+      file:
+        src: "{{ mac_inner }}/share"
+        dest: "{{ install_dir }}/share"
+        state: link
+        force: true
+        follow: false
+      tags: pandoc
+
+    # Configure & Verify Symlink To Pandoc
+    # -------------------------------------------------------
+    - name: Check that unified bin_path exists
+      when: [supported, need_install]
+      stat:
+        path: "{{ bin_path }}"
+      register: bin_stat
+      changed_when: false
+      tags: pandoc
+
+    - name: Fail early if unified bin_path missing
+      when:
+        - supported
+        - need_install
+        - not bin_stat.stat.exists
+      fail:
+        msg: "Expected pandoc at {{ bin_path }} but it was not found after extraction/normalisation."
+      tags: pandoc
+
+    - name: Symlink pandoc into {{ pandoc_bin_dir }}
+      when: [supported, need_install]
+      become: true
+      file:
+        src: "{{ bin_path }}"
+        dest: "{{ pandoc_bin_dir }}/pandoc"
+        state: link
+        force: true
+        follow: false
+      tags: pandoc
+
+    - name: Verify Pandoc installation
+      when: supported
+      become: true
+      command: "{{ pandoc_bin_dir }}/pandoc --version"
+      changed_when: false
+      failed_when: false
+      tags: pandoc
+
+    # Cleanup (remove archive)
+    - name: Remove downloaded archive
+      when: [supported, need_install]
+      become: true
+      file:
+        path: "{{ archive_path }}"
+        state: absent
+      tags: pandoc
