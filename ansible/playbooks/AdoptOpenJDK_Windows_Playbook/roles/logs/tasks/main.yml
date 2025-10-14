@@ -46,6 +46,9 @@
 - name: fsutil
   win_shell: fsutil volume diskfree c:
 
+- name: wmic
+  win_shell: wmic logicaldisk get size,freespace,caption
+
 - name: df -k with shell
   shell: df -k
 
