@@ -44,9 +44,9 @@
   win_shell: dir c:\temp
   
 - name: dir c:\
-  win_shell: dir c:\
+  win_shell: dir c:\t*
 
-- name: df -k
+- name: c:\cygwin64\df -k
   win_shell: df -k
 
 - name: df -k with shell
