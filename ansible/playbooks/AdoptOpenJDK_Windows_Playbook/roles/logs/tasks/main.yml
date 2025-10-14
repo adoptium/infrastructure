@@ -39,3 +39,18 @@
     path: '{{ log_path }}\ansible.log'
     insertafter: EOF
     line: "{{ position }} {{ date_output.start }} {{ git_sha }}"
+
+- name: dir c:\temp
+  win_shell: dir c:\temp
+  
+- name: dir c:\
+  win_shell: dir c:\
+
+- name: df -k
+  win_shell: df -k
+
+- name: df -k with shell
+  shell: df -k
+
+- name: du -k with shell
+  shell: du -k /cygdrive/c/temp

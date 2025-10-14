@@ -26,7 +26,7 @@ permissions:
 jobs:
     build:
         if: startsWith(github.repository, 'adoptium/')
-        runs-on: windows-2022
+        runs-on: windows-latest
         steps:
           - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
@@ -40,6 +40,12 @@ jobs:
 
           - name: Build container image
             run: docker build -t adoptium.azurecr.io/windows2022_build_image:latest -f ansible/docker/Dockerfile.win2022 .
+
+          - name: show disk space with dir
+            run: dir
+
+          - name: show disk space with df
+            run: df -k
 
           - name: Push container image to ACR
             if: github.ref == 'refs/heads/master'
