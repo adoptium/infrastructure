@@ -44,7 +44,7 @@
   win_shell: dir c:\t*
 
 - name: Run fsutil
-  win_shell: fsutil volume diskfree c:
+  win_shell: "fsutil volume diskfree c:"
 
 - name: Run wmic
   win_shell: wmic logicaldisk get size,freespace,caption
