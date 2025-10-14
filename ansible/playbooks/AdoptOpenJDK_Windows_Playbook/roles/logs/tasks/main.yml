@@ -49,6 +49,6 @@
 - name: Run wmic
   win_shell: wmic logicaldisk get size,freespace,caption
 
-- name: Run du -k with shell
-  shell: du -k /cygdrive/c/temp
+#- name: Run du -k with shell (Objects to python or lack thereof)
+#  shell: du -k /cygdrive/c/temp
 
