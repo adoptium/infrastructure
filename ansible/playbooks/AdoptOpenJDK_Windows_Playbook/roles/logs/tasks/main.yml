@@ -40,14 +40,11 @@
     insertafter: EOF
     line: "{{ position }} {{ date_output.start }} {{ git_sha }}"
 
-- name: dir c:\temp
-  win_shell: dir c:\temp
-  
-- name: dir c:\
+- name: dir c:\t
   win_shell: dir c:\t*
 
-- name: c:\cygwin64\df -k
-  win_shell: df -k
+- name: fsutil
+  win_shell: fsutil volume diskfree c:
 
 - name: df -k with shell
   shell: df -k
