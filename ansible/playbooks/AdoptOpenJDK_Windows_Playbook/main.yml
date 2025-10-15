@@ -22,7 +22,7 @@
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
 - name: Ansible Windows playbook
-  hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
+  hosts: all
   gather_facts: yes
   tasks:
     - name: Load Standard Variables
@@ -51,6 +51,7 @@
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
     - Strawberry_Perl             # Testing
+    - pandoc                      # JDK24+ Man Pages
 #    - Freemarker                  # OpenJ9"
     - GIT
     - Java7                       # JDK8 build bootstrap
@@ -68,12 +69,12 @@
     - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 21
     - ANT                         # Testing
-    - role: MSVS_2013
-      when: ansible_architecture == "64-bit"
-    - role: MSVS_2017             # OpenJ9
-      when: ansible_architecture == "64-bit"
-    - role: MSVS_2019                   # OpenJ9
-      tags: MSVS_2019
+    #- role: MSVS_2013
+    #  when: ansible_architecture == "64-bit"
+    #- role: MSVS_2017             # OpenJ9
+    #  when: ansible_architecture == "64-bit"
+    #- role: MSVS_2019                   # OpenJ9
+    #  tags: MSVS_2019
     - role: MSVS_2022
       tags: MSVS_2022
     - role: MSVS_2013_REDIST      # Required For Tests
