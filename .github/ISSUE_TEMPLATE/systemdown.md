@@ -11,4 +11,9 @@ assignees: ''
 
 - Link to any log file showing the problem:
 
+- Specific error text (if applicable):
+```
+Replace this sentence with the error text.
+```
+
 - Please describe the issue:
