@@ -10,6 +10,9 @@ assignees: ''
 - Please put the system name (or other machine group identifier) in the title of this issue.
 
 - Output or log showing the problem:
+```
+Replace this sentence with the error text.
+```
 
 - Output or log from another machine where it passes: 
 
