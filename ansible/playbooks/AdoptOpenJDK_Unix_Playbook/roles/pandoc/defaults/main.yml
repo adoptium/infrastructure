@@ -1,0 +1,21 @@
+---
+## Default Variables For Pandoc installation
+
+pandoc_version: "3.8.2"
+pandoc_base_url: "https://github.com/jgm/pandoc/releases/download"
+pandoc_install_root: "/opt"
+pandoc_bin_dir: "/usr/local/bin"
+
+pandoc_downloads:
+  "Linux:amd64":
+    filename: "pandoc-3.8.2-linux-amd64.tar.gz"
+    sha256: "3252c5fd8234925f46973f4f17f852ccda64777a0c631d5735861c7eb4d69132"
+  "Linux:arm64":
+    filename: "pandoc-3.8.2-linux-arm64.tar.gz"
+    sha256: "898b5c1f6bcab8a60253cca1027e43476efa22d1ce99232bb958cd11803bcb90"
+  "Darwin:amd64":
+    filename: "pandoc-3.8.2-x86_64-macOS.zip"
+    sha256: "e82f241ecd555b798cceab27311833d9aa3a474583f67cc273392802e8b6e0e0"
+  "Darwin:arm64":
+    filename: "pandoc-3.8.2-arm64-macOS.zip"
+    sha256: "02503ee9158fe65442722d8818c37833ed4766d970ce0290b69e08d051f6628d"
