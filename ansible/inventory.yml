@@ -73,6 +73,9 @@ hosts:
 
       - azure:
           ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
+          win2022-x64-1: {ip: 48.217.233.156, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
+          win2022-x64-2: {ip: 51.12.243.178, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
+          win2022-x64-3: {ip: 74.235.196.238, description: Intel Xeon PLattinum AMD EPYC 7763, 2 cores, 8GiB RAM}
 
       - equinix:
           ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
@@ -164,3 +167,7 @@ hosts:
           rhel6-x64-1: {ip: 169.48.4.140}
           rhel7-x64-1: {ip: 169.48.4.136}
           ubuntu1604-x64-1: {ip: 169.48.4.141}
+          centosstream10-x64-1: {ip: 161.156.170.114}
+          centosstream10-x64-2: {ip: 169.63.181.34}
+          rhel8-x64-1: {ip: 161.156.80.158}
+          rhel9-x64-1: {ip: 158.176.14.14}
