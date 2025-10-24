@@ -6,7 +6,7 @@ labels: 'jenkins'
 assignees: ''
 
 ---
-Process to follow: https://github.com/adoptium/infrastructure/blob/master/README.md#jenkins
+Process to follow: https://github.com/adoptium/infrastructure/blob/master/docs/JenkinsMaintenance.md
 
 Current version: X.YYY.Z - (Look in bottom right of the jenkins server
 New version: TBC
