@@ -67,25 +67,37 @@ please post a message into the `#infrastructure` slack channel where one of
 the committers should be able to assist you rather than attempting to contact
 someone directly.
 
-
 ## Infrastructure Providers
 The Adoptium project is proud to receive contributions from many companies, both in the form of monetary contributions in exchange for membership or in-kind contributions for required resources. The Infrastructure collaborates with the following companies who contribute various kinds of cloud and physical hardware to the Adoptium project.
 
-- Microsoft Azure (x64 and arm)
+- [Microsoft Azure](https://portal.azure.com) (x64 and arm)
 - IBM Cloud (x64)
-- MacStadium (macos on x86 and arm)
-- MacInCloud (macos/x64)
-- OSUOSL (ppc64/ppc64le/aarch64)
-- Skytap (ppc64/ppc64le)
-- Marist university (s390x)
+- [MacStadium](https://portal.macstadium.com/login) (macos on x86 and arm)
+- [MacInCloud](https://portal.macincloud.com) (macos/x64)
+- OSUOSL (ppc64/[ppc64le](https://openpower-openstack.osuosl.org/auth/login/)/[aarch64](https://arm-openstack.osuosl.org/auth/login/))
+- [Skytap](https://cloud.skytap.com) (ppc64/ppc64le)
+- [Marist university](https://linuxone.cloud.marist.edu/oss/#/login) (s390x)
 
 In addition we have some additional capacity primarily for some of the less common platforms:
 
-- Siteox (Solaris/SPARC)
-- AWS (x64 and arm)
-- Scaleway (riscv64)
+- [Siteox](https://www.siteox.com) (Solaris/SPARC)
+- [AWS](https://console.aws.amazon.com/) (x64 and arm)
+- [Scaleway](https://console.scaleway.com/login) (riscv64)
 
-### Host Information and Ansible AWX
+Tutorial videos showing how to provision machines at most of the providers
+above, along with some extra videos on using some of our internal services
+such as VagrantPlaybookCheck, Ansible AWX and Bastillion are on
+[this youtube playlist](https://www.youtube.com/watch?v=M60qElYGQLg&list=PL5XaxCIAi_2nUIzlEc4iaDS0iOViwWhzT)
+
+## BitWarden
+
+The team utilises [Bitwarden](https://bitwarden.com) which is managed by the
+Eclipse Foundation.  The credentials for the infrastructure accounts at the
+web sites linked above are stored in there and where possible all have MFA
+enabled.  If you are part of the infrastructure core team then you will be
+able to request access to the Adoptium BitWarden account.
+
+## Host Information and Ansible AWX
 
 Most information about our machines can be found at
 [Inventory](ansible/inventory.yml) This file is important not only as a
@@ -104,7 +116,7 @@ The infrastructure is divided into a few types of systems and they have differen
   - **Build images** are created and published to dockerhub and GitHub's container registry. They are created by running the playbooks inside a container of the operating system we build Temurin on using the dockerfiles in [ansible/docker](https://github.com/adoptium/infrastructure/tree/master/ansible/docker). For more details on how these are build, see [the FAQ](https://github.com/adoptium/infrastructure/blob/master/FAQ.md#what-about-the-builds-that-use-the-dockerbuild-tag). Build containers are instantiated during build execution and not retained afterwards in order to meet our secure development requirements. For licensing reasons, Windows build containers are pushed to a private Azure container repository and not made available on dockerhub/ghcr.
 - **Non-docker build systems** For AIX and Solaris we do not use containers for building. These machines are named `build-` and are set up in the same way as the test systems. Note that for Solaris we do not attach the machines directly to jenkins any more and connet to them via a proxy machine (See [this issue](https://github.com/adoptium/infrastructure/issues/3742) for why. For x64 we use Vagrant VMs on a Linux/x64 dockerhosthost machine.
 
-### Dynamic provisioning
+## Dynamic provisioning
 
 In addition to the build containers which are spun up dynamically we have some support for instantiating short-lived system on some of our infrastructure providers. All of these are configured via the corresponding [jenkins plugin configuration](https://ci.adoptium.net/cloud) for each provider.
 - **MacStadium Orka** is used for most of our macos build and testing. These images are built using our [packer scripts](https://github.com/adoptium/infrastructure/tree/master/ansible/packer)
@@ -113,20 +125,20 @@ In addition to the build containers which are spun up dynamically we have some s
 
 Careful consideration should be given when deciding whether to add additional dynamic systems to this list, as it will frequently require that a new provider-specific template image is created at each provider which will have additional maintenance overhead and processes required to keep them up to date with the playbooks.
 
-### Maintenance Window Schedule
+## Maintenance Window Schedule
 
 We will aim to perform routine maintenance on the first Tuesday of each
 month, generally between 1000-1200 (UTC) for performing jenkins updates.
 For more details see the
 [maintenance window documentation](docs/JenkinsMaintenance.md)
 
-### Backups
+## Backups
 
 These are taken on a daily basis, and one per month is currently kept
 "forever" on our backup server. Details are now in a
 [separate document](docs/Backups.md)
 
-### OS Patch Management
+## OS Patch Management
 
 * Nagios is configured to monitor each system and report on the status of OS patches required so we can identify if any system is not self-updating
 * Wazuh is used to perform intrusion detection on our infrastructure
@@ -134,7 +146,7 @@ These are taken on a daily basis, and one per month is currently kept
 * Infrastructure systems are configured to automatically apply security patches only. (Sundays at 5am local host time) This information is logged on the localhost: /var/log/apt-security-updates
 * We do not currently schedule outages to reboot to pick up new kernels.
 
-### Quick start guide to setting up machines manually
+## Quick start guide to setting up machines manually
 
 Typically our machines are set up using Ansible AWX, but if you need to do it yourself (for example on a personal machine) here is what you should do starting from a clone of this repository. Replace `podman` with `docker` in these commands if that's what is on your system:
 - **DockerStatic test machine:** `podman build -t aqa_u2404 -f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/Dockerfile.u2404`
@@ -155,10 +167,16 @@ The above should work for most UNIX/Linux machines including macos. AIX has a se
 
 For Windows there are other steps needed as ansible communicates with Windows systems via the WinRM protocol. For full information on the setup for that, and other information on running the playbooks see [The ansible documentation](https://github.com/adoptium/infrastructure/tree/master/ansible#how-do-i-run-the-playbooks-on-a-remote-windows-host)
 
-### Playbook testing
+## Playbook testing
 
 We have several different processes for testing playbook changes. Firstly we have the VagrantPlaybookCheck job which runs on a machine with Vagrant and VirtualBox and runs the playbooks on a clean machine, optionally running a build and basic test on the machines to ensure they work adequately. This can be set up on your local machine if desired. See the ansible page in the previous section for how to set it up on different host operating systems.
 
 - **VagrantPlaybookCheck** is our main checking process. It is x64 only ans has support for Windows, Linux and Solaris. Generally you should run this on each PR before merging. There is a checkbox in the PR template to remind you to run it. The scripts and documentation are in [ansible/pbTestScripts](https://github.com/adoptium/infrastructure/tree/master/ansible/pbTestScripts) but in general you can run it on the Adoptium infrastructure via jenkins with the [VagrantPlaybookCheck](https://ci.adoptium.net/job/VagrantPlaybookCheck/) job
 - **QEMUPlaybookCheck** is similar but uses qemu to test non-x64 distributions. Note that this has not been actively maintained for a while so does not currently work effectively. The jenkins job is at [QEMUPlaybookCheck](https://ci.adoptium.net/job/QEMUPlaybookCheck/) (If you're interested in helping improve that, see [issue 2121](https://github.com/adoptium/infrastructure/issues/2121)
 - Various github actions checks triggered automatically on each PR to run the playbooks on macos, Solaris, build the CentOS6 and Alpine3 build dockerfiles
+
+## Further information
+
+For more information on infrastructure related topics please look in the
+[docs](docs) directory or for some "howto"/"cheatsheet"-style documentation
+take a look at the [Infrastructure FAQ](FAQ.md).
