@@ -22,6 +22,8 @@ on how we implement these goals.
 * [hosts](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) - Our inventory file as used by ansible, [visualized](https://github.com/adoptium/infrastructure/blob/master/docs/adoptopenjdk.pdf) (now out of date).
 * [Ansible at Adoptium](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
 
+Note that in this documentation it's possible you will see "machines", "systems" and "agents" used. These are generally interchangable terms used for individual things which are attached into jenkins. Where the term "hosts" is used it will typically mean a single computer as provisioend at out provider and not a containerised system.
+
 ## Contributing
 
 Please visit our `#infrastructure` [Slack Channel](https://adoptium.net/slack) and say hello.
@@ -67,7 +69,7 @@ please post a message into the `#infrastructure` slack channel where one of
 the committers should be able to assist you rather than attempting to contact
 someone directly.
 
-## Infrastructure Providers
+r## Infrastructure Providers
 The Adoptium project is proud to receive contributions from many companies, both in the form of monetary contributions in exchange for membership or in-kind contributions for required resources. The Infrastructure collaborates with the following companies who contribute various kinds of cloud and physical hardware to the Adoptium project.
 
 - [Microsoft Azure](https://portal.azure.com) (x64 and arm)
@@ -114,7 +116,7 @@ The infrastructure is divided into a few types of systems and they have differen
 - **dockerhost systems** are configured to allow work to happen within containers on a large host system. These typically run two types of containers. Thesse are created using the [dockerhost.yml playbook](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/dockerhost.yml).
   - **Static docker containers** are used for testing. The process for deploying these is described in the [DockerStatic role](ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md) which makes use of the files in the Dockerfiles directory under that role. Each static docker container has its own agent definition in jenkins and has a name prefixed `test-docker-`.
   - **Build images** are created and published to dockerhub and GitHub's container registry. They are created by running the playbooks inside a container of the operating system we build Temurin on using the dockerfiles in [ansible/docker](https://github.com/adoptium/infrastructure/tree/master/ansible/docker). For more details on how these are build, see [the FAQ](https://github.com/adoptium/infrastructure/blob/master/FAQ.md#what-about-the-builds-that-use-the-dockerbuild-tag). Build containers are instantiated during build execution and not retained afterwards in order to meet our secure development requirements. For licensing reasons, Windows build containers are pushed to a private Azure container repository and not made available on dockerhub/ghcr.
-- **Non-docker build systems** For AIX and Solaris we do not use containers for building. These machines are named `build-` and are set up in the same way as the test systems. Note that for Solaris we do not attach the machines directly to jenkins any more and connet to them via a proxy machine (See [this issue](https://github.com/adoptium/infrastructure/issues/3742) for why. For x64 we use Vagrant VMs on a Linux/x64 dockerhosthost machine.
+- **Non-docker build systems** For AIX and Solaris we do not use containers for building. These machines are named `build-` and are set up in the same way as the test systems. Note that for Solaris we do not attach the machines directly to jenkins any more and connet to them via a proxy machine (See [this issue](https://github.com/adoptium/infrastructure/issues/3742) for why and [this link](https://github.com/adoptium/temurin-build/blob/master/SOLARIS.md) for how to diagnose those proxy jobs. For Solaris/x64 we use Vagrant VMs on a Linux/x64 dockerhosthost machine (The same one that runs the proxy)
 
 ## Dynamic provisioning
 
@@ -124,6 +126,27 @@ In addition to the build containers which are spun up dynamically we have some s
 - in the past we have interfaced with the **OSUOSL OpenStack interface** to perform the same funtionality there, but that is currently not being used.
 
 Careful consideration should be given when deciding whether to add additional dynamic systems to this list, as it will frequently require that a new provider-specific template image is created at each provider which will have additional maintenance overhead and processes required to keep them up to date with the playbooks.
+
+## Jenkins
+
+Our jenkins CI server is at [https://ci.adoptium.net] and is hosted by Hetzner. It contains jenkins pipelines for [build](https://github.com/adoptium/ci-jenkins-pipelines/) (In the `build-scripts` folder) and [test](https://github.com/adoptium/aqa-tests/) (Prefixed `Test_` or `Grinder`) and various other operations.
+
+### Labels in jenkins
+
+Jenkins agents (machines) are labelled with various names in order to allow the pipelines to know which jobs can run on each machine. The labels will include the operating system and architecture as well as potentially other information about the machine used for selecting machines to run on. THis list gives an example of how we use labels but should not be considered a comprehensive list.
+
+- For build systems the jenkins agents are either
+  - labelled as [build](https://ci.adoptium.net/label/build/) if the machine configured and used directly for building
+  - labelled as [dockerBuild](https://ci.adoptium.net/label/dockerBuild) if the machine is used as a host where ephemeral containers are spun up dynamically, used and then shut down again. The dockerBuils hosts will frequently also host static docker containers for test to ensure we have good utilisation on those machines.
+  - Some dockerBuild machines have a label of [qemustatic](https://ci.adoptium.net/label/qemustatic/) when a machien has the qemu packages installed. This is used for building riscv64 because running in emulation is currently slightly more efficient than running on the native machinas that we have. There are a few others labels used, such as `xlc13` `xlc16` and `xlc17` depending on which compilers they have installed.
+- build machines are labelled with short names to determine they architecture they can build for e.g. [linux](https://ci.adoptium.net/label/linux/) or [aarch64](https://ci.adoptium.net/label/aarch64/). These can be combined into e.g. [dockerBuild&&linux&&aarch64](https://ci.adoptium.net/label/dockerBuild&&linux&&aarch64/) to show machines which can build for that platform.
+- For static docker test machines (The ones prefixed as `test-docker-` and not listed in the inventory files) they will generally have a label of `hw.dockerhost.<name of host>` to help identify which container is on which host. This is used for assisting the admins using the jenkins UI and not by any of the jenkins pipelines.
+- For test systems a more hierarchical system is currently used. All machines available for test have the [ci.role.test](https://ci.adoptium.net/label/ci.role.test/) label. Operating system and architecture are determined by labels such as [sw.os.linux](https://ci.adoptium.net/label/sw.os.linux/) and [hw.arch.aarch64](https://ci.adoptium.net/label/hw.arch.aarch64/) and these can be combined as e.g. [ci.role.test&&sw.os.linux&&hw.arch.aarch64](https://ci.adoptium.net/label/ci.role.test&&sw.os.linux&&hw.arch.aarch64/).
+- Where further distintion is required we add other custom labels for test machiens e.g.
+  - [sw.tool.glibc.2_12](https://ci.adoptium.net/computer/test%2Dibmcloud%2Drhel6%2Dx64%2D1/) (used to stop JDK21+ on x64 being scheduled on those older systems)
+  - [sw.os.aix.7_2](https://ci.adoptium.net/computer/test-osuosl-aix72-ppc64-2/) Used to be used to restrict things that wouldn't run on AIX 7.1
+
+There is a long standing issue to [look at unifying the labelling structure across build and test](https://github.com/adoptium/infrastructure/issues/93) but that has not made it to the top of anyone's priority list.
 
 ## Maintenance Window Schedule
 
