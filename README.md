@@ -223,6 +223,19 @@ previous section for how to set it up on different host operating systems.
 - **QEMUPlaybookCheck** is similar but uses qemu to test non-x64 distributions. Note that this has not been actively maintained for a while so does not currently work effectively. The jenkins job is at [QEMUPlaybookCheck](https://ci.adoptium.net/job/QEMUPlaybookCheck/) (If you're interested in helping improve that, see [issue 2121](https://github.com/adoptium/infrastructure/issues/2121)
 - Various github actions checks triggered automatically on each PR to run the playbooks on macos, Solaris, build the CentOS6 and Alpine3 build dockerfiles
 
+## Secure development
+
+Most of the Temurin builds are compliant with [SLSA
+Build](https://slsa.dev/spec/v1.1/) level 3.  We also aim to follow the
+[NIST SSDF](https://csrc.nist.gov/Projects/ssdf) framework and
+[OpenSSF Baseline](https://baseline.openssf.org) requirements.  For more
+information on secure development at the project see the "Secure Software"
+section of the [Adoptium documantation](https://adoptium.net/en-GB/docs).
+The Temurin project also participated in an [external security audit](https://adoptium.net/en-GB/news/2024/06/external_audit)
+performed by Trail of Bits to validate our secure development practices.
+There is a secure development call which is held on every second Monday
+for interested parties.
+
 ## Further information
 
 For more information on infrastructure related topics please look in the
