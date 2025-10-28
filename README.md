@@ -225,19 +225,21 @@ previous section for how to set it up on different host operating systems.
 
 ## Secure development
 
-Most of the Temurin builds are compliant with [SLSA
-Build](https://slsa.dev/spec/v1.1/) level 3.  We also aim to follow the
-[NIST SSDF](https://csrc.nist.gov/Projects/ssdf) framework and
-[OpenSSF Baseline](https://baseline.openssf.org) requirements.  For more
+Most of the Temurin builds are compliant with
+[SLSA Build](https://slsa.dev/spec/v1.1/) level 3.  We also aim to follow
+the [NIST SSDF](https://csrc.nist.gov/Projects/ssdf) framework and
+[OpenSSF Baseline](https://baseline.openssf.org) requirements. For more
 information on secure development at the project see the "Secure Software"
 section of the [Adoptium documantation](https://adoptium.net/en-GB/docs).
-The Temurin project also participated in an [external security audit](https://adoptium.net/en-GB/news/2024/06/external_audit)
+The Temurin project has also participated in an [external security audit](https://adoptium.net/en-GB/news/2024/06/external_audit)
 performed by Trail of Bits to validate our secure development practices.
 There is a secure development call which is held on every second Monday
-for interested parties.
+for interested parties. If you're interested in participating, join the
+#secure-dev channel on the Adoptium slack instance.
 
 ## Further information
 
 For more information on infrastructure related topics please look in the
 [docs](docs) directory or for some "howto"/"cheatsheet"-style documentation
 take a look at the [Infrastructure FAQ](FAQ.md).
+
