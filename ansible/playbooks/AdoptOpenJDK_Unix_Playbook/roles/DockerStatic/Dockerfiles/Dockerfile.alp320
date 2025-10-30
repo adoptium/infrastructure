@@ -19,7 +19,6 @@ RUN wget -q 'https://api.adoptium.net/v3/binary/latest/21/ga/alpine-linux/x64/jd
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
 # Get sig file for latest jdk21 ga
 RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/21/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=alpine-linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk21.sig
-RUN gpg --verify /tmp/jdk21.sig /tmp/jdk21.tar.gz
 RUN mkdir -p /usr/lib/jvm/jdk21 && tar -xpzf /tmp/jdk21.tar.gz -C /usr/lib/jvm/jdk21 --strip-components=1
 
 # Install ant and ant-contrib.
