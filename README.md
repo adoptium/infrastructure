@@ -204,7 +204,7 @@ To run the playbooks against a remote machine, make sure your ssh keys are appro
 ```
 perl -p -i -e 's/hosts: .*/hosts: all/' ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 echo "test-<provider>-<distribution>-<arch>-<number> ansible_host=<ip_address_of_machine>" > hosts
-ansible-playbook -i hosts --skip-tags=adoptopenjdk,jenkins ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+ansible-playbook -i hosts -u root --skip-tags=adoptopenjdk,jenkins ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
 The above should work for most UNIX/Linux machines including macos. AIX has a separate playbook in `AdoptOpenJDK_AIX_Playbook` but otherwise works with the same commands. The `--skip-tags` of `adoptopenjdk` will stop it configuring things that are specific to the adoptium infrastructure, including the reading of things in `/Vendor_Files` which contains some non-public data. If you're not setting up a machine that will go into the adoptium jenkins, then skipping the jenkins tag is appropriate too. Note that if you're skipping the adopopenjdk tags then you can simplify the above by just using the IP address on its own in the hosts file as the name should be unused.
 
