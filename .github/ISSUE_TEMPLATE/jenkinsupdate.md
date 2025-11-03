@@ -1,7 +1,7 @@
 ---
 name: Regular jenkins maintenance update
 about: Template for a jenkins server update - usually first Tuesday of each month
-title: 202x/MM/DD: Jenkins regular patching cycle - update to X.YYY.Z
+title: '202x/MM/DD: Jenkins regular patching cycle - update to X.YYY.Z'
 labels: 'jenkins'
 assignees: ''
 
