@@ -67,7 +67,7 @@
     - 140.211.168.163 # jck-osuol-ubuntu2004-ppc64le-1
     - 140.211.168.2 # jck-osuol-ubuntu2004-ppc64le-2
     - 213.146.141.66 # jck-linaro-ubuntu2004-aarch64-2
-    - 199.204.216.109 # skytap AIX behind services-uswest.skytap.com
+    - 20.189.26.100 # skytap AIX behind services-us-texas-m-1.skytap.com
     - 12.202.69.3 # jck-siteox-solaris10u11-sparcv9-1
     - 178.62.54.114 # jck-digitalocean-ubuntu2004-x64-1
     - 188.166.144.71 # jck-digitalocean-ubuntu2004-x64-2
