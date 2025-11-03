@@ -127,6 +127,8 @@ check_until_filter_support() {
 SIX_MONTHS=4320h
 TWO_WEEKS=336h
 ONE_WEEK=168h
+FIVE_DAYS=120h
+THREE_DAYS=72h
 
 # Define Macros For Temp files
 IMAGES=$(mktemp)
@@ -234,7 +236,40 @@ fi
 echo
 
 ##########################################################
-# 7. Other prune operations (skip image prune if exclusions present)
+# 7. Remove images where TAG is <none>
+##########################################################
+echo "Scanning for images where TAG is <none> and older than 5 days ..."
+
+if [ "${USE_UNTIL_FILTER:-false}" = true ]; then
+    _imglist=$($CLI images --filter "until=$FIVE_DAYS" --format '{{.Repository}} {{.Tag}} {{.ID}}')
+else
+    echo "Skipping age filter for <none>-tag images (unsupported 'until' filter)."
+    _imglist=$($CLI images --format '{{.Repository}} {{.Tag}} {{.ID}}')
+fi
+
+none_tag_images=$(printf '%s\n' "$_imglist" | awk '$2=="<none>" {print $3}' | sort -u)
+
+if [ -n "$none_tag_images" ]; then
+    count=$(printf '%s\n' "$none_tag_images" | wc -l | tr -d ' ')
+    echo "Found $count image(s) with <none> tag older than 5 days."
+
+    if [ "$ACTION" = "delete" ]; then
+        echo "Removing images with <none> tag..."
+        # shellcheck disable=SC2086
+        run rmi -f $none_tag_images
+    else
+        echo "CHECK mode: would remove images with <none> tag."
+        for iid in $none_tag_images; do
+            printf 'Would run: %s rmi -f %s %s\n' "$CLI" "$iid" "$EXTRA_ARGS"
+        done
+    fi
+else
+    echo "No <none> tag images older than 5 days found."
+fi
+echo
+
+##########################################################
+# 8. Other prune operations (skip image prune if exclusions present)
 ##########################################################
 echo "Pruning builder cache older than $TWO_WEEKS ..."
 if [ "$USE_UNTIL_FILTER" = true ]; then
@@ -263,6 +298,6 @@ run network prune -f
 echo
 
 ##########################################################
-# 8. Summary
+# 9. Summary
 ##########################################################
 echo "Housekeeping finished in $ACTION mode."
