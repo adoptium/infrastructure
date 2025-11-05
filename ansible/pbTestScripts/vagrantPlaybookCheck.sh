@@ -475,7 +475,7 @@ startVMPlaybookWin()
 					python pbTestScripts/startScriptWin.py -i "127.0.0.1:$vagrantPort" -a "$jdkToBuild" -t 2>&1 | tee $testLogPath
 			elif [[ $PYTHON_VERSION == *"Python 3."* ]]; then
 					echo "Python 3 detected"
-					echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed"
+					echo "Due To Changes In Python 3 - No Output Will Be Displayed Until The Build Is Completed so use PowerShell instead"
 					# Create Powershell Script To Launch Build
 					echo "Set-Location -Path \"C:/tmp\"" > testJDK_Tmp.ps1
 					echo "& sh \"C:/vagrant/pbTestScripts/testJDKWin.sh\" $jdkToBuild" >> testJDK_Tmp.ps1
