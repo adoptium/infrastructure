@@ -31,12 +31,6 @@ hosts:
 
   - build:
 
-      - alibaba:
-          win2012r2-x64-1: {ip: 8.208.11.212, user: Administrator}
-          win2012r2-x64-2: {ip: 8.208.87.18, user: Administrator}
-          ubuntu1804-armv8-1: {ip: 119.8.164.219}
-          ubuntu1804-armv8-2: {ip: 159.138.100.163}
-
       - azure:
           win2022-x64-1: {ip: 172.187.129.163, user: adoptopenjdk}
           win2022-x64-2: {ip: 172.187.176.15, user: adoptopenjdk}
@@ -64,11 +58,6 @@ hosts:
       - ibmcloud:
           win2022-x64-1: {ip: 52.118.206.11, user: Administrator}
 
-  - docker:
-
-      - skytap:
-          ubuntu2004-ppc64le-1: {ip: 20.61.136.212}
-
   - dockerhost:
 
       - azure:
@@ -91,14 +80,9 @@ hosts:
           ubuntu2404-s390x-1: {ip: 148.100.74.237, user: linux1}
 
       - skytap:
-          ubuntu2204-ppc64le-1: {ip: 20.61.136.212, description: 32CPU, 400G}
           ubuntu2204-x64-1: {ip: 20.61.136.254, description: 24 core Intel X5650}
 
   - test:
-
-      - alibaba:
-          ubuntu1804-armv8-1: {ip: 119.8.166.104}
-          ubuntu1804-armv8-2: {ip: 114.119.175.125}
 
       - azure:
           ubuntu2404-x64-1: {ip: 20.115.98.159, user: azureuser}
