@@ -37,10 +37,10 @@ pipeline {
                 }
                 stage('Ubuntu16.04 armv7l') {
                     agent {
-                        label "docker&&linux&&armv7l"
+                        label "docker&&linux&&aarch64"
                     }
                     steps {
-                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                        dockerBuildArm32('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
                     }
                 }
                 stage('Ubuntu20.04 riscv64') {
@@ -81,7 +81,20 @@ pipeline {
             }
         }
     } 
-} 
+}
+
+def dockerBuildArm32(architecture, distro, dockerfile) {
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+        sh """
+            docker buildx build --platform linux/arm/v7 \
+            --build-arg git_sha=$git_sha -f ansible/docker/$dockerfile \
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture \ 
+            --push .
+        """
+    }
+}
 
 def dockerBuild(architecture, distro, dockerfile) {
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
