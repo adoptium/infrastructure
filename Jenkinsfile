@@ -92,8 +92,7 @@ def dockerBuildArm32(architecture, distro, dockerfile) {
             docker buildx build --platform linux/arm/v7 \
             --build-arg git_sha=$git_sha --build-arg ansible_arch=$ansible_arch \
             -f ansible/docker/$dockerfile \
-            -t adoptopenjdk/${distro}_build_image:linux-$architecture \ 
-            --push .
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture --push .
         """
     }
 }
