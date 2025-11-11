@@ -86,10 +86,12 @@ pipeline {
 def dockerBuildArm32(architecture, distro, dockerfile) {
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
     def git_sha = "${env.GIT_COMMIT.trim()}"
+    def ansible_arch = "armv7l"
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
         sh """
             docker buildx build --platform linux/arm/v7 \
-            --build-arg git_sha=$git_sha -f ansible/docker/$dockerfile \
+            --build-arg git_sha=$git_sha --build-arg ansible_arch=$ansible_arch \
+            -f ansible/docker/$dockerfile \
             -t adoptopenjdk/${distro}_build_image:linux-$architecture \ 
             --push .
         """
