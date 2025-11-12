@@ -6,7 +6,7 @@ pipeline {
                 stage('CentOS6 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
-                    } 
+                    }
                     steps {
                         dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
                     }
@@ -14,7 +14,7 @@ pipeline {
                 stage('CentOS7 x64') {
                     agent {
                         label "dockerBuild&&linux&&x64"
-                    } 
+                    }
                     steps {
                         dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
                     }
@@ -72,7 +72,7 @@ pipeline {
         stage('Docker Manifest') {
             agent {
                 label "dockerBuild&&linux&&x64"
-            } 
+            }
             environment {
                 DOCKER_CLI_EXPERIMENTAL = "enabled"
             }
@@ -94,9 +94,8 @@ pipeline {
                   cosign()
             }
         }
-
-    } 
-} 
+    }
+}
 
 def dockerBuild(architecture, distro, dockerfile) {
     sh "rm -vf *.sha256"
@@ -104,7 +103,7 @@ def dockerBuild(architecture, distro, dockerfile) {
     def git_sha = "${env.GIT_COMMIT.trim()}"
     dockerImage = docker.build("ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture",
         "--build-arg git_sha=$git_sha -f ansible/docker/$dockerfile .")
-    // dockerhub is the ID of the credentials stored in Jenkins 
+    // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         dockerImage.push()
         sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
@@ -112,7 +111,7 @@ def dockerBuild(architecture, distro, dockerfile) {
     }
 }
 
-def dockerManifest() { 
+def dockerManifest() {
     // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         git poll: false, url: 'https://github.com/sxa/infrastructure.git'
