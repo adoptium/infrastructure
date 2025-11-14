@@ -19,11 +19,11 @@
 
 - name: Download {{ devkit_filename }}
   get_url:
-    url: https://github.com/adoptium/devkit-binaries/releases/download/{{ devkit_version }}/{{  devkit_filename }}
+    url: https://github.com/adoptium/devkit-binaries/releases/download/{{ devkit_version }}/{{ devkit_filename }}
     dest: /tmp/devkit.tar.xz
     force: no
     mode: 0644
-    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + devkit_version | replace('.','_') | replace('-','_'))}}"
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture + '_' + devkit_version | replace('.', '_') | replace('-', '_')) }}"
   when:
     - devkit_installed.rc != 0
   tags: devkit
