@@ -1,0 +1,167 @@
+pipeline {
+    agent none
+    stages {
+        stage('Docker Build') {
+            parallel {
+                stage('CentOS6 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    }
+                    steps {
+                        dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
+                    }
+                }
+                stage('CentOS7 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    }
+                    steps {
+                        dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('CentOS7 aarch64') {
+                    agent {
+                        label "dockerBuild&&linux&&aarch64"
+                    }
+                    steps {
+                        dockerBuild('arm64', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('CentOS7 ppc64le') {
+                    agent {
+                        label "dockerBuild&&linux&&ppc64le"
+                    }
+                    steps {
+                        dockerBuild('ppc64le', 'centos7', 'Dockerfile.CentOS7')
+                    }
+                }
+                stage('Ubuntu16.04 armv7l') {
+                    agent {
+                        label "docker&&linux&&armv7l"
+                    }
+                    steps {
+                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                    }
+                }
+                stage('Ubuntu20.04 riscv64') {
+                    agent {
+                        label "docker&&linux&&riscv64"
+                    }
+                    steps {
+                        dockerBuild('riscv64', 'ubuntu2004', 'Dockerfile.Ubuntu2004-riscv64')
+                    }
+                }
+                stage('Alpine3 x64') {
+                    agent {
+                        label "dockerBuild&&linux&&x64"
+                    }
+                    steps {
+                        dockerBuild('amd64', 'alpine3', 'Dockerfile.Alpine3')
+                    }
+                }
+                stage('Alpine3 aarch64') {
+                    agent {
+                        label "dockerBuild&&linux&&aarch64"
+                    }
+                    steps {
+                        dockerBuild('arm64', 'alpine3', 'Dockerfile.Alpine3')
+                    }
+                }
+            }
+        }
+        stage('Docker Manifest') {
+            agent {
+                label "dockerBuild&&linux&&x64"
+            }
+            environment {
+                DOCKER_CLI_EXPERIMENTAL = "enabled"
+            }
+            steps {
+                dockerManifest()
+            }
+        }
+        stage('cosign') {
+            agent {
+                label "cosign"
+            }
+            environment {
+                DOCKER_CLI_EXPERIMENTAL = "enabled"
+            }
+            steps {
+                  sh "rm -vf *.sha256"
+                  copyArtifacts( projectName: '${JOB_NAME}', selector: specific("${BUILD_ID}"), flatten: true )
+                  sh "ls -ld *.sha256"
+                  cosign()
+            }
+        }
+    }
+}
+
+def dockerBuild(architecture, distro, dockerfile) {
+    sh "rm -vf *.sha256"
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    dockerImage = docker.build("ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture",
+        "--build-arg git_sha=$git_sha -f ansible/docker/$dockerfile .")
+    // dockerhub is the ID of the credentials stored in Jenkins
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        dockerImage.push()
+        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
+        archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
+    }
+}
+
+def dockerManifest() {
+    // dockerhub is the ID of the credentials stored in Jenkins
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+        sh '''
+            # Centos6
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:centos6"
+            AMD64=${TARGET}_linux-amd64
+            docker manifest create $TARGET $AMD64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest push $TARGET
+            # Centos7
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:centos7"
+            AMD64=${TARGET}_linux-amd64
+            ARM64=${TARGET}_linux-arm64
+            PPC64LE=${TARGET}_linux-ppc64le
+            docker manifest create $TARGET $AMD64 $ARM64 $PPC64LE
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
+            docker manifest push $TARGET
+            # Ubuntu1604
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:ubuntu1604"
+            ARMV7L=${TARGET}_linux-armv7l
+            docker manifest create $TARGET $ARMV7L
+            docker manifest annotate $TARGET $ARMV7L --arch arm --os linux
+            docker manifest push $TARGET
+            # Alpine3
+            export TARGET="ghcr.io/adoptium/adoptium_build_image:alpine3"
+            AMD64=${TARGET}_linux-amd64
+            ARM64=${TARGET}_linux-arm64
+            docker manifest create $TARGET $AMD64 $ARM64
+            docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
+            docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+            docker manifest push $TARGET
+        '''
+    }
+}
+def cosign() {
+    // dockerhub is the ID of the credentials stored in Jenkins
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
+        sh '''
+            curl -sSL -X POST --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token" | head -c -1 > token.txt
+            for IMAGE_SHA in *.sha256; do
+              IMAGE="$(cat $IMAGE_SHA)"
+              echo "Running cosign against image $IMAGE"
+              cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt -y
+              cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --certificate-identity=temurin-bot@eclipse.org
+            done
+            rm -vf token.txt
+        '''
+    }
+}
