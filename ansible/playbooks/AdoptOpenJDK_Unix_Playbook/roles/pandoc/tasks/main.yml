@@ -50,6 +50,16 @@
       changed_when: false
       tags: pandoc
 
+    - name: Override install root on macOS x64
+      when:
+        - supported
+        - ansible_facts['system'] == "Darwin"
+        - arch_normalized == "amd64"
+      set_fact:
+        pandoc_install_root: "/usr/local"
+      changed_when: false
+      tags: pandoc
+
     - name: Set Pandoc Base Directory Paths
       when: supported
       set_fact:
@@ -63,7 +73,7 @@
       set_fact:
         archive_path: "{{ download_dir }}/{{ archive_name }}"
         bin_path: "{{ install_dir }}/bin/pandoc"
-        mac_inner: "{{ install_dir }}/pandoc-{{ pandoc_version }}-{{ arch_normalized }}"
+        mac_inner: "{{ install_dir }}/pandoc-{{ pandoc_version }}-{{ ansible_facts['architecture'] }}"
       changed_when: false
       tags: pandoc
 
@@ -117,7 +127,7 @@
       when:
         - supported
         - need_install
-        - ansible_system == "Darwin"
+        - ansible_facts['system'] == "Darwin"
       become: true
       unarchive:
         src: "{{ archive_path }}"
@@ -130,7 +140,7 @@
       when:
         - supported
         - need_install
-        - ansible_system == "Linux"
+        - ansible_facts['system'] == "Linux"
       become: true
       unarchive:
         src: "{{ archive_path }}"
@@ -145,29 +155,25 @@
       when:
         - supported
         - need_install
-        - ansible_system == "Darwin"
+        - ansible_facts['system'] == "Darwin"
       become: true
       file:
         src: "{{ mac_inner }}/bin"
         dest: "{{ install_dir }}/bin"
         state: link
         force: true
-        follow: false
-      tags: pandoc
 
     - name: Ensure macOS share symlink exists (share -> mac_inner/share)
       when:
         - supported
         - need_install
-        - ansible_system == "Darwin"
+        - ansible_facts['system'] == "Darwin"
       become: true
       file:
         src: "{{ mac_inner }}/share"
         dest: "{{ install_dir }}/share"
         state: link
         force: true
-        follow: false
-      tags: pandoc
 
     # Configure & Verify Symlink To Pandoc
     # -------------------------------------------------------
