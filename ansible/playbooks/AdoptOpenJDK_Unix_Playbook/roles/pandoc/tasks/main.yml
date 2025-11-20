@@ -50,6 +50,16 @@
       changed_when: false
       tags: pandoc
 
+    - name: Override install root on macOS x64
+      when:
+        - supported
+        - ansible_system == "Darwin"
+        - arch_normalized == "amd64"
+      set_fact:
+        pandoc_install_root: "/usr/local"
+      changed_when: false
+      tags: pandoc
+
     - name: Set Pandoc Base Directory Paths
       when: supported
       set_fact:
