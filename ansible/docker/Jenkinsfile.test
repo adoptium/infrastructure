@@ -109,6 +109,7 @@ def cosign() {
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
+            curl -SL -X POST --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token"
             curl -sSL -X POST --url https://auth.eclipse.org/auth/realms/sigstore/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token" | head -c -1 > token.txt
             for IMAGE_SHA in *.sha256; do
               IMAGE="$(cat $IMAGE_SHA)"
@@ -116,7 +117,7 @@ def cosign() {
               cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --identity-token=token.txt -y
               cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/sigstore --certificate-identity=temurin-bot@eclipse.org
             done
-            rm -vf token.txt
+            #rm -vf token.txt
         '''
     }
 }
