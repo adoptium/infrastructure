@@ -180,4 +180,3 @@
 
     - name: Change the path of the libcurl library in the git-remote-http
       shell: "install_name_tool -change /usr/lib/libcurl.4.dylib {{ libcurl_path.stdout }} {{ git_remote_http_path.stdout }}"
-
