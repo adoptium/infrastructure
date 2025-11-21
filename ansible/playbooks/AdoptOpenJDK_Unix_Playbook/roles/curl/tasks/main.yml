@@ -155,15 +155,29 @@
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
-- name: Install curl via brew on MacOS 14 x64 (regardless if curl is already installed)
+- name: Install curl via brew in MacOS14 (regardless if curl is already installed)
   become: yes
   become_user: "{{ ansible_user }}"
-  homebrew:
-    name: curl
-    state: latest
-    path: "{{ homebrew_path }}"
   when:
     - ansible_distribution == "MacOSX"
     - ansible_distribution_major_version == "14"
     - ansible_architecture == "x86_64"
   tags: curl
+  block:
+    - name: Brew install curl
+      homebrew:
+        name: curl
+        state: latest
+        path: "{{ homebrew_path }}"
+
+    - name: Find libcurl.4.dylib library
+      shell: ls -ld /usr/local/Cellar/curl/8.*/lib/libcurl.4.dylib | awk '{print $9}'
+      register: libcurl_path
+
+    - name: Find git-remote-http executable
+      shell: ls -ld /usr/local/Cellar/git/2.*/libexec/git-core/git-remote-http | awk '{print $9}'
+      register: git_remote_http_path
+
+    - name: Change the path of the libcurl library in the git-remote-http
+      shell: "install_name_tool -change /usr/lib/libcurl.4.dylib {{ libcurl_path.stdout }} {{ git_remote_http_path.stdout }}"
+
