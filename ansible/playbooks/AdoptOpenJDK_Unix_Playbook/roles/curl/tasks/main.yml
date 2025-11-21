@@ -178,5 +178,5 @@
       shell: ls -ld /usr/local/Cellar/git/2.*/libexec/git-core/git-remote-http | awk '{print $9}'
       register: git_remote_http_path
 
-    - name: Change the path of the libcurl library in the git-remote-http
+    - name: Change the path of the libcurl library in the git-remote-http executable
       shell: "install_name_tool -change /usr/lib/libcurl.4.dylib {{ libcurl_path.stdout }} {{ git_remote_http_path.stdout }}"
