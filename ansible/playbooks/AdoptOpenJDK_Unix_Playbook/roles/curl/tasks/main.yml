@@ -31,11 +31,13 @@
   set_fact:
     homebrew_path: /usr/local/bin
   when: ansible_distribution == "MacOSX" and ansible_architecture == "x86_64"
+  tags: curl
 
 - name: Set Mac homebrew path (Arm64)
   set_fact:
     homebrew_path: /opt/homebrew/bin
   when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
+  tags: curl
 
 - name: Download curl {{ curl_latest }}
   get_url:
@@ -151,4 +153,17 @@
     - ansible_distribution == "MacOSX"
     - "macos_version_number is version('10.13', '>')"
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
+  tags: curl
+
+- name: Install curl via brew on MacOS 14 x64 (regardless if curl is already installed)
+  become: yes
+  become_user: "{{ ansible_user }}"
+  homebrew:
+    name: curl
+    state: latest
+    path: "{{ homebrew_path }}"
+  when:
+    - ansible_distribution == "MacOSX"
+    - ansible_distribution_major_version == "14"
+    - ansible_architecture == "x86_64"
   tags: curl
