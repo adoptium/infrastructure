@@ -37,10 +37,10 @@ pipeline {
                 }
                 stage('Ubuntu16.04 armv7l') {
                     agent {
-                        label "docker&&linux&&armv7l"
+                        label "docker&&linux&&aarch64"
                     }
                     steps {
-                        dockerBuild('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
+                        dockerBuildArm32('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
                     }
                 }
                 stage('Ubuntu20.04 riscv64') {
@@ -94,6 +94,21 @@ pipeline {
                   cosign()
             }
         }
+    }
+}
+
+def dockerBuildArm32(architecture, distro, dockerfile) {
+    sh "rm -vf *.sha256"
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
+        sh """
+            docker buildx build --platform linux/arm/v7 \
+            --build-arg git_sha=$git_sha --build-arg ansible_arch=$architecture \
+            -f ansible/docker/$dockerfile \
+            -t ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture --push .
+            docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
+        """
     }
 }
 
