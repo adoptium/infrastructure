@@ -107,7 +107,7 @@ def dockerBuildArm32(architecture, distro, dockerfile) {
             --build-arg git_sha=$git_sha --build-arg ansible_arch=$architecture \
             -f ansible/docker/$dockerfile \
             -t ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture --push .
-            docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256"
+            docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256
         """
     }
 }
