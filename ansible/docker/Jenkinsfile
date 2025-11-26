@@ -109,6 +109,7 @@ def dockerBuildArm32(architecture, distro, dockerfile) {
             -t ghcr.io/adoptium/adoptium_build_image:${distro}_linux-$architecture --push .
             docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/adoptium_build_image:${distro}_linux-${architecture} > ${distro}_linux-${architecture}.sha256
         """
+        archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
     }
 }
 
