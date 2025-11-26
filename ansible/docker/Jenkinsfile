@@ -37,7 +37,7 @@ pipeline {
                 }
                 stage('Ubuntu16.04 armv7l') {
                     agent {
-                        label "docker&&linux&&aarch64"
+                        label "dockerBuild&&linux&&aarch64"
                     }
                     steps {
                         dockerBuildArm32('armv7l', 'ubuntu1604', 'Dockerfile.Ubuntu1604')
