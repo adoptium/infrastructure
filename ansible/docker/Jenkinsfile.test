@@ -92,7 +92,6 @@ def dockerBuild(architecture, distro, staticdockerfile) {
 def dockerManifest() { 
     // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
-        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
             # Ubuntu 24.04
             export TARGET="ghcr.io/adoptium/test-containers:ubuntu2404"
@@ -119,7 +118,6 @@ def dockerManifest() {
 def cosign() {
     // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
-        git poll: false, url: 'https://github.com/sxa/infrastructure.git'
         sh '''
             curl -sSL -X POST --url https://auth.eclipse.org/auth/realms/foundation-service-accounts/protocol/openid-connect/token --header "Content-Type: application/x-www-form-urlencoded" --data @/home/jenkins/idp.txt | jq -r ".access_token" | head -c -1 > token.txt
             for IMAGE_SHA in *.sha256; do
