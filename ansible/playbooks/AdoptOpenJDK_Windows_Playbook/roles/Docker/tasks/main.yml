@@ -1,0 +1,229 @@
+---
+- name: Install Docker using static binaries on Windows
+  tags: docker
+  block:
+
+    # Create Docker Data Storage
+
+    - name: Create docker data directory on secondary drive
+      win_file:
+        path: "{{ docker_data_drive }}:\\docker"
+        state: directory
+
+    - name: Remove default ProgramData docker folder
+      win_file:
+        path: "C:\\ProgramData\\docker"
+        state: absent
+
+    - name: Create ProgramData Symbolic Link (junction)
+      win_shell: |
+          cmd.exe /c mklink /J C:\ProgramData\docker {{ docker_data_drive }}:\docker
+      register: junction_result
+      changed_when: "'junction' in junction_result.stdout.lower() or junction_result.rc == 0"
+      failed_when: junction_result.rc not in [0,1]
+
+    # Download Docker ZIP
+
+    - name: Download Docker zip archive
+      win_get_url:
+        url: "{{ docker_zip_url }}"
+        dest: "C:\\temp\\{{ docker_zip_filename }}"
+        force: yes
+
+    # Verify checksum
+
+    - name: Calculate SHA256 checksum
+      win_shell: |
+        (Get-FileHash "C:\temp\{{ docker_zip_filename }}" -Algorithm SHA256).Hash
+      register: docker_sha
+      changed_when: false
+
+    - name: Show expected checksum
+      debug:
+        msg: "Expected SHA256: {{ docker_zip_sha256 }}"
+
+    - name: Show actual checksum
+      debug:
+        msg: "Actual SHA256: {{ docker_sha.stdout | trim }}"
+
+    - name: Fail if checksum mismatch
+      assert:
+        that:
+          - docker_sha.stdout | trim | lower == docker_zip_sha256 | lower
+        msg: "Docker ZIP checksum mismatch"
+
+    # Extract Docker binaries
+
+    - name: Ensure Docker install directory exists
+      win_file:
+        path: "{{ docker_install_dir }}"
+        state: directory
+
+    - name: Extract Docker ZIP archive (flat install)
+      win_shell: |
+        $dest = "{{ docker_install_dir }}"
+        $zip = "C:\temp\{{ docker_zip_filename }}"
+
+        # Extract to a temp folder to avoid nesting
+        $tempExtract = "C:\temp\docker_extract"
+        if (Test-Path $tempExtract) { Remove-Item -Recurse -Force $tempExtract }
+        New-Item -ItemType Directory -Path $tempExtract | Out-Null
+
+        Expand-Archive $zip -DestinationPath $tempExtract -Force
+
+        # Docker ZIP always contains a top-level 'docker' folder
+        $inner = Join-Path $tempExtract "docker"
+
+        # Copy its contents to the install dir
+        Copy-Item -Path "$inner\*" -Destination $dest -Recurse -Force
+
+        # Cleanup temp extract folder
+        Remove-Item -Recurse -Force $tempExtract
+
+    # Create Docker Symlinks
+
+    - name: Check if docker.exe exists in docker_install_dir
+      win_stat:
+        path: "{{ docker_install_dir }}\\docker.exe"
+      register: docker_exe_stat
+      failed_when: false
+
+    - name: Create docker.exe symlink in System32
+      win_shell: |
+        New-Item -Path "C:\Windows\System32\docker.exe" -ItemType SymbolicLink -Value "{{ docker_install_dir }}\docker.exe" -Force
+      args:
+        executable: powershell
+      when: docker_exe_stat.stat.exists | default(false)
+
+    - name: Check if dockerd.exe exists in docker_install_dir
+      win_stat:
+        path: "{{ docker_install_dir }}\\dockerd.exe"
+      register: dockerd_exe_stat
+      failed_when: false
+
+    - name: Create dockerd.exe symlink in System32
+      win_shell: |
+        New-Item -Path "C:\Windows\System32\dockerd.exe" -ItemType SymbolicLink -Value "{{ docker_install_dir }}\dockerd.exe" -Force
+      args:
+        executable: powershell
+      when: dockerd_exe_stat.stat.exists | default(false)
+
+    # Create Docker daemon.json
+
+    - name: Ensure ProgramData\docker exists
+      win_file:
+        path: "C:\\ProgramData\\docker"
+        state: directory
+
+    - name: Write daemon.json
+      win_copy:
+        dest: "C:\\ProgramData\\docker\\daemon.json"
+        content: "{{ docker_daemon_json }}"
+
+    # Enable Windows Containers + optional Hyper-V
+
+    - name: Enable Windows Containers feature
+      win_shell: |
+        $feature = Get-WindowsFeature -Name Containers
+        if (-not $feature.Installed) {
+            Install-WindowsFeature -Name Containers -IncludeAllSubFeature -Restart:$false
+            Write-Output "FEATURE_CHANGED"
+        } else {
+            Write-Output "FEATURE_OK"
+        }
+      register: containers_feature_result
+      changed_when: "'FEATURE_CHANGED' in containers_feature_result.stdout"
+
+    # Enable Hyper V if available (docker requires this or WSL)
+
+    - name: Enable Hyper-V if available (safe no-op on machines without virtualization)
+      win_shell: |
+        $feature = Get-WindowsFeature -Name Hyper-V
+        if ($feature -and -not $feature.Installed) {
+            Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -Restart:$false
+            Write-Output "FEATURE_CHANGED"
+        } else {
+            Write-Output "FEATURE_OK"
+        }
+      register: hyperv_feature_result
+      changed_when: "'FEATURE_CHANGED' in hyperv_feature_result.stdout"
+      ignore_errors: yes
+
+    # Reboot logic if Containers or Hyper-V installation requires reboot
+
+    - name: Check if reboot is pending (registry)
+      win_shell: |
+        $pending = Get-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\Session\Manager -Name PendingFileRenameOperations -ErrorAction SilentlyContinue
+        if ($pending) { Write-Output "REBOOT_REQUIRED" } else { Write-Output "NO_REBOOT" }
+      register: reboot_flag
+      changed_when: false
+
+    - name: Reboot if Windows Containers installation requires it
+      win_reboot:
+        msg: "Restarting after enabling Windows Containers / Hyper-V"
+        pre_reboot_delay: 5
+        post_reboot_delay: 20
+      when: >
+        'FEATURE_CHANGED' in containers_feature_result.stdout or
+        'FEATURE_CHANGED' in hyperv_feature_result.stdout or
+        reboot_flag.stdout.find("REBOOT_REQUIRED") != -1
+
+    - name: Wait for WinRM connection after reboot
+      wait_for_connection:
+        timeout: 600
+      when: >
+        'FEATURE_CHANGED' in containers_feature_result.stdout or
+        'FEATURE_CHANGED' in hyperv_feature_result.stdout or
+        reboot_flag.stdout.find("REBOOT_REQUIRED") != -1
+
+    # Register and start Docker service
+
+    - name: Check if Docker service already exists
+      win_shell: |
+        $svc = Get-Service -Name docker -ErrorAction SilentlyContinue
+        if ($svc) { Write-Output "EXISTS" } else { Write-Output "MISSING" }
+      register: docker_service_check
+      changed_when: false
+
+    - name: Register Docker service if missing
+      win_shell: |
+        & "{{ dockerd_exe }}" --register-service
+      when: docker_service_check.stdout.find("MISSING") != -1
+
+    - name: Start Docker service
+      win_service:
+        name: docker
+        state: started
+
+    # Add docker.exe to PATH
+
+    - name: Add Docker install directory to PATH
+      win_shell: |
+        $add = "{{ docker_install_dir }}"
+        $reg = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
+        $cur = (Get-ItemProperty -Path $reg -Name PATH).Path
+
+        if ($cur -notmatch [regex]::Escape($add)) {
+            Set-ItemProperty -Path $reg -Name PATH -Value ($cur + ";" + $add)
+            Write-Output "UPDATED"
+        } else {
+            Write-Output "OK"
+        }
+      register: path_status
+      changed_when: "'UPDATED' in path_status.stdout"
+
+    # Test Docker Installation
+
+    - name: Run Docker hello-world test
+      win_shell: |
+        $docker = "{{ docker_exe }}"
+        & $docker run hello-world:nanoserver
+      register: hello_test
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Assert hello-world succeeded
+      assert:
+        that:
+          - hello_test.rc == 0
+        msg: "hello-world nanoserver test failed"

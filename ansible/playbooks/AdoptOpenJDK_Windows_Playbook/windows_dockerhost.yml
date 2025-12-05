@@ -1,0 +1,72 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# -------- Windows Docker Machine ---  #
+# - Windows Server 2022, 2025        - #
+########################################
+
+################
+# Please Note: #
+################
+# *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it (WINRM)***
+# Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
+# Run powershell as the Administrator
+# wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
+# .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+# .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+# .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+
+## IMPORTANT ##
+## Pre Requisites For A Windows Docker Host:
+## 1) The target machine must support docker for windows ( by utilising the containers )
+## windows feature, and also windows hyper v support. These do not have to be enabled, as
+## this playbook will enable them, however if unsure, please perform these steps manually
+## as enabling this features on machines that do not support them can cause issues.
+##
+## 2) For Windows Docker Hosts The Base Machine, MUST have a 2nd disk to be used
+## exclusively for the docker data, the drive letter for this must be configured
+## in the group_vars/all/docker_variables.yml
+##
+
+# Groups can be passed in as a command-line variable in Ansible playbook.
+# It can be defined as 'all' or a specific group which the host belongs to.
+# For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
+- name: Ansible Windows Dockerhost playbook
+  # hosts: "{{ Groups | default('localhost:dockerhost&win*') }}"
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Load Standard Variables
+      block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs Win Dockerhost variable files
+          include_vars: group_vars/all/docker_variables.yml
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - role: logs
+      position: "Start"
+      tags: always
+    - Debug
+    - Version
+    - Common
+    - Windows_Updates
+    - WMF_5.1
+    - CodesignCert
+    - 7-Zip                       # Mostly extracting other prereqs :-)
+    - cygwin
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 21
+    - NTP_TIME
+    - NSClient                    # Required For Nagios Monitoring
+    - shortNames
+    - Docker
+    - DH_Git_Config
+    - role: Jenkins_Service_Installation
+      when: jenkins_secret is defined  # Only run if jenkins_secret is defined
+    - role: logs
+      position: "End"
+      tags: always

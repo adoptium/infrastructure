@@ -1,0 +1,39 @@
+---
+####################################
+# Windows Dockerhost Specific Vars #
+####################################
+
+# Define the windows drive letter for docker data
+# Ideally this should be a 2nd disk, seperate to C:
+docker_data_drive: "D"
+
+# Jenkins Variables Used For Installing The Service
+# For a dockerhost on windows, this needs to be the admin account rather than a jenkins user
+Jenkins_Username: "{{ ansible_user }}"
+Jenkins_Win_Passwd: "{{ ansible_password }}"
+Jenkins_Workspace: "c:\\workspace"
+# This is a placeholder and should be replaced by the string when being added in jenkins
+#jenkins_secret: ""
+
+## Docker Download Variables
+docker_zip_url: "https://download.docker.com/win/static/stable/x86_64/docker-27.3.1.zip"
+docker_zip_filename: "docker-27.3.1.zip"
+docker_zip_sha256: "F2B36FCEE7FD6D0B8F7D04DCF5D415D2745B212F0847946034AD989BB99E0382"
+
+# Paths used by tasks (centralised so tasks never embed Jinja inline)
+docker_install_dir: "C:\\Program Files\\Docker"
+docker_exe: "{{ docker_install_dir }}\\docker.exe"
+dockerd_exe: "{{ docker_install_dir }}\\dockerd.exe"
+
+# Template For Windows Service Daemon
+docker_daemon_json: "{{ lookup('template', 'daemon.json.j2') }}"
+
+# Command For Verifying Shortname Check Inside Container
+docker_shortname_command: 'cmd.exe /v dir /x c:\'
+
+##### This needs to be set before running ######
+#ansible_password:
+
+# If Experiencing timeout errors, set the two variables below. (See https://github.com/adoptium/infrastructure/tree/master/ansible#how-do-i-run-the-playbooks-on-a-remote-windows-host)
+ansible_winrm_operation_timeout_sec: 600
+ansible_winrm_read_timeout_sec: 630
