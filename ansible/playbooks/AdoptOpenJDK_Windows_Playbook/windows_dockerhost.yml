@@ -18,9 +18,9 @@
 # .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
 
 ## IMPORTANT ##
-## Pre Requisites For A Windows Docker Host:
+## Prerequisites For A Windows Docker Host:
 ## 1) The target machine must support docker for windows ( by utilising the containers )
-## windows feature, and also windows hyper v support. These do not have to be enabled, as
+## windows feature, and also windows Hyper-V support. These do not have to be enabled, as
 ## this playbook will enable them, however if unsure, please perform these steps manually
 ## as enabling this features on machines that do not support them can cause issues.
 ##
@@ -59,7 +59,7 @@
     - 7-Zip                       # Mostly extracting other prereqs :-)
     - cygwin
     - role: Java_install          # Latest LTS, for use by agents
-      jdk_version: 21
+      jdk_version: 25
     - NTP_TIME
     - NSClient                    # Required For Nagios Monitoring
     - shortNames
