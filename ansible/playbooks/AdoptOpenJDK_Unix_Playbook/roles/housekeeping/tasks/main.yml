@@ -1,0 +1,53 @@
+---
+# roles/housekeeping/tasks/main.yml
+# ---------------------------------
+# Installs or updates the container-housekeeping cron job.
+
+# Check For Docker/Podman
+- name: Check for docker binary
+  stat:
+    path: /usr/bin/docker
+  register: docker_bin
+
+- name: Check for podman binary
+  stat:
+    path: /usr/bin/podman
+  register: podman_bin
+
+- name: Set container_engine fact (empty when none found)
+  set_fact:
+    container_engine: >-
+      {{ 'docker' if docker_bin.stat.exists else
+         ( 'podman' if podman_bin.stat.exists else '' ) }}
+
+- name: Skip message when no engine present
+  debug:
+    msg: "No Docker or Podman detected – housekeeping cron not installed."
+  when: container_engine == ''
+
+# Deploy Scripts & Crontab
+- name: Deploy housekeeping script and cron when container engine exists
+  when: container_engine != ''
+  block:
+
+    - name: Copy housekeeping script
+      copy:
+        src: housekeep_docker.sh           # file lives in role's files/
+        dest: "{{ script_dest }}"
+        mode: "0755"
+
+    - name: Remove existing housekeeping cron entry
+      cron:
+        name: "Container housekeeping"
+        user: root
+        state: absent
+
+    - name: Install housekeeping cron entry ({{ script_action | upper }})
+      cron:
+        name: "Container housekeeping"
+        user: root
+        minute: "{{ cron_minute }}"
+        hour: "{{ cron_hour }}"
+        job: >
+          {{ script_dest }} {{ script_action }}
+          >> /var/log/docker_housekeeping.log 2>&1

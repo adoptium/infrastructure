@@ -166,6 +166,54 @@
     - ansible_architecture == "armv7l"
   tags: default_java
 
+- name: Check if JDK25/arm32 is already installed in the target location
+  stat: path=/usr/lib/jvm/jdk25/bin/java
+  register: jdk25_installed
+  when:
+    - ansible_architecture == "armv7l"
+  tags: build_tools
+
+- name: Download JDK25/arm32 build
+  get_url:
+    url: https://ci.adoptium.net/userContent/arm32/OpenJDK25U.arm32_linux.25+36.tar.gz
+    dest: /tmp/OpenJDK25U.arm32_linux.25+36.tar.gz
+    force: no
+    mode: 0755
+    checksum: sha256:de160d44d5dbcb37c47cc1bd983e21fcb5dedd5ae16be21048e9a5c80f114502
+  when:
+    - ansible_architecture == "armv7l"
+    - not jdk25_installed.stat.exists
+  tags: build_tools
+
+- name: Decompress jdk25/arm32
+  unarchive:
+    src: /tmp/OpenJDK25U.arm32_linux.25+36.tar.gz
+    dest: /usr/lib/jvm
+    remote_src: yes
+  when:
+    - ansible_architecture == "armv7l"
+    - not jdk25_installed.stat.exists
+  tags: build_tools
+
+- name: Remove jdk25/arm32 tarball
+  file:
+    path: /tmp/OpenJDK25U.arm32_linux.25+36.tar.gz
+    state: absent
+  when:
+    - ansible_architecture == "armv7l"
+    - not jdk25_installed.stat.exists
+  tags: build_tools
+
+- name: Create jdk25 symlink on arm32
+  file:
+    src: /usr/lib/jvm/jdk-25+36
+    dest: /usr/lib/jvm/jdk25
+    state: link
+  when:
+    - ansible_architecture == "armv7l"
+    - not jdk25_installed.stat.exists
+  tags: adoptopenjdk_install
+
 - name: Set default java version for ppc64le
   alternatives:
     name: java

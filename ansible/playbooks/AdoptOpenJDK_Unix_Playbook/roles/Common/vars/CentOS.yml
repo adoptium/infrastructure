@@ -52,6 +52,7 @@ Build_Tool_Packages:
   - perl-IPC-Cmd                  # required for openssl v3 compiles
   - perl-libwww-perl
   - perl-Time-HiRes
+  - perl-Time-Piece               # required for openssl v3.5.3+ compiles
   - pigz
   - strace                        # For SBOM dependency analysis
   - systemtap-sdt-devel
@@ -82,7 +83,7 @@ Additional_Build_Tools_CentOS8_Plus:
   - ccache
   - procps-ng
 
-Additional_Build_Tools_NOT_CentOS8_CentOS9Stream:
+Additional_Build_Tools_NOT_CentOS8plus:
   - lbzip2
   - java-1.7.0-openjdk-devel
   - java-1.8.0-openjdk-devel

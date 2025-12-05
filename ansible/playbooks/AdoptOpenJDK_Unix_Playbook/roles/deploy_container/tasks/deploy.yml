@@ -1,5 +1,24 @@
 ---
 
+- name: Set adoptium_docker_cpu file path
+  set_fact:
+    docker_cpu_file_path: /etc/adoptium_docker_cpu
+
+- name: Check if docker_cpu file exists
+  stat:
+    path: "{{ docker_cpu_file_path }}"
+  register: docker_cpu_file
+
+- name: Create cpu file if it doesnt exist
+  shell: echo "0" > {{ docker_cpu_file_path }}
+  when: not docker_cpu_file.stat.exists
+
+- name: Run dockerCPU.sh script to determine which cpus to use
+  script: scripts/dockerCPU.sh {{ cpu_limit }}
+  args:
+    executable: bash
+  register: cpus_to_use
+
 - name: Set docker build command
   set_fact:
     docker_build_command: "docker build"
@@ -53,4 +72,7 @@
   when: not (docker_port_output.stdout == "")
 
 - name: Run {{ docker_image }} docker container
-  command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus='0-3' --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix | upper }} aqa_{{ docker_image }}{{ arm32_suffix }}"
+  command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus={{ cpus_to_use.stdout_lines[0] }} --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix | upper }} aqa_{{ docker_image }}{{ arm32_suffix }}"
+
+- name: Update docker_cpu file with next cpu to use
+  shell: echo {{ cpus_to_use.stdout_lines[1] }} > {{ docker_cpu_file_path }}

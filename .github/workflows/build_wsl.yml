@@ -26,6 +26,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022, windows-2025]
+        include:
+          - os: windows-2022
+            skip_tags: "adoptopenjdk,jenkins,MSVS_2013,reboot"
+          - os: windows-2025
+            # 2025 runners already have VS 2022 & 2019 redists so skip them on win2025
+            skip_tags: "adoptopenjdk,jenkins,MSVS_2013,MSVS_2019,MSVS_2022,reboot"
     name: Windows
     runs-on: ${{ matrix.os }}
     steps:
@@ -49,11 +55,12 @@ jobs:
             .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
         }
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - uses: Vampire/setup-wsl@6a8db447be7ed35f2f499c02c6e60ff77ef11278 # v6.0.0
       with:
         distribution: Ubuntu-24.04
+        wsl-version: 1
 
     - name: Install dependencies
       run: |
@@ -79,4 +86,5 @@ jobs:
       run: |
         export ANSIBLE_CONFIG=./ansible.cfg
         # Skip MSVS_2013 until https://github.com/adoptium/infrastructure/issues/2178 is fixed
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags adoptopenjdk,jenkins,MSVS_2013,reboot playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        # Windows 2025 runner already has MSVS_2022 installed so will be skipped in the playbook execution.
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags "${{ matrix.skip_tags }}" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml

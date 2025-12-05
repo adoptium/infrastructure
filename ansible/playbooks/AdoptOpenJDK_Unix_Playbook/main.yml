@@ -72,14 +72,28 @@
       tags: [build_tools]
     - role: gcc_11                # JDK19+
       tags: [build_tools]
-    - role: devkit                # JDK19+
+    - role: gcc_13
+      tags: [build_tools]
+    - role: devkit                # JDK19-24
       devkit_version: gcc-11.3.0-Centos7.9.2009-b03
       when:
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
       tags: [devkit]
-    - role: devkit                # JDK19+
+    - role: devkit                # JDK25+
+      devkit_version: gcc-14.2.0-Centos7.9.2009-b00
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "x86_64" or ansible_architecture == "ppc64le"
+      tags: [devkit]
+    - role: devkit                # JDK19-24
       devkit_version: gcc-11.3.0-Centos7.6.1810-b03
+      when:
+        - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        - ansible_architecture == "aarch64"
+      tags: [devkit]
+    - role: devkit                # JDK25+
+      devkit_version: gcc-14.2.0-Centos7.6.1810-b00
       when:
         - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
         - ansible_architecture == "aarch64"
@@ -157,6 +171,10 @@
     - IPv6
     - role: disable_gui
       tags: adoptopenjdk
+    - role: housekeeping           # override mode when needed
+      vars:
+        script_action: check              # check/delete
+    - pandoc                      # Build Of Man Pages JDK24+
     - role: logs
       position: "End"
       tags: always

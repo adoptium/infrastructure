@@ -12,16 +12,19 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * Ubuntu 16.04
 * Ubuntu 18.04
 * Ubuntu 20.04
+* Ubuntu 22.04
+* Ubuntu 24.04
 * CentOS6
 * CentOS7
 * CentOS8
-* Debian8
-* Debian10
-* FreeBSD12
+* Debian11
+* Debian12
+* Fedora 40
 * Solaris10
 * Windows Server 2012 R2
+* Windows Server 2022
 
-These machines will then have the playbooks ran on them, with additional options to build JDK8 and test it.
+These machines will then have the playbooks ran on them, with additional options to build JDKXX and test it.
 
 The top level script `vagrantPlayBookCheck.sh` takes a number of options:
 
@@ -56,7 +59,7 @@ Notes:
 
 The script will first clone the repository specified by the `--fork` and `--branch` options. For example, if `--fork` is 'willsparker' and `--branch` is '1941', the repository being cloned is https://github.com/willsparker/openjdk-infrastructure/tree/1941.
 
-The script will then make a directory in the `$WORKSPACE` location called _adoptopenjdkPBTests_, in which another directory containing the log files, and the Git repository is stored. Following that, the script will run each ansible playbook on their respective VMs, writing the output to the aforementioned log files. If not defined prior to running, `$WORKSPACE` will default to `$HOME`. 
+The script will then make a directory in the `$WORKSPACE` location called _adoptopenjdkPBTests_, in which another directory containing the log files, and the Git repository is stored. Following that, the script will run each ansible playbook on their respective VMs, writing the output to the aforementioned log files. If not defined prior to running, `$WORKSPACE` will default to `$HOME`.
 
 After each playbook is ran through, a summary is given, containing which OS playbooks succeeded, failed, or were cancelled. The logs can also be perused to get more in-depth error messages.
 
@@ -64,6 +67,6 @@ If specified, the VMs will then be tested by building JDK8 - if all dependencies
 
 If the VMs were chosen *not* to be destroyed, they can be later by running the _vmDestroy.sh_ script, which takes the `Vagrant OS` as an argument. If found, every Vagrant VM with this OS will be destroyed, therefore the user will be asked to confirm they want this. The `--force` option will skip this prompt.
 
-Vagrant boxes can be updated by their provider from time to time, and using outdated versions can occasionally [cause issues](https://github.com/adoptium/infrastructure/issues/2375#issue-1043540735). To ensure the current vagrant boxes used on the system are up to date, _updateBoxes.sh_ can be used. This will check and update all current vagrant boxes for the user. Outdated box versions will be removed if the `-r` option, is used. A prompt will ask the user to confirm the removal of a box, and option `-rf` will skip this prompt. 
+Vagrant boxes can be updated by their provider from time to time, and using outdated versions can occasionally [cause issues](https://github.com/adoptium/infrastructure/issues/2375#issue-1043540735). To ensure the current vagrant boxes used on the system are up to date, _updateBoxes.sh_ can be used. This will check and update all current vagrant boxes for the user. Outdated box versions will be removed if the `-r` option, is used. A prompt will ask the user to confirm the removal of a box, and option `-rf` will skip this prompt.
 
 The additional scripts in the _pbTestScripts_ folder are called from `vagrantPlaybookCheck.sh`

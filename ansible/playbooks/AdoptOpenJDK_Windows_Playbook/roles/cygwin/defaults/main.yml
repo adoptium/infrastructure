@@ -1,0 +1,16 @@
+---
+# Default Variables For Installing Build Related Cygwin packages
+# At Pinned Versions
+
+## This Cygwin Site URL installs on old version of the cygwin packages, due to
+## An Upstream Bug When Building JDK11 with the most recent versions of make etc
+## https://bugs.openjdk.org/browse/JDK-8357657?focusedId=14792554&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel
+## Once The Upstream Bug Is Resolved, This Line Can Be Reverted To And The --no-verify switch on the installation removed.
+## The Current Cygwin Cache Has Been Created From A Snapshot Of The Cygwin Site Repo:
+## Cygwin_SITE_URL: "http://ctm.crouchingtigerhiddenfruitbat.org/pub/cygwin/circa/64bit/2024/08/25/171201"
+## The Original Site Repo Which Would Install The Latest Of All Cygwin Packages Is:
+## Cygwin_SITE_URL: "https://mirrors.kernel.org/sourceware/cygwin/"
+Cygwin_PACKAGE_DIR: "C:\\cygwin_packages"
+Cygwin_CACHE_DIR: "C:\\cygwin_cache"
+Cygwin_INST_DIR: "C:\\cygwin64"
+Cygwin_CACHE_DIR_POSIX: "C://cygwin_cache"

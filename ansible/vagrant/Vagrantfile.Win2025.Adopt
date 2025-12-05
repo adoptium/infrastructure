@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Runs Powershell as an administator and does the following:
+#  - Gets/executes an Ansible provided script that configures WinRM to allow Ansible to communicate over it.
+#  - Resizes the disk to ~100GB, in line with the 'disksize.size = 100GB' option in the config below
+
+$script = <<SCRIPT
+Start-Process powershell -Verb runAs
+
+wget https://raw.githubusercontent.com/ansible/ansible/38e50c9f819a045ea4d40068f83e78adbfaf2e68/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\\ConfigureRemotingForAnsible.ps1
+.\\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
+.\\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+.\\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+.\\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+
+# Retrieving disk's current size
+$currentDiskSize =(Get-Partition -DriveLetter c | select Size)
+$currentDiskSize =($currentDiskSize -replace "[^0-9]" , "")
+# The size the disk should be, in bytes (130GB)
+$diskSizeBoundary = 139586437120
+# Changing the disksize to max supported size (~130GB)
+if ([long]$currentDiskSize -lt $diskSizeBoundary) {
+        echo "Resizing disk to max size"
+        $size = (Get-PartitionSupportedSize -DriveLetter c); Resize-Partition -DriveLetter c -Size $size.SizeMax
+}else {
+        echo "Disk is already at max size"
+}
+
+Start-Process cmd -Verb runAs
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  config.vm.define :adoptopenjdkW2025 do |adoptopenjdkW2025|
+    adoptopenjdkW2025.vm.box = "adoptium/windows2025"
+    adoptopenjdkW2025.vm.hostname = "adoptopenjdkW2025"
+    adoptopenjdkW2025.vm.communicator = "winrm"
+    adoptopenjdkW2025.vm.synced_folder ".", "/vagrant"
+    adoptopenjdkW2025.vm.network :private_network, type: "dhcp"
+    adoptopenjdkW2025.vm.provision "shell", inline: $script, privileged: false
+    adoptopenjdkW2025.disksize.size = '131GB'
+  end
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false
+    v.memory = 9126
+    v.cpus = 3
+    v.customize ["modifyvm", :id, "--cpuexecutioncap", "65"]
+  end
+  config.vm.boot_timeout = 800
+end

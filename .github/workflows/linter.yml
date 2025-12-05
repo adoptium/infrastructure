@@ -5,12 +5,12 @@ on:
     paths:
     - ansible/**
     - .ansible-lint
-    branches:         
+    branches:
     - master
   push:
     paths:
     - ansible/**
-    branches:         
+    branches:
     - master
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: 'Yamllint'
       uses: karancode/yamllint-github-action@4052d365f09b8d34eb552c363d1141fd60e2aeb2 # v3.0.0
@@ -39,12 +39,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: Set up Python 3.x
-      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
       with:
-        python-version: '3.x'
+        python-version: '3.13' # Pin To 3.13 until ansible 2.20 is supported
 
     - name: Install dependencies
       run: pip install ansible ansible-lint

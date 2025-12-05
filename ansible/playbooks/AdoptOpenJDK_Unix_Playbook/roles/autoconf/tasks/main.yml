@@ -15,7 +15,7 @@
 
 - name: Download Autoconf v2.69
   get_url:
-    url: https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+    url: https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
     dest: /tmp/autoconf-2.69.tar.gz
     force: no
     mode: 0755
@@ -28,7 +28,7 @@
   tags: autoconf-2.69
 
 - name: GPG Signature verification
-  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/autoconf-2.69.tar.gz -sl "https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz.sig" -k {{ key.autoconf }}
+  script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/autoconf-2.69.tar.gz -sl "https://www.mirrorservice.org/sites/ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz.sig" -k {{ key.autoconf }}
   when:
     - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
     - ansible_distribution_major_version == "6"

@@ -76,6 +76,8 @@
       tags: MSVS_2019
     - role: MSVS_2022
       tags: MSVS_2022
+    - role: MSVS_2013_REDIST      # Required For Tests
+      tags: MSVS_2013_REDIST
     - role: MSVS_2022_REDIST
       tags: MSVS_2022_REDIST
     - NVidia_Cuda_Toolkit         # OpenJ9

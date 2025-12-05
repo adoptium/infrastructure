@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [sonoma-arm64, sonoma-intel]
+        os: [sonoma-arm64, sonoma-intel, sequoia-intel, sequoia-arm64]
+      fail-fast: false
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
     # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
@@ -37,17 +38,22 @@ jobs:
         --passwd-on-stdin --background \
         --servercert ${{ secrets.ORKA_VPN_SERVER_CERT }}
 
-    - name: Init Packer
-      run: packer init orka.pkr.hcl
+    - name: Init Packer base
+      if: ${{ matrix.os != 'sonoma-arm64' && matrix.os != 'sequoia-arm64' }}
+      run: packer init orka-base.pkr.hcl
       working-directory: ansible/packer
     
     - name: Run Packer (base image)
       # Skip arm64 for now as Xcode download takes too long
-      if: matrix.os != 'sonoma-arm64'
+      if: ${{ matrix.os != 'sonoma-arm64' && matrix.os != 'sequoia-arm64' }}
       run: packer build --only=macstadium-orka.${{ matrix.os }} orka-base.pkr.hcl
       working-directory: ansible/packer
       env:
         ORKA_TOKEN: ${{ secrets.ORKA_TOKEN }}
+
+    - name: Init Packer
+      run: packer init orka.pkr.hcl
+      working-directory: ansible/packer
 
     - name: Run Packer (final image)
       run: packer build --only=macstadium-orka.${{ matrix.os }} orka.pkr.hcl

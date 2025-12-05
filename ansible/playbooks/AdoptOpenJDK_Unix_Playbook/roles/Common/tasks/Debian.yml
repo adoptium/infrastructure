@@ -14,7 +14,7 @@
   apt_repository: repo='ppa:openjdk-r/ppa' update_cache=no
   when:
     - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
-    - ansible_distribution_major_version != "10"
+    - ansible_distribution_major_version <= "10"
   tags: patch_update
 
 # Required for the apt-key task next
@@ -42,7 +42,7 @@
   apt_repository: repo='ppa:ubuntu-toolchain-r/test' update_cache=no
   when:
     - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
-    - ansible_distribution_major_version != "10"
+    - ansible_distribution_major_version <= "10"
   tags: patch_update
 
 # Required as 'Ubuntu Jessie' doesn't exist. See openjdk-infrastructure issue #1015
@@ -57,20 +57,6 @@
   when:
     - (ansible_architecture != "armv7l") and (ansible_architecture != "riscv64")
     - ansible_distribution_major_version == "8"
-  tags: patch_update
-
-- name: Add Azul Zulu GPG Package Signing Key for x86_64
-  apt_key:
-    url: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
-    state: present
-  when:
-    - ansible_architecture == "x86_64"
-  tags: [patch_update, azul-key]
-
-- name: Add Azul Zulu repository for x86_64
-  apt_repository: repo='deb https://repos.azulsystems.com/ubuntu stable main'
-  when:
-    - ansible_architecture == "x86_64"
   tags: patch_update
 
 # Both repositories needed for gcc/g++-4.8
@@ -191,6 +177,42 @@
   when:
     - ansible_architecture == "riscv64"
   tags: build_tools
+
+# Add Azul Repositories To Provide Boot JDK7 for JDK8 Builds
+
+# Install Azul Key On x64
+- name: Install Azul repo key (dearmored keyring)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    curl -fsSL https://repos.azul.com/azul-repo.key \
+    | gpg --dearmor \
+    | tee /usr/share/keyrings/azul.gpg >/dev/null
+  args:
+    executable: /bin/bash
+  when: ansible_architecture == "x86_64"
+  tags: [patch_update, azul-key]
+  become: true
+
+- name: Ensure Azul key permissions are readable by APT
+  ansible.builtin.file:
+    path: /usr/share/keyrings/azul.gpg
+    mode: '0644'
+    owner: root
+    group: root
+    state: file
+  when: ansible_architecture == "x86_64"
+  tags: [patch_update, azul-key]
+  become: true
+
+- name: Add Azul Zulu repository for x86_64 (signed-by keyring)
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/azul.gpg] https://repos.azul.com/zulu/deb stable main"
+    filename: zulu
+    state: present
+    update_cache: yes
+  when: ansible_architecture == "x86_64"
+  tags: patch_update
+  become: true
 
 #########################
 # Additional Test Tools #
