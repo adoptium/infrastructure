@@ -15,7 +15,7 @@ RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
            exit 1; \
        fi
 RUN rpm -i '/tmp/gpgkey.rpm'
-RUN curl -o /tmp/centosrepos.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-10.0-8.el10.noarch.rpm' 
+RUN curl -o /tmp/centosrepos.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-10.0-8.el10.noarch.rpm'
 ARG REPO_CHECKSUM=388bf4085af2b250c9f93ee049b3d031442cf36ee67adbf65edcbcec0caf881a
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$REPO_CHECKSUM" ]; then \

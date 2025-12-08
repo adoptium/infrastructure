@@ -5,8 +5,8 @@ pipeline {
             parallel {
                 stage('Ubuntu24.04 x64') {
                     agent {
-                        label "dockerBuild&&linux&&x64"
-                    } 
+                        label "dockerBuild&&linux&&x64&&containerBuilder"
+                    }
                     steps {
                         dockerBuild('amd64', 'ubuntu2404', 'Dockerfile.u2404')
                     }
@@ -14,15 +14,15 @@ pipeline {
                 stage('Ubuntu24.04 aarch64') {
                     agent {
                         label "dockerBuild&&linux&&aarch64"
-                    } 
+                    }
                     steps {
                         dockerBuild('arm64', 'ubuntu2404', 'Dockerfile.u2404')
                     }
                 }
                 stage('UBI10 x64') {
                     agent {
-                        label "dockerBuild&&linux&&x64"
-                    } 
+                        label "dockerBuild&&linux&&x64&&containerBuilder"
+                    }
                     steps {
                         dockerBuild('amd64', 'ubi10', 'Dockerfile.ubi10')
                     }
@@ -48,7 +48,7 @@ pipeline {
         stage('Docker Manifest') {
             agent {
                 label "dockerBuild&&linux&&x64"
-            } 
+            }
             environment {
                 DOCKER_CLI_EXPERIMENTAL = "enabled"
             }
@@ -71,8 +71,8 @@ pipeline {
             }
         }
 
-    } 
-} 
+    }
+}
 
 def dockerBuild(architecture, distro, staticdockerfile) {
     sh "rm -vf *.sha256"
@@ -81,7 +81,7 @@ def dockerBuild(architecture, distro, staticdockerfile) {
     dockerImage =
     docker.build("ghcr.io/adoptium/test-containers:${distro}-${architecture}",
         "-f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/$staticdockerfile .")
-    // dockerhub is the ID of the credentials stored in Jenkins 
+    // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         dockerImage.push()
         sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/test-containers:${distro}-${architecture} > ${distro}_linux-${architecture}.sha256"
@@ -89,7 +89,7 @@ def dockerBuild(architecture, distro, staticdockerfile) {
     }
 }
 
-def dockerManifest() { 
+def dockerManifest() {
     // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
         sh '''
@@ -97,6 +97,10 @@ def dockerManifest() {
             export TARGET="ghcr.io/adoptium/test-containers:ubuntu2404"
             AMD64=${TARGET}-amd64
             ARM64=${TARGET}-arm64
+            echo "Debug SF01"
+            docker manifest inspect $AMD64 2>/dev/null | grep mediaType
+            docker manifest inspect $ARM64 2>/dev/null | grep mediaType
+            echo "Debug SF01"
             docker manifest create $TARGET $AMD64 $ARM64
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
