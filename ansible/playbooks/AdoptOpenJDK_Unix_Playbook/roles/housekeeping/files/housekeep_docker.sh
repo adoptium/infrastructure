@@ -297,7 +297,42 @@ echo "Pruning unused networks ..."
 run network prune -f
 echo
 
+###########################################################################
+# 9. Always remove AdoptOpenJDK Test Container images (exclude *build*)
+###########################################################################
+echo "Scanning for AdoptOpenJDK Test Container images (excluding build)..."
+
+ADO_IMAGES=$(
+    $CLI images --format '{{.Repository}} {{.ID}}' \
+        | grep -i adoptopenjdk \
+        | grep -vi build \
+        | awk '{print $2}' \
+        | sort -u
+)
+
+if [ -z "$ADO_IMAGES" ]; then
+    echo "No AdoptOpenJDK images (non-build) found for forced removal."
+else
+    COUNT=$(printf '%s\n' "$ADO_IMAGES" | wc -l | tr -d ' ')
+    echo "Found $COUNT AdoptOpenJDK image(s) for forced removal:"
+    printf '%s\n' "$ADO_IMAGES" | sed 's/^/  /'
+
+    if [ "$ACTION" = "delete" ]; then
+        echo "Removing AdoptOpenJDK images..."
+        for iid in $ADO_IMAGES; do
+            run rmi -f "$iid"
+        done
+    else
+        echo "CHECK mode: would remove these AdoptOpenJDK images."
+        for iid in $ADO_IMAGES; do
+            printf 'Would run: %s rmi -f %s %s\n' "$CLI" "$iid" "$EXTRA_ARGS"
+        done
+    fi
+fi
+
+echo
+
 ##########################################################
-# 9. Summary
+# 10. Summary
 ##########################################################
 echo "Housekeeping finished in $ACTION mode."
