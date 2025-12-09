@@ -1,0 +1,59 @@
+---
+
+- name: Set internal role variables
+  set_fact:
+    cygwin_git_path: "C:\\cygwin64\\bin\\git.exe"
+    workspace_path: "{{ Jenkins_Workspace | default('C:\\workspace') }}"
+    git_safe_directories:
+      - "'*'"
+      - "/cygdrive/c/workspace/openjdk-build"
+      - "{{ Jenkins_Workspace }}\\openjdk-build"
+  tags: always
+
+# Ensure Jenkins workspace root exists
+
+- name: Ensure Jenkins workspace directory exists
+  win_file:
+    path: "{{ workspace_path }}"
+    state: directory
+  tags: dh_git_config
+
+# Check if Cygwin home directory exists for ansible_user
+
+- name: Check for Cygwin home directory for ansible_user
+  win_shell: |
+    C:\cygwin64\bin\bash.exe -lc '[ -d /home/{{ ansible_user }} ] && echo exists || echo missing'
+  args:
+    executable: powershell
+  register: cygwin_home_check
+  tags: dh_git_config
+
+# Create Cygwin home directory only if missing
+
+- name: Create Cygwin home directory for ansible_user
+  win_shell: |
+    C:\cygwin64\bin\bash.exe -lc 'mkdir -p /home/{{ ansible_user }}'
+  args:
+    executable: powershell
+  when: "'missing' in cygwin_home_check.stdout"
+  tags: dh_git_config
+
+# Fix ownership only if the home directory exists
+
+- name: Ensure ownership of Cygwin home directory for ansible_user
+  win_shell: |
+    C:\cygwin64\bin\bash.exe -lc 'chown {{ ansible_user }} /home/{{ ansible_user }} 2>/dev/null || true'
+  args:
+    executable: powershell
+  when: "'exists' in cygwin_home_check.stdout or 'missing' not in cygwin_home_check.stdout"
+  failed_when: false
+  tags: dh_git_config
+
+# Add safe.directory entries using Cygwin Git
+
+- name: Add safe.directory entries using Cygwin Git
+  win_command: >
+    {{ cygwin_git_path }} config --global --add safe.directory {{ item }}
+  loop: "{{ git_safe_directories }}"
+  failed_when: false
+  tags: dh_git_config

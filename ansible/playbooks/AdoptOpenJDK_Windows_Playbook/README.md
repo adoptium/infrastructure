@@ -1,4 +1,4 @@
-# Setting up Windows Machines
+# Setting up Standard Windows Machines
 
 There's a process to setting up Windows machines and getting them connected to Jenkins. If not followed, issues can occur with Jenkins workspaces (See: https://github.com/adoptium/infrastructure/issues/1674).
 
@@ -25,3 +25,36 @@ Note: If setting up a win2012r2 machine, `[Net.ServicePointManager]::SecurityPro
 Note that the role will be skipped if it cannot find a `jenkins_secret` variable. The role will also not remove any previosuly created service using the previous JNLP process.
 
 The jenkins service should then be started.
+
+# Setting up Windows Dockerhost Machines
+
+There are a number of prerequisite steps, and preparation steps required when building a windows dockerhost machine. The user the playbooks execute has needs to have administrative permissions in order to have docker install and execute correctly.
+
+1. Log on to the Windows machine via RDP and run the `ConfigureRemotingForAnsible` commands listed in [main.yml](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/windows_dockerhost.yml).
+
+1. Prerequisite Configuration Required For A Windows Docker Host
+
+The target machine must support docker for windows ( by utilising the containers )
+windows feature, and also windows Hyper-V support. These do not have to be enabled, as
+this playbook will enable them, however if unsure, please perform these steps manually
+as enabling this features on machines that do not support them can cause issues.
+
+For Windows docker dosts the base machine MUST have a 2nd disk to be used
+exclusively for the docker data, the drive letter for this must be configured
+in the group_vars/all/docker_variables.yml.
+
+A recommended size of at least 150Gb for the docker data drive.
+
+# Running The Windows Dockerhost playbook
+
+Before running the windows docker host playbook [windows_dockerhost.yml](./windows_dockerhost.yml), a few variables need to be configured in the in the [docker_variables.yml](./group_vars/all/docker_variables.yml) file.
+
+Specifically these values should be set :
+
+ansible_password: ( The password used to connect to the machine )
+docker_data_drive: ( This should be set to the drive letter for the preconfigured empty docker data drive )
+jenkins_secret: ( This should be set to the jenkins secret used for connecting the agent to jenkins )
+
+Once all the above is complete, the playbook can then be run:
+
+ansible-playbook -i << path to hosts file >> -u << target user name >> ./windows_dockerhost.yml
