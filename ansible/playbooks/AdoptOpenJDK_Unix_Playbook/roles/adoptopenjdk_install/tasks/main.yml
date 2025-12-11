@@ -174,6 +174,41 @@
       when: not (jdk_version == 11 and ansible_architecture == "riscv64")
       until: adoptopenjdk_download is not failed
 
+    # Local checksum verification for JDK 10 and JDK 16
+    - name: Validate checksum for JDK 10/16
+      when: jdk_version in [10, 16]
+      block:
+
+        - name: Load expected checksum from controller
+          set_fact:
+            sha_expected: >-
+              {{
+                (lookup(
+                    'file',
+                    role_path ~ '/files/checksums/jdk'
+                    ~ jdk_version ~ '_' ~ api_architecture ~ '.sha256'
+                )
+                .split()[0])
+              }}
+
+        - name: Compute actual checksum of downloaded archive
+          command: "sha256sum /tmp/jdk{{ jdk_version }}.tar.gz"
+          register: sha_actual_raw
+          changed_when: false
+
+        - name: Extract actual checksum only
+          set_fact:
+            sha_actual: "{{ sha_actual_raw.stdout.split()[0] }}"
+
+        - name: Fail if expected and actual checksum do NOT match
+          fail:
+            msg: |
+              Checksum verification FAILED for JDK {{ jdk_version }} ({{ api_architecture }}).
+              Expected: {{ sha_expected }}
+              Actual:   {{ sha_actual }}
+              File:     /tmp/jdk{{ jdk_version }}.tar.gz
+          when: sha_expected != sha_actual
+
     - name: GPG Signature verification (Linux/Alpine-Linux)
       script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
       when:
