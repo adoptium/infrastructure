@@ -22,6 +22,7 @@ hosts:
       - hetzner:
           ubuntu1604-x64-1: {ip: 78.47.239.96, description: nagios.adoptopenjdk.net}
           ubuntu2004-x64-1: {ip: 78.47.239.97, description: ci.adoptium.net}
+          ubuntu2404-x64-1: {ip: 46.224.123.39, description: jenkins-hetzner-worker}
 
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
