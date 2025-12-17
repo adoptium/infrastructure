@@ -26,12 +26,12 @@
     - not (ansible_distribution_major_version >= "10")
   tags: nagios_plugins
 
-- name: Install nagios-plugins (RHEL8/x64)
-  yum:
-    name: nagios-plugins
-    state: latest
+- name: Install nagios-plugins (RHEL 8 / x86_64)
+  command: dnf -y install nagios-plugins
   when:
-    - ansible_distribution_major_version == "8" and ansible_architecture == "x86_64"
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == "8"
+    - ansible_architecture == "x86_64"
   tags: nagios_plugins
 
 ##########
