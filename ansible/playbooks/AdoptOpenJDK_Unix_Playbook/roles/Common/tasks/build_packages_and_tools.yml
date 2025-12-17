@@ -12,9 +12,25 @@
   when:
     - ansible_distribution == "FreeBSD"
 
-- name: Install Build Tool Packages
+- name: Install Build Tool Packages (None RHEL)
   package: "name={{ item }} state={{ package_var }}"
   with_items: "{{ Build_Tool_Packages }}"
+  when:
+    - ansible_distribution != "RedHat"
+  tags: build_tools
+
+- name: Install Build Tool Packages (Prior To RHEL8)
+  package: "name={{ item }} state={{ package_var }}"
+  with_items: "{{ Build_Tool_Packages }}"
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int < 8))
+  tags: build_tools
+
+- name: Install Build Tool Packages (RHEL8+)
+  command: dnf -y install {{ item }}
+  with_items: "{{ Build_Tool_Packages }}"
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: build_tools
 
 - name: Create symlink for gmake to make
@@ -31,7 +47,23 @@
     - ansible_distribution != "Fedora"
   tags: build_tools
 
-- name: Install Test Tool Packages
+- name: Install Test Tool Packages (None-RHEL)
   package: "name={{ item }} state={{ package_var }}"
   with_items: "{{ Test_Tool_Packages }}"
+  when:
+    - ansible_distribution != "RedHat"
+  tags: test_tools
+
+- name: Install Test Tool Packages ( Prior To RHEL8 )
+  package: "name={{ item }} state={{ package_var }}"
+  with_items: "{{ Test_Tool_Packages }}"
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int < 8))
+  tags: test_tools
+
+- name: Install Test Tool Packages ( RHEL8+ )
+  command: dnf -y install {{ item }}
+  with_items: "{{ Test_Tool_Packages }}"
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: test_tools

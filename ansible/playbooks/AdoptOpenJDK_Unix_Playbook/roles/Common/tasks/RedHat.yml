@@ -36,10 +36,21 @@
     - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: patch_update
 
-- name: YUM upgrade all packages
+- name: YUM upgrade all packages ( Prior To RHEL8 )
   yum:
     name: '*'
     state: latest
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int < 8))
+  tags: patch_update
+
+# For RHEL8 plus to avoid conflicts with system python and ansible
+# Fall back to the shell to do the package upgrade
+- name: YUM upgrade all packages ( RHEL8+ )
+  command: dnf -y upgrade
+  changed_when: true
+  when:
+    - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: patch_update
 
 # TODO: We should find a better way of doing this in the future, for some reason these deps aren't in the aarch64 rhel 7 repos.
@@ -89,6 +100,14 @@
 - name: Install numactl-devel excluding RHEL 7 on s390x
   package: "name=numactl-devel state=latest"
   when:
+    - ansible_distribution_major_version | int < 8
+    - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
+  tags: build_tools
+
+- name: Install numactl-devel (RHEL 8+)
+  command: dnf -y install numactl-devel
+  when:
+    - ansible_distribution_major_version | int >= 8
     - not (ansible_distribution_major_version == "7" and ansible_architecture == "s390x")
   tags: build_tools
 
@@ -97,7 +116,15 @@
   with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
   when:
     - ansible_architecture == "x86_64"
-    - ansible_distribution_major_version | int < 10
+    - ansible_distribution_major_version | int < 8
+  tags: build_tools
+
+- name: Install additional build tools for RHEL8+ on x86
+  command: dnf -y install {{ item }}
+  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
+  when:
+    - ansible_architecture == "x86_64"
+    - ansible_distribution_major_version | int >= 8
   tags: build_tools
 
 - name: Install additional build tools for RHEL10+ on x86
@@ -124,14 +151,14 @@
   tags: build_tools
 
 - name: Install additional build tools for RHEL8 and above
-  package: "name={{ item }} state=latest"
+  command: dnf -y install {{ item }}
   with_items: "{{ Additional_Build_Tools_RHEL8Plus }}"
   when:
     - (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install jq for SBoM parsing for build reproducibility testing
-  package: "name=jq state=latest"
+  command: dnf -y install jq
   when:
     - ansible_distribution_major_version > "7"
   tags: test_tools
@@ -143,18 +170,47 @@
   tags: test_tools
   when: ansible_distribution_major_version | int < 10
   block:
-    - name: Install xorg-x11-server-Xvfb (< RHEL10)
+      # RHEL 8 and 9 — use cli
+
+    - name: Install xorg-x11-server-Xvfb (RHEL 8/9)
+      command: dnf -y install xorg-x11-server-Xvfb
+      when: ansible_distribution_major_version | int >= 8
+
+    - name: Install xorg-x11-server-Xorg on x86_64 (RHEL 8/9)
+      command: dnf -y install xorg-x11-server-Xorg
+      when:
+        - ansible_distribution_major_version | int >= 8
+        - ansible_architecture == "x86_64"
+
+    - name: Install xorg-x11-server-common on s390x (RHEL 8/9)
+      command: dnf -y install xorg-x11-server-common
+      when:
+        - ansible_distribution_major_version | int >= 8
+        - ansible_architecture == "s390x"
+
+    # RHEL 7 and earlier — keep modules
+
+    - name: Install xorg-x11-server-Xvfb (RHEL ≤ 7)
       package:
         name: xorg-x11-server-Xvfb
         state: latest
+      when: ansible_distribution_major_version | int < 8
 
-    - name: Install xorg-x11-server-Xorg if host is x86_64 and < RHEL10
-      yum: name=xorg-x11-server-Xorg state=installed
-      when: ansible_architecture == "x86_64"
+    - name: Install xorg-x11-server-Xorg on x86_64 (RHEL ≤ 7)
+      yum:
+        name: xorg-x11-server-Xorg
+        state: installed
+      when:
+        - ansible_distribution_major_version | int < 8
+        - ansible_architecture == "x86_64"
 
-    - name: Install xorg-x11-server-common if host is s390x and < RHEL10
-      yum: name=xorg-x11-server-common state=installed
-      when: ansible_architecture == "s390x"
+    - name: Install xorg-x11-server-common on s390x (RHEL ≤ 7)
+      yum:
+        name: xorg-x11-server-common
+        state: installed
+      when:
+        - ansible_distribution_major_version | int < 8
+        - ansible_architecture == "s390x"
 
 #############################
 # Configure Wayland(Weston) #
@@ -239,10 +295,16 @@
 # Locales #
 ###########
 
-- name: Install 'glibc-common' package
+- name: Install glibc-common (Prior to RHEL 8)
   package:
     name: glibc-common
     state: present
+  when: ansible_distribution_major_version | int < 8
+  tags: locales
+
+- name: Install glibc-common (RHEL 8+)
+  command: dnf -y install glibc-common
+  when: ansible_distribution_major_version | int >= 8
   tags: locales
 
 # Skipping linting as no alternative to shell can be used (lint error 305)

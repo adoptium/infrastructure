@@ -39,13 +39,35 @@
     ##################
     # Install Docker #
     ##################
-    - name: Install docker based on OS (Ubuntu, RHEL/CentOS 7/8/9, Debian)
+
+    # CentOS (all), RHEL < 8, Ubuntu < 20, Debian
+
+    - name: Install docker (CentOS, RHEL < 8, Ubuntu < 20, Debian)
       package:
         name:
           - docker-ce
         state: latest   # TODO: Package installs should not use latest
-        use: auto       # automatic select package manager to use yum, apt and so on
-      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or ((ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 20) or ansible_distribution == "Debian")
+        use: auto
+      when: >
+        (
+          ansible_distribution == "CentOS"
+          or
+          (ansible_distribution == "RedHat" and ansible_distribution_major_version | int < 8)
+        )
+        or
+        (
+          (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int < 20)
+          or ansible_distribution == "Debian"
+        )
+
+      # RHEL 8+
+
+    - name: Install docker (RHEL 8+)
+      command: dnf -y install docker-ce
+      when:
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version | int >= 8
+      tags: docker
 
     - name: Install default docker on Ubuntu 22+
       package:
