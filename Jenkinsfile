@@ -5,7 +5,7 @@ pipeline {
             parallel {
                 stage('CentOS6 x64') {
                     agent {
-                        label "dockerBuild&&linux&&x64"
+                        label "dockerBuild&&linux&&x64&&containerBuilder"
                     } 
                     steps {
                         dockerBuild('amd64', 'centos6', 'Dockerfile.CentOS6')
@@ -13,7 +13,7 @@ pipeline {
                 }
                 stage('CentOS7 x64') {
                     agent {
-                        label "dockerBuild&&linux&&x64"
+                        label "dockerBuild&&linux&&x64&&containerBuilder"
                     } 
                     steps {
                         dockerBuild('amd64', 'centos7', 'Dockerfile.CentOS7')
