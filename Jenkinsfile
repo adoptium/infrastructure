@@ -53,7 +53,7 @@ pipeline {
                 }
                 stage('Alpine3 x64') {
                     agent {
-                        label "dockerBuild&&linux&&x64"
+                        label "dockerBuild&&linux&&x64&&containerBuilder"
                     }
                     steps {
                         dockerBuild('amd64', 'alpine3', 'Dockerfile.Alpine3')
