@@ -59,7 +59,13 @@
         remote_src: true
 
     - name: Obtain JavaNativeFoundation from appleopenjdk
-      shell: mkdir -p "{{ xcode_appleopenjdk_tmp }}" && cd "{{ xcode_appleopenjdk_tmp }}" && git clone https://github.com/apple/openjdk.git appleopenjdk
+      shell: |
+        mkdir -p "{{ xcode_appleopenjdk_tmp }}"
+        cd "{{ xcode_appleopenjdk_tmp }}"
+        git clone https://github.com/apple/openjdk.git appleopenjdk
+        cd appleopenjdk
+        echo "Checking out apple/openjdk latest commit"
+        git checkout 356491bda24e6c4781c6b650f4efda05a6bc1296
 
     - name: Apply JavaNativeFoundation patch to Xcode
       shell: |
