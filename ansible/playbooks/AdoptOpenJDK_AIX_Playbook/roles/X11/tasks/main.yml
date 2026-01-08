@@ -5,7 +5,7 @@
 # x11.vfb installp download requiring an IBMid                          #
 # http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
 #########################################################################
-
+---
 - name: Check if X11.adt.ext is installed
   shell: lslpp -l X11.adt.ext >/dev/null 2>&1
   register: does_X11_adt_ext_exist
