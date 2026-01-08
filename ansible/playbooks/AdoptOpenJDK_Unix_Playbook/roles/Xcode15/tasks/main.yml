@@ -62,7 +62,7 @@
       shell: mkdir -p "{{ xcode_appleopenjdk_tmp }}" && cd "{{ xcode_appleopenjdk_tmp }}" && git clone https://github.com/apple/openjdk.git appleopenjdk
 
     - name: Apply JavaNativeFoundation patch to Xcode
-      shell:
+      shell: |
         mkdir {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current/Headers
         cp {{ xcode_appleopenjdk_tmp }}/appleopenjdk/apple/JavaNativeFoundation/JavaNativeFoundation/*.h {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current/Headers
         cp -R {{ xcode_appleopenjdk_tmp }}/appleopenjdk/apple/JavaNativeFoundation/JavaNativeFoundation/Modules {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current
