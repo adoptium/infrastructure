@@ -70,7 +70,7 @@
         ln -s Versions/Current/Modules {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Modules
 
     - name: Clean up appleopenjdk
-     shell: rm -rf "{{ xcode_appleopenjdk_tmp }}"
+      shell: rm -rf "{{ xcode_appleopenjdk_tmp }}"
 
     - name: Select Xcode as the default Xcode
       shell: sudo xcode-select --switch "{{ xcode_app_dest_path }}"
