@@ -1,0 +1,37 @@
+##############################################
+# IBM OpenXL C 17.1.4.1 Runtime and Compiler #
+##############################################
+---
+- name: Check if OpenXL 17 is installed
+  stat:
+    path: /opt/IBM/openxlC/17.1.4.1
+  register: xlc17
+
+- name: Install OpenXL runtime and Compiler
+  when: xlc17.stat.isdir is undefined
+  block:
+    - name: Transfer and extract OpenXL 17 runtime
+      unarchive:
+        src: "{{ vendor_files_path }}/aix/XLC/IBM_OPEN_XL_CPP_RUNTIME_17.1.4.1_AIX.tar.Z"
+        dest: /tmp/openxl17_runtime/
+        remote_src: false
+
+    - name: Install OpenXL 17 runtime
+      command: installp -acXgd /tmp/openxl17_runtime/ all
+
+    - name: Transfer and extract OpenXL 17 Compiler
+      unarchive:
+        src: "{{ vendor_files_path }}/aix/XLC/IBM_OPEN_XL_CPP_17.1.4.1_AIX.tar.Z"
+        dest: /tmp/openxl17_compiler/
+        remote_src: false
+
+    - name: Install OpenXL 17 Compiler
+      command: installp -aXYg -e /tmp/openxl17_install.log -d /tmp/openxl17_compiler/usr/sys/inst.images all
+
+    - name: Clean up files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/openxl17_compiler/
+        - /tmp/openxl17_runtime/

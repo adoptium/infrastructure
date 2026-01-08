@@ -15,12 +15,12 @@ Sudoers_File: /etc/sudoers
 
 # Jenkins User Variables:
 Jenkins_Username: jenkins
-Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub
+Jenkins_User_SSHKey: /Users/hkhel/Vendor_Files/keys/Jenkins_User_SSHKey
 
 # Superuser Variables:
 Superuser_Account: Enabled
 # Zeus_Username: zeus
-Zeus_User_SSHKey: /Vendor_Files/keys/zeus.key
+Zeus_User_SSHKey: /Users/hkhel/Vendor_Files/keys/zeus.key
 
 # Nagios Variables:
 Nagios_Plugins: Enabled
@@ -47,6 +47,9 @@ Slack_Notification: Disabled
 
 ant_version: 1.10.15
 ant_checksum: sha512:1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9
+
+# Modify if using a different local path
+vendor_files_path: /Vendor_Files
 
 key:
   apache_ant: 0A123C1ED3F13A6A0140E166C71FB765CD9DE313 # Jaikiran Pai <jaikiran@apache.org>

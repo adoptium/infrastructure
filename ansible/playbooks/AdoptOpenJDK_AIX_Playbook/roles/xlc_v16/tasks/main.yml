@@ -14,13 +14,13 @@
   block:
     - name: Transfer and Extract XLC16
       unarchive:
-        src: /Vendor_Files/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z
-        dest: /tmp
+        src: "{{ vendor_files_path }}/aix/XLC/XL_C_Cpp_FOR_AIX_V16.1_EMG.tar.Z"
+        dest: /tmp/xlc16/
         remote_src: false
       register: _vendor_copied
 
     - name: Install IBM XLC16 - installp
-      command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/usr/sys/inst.images all
+      command: installp -aXYg -e /tmp/xlc16_install.log -d /tmp/xlc16/usr/sys/inst.images all
       register: _installp
       failed_when: false
       when: _vendor_copied.failed is defined and _vendor_copied.failed == false
@@ -30,10 +30,23 @@
       when: xlc16.stat.islnk is not defined
       tags: xlc16
 
+    - name: Transfer and extract XLC16 Fixpack 10
+      unarchive:
+        src: "{{ vendor_files_path }}/aix/16.1.0.10-IBM-xlCcmp-AIX-FP010.tar.Z"
+        dest: /tmp/xlc16_fixpack
+        remote_src: false
+      register: fixpack_copied
+
+    - name: Install IBM XLC16 fixpack 10
+      command: installp -acXgd /tmp/xlc16_fixpack all
+
     - name: Clean XLC16 tmp files
       file:
-        path: /tmp/usr
+        path: "{{ item }}"
         state: absent
+      loop:
+        - "/tmp/xlc16/"
+        - "/tmp/xlc16_fixpack"
 
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion

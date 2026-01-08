@@ -14,7 +14,7 @@
   block:
     - name: Transfer and Extract XLC13
       unarchive:
-        src: /Vendor_Files/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz
+        src: "{{ vendor_files_path }}/aix/XLC/IBM_XL_C_C___FOR_AIX_V13.1.3_EMG.tar.gz"
         dest: /tmp
         remote_src: false
       register: _vendor_copied

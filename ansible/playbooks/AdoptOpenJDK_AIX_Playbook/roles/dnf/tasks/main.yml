@@ -89,7 +89,7 @@
           - expect
           - flex
           - freetype2-devel-2.8-1
-          - fontconfig-devel
+          - fontconfig-devel-2.11.95
           - gawk
           - git
           # - gnupg2-2.0.30
@@ -186,7 +186,7 @@
     dest: /opt/freeware/etc/dnf/dnf.conf
     firstmatch: true
     insertafter: 'plugins=1'
-    line: 'exclude=autoconf* cmake* freetype2*'
+    line: 'exclude=autoconf* cmake* freetype2* fontconfig-devel*'
   tags:
     - cmake
     - freetype2
