@@ -82,4 +82,3 @@
       file:
         path: "{{ xcode_xip_path }}"
         state: absent
-
