@@ -1,0 +1,32 @@
+######################################
+# IBM OpenXL C 17.1.4.1 Runtime only #
+# Does NOT install the compiler      #
+######################################
+---
+- name: Check if OpenXL 17 is installed
+  stat:
+    path: /opt/IBM/openxlC/17.1.4.1
+  register: xlc17
+
+- name: Install OpenXL runtime
+  when: xlc17.stat.isdir is undefined
+  block:
+    - name: Create runtime temp directory
+      file:
+        path: /tmp/openxl17_runtime
+        state: directory
+
+# Needs the XLC 16.1.0.10 fixpack to be installed, see xlc_v16 role
+    - name: Transfer and extract OpenXL 17 runtime
+      unarchive:
+        src: "{{ vendor_files_path }}/aix/XLC/IBM_OPEN_XL_CPP_RUNTIME_17.1.4.1_AIX.tar.Z"
+        dest: /tmp/openxl17_runtime
+        remote_src: false
+
+    - name: Install OpenXL 17 runtime
+      command: installp -acXgd /tmp/openxl17_runtime/ all
+
+    - name: Clean up files
+      file:
+        path: /tmp/openxl17_runtime/
+        state: absent
