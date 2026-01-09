@@ -11,6 +11,7 @@
     xcode_app_tmp_path: "/tmp/{{ xcode_app }}"
     xcode_app_dest_path: "/Applications/{{ xcode_app }}"
     xcode_sas_token_var: "XCode{{ xcode_version | replace('.', '_') }}_SAS_TOKEN"
+    xcode_appleopenjdk_tmp: "/tmp/appleopenjdk_clone"
 
 # Xcode {{ xcode_version }} is needed to build JDK 17+
 # Xcode {{ xcode_version }} can be downloaded from https://developer.apple.com/download/all after authentication with apple ID and password
@@ -56,6 +57,26 @@
         src: "{{ xcode_app_tmp_path }}"
         dest: "{{ xcode_app_dest_path }}"
         remote_src: true
+
+    - name: Obtain JavaNativeFoundation from appleopenjdk
+      shell: |
+        mkdir -p "{{ xcode_appleopenjdk_tmp }}"
+        cd "{{ xcode_appleopenjdk_tmp }}"
+        git clone https://github.com/apple/openjdk.git appleopenjdk
+        cd appleopenjdk
+        echo "Checking out apple/openjdk latest commit"
+        git checkout 356491bda24e6c4781c6b650f4efda05a6bc1296
+
+    - name: Apply JavaNativeFoundation patch to Xcode
+      shell: |
+        mkdir {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current/Headers
+        cp {{ xcode_appleopenjdk_tmp }}/appleopenjdk/apple/JavaNativeFoundation/JavaNativeFoundation/*.h {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current/Headers
+        cp -R {{ xcode_appleopenjdk_tmp }}/appleopenjdk/apple/JavaNativeFoundation/JavaNativeFoundation/Modules {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Versions/Current
+        ln -s Versions/Current/Headers {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Headers
+        ln -s Versions/Current/Modules {{ xcode_app_dest_path }}/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaNativeFoundation.framework/Modules
+
+    - name: Clean up appleopenjdk
+      shell: rm -rf "{{ xcode_appleopenjdk_tmp }}"
 
     - name: Select Xcode as the default Xcode
       shell: sudo xcode-select --switch "{{ xcode_app_dest_path }}"
