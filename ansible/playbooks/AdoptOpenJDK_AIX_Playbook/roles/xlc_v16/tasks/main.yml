@@ -30,23 +30,28 @@
       when: xlc16.stat.islnk is not defined
       tags: xlc16
 
-    - name: Transfer and extract XLC16 Fixpack 10
-      unarchive:
-        src: "{{ vendor_files_path }}/aix/16.1.0.10-IBM-xlCcmp-AIX-FP010.tar.Z"
-        dest: /tmp/xlc16_fixpack
-        remote_src: false
-      register: fixpack_copied
+- name: Create xlc16_fixpack directory
+  file:
+    path: /tmp/xlc16_fixpack
+    state: directory
 
-    - name: Install IBM XLC16 fixpack 10
-      command: installp -acXgd /tmp/xlc16_fixpack all
+- name: Transfer and extract XLC16 Fixpack 10
+  unarchive:
+    src: "{{ vendor_files_path }}/aix/XLC/16.1.0.10-IBM-xlCcmp-AIX-FP010.tar.Z"
+    dest: /tmp/xlc16_fixpack
+    remote_src: false
+  register: fixpack_copied
 
-    - name: Clean XLC16 tmp files
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - "/tmp/xlc16/"
-        - "/tmp/xlc16_fixpack"
+- name: Install IBM XLC16 fixpack 10
+  command: installp -acXgd /tmp/xlc16_fixpack all
+
+- name: Clean XLC16 tmp files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "/tmp/xlc16/"
+    - "/tmp/xlc16_fixpack"
 
 - name: Query xlC version
   command: /opt/IBM/xlC/16.1.0/bin/xlc -qversion
