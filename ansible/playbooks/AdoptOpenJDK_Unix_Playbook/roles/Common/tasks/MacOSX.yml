@@ -150,15 +150,84 @@
     - not (macos_version_number | regex_search("10.12"))
   tags: build_tools
 
-- name: Install Build Tool Casks
+# Install The Mac Build Tools Packages Cask
+# This is no longer able to be installed via the normal method as it no
+# longer passes the macos Gatekeeper checks.
+# This issue suggests this wont be fixed: https://github.com/packagesdev/packages/issues/170
+
+- name: Download Packages.zip
+  get_url:
+    url: https://ci.adoptium.net/userContent/macos/Macos_Build_Tools_Cask_Packages.zip
+    dest: /tmp/Packages.zip
+    mode: "0750"
+    checksum: "sha256:321d237d00d4085bf51926b577729a395b74468d57a26c0f5a71f19428004716"
+  retries: 3
+  delay: 5
+  register: packages_download
+  until: packages_download is not failed
+
+- name: Create staging directory
+  file:
+    path: /tmp/packages_stage
+    state: directory
+    mode: "0755"
+
+- name: Unzip Packages.zip
+  unarchive:
+    src: /tmp/Packages.zip
+    dest: /tmp/packages_stage
+    remote_src: true
+
+# See This Article For An Overview Of The Installation Procedure Below
+
+- name: Install Packages from DMG
   become: true
-  become_user: "{{ ansible_user }}"
-  homebrew_cask:
-    name: "{{ item }}"
-    state: present
-    path: "{{ homebrew_path }}"
-  with_items: "{{ Build_Tool_Casks }}"
-  tags: build_tools
+  shell: |
+    set -euo pipefail
+    DMG="/tmp/packages_stage/Packages.dmg"
+    ATTACH_OUT="$(hdiutil attach "$DMG" -nobrowse -readonly)"
+    # Extract mount point robustly (handles spaces)
+    MOUNT="$(echo "$ATTACH_OUT" | awk '
+      /\/Volumes\// {
+        for (i=1;i<=NF;i++) {
+          if ($i ~ /^\/Volumes\//) {
+            mp=$i
+            for (j=i+1;j<=NF;j++) mp=mp" "$j
+            print mp
+            exit
+          }
+        }
+      }')"
+    if [ -z "$MOUNT" ]; then
+      echo "ERROR: Could not determine mount point from hdiutil output" >&2
+      exit 1
+    fi
+    find "$MOUNT" -maxdepth 4 -name "*.pkg" \
+      -not -path "*/.Trashes/*" \
+      -not -path "*/.Spotlight-V100/*" \
+      -not -path "*/.fseventsd/*" \
+      -print || true
+    PKG="$(
+      find "$MOUNT" -maxdepth 4 -name "*.pkg" \
+        -not -path "*/.Trashes/*" \
+        -not -path "*/.Spotlight-V100/*" \
+        -not -path "*/.fseventsd/*" \
+        -print \
+      | awk '{ print length($0) "\t" $0 }' \
+      | sort -n \
+      | head -n 1 \
+      | cut -f2-
+    )"
+    if [ -z "$PKG" ]; then
+      echo "ERROR: No usable .pkg found inside DMG at $MOUNT" >&2
+      hdiutil detach "$MOUNT" || true
+      exit 1
+    fi
+    /usr/sbin/installer -pkg "$PKG" -target /
+    hdiutil detach "$MOUNT"
+  args:
+    executable: /bin/bash
+    creates: /Applications/Packages.app
 
 - name: Install Test Tool Packages
   become: true
