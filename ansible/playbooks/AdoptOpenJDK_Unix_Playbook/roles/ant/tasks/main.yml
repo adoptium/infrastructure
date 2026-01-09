@@ -92,12 +92,21 @@
   failed_when: false
   tags: ant
 
-- name: Remove the older Ant package via yum
+- name: Remove ant package (CentOS or RHEL prior to 8)
   yum:
     name: ant
     state: absent
   when:
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS")
+    - ansible_os_family == "RedHat"
+    - ansible_distribution == "CentOS"
+      or ansible_distribution_major_version | int < 8
+  tags: ant
+
+- name: Remove ant package (RHEL 8+)
+  command: dnf -y remove ant
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version | int >= 8
   tags: ant
 
 - name: Remove the older Ant package via apt
