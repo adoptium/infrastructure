@@ -103,9 +103,6 @@
       when:
         - ansible_architecture == "riscv64"
       tags: [devkit]
-    - role: Xcode11
-      when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
-      tags: [xcode11] # JDK 8
     - role: Xcode15
       when: ansible_distribution == "MacOSX" and ansible_architecture == "arm64"
       tags: [xcode15] # JDK 17+
