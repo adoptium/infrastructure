@@ -99,7 +99,7 @@
         - ansible_architecture == "aarch64"
       tags: [devkit]
     - role: devkit                # JDK19+
-      devkit_version: gcc-14.2.0-Fedora_28-b00
+      devkit_version: gcc-14.2.0-Fedora28-b01
       when:
         - ansible_architecture == "riscv64"
       tags: [devkit]
