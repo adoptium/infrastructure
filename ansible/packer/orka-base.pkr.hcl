@@ -19,10 +19,6 @@ variable "ORKA_ENDPOINT" {
   default = "http://10.221.188.20"
 }
 
-variable "XCode11_7_SAS_TOKEN" {
-  default = env("XCode11_7_SAS_TOKEN")
-}
-
 variable "XCode15_2_SAS_TOKEN" {
   default = env("XCode15_2_SAS_TOKEN")
 }
@@ -115,9 +111,8 @@ EOF
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--extra-vars", "XCode11_7_SAS_TOKEN=\"${var.XCode11_7_SAS_TOKEN}\"",
       "--extra-vars", "XCode15_2_SAS_TOKEN=\"${var.XCode15_2_SAS_TOKEN}\"",
-      "--tags", "xcode11,xcode15"
+      "--tags", "xcode15"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }

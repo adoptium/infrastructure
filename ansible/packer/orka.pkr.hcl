@@ -90,13 +90,13 @@ build {
   }
 
   # Run ansible playbook
-  # xcode11 and 15 are skipped because they should run only in the orka-base.pkr.hcl stage
+  # Xcode 15 are skipped because they should run only in the orka-base.pkr.hcl stage
   provisioner "ansible-local" {
     playbook_file = "../playbooks/AdoptOpenJDK_Unix_Playbook/main.yml"
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--skip-tags=xcode11,xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
+      "--skip-tags=xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }
