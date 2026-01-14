@@ -155,7 +155,20 @@
     - ((not curl_version.stdout) or ((curl_version.stdout) and (curl_version.stdout is version_compare(curl_oldest, operator='lt', strict=True))))
   tags: curl
 
-- name: Install curl via brew in MacOS14 (regardless if curl is already installed)
+- name: Install curl via brew on MacOS14 arm64 (upgrade to latest if curl is already installed)
+  become: yes
+  become_user: "{{ ansible_user }}"
+  homebrew:
+    name: curl
+    state: latest
+    path: "{{ homebrew_path }}"
+  when:
+    - ansible_distribution == "MacOSX"
+    - ansible_distribution_major_version == "14"
+    - ansible_architecture == "arm64"
+  tags: curl
+
+- name: Install curl via brew on MacOS14 x64 (upgrade to latest if curl is already installed)
   become: yes
   become_user: "{{ ansible_user }}"
   when:
