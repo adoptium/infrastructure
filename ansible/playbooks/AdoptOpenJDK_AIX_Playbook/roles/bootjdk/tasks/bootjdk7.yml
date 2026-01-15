@@ -9,7 +9,7 @@
 
 - name: Transfer and Extract Java7
   unarchive:
-    src: /Vendor_Files/aix/openjdk-7u-aix.tar
+    src: "{{ vendor_files_path }}/aix/openjdk-7u-aix.tar"
     dest: /usr
     remote_src: false
   when: java7.stat.isdir is not defined
@@ -20,7 +20,7 @@
 - name: Mention access requirements
   debug:
     msg:
-      - Need access to /Vendor_Files/aix/openjdk-7u-aix.tar for java7
+      - "Need access to {{ vendor_files_path }}/Vendor_Files/aix/openjdk-7u-aix.tar for java7"
       - "{{ vf.msg.split('\n') }}"
     verbosity: 0
   when: vf.changed == false and vf.skipped is not defined
