@@ -146,7 +146,7 @@
     state: present
     path: "{{ homebrew_path }}"
   with_items: "{{ Build_Tool_Packages_Not_MacOS14_arm64 }}"
-  when: not ((macos_version_number | regex_search("14")) or ansible_architecture == "arm64")
+  when: not ((macos_version_number | regex_search("14")) and ansible_architecture == "arm64")
   tags: build_tools
 
 - name: Install Build Tool Packages NOT macOS 10.12
