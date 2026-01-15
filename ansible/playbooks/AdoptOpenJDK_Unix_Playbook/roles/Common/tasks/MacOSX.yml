@@ -138,6 +138,17 @@
   tags: build_tools
   when: not (cmake_homebrew.stat.exists or cmake_local.stat.exists)
 
+- name: Install Build Tool Packages NOT MacOS 14 arm64
+  become: true
+  become_user: "{{ ansible_user }}"
+  homebrew:
+    name: "{{ item }}"
+    state: present
+    path: "{{ homebrew_path }}"
+  with_items: "{{ Build_Tool_Packages_Not_MacOS14_arm64 }}"
+  when: not ((macos_version_number | regex_search("14")) or ansible_architecture == "arm64")
+  tags: build_tools
+
 - name: Install Build Tool Packages NOT macOS 10.12
   become: true
   become_user: "{{ ansible_user }}"

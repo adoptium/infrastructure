@@ -9,7 +9,6 @@ Build_Tool_Packages:
   - autoconf
   - automake # for compiling freetype on JDK8u
   - coreutils
-  - git
   - gnupg
   - gnu-sed
   - gnu-tar
@@ -17,6 +16,9 @@ Build_Tool_Packages:
   - wget
   - bash # OpenJ9 needs bash v4 or later
   - make
+
+Build_Tool_Packages_Not_MacOS14_arm64:
+  - git # We want to use system git for MacOS14 arm64
 
 Build_Tool_Packages_NOT_10_12:
   - ccache # ccache is no longer working on macOS 10.12
