@@ -1,0 +1,34 @@
+#######################################
+# IBM OpenXL C 17.1.3.0 Runtime only  #
+# Does NOT install the compiler       #
+# Only to be run on 72TL5 or 73 boxes #
+#######################################
+---
+- name: Get version of libc++ runtime
+  shell: lslpp -l libc++.rte | grep 17 | awk '{print $2}'
+  register: runtime_version
+
+- name: Install OpenXL runtime
+  when: runtime_version.stdout != "" or runtime_version.stdout is version('17.1.3.0', '<')
+  block:
+    - name: Create runtime temp directory
+      file:
+        path: /tmp/openxl17.1.3.0_runtime
+        state: directory
+
+# Needs the XLC 16.1.0.10 fixpack to be installed, see xlc_v16 role
+    - name: Transfer and extract OpenXL 17.1.3.0 runtime
+      unarchive:
+        src: "{{ vendor_files_path }}/aix/XLC/IBM_OPEN_XL_CPP_RUNTIME_17.1.3.0_AIX.tar.Z"
+        dest: /tmp/openxl17_runtime
+        remote_src: false
+
+    - name: Install OpenXL 17.1.3.0 runtime
+      command: installp -acXgd /tmp/openxl17.1.3.0_runtime/ all
+
+    - name: Clean up files
+      file:
+        path: /tmp/openxl17.1.3.0_runtime
+        state: absent
+      loop:
+        - /tmp/openxl17.1.3.0_runtime

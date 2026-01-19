@@ -21,7 +21,7 @@
   block:
     - name: Transfer openssl binary
       unarchive:
-        src: /Vendor_Files/aix/openssl-3.0.10.1000.tar.Z
+        src: "{{ vendor_files_path }}/aix/openssl-3.0.10.1000.tar.Z"
         dest: /tmp/
         remote_src: false
 
