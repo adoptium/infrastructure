@@ -63,15 +63,37 @@
   register: ant_contrib_installed
   tags: ANT
 
-- name: Download ant-contrib
-  win_get_url:
-    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
-    dest: c:\temp\ant-contrib.zip
-    force: no
-    checksum: 22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc
-    checksum_algorithm: sha256
-  when: (not ant_contrib_installed.stat.exists)
-  tags: ANT
+# NOTE: This is commented out and replaced with a manual invocation of sha256sum
+#       afterwards because this was not workin consistently. It is left here as
+#       we need further diagnosis to understand why this is not working.
+#       Specifically is it failing in the github actions run for build image gen
+
+- name: Download ant-contrib with curl
+  win_shell: c:\cygwin64\bin\curl -Lo c:\temp\ant-contrib.zip https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
+#- name: Download ant-contrib
+#  win_get_url:
+#    url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.zip
+#    dest: c:\temp\ant-contrib.zip
+#    force: no
+#    checksum: 22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc
+#    checksum_algorithm: sha256
+#    when: (not ant_contrib_installed.stat.exists)
+#  tags: ANT
+
+- name: "Check sha256sum of ant-contrib.zip with PowerShell"
+  win_shell: |
+    $filePath = "c:\temp\ant-contrib.zip"
+    $expectedChecksum = "22bae6c3ddf1a464b285784599eef8698f64dde24378c77e42522a536b88cbbc"
+    $actualChecksum = Get-FileHash -Path $filePath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+    if ($actualChecksum -ne $expectedChecksum) {
+      Write-Output "Checksum mismatch"
+      Write-Output "Actual Checksum: $actualChecksum"
+      Write-Output "Expect Checksum: $expectedChecksum"
+      exit 1
+    }
+  register: checksum_result
+  failed_when: checksum_result.rc != 0
 
 - name: Unzip ant-contrib
   win_unzip:
@@ -81,7 +103,7 @@
   when: (not ant_contrib_installed.stat.exists)
   tags: ANT
 
-- name: Copy the ant-contrib.jar to ANT's lib folder
+- name: "Copy the ant-contrib.jar to ANT's lib folder"
   win_copy:
     src: C:\temp\ant-contrib\ant-contrib\lib\ant-contrib.jar
     dest: C:\apache-ant\apache-ant-{{ ant_version }}\lib\ant-contrib.jar
@@ -96,4 +118,5 @@
   with_items:
     - ant-contrib.zip
     - ant.zip
+    - ant-contrib.sha256
   tags: ANT
