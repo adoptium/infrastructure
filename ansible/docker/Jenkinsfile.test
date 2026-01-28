@@ -35,14 +35,22 @@ pipeline {
                        dockerBuild('arm64', 'ubi10', 'Dockerfile.ubi10')
                    }
                }
-//               stage('UBI10 ppc64le') {
-//                   agent {
-//                       label "dockerBuild&&linux&&ppc64le"
-//                   }
-//                   steps {
-//                       dockerBuild('ppc64le', 'ubi10', 'Dockerfile.ubi10')
-//                   }
-//               }
+              stage('Ubuntu24.04 s390x') {
+                  agent {
+                      label "dockerBuild&&linux&&s390x"
+                  }
+                  steps {
+                      dockerBuild('s390x', 'ubuntu2404', 'Dockerfile.u2404')
+                  }
+              }
+              stage('Ubuntu24.04 ppc64le') {
+                  agent {
+                      label "dockerBuild&&linux&&ppc64le"
+                  }
+                  steps {
+                      dockerBuild('ppc64le', 'ubuntu2404', 'Dockerfile.u2404')
+                  }
+              }
             }
         }
         stage('Docker Manifest') {
@@ -97,13 +105,19 @@ def dockerManifest() {
             export TARGET="ghcr.io/adoptium/test-containers:ubuntu2404"
             AMD64=${TARGET}-amd64
             ARM64=${TARGET}-arm64
+            S390X=${TARGET}-s390x
+            PPC64LE=${TARGET}-ppc64le
             echo "Debug SF01"
             docker manifest inspect $AMD64 2>/dev/null | grep mediaType
             docker manifest inspect $ARM64 2>/dev/null | grep mediaType
+            docker manifest inspect $S390X 2>/dev/null | grep mediaType
+            docker manifest inspect $PPC64LE 2>/dev/null | grep mediaType
             echo "Debug SF01"
-            docker manifest create $TARGET $AMD64 $ARM64
+            docker manifest create $TARGET $AMD64 $ARM64 $S390X $PPC64LE
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
+            docker manifest annotate $TARGET $S390X --arch s390x --os linux
+            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
             docker manifest push $TARGET
 
             # UBI10
