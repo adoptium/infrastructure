@@ -1,0 +1,16 @@
+---
+sshd_config_path: 'C:\ProgramData\ssh\sshd_config'
+
+openssh_port: 22
+openssh_allow_users: []  # e.g. ["DOMAIN\\Admin", "{{ jenkins_username }}"]
+
+# Required: public keys (single-line "ssh-rsa ..." or "ssh-ed25519 ..." strings)
+admin_ssh_key: "{{ Keybox_SSHKey }}"
+jenkins_ssh_key: "{{ Jenkins_User_SSHKey }}"
+
+openssh_default_shell: 'C:\cygwin64\bin\bash.exe'
+openssh_cygwin_home_root: 'C:\cygwin64\home'
+
+manage_admin_ssh_dir: true
+manage_jenkins_ssh_dir: true
+enable_ssh_agent: true

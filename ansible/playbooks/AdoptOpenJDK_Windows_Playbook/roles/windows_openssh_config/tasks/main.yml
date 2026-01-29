@@ -1,0 +1,257 @@
+---
+###############################################################################
+# Fixed identities (profiles created by win_profile elsewhere)
+###############################################################################
+
+- name: Set admin/jenkins path facts
+  ansible.builtin.set_fact:
+    admin_user: "{{ ansible_user }}"
+    jenkins_user: "{{ Jenkins_Username }}"
+    admin_ssh_dir: "C:\\Users\\{{ ansible_user }}\\.ssh"
+    admin_authkeys: "C:\\Users\\{{ ansible_user }}\\.ssh\\authorized_keys"
+    jenkins_ssh_dir: "C:\\Users\\{{ Jenkins_Username }}\\.ssh"
+    jenkins_authkeys: "C:\\Users\\{{ Jenkins_Username }}\\.ssh\\authorized_keys"
+  tags: windows_openssh_config
+
+###############################################################################
+# Ensure the jenkins user has a profile available
+###############################################################################
+
+- name: Create a windows profile for an account at C:\Users\ansible
+  win_user_profile:
+    username: "{{ Jenkins_Username }}"
+    name: "{{ Jenkins_Username }}"
+    state: present
+  tags: windows_openssh_config
+
+- name: Create Cygwin home directory for Jenkins (Windows path)
+  ansible.windows.win_file:
+    path: "{{ Cygwin_INST_DIR }}\\home\\{{ Jenkins_Username }}"
+    state: directory
+  tags: windows_openssh_config
+
+###############################################################################
+# Check SSH Configuration Paths etc are present
+###############################################################################
+
+- name: Ensure OpenSSH config directory exists
+  ansible.windows.win_file:
+    path: C:\ProgramData\ssh
+    state: directory
+  tags: windows_openssh_config
+
+- name: Check Cygwin bash exists (required)
+  ansible.windows.win_stat:
+    path: "{{ openssh_default_shell }}"
+  register: cyg_bash
+  tags: windows_openssh_config
+
+- name: Fail if Cygwin bash missing
+  ansible.builtin.fail:
+    msg: "Cygwin bash not found at {{ openssh_default_shell }} (required for DefaultShell + Jenkins SSH agent launch)."
+  when: not cyg_bash.stat.exists
+  tags: windows_openssh_config
+
+###############################################################################
+# Deploy sshd_config via template
+###############################################################################
+
+- name: Deploy sshd_config from template
+  ansible.windows.win_template:
+    src: sshd_config.j2
+    dest: "{{ sshd_config_path }}"
+  register: sshd_cfg
+  tags: windows_openssh_config
+
+###############################################################################
+# Set DefaultShell -> Cygwin bash
+###############################################################################
+
+- name: Set DefaultShell to Cygwin bash
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\OpenSSH
+    name: DefaultShell
+    data: "{{ openssh_default_shell }}"
+    type: string
+  register: default_shell
+  tags: windows_openssh_config
+
+###############################################################################
+# Ensure Windows .ssh directories exist
+###############################################################################
+
+- name: Ensure admin .ssh exists
+  ansible.windows.win_file:
+    path: "{{ admin_ssh_dir }}"
+    state: directory
+  tags: windows_openssh_config
+
+- name: Ensure Jenkins .ssh exists
+  ansible.windows.win_file:
+    path: "{{ jenkins_ssh_dir }}"
+    state: directory
+  tags: windows_openssh_config
+
+###############################################################################
+# Write authorized_keys from variables
+###############################################################################
+
+- name: Fail if admin_ssh_key is empty
+  ansible.builtin.fail:
+    msg: "admin_ssh_key is empty. Provide a public key string for the admin account."
+  when: (admin_ssh_key | default('') | trim) == ''
+  tags: windows_openssh_config
+
+- name: Fail if jenkins_ssh_key is empty
+  ansible.builtin.fail:
+    msg: "jenkins_ssh_key is empty. Provide a public key string for the jenkins account."
+  when: (jenkins_ssh_key | default('') | trim) == ''
+  tags: windows_openssh_config
+
+- name: Install admin authorized_keys
+  ansible.windows.win_copy:
+    dest: "{{ admin_authkeys }}"
+    content: "{{ admin_ssh_key | trim }}\r\n"
+  register: admin_authkeys_result
+  tags: windows_openssh_config
+
+- name: Install Jenkins authorized_keys
+  ansible.windows.win_copy:
+    dest: "{{ jenkins_authkeys }}"
+    content: "{{ jenkins_ssh_key | trim }}\r\n"
+  register: jenkins_authkeys_result
+  tags: windows_openssh_config
+
+###############################################################################
+# Set Windows ACLs for SSH config and directories
+###############################################################################
+# NB: PowerShell treats "$u:(...)" as a special variable scope.
+# So we build the grant strings explicitly to avoid parsing issues.
+###############################################################################
+
+- name: Fix ACLs on Admin User .ssh and authorized_keys
+  ansible.windows.win_shell: |
+    $u    = "{{ ansible_user }}"
+    $dir  = 'C:\Users\$u\.ssh'
+    $file = 'C:\Users\$u\.ssh\authorized_keys'
+
+    if (!(Test-Path -LiteralPath $dir)) { throw "Missing directory: $dir" }
+
+    icacls.exe "$dir" /inheritance:r | Out-Null
+    icacls.exe "$dir" /grant '$u:(OI)(CI)F' 'SYSTEM:(OI)(CI)F' | Out-Null
+
+    if (Test-Path -LiteralPath $file) {
+      icacls.exe "$file" /inheritance:r | Out-Null
+      icacls.exe "$file" /grant '$u:F' 'SYSTEM:F' | Out-Null
+    }
+  args:
+    executable: powershell.exe
+  tags: windows_openssh_config
+
+- name: Harden Jenkins OpenSSH key ACLs (remove Administrators) - PowerShell safe
+  ansible.windows.win_powershell:
+    script: |
+      $u    = '{{ Jenkins_Username }}'
+      $dir  = 'C:\Users\{{ Jenkins_Username }}\.ssh'
+      $file = 'C:\Users\{{ Jenkins_Username }}\.ssh\authorized_keys'
+
+      if (!(Test-Path -LiteralPath $dir))  { throw "Missing directory: $dir" }
+      if (!(Test-Path -LiteralPath $file)) { throw "Missing file: $file" }
+
+      # Remove inheritance
+      & icacls.exe $dir  '/inheritance:r' | Out-Null
+      & icacls.exe $file '/inheritance:r' | Out-Null
+
+      # Jenkins user must be the only user with access (plus SYSTEM) for non-admin keys
+      $grantDir  = "$u`:(OI)(CI)F"
+      $grantFile = "$u`:F"
+
+      & icacls.exe $dir  '/grant' $grantDir  'SYSTEM:(OI)(CI)F' | Out-Null
+      & icacls.exe $file '/grant' $grantFile 'SYSTEM:F'        | Out-Null
+
+      # Output ACLs for easy testing
+      "ACL: $dir"
+      & icacls.exe $dir
+      "ACL: $file"
+      & icacls.exe $file
+  tags: windows_openssh_config
+
+###############################################################################
+# Create File Junctions So Cygwin & Windows Can CoExist
+###############################################################################
+
+- name: Create Cygwin .ssh junction for Admin User
+  ansible.windows.win_shell: |
+    $cygHome = 'C:\cygwin64\home\{{ ansible_user }}'
+    $target  = 'C:\Users\{{ ansible_user }}\.ssh'
+    $link    = Join-Path -Path $cygHome -ChildPath '.ssh'
+
+    if (!(Test-Path -LiteralPath $cygHome)) {
+      New-Item -ItemType Directory -Path $cygHome | Out-Null
+    }
+    if (!(Test-Path -LiteralPath $target)) {
+      throw "Missing target: $target"
+    }
+
+    # If link exists already, do nothing
+    if (Test-Path -LiteralPath $link) { exit 0 }
+
+    # Use mklink via cmd.exe with CMD quoting (no PowerShell escaping)
+    cmd.exe /c ('mklink /J "{0}" "{1}"' -f $link, $target) | Out-Null
+  args:
+    executable: powershell.exe
+  tags: windows_openssh_config
+
+- name: Create Cygwin .ssh junction for Jenkins
+  ansible.windows.win_shell: |
+    $cygHome = '{{ Cygwin_INST_DIR }}\home\{{ Jenkins_Username }}'
+    $target  = '{{ jenkins_ssh_dir }}'
+    $link    = Join-Path -Path $cygHome -ChildPath '.ssh'
+
+    if (!(Test-Path -LiteralPath $cygHome)) {
+      New-Item -ItemType Directory -Path $cygHome -Force | Out-Null
+    }
+    if (!(Test-Path -LiteralPath $target)) {
+      throw "Missing target: $target"
+    }
+
+    if (Test-Path -LiteralPath $link) {
+      $item = Get-Item -LiteralPath $link -Force
+      if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { exit 0 }
+      throw "Path exists but is not a junction: $link"
+    }
+
+    cmd.exe /c ('mklink /J "{0}" "{1}"' -f $link, $target) | Out-Null
+  args:
+    executable: powershell.exe
+  tags: windows_openssh_config
+
+###############################################################################
+# Ensure services enabled/started, restart sshd if anything changed
+###############################################################################
+
+- name: Ensure sshd enabled and started
+  ansible.windows.win_service:
+    name: sshd
+    start_mode: auto
+    state: started
+  tags: windows_openssh_config
+
+- name: Ensure ssh-agent enabled and started (optional)
+  ansible.windows.win_service:
+    name: ssh-agent
+    start_mode: auto
+    state: started
+  when: enable_ssh_agent | default(true) | bool
+  tags: windows_openssh_config
+
+- name: Restart sshd if config/DefaultShell/keys changed
+  ansible.windows.win_service:
+    name: sshd
+    state: restarted
+  when: >
+    sshd_cfg.changed or
+    default_shell.changed or
+    admin_authkeys_result.changed or
+    jenkins_authkeys_result.changed
+  tags: windows_openssh_config

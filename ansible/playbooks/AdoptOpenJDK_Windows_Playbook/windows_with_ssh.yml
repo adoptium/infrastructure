@@ -1,0 +1,98 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+# -------- Windows 7, 8, 10 ---------  #
+# - Windows Server 2022, 2025        - #
+# - With SSH support                   #
+########################################
+
+################
+# Please Note: #
+################
+# *** This playbook assumes that the Windows client machine has been configure to allow Ansible to run on it (WINRM)***
+# Ensure you have opened Internet Explorer and completed the setup (other wise wget will not work)
+# Run powershell as the Administrator
+# If setting up a win2012r2 machine, run '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12' See: https://github.com/adoptium/infrastructure/issues/1858
+# wget https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -OutFile .\ConfigureRemotingForAnsible.ps1
+# .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999
+# .\ConfigureRemotingForAnsible.ps1 -EnableCredSSP
+# .\ConfigureRemotingForAnsible.ps1 -ForceNewSSLCert
+# .\ConfigureRemotingForAnsible.ps1 -SkipNetworkProfileCheck
+#
+# Also Ensure That The Open SSH Server & Client Windows Features Are Installed
+# The Openssh server and agent process are running, and that the firewall Has
+# the relevant ports open for winrm and ssh.
+
+# Groups can be passed in as a command-line variable in Ansible playbook.
+# It can be defined as 'all' or a specific group which the host belongs to.
+# For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
+- name: Ansible Windows playbook
+  hosts: all
+  gather_facts: yes
+  pre_tasks:
+    - name: Load Standard Variables
+      block:
+      # Set standard variables
+        - name: Load AdoptOpenJDKs variable file
+          include_vars: group_vars/all/adoptopenjdk_variables.yml
+
+
+  #########
+  # Roles #
+  #########
+  roles:
+    - role: logs
+      position: "Start"
+      tags: always
+    - Debug
+    - role: Get_Vendor_Files
+      tags: [vendor_files, adoptopenjdk, jenkins]
+    - Version
+    - Common
+    - Windows_Updates
+    - WMF_5.1
+    - role: Jenkins               # AdoptOpenJDK infrastructure
+      tags: [jenkins, adoptopenjdk]
+    - CodesignCert
+    - 7-Zip                       # Mostly extracting other prereqs :-)
+    - cygwin
+    - role: windows_openssh_config
+      tags: [windows_openssh_config, adoptopenjdk, vendor_files]
+    - Strawberry_Perl             # Testing
+    - GIT
+    - Java7                       # JDK8 build bootstrap
+    - Java8                       # JDK9 build bootstrap/ For Gradle
+    - role: Java_install          # JDK11 build bootstrap
+      jdk_version: 10
+    - role: Java_install          # For Gradle
+      jdk_version: 11
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 16
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 17
+    - role: Java_install          # Bootstrap for JDK21
+      jdk_version: 20
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 21
+    - ANT                         # Testing
+    - role: MSVS_2022
+      tags: MSVS_2022
+    - role: MSVS_2013_REDIST      # Required For Tests
+      tags: MSVS_2013_REDIST
+    - role: MSVS_2022_REDIST
+      tags: MSVS_2022_REDIST
+    - NVidia_Cuda_Toolkit         # OpenJ9
+    - NTP_TIME
+    - Clang_64bit                 # OpenJ9
+    - Clang_32bit                 # OpenJ9
+    - nasm                        # OpenJ9
+    - Rust                        # IcedTea-Web
+    - IcedTea-Web                 # For Jenkins webstart
+    - WiX                         # For creating installers
+    - NSClient                    # Required For Nagios Monitoring
+    - Incredibuild                # Configure Incredibuild Dashboard Service
+    - shortNames
+    - Dragonwell                  # Dragonwell bootstrap image
+    - role: logs
+      position: "End"
+      tags: always
