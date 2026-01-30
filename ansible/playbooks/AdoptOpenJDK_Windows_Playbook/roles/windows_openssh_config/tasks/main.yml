@@ -40,16 +40,16 @@
     state: directory
   tags: windows_openssh_config
 
-- name: Check Cygwin bash exists (required)
+- name: Check Default Shell exists (required)
   ansible.windows.win_stat:
     path: "{{ openssh_default_shell }}"
-  register: cyg_bash
+  register: default_shell_stat
   tags: windows_openssh_config
 
-- name: Fail if Cygwin bash missing
+- name: Fail if Default Shell missing
   ansible.builtin.fail:
-    msg: "Cygwin bash not found at {{ openssh_default_shell }} (required for DefaultShell + Jenkins SSH agent launch)."
-  when: not cyg_bash.stat.exists
+    msg: "Default Shell not found at {{ openssh_default_shell }} (required for DefaultShell + Jenkins SSH agent launch)."
+  when: not default_shell_stat.stat.exists
   tags: windows_openssh_config
 
 ###############################################################################
@@ -64,10 +64,10 @@
   tags: windows_openssh_config
 
 ###############################################################################
-# Set DefaultShell -> Cygwin bash
+# Set DefaultShell
 ###############################################################################
 
-- name: Set DefaultShell to Cygwin bash
+- name: Set DefaultShell
   ansible.windows.win_regedit:
     path: HKLM:\SOFTWARE\OpenSSH
     name: DefaultShell
