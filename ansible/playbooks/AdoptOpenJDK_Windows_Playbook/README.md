@@ -58,3 +58,66 @@ jenkins_secret: ( This should be set to the jenkins secret used for connecting t
 Once all the above is complete, the playbook can then be run:
 
 ansible-playbook -i << path to hosts file >> -u << target user name >> ./windows_dockerhost.yml
+
+
+# Setting up Windows Machines with SSH Access (Cygwin + OpenSSH)
+
+In addition to the standard Windows and Dockerhost playbooks, a dedicated playbook (`windows_with_ssh.yml`) is provided to configure Windows test machines for **secure, key-based SSH access**, suitable for Adoptium build and test usage.
+
+This playbook installs and configures OpenSSH on Windows, integrates it with **Cygwin bash as the default shell**, and ensures both the administrative Ansible user and the Jenkins user can authenticate using SSH keys with correct and hardened ACLs.
+
+## What this playbook configures
+
+The `windows_with_ssh.yml` playbook performs the following actions:
+
+1. Ensures Windows user profiles exist for both the Ansible admin user and the Jenkins user.
+2. Validates that Cygwin is installed and that the configured `DefaultShell` points to Cygwin bash.
+3. Deploys a templated `sshd_config` suitable for Jenkins agent usage.
+4. Creates and populates `authorized_keys` files for both users from Ansible variables.
+5. Applies strict Windows ACLs to `.ssh` directories and key files:
+  - Admin user: access limited to the user and `SYSTEM`.
+  - Jenkins user: access limited to the Jenkins user and `SYSTEM` (Administrators explicitly removed).
+6. Creates Windows junctions so that Cygwin and native Windows OpenSSH share the same `.ssh` directories.
+7. Enables and starts the `sshd` service (and optionally `ssh-agent`).
+8. Automatically restarts `sshd` when configuration, shell settings, or keys change.
+
+This configuration ensures compatibility with Jenkins SSH agents while meeting Windows OpenSSH security requirements.
+
+---
+
+# Running the `windows_with_ssh.yml` Playbook
+
+Before running the playbook, ensure the following prerequisites are met:
+
+1. Log on to the Windows machine via RDP and run the `ConfigureRemotingForAnsible` commands listed in `main.yml`, as described in the standard Windows setup section.
+2. Ensure the openssh client and server features are installed on the Windows host, and the OpenSSH server, and OpenSSH Agent services are both running.
+3. Ensure the path to `bash.exe` is known and available for use as the OpenSSH `DefaultShell`. This is installed via the cygwin role.
+5. Ensure SSH public keys are available for both the admin and Jenkins users.
+
+## Required variables
+
+The following variables must be set before running the playbook:
+
+- `Jenkins_Username`  
+ The Windows account used to run the Jenkins agent.
+
+- `admin_ssh_key`  
+ SSH public key string for the Ansible/admin user.
+
+- `jenkins_ssh_key`  
+ SSH public key string for the Jenkins user.
+
+- `openssh_default_shell`  
+ Full path to the Cygwin bash executable (for example: `C:\cygwin64\bin\bash.exe`).
+
+- `Cygwin_INST_DIR`  
+ Base installation directory of Cygwin (for example: `C:\cygwin64`).
+
+These variables are typically defined in Vendor_Files, `group_vars` or supplied via inventory, consistent with the rest of the Windows playbooks.
+
+## Running the playbook
+
+Once all prerequisites and variables are in place, the playbook can be run as follows:
+
+```bash
+ansible-playbook -i << path to hosts file >> -u << admin user >> ./windows_with_ssh.yml
