@@ -56,6 +56,17 @@
   when: (not wix_installed.stat.exists) or (installed_wix_version.stdout.find(wix_version) == -1)
   tags: Wix
 
+# Add WiX extensions for jpackage tests
+- name: Add WiX extensions
+  ansible.windows.win_shell: |
+    wix extension add -g WixToolset.Util.wixext/{{ wix_version }}
+    wix extension add -g WixToolset.Ui.wixext/{{ wix_version }}
+  register: wixext_add
+  failed_when: >
+    wixext_add.rc != 0 and
+    (wixext_add.stdout + wixext_add.stderr) is not search("already installed")
+  tags: Wix
+
 - name: Delete downloaded .NET installer
   win_file:
     path: 'C:\temp\dotnet-install.exe'
