@@ -163,12 +163,14 @@
       jdk_version: 24
       when:
         - ansible_distribution != "Solaris"
+        - ansible_architecture != "armv7l"
         - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
       tags: build_tools
     - role: adoptopenjdk_install  # Current LTS
       jdk_version: 25
       when:
         - ansible_distribution != "Solaris"
+        - ansible_architecture != "armv7l"
         - not (ansible_distribution == "Alpine" and ansible_architecture == "aarch64")
       tags: build_tools
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
