@@ -58,7 +58,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
       - ibmcloud:
-          win2022-x64-1: {ip: 52.118.206.11, user: Administrator, cloudloc: oj9 }
+          win2022-x64-1: {ip: 52.118.206.11, user: Administrator, cloudloc: oj9}
 
   - dockerhost:
 
