@@ -25,7 +25,7 @@ hosts:
           ubuntu2404-x64-1: {ip: 46.224.123.39, description: jenkins-hetzner-worker}
 
       - ibmcloud:
-          vagrant-x64-1: {ip: 150.239.60.120, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
+          vagrant-x64-1: {ip: 150.239.60.120, cloudloc: oj9, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
       - osuosl:
           ubuntu2204-aarch64-1: {ip: 140.211.169.21, description: jenkins-worker}
@@ -58,7 +58,7 @@ hosts:
           solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
 
       - ibmcloud:
-          win2022-x64-1: {ip: 52.118.206.11, user: Administrator}
+          win2022-x64-1: {ip: 52.118.206.11, user: Administrator, cloudloc: oj9}
 
   - dockerhost:
 
@@ -151,10 +151,10 @@ hosts:
           ubuntu2404-ppc64le-1: {ip: 20.61.136.211}
 
       - ibmcloud:
-          rhel6-x64-1: {ip: 169.48.4.140}
-          rhel7-x64-1: {ip: 169.48.4.136}
-          ubuntu1604-x64-1: {ip: 169.48.4.141}
-          centosstream10-x64-1: {ip: 161.156.170.114}
-          centosstream10-x64-2: {ip: 169.63.181.34}
-          rhel8-x64-1: {ip: 161.156.80.158}
-          rhel9-x64-1: {ip: 158.176.14.14}
+          centosstream10-x64-1: {ip: 161.156.170.114, cloudloc: rhr}
+          centosstream10-x64-2: {ip: 169.63.181.34, cloudloc: rhr}
+          rhel8-x64-1: {ip: 161.156.80.158, cloudloc: rhr}
+          rhel9-x64-1: {ip: 158.176.14.14, cloudloc: rhr}
+          rhel9-x64-2: {ip: 149.81.6.138, cloudloc: oj9}
+          rhel9-x64-3: {ip: 161.156.84.231, cloudloc: oj9}
+          ubuntu2204-x64-1: {ip: 149.81.161.130, cloudloc: oj9}
