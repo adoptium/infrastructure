@@ -67,6 +67,10 @@
       jdk_version: 20
     - role: Java_install          # Latest LTS, for use by agents
       jdk_version: 21
+    - role: Java_install          # Bootstrap for JDK25
+      jdk_version: 24
+    - role: Java_install          # Latest LTS, for use by agents
+      jdk_version: 25
     - ANT                         # Testing
     - role: MSVS_2013
       when: ansible_architecture == "64-bit"
