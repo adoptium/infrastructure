@@ -282,14 +282,8 @@ startVMPlaybook()
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
 
-	# Check if the OS is Solaris10 and add specific ssh-rsa algorithms
-	sshargs=""
-	if [ "$OS" == "Solaris10" ]; then
-	    sshargs="--ssh-extra-args='-o PubkeyAcceptedKeyTypes=ssh-rsa -o HostKeyAlgorithms=ssh-rsa'"
-	fi
-
 	# Initialize the args variable with common arguments
-	args="$verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b $sshargs --skip-tags adoptopenjdk,jenkins${skipFullSetup}"
+	args="$verbosity -i playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx -u vagrant -b --skip-tags adoptopenjdk,jenkins${skipFullSetup}"
 
 	## If CentOS6 Delegate Playbook Run To Vagrant Machine Itself For Compatibility
 	if [ "$OS" == "CentOS6" ]; then
@@ -313,7 +307,7 @@ startVMPlaybook()
 		exit 1
 	fi
 
-	if [ "$OS" == "Solaris10" ] || [ "$OS" == "CentOS6" ]; then
+	if [ "$OS" == "CentOS6" ]; then
 		# Remove IP from known_hosts as the playbook installs an
 		# alternate sshd which regenerates the host key infra#2244
 		ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
