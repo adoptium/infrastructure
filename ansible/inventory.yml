@@ -27,9 +27,6 @@ hosts:
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, cloudloc: oj9, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
-      - osuosl:
-          ubuntu2204-aarch64-1: {ip: 140.211.169.21, description: jenkins-worker}
-
   - build:
 
       - azure:
