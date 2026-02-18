@@ -1,50 +1,44 @@
 #########################################################################
-# X11 filesets are needed to support OSS and OpenJDK                    #
-# Historically Adoptium added missing files via files copied from the   #
-# Ansible master - to the remote AIX machine, and installed them.       #
-#                                                                       #
-# No longer!                                                            #
-# The filesets are licensed and need to be supplied via the (cloud)     #
-# platform provider.                                                    #
-#                                                                       #
-# Hence: the playbook verifies readiness, and stops on failure of       #
-# X11.base - as this is required for AIXToolbox installation            #
+# Install X11 extensions                                                #
+# x11.adt.ext installp download requiring an IBMid                      #
+# https://www-01.ibm.com/support/docview.wss?uid=isg1fileset-1198156818 #
+# x11.vfb installp download requiring an IBMid                          #
+# http://www-01.ibm.com/support/docview.wss?uid=isg1fileset-2054486724  #
 #########################################################################
 ---
-# Rather than run lslpp - use stat on the lpp directories
-# /usr/lib/libX11.a                   X11.base.lib
-# /usr/lpp/X11/include/X11/extensions X11.adt.ext
-# /usr/lpp/X11.vfb                    X11.vfb
-- name: Examine X11 base requirements
-  tags: x11
-  block:
-   - name: Verify X11.base
-     stat:
-      path: /usr/lib/libX11.a
-     register: _base
-
-   - name: Verify X11 extensions
-     stat:
-      path: /usr/lpp/X11/include/X11/extensions
-     register: _ext
-
-   - name: Verify X11 Frame Buffer Requirements
-     stat:
-      path: /usr/lpp/X11.vfb
-     register: _vfb
-
-   - name: Compute X11 Readiness
-     set_fact:
-      _x11rdy: "{{ ((_base.stat.islnk is defined) and _base.stat.islnk)
-         and _ext.stat.exists
-         and _vfb.stat.exists }}"
-
-- name: Halt when X11.base Not Ready
-  fail: msg="X11.base is required for AIXToolbox OSS needed later! Cannot proceed."
-  when: _base.stat.exists == false or _base.stat.islnk == false
+- name: Check if X11.adt.ext is installed
+  shell: lslpp -l X11.adt.ext >/dev/null 2>&1
+  register: does_X11_adt_ext_exist
+  failed_when: false
   tags: x11
 
-- name: Warn that X11 Not Complete - some tests will fail
-  debug: msg="Not all required X11 components are installed!"
-  when: _x11rdy == false
+- name: Check if X11.vfb is installed
+  shell: lslpp -l X11.vfb >/dev/null 2>&1
+  register: does_x11_exist
+  failed_when: false
+  tags: x11
+
+- name: Transfer and extract X11
+  unarchive:
+    src: "{{ vendor_files_path }}/aix/OpenGL_X11.tar"
+    dest: /tmp
+    remote_src: no
+  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
+  tags: x11
+
+- name: Install IBM X11 Extensions - installp
+  command: installp -aXYgd /tmp/x11/X11.adt X11.adt.ext
+  when: does_X11_adt_ext_exist.rc != 0
+  tags: x11
+
+- name: Install X11.vfb - installp
+  command: installp -agXYd /tmp/x11/X11.vfb all
+  when: does_x11_exist.rc != 0
+  tags: x11
+
+- name: Remove X11 install files
+  file:
+    state: absent
+    path: /tmp/x11
+  when: does_x11_exist.rc != 0 or does_X11_adt_ext_exist.rc != 0
   tags: x11

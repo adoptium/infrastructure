@@ -13,14 +13,17 @@ Domain: adoptopenjdk.net
 # Sudoers file
 Sudoers_File: /etc/sudoers
 
+# Modify if using a different local path
+vendor_files_path: /Vendor_Files
+
 # Jenkins User Variables:
 Jenkins_Username: jenkins
-Jenkins_User_SSHKey: /Vendor_Files/keys/id_rsa.pub
+Jenkins_User_SSHKey: "{{ vendor_files_path }}/keys/Jenkins_User_SSHKey"
 
 # Superuser Variables:
 Superuser_Account: Enabled
 # Zeus_Username: zeus
-Zeus_User_SSHKey: /Vendor_Files/keys/zeus.key
+Zeus_User_SSHKey: "{{ vendor_files_path }}/keys/zeus.key"
 
 # Nagios Variables:
 Nagios_Plugins: Enabled
@@ -35,11 +38,11 @@ jckftp_Username: jckftp
 
 # Jcktestr User Variables:
 Jcktestr_Username: jcktestr
-Jcktestr_User_SSHKey: /Vendor_Files/keys/keybox.key
+Jcktestr_User_SSHKey: "{{ vendor_files_path }}/keys/keybox.key"
 
 # Vendor Variables:
 Vendor_File: Disabled
-Vendor_Playbook: /Vendor_Files/Vendor_Playbook/Vendor.yml
+Vendor_Playbook: "{{ vendor_files_path }}/Vendor_Playbook/Vendor.yml"
 
 # Errata
 Asian_Locales: Disabled
