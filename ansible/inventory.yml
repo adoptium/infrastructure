@@ -38,8 +38,8 @@ hosts:
           centos69-x64-2: {ip: 167.71.130.191}
 
       - marist:
-          rhel79-s390x-1: {ip: 148.100.75.212, user: linux1}
           rhel8-s390x-1: {ip: 148.100.75.98, user: linux1}
+          rhel8-s390x-2: {ip: 148.100.75.210, user: linux1}
 
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.166, description: p8-java1-adopt10.osuosl.org, 7200-02-04-1914}
