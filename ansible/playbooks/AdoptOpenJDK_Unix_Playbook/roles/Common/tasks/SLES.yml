@@ -346,3 +346,19 @@
   when:
     - (ansible_distribution_major_version == "15" and ansible_architecture == "s390x")
   tags: libffi_sles
+
+###########################################
+# Additional test tools for SLES on s390x #
+###########################################
+
+- name: Install test tools for SLES 12/15 on s390x
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ Additional_Test_Tools_SLES_s390x }}"
+  when:
+    - ansible_distribution == "SLES"
+    - ansible_distribution_major_version in ["12", "15"]
+    - ansible_architecture == "s390x"
+  tags:
+    - test_tools
