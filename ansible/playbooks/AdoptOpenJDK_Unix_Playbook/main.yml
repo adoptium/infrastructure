@@ -180,6 +180,8 @@
     - Security
     - Vendor
     - IPv6
+    - role: iptables
+      when: ansible_architecture == "s390x"
     - role: disable_gui
       tags: adoptopenjdk
     - role: housekeeping           # override mode when needed

@@ -1,0 +1,110 @@
+---
+# roles/iptables/tasks/main.yml
+# Fixes multicast network on supported s390x hosts
+
+- name: Configure multicast iptables on supported s390x systems
+  when:
+    - ansible_architecture == "s390x"
+    - >
+      (ansible_distribution == "Ubuntu" and ansible_distribution_major_version in ["22", "24"])
+      or
+      (ansible_distribution == "SLES" and ansible_distribution_major_version in ["12", "15"])
+      or
+      (ansible_distribution == "RedHat" and ansible_distribution_major_version is version('7', '>='))
+  block:
+    - name: Ensure default IPv4 interface is detected
+      assert:
+        that:
+          - ansible_default_ipv4 is defined
+          - ansible_default_ipv4.interface is defined
+        fail_msg: "Could not determine default IPv4 interface."
+
+    - name: Add Ubuntu multicast route now
+      command: ip route add 224.0.0.0/4 dev {{ ansible_default_ipv4.interface }}
+      register: multicast_route
+      changed_when: multicast_route.rc == 0
+      failed_when:
+        - multicast_route.rc != 0
+        - "'File exists' not in multicast_route.stderr"
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version in ["22", "24"]
+
+    - name: Add multicast INPUT rule for SLES, RHEL and Ubuntu
+      iptables:
+        chain: INPUT
+        rule_num: 1
+        action: insert
+        in_interface: "{{ ansible_default_ipv4.interface }}"
+        protocol: udp
+        destination: 224.0.0.0/4
+        jump: ACCEPT
+        ip_version: ipv4
+
+    - name: Add Ubuntu multicast OUTPUT rule
+      iptables:
+        chain: OUTPUT
+        rule_num: 1
+        action: insert
+        out_interface: "{{ ansible_default_ipv4.interface }}"
+        protocol: udp
+        destination: 224.0.0.0/4
+        jump: ACCEPT
+        ip_version: ipv4
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version in ["22", "24"]
+
+    - name: Install persistent multicast script
+      copy:
+        dest: /usr/local/sbin/multicast-iptables.sh
+        owner: root
+        group: root
+        mode: "0755"
+        content: |
+          #!/bin/bash
+          set -eu
+
+          IFACE="{{ ansible_default_ipv4.interface }}"
+
+          add_rule_if_missing() {
+              chain="$1"
+              shift
+              if ! iptables -C "${chain}" "$@" >/dev/null 2>&1; then
+                  iptables -I "${chain}" 1 "$@"
+              fi
+          }
+
+          if grep -qi '^ID=ubuntu$' /etc/os-release; then
+              ip route add 224.0.0.0/4 dev "${IFACE}" 2>/dev/null || true
+              add_rule_if_missing INPUT -i "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
+              add_rule_if_missing OUTPUT -o "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
+          else
+              add_rule_if_missing INPUT -i "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
+          fi
+
+    - name: Persist multicast script on Ubuntu with if-up hook
+      copy:
+        dest: /etc/network/if-up.d/multicast-iptables
+        owner: root
+        group: root
+        mode: "0755"
+        content: |
+          #!/bin/sh
+          /usr/local/sbin/multicast-iptables.sh
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version in ["22", "24"]
+
+    - name: Persist multicast script on SLES and RHEL with rc.local
+      lineinfile:
+        path: /etc/rc.d/rc.local
+        line: /usr/local/sbin/multicast-iptables.sh
+        create: yes
+        mode: "0755"
+      when:
+        - ansible_distribution in ["SLES", "RedHat"]
+        - >
+          (ansible_distribution == "SLES" and ansible_distribution_major_version in ["12", "15"])
+          or
+          (ansible_distribution == "RedHat" and ansible_distribution_major_version is version('7', '>='))
