@@ -27,20 +27,6 @@
     protocol: icmp
     jump: ACCEPT
 
-- name: Setup iptables allow 22
-  iptables:
-    chain: INPUT
-    protocol: tcp
-    destination_port: 22
-    jump: ACCEPT
-
-- name: Setup iptables allow 53
-  iptables:
-    chain: INPUT
-    protocol: udp
-    destination_port: 53
-    jump: ACCEPT
-
 - name: Allow Azure private network (10.1.x.x)
   iptables:
     chain: INPUT
@@ -81,11 +67,13 @@
     - 62.210.163.131 # jck-rise-ubuntu2404-risc64-1
     - 62.210.163.164 # jck-rise-ubuntu2404-risc64-2
     - 62.210.163.34 # jck-rise-ubuntu2404-risc64-3
+    - 198.41.30.213 # Eclipse Foundation bastion
+    - 148.113.143.13 # Committers jumphost
 
 - name: Setup iptables
   iptables:
     chain: INPUT
-    jump: REJECT
+    jump: DROP
 
 - name: Set iptables_permanent
   shell: iptables-save > /etc/iptables/rules.v4
