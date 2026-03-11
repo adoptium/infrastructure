@@ -102,3 +102,10 @@ Test_Tool_Packages:
   - mozilla-nss
   - mozilla-nss-devel
   - mozilla-nss-tools
+
+Additional_Test_Tools_SLES_s390x:
+  - x11-tools                  # Required for dacopo_fop tests
+  - xdpyinfo                   # Required for dacopo_fop tests
+  - dejavu-fonts               # Required for java_beans tests
+  - liberation-fonts           # Required for java_beans tests
+  - fontconfig                 # Required for java_beans tests
