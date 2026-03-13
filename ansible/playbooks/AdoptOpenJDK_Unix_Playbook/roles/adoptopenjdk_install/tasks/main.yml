@@ -394,7 +394,7 @@
   find:
     paths: /usr/lib/jvm
     patterns:
-      - "^jdk{{ jdk_version }}($|[^0-9].*)"
+      - "^jdk{{ jdk_version }}u.*"
       - "^jdk-{{ jdk_version }}.*"
     use_regex: yes
     file_type: directory
