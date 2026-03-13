@@ -1,0 +1,46 @@
+---
+##########
+# gcc_14 #
+##########
+
+- name: Check if gcc 14.2 is installed on RHEL/CentOS/Ubuntu16
+  shell: /usr/local/gcc14/bin/gcc-14.2 --version 2>&1 > /dev/null
+  failed_when: false
+  register: gcc14_installed
+  when: ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+  changed_when: False
+  tags: gcc_14
+
+- name: Download Adoptium gcc-14.2 binary
+  get_url:
+    url: https://ci.adoptium.net/userContent/gcc/gcc142.{{ ansible_architecture }}.tar.xz
+    dest: '/tmp/ansible-adoptopenjdk-gcc-14.tar.xz'
+    force: no
+    mode: 0644
+    checksum: "sha256:{{ lookup('vars', 'csum_' + ansible_architecture) }}"
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc14_installed.rc != 0
+  tags: gcc_14
+
+- name: Extract AdoptOpenJDK gcc-14 binary to /usr/local/gcc14
+  unarchive:
+    src: /tmp/ansible-adoptopenjdk-gcc-14.tar.xz
+    dest: /usr/local/
+    copy: False
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc14_installed.rc != 0
+  tags: gcc_14
+
+- name: Remove downloaded gcc 14 binary tarball
+  file:
+    path: '/tmp/ansible-adoptopenjdk-gcc-14.tar.xz'
+    state: absent
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "Fedora" or ansible_distribution == "CentOS" or ansible_distribution == "openSUSE"
+    - ansible_architecture != "riscv64"
+    - gcc14_installed.rc != 0
+  tags: gcc_14
