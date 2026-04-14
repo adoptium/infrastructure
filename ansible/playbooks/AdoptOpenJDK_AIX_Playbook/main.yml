@@ -68,7 +68,8 @@
 
     ## verify/install licensed IBM compilers
     - xlc_v13
-    - xlc_v16
+    - role: xlc_v16
+      tags: xlc16
 
     ## additional OSS packages
     - ant
