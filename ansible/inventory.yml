@@ -128,7 +128,7 @@ hosts:
       # Rise machines are hosted in Scaleway
       - rise:
           ubuntu2404-riscv64-1: {ip: 62.210.163.198, user: ubuntu}
-          ubuntu2404-riscv64-2: {ip: 62.210.163.196, user: ubuntu}
+          ubuntu2404-riscv64-2: {ip: 62.210.163.10, user: ubuntu}
           ubuntu2404-riscv64-3: {ip: 62.210.163.99, user: ubuntu}
           ubuntu2404-riscv64-4: {ip: 62.210.163.103, user: ubuntu}
           ubuntu2404-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
