@@ -24,7 +24,7 @@
       include_tasks: rhel.yml
       when:
         - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
+        - ansible_distribution_major_version | int >= 7
 
     - name: Prepare for Ubuntu
       include_tasks: ubuntu.yml
@@ -99,7 +99,7 @@
         groups: docker
         append: yes
         state: present
-      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+      when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
             ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
       tags: jenkins
 
@@ -110,7 +110,7 @@
         append: yes
         state: present
       when:
-        - ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+        - ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
           ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
         - Nagios_Plugins == "Enabled"
       tags: docker
@@ -120,6 +120,6 @@
     name: docker
     state: started
     enabled: yes
-  when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version >= "7")) or
+  when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
         ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
   tags: docker
