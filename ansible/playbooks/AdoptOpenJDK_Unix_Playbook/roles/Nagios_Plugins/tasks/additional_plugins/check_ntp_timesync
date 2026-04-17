@@ -29,7 +29,7 @@ check_timedatectl() {
     local STATE SERVICE_STATE SYNC_STATE
     
     STATE="$(timedatectl 2>/dev/null)"
-    RC=$?
+    local RC=$?
     
     if [[ $RC -ne 0 || -z "$STATE" ]]; then
         return 1  # timedatectl not available
@@ -63,7 +63,7 @@ check_timedatectl() {
 
 check_ntpd() {
     # Check if ntpd service is running
-    if ! /sbin/service ntpd status >/dev/null 2>&1; then
+    if ! service ntpd status >/dev/null 2>&1; then
         echo "WARNING - Check NTPD Service"
         exit 1
     fi
@@ -87,7 +87,7 @@ check_ntpd() {
             exit 2
             ;;
         2)
-            echo "UNKNOWN - Clock state indeterminant"
+            echo "UNKNOWN - Clock state indeterminate"
             exit 3
             ;;
         *)
