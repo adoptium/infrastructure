@@ -7,6 +7,7 @@
 # agent secret as inputs.
 # ---------------------------------------------------------------
 
+
 name: Jenkins Agent (macOS)
 
 on:
@@ -30,6 +31,17 @@ jobs:
     steps:
       - name: Mask secret
         run: echo "::add-mask::${{ inputs.agent_secret }}"
+
+      - name: Install ant-contrib
+        run: |
+          ANT_LIB="$(ant -diagnostics | grep 'ant.home' | sed 's/.*: //')/lib"
+          curl -sSfL --retry 3 --retry-delay 5 -o /tmp/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz \
+            "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-${ANT_CONTRIB_VERSION}/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz"
+          tar xzf /tmp/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz -C /tmp
+          cp /tmp/ant-contrib/lib/ant-contrib.jar "$ANT_LIB/"
+          rm -rf /tmp/ant-contrib /tmp/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz
+        env:
+          ANT_CONTRIB_VERSION: 1.0b2
 
       - name: Download Jenkins agent JAR
         run: |
