@@ -32,7 +32,9 @@ jobs:
 
     steps:
       - name: Mask secret
-        run: echo "::add-mask::${{ inputs.agent_secret }}"
+        run: |
+          secret=$(jq -r '.inputs.agent_secret' "$GITHUB_EVENT_PATH")
+          echo "::add-mask::$secret"
 
       - name: Upgrade bash
         run: |
