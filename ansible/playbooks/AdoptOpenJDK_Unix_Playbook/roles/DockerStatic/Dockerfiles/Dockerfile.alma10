@@ -6,13 +6,13 @@ ARG ant_512checksum="1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c
 
 RUN dnf -y update && dnf install -y unzip zip epel-release openssl gpg
 
-# Get latest jdk21 ga JRE
-RUN curl -sL -o /tmp/jdk21.sig `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/21/ga?architecture=x64&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'`
+# Get latest jdk25 ga JRE
+RUN curl -sL -o /tmp/jdk25.sig `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/25/ga?architecture=x64&heap_size=normal&image_type=jre&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'`
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
 # Without this, building an EL10 container on podman will fail when it gets to the verify stage
 RUN rm -vf ~/.gnupg/public-keys.d/pubring.db.lock
-RUN mkdir -p /usr/lib/jvm/jdk21
-RUN curl -sL 'https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jre/hotspot/normal/eclipse?project=jdk' | tee >(tar xpfz - -C /usr/lib/jvm/jdk21 --strip-components=1) | gpg --verify /tmp/jdk21.sig -
+RUN mkdir -p /usr/lib/jvm/jdk25
+RUN curl -sL 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jre/hotspot/normal/eclipse?project=jdk' | tee >(tar xpfz - -C /usr/lib/jvm/jdk25 --strip-components=1) | gpg --verify /tmp/jdk25.sig -
 # Install ant
 RUN curl -o /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip' && \
     curl -Lo /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz && \
