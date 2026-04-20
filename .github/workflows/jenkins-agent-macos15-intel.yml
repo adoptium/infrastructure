@@ -7,6 +7,8 @@
 # agent secret as inputs.
 # ---------------------------------------------------------------
 
+# A full list of software installed on the macOS runner can be found here:
+# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
 
 name: Jenkins Agent (macOS)
 
@@ -34,7 +36,7 @@ jobs:
 
       - name: Install ant-contrib
         run: |
-          ANT_LIB="$(ant -diagnostics | grep 'ant.home' | sed 's/.*: //')/lib"
+          ANT_LIB="$(ant -diagnostics | grep 'ant.home' | head -1 | sed 's/.*: //')/lib"
           curl -sSfL --retry 3 --retry-delay 5 -o /tmp/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz \
             "https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-${ANT_CONTRIB_VERSION}/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz"
           tar xzf /tmp/ant-contrib-${ANT_CONTRIB_VERSION}-bin.tar.gz -C /tmp
