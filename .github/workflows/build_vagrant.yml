@@ -60,7 +60,7 @@ jobs:
 
     - name: Cache Solaris10.box
       id: solaris-10-cache
-      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: Solaris10.box
         key: sol10boxcache
