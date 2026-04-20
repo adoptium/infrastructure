@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright 2020 The Original Author(s)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,32 +13,101 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#! /usr/bin/env bash
+# Combined NTP/Chronyd Time Synchronization Check Plugin
 
-/sbin/service ntpd status >/dev/null 2>&1
-if [[ $? != 0 ]]; then
-  echo "WARNING - Check NTPD Service"
-  exit 1
+# Nagios exit codes:
+# 0 = OK
+# 1 = WARNING
+# 2 = CRITICAL
+# 3 = UNKNOWN
+
+is_ok() {
+    [[ "$1" == "active" || "$1" == "yes" ]]
+}
+
+check_timedatectl() {
+    local STATE SERVICE_STATE SYNC_STATE
+    
+    STATE="$(timedatectl 2>/dev/null)"
+    local RC=$?
+    
+    if [[ $RC -ne 0 || -z "$STATE" ]]; then
+        return 1  # timedatectl not available
+    fi
+    
+    SERVICE_STATE="$(printf '%s\n' "$STATE" | sed -n 's/^[[:space:]]*NTP service:[[:space:]]*//p')"
+    SYNC_STATE="$(printf '%s\n' "$STATE" | sed -n 's/^[[:space:]]*System clock synchronized:[[:space:]]*//p')"
+    
+    if [[ -z "$SERVICE_STATE" && -z "$SYNC_STATE" ]]; then
+        return 1  # Could not parse timedatectl output
+    fi
+    
+    if ! is_ok "$SERVICE_STATE" && ! is_ok "$SYNC_STATE"; then
+        echo "CRITICAL - NTP service is not active and clock is not synchronized"
+        exit 2
+    fi
+    
+    if ! is_ok "$SERVICE_STATE"; then
+        echo "WARNING - NTP service is not active"
+        exit 1
+    fi
+    
+    if ! is_ok "$SYNC_STATE"; then
+        echo "WARNING - Time not synchronized"
+        exit 1
+    fi
+    
+    echo "OK - Time synchronized (via timedatectl)"
+    exit 0
+}
+
+check_ntpd() {
+    # Check if ntpd service is running
+    if ! service ntpd status >/dev/null 2>&1; then
+        echo "WARNING - Check NTPD Service"
+        exit 1
+    fi
+    
+    # Check synchronization status using ntpstat
+    if ! command -v ntpstat >/dev/null 2>&1; then
+        echo "UNKNOWN - ntpstat command not found"
+        exit 3
+    fi
+    
+    ntpstat >/dev/null 2>&1
+    is_agent_syncd=$?
+    
+    case $is_agent_syncd in
+        0)
+            echo "OK - Time synchronized (via ntpd)"
+            exit 0
+            ;;
+        1)
+            echo "CRITICAL - Time not synchronized"
+            exit 2
+            ;;
+        2)
+            echo "UNKNOWN - Clock state indeterminate"
+            exit 3
+            ;;
+        *)
+            echo "UNKNOWN - Unexpected RC from ntpstat"
+            exit 3
+            ;;
+    esac
+}
+
+# Main execution
+# Try modern timedatectl first (systemd-based systems)
+if command -v timedatectl >/dev/null 2>&1; then
+    check_timedatectl
 fi
 
-ntpstat >/dev/null 2>&1
-is_agent_syncd=$?
+# Fall back to traditional ntpd check
+if command -v service >/dev/null 2>&1; then
+    check_ntpd
+fi
 
-case $is_agent_syncd in
-  0)
-  echo "OK - Time synchronized"
-  exit 0
-  ;;
-  1)
-  echo "CRITICAL - Time not synchronized"
-  exit 2
-  ;;
-  2)
-  echo "UNKNOWN - Clock state indeterminant"
-  exit 3
-  ;;
-  *)
-  echo "UNKNOWN - Unexpected RC"
-  exit 3
-  ;;
-esac
+# If we get here, neither method was available
+echo "UNKNOWN - No time synchronization method available (tried timedatectl and ntpd)"
+exit 3
