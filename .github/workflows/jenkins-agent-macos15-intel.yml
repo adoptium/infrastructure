@@ -32,7 +32,19 @@ jobs:
 
     steps:
       - name: Mask secret
-        run: echo "::add-mask::${{ inputs.agent_secret }}"
+        run: |
+          secret=$(jq -r '.inputs.agent_secret' "$GITHUB_EVENT_PATH")
+          echo "::add-mask::$secret"
+
+      - name: Upgrade bash
+        run: |
+          brew install bash
+          sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+          sudo dscl . -change /Users/runner UserShell /bin/bash /usr/local/bin/bash
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          echo "SHELL=/usr/local/bin/bash" >> "$GITHUB_ENV"
+          echo "BASH=/usr/local/bin/bash" >> "$GITHUB_ENV"
+          /usr/local/bin/bash --version
 
       - name: Install ant-contrib
         run: |
