@@ -7,15 +7,15 @@ RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-rele
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 
 # Download JDK
-RUN curl -Lo /tmp/jdk17.tar.gz 'https://api.adoptium.net/v3/binary/latest/17/ga/linux/aarch64/jdk/hotspot/normal/eclipse?project=jdk'
+RUN curl -Lo /tmp/jdk25.tar.gz 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/aarch64/jdk/hotspot/normal/eclipse?project=jdk'
 # This looks odd but without it CS10 hits a lock file issue in the later GPG verify step
 # Ref: https://adoptium.slack.com/archives/C53GHCXL4/p1734707508976569?thread_ts=1734705997.537229&cid=C53GHCXL4
 RUN mkdir -p /root/.gnupg/public-keys.d
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
-# Get sig file for latest jdk17 ga
-RUN curl -Lo /tmp/jdk17.sig `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/17/ga?architecture=aarch64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'`
-RUN gpg --verify /tmp/jdk17.sig /tmp/jdk17.tar.gz
-RUN mkdir -p /usr/lib/jvm/jdk17 && tar -xpzf /tmp/jdk17.tar.gz -C /usr/lib/jvm/jdk17 --strip-components=1
+# Get sig file for latest jdk25 ga
+RUN curl -Lo /tmp/jdk25.sig `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/25/ga?architecture=aarch64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'`
+RUN gpg --verify /tmp/jdk25.sig /tmp/jdk25.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk25 && tar -xpzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/jdk25 --strip-components=1
 
 # Install Ant
 RUN curl -Lo /tmp/ant.zip "https://archive.apache.org/dist/ant/binaries/apache-ant-$ant_version-bin.zip"
@@ -27,7 +27,7 @@ RUN ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-$ant_version/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar
 # Clear up space
-RUN rm /tmp/jdk17.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk17.sig /tmp/ant.sha512
+RUN rm /tmp/jdk25.tar.gz /tmp/ant.zip /tmp/ant-contrib.tgz /tmp/jdk25.sig /tmp/ant.sha512
 
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins
@@ -42,6 +42,6 @@ RUN dnf -y --enablerepo=crb install turbojpeg
 RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools openssl
-# ENTRYPOINT /usr/lib/jvm/jdk17/bin/java
+# ENTRYPOINT /usr/lib/jvm/jdk25/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID
