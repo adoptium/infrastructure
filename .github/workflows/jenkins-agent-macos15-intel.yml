@@ -47,27 +47,19 @@ jobs:
             echo "::1       $HNAME" | sudo tee -a /etc/hosts
           fi
 
-          # GHA macOS runners use Apple Virtualization.framework; the en0
-          # vmnet adapter does not forward multicast, so route multicast
-          # through lo0 where loopback delivery works reliably.
-
-          # IPv4: delete the pre-existing en0 multicast route, then add via lo0
-          sudo route -n delete -net 224.0.0.0/4 || true
-          sudo route -n add    -net 224.0.0.0/4 -interface lo0
-
-          # IPv6: delete any pre-existing en0 multicast route, then add via lo0
-          sudo route -n delete -inet6 -net ff00::/8 || true
-          sudo route -n add    -inet6 -net ff00::/8 -interface lo0
-
           # Disable the application-level firewall so test JVMs can accept
           # inbound connections without an interactive allow/deny dialog
           sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off || true
 
-          # Diagnostic: print routes for troubleshooting
-          echo "--- IPv4 multicast route ---"
-          netstat -rn -f inet  | grep -E '224|multicast' || true
-          echo "--- IPv6 multicast route ---"
-          netstat -rn -f inet6 | grep -i 'ff00\|multicast' || true
+          # NOTE: Multicast tests (DatagramSocket, MulticastSocket,
+          # DatagramChannel/Promiscuous*) cannot work on GHA macOS runners.
+          # The JVM binds multicast sockets to en0, which is an Apple
+          # Virtualization.framework vmnet adapter that silently drops
+          # multicast traffic at the hypervisor level. Routing table
+          # changes do not help because the JVM sends on the socket's
+          # bound interface, not via the routing table. These tests must
+          # be excluded via the AQA exclude list for GHA macOS nodes.
+          # See: adoptium/infrastructure#4326
 
       - name: Upgrade bash
         run: |
