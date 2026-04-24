@@ -6,6 +6,7 @@
 - name: Download libdwarf
   get_url:
     url: "https://github.com/davea42/libdwarf-code/releases/download/v2.3.1/libdwarf-2.3.1.tar.xz"
+    checksum: sha256:28cf9a5d27aceff5c1f906244a4fe7ae208e41d20a6d8fc7e091c633a40b6e97
     dest: /tmp/libdwarf.tar.xz
   tags: libdwarf
 
@@ -17,7 +18,7 @@
   tags: libdwarf
 
 - name: Run cmake
-  command: cmake -DBUILD_SHARED=YES -DBUILD_NON_SHARED=NO
+  command: cmake -DBUILD_SHARED=YES -DBUILD_NON_SHARED=NO -DCMAKE_INSTALL_PREFIX=/
   args:
     chdir: /tmp/libdwarf-2.3.1
   tags: libdwarf
@@ -28,41 +29,14 @@
     chdir: /tmp/libdwarf-2.3.1
   tags: libdwarf
 
-- name: Backup existing headers (if present)
-  command: mv {{ item.src }} {{ item.dest }}
-  loop:
-    - src: /usr/include/libdwarf/dwarf.h
-      dest: /usr/include/libdwarf/dwarf.h.org
-    - src: /usr/include/libdwarf/libdwarf.h
-      dest: /usr/include/libdwarf/libdwarf.h.org
-  ignore_errors: true # if /usr/include/libdwarf/ doesn't exists
-  tags: libdwarf
-
 - name: Ensure include directory exists
   file:
-    path: /usr/include/libdwarf
+    path: /usr/include/libdwarf-2
     state: directory
   tags: libdwarf
 
-- name: Create symlinks for headers
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: link
-    force: yes
-  loop:
-    - src: /usr/local/include/dwarf.h
-      dest: /usr/include/libdwarf/dwarf.h
-    - src: /usr/local/include/libdwarf.h
-      dest: /usr/include/libdwarf/libdwarf.h
-  tags: libdwarf
-
-- name: Copy libdwarf shared libraries to /lib64
-  shell: cp /usr/local/lib64/libdwarf.so.2.* /lib64
-  tags: libdwarf
-
-- name: Refresh linker cache
-  command: ldconfig
+- name: Move dwarf header files to libdwarf-2 directory
+  command: mv /usr/include/dwarf.h /usr/include/libdwarf.h /usr/include/libdwarf-2/
   tags: libdwarf
 
 - name: Verify installation
@@ -71,6 +45,7 @@
   changed_when: false
   tags: libdwarf
 
-- debug:
+- name: Output ldconfig
+  debug:
     var: ldconfig_output.stdout_lines
   tags: libdwarf
