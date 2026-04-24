@@ -365,6 +365,7 @@
 ###########
 
 # Skipping linting as no alternative to shell can be used (lint error 305)
+
 - name: Get locale list
   shell: locale -a
   register: localeList
@@ -375,6 +376,13 @@
 
 # Skipping linting as locale_gen module isn't usable on CentOS6/7
 # https://github.com/ansible/ansible/issues/44708
+- name: Create US UTF-8 locale
+  shell: localedef -i en_US -c -f UTF-8 en_US.UTF-8
+  when: localeList.stdout | lower is not search("en_us\.utf8")
+  tags:
+    - locales
+    - skip_ansible_lint
+
 - name: Create Japanese locale
   shell: localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8
   when: localeList.stdout | lower is not search("ja_jp\.utf8")
