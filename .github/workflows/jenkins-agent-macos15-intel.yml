@@ -36,6 +36,25 @@ jobs:
           secret=$(jq -r '.inputs.agent_secret' "$GITHUB_EVENT_PATH")
           echo "::add-mask::$secret"
 
+      - name: Configure networking
+        run: |
+          # Ensure the runner's hostname resolves (fixes compiler control
+          # MethodMatcherTest / Klass failures that rely on local socket
+          # connections during JVM startup)
+          HNAME=$(hostname)
+          if ! dscacheutil -q host -a name "$HNAME" | grep -q ip_address; then
+            echo "127.0.0.1 $HNAME" | sudo tee -a /etc/hosts
+          fi
+
+          # Add a multicast route so java/net multicast and DatagramSocket
+          # tests can bind to 224.0.0.0/4 (fixes "No route to host")
+          IFACE=$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')
+          sudo route -n add -net 224.0.0.0/4 -interface "${IFACE:-en0}"
+
+          # Disable the application-level firewall so test JVMs can accept
+          # inbound connections without an interactive allow/deny dialog
+          sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off || true
+
       - name: Upgrade bash
         run: |
           brew install bash
