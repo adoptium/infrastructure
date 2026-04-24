@@ -44,16 +44,30 @@ jobs:
           HNAME=$(hostname)
           if ! dscacheutil -q host -a name "$HNAME" | grep -q ip_address; then
             echo "127.0.0.1 $HNAME" | sudo tee -a /etc/hosts
+            echo "::1       $HNAME" | sudo tee -a /etc/hosts
           fi
 
-          # Add a multicast route so java/net multicast and DatagramSocket
-          # tests can bind to 224.0.0.0/4 (fixes "No route to host")
-          IFACE=$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')
-          sudo route -n add -net 224.0.0.0/4 -interface "${IFACE:-en0}"
+          # GHA macOS runners use Apple Virtualization.framework; the en0
+          # vmnet adapter does not forward multicast, so route multicast
+          # through lo0 where loopback delivery works reliably.
+          # IPv4 multicast (fixes SetLoopbackModeIPv4, DatagramSocketExample, etc.)
+          sudo route -n add -net 224.0.0.0/4 -interface lo0
+          # IPv6 multicast (fixes PromiscuousIPv6, DatagramSocketMulticasting)
+          sudo route -n add -inet6 -net ff00::/8 -interface lo0
+
+          # Enable multicast loopback at the kernel level
+          sudo sysctl -w net.inet.ip.mforwarding=1 || true
+          sudo sysctl -w net.inet6.ip6.mforwarding=1 || true
 
           # Disable the application-level firewall so test JVMs can accept
           # inbound connections without an interactive allow/deny dialog
           sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off || true
+
+          # Diagnostic: print routes for troubleshooting
+          echo "--- IPv4 multicast route ---"
+          netstat -rn -f inet  | grep -E '224|multicast' || true
+          echo "--- IPv6 multicast route ---"
+          netstat -rn -f inet6 | grep -i 'ff00\|multicast' || true
 
       - name: Upgrade bash
         run: |
