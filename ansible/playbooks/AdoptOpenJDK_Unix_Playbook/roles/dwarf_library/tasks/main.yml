@@ -1,0 +1,51 @@
+---
+###################################
+#  Compile specific dwarf library #
+###################################
+
+- name: Download libdwarf
+  get_url:
+    url: "https://github.com/davea42/libdwarf-code/releases/download/v2.3.1/libdwarf-2.3.1.tar.xz"
+    checksum: sha256:28cf9a5d27aceff5c1f906244a4fe7ae208e41d20a6d8fc7e091c633a40b6e97
+    dest: /tmp/libdwarf.tar.xz
+  tags: libdwarf
+
+- name: Extract libdwarf
+  unarchive:
+    src: /tmp/libdwarf.tar.xz
+    dest: /tmp
+    remote_src: true
+  tags: libdwarf
+
+- name: Run cmake
+  command: cmake -DBUILD_SHARED=YES -DBUILD_NON_SHARED=NO -DCMAKE_INSTALL_PREFIX=/
+  args:
+    chdir: /tmp/libdwarf-2.3.1
+  tags: libdwarf
+
+- name: Build and install
+  command: make install
+  args:
+    chdir: /tmp/libdwarf-2.3.1
+  tags: libdwarf
+
+- name: Ensure include directory exists
+  file:
+    path: /usr/include/libdwarf-2
+    state: directory
+  tags: libdwarf
+
+- name: Move dwarf header files to libdwarf-2 directory
+  command: mv /usr/include/dwarf.h /usr/include/libdwarf.h /usr/include/libdwarf-2/
+  tags: libdwarf
+
+- name: Verify installation
+  shell: ldconfig -v | grep libdwarf
+  register: ldconfig_output
+  changed_when: false
+  tags: libdwarf
+
+- name: Output ldconfig
+  debug:
+    var: ldconfig_output.stdout_lines
+  tags: libdwarf
