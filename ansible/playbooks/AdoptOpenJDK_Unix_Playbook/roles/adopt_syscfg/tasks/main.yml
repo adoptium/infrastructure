@@ -1,0 +1,24 @@
+---
+#########################
+# Configure Kernel Core Pattern
+# https://github.com/adoptium/infrastructure/issues/1829
+#########################
+
+- name: Set kernel.core_pattern in sysctl.conf
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^kernel\.core_pattern\s*='
+    line: 'kernel.core_pattern = core.%p'
+    state: present
+    backup: yes
+  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
+  tags: adoptopenjdk
+
+- name: Apply sysctl settings immediately
+  ansible.builtin.sysctl:
+    name: kernel.core_pattern
+    value: 'core.%p'
+    state: present
+    reload: yes
+  when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
+  tags: adoptopenjdk

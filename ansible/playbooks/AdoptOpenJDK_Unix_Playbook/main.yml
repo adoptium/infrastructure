@@ -186,6 +186,7 @@
       vars:
         script_action: check              # check/delete
     - pandoc                      # Build Of Man Pages JDK24+
+    - adopt_syscfg
     - role: logs
       position: "End"
       tags: always
