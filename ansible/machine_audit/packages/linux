@@ -1,0 +1,31 @@
+{
+  "build_packages": [
+    "gcc",
+    "g++",
+    "make",
+    "cmake",
+    "autoconf",
+    "automake",
+    "libtool",
+    "pkg-config",
+    "git",
+    "ant",
+    "maven",
+    "gradle"
+  ],
+  "test_packages": [
+    "java",
+    "javac",
+    "python3",
+    "python",
+    "perl",
+    "curl",
+    "wget",
+    "tar",
+    "unzip",
+    "zip",
+    "gzip",
+    "bzip2",
+    "xz"
+  ]
+}

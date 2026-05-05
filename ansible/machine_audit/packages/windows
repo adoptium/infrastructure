@@ -1,0 +1,29 @@
+{
+  "build_packages": [
+    "cl",
+    "link",
+    "nmake",
+    "msbuild",
+    "cmake",
+    "git",
+    "ant",
+    "maven",
+    "gradle",
+    "cygwin",
+    "mingw32-make"
+  ],
+  "test_packages": [
+    "java",
+    "javac",
+    "python",
+    "python3",
+    "perl",
+    "powershell",
+    "curl",
+    "wget",
+    "tar",
+    "7z",
+    "zip",
+    "unzip"
+  ]
+}
