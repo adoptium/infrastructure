@@ -47,9 +47,6 @@ hosts:
           aix72-ppc64-3: {ip: 140.211.9.163, description: p8-java1-adopt09.osuosl.org, 7200-05-03-2135}
           aix72-ppc64-4: {ip: 140.211.9.137, description: p10-aix-adopt05.osuosl.org, 7200-02-06-2016}
 
-      - siteox:
-          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 24322}
-
       - ibmcloud:
           win2022-x64-1: {ip: 52.118.206.11, user: Administrator, cloudloc: oj9}
 
@@ -60,10 +57,6 @@ hosts:
           win2022-x64-1: {ip: 48.217.233.156, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
           win2022-x64-2: {ip: 51.12.243.178, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
           win2022-x64-3: {ip: 74.235.196.238, description: Intel Xeon PLattinum AMD EPYC 7763, 2 cores, 8GiB RAM}
-
-      - equinix:
-          ubuntu2404-armv8-1: {ip: 147.75.35.203, description: Ampere Altra 160 core, 512Gb}
-          ubuntu2204-armv8-1: {ip: 139.178.86.243, description: Ampere Altra 160 cores, 512Gb}
 
       - osuosl:
           ubuntu2404-ppc64le-1: {ip: 140.211.168.214}
@@ -136,9 +129,6 @@ hosts:
           ubuntu2404-riscv64-7: {ip: 62.210.163.137, user: ubuntu}
           ubuntu2404-riscv64-8: {ip: 62.210.163.38, user: ubuntu}
           ubuntu2404-riscv64-9: {ip: 62.210.163.36, user: ubuntu}
-
-      - siteox:
-          solaris10u11-sparcv9-1: {ip: cloud.siteox.com, port: 53322}
 
       - skytap:
           ubuntu2404-ppc64le-1: {ip: 20.61.136.211}
