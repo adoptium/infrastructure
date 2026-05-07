@@ -203,6 +203,8 @@ ansible-playbook -i hosts --skip-tags=adoptopenjdk,jenkins ansible/playbooks/Ado
 To run the playbooks against a remote machine, make sure your ssh keys are appropriately configured to log into the remote machines as root, then:
 ```
 perl -p -i -e 's/hosts: .*/hosts: all/' ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
+```
+This will change the `hosts` line in the playbook to `hosts: all` so that it will run against unspecified machines (if the chosen playbook already has `hosts: all`, you can skip that command). Then to specifiy machines you can run:
 echo "test-<provider>-<distribution>-<arch>-<number> ansible_host=<ip_address_of_machine>" > hosts
 ansible-playbook -i hosts -u root --skip-tags=adoptopenjdk,jenkins ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 ```
