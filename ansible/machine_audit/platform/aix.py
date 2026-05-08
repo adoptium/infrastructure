@@ -12,20 +12,16 @@ from datetime import datetime
 import shutil
 import tempfile
 
-
 OUTPUT_FILE = "/var/log/machine_info.json"
-
 
 def get_timestamp():
     return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-
 
 def get_hostname():
     try:
         return socket.gethostname()
     except Exception:
         return "Unable to determine"
-
 
 def get_architecture():
     try:
@@ -85,7 +81,6 @@ def get_os_info():
         'architecture': get_architecture()
     }
 
-
 def check_packages():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     packages_file = os.path.join(script_dir, '../packages/aix')
@@ -121,7 +116,6 @@ def check_packages():
     
     return results
 
-
 def collect_info():
     return {
         'timestamp': get_timestamp(),
@@ -129,7 +123,6 @@ def collect_info():
         'os': get_os_info(),
         'packages': check_packages()
     }
-
 
 def write_output(data):
     try:
@@ -176,7 +169,6 @@ def main():
         return 0
     else:
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

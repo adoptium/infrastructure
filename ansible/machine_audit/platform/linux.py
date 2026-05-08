@@ -13,13 +13,10 @@ import shutil
 import tempfile
 import re
 
-
 OUTPUT_FILE = "/var/log/machine_info.json"
-
 
 def get_timestamp():
     return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-
 
 def get_hostname():
     try:
@@ -30,7 +27,6 @@ def get_hostname():
                 return f.read().strip()
         except Exception:
             return "Unable to determine"
-
 
 def get_architecture():
     try:
@@ -44,7 +40,6 @@ def get_architecture():
         except Exception:
             pass
     return "Unknown"
-
 
 def get_os_info():
     os_name = ""
@@ -141,7 +136,6 @@ def check_packages():
     
     return results
 
-
 def collect_info():
     return {
         'timestamp': get_timestamp(),
@@ -149,7 +143,6 @@ def collect_info():
         'os': get_os_info(),
         'packages': check_packages()
     }
-
 
 def write_output(data):
     try:
@@ -176,7 +169,6 @@ def write_output(data):
         print(f"Error creating temporary file: {e}")
         return False
 
-
 def main():
     print("Collecting machine information...")
     
@@ -196,7 +188,6 @@ def main():
         return 0
     else:
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())
