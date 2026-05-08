@@ -18,7 +18,7 @@
   tags: libdwarf
 
 - name: Run cmake
-  command: cmake -DBUILD_SHARED=YES -DBUILD_NON_SHARED=NO -DCMAKE_INSTALL_PREFIX=/
+  command: cmake -DBUILD_SHARED=YES -DBUILD_NON_SHARED=NO -DCMAKE_INSTALL_PREFIX=/usr/local/
   args:
     chdir: /tmp/libdwarf-2.3.1
   tags: libdwarf
@@ -27,16 +27,6 @@
   command: make install
   args:
     chdir: /tmp/libdwarf-2.3.1
-  tags: libdwarf
-
-- name: Ensure include directory exists
-  file:
-    path: /usr/include/libdwarf-2
-    state: directory
-  tags: libdwarf
-
-- name: Move dwarf header files to libdwarf-2 directory
-  command: mv /usr/include/dwarf.h /usr/include/libdwarf.h /usr/include/libdwarf-2/
   tags: libdwarf
 
 - name: Verify installation
