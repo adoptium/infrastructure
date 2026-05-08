@@ -27,13 +27,28 @@ def get_hostname():
         return "Unable to determine"
 
 
+def get_architecture():
+    try:
+        result = subprocess.run(['uname', '-p'],
+                              capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    try:
+        return platform.machine()
+    except Exception:
+        pass
+    
+    return "Unknown"
+
 def get_os_info():
     os_name = "AIX"
-    os_version = "Unknown"
-    kernel_version = "Unknown"
+    os_version = ""
+    kernel_version = ""
     
     try:
-        result = subprocess.run(['oslevel'], 
+        result = subprocess.run(['oslevel'],
                               capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             os_version = result.stdout.strip()
@@ -41,11 +56,11 @@ def get_os_info():
         pass
     
     try:
-        result = subprocess.run(['uname', '-v'], 
+        result = subprocess.run(['uname', '-v'],
                               capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             version = result.stdout.strip()
-            result = subprocess.run(['uname', '-r'], 
+            result = subprocess.run(['uname', '-r'],
                                   capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 release = result.stdout.strip()
@@ -53,9 +68,9 @@ def get_os_info():
     except Exception:
         pass
     
-    technology_level = "Unknown"
+    technology_level = ""
     try:
-        result = subprocess.run(['oslevel', '-s'], 
+        result = subprocess.run(['oslevel', '-s'],
                               capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             technology_level = result.stdout.strip()
@@ -66,7 +81,8 @@ def get_os_info():
         'name': os_name,
         'version': os_version,
         'kernel': kernel_version,
-        'technology_level': technology_level
+        'technology_level': technology_level,
+        'architecture': get_architecture()
     }
 
 

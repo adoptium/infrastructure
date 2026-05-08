@@ -20,11 +20,27 @@ function Get-HostnameInfo {
     }
 }
 
+function Get-Architecture {
+    try {
+        $arch = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
+        return $arch.Architecture
+    }
+    catch {
+        try {
+            return $env:PROCESSOR_ARCHITECTURE
+        }
+        catch {
+            return "Unknown"
+        }
+    }
+}
+
 function Get-OSInfo {
     $osInfo = @{
         name = "Windows"
-        version = "Unknown"
-        build = "Unknown"
+        version = ""
+        build = ""
+        architecture = ""
     }
     
     try {
@@ -32,6 +48,7 @@ function Get-OSInfo {
         $osInfo.name = $os.Caption
         $osInfo.version = $os.Version
         $osInfo.build = $os.BuildNumber
+        $osInfo.architecture = Get-Architecture
     }
     catch {
         Write-Warning "Unable to retrieve OS information: $_"

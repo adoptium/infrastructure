@@ -32,10 +32,24 @@ def get_hostname():
             return "Unable to determine"
 
 
+def get_architecture():
+    try:
+        return platform.machine()
+    except Exception:
+        try:
+            result = subprocess.run(['uname', '-m'],
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except Exception:
+            pass
+    return "Unknown"
+
+
 def get_os_info():
-    os_name = "Unknown"
-    os_version = "Unknown"
-    kernel_version = "Unknown"
+    os_name = ""
+    os_version = ""
+    kernel_version = ""
     
     try:
         kernel_version = platform.release()
@@ -88,7 +102,8 @@ def get_os_info():
     return {
         'name': os_name,
         'version': os_version,
-        'kernel': kernel_version
+        'kernel': kernel_version,
+        'architecture': get_architecture()
     }
 
 def check_packages():
