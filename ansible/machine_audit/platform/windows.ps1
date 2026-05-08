@@ -17,28 +17,10 @@ function Get-HostnameInfo {
 
 function Get-Architecture {
     try {
-        $arch = Get-CimInstance -ClassName Win32_Processor -ErrorAction Stop | Select-Object -First 1
-        switch ($arch.Architecture) {
-            0 { return "x86" }
-            5 { return "arm" }
-            9 { return "x64" }
-            12 { return "arm64" }
-            default { return "unknown" }
-        }
+        return $env:PROCESSOR_ARCHITECTURE
     }
     catch {
-        try {
-            switch (($env:PROCESSOR_ARCHITECTURE | ForEach-Object { $_.ToUpperInvariant() })) {
-                "X86" { return "x86" }
-                "AMD64" { return "x64" }
-                "ARM" { return "arm" }
-                "ARM64" { return "arm64" }
-                default { return "unknown" }
-            }
-        }
-        catch {
-            return "unknown"
-        }
+        return "unknown"
     }
 }
 
