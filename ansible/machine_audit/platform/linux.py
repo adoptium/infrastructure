@@ -153,6 +153,7 @@ def write_output(data):
         
         try:
             shutil.move(temp_path, OUTPUT_FILE)
+            os.chmod(OUTPUT_FILE, 0o644)
             print(f"Machine information successfully written to: {OUTPUT_FILE}")
             return True
         except PermissionError:

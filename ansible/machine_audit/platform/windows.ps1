@@ -122,6 +122,17 @@ function Write-MachineInfo {
                 Remove-Item $OutputFile -Force
             }
             Move-Item $tempFile $OutputFile -Force
+            
+            # Set file permissions: Read/Write for owner, Read for everyone else
+            $acl = Get-Acl $OutputFile
+            $acl.SetAccessRuleProtection($true, $false)  # Disable inheritance
+            $owner = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+            $ownerRule = New-Object System.Security.AccessControl.FileSystemAccessRule($owner, "Read,Write", "Allow")
+            $acl.AddAccessRule($ownerRule)
+            $everyoneRule = New-Object System.Security.AccessControl.FileSystemAccessRule("Everyone", "Read", "Allow")
+            $acl.AddAccessRule($everyoneRule)
+            Set-Acl $OutputFile $acl
+            
             Write-Host "Machine information successfully written to: $OutputFile"
             return $true
         }
