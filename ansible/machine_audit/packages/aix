@@ -11,13 +11,9 @@
     "automake",
     "libtool",
     "git",
-    "ant",
-    "maven",
-    "gradle"
+    "ant"
   ],
   "test_packages": [
-    "java",
-    "javac",
     "python3",
     "python",
     "perl",
@@ -26,8 +22,6 @@
     "curl",
     "wget",
     "tar",
-    "gzip",
-    "bzip2",
-    "xz"
+    "gzip"
   ]
 }

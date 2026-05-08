@@ -9,13 +9,9 @@
     "libtool",
     "pkg-config",
     "git",
-    "ant",
-    "maven",
-    "gradle"
+    "ant"
   ],
   "test_packages": [
-    "java",
-    "javac",
     "python3",
     "python",
     "perl",
@@ -25,7 +21,6 @@
     "unzip",
     "zip",
     "gzip",
-    "bzip2",
     "xz"
   ]
 }

@@ -1,22 +1,12 @@
 {
   "build_packages": [
-    "cl",
-    "link",
     "nmake",
-    "msbuild",
     "cmake",
     "git",
     "ant",
-    "maven",
-    "gradle",
-    "cygwin",
-    "mingw32-make"
+    "cygwin"
   ],
   "test_packages": [
-    "java",
-    "javac",
-    "python",
-    "python3",
     "perl",
     "powershell",
     "curl",
