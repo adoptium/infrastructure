@@ -118,9 +118,7 @@ function Write-MachineInfo {
         $jsonData | Out-File -FilePath $tempFile -Encoding UTF8
         
         try {
-            if (Test-Path $OutputFile) {
-                Remove-Item $OutputFile -Force
-            }
+
             Move-Item $tempFile $OutputFile -Force
             
             # Set file permissions: Read/Write for owner, Read for everyone else
