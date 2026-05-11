@@ -29,20 +29,20 @@
       "path": "/usr/java25_64/bin/java"
     },
     {
-      "name": "gcc",
-      "path": "default"
+      "name": "xlc13",
+      "path": "/opt/IBM/xlc/13.1.3/bin/xlc"
     },
     {
-      "name": "g++",
-      "path": "default"
+      "name": "xlc13++",
+      "path": "/opt/IBM/xlC/13.1.3/bin/xlc++"
     },
     {
-      "name": "xlc",
-      "path": "default"
+      "name": "xlc16",
+      "path": "/opt/IBM/xlc/16.1.0/bin/xlc"
     },
     {
-      "name": "xlC",
-      "path": "default"
+      "name": "xlc16++",
+      "path": "/opt/IBM/xlC/16.1.0/bin/xlc++"
     },
     {
       "name": "make",
