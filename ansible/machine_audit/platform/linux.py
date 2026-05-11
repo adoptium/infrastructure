@@ -120,16 +120,30 @@ def check_packages():
         'test_packages': {}
     }
     
-    for package in packages_data.get('build_packages', []):
-        path = shutil.which(package)
-        results['build_packages'][package] = {
+    for package_info in packages_data.get('build_packages', []):
+        package_name = package_info.get('name', package_info) if isinstance(package_info, dict) else package_info
+        package_path = package_info.get('path', 'default') if isinstance(package_info, dict) else 'default'
+        
+        if package_path != 'default' and os.path.isfile(package_path) and os.access(package_path, os.X_OK):
+            path = package_path
+        else:
+            path = shutil.which(package_name)
+        
+        results['build_packages'][package_name] = {
             'installed': path is not None,
             'path': path
         }
     
-    for package in packages_data.get('test_packages', []):
-        path = shutil.which(package)
-        results['test_packages'][package] = {
+    for package_info in packages_data.get('test_packages', []):
+        package_name = package_info.get('name', package_info) if isinstance(package_info, dict) else package_info
+        package_path = package_info.get('path', 'default') if isinstance(package_info, dict) else 'default'
+        
+        if package_path != 'default' and os.path.isfile(package_path) and os.access(package_path, os.X_OK):
+            path = package_path
+        else:
+            path = shutil.which(package_name)
+        
+        results['test_packages'][package_name] = {
             'installed': path is not None,
             'path': path
         }

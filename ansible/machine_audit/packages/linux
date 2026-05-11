@@ -1,26 +1,102 @@
 {
   "build_packages": [
-    "gcc",
-    "g++",
-    "make",
-    "cmake",
-    "autoconf",
-    "automake",
-    "libtool",
-    "pkg-config",
-    "git",
-    "ant"
+    {
+      "name": "JDK8",
+      "path": "/usr/lib/jvm/jdk8/bin/java"
+    },
+    {
+      "name": "JDK10",
+      "path": "/usr/lib/jvm/jdk10/bin/java"
+    },
+    {
+      "name": "JDK11",
+      "path": "/usr/lib/jvm/jdk11/bin/java"
+    },
+    {
+      "name": "JDK17",
+      "path": "/usr/lib/jvm/jdk17/bin/java"
+    },
+    {
+      "name": "JDK21",
+      "path": "/usr/lib/jvm/jdk17/bin/java"
+    },
+    {
+      "name": "JDK24",
+      "path": "/usr/lib/jvm/jdk24/bin/java"
+    },
+    {
+      "name": "JDK25",
+      "path": "/usr/lib/jvm/jdk25/bin/java"
+    },
+    {
+      "name": "gcc",
+      "path": "default"
+    },
+    {
+      "name": "g++",
+      "path": "default"
+    },
+    {
+      "name": "make",
+      "path": "default"
+    },
+    {
+      "name": "cmake",
+      "path": "default"
+    },
+    {
+      "name": "autoconf",
+      "path": "default"
+    },
+    {
+      "name": "automake",
+      "path": "default"
+    },
+    {
+      "name": "libtool",
+      "path": "default"
+    },
+    {
+      "name": "git",
+      "path": "default"
+    },
+    {
+      "name": "ant",
+      "path": "default"
+    }
   ],
   "test_packages": [
-    "python3",
-    "python",
-    "perl",
-    "curl",
-    "wget",
-    "tar",
-    "unzip",
-    "zip",
-    "gzip",
-    "xz"
+    {
+      "name": "perl",
+      "path": "default"
+    },
+    {
+      "name": "curl",
+      "path": "default"
+    },
+    {
+      "name": "wget",
+      "path": "default"
+    },
+    {
+      "name": "tar",
+      "path": "default"
+    },
+    {
+      "name": "unzip",
+      "path": "default"
+    },
+    {
+      "name": "zip",
+      "path": "default"
+    },
+    {
+      "name": "gzip",
+      "path": "default"
+    },
+    {
+      "name": "xz",
+      "path": "default"
+    }
   ]
 }

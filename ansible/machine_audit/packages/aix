@@ -1,27 +1,118 @@
 {
   "build_packages": [
-    "gcc",
-    "g++",
-    "xlc",
-    "xlC",
-    "make",
-    "gmake",
-    "cmake",
-    "autoconf",
-    "automake",
-    "libtool",
-    "git",
-    "ant"
+    {
+      "name": "JDK8",
+      "path": "/usr/java8_64/bin/java"
+    },
+    {
+      "name": "JDK10",
+      "path": "/usr/java10_64/bin/java"
+    },
+    {
+      "name": "JDK11",
+      "path": "/usr/java11_64/bin/java"
+    },
+    {
+      "name": "JDK17",
+      "path": "/usr/java17_64/bin/java"
+    },
+    {
+      "name": "JDK21",
+      "path": "/usr/java21_64/bin/java"
+    },
+    {
+      "name": "JDK24",
+      "path": "/usr/java24_64/bin/java"
+    },
+    {
+      "name": "JDK25",
+      "path": "/usr/java25_64/bin/java"
+    },
+    {
+      "name": "gcc",
+      "path": "default"
+    },
+    {
+      "name": "g++",
+      "path": "default"
+    },
+    {
+      "name": "xlc",
+      "path": "default"
+    },
+    {
+      "name": "xlC",
+      "path": "default"
+    },
+    {
+      "name": "make",
+      "path": "default"
+    },
+    {
+      "name": "gmake",
+      "path": "default"
+    },
+    {
+      "name": "cmake",
+      "path": "default"
+    },
+    {
+      "name": "autoconf",
+      "path": "default"
+    },
+    {
+      "name": "automake",
+      "path": "default"
+    },
+    {
+      "name": "libtool",
+      "path": "default"
+    },
+    {
+      "name": "git",
+      "path": "default"
+    },
+    {
+      "name": "ant",
+      "path": "default"
+    }
   ],
   "test_packages": [
-    "python3",
-    "python",
-    "perl",
-    "ksh",
-    "bash",
-    "curl",
-    "wget",
-    "tar",
-    "gzip"
+    {
+      "name": "python3",
+      "path": "default"
+    },
+    {
+      "name": "python",
+      "path": "default"
+    },
+    {
+      "name": "perl",
+      "path": "default"
+    },
+    {
+      "name": "ksh",
+      "path": "default"
+    },
+    {
+      "name": "bash",
+      "path": "default"
+    },
+    {
+      "name": "curl",
+      "path": "default"
+    },
+    {
+      "name": "wget",
+      "path": "default"
+    },
+    {
+      "name": "tar",
+      "path": "default"
+    },
+    {
+      "name": "gzip",
+      "path": "default"
+    }
   ]
 }
