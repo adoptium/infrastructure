@@ -2,35 +2,51 @@
   "build_packages": [
     {
       "name": "Java7",
-      "path": "C:\\Program Files\\Java\\java-se-7u75-ri"
+      "path": "C:\\Program Files\\Java\\java-se-7u75-ri\\bin\\java"
     },
     {
       "name": "JDK8",
-      "path": "C:\\openjdk\\jdk-8\\bin\\java"
+      "path": "C:\\openjdk\\jdk-8\\bin\\java.exe"
     },
     {
       "name": "JDK10",
-      "path": "C:\\openjdk\\jdk-10\\bin\\java"
+      "path": "C:\\openjdk\\jdk-10\\bin\\java.exe"
     },
     {
       "name": "JDK11",
-      "path": "C:\\openjdk\\jdk-11\\bin\\java"
+      "path": "C:\\openjdk\\jdk-11\\bin\\java.exe"
     },
     {
       "name": "JDK17",
-      "path": "C:\\openjdk\\jdk-17\\bin\\java"
+      "path": "C:\\openjdk\\jdk-17\\bin\\java.exe"
     },
     {
       "name": "JDK21",
-      "path": "C:\\openjdk\\jdk-21\\bin\\java"
+      "path": "C:\\openjdk\\jdk-21\\bin\\java.exe"
     },
     {
       "name": "JDK24",
-      "path": "C:\\openjdk\\jdk-24\\bin\\java"
+      "path": "C:\\openjdk\\jdk-24\\bin\\java.exe"
     },
     {
       "name": "JDK25",
-      "path": "C:\\openjdk\\jdk-25\\bin\\java"
+      "path": "C:\\openjdk\\jdk-25\\bin\\java.exe"
+    },
+    {
+      "name": "MSVS_2013",
+      "path": "C:\\Program Files (x86)\\Microsoft Visual Studio 12.0"
+    },
+    {
+      "name": "MSVS_2017",
+      "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community"
+    },
+    {
+      "name": "MSVS_2019",
+      "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community"
+    },
+    {
+      "name": "MSVS_2022",
+      "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022"
     },
     {
       "name": "nmake",
@@ -41,21 +57,17 @@
       "path": "default"
     },
     {
-      "name": "git",
-      "path": "default"
-    },
-    {
       "name": "ant",
-      "path": "default"
-    },
-    {
-      "name": "cygwin",
       "path": "default"
     }
   ],
   "test_packages": [
     {
       "name": "perl",
+      "path": "default"
+    },
+    {
+      "name": "git",
       "path": "default"
     },
     {

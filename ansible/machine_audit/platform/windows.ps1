@@ -66,12 +66,10 @@ function Test-PackageInstalled {
     
     $path = $null
     
-    # If a specific path is provided and it's not "default", check that path
     if ($PackagePath -ne "default" -and (Test-Path $PackagePath)) {
         $path = $PackagePath
     }
     else {
-        # Otherwise use Get-Command to find the package
         $path = Get-CommandPath -Command $Package
     }
     
