@@ -63,27 +63,11 @@
     {
       "name": "automake",
       "path": "default"
-    },
-    {
-      "name": "libtool",
-      "path": "default"
-    },
-    {
-      "name": "git",
-      "path": "default"
-    },
-    {
-      "name": "ant",
-      "path": "default"
     }
   ],
   "test_packages": [
     {
-      "name": "python3",
-      "path": "default"
-    },
-    {
-      "name": "python",
+      "name": "ant",
       "path": "default"
     },
     {
@@ -91,11 +75,7 @@
       "path": "default"
     },
     {
-      "name": "ksh",
-      "path": "default"
-    },
-    {
-      "name": "bash",
+      "name": "git",
       "path": "default"
     },
     {
@@ -104,14 +84,6 @@
     },
     {
       "name": "wget",
-      "path": "default"
-    },
-    {
-      "name": "tar",
-      "path": "default"
-    },
-    {
-      "name": "gzip",
       "path": "default"
     }
   ]

@@ -49,19 +49,11 @@
       "path": "default"
     },
     {
+      "name": "docker",
+      "path": "default"
+    },
+    {
       "name": "automake",
-      "path": "default"
-    },
-    {
-      "name": "libtool",
-      "path": "default"
-    },
-    {
-      "name": "git",
-      "path": "default"
-    },
-    {
-      "name": "ant",
       "path": "default"
     }
   ],
@@ -75,27 +67,15 @@
       "path": "default"
     },
     {
+      "name": "git",
+      "path": "default"
+    },
+    {
+      "name": "ant",
+      "path": "default"
+    },
+    {
       "name": "wget",
-      "path": "default"
-    },
-    {
-      "name": "tar",
-      "path": "default"
-    },
-    {
-      "name": "unzip",
-      "path": "default"
-    },
-    {
-      "name": "zip",
-      "path": "default"
-    },
-    {
-      "name": "gzip",
-      "path": "default"
-    },
-    {
-      "name": "xz",
       "path": "default"
     }
   ]
