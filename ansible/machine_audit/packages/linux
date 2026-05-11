@@ -18,7 +18,7 @@
     },
     {
       "name": "JDK21",
-      "path": "/usr/lib/jvm/jdk17/bin/java"
+      "path": "/usr/lib/jvm/jdk21/bin/java"
     },
     {
       "name": "JDK24",
