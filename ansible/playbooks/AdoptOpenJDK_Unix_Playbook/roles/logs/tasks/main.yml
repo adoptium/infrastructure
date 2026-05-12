@@ -22,7 +22,7 @@
   register: date_output
 
 - name: Get Latest git commit SHA
-  shell: git rev-parse HEAD
+  shell: git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
   register: git_output
   delegate_to: localhost
   ignore_errors: yes
