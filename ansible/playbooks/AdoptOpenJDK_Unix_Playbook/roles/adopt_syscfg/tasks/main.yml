@@ -5,7 +5,7 @@
 #########################
 
 - name: Set kernel.core_pattern in sysctl.conf
-  ansible.builtin.lineinfile:
+  lineinfile:
     path: /etc/sysctl.conf
     regexp: '^kernel\.core_pattern\s*='
     line: 'kernel.core_pattern = core.%p'
@@ -15,7 +15,7 @@
   tags: adoptopenjdk
 
 - name: Apply sysctl settings immediately
-  ansible.builtin.sysctl:
+  sysctl:
     name: kernel.core_pattern
     value: 'core.%p'
     state: present
