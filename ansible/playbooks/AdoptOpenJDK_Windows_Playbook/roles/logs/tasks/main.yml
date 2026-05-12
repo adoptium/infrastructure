@@ -12,7 +12,7 @@
 
 # Accounts for cases where playbook executor is windows and its executing on localhost
 - name: Get Latest git commit SHA (Windows local container)
-  win_command: C:\cygwin64\bin\git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
+  win_shell: C:\cygwin64\bin\git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
   register: git_output
   ignore_errors: yes
   when:
@@ -20,7 +20,7 @@
     - inventory_hostname == "localhost" or inventory_hostname == "127.0.0.1"
 
 - name: Get Latest git commit SHA (Windows remote)
-  win_command: C:\cygwin64\bin\git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
+  win_shell: C:\cygwin64\bin\git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
   register: git_output
   ignore_errors: yes
   when:
