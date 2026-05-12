@@ -2,7 +2,7 @@
   "build_packages": [
     {
       "name": "Java7",
-      "path": "C:\\Program Files\\Java\\java-se-7u75-ri"
+      "path": "C:\\openjdk\\jdk-7"
     },
     {
       "name": "JDK8",
