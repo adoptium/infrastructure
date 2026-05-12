@@ -20,9 +20,8 @@
     - inventory_hostname == "localhost" or inventory_hostname == "127.0.0.1"
 
 - name: Get Latest git commit SHA (Windows remote)
-  shell: git rev-parse HEAD
+  win_command: C:\cygwin64\bin\git ls-remote https://github.com/adoptium/infrastructure.git HEAD | awk '{split($0,a," "); print a[1]}'
   register: git_output
-  delegate_to: localhost
   ignore_errors: yes
   when:
     - git_sha is not defined
