@@ -29,7 +29,7 @@
 
 - name: Set git_output to git_sha
   set_fact:
-    git_sha: "{{ git_output.stdout }}"
+    git_sha: "{{ git_output.stdout | trim }}"
   when: git_sha is not defined
 
 - name: Update Log File
