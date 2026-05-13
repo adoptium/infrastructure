@@ -122,12 +122,42 @@ function Get-PackageInfo {
     return $results
 }
 
+function Get-LastExecutedPlaybook {
+
+    $logFile = "$HOME\ansible.log"
+    
+    try {
+        if (-not (Test-Path $logFile)) {
+            return $null
+        }
+        
+        $content = Get-Content $logFile -Tail 1 -ErrorAction Stop
+        
+        if (-not $content) {
+            return $null
+        }
+        
+        $parts = $content.Trim() -split '\s+'
+        
+        if ($parts.Count -ge 4) {
+            $date = $parts[1]
+            $time = $parts[2]
+            $sha = $parts[3]
+            return "$date $time $sha"
+        }
+        return $null
+    }
+    catch {
+        return $null
+    }
+}
 function Get-MachineInfo {
     return @{
         timestamp = Get-Timestamp
         hostname = Get-HostnameInfo
         os = Get-OSInfo
         packages = Get-PackageInfo
+        last_executed_playbook = Get-LastExecutedPlaybook
     }
 }
 
