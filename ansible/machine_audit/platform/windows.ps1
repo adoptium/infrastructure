@@ -156,8 +156,8 @@ function Get-MachineInfo {
         timestamp = Get-Timestamp
         hostname = Get-HostnameInfo
         os = Get-OSInfo
-        packages = Get-PackageInfo
         last_executed_playbook = Get-LastExecutedPlaybook
+        packages = Get-PackageInfo
     }
 }
 

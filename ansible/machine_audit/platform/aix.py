@@ -164,7 +164,7 @@ def get_last_executed_playbook():
             return None
     
     except Exception as e:
-        
+
         return None
 
 def collect_info():
@@ -172,8 +172,8 @@ def collect_info():
         'timestamp': get_timestamp(),
         'hostname': get_hostname(),
         'os': get_os_info(),
-        'packages': check_packages(),
-        'last_executed_playbook': get_last_executed_playbook()
+        'last_executed_playbook': get_last_executed_playbook(),
+        'packages': check_packages()
     }
 
 def write_output(data):
