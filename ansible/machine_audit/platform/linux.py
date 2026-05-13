@@ -150,11 +150,51 @@ def check_packages():
     
     return results
 
+def get_last_executed_playbook():
+
+    log_file = '/var/log/ansible.log'
+    
+    try:
+        if not os.path.exists(log_file):
+            return None
+        
+        with open(log_file, 'rb') as f:
+
+            f.seek(0, os.SEEK_END)
+            file_size = f.tell()
+            
+            if file_size == 0:
+                return None
+            
+            buffer_size = min(1024, file_size)
+            f.seek(max(0, file_size - buffer_size), os.SEEK_SET)
+            lines = f.read().decode('utf-8', errors='ignore').splitlines()
+            
+            if not lines:
+                return None
+            
+            last_line = lines[-1].strip()
+            
+            parts = last_line.split()
+            if len(parts) >= 4:
+                
+                date = parts[1]
+                time = parts[2]
+                sha = parts[3]
+                return f"{date} {time} {sha}"
+            
+            return None
+    
+    except Exception as e:
+
+        return None
+
 def collect_info():
     return {
         'timestamp': get_timestamp(),
         'hostname': get_hostname(),
         'os': get_os_info(),
+        'last_executed_playbook': get_last_executed_playbook(),
         'packages': check_packages()
     }
 
