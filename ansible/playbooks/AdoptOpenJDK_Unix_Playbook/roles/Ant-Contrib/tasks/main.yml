@@ -39,7 +39,6 @@
   when:
     - not antcontrib_status.stat.exists
     - ansible_distribution != "MacOSX"
-    - ansible_distribution != "Solaris"
     - not (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6")
   tags: ant-contrib
 
@@ -68,13 +67,13 @@
     - ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
   tags: ant-contrib
 
-- name: Download ant-contrib (macOS) and (Solaris)
+- name: Download ant-contrib (macOS)
   get_url:
     url: https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-{{ antContribVersion }}/ant-contrib-{{ antContribVersion }}-bin.tar.gz
     dest: /tmp/ant-contrib-{{ antContribVersion }}-bin.tar.gz
   when:
     - not antcontrib_status.stat.exists
-    - ansible_distribution == "MacOSX" or ansible_distribution == "Solaris"
+    - ansible_distribution == "MacOSX"
   tags: ant-contrib
 
 - name: Extract ant-contrib

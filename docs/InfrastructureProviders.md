@@ -15,7 +15,6 @@ All of the companies sponsoring the project are listed towards the end of our
 
 In addition we have some additional capacity primarily for some of the less common platforms:
 
-- [Siteox](https://www.siteox.com) (Solaris/SPARC)
 - [Amazon AWS](https://console.aws.amazon.com/) (x64 and arm)
 - [Scaleway](https://console.scaleway.com/login) (riscv64)
 - [Hetzner](https://console.hetzner.com) (Jenkins, Nagios)

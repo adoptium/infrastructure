@@ -13,7 +13,6 @@ Currently, the supported x86-64 systems are:
 - Debian 8 and 10
 - Ubuntu 16.04, 18.04, 20.04 and 22.04
 - CentOS 6, 7 and 8
-- Solaris 10
 - Fedora 35
 ## Qemu Playbook Check
 
@@ -34,7 +33,6 @@ These jobs run automatically when a pull request is submitted. The files for the
 ### Platforms
 
 If a pull request contains changes to the playbooks, this workflow will be triggered automatically. It will execute the playbook changes on the supported platforms:
-- [Solaris 10](https://github.com/adoptium/infrastructure/blob/master/.github/workflows/build_vagrant.yml)
 - [MacOS 11](https://github.com/adoptium/infrastructure/blob/master/.github/workflows/build_mac.yml)
 - [Windows 2019 and 2022](https://github.com/adoptium/infrastructure/blob/master/.github/workflows/build_wsl.yml)
 

@@ -29,7 +29,6 @@ Most Ansible changes are tested automatically with a series of CI jobs:
 | Alpine 3 | [build.yml](./.github/workflows/build.yml) | |
 | macOS 11 | [build_mac.yml](./.github/workflows/build_mac.yml) | |
 | Windows (2019 and 2022) | [build_wsl.yml](./.github/workflows/build_wsl.yml) | Uses Windows Subsystem for Linux to run ansible |
-| Solaris 10 | [build_vagrant.yml](./.github/workflows/build_vagrant.yml) | Uses Vagrant to run a Solaris image inside a macOS host |
 
 Please note that the Centos 6 & Alpine 3 build jobs, build a docker image but DO NOT PUSH to dockerhub. The job has a seperate configuration section to push to dockerhub when a PR is merged, however that function is disabled, and has been superceded by the Jenkins docker image updater job. The code has been left in place for two reasons, the first to allow the ability to re-enable quickly, and also to test the authentication job for the dockerhub credentials. These credentials are stored in GitHub and are managed by the EF infrastructure team.
 

@@ -32,9 +32,3 @@
         job="/usr/sbin/pkg update && /usr/sbin/pkg upgrade -y"
   when: (ansible_distribution == "FreeBSD")
   tags: crontab
-
-- name: Add cron job to apply OS updates on Solaris systems
-  cron: name="Check for updates everyday at 1am" weekday="*" minute="0" hour="1" user=root state=present
-        job="/opt/csw/bin/pkgutil --upgrade --yes"
-  when: (ansible_distribution == "Solaris")
-  tags: crontab
