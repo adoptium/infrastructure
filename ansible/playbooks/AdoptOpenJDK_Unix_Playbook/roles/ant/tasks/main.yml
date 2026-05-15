@@ -107,7 +107,6 @@
   vars:
     packages:
       - ant
-      - ant-contrib
       - ant-optional
   when:
     - ansible_distribution == "Ubuntu"
