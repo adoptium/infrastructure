@@ -12,11 +12,6 @@ fi
 
 echo DEBUG: TEST_JDK_HOME = $TEST_JDK_HOME
 
-# Special case for Solaris. See: https://github.com/adoptium/infrastructure/pull/2405#issuecomment-999498345
-if [[ "$(uname)" == "SunOS" ]]; then
-	export PATH="/usr/local/bin:/opt/csw/bin:${PATH}"
-fi
-
 ## Run The Smoke Tests To Ensure The JDK Build OK
 mkdir -p $HOME/testLocation
 [ ! -d $HOME/testLocation/aqa-tests ] && git clone https://github.com/adoptium/aqa-tests.git $HOME/testLocation/aqa-tests
@@ -40,8 +35,8 @@ $MAKE_COMMAND compile
 $MAKE_COMMAND _MBCS_Tests_pref_ja_JP_linux_0
 $MAKE_COMMAND _MBCS_Tests_formatter_ja_JP_linux_0
 
-# Run SSL Client Tests Linux Only ( Not Solaris / FreeBSD )
-if [[ "$(uname)" == "FreeBSD" ]] || [[ "$(uname)" == "SunOS" ]]; then
+# Run SSL Client Tests Linux Only ( Not FreeBSD )
+if [[ "$(uname)" == "FreeBSD" ]]; then
 	echo "Skipping SSL Tests As Not Supported"
 else
 	export TESTJAVA=$TEST_JDK_HOME

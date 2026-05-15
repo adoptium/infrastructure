@@ -8,7 +8,7 @@ assignees: ''
 ---
 I need to request a new machine:
 
-- New machine operating system (e.g. linux/windows/macos/solaris/aix):
+- New machine operating system (e.g. linux/windows/macos/aix):
 - New machine architecture (e.g. x64/aarch32/arm32/ppc64/ppc64le/sparc):
 - Provider (leave blank if it does not matter):
 - Desired usage:

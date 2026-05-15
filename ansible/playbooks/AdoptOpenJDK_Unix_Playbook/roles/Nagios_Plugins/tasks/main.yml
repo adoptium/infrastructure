@@ -24,12 +24,6 @@
   when:
     - ansible_distribution == "MacOSX"
 
-- name: Set Home Folder for Nagios user (Solaris)
-  set_fact:
-    home_folder: /export/home/nagios
-  when:
-    - ansible_distribution == "Solaris"
-
 - name: Create Nagios user
   action: user name=nagios state=present home={{ home_folder }} shell=/bin/bash
   failed_when: false
@@ -49,23 +43,6 @@
   when:
     - Nagios_Plugins == "Enabled"
     - ansible_distribution == "MacOSX"
-
-- name: Create Nagios user's home folder (Solaris)
-  file:
-    path: /export/home/nagios
-    state: directory
-    owner: nagios
-    group: staff
-    mode: 0700
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution == "Solaris"
-
-- name: Set Nagios user's home folder (Solaris)
-  command: usermod -d /export/home/nagios/ nagios
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution == "Solaris"
 
 - name: Set authorized key for Nagios user
   authorized_key:
@@ -94,13 +71,6 @@
     checksum: sha256:bd6476a3ea399aa6653c359c415be23ca485431e609642f44f456493270789ce
   when:
     - Nagios_Plugins == "Enabled"
-    - ansible_distribution != "Solaris"
-
-- name: Download add-on check_mem plugin (Solaris)
-  command: wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl -O /usr/local/nagios/libexec/check_mem
-  when:
-    - Nagios_Plugins == "Enabled"
-    - ansible_distribution == "Solaris"
 
 - name: Copy Get Container Health Plugin
   copy:

@@ -104,7 +104,6 @@
     platformLinux: linux
   when:
     - ansible_distribution != "MacOSX"
-    - ansible_os_family != "Solaris"
     - ansible_distribution != "Alpine"
 
 - name: Set platform variable for Alpine-Linux
@@ -149,7 +148,6 @@
   when:
     - ansible_distribution != "MacOSX"
     - not ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and ansible_distribution_major_version == "6")
-    - ansible_os_family != "Solaris"
     - not (ansible_architecture == "riscv64" and (jdk_version == 20 or jdk_version == 19 or jdk_version == 11)) # Linux-riscv64 for JDK 11, 19, 20 are not GA
     - adoptopenjdk_installed.rc != 0
   tags: adoptopenjdk_install
@@ -366,29 +364,6 @@
       become: yes
       become_user: root
       become_method: ansible.builtin.sudo
-
-- name: Install latest JDK {{ jdk_version }} release if one not already installed (Solaris)
-  when:
-    - ansible_os_family == "Solaris"
-    - adoptopenjdk_installed.rc != 0
-  tags: adoptopenjdk_install
-  block:
-    - name: Download latest JDK {{ jdk_version }} release (Solaris)
-      command: wget {{ api_url }}/v3/binary/latest/{{ jdk_version }}/ga/solaris/{{ api_architecture }}/jdk/{{ bootjdk }}/normal/{{ api_vendor }}?project=jdk -O /tmp/jdk-{{ jdk_version }}.tar.gz
-      register: adoptopenjdk_download
-      until: adoptopenjdk_download is not failed
-
-    - name: Get Signature File Link (Solaris)
-      shell: curl -s '{{ api_url }}/v3/assets/latest/{{ jdk_version }}/{{ bootjdk }}?architecture={{ api_architecture }}&image_type=jdk&os=solaris&vendor={{ api_vendor }}' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'
-      register: sig_output
-
-    - name: GPG Signature verification (Solaris)
-      script: ../Supporting_Scripts/package_signature_verification.sh -f /tmp/jdk-{{ jdk_version }}.tar.gz -sl "{{ sig_output.stdout }}" -k {{ key.adoptium }}
-
-    - name: Extract latest JDK {{ jdk_version }} release (Solaris)
-      command: tar -xf /tmp/jdk-{{ jdk_version }}.tar.gz -C /usr/lib/jvm
-      register: adoptopenjdk_unpack
-      until: adoptopenjdk_unpack is not failed
 
 - name: Get {{ path }}* full path name
   find:

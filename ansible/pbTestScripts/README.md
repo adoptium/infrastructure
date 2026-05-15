@@ -20,7 +20,7 @@ This folder contains the scripts necessary to start separate vagrant machines wi
 * Debian11
 * Debian12
 * Fedora 40
-* Solaris10
+* Fedora 40
 * Windows Server 2012 R2
 * Windows Server 2022
 

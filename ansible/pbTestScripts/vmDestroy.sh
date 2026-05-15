@@ -65,8 +65,6 @@ checkOS() {
                         osToDestroy="F40" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
 			osToDestroy="FBSD12" ;;
-		"Solaris10" | "solaris10" | "Sol10" | "sol10" )
-			osToDestroy="Sol10" ;;
 		"Windows2012" | "Win2012" | "W12" | "w12" )
                         osToDestroy="W2012";;
   	"Windows2022" | "Win2022" | "W22" | "w22" )
@@ -94,7 +92,6 @@ listOS() {
 		- Debian8
 		- Debian10
 		- FreeBSD12
-		- Solaris10
 		- Win2012
 		- Win2022"
 	echo

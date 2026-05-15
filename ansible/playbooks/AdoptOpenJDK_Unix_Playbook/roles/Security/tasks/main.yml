@@ -62,14 +62,6 @@
   failed_when: false
   when:
     - Security == "Enabled"
-    - ansible_distribution != "Solaris"
-  tags: [security, adoptopenjdk]
-
-- name: Restart ssh service (Solaris)
-  command: svcadm restart ssh
-  when:
-    - Security == "Enabled"
-    - ansible_distribution == "Solaris"
   tags: [security, adoptopenjdk]
 
 - name: Restart sshd service
@@ -80,7 +72,6 @@
   failed_when: false
   when:
     - Security == "Enabled"
-    - ansible_distribution != "Solaris"
   tags: [security, adoptopenjdk]
 
 ##################
