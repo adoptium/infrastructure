@@ -15,15 +15,12 @@ RUN mkdir -p /usr/lib/jvm/jdk25
 RUN curl -sL 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jre/hotspot/normal/eclipse?project=jdk' | tee >(tar xpfz - -C /usr/lib/jvm/jdk25 --strip-components=1) | gpg --verify /tmp/jdk25.sig -
 # Install ant
 RUN curl -o /tmp/ant.zip 'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip' && \
-    curl -Lo /tmp/ant-contrib.tgz  https://sourceforge.net/projects/ant-contrib/files/ant-contrib/ant-contrib-1.0b2/ant-contrib-1.0b2-bin.tar.gz && \
     echo "$ant_512checksum  /tmp/ant.zip" > /tmp/ant.sha512 && \
-    echo "0fd2771dca2b8b014a4cb3246715b32e20ad5d26754186d82eee781507a183d5e63064890b95eb27c091c93c1209528a0b18a6d7e6901899319492a7610e74ad  /tmp/ant-contrib.tgz" >> /tmp/ant.sha512 && \
     sha512sum --check --strict /tmp/ant.sha512 && \
     unzip -q -d /usr/local /tmp/ant.zip && \
-    tar xpfz /tmp/ant-contrib.tgz -C /usr/local/apache-ant-$ant_version/lib --strip-components=2 ant-contrib/lib/ant-contrib.jar && \
     ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
 # Housekeep Downloaded Archives
-RUN rm /tmp/ant.zip /tmp/ant-contrib.tgz
+RUN rm /tmp/ant.zip
 
 # Set up jenkins user
 RUN useradd -m -d /home/jenkins jenkins && \
