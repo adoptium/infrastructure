@@ -3,21 +3,32 @@
 # Incredibuild - Configuration Tasks  #
 #######################################
 
-- name: Check if the ibxbuild service exists
-  ansible.windows.win_service_info:
-    name: IBXDashboard
-  register: service_info
+- name: Check if the IBXDashboard service exists
+  win_shell: |
+    $service = Get-Service -Name IBXDashboard -ErrorAction SilentlyContinue
+    if ($service) { Write-Output "exists" } else { Write-Output "not_found" }
+  register: service_check
+  changed_when: false
+  failed_when: false
+  tags: IncrediBuild
+
+- name: Set service exists fact
+  set_fact:
+    service_exists: "{{ 'exists' in service_check.stdout }}"
+  tags: IncrediBuild
 
 - name: Stop the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: stopped
-  when: service_info.exists
+  when: service_exists | bool
+  tags: IncrediBuild
 
 - name: Check if incredibuild.conf file exists
   win_stat:
     path: 'C:\Program Files (x86)\IncrediBuild\Dashboard\Apache24\conf\incredibuild.conf'
   register: incredibuild_conf_file
+  tags: IncrediBuild
 
 - name: Replace APACHE_PORT in incredibuild.conf if file exists
   win_lineinfile:
@@ -26,9 +37,11 @@
     line: 'define APACHE_PORT 31000'
     backup: yes
   when: incredibuild_conf_file.stat.exists
+  tags: IncrediBuild
 
 - name: Start the IBX Dashboard service if it exists
-  ansible.windows.win_service:
+  win_service:
     name: IBXDashboard
     state: started
-  when: service_info.exists
+  when: service_exists | bool
+  tags: IncrediBuild
