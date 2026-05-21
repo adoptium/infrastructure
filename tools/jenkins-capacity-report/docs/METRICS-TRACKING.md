@@ -108,7 +108,7 @@ METRICS_AUTO_RECORD=false
 Then use cron jobs or other schedulers:
 ```bash
 # Hourly via cron
-0 * * * * curl -X POST http://your-server/api/metrics/record
+0 * * * * curl -X POST https://your-server/api/metrics/record
 ```
 
 ## API Endpoints
