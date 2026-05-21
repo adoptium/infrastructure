@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category }} - Jenkins Capacity Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .summary-card.online .value {
+            color: #28a745;
+        }
+        
+        .summary-card.offline .value {
+            color: #dc3545;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-online {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .status-offline {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .offline-reason {
+            color: #dc3545;
+            font-size: 0.85em;
+            padding-left: 30px;
+            font-style: italic;
+        }
+        
+        .section-title {
+            color: #333;
+            margin: 20px 0;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .category-link {
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .category-link:hover {
+            color: #764ba2;
+            border-bottom: 2px solid #764ba2;
+        }
+        
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px;
+        }
+        
+        th.sortable:hover {
+            background: #5568d3;
+        }
+        
+        th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+        }
+        
+        th.sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+        
+        th.sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🖥️ {{ category }}</h1>
+                <a href="{{ url_for('index') }}" class="back-btn">← Back to Dashboard</a>
+            </div>
+            
+            <div class="nav-bar">
+                <a href="{{ url_for('index') }}" class="nav-btn">🏠 Home</a>
+                {% if cloud_config_available %}
+                <a href="{{ url_for('cloud_statistics') }}" class="nav-btn">☁️ Cloud Statistics</a>
+                {% else %}
+                <span class="nav-btn" style="opacity: 0.5; cursor: not-allowed; position: relative;"
+                      title="Cloud configuration not available. To enable: 1) Run tools/extract_clouds_config.sh on Jenkins server, 2) Copy clouds.xml to app directory, 3) Update CLOUD_CONFIG_FILE in .env">
+                    ☁️ Cloud Statistics
+                </span>
+                {% endif %}
+                <a href="{{ url_for('category_listing', category_name='build') }}" class="nav-btn">🔨 Build Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='test') }}" class="nav-btn">🧪 Test Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='docker-host') }}" class="nav-btn">🐳 Docker Hosts</a>
+                <a href="{{ url_for('category_listing', category_name='static-docker') }}" class="nav-btn">🐋 Static Docker Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='infrastructure') }}" class="nav-btn">🏗️ Infrastructure Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='dynamic') }}" class="nav-btn">⚡ Dynamic Nodes</a>
+                <a href="{{ url_for('filter_by_status', status='online') }}" class="nav-btn">✅ Online</a>
+                <a href="{{ url_for('filter_by_status', status='offline') }}" class="nav-btn">❌ Offline</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Summary Stats -->
+            <div class="summary-section">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="label">Total Nodes</div>
+                        <div class="value">{{ total }}</div>
+                    </div>
+                    <div class="summary-card online">
+                        <div class="label">Online Nodes</div>
+                        <div class="value">{{ online }}</div>
+                    </div>
+                    <div class="summary-card offline">
+                        <div class="label">Offline Nodes</div>
+                        <div class="value">{{ offline }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nodes Table -->
+            <h2 class="section-title">All Nodes</h2>
+            
+            {% if nodes %}
+            <table class="sortable-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="name">Node Name</th>
+                        <th class="sortable" data-sort="type">Type</th>
+                        <th class="sortable" data-sort="arch">Arch</th>
+                        <th class="sortable" data-sort="os">OS</th>
+                        {% if category in ['Static Docker Nodes', 'Build Nodes', 'Test Nodes', 'Docker Host Nodes'] %}
+                        <th class="sortable" data-sort="container">Container Host</th>
+                        {% endif %}
+                        <th class="sortable" data-sort="status">Status</th>
+                        {% if category not in ['Static Docker Nodes'] %}
+                        <th class="sortable" data-sort="executors">Executors</th>
+                        <th class="sortable" data-sort="busy">Busy</th>
+                        <th class="sortable" data-sort="idle">Idle</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for node in nodes %}
+                    <tr>
+                        <td><a href="{{ url_for('node_detail', node_name=node.name) }}" style="color: #667eea; text-decoration: none; font-weight: 600;">{{ node.name }}</a></td>
+                        <td>
+                            <a href="{{ url_for('filter_by_os_type', os_type=node.os_type) }}" class="category-link">{{ node.os_type }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('filter_by_arch', arch_name=node.arch) }}" class="category-link">{{ node.arch }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('filter_by_os', os_name=node.os) }}" class="category-link">{{ node.os }}</a>
+                        </td>
+                        {% if category in ['Static Docker Nodes', 'Build Nodes', 'Test Nodes', 'Docker Host Nodes'] %}
+                        <td>{{ node.container_host }}</td>
+                        {% endif %}
+                        <td class="{% if node.status == 'ONLINE' %}status-online{% else %}status-offline{% endif %}">
+                            <a href="{{ url_for('filter_by_status', status=node.status.lower()) }}" class="category-link" style="color: inherit;">
+                                {{ node.status }}{% if node.temp_offline %} (TEMP){% endif %}
+                            </a>
+                        </td>
+                        {% if category not in ['Static Docker Nodes'] %}
+                        <td>{{ node.executors }}</td>
+                        <td>{{ node.busy }}</td>
+                        <td>{{ node.idle }}</td>
+                        {% endif %}
+                    </tr>
+                    {% if node.offline_cause %}
+                    <tr>
+                        <td colspan="{% if category == 'Static Docker Nodes' %}6{% elif category in ['Build Nodes', 'Test Nodes', 'Docker Host Nodes'] %}9{% else %}8{% endif %}" class="offline-reason">
+                            └─ Offline reason: {{ node.offline_cause }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="text-align: center; color: #666; padding: 40px;">No nodes found in this category.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        // Table sorting functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = document.querySelectorAll('.sortable-table');
+            
+            tables.forEach(table => {
+                const headers = table.querySelectorAll('th.sortable');
+                const tbody = table.querySelector('tbody');
+                
+                headers.forEach((header, index) => {
+                    header.addEventListener('click', function() {
+                        const sortType = this.getAttribute('data-sort');
+                        const isAscending = this.classList.contains('asc');
+                        
+                        // Remove sort classes from all headers
+                        headers.forEach(h => h.classList.remove('asc', 'desc'));
+                        
+                        // Add appropriate class to clicked header
+                        if (isAscending) {
+                            this.classList.add('desc');
+                        } else {
+                            this.classList.add('asc');
+                        }
+                        
+                        // Get all rows (including offline reason rows)
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        const dataRows = [];
+                        
+                        // Group main rows with their offline reason rows
+                        for (let i = 0; i < rows.length; i++) {
+                            const row = rows[i];
+                            if (!row.querySelector('.offline-reason')) {
+                                const group = [row];
+                                // Check if next row is an offline reason
+                                if (i + 1 < rows.length && rows[i + 1].querySelector('.offline-reason')) {
+                                    group.push(rows[i + 1]);
+                                    i++; // Skip the offline reason row in next iteration
+                                }
+                                dataRows.push(group);
+                            }
+                        }
+                        
+                        // Sort the grouped rows
+                        dataRows.sort((a, b) => {
+                            const aRow = a[0];
+                            const bRow = b[0];
+                            const aCells = aRow.querySelectorAll('td');
+                            const bCells = bRow.querySelectorAll('td');
+                            
+                            let aValue = aCells[index]?.textContent.trim() || '';
+                            let bValue = bCells[index]?.textContent.trim() || '';
+                            
+                            // Handle numeric values
+                            if (sortType === 'executors' || sortType === 'busy' || sortType === 'idle') {
+                                aValue = parseInt(aValue) || 0;
+                                bValue = parseInt(bValue) || 0;
+                            }
+                            
+                            // Compare values
+                            if (aValue < bValue) return isAscending ? 1 : -1;
+                            if (aValue > bValue) return isAscending ? -1 : 1;
+                            return 0;
+                        });
+                        
+                        // Clear tbody and append sorted rows
+                        tbody.innerHTML = '';
+                        dataRows.forEach(group => {
+                            group.forEach(row => tbody.appendChild(row));
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

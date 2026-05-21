@@ -1,0 +1,6 @@
+requests>=2.31.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+flask>=3.0.0
+apscheduler>=3.10.0
+werkzeug>=3.0.0

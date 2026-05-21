@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Statistics - Jenkins Capacity Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header .timestamp {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .page-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .cloud-section {
+            margin-bottom: 50px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .cloud-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .cloud-name {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        .cloud-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .cloud-info-item {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        .cloud-info-label {
+            opacity: 0.8;
+            margin-right: 5px;
+        }
+        
+        .cloud-info-value {
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th {
+            background: #495057;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .template-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .label-badge {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 2px;
+            color: #495057;
+        }
+        
+        .labels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px;
+        }
+        
+        th.sortable:hover {
+            background: #3d4349;
+        }
+        
+        th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+        }
+        
+        th.sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+        
+        th.sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .cloud-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>☁️ Cloud Provider Statistics</h1>
+                <div class="timestamp">Last Updated: {{ timestamp }}</div>
+            </div>
+            
+            <div class="nav-bar">
+                <a href="{{ url_for('index') }}" class="nav-btn">🏠 Home</a>
+                {% if cloud_config_available %}
+                <a href="{{ url_for('cloud_statistics') }}" class="nav-btn">☁️ Cloud Statistics</a>
+                {% else %}
+                <span class="nav-btn" style="opacity: 0.5; cursor: not-allowed;" title="Cloud configuration file not available">☁️ Cloud Statistics (Disabled)</span>
+                {% endif %}
+                <a href="{{ url_for('category_listing', category_name='build') }}" class="nav-btn">🔨 Build Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='test') }}" class="nav-btn">🧪 Test Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='docker-host') }}" class="nav-btn">🐳 Docker Hosts</a>
+                <a href="{{ url_for('category_listing', category_name='static-docker') }}" class="nav-btn">🐋 Static Docker Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='infrastructure') }}" class="nav-btn">🏗️ Infrastructure Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='dynamic') }}" class="nav-btn">⚡ Dynamic Nodes</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h1 class="page-title">☁️ Cloud Provider Template Details</h1>
+            
+            {% if clouds %}
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="label">Total Cloud Providers</div>
+                        <div class="value">{{ clouds|length }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Total Templates</div>
+                        <div class="value">
+                            {% set total_templates = namespace(count=0) %}
+                            {% for cloud in clouds %}
+                                {% set total_templates.count = total_templates.count + cloud.templates|length %}
+                            {% endfor %}
+                            {{ total_templates.count }}
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Total Executors</div>
+                        <div class="value">
+                            {% set total_executors = namespace(count=0) %}
+                            {% for cloud in clouds %}
+                                {% for template in cloud.templates %}
+                                    {% set total_executors.count = total_executors.count + template.num_executors %}
+                                {% endfor %}
+                            {% endfor %}
+                            {{ total_executors.count }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cloud Sections -->
+                {% for cloud in clouds %}
+                <div class="cloud-section">
+                    <div class="cloud-header">
+                        <div class="cloud-name">{{ cloud.name }}</div>
+                        <div class="cloud-info">
+                            <div class="cloud-info-item">
+                                <span class="cloud-info-label">Type:</span>
+                                <span class="cloud-info-value">{{ cloud.cloud_type }}</span>
+                            </div>
+                            <div class="cloud-info-item">
+                                <span class="cloud-info-label">Templates:</span>
+                                <span class="cloud-info-value">{{ cloud.templates|length }}</span>
+                            </div>
+                            <div class="cloud-info-item">
+                                <span class="cloud-info-label">Max Instances:</span>
+                                <span class="cloud-info-value">
+                                    {% if cloud.instance_cap == -1 %}
+                                        Unlimited
+                                    {% else %}
+                                        {{ cloud.instance_cap }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if cloud.templates %}
+                    <table class="sortable-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="name">Template Name</th>
+                                <th class="sortable" data-sort="image">Image</th>
+                                <th class="sortable" data-sort="os_type">OS Type</th>
+                                <th class="sortable" data-sort="arch">Architecture</th>
+                                <th class="sortable" data-sort="executors">Executors</th>
+                                <th class="sortable" data-sort="labels">Labels</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for template in cloud.templates %}
+                            <tr>
+                                <td class="template-name">{{ template.name_prefix }}</td>
+                                <td>{{ template.image }}</td>
+                                <td>{{ template.os_type|capitalize }}</td>
+                                <td>{{ template.architecture }}</td>
+                                <td>{{ template.num_executors }}</td>
+                                <td>
+                                    {% if template.label_string %}
+                                        <div class="labels-container">
+                                            {% for label in template.label_string.split() %}
+                                                <span class="label-badge">{{ label }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span style="color: #999; font-style: italic;">No labels</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="no-data">No templates configured for this cloud provider</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-data" style="text-align: left; max-width: 800px; margin: 40px auto;">
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 4px;">
+                        <h2 style="color: #856404; margin-bottom: 15px;">⚠️ Cloud Configuration Not Available</h2>
+                        <p style="color: #856404; margin-bottom: 15px;">
+                            Cloud capacity reporting is disabled because the clouds.xml configuration file is not present.
+                        </p>
+                        <p style="color: #856404; margin-bottom: 10px;"><strong>To enable cloud capacity reporting:</strong></p>
+                        <ol style="color: #856404; margin-left: 20px; margin-bottom: 15px;">
+                            <li style="margin-bottom: 8px;">
+                                On your Jenkins server, run the extraction script:
+                                <br>
+                                <code style="background: #fff; padding: 4px 8px; border-radius: 3px; display: inline-block; margin-top: 5px;">
+                                    cd /path/to/jenkins-capacity-report/tools<br>
+                                    ./extract_clouds_config.sh -o ../data/clouds.xml.live
+                                </code>
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                Copy the generated <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">clouds.xml</code> file to this application directory
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                Update the <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">CLOUD_CONFIG_FILE</code> variable in your <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">.env</code> file:
+                                <br>
+                                <code style="background: #fff; padding: 4px 8px; border-radius: 3px; display: inline-block; margin-top: 5px;">
+                                    CLOUD_CONFIG_FILE=./data/clouds.xml.live
+                                </code>
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                Restart the web application
+                            </li>
+                        </ol>
+                        <p style="color: #856404; margin-top: 15px;">
+                            <strong>Note:</strong> The extraction script must be run on the Jenkins controller server where the main <code style="background: #fff; padding: 2px 6px; border-radius: 3px;">config.xml</code> file is located.
+                        </p>
+                        <p style="color: #856404; margin-top: 10px;">
+                            For detailed instructions, see the <a href="/" style="color: #856404; text-decoration: underline;">README.md</a> file.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        // Table sorting functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = document.querySelectorAll('.sortable-table');
+            
+            tables.forEach(table => {
+                const headers = table.querySelectorAll('th.sortable');
+                const tbody = table.querySelector('tbody');
+                
+                headers.forEach((header, index) => {
+                    header.addEventListener('click', function() {
+                        const sortType = this.getAttribute('data-sort');
+                        const isAscending = this.classList.contains('asc');
+                        
+                        // Remove sort classes from all headers in this table
+                        table.querySelectorAll('th.sortable').forEach(h => h.classList.remove('asc', 'desc'));
+                        
+                        // Add appropriate class to clicked header
+                        if (isAscending) {
+                            this.classList.add('desc');
+                        } else {
+                            this.classList.add('asc');
+                        }
+                        
+                        // Get all rows
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        
+                        // Sort the rows
+                        rows.sort((a, b) => {
+                            const aCells = a.querySelectorAll('td');
+                            const bCells = b.querySelectorAll('td');
+                            
+                            let aValue = aCells[index]?.textContent.trim() || '';
+                            let bValue = bCells[index]?.textContent.trim() || '';
+                            
+                            // Handle numeric values
+                            if (sortType === 'executors') {
+                                aValue = parseInt(aValue) || 0;
+                                bValue = parseInt(bValue) || 0;
+                            }
+                            
+                            // Compare values
+                            if (aValue < bValue) return isAscending ? 1 : -1;
+                            if (aValue > bValue) return isAscending ? -1 : 1;
+                            return 0;
+                        });
+                        
+                        // Clear tbody and append sorted rows
+                        tbody.innerHTML = '';
+                        rows.forEach(row => tbody.appendChild(row));
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
