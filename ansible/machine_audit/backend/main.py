@@ -17,18 +17,7 @@ UNIX_LOG_PATH="/var/log/machine_info.json"
 WINDOWS_LOG_PATH="c:\\machine_info.json"
 
 def scp_machine_info(node_name, ip, port, collected_info_dir, log_path):
-    """
-    SCP the machine_info.json file from a remote machine.
-    
-    Args:
-        node_name: Name of the node
-        ip: IP address of the machine
-        port: SSH port number
-        collected_info_dir: Directory to store collected files
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
+
     if ip is None or ip == "None" or port is None or port == "None":
         print(f"  {CYAN}[SKIP]{RESET} {node_name}: IP or port is None")
         return False
