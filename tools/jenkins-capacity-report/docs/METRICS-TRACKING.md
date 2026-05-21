@@ -39,7 +39,7 @@ View comprehensive statistics including:
 
 1. Navigate to the main dashboard
 2. Click on **"📊 Metrics History"** in the navigation bar
-3. Or directly access: `http://your-server/metrics-history`
+3. Or directly access: `https://your-server/metrics-history`
 
 ### Automatic Snapshot Recording
 
@@ -88,11 +88,11 @@ You can also record snapshots manually at any time:
 **Via API:**
 ```bash
 # Using curl
-curl -X POST http://your-server/api/metrics/record
+curl -X POST https://your-server/api/metrics/record
 
 # Using Python requests
 import requests
-response = requests.post('http://your-server/api/metrics/record')
+response = requests.post('https://your-server/api/metrics/record')
 print(response.json())
 ```
 
