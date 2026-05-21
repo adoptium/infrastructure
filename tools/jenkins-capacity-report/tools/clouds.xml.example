@@ -1,0 +1,218 @@
+  <clouds>
+    <!-- Orka/MacStadium Cloud Configuration Example -->
+    <io.jenkins.plugins.orka.OrkaCloud plugin="macstadium-orka@2.09">
+      <actions/>
+      <name>orka</name>
+      <credentialsId>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</credentialsId>
+      <endpoint>http://10.0.0.1</endpoint>
+      <instanceCap>2147483647</instanceCap>
+      <instanceCapSetting></instanceCapSetting>
+      <timeout>600</timeout>
+      <httpTimeout>300</httpTimeout>
+      <useJenkinsProxySettings>false</useJenkinsProxySettings>
+      <ignoreSSLErrors>false</ignoreSSLErrors>
+      <noDelayProvisioning>false</noDelayProvisioning>
+      <mappings>
+        <io.jenkins.plugins.orka.AddressMapper>
+          <defaultHost>10.0.1.1</defaultHost>
+          <redirectHost>203.0.113.1</redirectHost>
+        </io.jenkins.plugins.orka.AddressMapper>
+        <io.jenkins.plugins.orka.AddressMapper>
+          <defaultHost>10.0.1.2</defaultHost>
+          <redirectHost>203.0.113.2</redirectHost>
+        </io.jenkins.plugins.orka.AddressMapper>
+      </mappings>
+      <templates>
+        <io.jenkins.plugins.orka.AgentTemplate>
+          <vmCredentialsId>yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy</vmCredentialsId>
+          <namePrefix>build-orka-macos14-arm64</namePrefix>
+          <image>adoptium-sonoma-arm64</image>
+          <cpu>4</cpu>
+          <memory>auto</memory>
+          <namespace>orka-default</namespace>
+          <useNetBoost>false</useNetBoost>
+          <useLegacyIO>false</useLegacyIO>
+          <useGpuPassthrough>false</useGpuPassthrough>
+          <scheduler>default</scheduler>
+          <tag></tag>
+          <tagRequired>false</tagRequired>
+          <legacyConfigTagRequired>false</legacyConfigTagRequired>
+          <numExecutors>1</numExecutors>
+          <mode>NORMAL</mode>
+          <remoteFS>/Users/admin/workspace</remoteFS>
+          <labelString>build mac macos14 aarch64 arm64 x64 xcode15.0.1 sw.os.osx</labelString>
+          <retentionStrategy class="io.jenkins.plugins.orka.IdleTimeCloudRetentionStrategy">
+            <idleMinutes>1</idleMinutes>
+            <idleMinutes defined-in="io.jenkins.plugins.orka.IdleTimeCloudRetentionStrategy">1</idleMinutes>
+          </retentionStrategy>
+          <nodeProperties>
+            <hudson.slaves.EnvironmentVariablesNodeProperty>
+              <envVars serialization="custom">
+                <unserializable-parents/>
+                <tree-map>
+                  <default>
+                    <comparator class="java.lang.String$CaseInsensitiveComparator"/>
+                  </default>
+                  <int>2</int>
+                  <string>JAVA_HOME</string>
+                  <string>/Library/Java/JavaVirtualMachines/jdk-17/Contents/Home</string>
+                  <string>PATH</string>
+                  <string>/opt/homebrew/bin:/usr/local/bin/:$PATH</string>
+                </tree-map>
+              </envVars>
+            </hudson.slaves.EnvironmentVariablesNodeProperty>
+          </nodeProperties>
+          <jvmOptions></jvmOptions>
+          <launchMethod>jnlp</launchMethod>
+          <host></host>
+          <port>0</port>
+          <createNewVMConfig>false</createNewVMConfig>
+          <configName></configName>
+          <vmName></vmName>
+        </io.jenkins.plugins.orka.AgentTemplate>
+      </templates>
+    </io.jenkins.plugins.orka.OrkaCloud>
+    
+    <!-- Azure Cloud Configuration Example -->
+    <com.microsoft.azure.vmagent.AzureVMCloud plugin="azure-vm-agents@1075.v0de0eb_b_27544">
+      <cloudName>azure</cloudName>
+      <credentialsId>zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz</credentialsId>
+      <maxVirtualMachinesLimit>10</maxVirtualMachinesLimit>
+      <resourceGroupReferenceType>existing</resourceGroupReferenceType>
+      <newResourceGroupName></newResourceGroupName>
+      <existingResourceGroupName>jenkins-agents-rg</existingResourceGroupName>
+      <vmTemplates>
+        <com.microsoft.azure.vmagent.AzureVMAgentTemplate>
+          <templateName>ubuntu-build-agent</templateName>
+          <templateDesc>Ubuntu 22.04 Build Agent</templateDesc>
+          <labels>build linux ubuntu x64</labels>
+          <location>eastus</location>
+          <virtualMachineSize>Standard_D2s_v3</virtualMachineSize>
+          <storageAccountType>Premium_LRS</storageAccountType>
+          <storageAccountNameReferenceType>new</storageAccountNameReferenceType>
+          <newStorageAccountName></newStorageAccountName>
+          <existingStorageAccountName></existingStorageAccountName>
+          <diskType>managed</diskType>
+          <noOfParallelJobs>1</noOfParallelJobs>
+          <usageMode>NORMAL</usageMode>
+          <shutdownOnIdle>false</shutdownOnIdle>
+          <retentionTimeInMin>60</retentionTimeInMin>
+          <imageTopLevelType>basic</imageTopLevelType>
+          <builtInImage>Ubuntu 22.04 LTS</builtInImage>
+          <credentialsId>aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa</credentialsId>
+          <virtualNetworkName>jenkins-vnet</virtualNetworkName>
+          <virtualNetworkResourceGroupName>jenkins-network-rg</virtualNetworkResourceGroupName>
+          <subnetName>agents-subnet</subnetName>
+          <usePrivateIP>false</usePrivateIP>
+          <nsgName></nsgName>
+          <jvmOptions></jvmOptions>
+          <agentLaunchMethod>SSH</agentLaunchMethod>
+          <initScript></initScript>
+          <executeInitScriptAsRoot>true</executeInitScriptAsRoot>
+          <doNotUseMachineIfInitFails>true</doNotUseMachineIfInitFails>
+          <enableMSI>false</enableMSI>
+          <enableUAMI>false</enableUAMI>
+          <templateDisabled>false</templateDisabled>
+          <templateStatusDetails></templateStatusDetails>
+          <preInstallSsh>true</preInstallSsh>
+          <nodeProperties/>
+        </com.microsoft.azure.vmagent.AzureVMAgentTemplate>
+      </vmTemplates>
+      <deploymentTimeout>1200</deploymentTimeout>
+      <cloudTags/>
+    </com.microsoft.azure.vmagent.AzureVMCloud>
+    
+    <!-- AWS EC2 Cloud Configuration Example -->
+    <hudson.plugins.ec2.EC2Cloud plugin="ec2@2.1.2">
+      <name>aws-ec2</name>
+      <useInstanceProfileForCredentials>false</useInstanceProfileForCredentials>
+      <credentialsId>bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb</credentialsId>
+      <privateKey class="com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey$DirectEntryPrivateKeySource">
+        <privateKey></privateKey>
+      </privateKey>
+      <instanceCapStr>10</instanceCapStr>
+      <templates>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-0123456789abcdef0</ami>
+          <description>Amazon Linux 2 Build Agent</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>sg-0123456789abcdef0</securityGroups>
+          <remoteFS>/home/ec2-user/jenkins</remoteFS>
+          <type>T3Medium</type>
+          <ebsOptimized>false</ebsOptimized>
+          <labels>build linux aws x64</labels>
+          <mode>NORMAL</mode>
+          <initScript></initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>1</numExecutors>
+          <remoteAdmin>ec2-user</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-0123456789abcdef0</subnetId>
+          <idleTerminationMinutes>30</idleTerminationMinutes>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <instanceCapStr>5</instanceCapStr>
+          <iamInstanceProfile></iamInstanceProfile>
+          <deleteRootOnTermination>true</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <associatePublicIp>true</associatePublicIp>
+          <launchTimeoutStr>300</launchTimeoutStr>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <connectionStrategy>PUBLIC_IP</connectionStrategy>
+          <maxTotalUses>-1</maxTotalUses>
+          <nodeProperties/>
+        </hudson.plugins.ec2.SlaveTemplate>
+      </templates>
+      <region>us-east-1</region>
+    </hudson.plugins.ec2.EC2Cloud>
+    
+    <!-- Kubernetes Cloud Configuration Example -->
+    <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@4253.v7700d91739e5">
+      <name>kubernetes</name>
+      <defaultsProviderTemplate></defaultsProviderTemplate>
+      <templates>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>jnlp-agent</name>
+          <namespace>jenkins</namespace>
+          <label>kubernetes jnlp</label>
+          <nodeUsageMode>NORMAL</nodeUsageMode>
+          <idleMinutes>0</idleMinutes>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>jenkins/inbound-agent:latest</image>
+              <workingDir>/home/jenkins/agent</workingDir>
+              <command></command>
+              <args></args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu>100m</resourceRequestCpu>
+              <resourceRequestMemory>256Mi</resourceRequestMemory>
+              <resourceLimitCpu>1</resourceLimitCpu>
+              <resourceLimitMemory>512Mi</resourceLimitMemory>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+            <memory>false</memory>
+          </workspaceVolume>
+          <yaml></yaml>
+          <serviceAccount>jenkins</serviceAccount>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+      </templates>
+      <serverUrl>https://kubernetes.default.svc.cluster.local</serverUrl>
+      <skipTlsVerify>false</skipTlsVerify>
+      <namespace>jenkins</namespace>
+      <jenkinsUrl>http://jenkins.jenkins.svc.cluster.local:8080</jenkinsUrl>
+      <jenkinsTunnel>jenkins-agent.jenkins.svc.cluster.local:50000</jenkinsTunnel>
+      <containerCapStr>10</containerCapStr>
+      <retentionTimeout>5</retentionTimeout>
+      <connectTimeout>5</connectTimeout>
+      <readTimeout>15</readTimeout>
+      <podLabels/>
+      <usageRestricted>false</usageRestricted>
+      <maxRequestsPerHostStr>32</maxRequestsPerHostStr>
+    </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+  </clouds>

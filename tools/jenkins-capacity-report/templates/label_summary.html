@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Summary - {{ label }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-5px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .summary-card.online .value {
+            color: #28a745;
+        }
+        
+        .summary-card.offline .value {
+            color: #dc3545;
+        }
+        
+        .nodes-section {
+            margin-top: 30px;
+        }
+        
+        .nodes-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .node-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .node-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .status-online {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .status-offline {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .offline-reason {
+            color: #dc3545;
+            font-size: 0.85em;
+            padding-left: 30px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🏷️ Label: {{ label }}</h1>
+                <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
+            </div>
+            
+            <div class="nav-bar">
+                <a href="{{ url_for('index') }}" class="nav-btn">🏠 Home</a>
+                {% if cloud_config_available %}
+                <a href="{{ url_for('cloud_statistics') }}" class="nav-btn">☁️ Cloud Statistics</a>
+                {% else %}
+                <span class="nav-btn" style="opacity: 0.5; cursor: not-allowed; position: relative;"
+                      title="Cloud configuration not available. To enable: 1) Run tools/extract_clouds_config.sh on Jenkins server, 2) Copy clouds.xml to app directory, 3) Update CLOUD_CONFIG_FILE in .env">
+                    ☁️ Cloud Statistics
+                </span>
+                {% endif %}
+                <a href="{{ url_for('category_listing', category_name='build') }}" class="nav-btn">🔨 Build Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='test') }}" class="nav-btn">🧪 Test Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='docker-host') }}" class="nav-btn">🐳 Docker Hosts</a>
+                <a href="{{ url_for('category_listing', category_name='static-docker') }}" class="nav-btn">🐋 Static Docker Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='infrastructure') }}" class="nav-btn">🏗️ Infrastructure Nodes</a>
+                <a href="{{ url_for('category_listing', category_name='dynamic') }}" class="nav-btn">⚡ Dynamic Nodes</a>
+                <a href="{{ url_for('filter_nodes', filter_type='status', filter_value='online') }}" class="nav-btn">✅ Online</a>
+                <a href="{{ url_for('filter_nodes', filter_type='status', filter_value='offline') }}" class="nav-btn">❌ Offline</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Summary Statistics -->
+            <div class="summary-section">
+                <h2>📊 Summary Statistics</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="label">Total Nodes</div>
+                        <div class="value">{{ summary.nodes }}</div>
+                    </div>
+                    <div class="summary-card online">
+                        <div class="label">Online Nodes</div>
+                        <div class="value">{{ summary.online_nodes }}</div>
+                    </div>
+                    <div class="summary-card offline">
+                        <div class="label">Offline Nodes</div>
+                        <div class="value">{{ summary.nodes - summary.online_nodes }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Total Executors</div>
+                        <div class="value">{{ summary.executors }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Busy Executors</div>
+                        <div class="value">{{ summary.busy }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Idle Executors</div>
+                        <div class="value">{{ summary.idle }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nodes with this Label -->
+            <div class="nodes-section">
+                <h2>🖥️ Nodes with Label "{{ label }}" ({{ nodes|length }})</h2>
+                
+                {% if nodes %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Node Name</th>
+                            <th>Type</th>
+                            <th>Arch</th>
+                            <th>OS</th>
+                            <th>Status</th>
+                            <th>Executors</th>
+                            <th>Busy</th>
+                            <th>Idle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for node in nodes %}
+                        <tr>
+                            <td><a href="/node/{{ node.name }}" class="node-link">{{ node.name }}</a></td>
+                            <td>{{ node.os_type }}</td>
+                            <td>{{ node.arch }}</td>
+                            <td>{{ node.os }}</td>
+                            <td class="{% if node.status == 'ONLINE' %}status-online{% else %}status-offline{% endif %}">
+                                {{ node.status }}{% if node.temp_offline %} (TEMP){% endif %}
+                            </td>
+                            <td>{{ node.executors }}</td>
+                            <td>{{ node.busy }}</td>
+                            <td>{{ node.idle }}</td>
+                        </tr>
+                        {% if node.offline_cause %}
+                        <tr>
+                            <td colspan="8" class="offline-reason">
+                                └─ Offline reason: {{ node.offline_cause }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="color: #666; font-style: italic;">No nodes found with this label.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

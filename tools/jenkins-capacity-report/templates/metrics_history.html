@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics History - Jenkins Capacity Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header .timestamp {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #5B2A86;
+        }
+        
+        .section h2 {
+            color: #5B2A86;
+            font-size: 1.5em;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #5B2A86;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3C1361;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #5B2A86 0%, #3C1361 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Vertical dividers for category separation */
+        th.divider-left,
+        td.divider-left {
+            border-left: 3px solid #5B2A86;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-online {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .status-offline {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .percentage {
+            font-weight: 600;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.1em;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>📊 Metrics History</h1>
+                <p class="timestamp">Last Updated: {{ timestamp }}</p>
+            </div>
+            <div class="nav-buttons">
+                <a href="{{ url_for('index') }}" class="nav-button">🏠 Dashboard</a>
+                {% if cloud_config_available %}
+                <a href="{{ url_for('cloud_statistics') }}" class="nav-button">☁️ Cloud Statistics</a>
+                {% endif %}
+                <a href="{{ url_for('metrics_history') }}" class="nav-button" style="background: rgba(255, 255, 255, 0.4);">📊 Metrics History</a>
+                <button onclick="refreshData()" class="nav-button" style="border: 2px solid white; cursor: pointer;">🔄 Refresh Data</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Current Online Statistics by Function -->
+            {% if current_stats %}
+            <div class="section">
+                <div class="section-header">
+                    <h2>🔴 Current Online Status by Function</h2>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Real-time Status:</strong> These statistics reflect the most recent snapshot recorded.
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h3>🔨 Build Nodes</h3>
+                        <div class="value">{{ current_stats.build_nodes.online_percentage }}%</div>
+                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                            {{ current_stats.build_nodes.online }} / {{ current_stats.build_nodes.total }} online
+                            ({{ current_stats.build_nodes.offline }} offline)
+                        </p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <h3>🧪 Test Nodes</h3>
+                        <div class="value">{{ current_stats.test_nodes.online_percentage }}%</div>
+                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                            {{ current_stats.test_nodes.online }} / {{ current_stats.test_nodes.total }} online
+                            ({{ current_stats.test_nodes.offline }} offline)
+                        </p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <h3>🏗️ Infrastructure</h3>
+                        <div class="value">{{ current_stats.infra_nodes.online_percentage }}%</div>
+                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                            {{ current_stats.infra_nodes.online }} / {{ current_stats.infra_nodes.total }} online
+                            ({{ current_stats.infra_nodes.offline }} offline)
+                        </p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <h3>🐳 Docker Hosts</h3>
+                        <div class="value">{{ current_stats.docker_host_nodes.online_percentage }}%</div>
+                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                            {{ current_stats.docker_host_nodes.online }} / {{ current_stats.docker_host_nodes.total }} online
+                            ({{ current_stats.docker_host_nodes.offline }} offline)
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Statistics Summary -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>📈 Historical Statistics</h2>
+                </div>
+                
+                {% if statistics.total_snapshots > 0 %}
+                <h3 style="margin: 20px 0 10px 0; color: #667eea;">General Metrics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Snapshots</h3>
+                        <div class="value">{{ statistics.total_snapshots }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Online %</h3>
+                        <div class="value">{{ statistics.avg_online_percentage }}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Utilization</h3>
+                        <div class="value">{{ statistics.avg_utilization }}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Max Nodes</h3>
+                        <div class="value">{{ statistics.max_nodes }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Min Nodes</h3>
+                        <div class="value">{{ statistics.min_nodes }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Online Nodes</h3>
+                        <div class="value">{{ statistics.avg_online_nodes }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Offline Nodes</h3>
+                        <div class="value">{{ statistics.avg_offline_nodes }}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 10px 0; color: #667eea;">📊 Category Availability (Average Online %)</h3>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h3>🔨 Build Nodes</h3>
+                        <div class="value">{% if snapshots %}{{ "%.2f"|format(snapshots|map(attribute='build_nodes_online_percentage')|sum / snapshots|length) }}%{% else %}N/A{% endif %}</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <h3>🧪 Test Nodes</h3>
+                        <div class="value">{% if snapshots %}{{ "%.2f"|format(snapshots|map(attribute='test_nodes_online_percentage')|sum / snapshots|length) }}%{% else %}N/A{% endif %}</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <h3>🏗️ Infrastructure</h3>
+                        <div class="value">{% if snapshots %}{{ "%.2f"|format(snapshots|map(attribute='infra_nodes_online_percentage')|sum / snapshots|length) }}%{% else %}N/A{% endif %}</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <h3>🐳 Docker Hosts</h3>
+                        <div class="value">{% if snapshots %}{{ "%.2f"|format(snapshots|map(attribute='docker_host_nodes_online_percentage')|sum / snapshots|length) }}%{% else %}N/A{% endif %}</div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Recording Period:</strong> From {{ statistics.first_recorded|format_timestamp|truncate(10, True, '') }} to {{ statistics.last_recorded|format_timestamp|truncate(10, True, '') }}
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <strong>No metrics recorded yet.</strong> Click "Record Snapshot" to start tracking metrics.
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Current Month Data Table -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>📋 Current Month Snapshots ({{ current_month }})</h2>
+                    {% if current_role == 'admin' %}
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="recordSnapshot()">📸 Record Snapshot</button>
+                        <button class="btn btn-danger" onclick="clearHistory()">🗑️ Clear History</button>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if snapshots %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Timestamp</th>
+                                <th colspan="5" class="divider-left">Overall</th>
+                                <th colspan="4" class="divider-left">Build Nodes</th>
+                                <th colspan="4" class="divider-left">Test Nodes</th>
+                                <th colspan="4" class="divider-left">Infrastructure</th>
+                                <th colspan="4" class="divider-left">Docker Hosts</th>
+                                <th colspan="3" class="divider-left">Executors</th>
+                            </tr>
+                            <tr>
+                                <!-- Overall -->
+                                <th class="divider-left">Total</th>
+                                <th>Online</th>
+                                <th>Offline</th>
+                                <th>Excluded</th>
+                                <th>Online %</th>
+                                <!-- Build Nodes -->
+                                <th class="divider-left">Total</th>
+                                <th>Online</th>
+                                <th>Offline</th>
+                                <th>Online %</th>
+                                <!-- Test Nodes -->
+                                <th class="divider-left">Total</th>
+                                <th>Online</th>
+                                <th>Offline</th>
+                                <th>Online %</th>
+                                <!-- Infrastructure -->
+                                <th class="divider-left">Total</th>
+                                <th>Online</th>
+                                <th>Offline</th>
+                                <th>Online %</th>
+                                <!-- Docker Hosts -->
+                                <th class="divider-left">Total</th>
+                                <th>Online</th>
+                                <th>Offline</th>
+                                <th>Online %</th>
+                                <!-- Executors -->
+                                <th class="divider-left">Total</th>
+                                <th>Busy</th>
+                                <th>Util %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for snapshot in snapshots %}
+                            <tr>
+                                <td>{{ snapshot.timestamp|format_timestamp }}</td>
+                                <!-- Overall -->
+                                <td class="divider-left">{{ snapshot.total_nodes }}</td>
+                                <td class="status-online">{{ snapshot.online_nodes }}</td>
+                                <td class="status-offline">{{ snapshot.offline_nodes }}</td>
+                                <td>{{ snapshot.excluded_nodes }}</td>
+                                <td class="percentage">{{ snapshot.online_percentage }}%</td>
+                                <!-- Build Nodes -->
+                                <td class="divider-left">{{ snapshot.build_nodes_total }}</td>
+                                <td class="status-online">{{ snapshot.build_nodes_online }}</td>
+                                <td class="status-offline">{{ snapshot.build_nodes_offline }}</td>
+                                <td class="percentage">{{ snapshot.build_nodes_online_percentage }}%</td>
+                                <!-- Test Nodes -->
+                                <td class="divider-left">{{ snapshot.test_nodes_total }}</td>
+                                <td class="status-online">{{ snapshot.test_nodes_online }}</td>
+                                <td class="status-offline">{{ snapshot.test_nodes_offline }}</td>
+                                <td class="percentage">{{ snapshot.test_nodes_online_percentage }}%</td>
+                                <!-- Infrastructure -->
+                                <td class="divider-left">{{ snapshot.infra_nodes_total }}</td>
+                                <td class="status-online">{{ snapshot.infra_nodes_online }}</td>
+                                <td class="status-offline">{{ snapshot.infra_nodes_offline }}</td>
+                                <td class="percentage">{{ snapshot.infra_nodes_online_percentage }}%</td>
+                                <!-- Docker Hosts -->
+                                <td class="divider-left">{{ snapshot.docker_host_nodes_total }}</td>
+                                <td class="status-online">{{ snapshot.docker_host_nodes_online }}</td>
+                                <td class="status-offline">{{ snapshot.docker_host_nodes_offline }}</td>
+                                <td class="percentage">{{ snapshot.docker_host_nodes_online_percentage }}%</td>
+                                <!-- Executors -->
+                                <td class="divider-left">{{ snapshot.total_executors }}</td>
+                                <td>{{ snapshot.busy_executors }}</td>
+                                <td class="percentage">{{ snapshot.utilization_percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <p>No metrics snapshots recorded yet.</p>
+                    <p>Click "Record Snapshot" to capture the current state.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Monthly Archive Summary Section -->
+            {% if archived_months %}
+            <div class="section">
+                <div class="section-header">
+                    <h2>📅 Monthly Archive Summary</h2>
+                    {% if current_role == 'admin' %}
+                    <button class="btn btn-primary" onclick="archiveMetrics()">
+                        📦 Archive Previous Months
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Historical Archives:</strong> Comprehensive monthly statistics from completed months.
+                    Each row shows averages, minimums, and maximums for all tracked metrics.
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Month</th>
+                                <th rowspan="2">Snapshots</th>
+                                <th rowspan="2">Date Range</th>
+                                <th colspan="3" class="divider-left">Overall</th>
+                                <th colspan="3" class="divider-left">Build Nodes</th>
+                                <th colspan="3" class="divider-left">Test Nodes</th>
+                                <th colspan="3" class="divider-left">Infra Nodes</th>
+                                <th colspan="3" class="divider-left">Docker Hosts</th>
+                                <th colspan="3" class="divider-left">Executors</th>
+                            </tr>
+                            <tr>
+                                <!-- Overall -->
+                                <th class="divider-left">Avg Nodes</th>
+                                <th>Avg Online %</th>
+                                <th>Range %</th>
+                                <!-- Build Nodes -->
+                                <th class="divider-left">Avg Total</th>
+                                <th>Avg Online %</th>
+                                <th>Range %</th>
+                                <!-- Test Nodes -->
+                                <th class="divider-left">Avg Total</th>
+                                <th>Avg Online %</th>
+                                <th>Range %</th>
+                                <!-- Infra Nodes -->
+                                <th class="divider-left">Avg Total</th>
+                                <th>Avg Online %</th>
+                                <th>Range %</th>
+                                <!-- Docker Hosts -->
+                                <th class="divider-left">Avg Total</th>
+                                <th>Avg Online %</th>
+                                <th>Range %</th>
+                                <!-- Executors -->
+                                <th class="divider-left">Avg Total</th>
+                                <th>Avg Util %</th>
+                                <th>Range %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for archive in archived_months %}
+                            <tr>
+                                <td><strong>{{ archive.month }}</strong></td>
+                                <td>{{ archive.snapshot_count }}</td>
+                                <td style="font-size: 0.85em;">
+                                    {{ archive.start_date|format_timestamp|truncate(10, True, '') }}<br>
+                                    to {{ archive.end_date|format_timestamp|truncate(10, True, '') }}
+                                </td>
+                                
+                                <!-- Overall -->
+                                <td class="divider-left">{{ archive.avg_total_nodes }}</td>
+                                <td class="percentage">{{ archive.avg_online_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.min_online_percentage }}%-{{ archive.max_online_percentage }}%</td>
+                                
+                                <!-- Build Nodes -->
+                                <td class="divider-left">{{ archive.build_nodes_avg_total }}</td>
+                                <td class="percentage">{{ archive.build_nodes_avg_online_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.build_nodes_min_online_percentage }}%-{{ archive.build_nodes_max_online_percentage }}%</td>
+                                
+                                <!-- Test Nodes -->
+                                <td class="divider-left">{{ archive.test_nodes_avg_total }}</td>
+                                <td class="percentage">{{ archive.test_nodes_avg_online_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.test_nodes_min_online_percentage }}%-{{ archive.test_nodes_max_online_percentage }}%</td>
+                                
+                                <!-- Infra Nodes -->
+                                <td class="divider-left">{{ archive.infra_nodes_avg_total }}</td>
+                                <td class="percentage">{{ archive.infra_nodes_avg_online_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.infra_nodes_min_online_percentage }}%-{{ archive.infra_nodes_max_online_percentage }}%</td>
+                                
+                                <!-- Docker Hosts -->
+                                <td class="divider-left">{{ archive.docker_host_nodes_avg_total }}</td>
+                                <td class="percentage">{{ archive.docker_host_nodes_avg_online_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.docker_host_nodes_min_online_percentage }}%-{{ archive.docker_host_nodes_max_online_percentage }}%</td>
+                                
+                                <!-- Executors -->
+                                <td class="divider-left">{{ archive.avg_total_executors }}</td>
+                                <td class="percentage">{{ archive.avg_utilization_percentage }}%</td>
+                                <td style="font-size: 0.85em;">{{ archive.min_utilization_percentage }}%-{{ archive.max_utilization_percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function refreshData() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Refreshing...';
+            
+            fetch('{{ url_for("refresh_data") }}')
+                .then(response => response.json())
+                .then(data => {
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error refreshing data:', error);
+                    alert('Failed to refresh data. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = '🔄 Refresh Data';
+                });
+        }
+        
+        function recordSnapshot() {
+            if (!confirm('Record a new metrics snapshot? This will refresh data from Jenkins first.')) {
+                return;
+            }
+            
+            fetch('{{ url_for("record_metrics") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Metrics snapshot recorded successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to record snapshot'));
+                }
+            })
+            .catch(error => {
+                alert('Error recording snapshot: ' + error);
+            });
+        }
+        
+        function clearHistory() {
+            if (!confirm('Are you sure you want to clear ALL metrics history? This cannot be undone!')) {
+                return;
+            }
+            
+            fetch('{{ url_for("clear_metrics") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to clear history'));
+                }
+            })
+            .catch(error => {
+                alert('Error clearing history: ' + error);
+            });
+        }
+        
+        function archiveMetrics() {
+            if (!confirm('Archive all completed months? This will move old snapshots to archive files and keep only the current month in the main history.')) {
+                return;
+            }
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Archiving...';
+            
+            fetch('{{ url_for("archive_metrics") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to archive metrics'));
+                    btn.disabled = false;
+                    btn.textContent = '📦 Archive Previous Months';
+                }
+            })
+            .catch(error => {
+                alert('Error archiving metrics: ' + error);
+                btn.disabled = false;
+                btn.textContent = '📦 Archive Previous Months';
+            });
+        }
+    </script>
+</body>
+</html>
