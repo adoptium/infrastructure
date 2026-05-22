@@ -6,7 +6,7 @@ ARG PW=T3mp=Passwd
 # Download Cygwin Bootstrapper & Verify Its Checksum
 RUN powershell -Command \
     "wget -UseBasicParsing https://cygwin.com/setup-x86_64.exe -OutFile setup-x86_64.exe; \
-    $expectedChecksum = 'e7815d360ab098fdd1f03f10f43f363c73a632e8866e304c72573cf1e6a0dec8'; \
+    $expectedChecksum = '2c9f2fb56e1fb687b5d9680afa8f8b06e6214f0e483096af0eae1946431226c5'; \
     $fileChecksum = CertUtil -hashfile setup-x86_64.exe SHA256 | Select-String -Pattern '([A-Fa-f0-9]{64})' | ForEach-Object { $_.Matches[0].Groups[1].Value }; \
     if ($fileChecksum -ne $expectedChecksum) { \
         Write-Host 'Checksum verification failed!' -ForegroundColor Red; \
@@ -16,12 +16,87 @@ RUN powershell -Command \
         Write-Host 'Checksum verification succeeded!' -ForegroundColor Green; \
     }"
 
+# Download Cygwin Package Cache & Verify Checksum
+RUN powershell -Command \
+    "$url = 'https://ci.adoptium.net/userContent/cygwin/cygwin_cache_20260101.zip'; \
+    $dest = 'C:\\temp\\cygwin_cache.zip'; \
+    $expectedChecksum = 'c9c3d4d408718ec595583c821c7c8dc317d4f46db4536a8277e85e1717c0da7f'; \
+    if (-not (Test-Path 'C:\\cygwin64\\bin\\bash.exe')) { \
+        Write-Host 'Downloading Cygwin cache...' -ForegroundColor Cyan; \
+        New-Item -ItemType Directory -Force -Path 'C:\\temp' | Out-Null; \
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+        Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing; \
+        Write-Host 'Verifying checksum...' -ForegroundColor Cyan; \
+        $fileChecksum = (Get-FileHash -Path $dest -Algorithm SHA256).Hash.ToLower(); \
+        if ($fileChecksum -ne $expectedChecksum) { \
+            Write-Host 'Checksum verification failed!' -ForegroundColor Red; \
+            Write-Host \"Expected: $expectedChecksum\" -ForegroundColor Red; \
+            Write-Host \"Got: $fileChecksum\" -ForegroundColor Red; \
+            Remove-Item $dest -Force; \
+            exit 1; \
+        } else { \
+            Write-Host 'Checksum verification succeeded!' -ForegroundColor Green; \
+        } \
+    } else { \
+        Write-Host 'Cygwin already installed, skipping cache download.' -ForegroundColor Yellow; \
+    }"
+
+# Unzip Cygwin Cache
+RUN powershell -Command \
+    "$src = 'C:\\temp\\cygwin_cache.zip'; \
+    $dest = $env:CYGWIN_CACHE_DIR; \
+    if (-not $dest) { $dest = 'C:\\cygwin_cache' }; \
+    if (-not (Test-Path 'C:\\cygwin64\\bin\\bash.exe')) { \
+        if (Test-Path $src) { \
+            Write-Host \"Extracting Cygwin cache to $dest...\" -ForegroundColor Cyan; \
+            New-Item -ItemType Directory -Force -Path $dest | Out-Null; \
+            Expand-Archive -Path $src -DestinationPath $dest -Force; \
+            Write-Host 'Cygwin cache extracted successfully!' -ForegroundColor Green; \
+        } else { \
+            Write-Host 'Cygwin cache zip file not found!' -ForegroundColor Red; \
+            exit 1; \
+        } \
+    } else { \
+        Write-Host 'Cygwin already installed, skipping cache extraction.' -ForegroundColor Yellow; \
+    }"
+
+
 # Set up cygwin with git and ansible as a bootstrap, and add to system default path
-RUN setup-x86_64.exe --packages git,ansible --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode & \
-    C:\cygwin64\bin\git config --system core.autocrlf false & \
-    del setup-x86_64.exe & \
-    setx PATH "c:\cygwin64\bin;%PATH%" & \
-    mkdir c:\temp
+# RUN setup-x86_64.exe --packages git,ansible --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin --local-package-dir c:\cygwin_packages --root C:\cygwin64 --wait --quiet-mode & \
+#    C:\cygwin64\bin\git config --system core.autocrlf false & \
+#    del setup-x86_64.exe & \
+#    setx PATH "c:\cygwin64\bin;%PATH%" & \
+#    mkdir c:\temp
+
+# Set up cygwin with git and ansible from package cache, and add to system default path
+RUN powershell -Command \
+    "$setup = 'C:\temp\setup-x86_64.exe'; \
+    if (-not (Test-Path $setup)) { \
+        Copy-Item 'setup-x86_64.exe' $setup; \
+    }; \
+    $args = @( \
+        '--quiet-mode', \
+        '--local-install', \
+        '--delete-orphans', \
+        '--only-site', \
+        '--no-verify', \
+        '--no-version-check', \
+        '--root', 'C:\cygwin64', \
+        '--local-package-dir', 'C:\cygwin_cache', \
+        '--site', 'file:///cygwin_cache', \
+        '--packages', 'git,ansible' \
+    ); \
+    Write-Host 'Installing Cygwin with git and ansible from package cache...' -ForegroundColor Cyan; \
+    $p = Start-Process -FilePath $setup -ArgumentList $args -NoNewWindow -Wait -PassThru; \
+    if ($p.ExitCode -ne 0) { \
+        Write-Host \"Cygwin install from cache failed (exit $($p.ExitCode))\" -ForegroundColor Red; \
+        exit 1; \
+    }; \
+    Write-Host 'Cygwin installation completed successfully!' -ForegroundColor Green;" && \
+    C:\cygwin64\bin\git config --system core.autocrlf false && \
+    del C:\temp\setup-x86_64.exe && \
+    setx PATH "c:\cygwin64\bin;%PATH%"
+
 
 # Download Ansible Config Script & Verify Its Checksum
 RUN powershell -Command \
@@ -46,12 +121,12 @@ RUN PowerShell .\ConfigureRemotingForAnsible.ps1 -CertValidityDays 9999 & \
 ENV TERM=dumb
 
 RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & net localgroup "Remote Management Users" ansible /ADD & \
-    C:\cygwin64\bin\git clone https://github.com/sxa/infrastructure -b windows_docker_support c:/infrastructure & \
+    C:\cygwin64\bin\git clone https://github.com/adoptium/infrastructure -b master c:/infrastructure & \
     sed -i -e 's/hosts: .*/hosts: localhost/' infrastructure/ansible/playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
     echo localhost ansible_connection=winrm > infrastructure/ansible/hosts & \
     cd infrastructure\ansible & \
     C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
-    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019 playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
+    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019,Windows_Updates playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
     net user ansible /DELETE
 
 ENTRYPOINT ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
