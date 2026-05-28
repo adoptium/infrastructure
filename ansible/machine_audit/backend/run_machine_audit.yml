@@ -1,0 +1,107 @@
+---
+# Ansible playbook to run machine audit scripts on remote machines
+# This playbook copies the appropriate platform script to the remote machine,
+# executes it, and generates machine_info.json
+
+- name: Run Machine Audit on Remote Machines
+  hosts: all
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    script_dir: "/Users/hkhel/Adoptium/openjdk-infrastructure/ansible/machine_audit/platform"
+    packages_dir: "/Users/hkhel/Adoptium/openjdk-infrastructure/ansible/machine_audit/packages"
+    remote_temp_dir: "/tmp/machine_audit"
+    output_file: "/var/log/machine_info.json"
+  
+  tasks:
+    - name: Detect operating system
+      set_fact:
+        is_aix: "{{ ansible_system == 'AIX' }}"
+        is_linux: "{{ ansible_system == 'Linux' }}"
+    
+    - name: Display detected OS
+      debug:
+        msg: "Detected OS: {{ ansible_system }} (AIX: {{ is_aix }}, Linux: {{ is_linux }})"
+    
+    - name: Create temporary directory on remote machine
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items:
+       - "{{ remote_temp_dir }}"
+       - "{{ remote_temp_dir }}/packages"
+    
+    # Copy Linux script and packages
+    - name: Copy Linux audit script to remote machine
+      copy:
+        src: "{{ script_dir }}/linux.py"
+        dest: "{{ remote_temp_dir }}/linux.py"
+        mode: '0755'
+      when: is_linux
+    
+    - name: Copy Linux packages file to remote machine
+      copy:
+        src: "{{ packages_dir }}/linux"
+        dest: "{{ remote_temp_dir }}/packages/linux"
+        mode: '0644'
+      when: is_linux
+    
+    # Copy AIX script and packages
+    - name: Copy AIX audit script to remote machine
+      copy:
+        src: "{{ script_dir }}/aix.py"
+        dest: "{{ remote_temp_dir }}/aix.py"
+        mode: '0755'
+      when: is_aix
+    
+    - name: Copy AIX packages file to remote machine
+      copy:
+        src: "{{ packages_dir }}/aix"
+        dest: "{{ remote_temp_dir }}/packages/aix"
+        mode: '0644'
+      when: is_aix
+    
+    # Execute the appropriate script
+    - name: Execute Linux audit script
+      command: "python3 {{ remote_temp_dir }}/linux.py"
+      register: linux_result
+      when: is_linux
+      ignore_errors: yes
+    
+    - name: Execute AIX audit script
+      command: "python3 {{ remote_temp_dir }}/aix.py"
+      register: aix_result
+      when: is_aix
+      ignore_errors: yes
+    
+    # Display results
+    - name: Display Linux script output
+      debug:
+        var: linux_result.stdout_lines
+      when: is_linux and linux_result is defined
+    
+    - name: Display AIX script output
+      debug:
+        var: aix_result.stdout_lines
+      when: is_aix and aix_result is defined
+    
+    # Check if output file was created
+    - name: Check if machine_info.json was created
+      stat:
+        path: "{{ output_file }}"
+      register: output_file_stat
+    
+    - name: Display file creation status
+      debug:
+        msg: "machine_info.json {{ 'created successfully' if output_file_stat.stat.exists else 'was NOT created' }}"
+    
+    # Clean up temporary directory
+    - name: Clean up temporary directory
+      file:
+        path: "{{ remote_temp_dir }}"
+        state: absent
+      when: output_file_stat.stat.exists
+
+# Made with Bob
