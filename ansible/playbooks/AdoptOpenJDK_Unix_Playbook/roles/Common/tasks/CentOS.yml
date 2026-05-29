@@ -64,36 +64,30 @@
 # Additional build tools #
 ##########################
 - name: Install additional build tools for CentOS 7
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS7 }}"
-  when: ansible_distribution_major_version == "7"
+  package: "name={{ Additional_Build_Tools_CentOS7 }} state=latest"
   tags: build_tools
 
 - name: Install additional build tools for CentOS 8+
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS8_Plus }}"
+  package: "name={{ Additional_Build_Tools_CentOS8_Plus }} state=latest"
   when:
     - ansible_distribution_major_version|int > 7
     - ansible_distribution_major_version|int > 7
   tags: build_tools
 
 - name: Install additional build tools when NOT CentOS8+
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8plus }}"
+  package: "name={{ Additional_Build_Tools_NOT_CentOS8plus }} state=latest"
   when:
     - ansible_distribution_major_version | int < 8
   tags: build_tools
 
 - name: Install additional test tools for CentOS 10+ e.g. weston
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Test_Tools_CentOS10_Plus }}"
+  package: "name={{ Additional_Test_Tools_CentOS10_Plus }} state=latest"
   when:
     - ansible_distribution_major_version|int > 10
   tags: test_tools
 
 - name: Install additional tools for CentOS pre-10
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Test_Tools_PreCentOS10 }}"
+  package: "name={{ Additional_Test_Tools_PreCentOS10 }} state=latest"
   when:
     - ansible_distribution_major_version|int < 10
   tags: test_tools
@@ -104,21 +98,18 @@
   tags: build_tools
 
 - name: Install additional build tools for CentOS 8 Stream
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS8_Stream }}"
+  package: "name={{ Additional_Build_Tools_CentOS8_Stream }} state=latest"
   when: (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') != -1)
   tags: build_tools
 
 - name: Install additional build tools for CentOS8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
+  package: "name={{ Additional_Build_Tools_NOT_CentOS8_Stream }} state=latest"
   when:
     - (ansible_distribution_major_version == "8") and (relfile_contents.stdout.find('Stream') == -1)
   tags: build_tools
 
 - name: Install additional build tools for NOT CentOS8 Stream
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_CentOS8_Stream }}"
+  package: "name={{ Additional_Build_Tools_NOT_CentOS8_Stream }} state=latest"
   when:
     - ansible_distribution_major_version != "8"
   tags: build_tools
@@ -147,8 +138,7 @@
   tags: build_tools
 
 - name: Install gcc4.8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc48_devtoolset_compiler }}"
+  package: "name={{ gcc48_devtoolset_compiler }} state=latest"
   when:
     - ansible_distribution_major_version == "6"
   tags: build_tools
@@ -208,8 +198,7 @@
   tags: build_tools
 
 - name: Install additional build tools for CentOS on x86 for EL<10 (Not 32-bit support)
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_CentOS_x86 }}"
+  package: "name={{ Additional_Build_Tools_CentOS_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version | int < 10
@@ -304,9 +293,8 @@
 #############################
 - name: Install Wayland related packages (>= CentOS10)
   package:
-    name: "{{ item }}"
+    name: "{{ Additional_Test_Tool_Packages_Wayland }}"
     state: latest
-  with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
   when: ansible_distribution_major_version | int > 9
   tags: test_tools
 

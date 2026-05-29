@@ -45,43 +45,37 @@
 # Additional build tools #
 ##########################
 - name: Install additional build tools for SLES 15
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES15 }}"
+  package: "name={{ Additional_Build_Tools_SLES15 }} state=latest"
   when:
     - ansible_distribution_major_version == "15"
   tags: build_tools
 
 - name: Install additional build tools for SLES 15 NOT SP2
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES15_NOT_SP2 }}"
+  package: "name={{ Additional_Build_Tools_SLES15_NOT_SP2 }} state=latest"
   when:
     - (ansible_distribution_major_version == "15" and ansible_distribution_version != "15.2")
   tags: build_tools
 
 - name: Install Earlier SystemTap On SLES15 SP2
-  zypper: name={{ item }} state=installed
-  with_items: "{{ Additional_Build_Tools_SLES15_SP2 }}"
+  zypper: name={{ Additional_Build_Tools_SLES15_SP2 }} state=installed
   when:
     - (ansible_distribution_major_version == "15" and ansible_distribution_version == "15.2")
   tags: build_tools
 
 - name: Install additional build tools for SLES 12
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES12 }}"
+  package: "name={{ Additional_Build_Tools_SLES12 }} state=latest"
   when:
     - ansible_distribution_major_version == "12"
   tags: build_tools
 
 - name: Install additional build tools for SLES 12 SP5
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES12_SP5 }}"
+  package: "name={{ Additional_Build_Tools_SLES12_SP5 }} state=latest"
   when:
     - (ansible_distribution_major_version == "12" and ansible_distribution_version == "12.5")
   tags: build_tools
 
 - name: Install additional build tools for SLES 12 NOT SP5
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES12_NOT_SP5 }}"
+  package: "name={{ Additional_Build_Tools_SLES12_NOT_SP5 }} state=latest"
   when:
     - (ansible_distribution_major_version == "12" and ansible_distribution_version != "12.5")
   tags: build_tools
@@ -129,15 +123,13 @@
         - (git_installed.rc != 0) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.31', operator='lt'))
 
 - name: Install additional build tools for SLES 11
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES11 }}"
+  package: "name={{ Additional_Build_Tools_SLES11 }} state=latest"
   when:
     - ansible_distribution_major_version == "11"
   tags: build_tools
 
 - name: Install additional build tools for SLES on x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SLES_x86 }}"
+  package: "name={{ Additional_Build_Tools_SLES_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
@@ -353,9 +345,8 @@
 
 - name: Install test tools for SLES 12/15 on s390x
   package:
-    name: "{{ item }}"
+    name: "{{ Additional_Test_Tools_SLES_s390x }}"
     state: latest
-  with_items: "{{ Additional_Test_Tools_SLES_s390x }}"
   when:
     - ansible_distribution == "SLES"
     - ansible_distribution_major_version in ["12", "15"]

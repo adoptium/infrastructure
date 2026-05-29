@@ -112,10 +112,9 @@
   become: true
   become_user: "{{ ansible_user }}"
   homebrew:
-    name: "{{ item }}"
+    name: "{{ Build_Tool_Packages }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ Build_Tool_Packages }}"
   tags: build_tools
 
 # Install CMAKE Where It Doesn't exist
@@ -140,12 +139,11 @@
 
 - name: Install Build Tool Packages NOT MacOS 14 arm64
   become: true
-  become_user: "{{ ansible_user }}"
+  become_user: "{{ Build_Tool_Packages_Not_MacOS14_arm64 }}"
   homebrew:
     name: "{{ item }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ Build_Tool_Packages_Not_MacOS14_arm64 }}"
   when: not ((macos_version_number | regex_search("14")) and ansible_architecture == "arm64")
   tags: build_tools
 
@@ -153,10 +151,9 @@
   become: true
   become_user: "{{ ansible_user }}"
   homebrew:
-    name: "{{ item }}"
+    name: "{{ Build_Tool_Packages_NOT_10_12 }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ Build_Tool_Packages_NOT_10_12 }}"
   when:
     - not (macos_version_number | regex_search("10.12"))
   tags: build_tools
@@ -165,30 +162,27 @@
   become: true
   become_user: "{{ ansible_user }}"
   homebrew_cask:
-    name: "{{ item }}"
+    name: "{{ Build_Tool_Casks }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ Build_Tool_Casks }}"
   tags: build_tools
 
 - name: Install Test Tool Packages
   become: true
   become_user: "{{ ansible_user }}"
   homebrew:
-    name: "{{ item }}"
+    name: "{{ Test_Tool_Packages }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ Test_Tool_Packages }}"
   tags: test_tools
 
 - name: Install JCK Tool Casks
   become: true
   become_user: "{{ ansible_user }}"
   homebrew_cask:
-    name: "{{ item }}"
+    name: "{{ JCK_Tool_Casks }}"
     state: present
     path: "{{ homebrew_path }}"
-  with_items: "{{ JCK_Tool_Casks }}"
   tags: jck_tools
 
 # Used for JCK printer tests

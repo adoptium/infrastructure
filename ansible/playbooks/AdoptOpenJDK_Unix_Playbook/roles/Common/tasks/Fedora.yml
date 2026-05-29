@@ -38,22 +38,19 @@
 # Additional build tools #
 ##########################
 - name: Install additional build tools if NOT RHEL 8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_RHEL8 }}"
+  package: "name={{ Additional_Build_Tools_NOT_RHEL8 }} state=latest"
   when:
     - (ansible_distribution_major_version != "8" and ansible_distribution != "Fedora")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL7 }}"
+  package: "name={{ Additional_Build_Tools_RHEL7 }} state=latest"
   when:
     - (ansible_distribution_major_version == "7" and ansible_architecture != "aarch64")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7 on ppc64le
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL7_PPC64LE }}"
+  package: "name={{ Additional_Build_Tools_RHEL7_PPC64LE }} state=latest"
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
@@ -66,37 +63,32 @@
   tags: build_tools
 
 - name: Install additional build tools for RHEL on x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
+  package: "name={{ Additional_Build_Tools_RHEL_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
     - not (ansible_distribution_major_version == "35" and ansible_distribution == "Fedora" )
   tags: build_tools
 
 - name: Install additional build tools for RHEL on ppc64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_ppc64 }}"
+  package: "name={{ Additional_Build_Tools_RHEL_ppc64 }} state=latest"
   when:
     - ansible_architecture == "ppc64"
   tags: build_tools
 
 - name: Install additional build tools for RHEL on s390x
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_s390x }}"
+  package: "name={{ Additional_Build_Tools_RHEL_s390x }} state=latest"
   when:
     - ansible_architecture == "s390x"
   tags: build_tools
 
 - name: Install additional build tools for RHEL 8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL8 }}"
+  package: "name={{ Additional_Build_Tools_RHEL8 }} state=latest"
   when:
     - (ansible_distribution_major_version == "8")
   tags: build_tools
 
 - name: Install additional build tools for FEDORA 35+
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_FEDORA35PLUS }}"
+  package: "name={{ Additional_Build_Tools_FEDORA35PLUS }} state=latest"
   when:
     - (ansible_distribution_major_version >= "35" and ansible_distribution == "Fedora")
   tags: build_tools
@@ -118,8 +110,7 @@
 # Install Java #
 ################
 - name: Install Java (Not RedHat 6 on ppc64)
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_NOT_RHEL6_PPC64 }}"
+  package: "name={{ Java_NOT_RHEL6_PPC64 }} state=latest"
   when:
     - not (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
     - not (ansible_distribution_major_version == "8")
@@ -127,20 +118,17 @@
   tags: install_java
 
 - name: Install Java when RedHat 6 on ppc64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_RHEL6_PPC64 }}"
+  package: "name={{ Java_RHEL6_PPC64 }} state=latest"
   when: (ansible_distribution_major_version == "6" and ansible_architecture == "ppc64")
   tags: install_java
 
 - name: Install Java when RedHat 8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_RHEL8 }}"
+  package: "name={{ Java_RHEL8 }} state=latest"
   when: (ansible_distribution_major_version == "8")
   tags: install_java
 
 - name: Install Java when Fedora 35
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_FED35 }}"
+  package: "name={{ Java_FED35 }} state=latest"
   when: (ansible_distribution_major_version == "35" and ansible_distribution != "Fedora")
   tags: install_java
 
