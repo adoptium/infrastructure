@@ -96,7 +96,8 @@ build {
     playbook_dir = "../playbooks/AdoptOpenJDK_Unix_Playbook"
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
-      "--skip-tags=xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools"
+      "--skip-tags=xcode15,hostname,brew_upgrade,brew_cu,core_dumps,crontab,kernel_tuning,adoptopenjdk,jenkins,nagios,superuser,swap_file,jck_tools",
+      "-v"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }

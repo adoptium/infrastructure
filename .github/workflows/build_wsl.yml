@@ -87,4 +87,4 @@ jobs:
         export ANSIBLE_CONFIG=./ansible.cfg
         # Skip MSVS_2013 until https://github.com/adoptium/infrastructure/issues/2178 is fixed
         # Windows 2025 runner already has MSVS_2022 installed so will be skipped in the playbook execution.
-        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags "${{ matrix.skip_tags }}" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml
+        ansible-playbook -i playbooks/AdoptOpenJDK_Windows_Playbook/hosts.win --extra-vars 'git_sha=${{ github.sha }}' -b --skip-tags "${{ matrix.skip_tags }}" playbooks/AdoptOpenJDK_Windows_Playbook/main.yml -v

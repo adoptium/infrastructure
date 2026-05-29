@@ -16,7 +16,7 @@ RUN echo "localhost ansible_connection=local" > /ansible/hosts
 
 RUN set -eux; \
  cd /ansible; \
- ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,locales,ntp_time"
+ ansible-playbook -i hosts ansible/playbooks/AdoptOpenJDK_Unix_Playbook/main.yml -e "git_sha=$git_sha" --skip-tags="debug,hosts_file,hostname,adoptopenjdk,jenkins,nagios,superuser,docker,swap_file,crontab,nvidia_cuda_toolkit,locales,ntp_time" -v
 # ^^^ locales ommitted because locale-gen isn't present on RHEL and the ones we install aren't there by default
 
 RUN rm -rf /ansible; yum remove ansible; yum clean all
