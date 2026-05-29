@@ -112,7 +112,8 @@ EOF
     extra_arguments = [
       "--extra-vars", "ansible_user=admin",
       "--extra-vars", "XCode15_2_SAS_TOKEN=\"${var.XCode15_2_SAS_TOKEN}\"",
-      "--tags", "xcode15"
+      "--tags", "xcode15",
+      "-v"
     ]
     command = "source /Users/admin/.zprofile; ansible-playbook"
   }

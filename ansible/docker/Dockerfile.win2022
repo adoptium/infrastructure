@@ -126,7 +126,7 @@ RUN net user ansible %PW% /ADD & net localgroup "Administrators" ansible /ADD & 
     echo localhost ansible_connection=winrm > infrastructure/ansible/hosts & \
     cd infrastructure\ansible & \
     C:\cygwin64\bin\python3.7m.exe /usr/bin/ansible-playbook -e git_sha=00000000 -e ansible_user=ansible -e ansible_password=%PW% -i hosts \
-    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019,Windows_Updates playbooks/AdoptOpenJDK_Windows_Playbook/main.yml & \
+    --skip-tags=adoptopenjdk,reboot,NTP_TIME,MSVS_2013,MSVS_2017,MSVS_2019,Windows_Updates playbooks/AdoptOpenJDK_Windows_Playbook/main.yml -v & \
     net user ansible /DELETE
 
 ENTRYPOINT ["C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "&&", "powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
