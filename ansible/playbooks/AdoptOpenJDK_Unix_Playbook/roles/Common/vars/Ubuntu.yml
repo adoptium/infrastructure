@@ -46,7 +46,7 @@ Build_Tool_Packages:
   - libxt-dev
   - libxtst-dev
   - make
-  - ntp
+  - chrony
   - patch                         # For Devkit creation which runs "patch"
   - pigz
   - pkg-config
