@@ -43,6 +43,10 @@
 ############################
 # Build Packages and tools #
 ############################
+- name: Set qemu package name based on Ubuntu version
+  set_fact:
+    qemu_package: "{{ 'qemu-user-binfmt' if ansible_distribution_major_version == '26' else 'qemu-user-static' }}"
+
 - name: Call Build Packages and Tools Task
   include_tasks: build_packages_and_tools.yml
 
