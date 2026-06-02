@@ -78,6 +78,7 @@ hosts:
           win2022-x64-4: {ip: 20.77.112.43, user: adoptopenjdk}
           win11-aarch64-1: {ip: 20.4.31.184, user: adoptopenjdk}
           win11-aarch64-2: {ip: 108.143.205.79, user: adoptopenjdk}
+          win11-aarch64-3: {ip: 4.231.23.141, user: adoptopenjdk}
 
       - aws:
           rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
