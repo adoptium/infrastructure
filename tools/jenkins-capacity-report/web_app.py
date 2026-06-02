@@ -256,6 +256,22 @@ def start_metrics_scheduler():
         interval_minutes = config.metrics_snapshot_interval
         logger.info(f"Starting automatic metrics recording every {interval_minutes} minutes")
         
+        # Check for and archive any completed months on startup
+        # This ensures archiving happens even if the scheduled job was missed
+        try:
+            logger.info("Checking for completed months to archive on startup...")
+            tracker = get_metrics_tracker()
+            result = tracker.archive_and_cleanup()
+            
+            if result['archived_months']:
+                logger.info(f"Startup archiving: Archived {len(result['archived_months'])} month(s): {', '.join(result['archived_months'])}")
+                logger.info(f"  Total snapshots archived: {result['snapshots_archived']}")
+                logger.info(f"  Current month snapshots retained: {result['current_month_snapshots']}")
+            else:
+                logger.info("Startup archiving: No completed months to archive")
+        except Exception as e:
+            logger.error(f"Error during startup archiving check: {e}", exc_info=True)
+        
         # Add metrics snapshot job
         scheduler.add_job(
             func=record_metrics_snapshot,
