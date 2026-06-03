@@ -28,6 +28,13 @@ import re
 import fnmatch
 import uuid
 
+# Default logRotator configuration values
+DEFAULT_DAYS_TO_KEEP = 365
+DEFAULT_NUM_TO_KEEP = 5
+DEFAULT_ARTIFACT_DAYS_TO_KEEP = 365
+DEFAULT_ARTIFACT_NUM_TO_KEEP = 5
+DEFAULT_REMOVE_LAST_BUILD = 'true'
+
 def backup_file(config_path, backup_dir, jenkins_home):
     """
     Create a backup of the config file preserving directory structure.
@@ -105,11 +112,11 @@ def create_logrotator(root):
     logrotator = ET.SubElement(properties, 'logRotator')
     
     # Set default values
-    ET.SubElement(logrotator, 'daysToKeep').text = '365'
-    ET.SubElement(logrotator, 'numToKeep').text = '5'
-    ET.SubElement(logrotator, 'artifactDaysToKeep').text = '365'
-    ET.SubElement(logrotator, 'artifactNumToKeep').text = '5'
-    ET.SubElement(logrotator, 'removeLastBuild').text = 'true'
+    ET.SubElement(logrotator, 'daysToKeep').text = str(DEFAULT_DAYS_TO_KEEP)
+    ET.SubElement(logrotator, 'numToKeep').text = str(DEFAULT_NUM_TO_KEEP)
+    ET.SubElement(logrotator, 'artifactDaysToKeep').text = str(DEFAULT_ARTIFACT_DAYS_TO_KEEP)
+    ET.SubElement(logrotator, 'artifactNumToKeep').text = str(DEFAULT_ARTIFACT_NUM_TO_KEEP)
+    ET.SubElement(logrotator, 'removeLastBuild').text = DEFAULT_REMOVE_LAST_BUILD
     
     return logrotator, 'direct'
 
@@ -167,7 +174,10 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                 xml_version = '1.1'
         
         # Find and replace character entities with unique placeholders
-        # Pattern matches &#x followed by hex digits and semicolon
+        # This is necessary because some job descriptions contain escape characters
+        # for things like newline (&#xd;), which ElementTree would decode during parsing
+        # and not re-encode when writing, causing them to become literal characters.
+        # Pattern matches &#x followed by hex digits and semicolon (e.g., &#xd; &#xa;)
         entity_pattern = re.compile(r'&#x([0-9a-fA-F]+);')
         entity_map = {}  # Maps placeholder to original entity
         
@@ -209,11 +219,11 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
             
             # Record after state
             result['after'] = {
-                'daysToKeep': '365',
-                'numToKeep': '5',
-                'artifactDaysToKeep': '365',
-                'artifactNumToKeep': '5',
-                'removeLastBuild': 'true'
+                'daysToKeep': str(DEFAULT_DAYS_TO_KEEP),
+                'numToKeep': str(DEFAULT_NUM_TO_KEEP),
+                'artifactDaysToKeep': str(DEFAULT_ARTIFACT_DAYS_TO_KEEP),
+                'artifactNumToKeep': str(DEFAULT_ARTIFACT_NUM_TO_KEEP),
+                'removeLastBuild': DEFAULT_REMOVE_LAST_BUILD
             }
         elif len(logrotators) == 1:
             # Single logRotator - update it
@@ -226,35 +236,35 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                 result['before'][field] = elem.text if elem is not None else None
             
             # Ensure daysToKeep and artifactDaysToKeep have values
-            days_changed, days_action = ensure_element(logrotator, 'daysToKeep', 365)
+            days_changed, days_action = ensure_element(logrotator, 'daysToKeep', DEFAULT_DAYS_TO_KEEP)
             if days_changed:
                 result['modified'] = True
-                result['changes'].append(f'daysToKeep {days_action}: 365')
+                result['changes'].append(f'daysToKeep {days_action}: {DEFAULT_DAYS_TO_KEEP}')
             
-            artifact_days_changed, artifact_days_action = ensure_element(logrotator, 'artifactDaysToKeep', 365)
+            artifact_days_changed, artifact_days_action = ensure_element(logrotator, 'artifactDaysToKeep', DEFAULT_ARTIFACT_DAYS_TO_KEEP)
             if artifact_days_changed:
                 result['modified'] = True
-                result['changes'].append(f'artifactDaysToKeep {artifact_days_action}: 365')
+                result['changes'].append(f'artifactDaysToKeep {artifact_days_action}: {DEFAULT_ARTIFACT_DAYS_TO_KEEP}')
             
             # Ensure numToKeep and artifactNumToKeep exist
-            num_changed, num_action = ensure_element(logrotator, 'numToKeep', 5)
+            num_changed, num_action = ensure_element(logrotator, 'numToKeep', DEFAULT_NUM_TO_KEEP)
             if num_changed:
                 result['modified'] = True
-                result['changes'].append(f'numToKeep {num_action}: 5')
+                result['changes'].append(f'numToKeep {num_action}: {DEFAULT_NUM_TO_KEEP}')
             
-            artifact_num_changed, artifact_num_action = ensure_element(logrotator, 'artifactNumToKeep', 5)
+            artifact_num_changed, artifact_num_action = ensure_element(logrotator, 'artifactNumToKeep', DEFAULT_ARTIFACT_NUM_TO_KEEP)
             if artifact_num_changed:
                 result['modified'] = True
-                result['changes'].append(f'artifactNumToKeep {artifact_num_action}: 5')
+                result['changes'].append(f'artifactNumToKeep {artifact_num_action}: {DEFAULT_ARTIFACT_NUM_TO_KEEP}')
             
             # Set removeLastBuild=true
             remove_last_build = logrotator.find('removeLastBuild')
             
             if remove_last_build is not None:
-                if remove_last_build.text != 'true':
-                    remove_last_build.text = 'true'
+                if remove_last_build.text != DEFAULT_REMOVE_LAST_BUILD:
+                    remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                     result['modified'] = True
-                    result['changes'].append('removeLastBuild set to true')
+                    result['changes'].append(f'removeLastBuild set to {DEFAULT_REMOVE_LAST_BUILD}')
             else:
                 # Add new element after artifactNumToKeep
                 artifact_num = logrotator.find('artifactNumToKeep')
@@ -262,11 +272,11 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                     children = list(logrotator)
                     index = children.index(artifact_num) + 1
                     remove_last_build = ET.Element('removeLastBuild')
-                    remove_last_build.text = 'true'
+                    remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                     logrotator.insert(index, remove_last_build)
                 else:
                     remove_last_build = ET.SubElement(logrotator, 'removeLastBuild')
-                    remove_last_build.text = 'true'
+                    remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                 
                 result['modified'] = True
                 result['changes'].append('removeLastBuild created: true')
