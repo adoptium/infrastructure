@@ -7,7 +7,7 @@ Supports both <logRotator> and <jenkins.model.BuildDiscarderProperty> formats.
 
 Features:
 1. Set removeLastBuild=true
-2. Ensure daysToKeep and artifactDaysToKeep are set (default: 30)
+2. Ensure daysToKeep and artifactDaysToKeep are set (default: 365)
 3. Create logRotator if missing with sensible defaults
 4. Validate only one logRotator definition exists
 5. Support both XML formats (direct logRotator and BuildDiscarderProperty)
