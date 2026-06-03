@@ -262,15 +262,24 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                     result['modified'] = True
                     result['changes'].append(f'removeLastBuild set to {DEFAULT_REMOVE_LAST_BUILD}')
             else:
-                # Add new element after numToKeep
-                num_keep = logrotator.find('numToKeep')
-                if num_keep is not None:
+                # Add new element maintaining proper order:
+                # daysToKeep, numToKeep, artifactDaysToKeep, artifactNumToKeep, removeLastBuild
+                # Insert after the last existing element in the sequence
+                insert_after = None
+                for field in ['artifactNumToKeep', 'artifactDaysToKeep', 'numToKeep', 'daysToKeep']:
+                    elem = logrotator.find(field)
+                    if elem is not None:
+                        insert_after = elem
+                        break
+                
+                if insert_after is not None:
                     children = list(logrotator)
-                    index = children.index(num_keep) + 1
+                    index = children.index(insert_after) + 1
                     remove_last_build = ET.Element('removeLastBuild')
                     remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                     logrotator.insert(index, remove_last_build)
                 else:
+                    # Fallback: append at end
                     remove_last_build = ET.SubElement(logrotator, 'removeLastBuild')
                     remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                 
