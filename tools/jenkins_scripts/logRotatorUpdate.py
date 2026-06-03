@@ -7,10 +7,13 @@ Supports both <logRotator> and <jenkins.model.BuildDiscarderProperty> formats.
 
 Features:
 1. Set removeLastBuild=true
-2. Ensure daysToKeep and artifactDaysToKeep are set (default: 365)
-3. Create logRotator if missing with sensible defaults
+2. Ensure daysToKeep and numToKeep are set (default: 365 days, 5 builds)
+3. Create logRotator if missing with sensible defaults (including artifact sub-policies)
 4. Validate only one logRotator definition exists
 5. Support both XML formats (direct logRotator and BuildDiscarderProperty)
+
+Note: Artifact retention settings (artifactDaysToKeep, artifactNumToKeep) are sub-policies
+and are only set when creating a new logRotator. Existing artifact settings are not modified.
 
 NO EXTERNAL DEPENDENCIES - Uses only Python standard library.
 Requires: Python 3.6+
@@ -21,6 +24,7 @@ Version: 2.1.0
 
 import os
 import sys
+import io
 import xml.etree.ElementTree as ET
 import argparse
 import re
@@ -309,7 +313,6 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
             result['backup'] = backup_file(config_path, backup_dir, jenkins_home)
             
             # Write modified XML preserving original version and encoding
-            import io
             output = io.BytesIO()
             tree.write(output, encoding='UTF-8', xml_declaration=False)
             xml_content = output.getvalue().decode('UTF-8')
@@ -402,11 +405,14 @@ def main():
         epilog="""
 Features:
   1. Set removeLastBuild=true
-  2. Ensure daysToKeep and artifactDaysToKeep are set (default: 365)
-  3. Create logRotator if missing with sensible defaults
+  2. Ensure daysToKeep and numToKeep are set (default: 365 days, 5 builds)
+  3. Create logRotator if missing with sensible defaults (including artifact sub-policies)
   4. Support both logRotator and BuildDiscarderProperty formats
   5. Validate only one logRotator definition exists
   6. Create backups preserving directory structure
+
+Note: Artifact settings (artifactDaysToKeep, artifactNumToKeep) are only set when creating
+new logRotators. Existing artifact settings are not modified as they are sub-policies.
 
 Examples:
 # Test on single job
@@ -436,9 +442,24 @@ python3 logRotatorUpdate.py /home/jenkins/.jenkins /backup/jenkins-configs \\
     
     jobs_dir = os.path.join(args.jenkins_home, 'jobs')
     
+    # Validate Jenkins home directory
     if not os.path.exists(jobs_dir):
         print(f"❌ Error: Jobs directory not found: {jobs_dir}")
         sys.exit(1)
+    
+    # Validate and create backup directory if needed (unless in list-matches mode)
+    if not args.list_matches:
+        if not os.path.exists(args.backup_dir):
+            try:
+                os.makedirs(args.backup_dir, exist_ok=True)
+                print(f"✅ Created backup directory: {args.backup_dir}")
+            except OSError as e:
+                print(f"❌ Error: Cannot create backup directory: {args.backup_dir}")
+                print(f"   {e}")
+                sys.exit(1)
+        elif not os.access(args.backup_dir, os.W_OK):
+            print(f"❌ Error: Backup directory is not writable: {args.backup_dir}")
+            sys.exit(1)
     
     print("="*80)
     print("Jenkins logRotator Configuration Tool")
