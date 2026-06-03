@@ -19,7 +19,7 @@ jobs:
         os: [sonoma-arm64, sonoma-intel, sequoia-intel, sequoia-arm64]
       fail-fast: false
     steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+    - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
     # This is to fix an issue with the github macos14 runner, that cant resolve keyserver.ubuntu.com
     # but this does work when replaced with the IP address. Spotted during the GPG verification of ANT step
