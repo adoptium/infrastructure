@@ -63,16 +63,19 @@ python3 logRotatorUpdate.py /home/jenkins/.jenkins /backup/dir \
 ```
 
 ### Pattern Matching
-Use patterns to target specific jobs:
+Use patterns to target specific jobs. Patterns match the filesystem path structure (Jenkins stores folders as `jobs/<folder>/jobs/<job>`):
+
 ```bash
 # Glob patterns
---pattern "Test*"              # Jobs starting with Test
---pattern "build-*"            # Jobs starting with build-
+--pattern "Test*"                 # Top-level jobs starting with Test
+--pattern "build-*"               # Top-level jobs starting with build-
 
-# Regex patterns  
---pattern ".*openjdk8.*"       # Jobs containing openjdk8
---pattern "folder/.*"          # Jobs in specific folder
+# Regex patterns
+--pattern ".*openjdk8.*"          # Jobs containing openjdk8 (any level)
+--pattern "folder/jobs/.*"        # Jobs in "folder" (filesystem structure)
 ```
+
+**Note:** For jobs in folders, patterns must include `/jobs/` directories (e.g., `folder/jobs/job-name`).
 
 ### List Matching Jobs
 Preview which jobs match your pattern:

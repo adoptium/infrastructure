@@ -6,9 +6,11 @@ Safely configure logRotator settings in Jenkins job `config.xml` files.
 
 This script ensures all Jenkins jobs have proper build retention policies configured:
 1. Sets `removeLastBuild=true` to allow deletion of the last build
-2. Ensures `daysToKeep` and `artifactDaysToKeep` are set (default: 365 days)
-3. Ensures `numToKeep` and `artifactNumToKeep` are set (default: 5 builds)
-4. Creates complete logRotator configuration for jobs that don't have one
+2. Ensures `daysToKeep` is set (default: 365 days)
+3. Ensures `numToKeep` is set (default: 5 builds)
+4. Creates complete logRotator configuration for jobs that don't have one (including artifact sub-policies)
+
+**Note:** Artifact retention settings (`artifactDaysToKeep`, `artifactNumToKeep`) are sub-policies of the basic settings and are only set when creating a new logRotator. Existing artifact settings are left unchanged as they may be intentionally configured differently.
 
 This prevents old builds from accumulating and consuming excessive memory/disk space.
 
@@ -58,53 +60,44 @@ The script applies these rules:
 
 1. **If logRotator exists:**
    - Sets `daysToKeep=365` if missing/empty/-1
-   - Sets `artifactDaysToKeep=365` if missing/empty/-1
    - Sets `numToKeep=5` if missing/empty/-1
-   - Sets `artifactNumToKeep=5` if missing/empty/-1
    - Sets `removeLastBuild=true`
+   - **Does NOT modify** `artifactDaysToKeep` or `artifactNumToKeep` (sub-policies, may be intentionally different)
 
 2. **If logRotator doesn't exist:**
-   - Creates complete logRotator with:
+   - Creates complete logRotator with all settings:
      - `daysToKeep=365`
      - `numToKeep=5`
-     - `artifactDaysToKeep=365`
-     - `artifactNumToKeep=5`
+     - `artifactDaysToKeep=365` (sub-policy)
+     - `artifactNumToKeep=5` (sub-policy)
      - `removeLastBuild=true`
 
 ## Pattern Examples
 
+Patterns match against the filesystem path structure. Jenkins stores folders as `jobs/<folder>/jobs/<job>`, so patterns must account for this structure.
+
 ```bash
-# Exact match
+# Exact match (top-level job)
 --pattern "my-job"
 
 # Glob patterns
---pattern "Test*"              # All jobs starting with Test
---pattern "build-*"            # All jobs starting with build-
+--pattern "Test*"                    # All top-level jobs starting with Test
+--pattern "build-*"                  # All top-level jobs starting with build-
 
 # Regex patterns
---pattern "Test.*"             # All jobs starting with Test
---pattern ".*openjdk8.*"       # All jobs containing openjdk8
---pattern "build-scripts/.*"   # All jobs in build-scripts folder
+--pattern "Test.*"                   # All top-level jobs starting with Test
+--pattern ".*openjdk8.*"             # All jobs containing openjdk8 (any level)
+--pattern "folder/jobs/.*"           # All jobs in "folder" (filesystem structure)
+--pattern "build-scripts/jobs/.*"    # All jobs in "build-scripts" folder
 ```
+
+**Note:** Patterns match the filesystem path relative to `JENKINS_HOME/jobs/`. For jobs in folders, the path includes `/jobs/` directories (e.g., `folder/jobs/job-name`).
 
 ## Supported XML Formats
 
 The tool supports both current and legacy Jenkins XML formats:
 
-**Format 1: Direct logRotator (older Jenkins versions)**
-```xml
-<properties>
-  <logRotator>
-    <daysToKeep>365</daysToKeep>
-    <numToKeep>5</numToKeep>
-    <artifactDaysToKeep>365</artifactDaysToKeep>
-    <artifactNumToKeep>5</artifactNumToKeep>
-    <removeLastBuild>true</removeLastBuild>
-  </logRotator>
-</properties>
-```
-
-**Format 2: BuildDiscarderProperty (current Jenkins versions)**
+**Format 1: BuildDiscarderProperty (current Jenkins standard)**
 ```xml
 <properties>
   <jenkins.model.BuildDiscarderProperty>
@@ -119,7 +112,20 @@ The tool supports both current and legacy Jenkins XML formats:
 </properties>
 ```
 
-Both formats are fully supported and will be updated appropriately.
+**Format 2: Direct logRotator (legacy format)**
+```xml
+<properties>
+  <logRotator>
+    <daysToKeep>365</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>365</artifactDaysToKeep>
+    <artifactNumToKeep>5</artifactNumToKeep>
+    <removeLastBuild>true</removeLastBuild>
+  </logRotator>
+</properties>
+```
+
+Both formats are fully supported and will be updated appropriately. When creating a new logRotator (if none exists), the tool uses the current BuildDiscarderProperty format.
 
 ## XML Changes
 

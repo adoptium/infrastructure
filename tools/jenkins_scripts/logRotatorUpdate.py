@@ -22,7 +22,6 @@ Version: 2.1.0
 import os
 import sys
 import xml.etree.ElementTree as ET
-from datetime import datetime
 import argparse
 import re
 import fnmatch
@@ -57,8 +56,8 @@ def backup_file(config_path, backup_dir, jenkins_home):
     os.makedirs(os.path.dirname(backup_path), exist_ok=True)
     
     # Copy file
-    with open(config_path, 'r') as src:
-        with open(backup_path, 'w') as dst:
+    with open(config_path, 'rb') as src:
+        with open(backup_path, 'wb') as dst:
             dst.write(src.read())
     
     return backup_path
@@ -98,27 +97,30 @@ def ensure_element(parent, tag, default_value):
         elem = ET.SubElement(parent, tag)
         elem.text = str(default_value)
         return True, 'created'
-    elif elem.text is None or elem.text.strip() == '' or elem.text == '-1':
+    elif elem.text is None or elem.text.strip() == '' or elem.text.strip() == '-1':
         elem.text = str(default_value)
         return True, 'set'
     return False, 'unchanged'
 
 def create_logrotator(root):
-    """Create a new logRotator element (direct format under properties)."""
+    """Create a new logRotator using BuildDiscarderProperty format (current Jenkins standard)."""
     properties = root.find('properties')
     if properties is None:
         properties = ET.SubElement(root, 'properties')
     
-    logrotator = ET.SubElement(properties, 'logRotator')
+    # Create BuildDiscarderProperty wrapper (current format)
+    build_discarder = ET.SubElement(properties, 'jenkins.model.BuildDiscarderProperty')
+    strategy = ET.SubElement(build_discarder, 'strategy')
+    strategy.set('class', 'hudson.tasks.LogRotator')
     
     # Set default values
-    ET.SubElement(logrotator, 'daysToKeep').text = str(DEFAULT_DAYS_TO_KEEP)
-    ET.SubElement(logrotator, 'numToKeep').text = str(DEFAULT_NUM_TO_KEEP)
-    ET.SubElement(logrotator, 'artifactDaysToKeep').text = str(DEFAULT_ARTIFACT_DAYS_TO_KEEP)
-    ET.SubElement(logrotator, 'artifactNumToKeep').text = str(DEFAULT_ARTIFACT_NUM_TO_KEEP)
-    ET.SubElement(logrotator, 'removeLastBuild').text = DEFAULT_REMOVE_LAST_BUILD
+    ET.SubElement(strategy, 'daysToKeep').text = str(DEFAULT_DAYS_TO_KEEP)
+    ET.SubElement(strategy, 'numToKeep').text = str(DEFAULT_NUM_TO_KEEP)
+    ET.SubElement(strategy, 'artifactDaysToKeep').text = str(DEFAULT_ARTIFACT_DAYS_TO_KEEP)
+    ET.SubElement(strategy, 'artifactNumToKeep').text = str(DEFAULT_ARTIFACT_NUM_TO_KEEP)
+    ET.SubElement(strategy, 'removeLastBuild').text = DEFAULT_REMOVE_LAST_BUILD
     
-    return logrotator, 'direct'
+    return strategy, 'BuildDiscarderProperty'
 
 def validate_single_logrotator(root):
     """
@@ -175,36 +177,40 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
         
         # Find and replace character entities with unique placeholders
         # This is necessary because some job descriptions contain escape characters
-        # for things like newline (&#xd;), which ElementTree would decode during parsing
+        # for things like newline (&#xd; or &#13;), which ElementTree would decode during parsing
         # and not re-encode when writing, causing them to become literal characters.
-        # Pattern matches &#x followed by hex digits and semicolon (e.g., &#xd; &#xa;)
-        entity_pattern = re.compile(r'&#x([0-9a-fA-F]+);')
-        entity_map = {}  # Maps placeholder to original entity
+        # Pattern matches both hex (&#xHH;) and decimal (&#DDD;) numeric character references
+        entity_pattern = re.compile(r'&#x?[0-9a-fA-F]+;')
+        entity_map = {}  # Maps entity to placeholder for O(1) lookup
+        entity_to_placeholder = {}  # Reverse map for restoration
         
         def replace_entity(match):
-            entity = match.group(0)  # e.g., '&#xd;'
-            if entity not in entity_map:
+            entity = match.group(0)  # e.g., '&#xd;' or '&#13;'
+            if entity not in entity_to_placeholder:
                 # Create unique placeholder that won't appear in XML
-                placeholder = f'__XMLENTITY_{uuid.uuid4().hex[:8]}_{match.group(1)}__'
+                # Use entity value in placeholder for debugging
+                placeholder = f'__XMLENTITY_{uuid.uuid4().hex[:8]}__'
+                entity_to_placeholder[entity] = placeholder
                 entity_map[placeholder] = entity
-            else:
-                # Find existing placeholder for this entity
-                placeholder = [k for k, v in entity_map.items() if v == entity][0]
-            return placeholder
+            return entity_to_placeholder[entity]
         
         modified_content = entity_pattern.sub(replace_entity, original_content)
         
-        # Write temporary file with placeholders
-        temp_path = config_path + '.tmp'
-        with open(temp_path, 'w', encoding='utf-8') as f:
-            f.write(modified_content)
+        # Create unique temporary file to avoid conflicts with concurrent runs
+        temp_path = f"{config_path}.tmp.{uuid.uuid4().hex[:8]}"
         
-        # Parse XML from temporary file
-        tree = ET.parse(temp_path)
-        root = tree.getroot()
-        
-        # Clean up temp file
-        os.remove(temp_path)
+        try:
+            # Write temporary file with placeholders
+            with open(temp_path, 'w', encoding='utf-8') as f:
+                f.write(modified_content)
+            
+            # Parse XML from temporary file
+            tree = ET.parse(temp_path)
+            root = tree.getroot()
+        finally:
+            # Always clean up temp file, even if parsing fails
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
         
         # Find all logRotator elements (both formats)
         logrotators = find_all_logrotators(root)
@@ -235,27 +241,17 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                 elem = logrotator.find(field)
                 result['before'][field] = elem.text if elem is not None else None
             
-            # Ensure daysToKeep and artifactDaysToKeep have values
+            # Ensure basic retention settings have values (daysToKeep and numToKeep)
+            # Note: Artifact settings are sub-policies and should not be modified if they exist
             days_changed, days_action = ensure_element(logrotator, 'daysToKeep', DEFAULT_DAYS_TO_KEEP)
             if days_changed:
                 result['modified'] = True
                 result['changes'].append(f'daysToKeep {days_action}: {DEFAULT_DAYS_TO_KEEP}')
             
-            artifact_days_changed, artifact_days_action = ensure_element(logrotator, 'artifactDaysToKeep', DEFAULT_ARTIFACT_DAYS_TO_KEEP)
-            if artifact_days_changed:
-                result['modified'] = True
-                result['changes'].append(f'artifactDaysToKeep {artifact_days_action}: {DEFAULT_ARTIFACT_DAYS_TO_KEEP}')
-            
-            # Ensure numToKeep and artifactNumToKeep exist
             num_changed, num_action = ensure_element(logrotator, 'numToKeep', DEFAULT_NUM_TO_KEEP)
             if num_changed:
                 result['modified'] = True
                 result['changes'].append(f'numToKeep {num_action}: {DEFAULT_NUM_TO_KEEP}')
-            
-            artifact_num_changed, artifact_num_action = ensure_element(logrotator, 'artifactNumToKeep', DEFAULT_ARTIFACT_NUM_TO_KEEP)
-            if artifact_num_changed:
-                result['modified'] = True
-                result['changes'].append(f'artifactNumToKeep {artifact_num_action}: {DEFAULT_ARTIFACT_NUM_TO_KEEP}')
             
             # Set removeLastBuild=true
             remove_last_build = logrotator.find('removeLastBuild')
@@ -266,11 +262,11 @@ def configure_logrotator(config_path, backup_dir, jenkins_home, dry_run=False):
                     result['modified'] = True
                     result['changes'].append(f'removeLastBuild set to {DEFAULT_REMOVE_LAST_BUILD}')
             else:
-                # Add new element after artifactNumToKeep
-                artifact_num = logrotator.find('artifactNumToKeep')
-                if artifact_num is not None:
+                # Add new element after numToKeep
+                num_keep = logrotator.find('numToKeep')
+                if num_keep is not None:
                     children = list(logrotator)
-                    index = children.index(artifact_num) + 1
+                    index = children.index(num_keep) + 1
                     remove_last_build = ET.Element('removeLastBuild')
                     remove_last_build.text = DEFAULT_REMOVE_LAST_BUILD
                     logrotator.insert(index, remove_last_build)
@@ -339,10 +335,7 @@ def process_job(job_path, job_name, backup_dir, jenkins_home, dry_run=False, ver
         print(f"{'='*80}")
         
         if result['error']:
-            if result.get('archive_required'):
-                print(f"🗄️  ARCHIVE: {result['error']}")
-            else:
-                print(f"❌ Error: {result['error']}")
+            print(f"❌ Error: {result['error']}")
         elif result['modified']:
             if result['created_logrotator']:
                 print(f"✅ Created logRotator ({result['format']})")
@@ -450,12 +443,14 @@ python3 logRotatorUpdate.py /home/jenkins/.jenkins /backup/jenkins-configs \\
     print("="*80)
     
     # Find matching jobs
-    if args.pattern:
-        matching_jobs = find_matching_jobs(jobs_dir, args.pattern)
-        print(f"\nFound {len(matching_jobs)} matching jobs")
-    else:
-        matching_jobs = [(os.path.join(jobs_dir, j), j) for j in os.listdir(jobs_dir) if os.path.isdir(os.path.join(jobs_dir, j))]
-        if not args.list_matches:
+    # Use '*' pattern when no pattern specified to recursively find ALL jobs (including those in folders)
+    pattern = args.pattern if args.pattern else '*'
+    matching_jobs = find_matching_jobs(jobs_dir, pattern)
+    
+    if not args.list_matches:
+        if args.pattern:
+            print(f"\nFound {len(matching_jobs)} matching jobs")
+        else:
             print(f"\nFound {len(matching_jobs)} jobs")
     
     # If list-matches mode, just list and exit
