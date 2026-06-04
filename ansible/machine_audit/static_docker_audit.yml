@@ -124,7 +124,7 @@
 
     - name: Summary
       debug:
-        msg: 
+        msg:
           - "Audit complete!"
           - "Containers audited: {{ aqa_containers.stdout_lines | length }}"
           - "Output directory: {{ output_dir }}"

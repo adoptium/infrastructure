@@ -29,8 +29,8 @@
         state: directory
         mode: '0755'
       with_items:
-       - "{{ remote_temp_dir }}"
-       - "{{ remote_temp_dir }}/packages"
+        - "{{ remote_temp_dir }}"
+        - "{{ remote_temp_dir }}/packages"
 
     # Copy Linux script and packages
     - name: Copy Linux audit script to remote machine
