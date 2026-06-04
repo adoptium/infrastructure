@@ -22,16 +22,20 @@
   when: ansible_architecture == "aarch64"
   tags: patch_update
 
-- name: Add Azul Zulu GPG Package Signing Key for x86_64
-  apt_key:
-    url: https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
-    state: present
+- name: Download and convert Azul Zulu GPG Package Signing Key for x86_64
+  ansible.builtin.shell: |
+    curl -fsSL https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems | gpg --dearmor > /etc/apt/keyrings/azulsystems.gpg
+  args:
+    creates: /etc/apt/keyrings/azulsystems.gpg
   when:
     - ansible_architecture == "x86_64"
   tags: [patch_update, azul-key]
 
 - name: Add Azul Zulu repository for x86_64
-  apt_repository: repo='deb http://repos.azulsystems.com/ubuntu stable main'
+  ansible.builtin.apt_repository:
+    repo: 'deb [signed-by=/etc/apt/keyrings/azulsystems.gpg] http://repos.azulsystems.com/ubuntu stable main'
+    state: present
+    filename: azul-zulu
   when:
     - ansible_architecture == "x86_64"
   tags: patch_update
