@@ -86,8 +86,7 @@
         docker exec ${CONTAINER_ID} chmod +x {{ container_temp_dir }}/linux.py
 
         # Run the audit script
-        docker exec ${CONTAINER_ID} python3 {{ container_temp_dir }}/linux.py || \
-        docker exec ${CONTAINER_ID} python {{ container_temp_dir }}/linux.py || true
+        docker exec ${CONTAINER_ID} python3 {{ container_temp_dir }}/linux.py
 
         # Copy the output file from container to host
         docker cp ${CONTAINER_ID}:/var/log/machine_info.json {{ output_dir }}/${CONTAINER_NAME}_machine_info.json 2>/dev/null || \
