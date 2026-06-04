@@ -5,6 +5,8 @@
 import sys
 import jenkins
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 def getIP(nodeConfig):
     find1 = nodeConfig.find("<host>") + 6
@@ -72,5 +74,18 @@ def getNodeList(url, username, password):
         return None
 
 if __name__ == "__main__":
-    url, username, password = sys.argv[1:4]
+    # Load environment variables from .env file
+    script_dir = Path(__file__).parent
+    env_path = script_dir / ".env"
+    load_dotenv(env_path)
+
+    url = os.getenv('url')
+    username = os.getenv('username')
+    password = os.getenv('password')
+    
+    if not all([url, username, password]):
+        print("Error: Missing credentials in .env file")
+        print("Required variables: url, username, password")
+        sys.exit(1)
+    
     getNodeList(url, username, password)

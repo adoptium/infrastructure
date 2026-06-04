@@ -6,6 +6,8 @@ import sys
 import subprocess
 from pathlib import Path
 from getNodeList import getNodeList
+from dotenv import load_dotenv
+import os
 
 # ANSI color codes
 GREEN = '\033[92m'
@@ -64,14 +66,23 @@ def scp_machine_info(node_name, ip, port, collected_info_dir, log_path):
 
 def main():
     
-    # Jenkins credentials from command line
-    url, username, password = sys.argv[1:4]
+    # Load environment variables from .env file
+    script_dir = Path(__file__).parent
+    env_path = script_dir / ".env"
+    load_dotenv(env_path)
+    
+    url = os.getenv('url')
+    username = os.getenv('username')
+    password = os.getenv('password')
+    
+    if not all([url, username, password]):
+        print(f"{RED}[ERROR]{RESET} Missing credentials in .env file")
+        print("Required variables: url, username, password")
+        return 1
 
     # Generate machine list from Jenkins
     print("\nFetching node list from Jenkins...")
     getNodeList(url, username, password)
-    
-    script_dir = Path(__file__).parent
     collected_info_dir = script_dir / "collectedInfo"
     machine_list_path = collected_info_dir / "machine.list"
     
