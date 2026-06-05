@@ -9,7 +9,7 @@ Collection of utility scripts and scriptlets for managing Jenkins configurations
 **Groovy scriptlet** to configure build retention policies (LogRotator settings) for Jenkins jobs. Runs directly in Jenkins Script Console.
 
 **Key Features:**
-- Updates existing LogRotator settings (sets defaults for -1 values)
+- Updates existing LogRotator settings: `daysToKeep` and `numToKeep` (when set to -1)
 - Creates LogRotator for jobs that don't have one
 - Forces `removeLastBuild=true` for all jobs
 - Preserves existing artifact retention settings
