@@ -48,7 +48,7 @@ ls -lh jenkins-configs-*.tar.gz
 2. Copy the contents of `updateLogRotators.scriptlet`
 3. Configure processing mode:
    - **Option A:** Set `process_all_jobs = true` to process ALL jobs
-   - **Option B:** Set `process_all_jobs = false` and set `filter_DisplayName_starts_with = "your-prefix"`
+   - **Option B:** Set `process_all_jobs = false` and set `filter_DisplayName_contains = "your-substring"`
 4. Set `dryRun = true` for testing
 5. Click "Run"
 6. Review output, then set `dryRun = false` and run again to apply
@@ -57,18 +57,25 @@ ls -lh jenkins-configs-*.tar.gz
 - **For jobs with existing LogRotator:**
   - Sets `daysToKeep=365` if currently -1
   - Sets `numToKeep=5` if currently -1
-  - Forces `removeLastBuild=true`
+  - Forces `removeLastBuild=true` if not already set
   - Preserves artifact settings unchanged
+  - Only updates jobs that need changes (skips jobs already configured correctly)
   
 - **For jobs without LogRotator:**
   - Creates new LogRotator with default values
   - Sets all retention policies
 
+- **Optional immediate log rotation:**
+  - If `performRotate = true`, calls `job.logRotate()` after updating
+  - Immediately prunes old builds according to new retention policy
+  - Useful for cleaning up builds right away
+
 **Safety:**
 - Always test with `dryRun = true` first
-- Use job name filter to limit scope (line 17)
+- Use job name filter to limit scope
 - Review output before applying changes
 - Changes are saved immediately when `dryRun = false`
+- Summary report shows exactly what was changed
 
 ## Requirements
 
