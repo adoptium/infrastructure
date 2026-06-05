@@ -1,0 +1,57 @@
+import jenkins.model.Jenkins
+import hudson.model.Job
+import hudson.model.Run
+
+// List jobs with over 40 builds
+int topBuildsCount = 40
+
+// Count builds and their references
+int totalJobs = 0
+int totalBuildReferences = 0
+Map<String, Integer> jobBuildCounts = [:]
+
+// Real data: 40,000 builds = 4GB, so ~100KB per build
+int kbPerBuildRef = 100
+
+Jenkins.instance.allItems(Job).each { job ->
+    totalJobs++
+    
+    // Each build has a BuildReference + metadata in memory
+    def builds = job.getBuilds()
+    int buildCount = builds.size()
+    totalBuildReferences += buildCount
+    
+    if (buildCount > topBuildsCount) {
+        jobBuildCounts[job.fullDisplayName] = buildCount
+    }
+}
+
+// Calculate memory usage based on real heap dump analysis
+def avgBuilds = totalJobs > 0 ? (totalBuildReferences / totalJobs) : 0
+def estimatedMB = (totalBuildReferences * kbPerBuildRef) / 1024
+def estimatedGB = estimatedMB / 1024
+
+println "=========================================="
+println "JENKINS BUILD REFERENCES IN MEMORY"
+println "=========================================="
+println "Total jobs: ${totalJobs}"
+println "Total BuildReferences in heap: ${totalBuildReferences}"
+println "Average builds per job: ${String.format('%.1f', avgBuilds)}"
+println ""
+println "Estimated heap usage (based on heap dump analysis):"
+println "  ~${String.format('%.1f', estimatedMB)} MB"
+println "  ~${String.format('%.2f', estimatedGB)} GB"
+println "  (at ~${kbPerBuildRef}KB per build reference + metadata)"
+println "=========================================="
+
+if (jobBuildCounts.size() > 0) {
+    println "\nJobs with >${topBuildsCount} builds (high memory impact):"
+    println "(Reducing these will have the biggest memory impact)"
+    jobBuildCounts.sort { -it.value }.each { name, count ->
+        def jobMemoryMB = (count * kbPerBuildRef) / 1024
+        println "  ${count} builds (~${String.format('%.1f', jobMemoryMB)} MB): ${name}"
+    }
+}
+
+return;
+
