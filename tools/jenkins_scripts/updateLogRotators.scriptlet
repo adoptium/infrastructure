@@ -2,6 +2,7 @@ import jenkins.model.Jenkins
 import hudson.model.Job
 import jenkins.model.BuildDiscarderProperty
 import hudson.tasks.LogRotator
+import hudson.matrix.MatrixConfiguration
 
 // Whether DRY-RUN or not..?
 boolean dryRun = true
@@ -34,7 +35,7 @@ Jenkins.instance.allItems(Job).each { job ->
     // Apply filter: process all jobs OR jobs matching the filter
     boolean shouldProcess = process_all_jobs || job.fullDisplayName.contains(filter_DisplayName_contains)
     
-    if (job.supportsLogRotator() && shouldProcess) {
+    if (job.supportsLogRotator() && shouldProcess && !(job instanceof hudson.matrix.MatrixConfiguration)) {
        totalChecked++
 
        BuildDiscarder bd = job.getBuildDiscarder()
