@@ -19,9 +19,10 @@ Collection of utility scripts and scriptlets for managing Jenkins configurations
 
 **Configuration (edit in scriptlet):**
 ```groovy
-boolean dryRun = true                              // Set to false to apply changes
-boolean process_all_jobs = false                   // Set to true to process ALL jobs
-String filter_DisplayName_starts_with = "STARTS_WITH_FILTER_VALUE"   // Filter prefix (ignored if process_all_jobs = true)
+boolean dryRun = true                                    // Set to false to apply changes
+boolean performRotate = true                             // Perform immediate log rotation after update
+boolean process_all_jobs = false                         // Set to true to process ALL jobs
+String filter_DisplayName_contains = "CONTAINS_FILTER_VALUE"  // Filter substring (ignored if process_all_jobs = true)
 
 // Default LogRotator values
 int default_daysToKeep = 365
