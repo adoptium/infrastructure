@@ -13,6 +13,8 @@ Collection of utility scripts and scriptlets for managing Jenkins configurations
 - Creates LogRotator for jobs that don't have one
 - Forces `removeLastBuild=true` for all jobs
 - Preserves existing artifact retention settings
+- Optional immediate log rotation (`performRotate`) to prune builds right away
+- Comprehensive statistics summary (jobs checked, updated, created)
 - Dry-run mode for safe testing
 - Works with all job types that support LogRotator
 - Uses Jenkins API (no file parsing required)
