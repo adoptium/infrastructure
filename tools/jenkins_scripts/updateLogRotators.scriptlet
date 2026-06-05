@@ -1,0 +1,147 @@
+import jenkins.model.Jenkins
+import hudson.model.Job
+import jenkins.model.BuildDiscarderProperty
+import hudson.tasks.LogRotator
+import hudson.matrix.MatrixConfiguration
+
+// Whether DRY-RUN or not..?
+boolean dryRun = true
+// Perform a logRotate() to prune builds
+boolean performRotate = true
+// Process all jobs or use filter below
+boolean process_all_jobs = false
+
+// Filter: only process jobs where displayName contains this value
+// (ignored if process_all_jobs = true)
+String filter_DisplayName_contains = "jdk25-linux-aarch64-temurin"
+
+// Default LogRotator values
+int default_daysToKeep = 365
+int default_numToKeep  = 5
+int default_artifactDaysToKeep = -1
+int default_artifactNumToKeep  = 1
+boolean default_removeLastBuild = true
+
+// Statistics counters
+int totalUpdated = 0
+int updatedDaysToKeep = 0
+int updatedNumToKeep = 0
+int updatedRemoveLastBuild = 0
+int createdLogRotator = 0
+int totalChecked = 0
+int totalLogRotate = 0
+
+Jenkins.instance.allItems(Job).each { job ->
+    // Apply filter: process all jobs OR jobs matching the filter
+    boolean shouldProcess = process_all_jobs || job.fullDisplayName.contains(filter_DisplayName_contains)
+    
+    if (job.supportsLogRotator() && shouldProcess && !(job instanceof hudson.matrix.MatrixConfiguration)) {
+       totalChecked++
+
+       BuildDiscarder bd = job.getBuildDiscarder()
+       if (bd instanceof LogRotator) {
+           def lr = (LogRotator)bd
+           def daysToKeep = lr.getDaysToKeep()
+           def numToKeep  = lr.getNumToKeep()
+           def removeLastBuild = lr.isRemoveLastBuild()
+
+           boolean changedDays = false
+           boolean changedNum = false
+           boolean changedRemoveLastBuild = false
+
+           // Default daysToKeep and numToKeep
+           if (daysToKeep == -1) {
+               daysToKeep = default_daysToKeep
+               changedDays = true
+           }
+           if (numToKeep == -1) {
+               numToKeep = default_numToKeep
+               changedNum = true
+           }
+           if (removeLastBuild != default_removeLastBuild) {
+               removeLastBuild = default_removeLastBuild
+               changedRemoveLastBuild = true
+           }
+
+           if (changedDays || changedNum || changedRemoveLastBuild) {
+               println "Updating job supporting logRotator: \"${job.fullDisplayName}\""
+               println "    Existing LogRotator : daysToKeep:${lr.getDaysToKeep()}, numToKeep:${lr.getNumToKeep()}, artifactDaysToKeep:${lr.getArtifactDaysToKeep()}, artifactNumToKeep:${lr.getArtifactNumToKeep()}, removeLastBuild:${lr.isRemoveLastBuild()}"
+               // Construct new LogRotator
+               LogRotator newLr = new LogRotator(daysToKeep, numToKeep, lr.getArtifactDaysToKeep(), lr.getArtifactNumToKeep());
+               // Set removeLastBuild
+               newLr.setRemoveLastBuild(default_removeLastBuild)
+
+               // Set new LogRotator, implicitly Saves Job to disk
+               if (dryRun) {
+                   println "    (DryRun) Would update logRotator to : daysToKeep:${newLr.getDaysToKeep()}, numToKeep:${newLr.getNumToKeep()}, artifactDaysToKeep:${newLr.getArtifactDaysToKeep()}, artifactNumToKeep:${newLr.getArtifactNumToKeep()}, removeLastBuild:${newLr.isRemoveLastBuild()}"
+               } else {
+                   println "    Saving updated logRotator to : daysToKeep:${newLr.getDaysToKeep()}, numToKeep:${newLr.getNumToKeep()}, artifactDaysToKeep:${newLr.getArtifactDaysToKeep()}, artifactNumToKeep:${newLr.getArtifactNumToKeep()}, removeLastBuild:${newLr.isRemoveLastBuild()}"
+                   job.setBuildDiscarder(newLr);
+                   if (performRotate) {
+                     print "    Performing log rotation..."
+                     job.logRotate()
+                     totalLogRotate++
+                     println "    Done"
+                   }
+               }
+
+               // Update statistics
+               totalUpdated++
+               if (changedDays) updatedDaysToKeep++
+               if (changedNum) updatedNumToKeep++
+               if (changedRemoveLastBuild) updatedRemoveLastBuild++
+           }
+       } else if (bd == null) {
+           println "Updating job supporting logRotator: \"${job.fullDisplayName}\""
+           if (dryRun) { 
+               println "    (DryRun) Has no logRotator, creating default..."
+           } else {
+               println "    Has no logRotator, creating default..."
+           }
+           // No BuildDiscarder set, create a default
+           LogRotator newLr = new LogRotator(default_daysToKeep, default_numToKeep, default_artifactDaysToKeep, default_artifactNumToKeep)
+           newLr.setRemoveLastBuild(default_removeLastBuild)
+
+           // Set new LogRotator, implicitly Saves Job to disk
+           if (dryRun) {
+               println "    (DryRun) Would set logRotator to : daysToKeep:${newLr.getDaysToKeep()}, numToKeep:${newLr.getNumToKeep()}, artifactDaysToKeep:${newLr.getArtifactDaysToKeep()}, artifactNumToKeep:${newLr.getArtifactNumToKeep()}, removeLastBuild:${newLr.isRemoveLastBuild()}"
+           } else {
+               println "    Saving new logRotator to : daysToKeep:${newLr.getDaysToKeep()}, numToKeep:${newLr.getNumToKeep()}, artifactDaysToKeep:${newLr.getArtifactDaysToKeep()}, artifactNumToKeep:${newLr.getArtifactNumToKeep()}, removeLastBuild:${newLr.isRemoveLastBuild()}"
+               job.setBuildDiscarder(newLr);
+               if (performRotate) {
+                 print "    Performing log rotation..."
+                 job.logRotate()
+                 totalLogRotate++
+                 println "    Done"
+               }
+           }
+
+           // Update statistics
+           totalUpdated++
+           createdLogRotator++
+       } else {
+           println "    WARNING: Unrecognized BuildDiscarder"
+       }
+    }
+}
+
+// Print summary
+println "\n=========================================="
+println "SUMMARY"
+println "=========================================="
+println "Total jobs checked: ${totalChecked}"
+println "Total jobs updated: ${totalUpdated}"
+println "  - Updated daysToKeep: ${updatedDaysToKeep}"
+println "  - Updated numToKeep: ${updatedNumToKeep}"
+println "  - Updated removeLastBuild: ${updatedRemoveLastBuild}"
+println "  - Created new LogRotator: ${createdLogRotator}"
+if (performRotate) {
+    println "Total log rotations: ${totalLogRotate}"
+}
+
+if (dryRun) {
+    println "\n(DRY RUN - No changes were saved)"
+}
+println "=========================================="
+
+return;
