@@ -7,16 +7,16 @@ ARG ant_512checksum="1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 RUN dnf -y update && dnf install -y unzip zip epel-release openssl gpg
 # Install Additional Repos
-RUN curl -o /tmp/gpgkey.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-10.0-8.el10.noarch.rpm'
-ARG EXPECTED_CHECKSUM=8ccfb83b742adad37de4e5e7f323510a760586263d4ebb0a8ed5fca393c7a9d4
+RUN curl -o /tmp/gpgkey.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-10.0-21.el10.noarch.rpm'
+ARG EXPECTED_CHECKSUM=22db8b48d11b75b416200a69b5055ce8f453d16c6f7243673be836a805114ec4
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then \
            echo "Checksum mismatch! Aborting installation."; \
            exit 1; \
        fi
 RUN rpm -i '/tmp/gpgkey.rpm'
-RUN curl -o /tmp/centosrepos.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-10.0-8.el10.noarch.rpm'
-ARG REPO_CHECKSUM=388bf4085af2b250c9f93ee049b3d031442cf36ee67adbf65edcbcec0caf881a
+RUN curl -o /tmp/centosrepos.rpm 'https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-10.0-21.el10.noarch.rpm'
+ARG REPO_CHECKSUM=0f8b1857616b172e1d6a3cd2d3c45b68a683916de4212947cd48ea51f3f18bbf
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$REPO_CHECKSUM" ]; then \
            echo "Checksum mismatch! Aborting installation."; \
