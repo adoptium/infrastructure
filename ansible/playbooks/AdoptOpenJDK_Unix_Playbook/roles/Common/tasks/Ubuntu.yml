@@ -23,7 +23,7 @@
   tags: patch_update
 
 - name: Create /etc/apt/keyrings directory for x86_64
-  ansible.builtin.file:
+  file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
@@ -32,15 +32,15 @@
   tags: [patch_update, azul-key]
 
 - name: Download and convert Azul Zulu GPG Package Signing Key for x86_64
-  ansible.builtin.shell: curl -fsSL https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems | gpg --dearmor > /etc/apt/keyrings/azulsystems.gpg
-  args:
+  shell:
+    cmd: curl -fsSL https://repos.azulsystems.com/RPM-GPG-KEY-azulsystems | gpg --dearmor > /etc/apt/keyrings/azulsystems.gpg
     creates: /etc/apt/keyrings/azulsystems.gpg
   when:
     - ansible_architecture == "x86_64"
   tags: [patch_update, azul-key]
 
 - name: Add Azul Zulu repository for x86_64
-  ansible.builtin.apt_repository:
+  apt_repository:
     repo: 'deb [signed-by=/etc/apt/keyrings/azulsystems.gpg] http://repos.azulsystems.com/ubuntu stable main'
     state: present
     filename: azul-zulu
