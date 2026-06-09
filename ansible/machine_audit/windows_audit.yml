@@ -87,6 +87,13 @@
         flat: yes
       when: output_file_stat.stat.exists
 
+    # Clean up temporary directory
+    - name: Clean up temporary directory
+      win_file:
+        path: "{{ remote_temp_dir }}"
+        state: absent
+      when: output_file_stat.stat.exists
+
     # Transfer machine_info.json to Nagios server via SCP
     - name: Transfer machine_info.json to Nagios server
       command: >
@@ -94,16 +101,14 @@
         {{ nagios_user }}@{{ nagios_host }}:{{ nagios_scp_dir }}
       delegate_to: localhost
       when: output_file_stat.stat.exists
+      vars:
+        ansible_port: 22
+        ansible_connection: ssh
       register: scp_result
 
-    - name: Display SCP transfer status
-      debug:
-        msg: "SCP transfer {{ 'successful' if scp_result.rc == 0 else 'failed' }}"
-      when: output_file_stat.stat.exists
-
-    # Clean up temporary directory
-    - name: Clean up temporary directory
-      win_file:
-        path: "{{ remote_temp_dir }}"
+    - name: Remove local machine_info.json file
+      file:
+        path: "{{ playbook_dir }}/collected_machine_info/{{ inventory_hostname }}_machine_info.json"
         state: absent
-      when: output_file_stat.stat.exists
+      delegate_to: localhost
+      when: output_file_stat.stat.exists and scp_result.rc == 0
