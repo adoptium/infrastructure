@@ -82,6 +82,7 @@ Additional_Packages_Ubuntu16:
 Additional_Packages_Ubuntu18:
   - libgstreamer1.0-dev                 # OpenJFX prereq
   - libgstreamer-plugins-base1.0-dev    # OpenJFX prereq
+  - ntp                                 # Required For Ubuntu 18 20+ has switched to chrony
 
 Additional_Build_Tools_x86:
   - libnuma-dev
