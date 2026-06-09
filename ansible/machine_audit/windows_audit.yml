@@ -93,7 +93,6 @@
 
 - name: Transfer machine_info.json files to Nagios server
   hosts: infrastructure-hetzner-ubuntu1604-x64-1
-  remote_user: nagios
   gather_facts: yes
 
   vars:
