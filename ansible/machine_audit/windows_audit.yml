@@ -95,7 +95,6 @@
       delegate_to: localhost
       when: output_file_stat.stat.exists
       register: scp_result
-      ignore_errors: yes
 
     - name: Display SCP transfer status
       debug:
