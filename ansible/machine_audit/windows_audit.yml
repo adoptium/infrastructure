@@ -109,7 +109,7 @@
         scp {{ playbook_dir }}/collected_machine_info/{{ inventory_hostname }}_machine_info.json
         {{ nagios_user }}@{{ nagios_host }}:{{ nagios_scp_dir }}
       delegate_to: localhost
-      # when: output_file_stat.stat.exists
+      when: output_file_stat.stat.exists
       register: scp_result
       tags: scp_transfer
 
