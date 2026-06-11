@@ -180,6 +180,9 @@ for IMAGE_NAME in "${IMAGE_LIST[@]}"; do
     # Backup original .env
     cp "$PROJECT_ROOT/.env" "$PROJECT_ROOT/.env.backup"
     
+    # Set trap to restore .env on exit/interrupt
+    trap 'if [ -f "$PROJECT_ROOT/.env.backup" ]; then mv "$PROJECT_ROOT/.env.backup" "$PROJECT_ROOT/.env"; fi' EXIT INT TERM
+    
     # Update .env with current image
     sed -i.tmp "s|^export AZURE_IMAGE_DEFINITION=.*|export AZURE_IMAGE_DEFINITION=\"$IMAGE_NAME\"|" "$PROJECT_ROOT/.env"
     sed -i.tmp "s|^export AZURE_SOURCE_IMAGE=.*|export AZURE_SOURCE_IMAGE=\"$AZURE_SOURCE_IMAGE_OVERRIDE\"|" "$PROJECT_ROOT/.env"

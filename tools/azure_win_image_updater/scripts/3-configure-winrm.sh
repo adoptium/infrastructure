@@ -122,6 +122,7 @@ echo -e "${BLUE}Executing WinRM configuration...${NC}"
 echo "This may take 2-3 minutes..."
 echo ""
 
+set +e
 RUN_COMMAND_OUTPUT=$(az vm run-command invoke \
     --resource-group "$RESOURCE_GROUP" \
     --name "$VM_NAME" \
@@ -130,6 +131,7 @@ RUN_COMMAND_OUTPUT=$(az vm run-command invoke \
     --output json 2>&1)
 
 RUN_COMMAND_STATUS=$?
+set -e
 
 echo ""
 

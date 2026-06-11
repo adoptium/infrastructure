@@ -7,6 +7,12 @@ set -e
 # Load environment variables
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+if [ ! -f "$PROJECT_ROOT/.env" ]; then
+    echo "ERROR: .env file not found at $PROJECT_ROOT/.env"
+    exit 1
+fi
+
 source "$PROJECT_ROOT/.env"
 
 # Configuration

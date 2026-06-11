@@ -109,7 +109,7 @@ source .env
 **Features:**
 - ⚠️ Prompts before starting
 - ⚠️ Prompts after failures
-- ✅ Uses `AZURE_IMAGE_DEFINITION` variable
+- ✅ Uses `AZURE_IMAGE_MULTIPLE` variable
 - ✅ Good for testing/debugging
 
 ## 📁 Project Structure

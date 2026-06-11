@@ -107,7 +107,7 @@ else
         --resource-group "$GALLERY_RG" \
         --gallery-name "$AZURE_GALLERY_NAME" \
         --gallery-image-definition "$AZURE_IMAGE_DEFINITION" \
-        --query "max_by([], &name).name" \
+        --query "sort_by(@, &publishingProfile.publishedDate)[-1].name" \
         --output tsv 2>/dev/null)
     echo "Latest version: $LATEST_VERSION"
 fi

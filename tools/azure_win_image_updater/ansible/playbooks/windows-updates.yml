@@ -17,7 +17,7 @@
           - Updates
         reboot: no
       register: update_result
-      failed_when: false
+      failed_when: (update_result.failed_update_count | default(0)) > 0
       async: 7200
       poll: 30
       tags: Windows_Updates
@@ -69,9 +69,17 @@
       when: update_result.reboot_required
       tags: Windows_Updates
 
+    - name: Fail if additional updates are available after reboot
+      fail:
+        msg: "Additional updates are available after reboot; rerun Windows updates before capturing an image."
+      when:
+        - update_result.reboot_required
+        - (additional_updates.found_update_count | default(0) | int) > 0
+      tags: Windows_Updates
+
     - name: Final status
       debug:
-        msg: "Windows Updates completed. System is {{ 'up to date' if (additional_updates.found_update_count | default(0)) == 0 else 'ready for another update cycle' }}"
+        msg: "Windows Updates completed. System is up to date."
       tags: Windows_Updates
 
 # Made with Bob

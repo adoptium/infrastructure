@@ -20,7 +20,15 @@ try {
     $output = "C:\ConfigureRemotingForAnsible.ps1"
     
     Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+    
+    # Verify checksum for supply-chain security
+    $expectedChecksum = "EBA72DF06E3E77709595F75D1D5B4D95B06602429DD2A3F7867406DF875B0C70"
+    $actualChecksum = (Get-FileHash -Path $output -Algorithm SHA256).Hash
+    if ($actualChecksum -ne $expectedChecksum) {
+        throw "Checksum mismatch for ConfigureRemotingForAnsible.ps1. Actual: $actualChecksum Expected: $expectedChecksum"
+    }
     Write-Output "Download complete: $output"
+    Write-Output "Checksum verified: $actualChecksum"
     Write-Output ""
     
     Write-Output "Running ConfigureRemotingForAnsible.ps1 with parameters:"

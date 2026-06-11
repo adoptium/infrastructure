@@ -66,12 +66,14 @@ echo "After sysprep completes, the VM will be in a stopped (deallocated) state."
 echo ""
 
 # Run the sysprep playbook
+set +e
 ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
     -i "$TEMP_INVENTORY" \
     "$PROJECT_ROOT/ansible/playbooks/run-sysprep.yml" \
     -v
 
 PLAYBOOK_EXIT_CODE=$?
+set -e
 
 if [ $PLAYBOOK_EXIT_CODE -eq 0 ]; then
     echo ""

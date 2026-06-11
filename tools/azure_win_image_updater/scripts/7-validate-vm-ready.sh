@@ -2,7 +2,7 @@
 set -e
 
 # Script 7: Validate VM is Ready for Image Capture
-# This script monitors the VM until it's stopped, then validates it's properly generalized
+# This script monitors the VM until it's stopped/deallocated, then performs basic capture readiness checks
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"

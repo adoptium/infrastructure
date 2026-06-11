@@ -63,9 +63,10 @@ log_info "Creating directory structure..."
 mkdir -p logs
 mkdir -p temp
 
-# Set up environment file template
-log_info "Creating environment file template..."
-cat > .env.template << 'EOF'
+# Set up environment file template (only if it doesn't exist)
+if [ ! -f .env.template ]; then
+    log_info "Creating environment file template..."
+    cat > .env.template << 'EOF'
 # Azure Service Principal Credentials
 # DO NOT commit this file with actual values!
 export AZURE_SUBSCRIPTION_ID="your-subscription-id"
@@ -73,6 +74,9 @@ export AZURE_TENANT_ID="your-tenant-id"
 export AZURE_CLIENT_ID="your-service-principal-client-id"
 export AZURE_CLIENT_SECRET="your-service-principal-client-secret"
 EOF
+else
+    log_info ".env.template already exists (preserving existing template)"
+fi
 
 # Check if .env file exists
 if [ ! -f .env ]; then

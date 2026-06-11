@@ -151,7 +151,7 @@ if [ "$PLAYBOOK_SUCCESS" = true ]; then
     echo "  1. Verify VM is accessible"
     echo "  2. Check for any additional updates (optional)"
     echo "  3. Run sysprep: ./scripts/6-run-sysprep.sh"
-    echo "  4. Capture image: ./scripts/2-capture-image.sh"
+    echo "  4. Capture image: ./scripts/8-capture-image.sh"
     echo ""
     exit 0
 else

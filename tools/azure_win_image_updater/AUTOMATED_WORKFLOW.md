@@ -59,7 +59,7 @@ Every action is logged with:
 ### Single Image (Direct)
 
 ```bash
-cd infrastructure.azureauto/tools/azure_win_image_updater
+cd tools/azure_win_image_updater
 source .env
 
 # Set the image to process
@@ -73,10 +73,10 @@ export AZURE_SOURCE_IMAGE="/subscriptions/$AZURE_SUBSCRIPTION_ID/resourceGroups/
 ### Multiple Images (Wrapper)
 
 ```bash
-cd infrastructure.azureauto/tools/azure_win_image_updater
+cd tools/azure_win_image_updater
 source .env
 
-# Process all images defined in AZURE_IMAGE_DEFINITION
+# Process all images defined in AZURE_IMAGE_MULTIPLE
 ./scripts/run-all-images.sh
 ```
 

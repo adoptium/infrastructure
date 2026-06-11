@@ -65,9 +65,11 @@ log_info "Creating project directory: ${PROJECT_DIR}"
 mkdir -p "${PROJECT_DIR}"
 
 # Copy project files if running from project directory
-if [ -f "config.yaml" ] && [ -d "scripts" ]; then
+if [ -f ".env.template" ] && [ -d "scripts" ]; then
     log_info "Copying project files to ${PROJECT_DIR}"
+    shopt -s dotglob  # Enable dotfile globbing
     cp -r ./* "${PROJECT_DIR}/"
+    shopt -u dotglob  # Disable dotfile globbing
     
     # Don't copy .env if it exists (security)
     if [ -f "${PROJECT_DIR}/.env" ]; then
@@ -101,35 +103,44 @@ log_info "SSH directory created. Add your public key to:"
 log_info "  ${USER_HOME}/.ssh/authorized_keys"
 
 # Create a setup completion script for the user
-cat > "${PROJECT_DIR}/complete-setup.sh" << 'EOF'
+cat > "${PROJECT_DIR}/user-setup-guide.sh" << 'EOF'
 #!/bin/bash
-# Run this script as the azureupdater user to complete setup
+# Setup guide for the azureupdater user
+# This script provides instructions - system packages must be installed by root first
 
-echo "Completing setup for Azure Image Updater..."
-
-# Run the main setup script
-cd ~/azure-image-updater
-./setup-ubuntu-node.sh
-
-# Configure credentials
+echo "=========================================="
+echo "Azure Image Updater - User Setup Guide"
+echo "=========================================="
 echo ""
-echo "Next steps:"
-echo "1. Edit .env file with your Azure credentials:"
-echo "   nano ~/azure-image-updater/.env"
+echo "IMPORTANT: System packages must be installed by root first!"
+echo "Ask your administrator to run: sudo ./setup-ubuntu-node.sh"
 echo ""
-echo "2. Edit config.yaml with your Azure resources:"
-echo "   nano ~/azure-image-updater/config.yaml"
+echo "Once system packages are installed, complete these steps:"
 echo ""
-echo "3. Source the environment file:"
-echo "   source ~/azure-image-updater/.env"
-echo ""
-echo "4. Test the setup:"
+echo "1. Configure Azure credentials:"
 echo "   cd ~/azure-image-updater"
-echo "   ./scripts/update-image.sh --dry-run"
+echo "   cp .env.template .env"
+echo "   nano .env"
+echo "   # Add your Azure credentials"
+echo ""
+echo "2. Source the environment file:"
+echo "   source .env"
+echo ""
+echo "3. Test Azure CLI access:"
+echo "   az account show"
+echo ""
+echo "4. Run a test workflow:"
+echo "   cd ~/azure-image-updater"
+echo "   ./scripts/0-check-prerequisites.sh"
+echo ""
+echo "5. For full workflow test:"
+echo "   ./scripts/test-full-workflow.sh"
+echo ""
+echo "=========================================="
 EOF
 
-chmod +x "${PROJECT_DIR}/complete-setup.sh"
-chown "${USERNAME}:${USERNAME}" "${PROJECT_DIR}/complete-setup.sh"
+chmod +x "${PROJECT_DIR}/user-setup-guide.sh"
+chown "${USERNAME}:${USERNAME}" "${PROJECT_DIR}/user-setup-guide.sh"
 
 # Summary
 log_info "=========================================="
@@ -154,9 +165,9 @@ echo ""
 echo "3. Or switch to the user directly:"
 echo "   sudo su - ${USERNAME}"
 echo ""
-echo "2. Complete the setup:"
+echo "2. Review the setup guide:"
 echo "   cd ${PROJECT_DIR}"
-echo "   ./complete-setup.sh"
+echo "   ./user-setup-guide.sh"
 echo ""
 echo "3. Configure credentials and resources:"
 echo "   nano .env"
