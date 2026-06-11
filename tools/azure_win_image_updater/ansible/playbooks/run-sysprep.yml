@@ -1,0 +1,70 @@
+---
+# Sysprep Playbook
+# Prepares Windows VM for image capture by running sysprep
+
+- name: Run Sysprep to Generalize Windows
+  hosts: windows
+  gather_facts: no
+  
+  tasks:
+    - name: Check if sysprep tag file exists
+      win_stat:
+        path: C:\Windows\System32\Sysprep\Sysprep_succeeded.tag
+      register: sysprep_tag
+      tags: sysprep
+
+    - name: Remove sysprep tag file if it exists
+      win_file:
+        path: C:\Windows\System32\Sysprep\Sysprep_succeeded.tag
+        state: absent
+      when: sysprep_tag.stat.exists
+      tags: sysprep
+
+    - name: Display warning if sysprep was previously run
+      debug:
+        msg: |
+          WARNING: Sysprep tag file was found and removed.
+          This VM may have been sysprepped before.
+          Proceeding with sysprep anyway...
+      when: sysprep_tag.stat.exists
+      tags: sysprep
+
+    - name: Display sysprep information
+      debug:
+        msg: |
+          Running sysprep with the following options:
+          - Mode: OOBE (Out-of-Box Experience)
+          - Generalize: Yes
+          - Shutdown: Yes
+          
+          WARNING: VM will shutdown after sysprep completes
+          Connection will be lost - this is expected behavior
+      tags: sysprep
+
+    - name: Run sysprep to generalize the image
+      win_shell: |
+        C:\Windows\System32\Sysprep\sysprep.exe /oobe /generalize /shutdown /quiet
+      async: 600
+      poll: 0
+      register: sysprep_job
+      tags: sysprep
+
+    - name: Wait a few seconds for sysprep to start
+      pause:
+        seconds: 10
+      tags: sysprep
+
+    - name: Display completion message
+      debug:
+        msg: |
+          Sysprep has been initiated successfully.
+          The VM will generalize and shutdown automatically.
+          This process takes 5-10 minutes.
+          
+          Next steps:
+          1. Wait for VM to reach 'Stopped' state
+          2. Run validation script to confirm VM is ready
+          3. Capture the image to gallery
+      tags: sysprep
+
+# Made with Bob

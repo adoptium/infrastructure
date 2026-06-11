@@ -1,0 +1,77 @@
+---
+# Windows Updates Playbook
+# Downloads and installs all available Windows updates
+# Based on adoptium/infrastructure Windows_Updates role
+
+- name: Install Windows Updates
+  hosts: windows
+  gather_facts: no
+  
+  tasks:
+    - name: Download and Install Windows Updates
+      win_updates:
+        category_names:
+          - CriticalUpdates
+          - SecurityUpdates
+          - UpdateRollups
+          - Updates
+        reboot: no
+      register: update_result
+      failed_when: false
+      async: 7200
+      poll: 30
+      tags: Windows_Updates
+
+    - name: Display update results
+      debug:
+        msg: |
+          Updates found: {{ update_result.found_update_count | default(0) }}
+          Updates installed: {{ update_result.installed_update_count | default(0) }}
+          Updates failed: {{ update_result.failed_update_count | default(0) }}
+          Reboot required: {{ update_result.reboot_required | default(false) }}
+      tags: Windows_Updates
+
+    - name: Reboot machine if necessary
+      win_reboot:
+        reboot_timeout: 3600
+        post_reboot_delay: 60
+      failed_when: false
+      when: update_result.reboot_required
+      tags:
+        - Windows_Updates
+        - reboot
+
+    - name: Wait for system to be ready after reboot
+      wait_for_connection:
+        timeout: 900
+        delay: 60
+      when: update_result.reboot_required
+      tags:
+        - Windows_Updates
+        - reboot
+
+    - name: Check for additional updates after reboot
+      win_updates:
+        category_names:
+          - CriticalUpdates
+          - SecurityUpdates
+          - UpdateRollups
+          - Updates
+        state: searched
+      register: additional_updates
+      failed_when: false
+      when: update_result.reboot_required
+      tags: Windows_Updates
+
+    - name: Display additional updates found
+      debug:
+        msg: "Additional updates available: {{ additional_updates.found_update_count | default(0) }}"
+      when: update_result.reboot_required
+      tags: Windows_Updates
+
+    - name: Final status
+      debug:
+        msg: "Windows Updates completed. System is {{ 'up to date' if (additional_updates.found_update_count | default(0)) == 0 else 'ready for another update cycle' }}"
+      tags: Windows_Updates
+
+# Made with Bob
