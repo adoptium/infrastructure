@@ -1,0 +1,66 @@
+# Environment files with credentials
+.env
+.env.*
+!.env.template
+Confidential.txt
+
+# Workflow state files
+.last-vm-name
+.proposed-version
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp/
+*.tmp
+
+# Azure CLI cache
+.azure/
+
+# VM details (may contain passwords)
+temp/vm_details.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Archives
+archive/
+*.zip
+*.tar.gz
+*.rar
+
+# Local configuration overrides
+config.local.yaml
+config.override.yaml
+
+# Reference files (not part of this project)
+ansible/playbooks/windows_openssh_config/
+
+# Made with Bob
