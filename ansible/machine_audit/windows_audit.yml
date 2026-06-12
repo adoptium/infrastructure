@@ -21,10 +21,6 @@
 
   tasks:
     - name: Run Run platform/windows.ps1 on Windows machines
-      vars:
-        ansible_port: 5986,
-        ansible_connection: "winrm"
-        ansible_winrm_server_cert_validation: "ignore"
       block:
       - name: Detect operating system
         set_fact:
@@ -86,14 +82,6 @@
       - name: Display file creation status
         debug:
           msg: "machine_info.json {{ 'created successfully at ' + output_file if output_file_stat.stat.exists else 'was NOT created' }}"
-
-      # Fetch machine_info.json to local host
-      - name: Fetch machine_info.json to local machine
-        fetch:
-          src: "{{ output_file }}"
-          dest: "{{ playbook_dir }}/collected_machine_info/{{ inventory_hostname }}_machine_info.json"
-          flat: yes
-        when: output_file_stat.stat.exists
 
       # Clean up temporary directory
       - name: Clean up temporary directory
