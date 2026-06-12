@@ -13,9 +13,6 @@
     packages_dir: "{{ playbook_dir }}/packages"
     remote_temp_dir: "C:\\temp\\machine_audit"
     output_file: "C:\\machine_info.json"
-    nagios_user: "78.47.239.96"
-    nagios_host: "nagios"
-    nagios_scp_dir: "/home/nagios/machine_info_files"
 
   tasks:
     - name: Run Run platform/windows.ps1 on Windows machines
@@ -99,23 +96,3 @@
           path: "{{ remote_temp_dir }}"
           state: absent
         when: output_file_stat.stat.exists
-
-    # Transfer machine_info.json to Nagios server via SCP
-    - name: Transfer machine_info.json to Nagios server
-      vars:
-        ansible_port: 22
-        ansible_connection: ssh
-      command: >
-        scp {{ playbook_dir }}/collected_machine_info/{{ inventory_hostname }}_machine_info.json
-        {{ nagios_user }}@{{ nagios_host }}:{{ nagios_scp_dir }}
-      delegate_to: localhost
-      when: output_file_stat.stat.exists
-      register: scp_result
-      tags: scp_transfer
-
-    - name: Remove local machine_info.json file
-      file:
-        path: "{{ playbook_dir }}/collected_machine_info/{{ inventory_hostname }}_machine_info.json"
-        state: absent
-      delegate_to: localhost
-      when: output_file_stat.stat.exists and scp_result.rc == 0
