@@ -21,70 +21,70 @@
 
   tasks:
 
-- name: Detect operating system
-  set_fact:
-    is_windows: "{{ ansible_os_family == 'Windows' }}"
+    - name: Detect operating system
+      set_fact:
+        is_windows: "{{ ansible_os_family == 'Windows' }}"
 
-- name: Display detected OS
-  debug:
-    msg: "Detected OS: {{ ansible_os_family }} (Windows: {{ is_windows }})"
+    - name: Display detected OS
+      debug:
+        msg: "Detected OS: {{ ansible_os_family }} (Windows: {{ is_windows }})"
 
-- name: Fail if not Windows
-  fail:
-    msg: "This playbook is designed for Windows hosts only"
-  when: not is_windows
+    - name: Fail if not Windows
+      fail:
+        msg: "This playbook is designed for Windows hosts only"
+      when: not is_windows
 
-- name: Create temporary directory on remote machine
-  win_file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ remote_temp_dir }}"
-    - "{{ remote_temp_dir }}\\packages"
+    - name: Create temporary directory on remote machine
+      win_file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ remote_temp_dir }}"
+        - "{{ remote_temp_dir }}\\packages"
 
-# Copy Windows script and packages
-- name: Copy Windows audit script to remote machine
-  win_copy:
-    src: "{{ script_dir }}/windows.ps1"
-    dest: "{{ remote_temp_dir }}\\windows.ps1"
+    # Copy Windows script and packages
+    - name: Copy Windows audit script to remote machine
+      win_copy:
+        src: "{{ script_dir }}/windows.ps1"
+        dest: "{{ remote_temp_dir }}\\windows.ps1"
 
-- name: Copy Windows packages file to remote machine
-  win_copy:
-    src: "{{ packages_dir }}/windows"
-    dest: "{{ remote_temp_dir }}\\packages\\windows"
+    - name: Copy Windows packages file to remote machine
+      win_copy:
+        src: "{{ packages_dir }}/windows"
+        dest: "{{ remote_temp_dir }}\\packages\\windows"
 
-# Execute the PowerShell script
-- name: Execute Windows audit script
-  win_shell: |
-    Set-Location "{{ remote_temp_dir }}"
-    powershell.exe -ExecutionPolicy Bypass -File "{{ remote_temp_dir }}\\windows.ps1"
-  register: windows_result
-  ignore_errors: yes
+    # Execute the PowerShell script
+    - name: Execute Windows audit script
+      win_shell: |
+        Set-Location "{{ remote_temp_dir }}"
+        powershell.exe -ExecutionPolicy Bypass -File "{{ remote_temp_dir }}\\windows.ps1"
+      register: windows_result
+      ignore_errors: yes
 
-# Display results
-- name: Display Windows script output
-  debug:
-    var: windows_result.stdout_lines
-  when: windows_result is defined
+    # Display results
+    - name: Display Windows script output
+      debug:
+        var: windows_result.stdout_lines
+      when: windows_result is defined
 
-- name: Display Windows script errors (if any)
-  debug:
-    var: windows_result.stderr_lines
-  when: windows_result is defined and windows_result.stderr_lines | length > 0
+    - name: Display Windows script errors (if any)
+      debug:
+        var: windows_result.stderr_lines
+      when: windows_result is defined and windows_result.stderr_lines | length > 0
 
-# Check if output file was created
-- name: Check if machine_info.json was created
-  win_stat:
-    path: "{{ output_file }}"
-  register: output_file_stat
+    # Check if output file was created
+    - name: Check if machine_info.json was created
+      win_stat:
+        path: "{{ output_file }}"
+      register: output_file_stat
 
-- name: Display file creation status
-  debug:
-    msg: "machine_info.json {{ 'created successfully at ' + output_file if output_file_stat.stat.exists else 'was NOT created' }}"
+    - name: Display file creation status
+      debug:
+        msg: "machine_info.json {{ 'created successfully at ' + output_file if output_file_stat.stat.exists else 'was NOT created' }}"
 
-# Clean up temporary directory
-- name: Clean up temporary directory
-  win_file:
-    path: "{{ remote_temp_dir }}"
-    state: absent
-  when: output_file_stat.stat.exists
+    # Clean up temporary directory
+    - name: Clean up temporary directory
+      win_file:
+        path: "{{ remote_temp_dir }}"
+        state: absent
+      when: output_file_stat.stat.exists
