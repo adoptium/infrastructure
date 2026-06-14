@@ -103,7 +103,7 @@ def get_os_info():
 
 def check_packages():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    packages_file = os.path.join(script_dir, '../packages/linux')
+    packages_file = os.path.join(script_dir, 'packages/linux')
     
     try:
         with open(packages_file, 'r') as f:
