@@ -6,11 +6,13 @@ Wazuh Alert Recovery and Reindexing Tool
 This script extracts and reindexes Wazuh alerts from compressed log files
 within a specific time range. Useful for data recovery, reprocessing, and migration.
 
-
 Originally Sourced From This Blog Post
 https://wazuh.com/blog/recover-your-data-using-wazuh-alert-backups/
 
 Additional validation checks and improvements added by #IBMBob
+
+Author: Wazuh Infrastructure Team
+Version: 2.0
 """
 
 import gzip
@@ -384,8 +386,7 @@ class WazuhRecovery:
                     alert_file = self._get_alert_file_path(current_time)
                     
                     if os.path.exists(alert_file):
-                        daily_alerts = self._process_file(alert_file, output_handle, chunk)
-                        chunk = daily_alerts % self.config.eps_max
+                        chunk = self._process_file(alert_file, output_handle, chunk)
                         self.stats.files_processed += 1
                         
                         # Check if output file exceeded max size
@@ -437,10 +438,9 @@ class WazuhRecovery:
             chunk: Current chunk counter for EPS limiting
             
         Returns:
-            int: Number of alerts processed from this file
+            int: Updated chunk counter for EPS rate limiting
         """
         daily_alerts = 0
-        
         try:
             self.log(f"Processing: {alert_file}")
             
@@ -593,5 +593,3 @@ For more information, see README.md
 
 if __name__ == '__main__':
     main()
-
-# Made with Bob
