@@ -3,7 +3,7 @@
 
 - name: Set Log path
   set_fact:
-    log_path: 'C:\Users\{{ ansible_user }}'
+    log_path: 'C:\ansible.log'
 
 # This task doesn't actually matter, aslong as it runs and is registered. The timestamp for the registered variable is used
 - name: Dummy task to get timestamp
@@ -35,6 +35,6 @@
 - name: Update Log File
   win_lineinfile:
     create: yes
-    path: '{{ log_path }}\ansible.log'
+    path: '{{ log_path }}'
     insertafter: EOF
     line: "{{ position }} {{ date_output.start }} {{ git_sha }}"
