@@ -18,7 +18,7 @@ The `recovery.py` script is a powerful tool designed to extract and reindex Wazu
 
 - ✅ Time-range based alert extraction
 - ✅ Configurable Events Per Second (EPS) rate limiting
-- ✅ Automatic file size management with rotation
+- ✅ Automatic file size management (truncate and restart output when limit reached)
 - ✅ Progress tracking and detailed logging
 - ✅ Dry-run mode for preview without writing
 - ✅ Graceful interrupt handling (Ctrl+C)
@@ -102,7 +102,7 @@ Extract alerts with rate limiting and detailed logging:
 
 ### Example 3: Large Dataset with Size Limit
 
-Extract large dataset with automatic file rotation:
+Extract large dataset with automatic output truncation when size limit is reached:
 
 ```bash
 ./recovery.py \
@@ -130,11 +130,13 @@ For non-standard Wazuh installations:
 
 Preview what would be processed without writing output:
 
-```bash
-./recovery.py \
+    ./recovery.py \
+      -min 2024-01-01T00:00:00 \
+      -max 2024-01-31T23:59:59 \
+      -o alerts.json \
+      --dry-run
 
 ## Filebeat Integration
-
 ### Overview
 
 For the recovered alerts to be automatically reindexed into your Wazuh indexer, the output file must be configured in Filebeat's Wazuh module. The script automatically validates this configuration and will error if the output file is not properly configured.
@@ -290,11 +292,6 @@ sudo filebeat test output
 curl -X GET "localhost:9200/wazuh-alerts-*/_count" -H 'Content-Type: application/json'
 ```
 
-  -min 2024-01-01T00:00:00 \
-  -max 2024-01-31T23:59:59 \
-  -o alerts.json \
-  --dry-run
-```
 
 ## How It Works
 
@@ -303,7 +300,7 @@ curl -X GET "localhost:9200/wazuh-alerts-*/_count" -H 'Content-Type: application
 3. **File Processing**: Reads compressed alert files (`ossec-alerts-DD.json.gz`)
 4. **Timestamp Filtering**: Filters alerts within the exact timestamp range
 5. **Rate Limiting**: Applies EPS throttling to avoid overwhelming the system
-6. **Output Management**: Writes filtered alerts and rotates file when size limit reached
+6. **Output Management**: Writes filtered alerts and truncates the output when the size limit is reached
 7. **Summary**: Provides statistics on completion
 
 ## Output Format
@@ -458,14 +455,7 @@ if 'agent' in line_json and line_json['agent']['id'] == '001':
 
 ### Integration with Indexer
 
-Pipe output directly to indexer:
-
-```bash
-./recovery.py -min ... -max ... -o - | \
-  curl -X POST "localhost:9200/_bulk" \
-    -H "Content-Type: application/x-ndjson" \
-    --data-binary @-
-```
+The generated output file is JSONL (one alert per line). For ingestion/reindexing, use Filebeat (recommended; see above) or a pipeline that supports JSON Lines input (for example, Logstash with a json_lines codec).
 
 ## Limitations
 

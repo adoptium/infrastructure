@@ -384,8 +384,7 @@ class WazuhRecovery:
                     alert_file = self._get_alert_file_path(current_time)
                     
                     if os.path.exists(alert_file):
-                        daily_alerts = self._process_file(alert_file, output_handle, chunk)
-                        chunk = daily_alerts % self.config.eps_max
+                        chunk = self._process_file(alert_file, output_handle, chunk)
                         self.stats.files_processed += 1
                         
                         # Check if output file exceeded max size
@@ -393,7 +392,7 @@ class WazuhRecovery:
                             self.log("Output file reached max size, truncating and restarting")
                             output_handle.seek(0)
                             output_handle.truncate()
-                            time.sleep(self.config.eps_max / 100)
+                            time.sleep(5)
                     else:
                         self.log(f"File not found: {alert_file}")
                         self.stats.files_not_found += 1
@@ -437,10 +436,9 @@ class WazuhRecovery:
             chunk: Current chunk counter for EPS limiting
             
         Returns:
-            int: Number of alerts processed from this file
+            int: Updated chunk counter for EPS rate limiting
         """
         daily_alerts = 0
-        
         try:
             self.log(f"Processing: {alert_file}")
             
@@ -474,13 +472,13 @@ class WazuhRecovery:
                             event_date <= self.config.max_timestamp):
                             
                             output_handle.write(json.dumps(line_json) + "\n")
-                            output_handle.flush()
                             daily_alerts += 1
                             self.stats.total_alerts += 1
                             chunk += 1
                             
                             # Apply EPS rate limiting
                             if chunk >= self.config.eps_max:
+                                output_handle.flush()
                                 chunk = 0
                                 time.sleep(1)
                     
