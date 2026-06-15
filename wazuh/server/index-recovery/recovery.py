@@ -30,9 +30,9 @@ class RecoveryConfig:
     
     def __init__(self, args: argparse.Namespace):
         """Initialize configuration from command-line arguments."""
-        self.eps_max = args.eps if args.eps else 400
+        self.eps_max = args.eps if args.eps is not None else 400
         self.wazuh_path = args.wazuh_path if args.wazuh_path else '/var/ossec/'
-        self.max_size = args.max_size if args.max_size else 1.0
+        self.max_size = args.max_size if args.max_size is not None else 1.0
         self.output_file = args.output_file
         self.log_file = args.log_file
         self.dry_run = args.dry_run
@@ -388,6 +388,7 @@ class WazuhRecovery:
                         self.stats.files_processed += 1
                         
                         # Check if output file exceeded max size
+                        output_handle.flush()
                         if os.path.getsize(self.config.output_file) >= self.config.max_bytes:
                             self.log("Output file reached max size, truncating and restarting")
                             output_handle.seek(0)
@@ -455,11 +456,6 @@ class WazuhRecovery:
                             continue
                         
                         string_timestamp = line_json['timestamp'][:19]
-                        
-                        # Ensure timestamp integrity (pad milliseconds if needed)
-                        while len(line_json['timestamp'].split("+")[0]) < 23:
-                            line_json['timestamp'] = (line_json['timestamp'][:20] + 
-                                                     "0" + line_json['timestamp'][20:])
                         
                         # Parse event timestamp
                         try:
