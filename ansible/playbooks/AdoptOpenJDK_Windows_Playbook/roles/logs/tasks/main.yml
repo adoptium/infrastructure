@@ -35,6 +35,6 @@
 - name: Update Log File
   win_lineinfile:
     create: yes
-    path: '{{ log_path }}\ansible.log'
+    path: '{{ log_path }}'
     insertafter: EOF
     line: "{{ position }} {{ date_output.start }} {{ git_sha }}"
