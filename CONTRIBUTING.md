@@ -166,6 +166,7 @@ Wherever possible, prefix the commit message with the area which you are changin
 - winPB:
 - aixPB:
 - ansible:
+- docker:
 - vagrant:
 - pbTests:
 - docs:
