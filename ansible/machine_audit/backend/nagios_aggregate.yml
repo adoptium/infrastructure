@@ -8,8 +8,8 @@
 - name: Collection machine_info.json files from all nodes
   hosts: all
   gather_facts: yes
-  become: yes
-  become_user: nagios
+  # become: yes
+  # become_user: nagios
 
   vars:
     backend_dir: "/home/nagios/machine_audit"
