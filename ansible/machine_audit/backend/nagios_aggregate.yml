@@ -60,7 +60,6 @@
 
     - name: Run main.py
       command: python3 {{ backend_dir }}/main.py
-      become_user: nagios
       register: script_output
       args:
         chdir: "{{ backend_dir }}"
