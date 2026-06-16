@@ -24,7 +24,7 @@
         name: python3
         state: present
 
-    - name: Create backend directory
+    - name: Create machiine_audit directory
       file:
         path: "{{ backend_dir }}"
         state: directory
@@ -32,7 +32,7 @@
         owner: nagios
         group: nagios
 
-    - name: Copy backend scripts to remote host
+    - name: Copy scripts to remote host
       copy:
         src: "{{ item }}"
         dest: "{{ backend_dir }}/{{ item | basename }}"
@@ -43,7 +43,7 @@
         - "{{ script_dir }}/main.py"
         - "{{ script_dir }}/getNodeList.py"
 
-    - name: Check if .env file exists in backend directory
+    - name: Check if .env file exists in target directory
       stat:
         path: "{{ backend_dir }}/.env"
       register: env_file
@@ -57,14 +57,14 @@
           password=<jenkins_api_token>
       when: not env_file.stat.exists
 
-    - name: Run backend script
+    - name: Run main.py
       command: python3 {{ backend_dir }}/main.py
       become_user: nagios
       register: script_output
       args:
         chdir: "{{ backend_dir }}"
 
-    - name: Check collected files
+    - name: Check collected machine_info.json files
       find:
         paths: "{{ backend_dir }}/collectedInfo"
         patterns: "*_machine_info.json"
