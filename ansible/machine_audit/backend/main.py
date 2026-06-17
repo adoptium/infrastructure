@@ -112,8 +112,11 @@ def main():
                 node_name = parts[0]
                 ip = parts[1]
                 port = parts[2]
-                
-                # SCP only from non windows machines for now
+
+                # Skip orka nodes
+                if "orka" in node_name:
+                    continue
+                # NOTE: only passing UNIX_LOG_PATH at the moment. Change when windows fix is in
                 if scp_machine_info(node_name, ip, port, collected_info_dir, UNIX_LOG_PATH):
                     successful += 1
                 else:
