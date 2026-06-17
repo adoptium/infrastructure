@@ -14,5 +14,7 @@ New version: TBC
 
 Previous patching issue: (Pick the latest from https://github.com/adoptium/infrastructure/issues?q=is%3Aissue%20state%3Aclosed%20jenkins%20regular%20update)
 
+Prior to updating check jenkins update service status :  http://status.jenkins.io/
+
 Part of https://github.com/adoptium/infrastructure/issues/3380
 
