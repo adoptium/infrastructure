@@ -20,6 +20,7 @@ on how we implement these goals.
 ## Important Documentation and terminology
 
 * [hosts](https://github.com/adoptium/infrastructure/blob/master/ansible/inventory.yml) - Our inventory file as used by ansible, [visualized](https://github.com/adoptium/infrastructure/blob/master/docs/adoptopenjdk.pdf) (now out of date).
+* [Adding New Machines](docs/Adding-New-Machines.md) - Complete guide for adding physical machines, VMs, or cloud instances to the infrastructure.
 * [Ansible at Adoptium](https://github.com/adoptium/infrastructure/blob/master/ansible/README.md) - Our hosts are built using Ansible Playbooks.
 * [End of support dates](https://github.com/adoptium/infrastructure/wiki/End-of-support-date-for-OS-distributions) for operating systems/distributions which we use.
 * [Infrastructure wiki](https://github.com/adoptium/infrastructure/wiki) has infromationon how to set up some of the software we use for infrastructure management.
