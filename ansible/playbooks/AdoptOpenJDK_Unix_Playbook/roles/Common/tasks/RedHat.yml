@@ -76,22 +76,19 @@
 # Additional build tools #
 ##########################
 - name: Install additional build tools if NOT RHEL8 and above
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_NOT_RHEL8Plus }}"
+  package: "name={{ Additional_Build_Tools_NOT_RHEL8Plus }} state=latest"
   when:
     - not (ansible_distribution_major_version | int >= 8)
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL7 }}"
+  package: "name={{ Additional_Build_Tools_RHEL7 }} state=latest"
   when:
     - (ansible_distribution_major_version == "7" and ansible_architecture != "aarch64")
   tags: build_tools
 
 - name: Install additional build tools for RHEL 7 on ppc64le
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL7_PPC64LE }}"
+  package: "name={{ Additional_Build_Tools_RHEL7_PPC64LE }} state=latest"
   when:
     - ansible_distribution_major_version == "7"
     - ansible_architecture == "ppc64le"
@@ -112,47 +109,41 @@
   tags: build_tools
 
 - name: Install additional build tools for RHEL on x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
+  package: "name={{ Additional_Build_Tools_RHEL_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version | int < 8
   tags: build_tools
 
 - name: Install additional build tools for RHEL8+ on x86
-  command: dnf -y install {{ item }}
-  with_items: "{{ Additional_Build_Tools_RHEL_x86 }}"
+  command: dnf -y install {{ Additional_Build_Tools_RHEL_x86 }}
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version | int >= 8
   tags: build_tools
 
 - name: Install additional build tools for RHEL10+ on x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL10plus_x86 }}"
+  package: "name={{ Additional_Build_Tools_RHEL10plus_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
     - ansible_distribution_major_version | int >= 10
   tags: build_tools
 
 - name: Install additional build tools for RHEL on ppc64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL_ppc64 }}"
+  package: "name={{ Additional_Build_Tools_RHEL_ppc64 }} state=latest"
   when:
     - ansible_architecture == "ppc64"
   tags: build_tools
 
 - name: Install additional build tools for RHEL6/7 on s390x (31-bit support)
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_RHEL7_s390x }}"
+  package: "name={{ Additional_Build_Tools_RHEL7_s390x }} state=latest"
   when:
     - ansible_architecture == "s390x"
     - (ansible_distribution_major_version == "6") or (ansible_distribution_major_version == "7")
   tags: build_tools
 
 - name: Install additional build tools for RHEL8 and above
-  command: dnf -y install {{ item }}
-  with_items: "{{ Additional_Build_Tools_RHEL8Plus }}"
+  command: dnf -y install {{ Additional_Build_Tools_RHEL8Plus }}
   when:
     - (ansible_distribution_major_version | int >= 8)
   tags: build_tools
@@ -217,9 +208,8 @@
 #############################
 - name: Install Wayland related packages (>= RHEL10)
   package:
-    name: "{{ item }}"
+    name: "{{ Additional_Test_Tool_Packages_Wayland }}"
     state: latest
-  with_items: "{{ Additional_Test_Tool_Packages_Wayland }}"
   when: ansible_distribution_major_version | int > 9
   tags: test_tools
 
@@ -228,15 +218,13 @@
 ################
 
 - name: Install Java when below Rhel8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_NOT_RHEL8Plus }}"
+  package: "name={{ Java_NOT_RHEL8Plus }} state=latest"
   when:
     - not (ansible_distribution_major_version | int >= 8)
   tags: install_java
 
 - name: Install Java when RedHat 8 and above
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Java_RHEL8Plus }}"
+  package: "name={{ Java_RHEL8Plus }} state=latest"
   when:
     - (ansible_distribution_major_version | int == 8)
     - (ansible_distribution_major_version | int == 9)

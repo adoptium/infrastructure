@@ -122,13 +122,11 @@
 ##########################
 
 - name: Call Build Packages and Tools Task for OpenJFX
-  package: "name={{ item }} state=latest"
-  with_items: "{{ OpenJFX_Build_Tool_Packages }}"
+  package: "name={{ OpenJFX_Build_Tool_Packages }} state=latest"
   tags: [build_tools, build_tools_jfx]
 
 - name: Install GCC G++ on supported platforms
-  package: "name={{ item }} state=latest"
-  with_items: "{{ gcc_compiler }}"
+  package: "name={{ gcc_compiler }} state=latest"
   when:
     - ansible_architecture != "riscv64"
     - ansible_distribution_major_version == "10"
@@ -144,36 +142,31 @@
   tags: build_tools
 
 - name: Install additional build tools for x86_64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_x86_64 }}"
+  package: "name={{ Additional_Build_Tools_x86_64 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
 
 - name: Install additional build tools for PPC64LE
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_ppc64le }}"
+  package: "name={{ Additional_Build_Tools_ppc64le }} state=latest"
   when:
     - ansible_architecture == "ppc64le"
   tags: build_tools
 
 - name: Install additional build tools for S390x
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_s390x }}"
+  package: "name={{ Additional_Build_Tools_s390x }} state=latest"
   when:
     - ansible_architecture == "s390x"
   tags: build_tools
 
 - name: Install additional build tools for aarch64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_aarch64 }}"
+  package: "name={{ Additional_Build_Tools_aarch64 }} state=latest"
   when:
     - ansible_architecture == "aarch64"
   tags: build_tools
 
 - name: Install additional build tools for riscv64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_riscv64 }}"
+  package: "name={{ Additional_Build_Tools_riscv64 }} state=latest"
   when:
     - ansible_architecture == "riscv64"
   tags: build_tools
@@ -218,15 +211,13 @@
 # Additional Test Tools #
 #########################
 - name: Install additional Test Tool Packages for x86_64
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Test_Tool_Packages_x86_64 }}"
+  package: "name={{ Test_Tool_Packages_x86_64 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
   tags: test_tools
 
 - name: Install additional Packages specific to Debian 8
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Packages_Debian8 }}"
+  package: "name={{ Additional_Packages_Debian8 }} state=latest"
   when:
     - ansible_distribution_major_version == "8"
   tags: test_tools

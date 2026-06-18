@@ -43,8 +43,7 @@
 # Additional build tools #
 ##########################
 - name: Install GCC G++ on supported platforms
-  package: "name={{ item }} state=present"
-  with_items: "{{ gcc_compiler }}"
+  package: "name={{ gcc_compiler }} state=present"
   tags: build_tools
 
 #######################

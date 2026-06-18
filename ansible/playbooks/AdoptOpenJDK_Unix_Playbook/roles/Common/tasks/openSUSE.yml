@@ -49,15 +49,13 @@
 # Additional build tools #
 ##########################
 - name: Install additional build tools for SUSE12
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SUSE12 }}"
+  package: "name={{ Additional_Build_Tools_SUSE12 }} state=latest"
   when:
     - ansible_distribution_major_version == "12"
   tags: build_tools
 
 - name: Install additional build tools for SUSE on x86
-  package: "name={{ item }} state=latest"
-  with_items: "{{ Additional_Build_Tools_SUSE_x86 }}"
+  package: "name={{ Additional_Build_Tools_SUSE_x86 }} state=latest"
   when:
     - ansible_architecture == "x86_64"
   tags: build_tools
