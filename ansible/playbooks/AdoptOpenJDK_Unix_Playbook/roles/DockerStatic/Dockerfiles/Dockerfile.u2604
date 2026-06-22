@@ -1,0 +1,51 @@
+FROM ubuntu:26.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip gnupg curl
+
+ARG ant_version="1.10.15"
+ARG ant_512checksum="1de7facbc9874fa4e5a2f045d5c659f64e0b89318c1dbc8acc6aae4595c4ffaf90a7b1ffb57f958dd08d6e086d3fff07aa90e50c77342a0aa5c9b4c36bff03a9"
+
+# Get latest jdk25 ga
+RUN wget -q 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk25.tar.gz
+RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Get sig file for latest jdk25 ga
+RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/25/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk25.sig
+RUN gpg --verify /tmp/jdk25.sig /tmp/jdk25.tar.gz
+RUN mkdir -p /usr/lib/jvm/jdk25 && tar -xpzf /tmp/jdk25.tar.gz -C /usr/lib/jvm/jdk25 --strip-components=1
+
+# Install ant
+RUN wget -q -O /tmp/ant.zip "https://archive.apache.org/dist/ant/binaries/apache-ant-$ant_version-bin.zip"
+RUN echo "$ant_512checksum  /tmp/ant.zip" > /tmp/ant.sha512
+RUN sha512sum --check --strict /tmp/ant.sha512
+RUN ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
+RUN unzip -q -d /usr/local /tmp/ant.zip
+
+# Clear up space
+RUN rm /tmp/jdk25.tar.gz /tmp/ant.zip /tmp/jdk25.sig
+
+# Set up jenkins user
+RUN useradd -m -d /home/jenkins jenkins
+RUN mkdir /home/jenkins/.ssh
+RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
+RUN chown -R jenkins /home/jenkins/.ssh
+RUN chmod -R og-rwx /home/jenkins/.ssh
+
+# Set up Nagios user
+RUN useradd -m -d /home/nagios nagios
+RUN mkdir /home/nagios/.ssh
+RUN echo "Nagios_User_SSHKey" > /home/nagios/.ssh/authorized_keys
+RUN chown -R nagios /home/nagios/.ssh
+RUN chmod -R og-rwx /home/nagios/.ssh
+
+RUN service ssh start
+CMD ["/usr/sbin/sshd","-D"]
+
+RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6 locales fontconfig fakeroot
+# Install SSL Test packages
+RUN apt-get install -qq -y gnutls-bin libnss3 libnss3-tools libnss3-dev pkg-config weston
+
+RUN locale-gen en_US.utf8
+
+EXPOSE 22
+# Start with docker run -p 2226:22 UUID

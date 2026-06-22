@@ -6,7 +6,7 @@
 - name: Install Windows Updates
   hosts: windows
   gather_facts: no
-  
+
   tasks:
     - name: Download and Install Windows Updates
       win_updates:

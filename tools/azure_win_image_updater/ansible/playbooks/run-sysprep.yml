@@ -5,7 +5,7 @@
 - name: Run Sysprep to Generalize Windows
   hosts: windows
   gather_facts: no
-  
+
   tasks:
     - name: Check if sysprep tag file exists
       win_stat:
@@ -36,7 +36,7 @@
           - Mode: OOBE (Out-of-Box Experience)
           - Generalize: Yes
           - Shutdown: Yes
-          
+
           WARNING: VM will shutdown after sysprep completes
           Connection will be lost - this is expected behavior
       tags: sysprep
@@ -60,7 +60,7 @@
           Sysprep has been initiated successfully.
           The VM will generalize and shutdown automatically.
           This process takes 5-10 minutes.
-          
+
           Next steps:
           1. Wait for VM to reach 'Stopped' state
           2. Run validation script to confirm VM is ready
