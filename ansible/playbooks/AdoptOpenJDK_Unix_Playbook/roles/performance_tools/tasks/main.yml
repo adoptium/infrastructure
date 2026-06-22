@@ -66,3 +66,4 @@
         path: /etc/sysctl.d/10-ptrace.conf
         regexp: '^kernel.yama.ptrace_scope'
         line: kernel.yama.ptrace_scope = 0
+        create: yes
