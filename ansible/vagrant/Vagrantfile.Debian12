@@ -3,7 +3,12 @@
 
 $script = <<SCRIPT
 # Configure DPKG to be noninteractive
-ENV DEBIAN_FRONTEND=noninteractive 
+export DEBIAN_FRONTEND=noninteractive
+
+# Pre-configure GRUB to prevent interactive prompts during upgrades
+echo "grub-pc grub-pc/install_devices_empty boolean true" | sudo debconf-set-selections
+echo "grub-pc grub-pc/install_devices string /dev/sda" | sudo debconf-set-selections
+
 # Update Repository Addresses For Debian
 sudo apt-get update
 sudo apt-get install tree -y

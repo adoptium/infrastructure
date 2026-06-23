@@ -123,3 +123,36 @@
   when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
         ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
   tags: docker
+
+- name: Ensure Docker daemon directory exists
+  file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+  when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
+        ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
+  tags: docker
+
+- name: Configure Docker daemon with seccomp fix
+  copy:
+    content: |
+      {
+        "seccomp-profile": "unconfined"
+      }
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  register: docker_daemon_config
+  when: ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
+        ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
+  tags: docker
+
+- name: Restart Docker service after daemon.json changes
+  service:
+    name: docker
+    state: restarted
+  when:
+    - docker_daemon_config is defined
+    - docker_daemon_config.changed
+    - ((ansible_distribution == "RedHat" or ansible_distribution == "CentOS") and (ansible_distribution_major_version | int >= 7)) or
+      ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" or ansible_distribution == "SLES"
+  tags: docker
