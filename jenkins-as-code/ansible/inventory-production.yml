@@ -1,0 +1,22 @@
+---
+# Production Jenkins Server Inventory
+# Use this for production deployments with full resources
+
+all:
+  hosts:
+    jenkins-production:
+      ansible_host: localhost
+      ansible_connection: local
+
+      # Fail2ban IP Whitelist - Production trusted IPs
+      fail2ban_ignoreip: "127.0.0.1/8 ::1 10.0.0.0/8 192.168.0.0/16 78.47.239.96 46.224.123.39 178.62.115.224 20.90.182.165"
+
+      # NTP configuration
+      ntp_service: ntpsec
+      ntp_package: ntpsec
+
+  vars:
+    # Environment identifier
+    jenkins_environment: production
+
+# Made with Bob

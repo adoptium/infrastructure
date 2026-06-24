@@ -1,0 +1,49 @@
+---
+# Example Inventory File for Jenkins Infrastructure
+# Copy this to inventory.yml and customize for your environment
+
+all:
+  hosts:
+    jenkins-master:
+      ansible_host: 192.168.1.100
+      ansible_user: root
+      ansible_ssh_private_key_file: ~/.ssh/jenkins_master_key
+      
+      # Fail2ban IP Whitelist Configuration
+      # Default includes production Jenkins master whitelist
+      # IMPORTANT: Review and update for your specific environment
+      fail2ban_ignoreip: >-
+        127.0.0.1/8
+        ::1
+        10.0.0.0/8
+        192.168.0.0/16
+        78.47.239.96
+        46.224.123.39
+        178.62.115.224
+        20.90.182.165
+      
+      # NTP Configuration (optional overrides)
+      # ntp_service: ntpsec  # Use 'ntp' for older Ubuntu versions
+      # ntp_package: ntpsec  # Use 'ntp' for older Ubuntu versions
+      
+  vars:
+    # Global variables for all hosts
+    ansible_python_interpreter: /usr/bin/python3
+    
+    # Jenkins user configuration
+    jenkins_username: jenkins
+    jenkins_home: /home/jenkins
+    jenkins_ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... jenkins@adoptopenjdk"
+
+# Example: Multiple Jenkins servers with different whitelists
+# jenkins_servers:
+#   hosts:
+#     jenkins-master-prod:
+#       ansible_host: 10.0.1.100
+#       fail2ban_ignoreip: "127.0.0.1/8 ::1 10.0.0.0/8 203.0.113.0/24"
+#     
+#     jenkins-master-staging:
+#       ansible_host: 10.0.2.100
+#       fail2ban_ignoreip: "127.0.0.1/8 ::1 10.0.0.0/8 198.51.100.0/24"
+
+# Made with Bob

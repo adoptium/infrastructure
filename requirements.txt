@@ -1,0 +1,21 @@
+# Python requirements for Ansible control node
+# Required for managing Windows hosts via WinRM
+
+# Core Ansible requirement
+ansible>=2.9
+
+# Windows management via WinRM
+pywinrm>=0.4.1
+
+# Additional WinRM dependencies for better compatibility
+requests>=2.25.0
+requests-ntlm>=1.1.0
+requests-credssp>=2.0.0
+
+# For Kerberos authentication (optional but recommended)
+# Uncomment if you need Kerberos support:
+# pywinrm[kerberos]>=0.4.1
+
+# For CredSSP authentication (optional)
+# Uncomment if you need CredSSP support:
+# pywinrm[credssp]>=0.4.1

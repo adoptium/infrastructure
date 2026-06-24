@@ -1,0 +1,122 @@
+---
+# Fail2ban configuration role - SSH protection with IP whitelisting
+# Based on existing Jenkins master configuration
+
+- name: Install fail2ban package
+  apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Create fail2ban jail.local configuration
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      ###############################################################################
+      # Fail2Ban local configuration
+      #
+      # This file overrides package defaults in jail.conf.
+      # It is safe from package upgrades and is the recommended place for
+      # site-specific configuration.
+      ###############################################################################
+      
+      [DEFAULT]
+      
+      # ---------------------------------------------------------------------------
+      # LOG BACKEND
+      # ---------------------------------------------------------------------------
+      # Use systemd/journald for log reading.
+      # Required on modern Ubuntu where authentication logs are in journald.
+      backend = systemd
+      
+      # ---------------------------------------------------------------------------
+      # FAILURE DETECTION
+      # ---------------------------------------------------------------------------
+      # Time window in which failures are counted
+      # Example: maxretry=3 means "3 failures within 10 minutes"
+      findtime = 10m
+      
+      # Number of failures allowed within findtime before banning
+      maxretry = 3
+      
+      # ---------------------------------------------------------------------------
+      # BAN DURATION
+      # ---------------------------------------------------------------------------
+      # Initial ban time for first-time offenders
+      bantime = 1h
+      
+      # Escalate ban time for repeat offenders
+      # Each repeat ban multiplies bantime by bantime.factor
+      bantime.increment = true
+      bantime.factor = 2
+      
+      # Maximum ban time cap to prevent runaway values
+      bantime.max = 1w
+      
+      # ---------------------------------------------------------------------------
+      # IP EXCLUSIONS
+      # ---------------------------------------------------------------------------
+      # IPs/networks that should NEVER be banned
+      # Always include loopback and trusted networks (VPNs, office IPs, etc.)
+      ignoreip = {{ fail2ban_ignoreip | default('127.0.0.1/8 ::1 10.0.0.0/8 192.168.0.0/16') }}
+      
+      # ---------------------------------------------------------------------------
+      # DNS HANDLING
+      # ---------------------------------------------------------------------------
+      # Disable reverse DNS lookups for speed and reliability
+      usedns = no
+      
+      ###############################################################################
+      # SSH PROTECTION
+      ###############################################################################
+      
+      [sshd]
+      
+      # Enable protection for the OpenSSH daemon
+      enabled = true
+      
+      # Protect the SSH service port
+      # "ssh" resolves to port 22 via /etc/services
+      # Change or extend if you use non-standard ports
+      port = ssh
+      
+      ###############################################################################
+      # REPEAT OFFENDER JAIL (RECIDIVE)
+      ###############################################################################
+      # Bans IPs that are repeatedly banned across any jails
+      
+      [recidive]
+      
+      # Enable repeat-offender detection
+      enabled = true
+      
+      # Fail2Ban's own log file
+      logpath = /var/log/fail2ban.log
+      
+      # If an IP is banned this many times...
+      maxretry = 5
+      
+      # ...within this time window...
+      findtime = 1d
+      
+      # ...apply a longer ban
+      bantime = 7d
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  notify: restart fail2ban
+
+- name: Ensure fail2ban service is enabled and started
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+  become: yes
+
+- name: Display fail2ban status
+  debug:
+    msg: "Fail2ban installed and configured with SSH protection and repeat offender detection"
+
+# Made with Bob

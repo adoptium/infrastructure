@@ -1,0 +1,42 @@
+---
+###############################################
+# System Update Role - Main Tasks
+###############################################
+# This role performs system updates using apt
+# It runs apt update and apt upgrade as the first role
+
+- name: Update apt package cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 0
+  register: apt_update_result
+  retries: 3
+  delay: 5
+  until: apt_update_result is succeeded
+  tags:
+    - system_update
+    - apt_update
+
+- name: Upgrade all apt packages
+  apt:
+    upgrade: dist
+    update_cache: no
+    autoremove: yes
+    autoclean: yes
+  register: apt_upgrade_result
+  retries: 3
+  delay: 5
+  until: apt_upgrade_result is succeeded
+  tags:
+    - system_update
+    - apt_upgrade
+
+- name: Display system update results
+  debug:
+    msg:
+      - "System update completed successfully"
+      - "Packages updated: {{ apt_upgrade_result.changed }}"
+  tags:
+    - system_update
+
+# Made with Bob

@@ -1,0 +1,41 @@
+[Unit]
+Description=Jenkins Automation Server
+Documentation=https://www.jenkins.io/doc/
+After=network.target
+
+[Service]
+Type=simple
+User={{ jenkins_username }}
+Group={{ jenkins_username }}
+
+# Environment
+Environment="JENKINS_HOME={{ jenkins_data_dir }}"
+EnvironmentFile=-/etc/default/jenkins
+
+# Working directory
+WorkingDirectory={{ jenkins_data_dir }}
+
+# Start Jenkins
+ExecStart={{ java_home }}/bin/java $JAVA_ARGS -jar {{ jenkins_war_path }} $JENKINS_ARGS
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=3
+StartLimitInterval=60
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=8192
+LimitNPROC=30654
+
+# Logging
+StandardOutput=append:/var/log/jenkins/jenkins.log
+StandardError=append:/var/log/jenkins/jenkins.log
+SyslogIdentifier=jenkins
+
+[Install]
+WantedBy=multi-user.target
