@@ -220,6 +220,27 @@
                 padding: 8px;
             }
         }
+        
+        /* Jenkins link icon styling */
+        .jenkins-link-icon {
+            display: inline-block;
+            margin-left: 6px;
+            vertical-align: middle;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .jenkins-link-icon:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+        
+        .jenkins-link-icon svg {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -246,8 +267,8 @@
                 <a href="{{ url_for('category_listing', category_name='static-docker') }}" class="nav-btn">🐋 Static Docker Nodes</a>
                 <a href="{{ url_for('category_listing', category_name='infrastructure') }}" class="nav-btn">🏗️ Infrastructure Nodes</a>
                 <a href="{{ url_for('category_listing', category_name='dynamic') }}" class="nav-btn">⚡ Dynamic Nodes</a>
-                <a href="{{ url_for('filter_nodes', filter_type='status', filter_value='online') }}" class="nav-btn">✅ Online</a>
-                <a href="{{ url_for('filter_nodes', filter_type='status', filter_value='offline') }}" class="nav-btn">❌ Offline</a>
+                <a href="{{ url_for('filter_by_status', status='online') }}" class="nav-btn">✅ Online</a>
+                <a href="{{ url_for('filter_by_status', status='offline') }}" class="nav-btn">❌ Offline</a>
             </div>
         </div>
         
@@ -294,6 +315,7 @@
                             <th>Node Name</th>
                             <th>Type</th>
                             <th>Arch</th>
+                            <th>Java</th>
                             <th>OS</th>
                             <th>Status</th>
                             <th>Executors</th>
@@ -304,9 +326,19 @@
                     <tbody>
                         {% for node in nodes %}
                         <tr>
-                            <td><a href="/node/{{ node.name }}" class="node-link">{{ node.name }}</a></td>
+                            <td>
+                                <a href="{{ url_for('node_detail', node_name=node.name) }}" class="node-link">{{ node.name }}</a>
+                                <a href="{{ jenkins_url }}/computer/{{ node.name }}" target="_blank" rel="noopener noreferrer" class="jenkins-link-icon" title="View {{ node.name }} in Jenkins">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#D33833" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                </a>
+                            </td>
                             <td>{{ node.os_type }}</td>
                             <td>{{ node.arch }}</td>
+                            <td>{{ node.java_version }}</td>
                             <td>{{ node.os }}</td>
                             <td class="{% if node.status == 'ONLINE' %}status-online{% else %}status-offline{% endif %}">
                                 {{ node.status }}{% if node.temp_offline %} (TEMP){% endif %}

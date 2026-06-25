@@ -10,6 +10,7 @@ A Python utility to extract and analyze Jenkins node capacity data, helping you 
 - **Cloud Capacity Reporting**: Analyze cloud provider configurations, templates, and instance limits (optional)
 - **Node Exclusion**: Exclude specific nodes from statistics and reporting without removing them from Jenkins
 - **Historical Metrics Tracking**: Record and analyze capacity trends over time with automated snapshots
+- **Direct Jenkins Links**: Quick access to Jenkins node pages with clickable icons next to every node name
 - **Detailed Reporting**: Generate both summary and detailed node reports
 - **Interactive Web Dashboard**: Real-time visualization with filtering and sorting capabilities
 - **Data Export**: Save results to JSON and CSV files for further analysis
@@ -94,10 +95,35 @@ The web dashboard provides:
 - Quick stats by function with subcategories
 - Cloud provider capacity and template information (if configured)
 - **Node exclusion management** - exclude/include nodes from reporting
+- **Direct Jenkins links** - clickable icons next to every node name
 - Detailed node information organized by category and provider
 - Interactive filtering and sorting capabilities
 - Refresh button to update data on demand
 - Responsive design for desktop and mobile
+
+#### Jenkins Node Links
+
+Every node name in the dashboard includes a clickable Jenkins icon that opens the node's page directly in Jenkins:
+
+**Features:**
+- 🔗 Small external link icon appears next to every node name
+- Opens Jenkins node page in a new tab (format: `{JENKINS_URL}/computer/{node_name}`)
+- Available on all pages: Dashboard, Category listings, Node details, Label summaries
+- Prominent "View in Jenkins" button on individual node detail pages
+- Hover effect for better visibility
+- Consistent Jenkins branding color (#D33833)
+
+**Example URLs:**
+- `https://ci.adoptium.net/computer/test-docker-rhel7-s390x-RH8host`
+- `https://ci.adoptium.net/computer/build-ubuntu2204-x64-1`
+
+**Configuration:**
+The Jenkins URL is automatically configured from your `.env` file:
+```bash
+JENKINS_URL=https://ci.adoptium.net
+```
+
+No additional configuration needed - the feature works automatically once the Jenkins URL is set.
 
 #### Node Exclusion Feature
 

@@ -277,7 +277,7 @@ def extract_container_host(node):
 
 def save_nodes_to_csv(nodes, filename: str):
     """
-    Save nodes to CSV file with node name, function, provider, OS, OS Type, architecture, container host, status.
+    Save nodes to CSV file with node name, function, provider, OS, OS Type, architecture, Java version, container host, status.
     
     Args:
         nodes: List of JenkinsNode instances
@@ -289,7 +289,7 @@ def save_nodes_to_csv(nodes, filename: str):
         writer = csv.writer(f)
         
         # Write header
-        writer.writerow(['Node Name', 'Node Function', 'Node Provider', 'OS', 'OS Type', 'Architecture', 'Container Host', 'Status', 'Online'])
+        writer.writerow(['Node Name', 'Node Function', 'Node Provider', 'OS', 'OS Type', 'Architecture', 'Java Version', 'Container Host', 'Status', 'Online'])
         
         # Write node data
         for node in sorted(nodes, key=lambda n: n.name):
@@ -297,6 +297,7 @@ def save_nodes_to_csv(nodes, filename: str):
             node_provider = extract_provider_from_name(node.name)
             node_os = extract_os_from_name(node.name)
             node_arch = get_node_architecture(node)
+            java_version = node.java_version or 'N/A'
             container_host = extract_container_host(node)
             status = 'offline' if node.offline else 'online'
             online = 'no' if node.offline else 'yes'
@@ -314,6 +315,7 @@ def save_nodes_to_csv(nodes, filename: str):
                 node_os,
                 node_os_type,
                 node_arch,
+                java_version,
                 container_host,
                 status,
                 online
