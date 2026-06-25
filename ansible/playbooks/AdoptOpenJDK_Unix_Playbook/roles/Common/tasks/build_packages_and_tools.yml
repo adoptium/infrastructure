@@ -25,7 +25,9 @@
   tags: build_tools
 
 - name: Install Build Tool Packages (RHEL8+)
-  command: dnf -y install {{ Build_Tool_Packages }}
+  package:
+    name: "{{ Build_Tool_Packages }}"
+    state: "{{ package_var }}"
   when:
     - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: build_tools
@@ -57,7 +59,9 @@
   tags: test_tools
 
 - name: Install Test Tool Packages ( RHEL8+ )
-  command: dnf -y install {{ Test_Tool_Packages }}
+  package:
+    name: "{{ Test_Tool_Packages }}"
+    state: "{{ package_var }}"
   when:
     - (ansible_distribution == "RedHat" and (ansible_distribution_major_version | int >= 8))
   tags: test_tools
