@@ -80,12 +80,12 @@ jobs:
       max-parallel: 4
       matrix:
        include:
-         - os: ubuntu20.04
-           dockerfile: "Dockerfile.u2004"
          - os: ubuntu22.04
            dockerfile: "Dockerfile.u2204"
          - os: ubuntu24.04
            dockerfile: "Dockerfile.u2404"
+         - os: ubuntu26.04
+           dockerfile: "Dockerfile.u2604"
     steps:
     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
     - name: Test Dockerfile on ${{ matrix.os }}
