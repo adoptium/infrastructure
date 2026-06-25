@@ -34,7 +34,7 @@ Two changes are needed:
 Push a legacy index template to the Wazuh indexer. This overwrites the default `wazuh` template to ensure the correct index settings are applied.
 
 ```bash
-curl -k -u admin:<password> \
+curl --cacert /etc/wazuh-indexer/certs/root-ca.pem -u admin:<password> \
   -X PUT "https://127.0.0.1:9200/_template/wazuh" \
   -H "Content-Type: application/json" \
   -d '{
@@ -123,7 +123,7 @@ sudo journalctl -u filebeat -f
 Confirm monthly indices are being created in the indexer:
 
 ```bash
-curl -k -u admin:<password> \
+curl --cacert /etc/wazuh-indexer/certs/root-ca.pem -u admin:<password> \
   -X GET "https://127.0.0.1:9200/_cat/indices/wazuh-alerts-4.x-*?v&s=index"
 ```
 
@@ -156,7 +156,7 @@ Edit `/usr/share/filebeat/module/wazuh/alerts/ingest/pipeline.json` and change `
 Re-apply the default Wazuh template with the original `version` value so it is recognised as a rollback:
 
 ```bash
-curl -k -u admin:<password> \
+curl --cacert /etc/wazuh-indexer/certs/root-ca.pem -u admin:<password> \
   -X PUT "https://127.0.0.1:9200/_template/wazuh" \
   -H "Content-Type: application/json" \
   -d '{
