@@ -10,8 +10,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 import jenkins
 import requests
-from datetime import datetime
-
 
 def create_jenkins_server():
 
@@ -41,7 +39,6 @@ def create_jenkins_server():
         print(f"Error: Could not connect to Jenkins server: {e}")
         sys.exit(1)
 
-
 def get_all_nodes(server):
 
     try:
@@ -59,8 +56,17 @@ def get_all_nodes(server):
         print(f"Error: Could not retrieve nodes from Jenkins: {e}")
         sys.exit(1)
 
+def get_node_labels(server, node_name):
+    """Get labels for a specific node from Jenkins."""
+    try:
+        node_info = server.get_node_info(node_name)
+        labels = node_info["assignedLabels"]
+        return labels if labels else []
+    except Exception as e:
+        print(f"Warning: Could not retrieve labels for node {node_name}: {e}")
+        return []
 
-def extract_os_info(nodes):
+def extract_os_info(nodes, server):
     # Extract OS and version info from node name
     result = []
     
@@ -69,64 +75,108 @@ def extract_os_info(nodes):
         os_name = None
         version = None
 
-        # Ignore dynamic windows nodes
-        if 'test-win' in node_name.lower():
+        # List of ignores:
+        if 'win' in node_name.lower():
             continue
 
-
         if 'macos' in node_name.lower():
-            # GHA dyanmic mac nodes
-            match = re.search(r'-macos(\d+)', node_name, re.IGNORECASE)
-            if match:
-                os_name = 'macos'
-                version = match.group(1)
-        else:
-            parts = node_name.split('-')
-            if len(parts) >= 3:
-                segment = parts[2]  # Third part (index 2)
+            continue
 
-                # Ubuntu pattern: ubuntu2404 -> ubuntu 24.04
-                match = re.match(r'(ubuntu)(\d{2})(\d{2})', segment, re.IGNORECASE)
-                if match:
-                    os_name = match.group(1).lower()
-                    version = f"{match.group(2)}.{match.group(3)}"
-                else:
-                    # AIX pattern: aix72 -> aix 7.2.0
-                    match = re.match(r'(aix)(\d)(\d)', segment, re.IGNORECASE)
-                    if match:
-                        os_name = match.group(1).lower()
-                        version = f"{match.group(2)}.{match.group(3)}.0"
-                    else:
-                        # CentOS Stream pattern: centosstream10 -> centos-stream 10
-                        match = re.match(r'centosstream(\d+)', segment, re.IGNORECASE)
-                        if match:
-                            os_name = 'centos-stream'
-                            version = match.group(1)
-                        else:
-                            # CentOS pattern: centos74 -> centos 7
-                            match = re.match(r'(centos)(\d{2})', segment, re.IGNORECASE)
-                            if match:
-                                os_name = match.group(1).lower()
-                                version = match.group(2)[0]  # Take first digit only
-                            else:
-                                # SLES pattern: sles15 -> sles 15.0
-                                match = re.match(r'(sles)(\d+)', segment, re.IGNORECASE)
-                                if match:
-                                    os_name = match.group(1).lower()
-                                    version = f"{match.group(2)}.0"
-                                else:
-                                    # Alpine pattern: alpine321 -> alpine 3.21
-                                    match = re.match(r'(alpine)(\d)(\d{2})', segment, re.IGNORECASE)
-                                    if match:
-                                        os_name = match.group(1).lower()
-                                        version = f"{match.group(2)}.{match.group(3)}"
-                                    else:
-                                        # Generic pattern
-                                        match = re.match(r'([a-z]+?)(\d+(?:\.\d+)*)', segment, re.IGNORECASE)
-                                        if match:
-                                            os_name = match.group(1).lower()
-                                            version = match.group(2)
+        if 'gha' in node_name.lower():
+            continue
+
+        if 'vagrant' in node_name.lower():
+            continue
+
+        if 'Built-In' in node_name.lower() or 'eclipse' in node_name.lower() or 'jenkins' in node_name.lower() or 'trss' in node_name.lower():
+            continue
         
+        # Switch based on substrings found in node name
+        if 'ubuntu' in node_name.lower():
+            os_name = 'ubuntu'
+            # Look for 4-digit number after 'ubuntu' (e.g., ubuntu1604, ubuntu2004)
+            match = re.search(r'ubuntu(\d{4})', node_name, re.IGNORECASE)
+            if match:
+                version_str = match.group(1)
+                # Split into XX.YY format (e.g., 1604 -> 16.04, 2004 -> 20.04)
+                version = f"{version_str[:2]}.{version_str[2:]}"
+
+        elif 'rhel' in node_name.lower() or 'ubi' in node_name.lower():
+            os_name = 'rhel'
+            # Look for first digit after 'rhel' or 'ubi' (e.g., rhel78 -> 7, ubi9 -> 9)
+            match = re.search(r'(?:rhel|ubi)(\d)', node_name, re.IGNORECASE)
+            if match:
+                version = match.group(1)
+                
+        elif 'centos' in node_name.lower():
+            # Check for centos-stream first (more specific)
+            if 'centosstream' in node_name.lower():
+                os_name = 'centos-stream'
+                # Look for number after 'centosstream' (e.g., centosstream10 -> 10)
+                match = re.search(r'centosstream(\d+)', node_name, re.IGNORECASE)
+                if match:
+                    version = match.group(1)
+            else:
+                # Regular centos
+                os_name = 'centos'
+                # Look for first digit after 'centos' (e.g., centos7 -> 7)
+                match = re.search(r'centos(\d)', node_name, re.IGNORECASE)
+                if match:
+                    version = match.group(1)
+
+        elif 'fedora' in node_name.lower():
+            os_name = 'fedora'
+            # Look for 2-digit number after 'fedora' (e.g., fedora38 -> 38, fedora44 -> 44)
+            match = re.search(r'fedora(\d{2})', node_name, re.IGNORECASE)
+            if match:
+                version = match.group(1)
+
+        elif 'alpine' in node_name.lower():
+            os_name = 'alpine'
+            # Look for 3-digit number after 'alpine' (e.g., alpine321 -> 3.21, alpine324 -> 3.24)
+            match = re.search(r'alpine(\d{3})', node_name, re.IGNORECASE)
+            if match:
+                version_str = match.group(1)
+                # Format as X.YZ (e.g., 321 -> 3.21)
+                version = f"{version_str[0]}.{version_str[1:]}"
+
+        elif 'sles' in node_name.lower():
+            os_name = 'sles'
+            # Extract major version from node name (e.g., sles12 -> 12)
+            match = re.search(r'sles(\d+)', node_name, re.IGNORECASE)
+            if match:
+                major = match.group(1)
+                # Get labels and search for major.minor pattern (e.g., 12.5)
+                labels = get_node_labels(server, node_name)
+                for label in labels:
+                    label_name = label.get('name', '')
+                    # Look for pattern like "12.5" where 12 matches the major version
+                    version_match = re.match(rf'^{major}\.(\d+)$', label_name)
+                    if version_match:
+                        version = label_name  # e.g., "12.5"
+                        break
+
+        elif 'aix' in node_name.lower():
+            os_name = 'aix'
+            # Extract major version from node name (e.g., aix72 -> 7.2, aix73 -> 7.3)
+            match = re.search(r'aix(\d)(\d)', node_name, re.IGNORECASE)
+            if match:
+                major = match.group(1)
+                minor = match.group(2)
+                # Default version is major.minor.0
+                version = f"{major}.{minor}.0"
+                
+                # Get labels and search for TL-X pattern to get patch version
+                labels = get_node_labels(server, node_name)
+                for label in labels:
+                    label_name = label.get('name', '')
+                    # Look for TL-X pattern (e.g., TL-5)
+                    tl_match = re.match(r'^TL-(\d+)$', label_name)
+                    if tl_match:
+                        patch = tl_match.group(1)
+                        version = f"{major}.{minor}.{patch}"
+                        break
+
         result.append({
             "name": node_name,
             "os": os_name,
@@ -134,7 +184,6 @@ def extract_os_info(nodes):
         })
     
     return result
-
 
 def check_eol_status(os_info_list):
 
@@ -205,7 +254,6 @@ def check_eol_status(os_info_list):
     
     return result
 
-
 def main():
     """Main function."""
     print("Connecting to Jenkins server...")
@@ -218,18 +266,18 @@ def main():
     
     # Extract OS information
     print("\nExtracting OS information...")
-    os_info = extract_os_info(nodes)
-    
-    # Check EOL status for each node
+    os_info = extract_os_info(nodes, server)
+    # # Check EOL status for each node
     print("\nChecking EOL status from endoflife.date API...")
     eol_info = check_eol_status(os_info)
+    # Display results
+    print("\nNode EOL Information:")
     
     # Display as JSON
     print("\nNode EOL Information (JSON):")
     print(json.dumps(eol_info, indent=2))
     
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

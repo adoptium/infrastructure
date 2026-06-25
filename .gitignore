@@ -8,3 +8,4 @@ ansible/host_vars/*
 *.swp
 ansible/machine_audit/backend/collectedInfo
 ansible/machine_audit/backend/.env
+EOL_audit/.env
