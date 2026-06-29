@@ -245,6 +245,27 @@
                 padding: 8px;
             }
         }
+        
+        /* Jenkins link icon styling */
+        .jenkins-link-icon {
+            display: inline-block;
+            margin-left: 6px;
+            vertical-align: middle;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .jenkins-link-icon:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+        
+        .jenkins-link-icon svg {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -305,6 +326,7 @@
                         <th class="sortable" data-sort="name">Node Name</th>
                         <th class="sortable" data-sort="type">Type</th>
                         <th class="sortable" data-sort="arch">Arch</th>
+                        <th class="sortable" data-sort="java">Java</th>
                         <th class="sortable" data-sort="os">OS</th>
                         {% if category in ['Static Docker Nodes', 'Build Nodes', 'Test Nodes', 'Docker Host Nodes'] %}
                         <th class="sortable" data-sort="container">Container Host</th>
@@ -320,13 +342,23 @@
                 <tbody>
                     {% for node in nodes %}
                     <tr>
-                        <td><a href="{{ url_for('node_detail', node_name=node.name) }}" style="color: #667eea; text-decoration: none; font-weight: 600;">{{ node.name }}</a></td>
+                        <td>
+                            <a href="{{ url_for('node_detail', node_name=node.name) }}" style="color: #667eea; text-decoration: none; font-weight: 600;">{{ node.name }}</a>
+                            <a href="{{ jenkins_url }}/computer/{{ node.name }}" target="_blank" rel="noopener noreferrer" class="jenkins-link-icon" title="View {{ node.name }} in Jenkins">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#D33833" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        </td>
                         <td>
                             <a href="{{ url_for('filter_by_os_type', os_type=node.os_type) }}" class="category-link">{{ node.os_type }}</a>
                         </td>
                         <td>
                             <a href="{{ url_for('filter_by_arch', arch_name=node.arch) }}" class="category-link">{{ node.arch }}</a>
                         </td>
+                        <td>{{ node.java_version }}</td>
                         <td>
                             <a href="{{ url_for('filter_by_os', os_name=node.os) }}" class="category-link">{{ node.os }}</a>
                         </td>

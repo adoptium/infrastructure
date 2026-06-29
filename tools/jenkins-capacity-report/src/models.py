@@ -26,6 +26,7 @@ class JenkinsNode(BaseModel):
     offline_cause: Optional[str] = Field(None, description="Reason for being offline")
     idle: bool = Field(..., description="Whether the node is idle")
     temporarily_offline: bool = Field(..., description="Whether the node is temporarily offline")
+    java_version: Optional[str] = Field(None, description="Java version running on the node")
     
     # Additional capacity metrics
     busy_executors: int = Field(0, description="Number of busy executors")

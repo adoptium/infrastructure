@@ -81,6 +81,12 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 APPLICATION_ROOT = os.environ.get('APPLICATION_ROOT', '')
 if APPLICATION_ROOT:
     app.config['APPLICATION_ROOT'] = APPLICATION_ROOT
+# Add Jenkins URL to template context for all templates
+@app.context_processor
+def inject_jenkins_url():
+    """Inject Jenkins URL into all templates."""
+    return {'jenkins_url': config.jenkins_url}
+
 
 # Initialize background scheduler for automatic metrics recording
 scheduler = BackgroundScheduler()
@@ -514,6 +520,7 @@ def prepare_detailed_nodes(nodes):
             'os': extract_os_from_name(node.name),
             'os_type': get_os_type(extract_os_from_name(node.name)),
             'arch': get_node_architecture(node),
+            'java_version': node.java_version or 'N/A',
             'container_host': extract_container_host(node),
             'status': 'OFFLINE' if node.offline else 'ONLINE',
             'temp_offline': node.temporarily_offline,
@@ -1415,6 +1422,7 @@ def node_detail(node_name):
 
 
 @app.route('/category/<category_name>')
+@optional_auth
 def category_listing(category_name):
     """Category listing page showing all nodes of a specific type."""
     all_nodes, summary = get_jenkins_data()
@@ -1483,6 +1491,7 @@ def category_listing(category_name):
 
 
 @app.route('/category/<category_name>/<subcategory>')
+@optional_auth
 def subcategory_listing(category_name, subcategory):
     """Subcategory listing page showing Docker or non-Docker nodes."""
     all_nodes, summary = get_jenkins_data()
@@ -1704,6 +1713,7 @@ def filter_by_status(status):
 
 
 @app.route('/label/<label_name>')
+@optional_auth
 def label_summary(label_name):
     """Label summary page showing all nodes with a specific label."""
     all_nodes, summary = get_jenkins_data()

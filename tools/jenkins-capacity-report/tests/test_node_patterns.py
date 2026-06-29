@@ -19,7 +19,13 @@ def test_node_patterns():
     
     # Test cases: (node_name, expected_provider, expected_function, expected_os, expected_arch)
     test_cases = [
-        # Azure dynamic nodes
+        # New Azure dynamic nodes (build-azure-<os>-<arch>-<hex>)
+        ("build-azure-linux-x64-df7db0", "azure", "build", "linux", "x64"),
+        ("test-azure-linux-aarch64-3f9a1c", "azure", "test", "linux", "aarch64"),
+        ("build-azure-windows-x64-a1b2c3", "azure", "build", "windows", "x64"),
+        ("test-azure-windows-x64-fe9023", "azure", "test", "windows", "x64"),
+
+        # Legacy Azure dynamic nodes (build-<os>-<arch>-<hex>) — kept for backward compat
         ("build-linux-x64-21bf53", "azure", "build", "linux", "x64"),
         ("test-linux-x64-abc123", "azure", "test", "linux", "x64"),
         ("test-windows-x64-xyz789", "azure", "test", "windows", "x64"),
@@ -133,7 +139,13 @@ def test_dynamic_node_categorization():
     
     # Test cases: (node_name, expected_is_dynamic, expected_provider, expected_function, expected_category)
     test_cases = [
-        # Azure dynamic nodes
+        # New Azure dynamic nodes
+        ("build-azure-linux-x64-df7db0", True, "azure", "build", "Dynamic Nodes"),
+        ("test-azure-linux-aarch64-3f9a1c", True, "azure", "test", "Dynamic Nodes"),
+        ("build-azure-windows-x64-a1b2c3", True, "azure", "build", "Dynamic Nodes"),
+        ("test-azure-windows-x64-fe9023", True, "azure", "test", "Dynamic Nodes"),
+
+        # Legacy Azure dynamic nodes
         ("build-linux-x64-21bf53", True, "azure", "build", "Dynamic Nodes"),
         ("test-linux-x64-abc123", True, "azure", "test", "Dynamic Nodes"),
         ("test-windows-x64-xyz789", True, "azure", "test", "Dynamic Nodes"),

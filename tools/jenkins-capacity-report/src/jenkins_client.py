@@ -60,16 +60,97 @@ class JenkinsClient:
             Dictionary containing computer information
         """
         # Use the computer API with tree parameter to get specific fields
+        # Include monitorData to get Java version information
         tree_params = (
             "computer[displayName,description,numExecutors,idle,offline,"
             "temporarilyOffline,offlineCause[description],executors[idle,currentExecutable],"
-            "assignedLabels[name]]"
+            "assignedLabels[name],monitorData[*]]"
         )
         
         return self._make_request(
             "/computer/api/json",
             params={"tree": tree_params}
         )
+    
+    def _extract_java_version(self, monitor_data: Dict[str, Any]) -> Optional[str]:
+        """
+        Extract Java version from monitor data.
+        
+        Args:
+            monitor_data: Monitor data from Jenkins API
+            
+        Returns:
+            Java version string or None if not available
+        """
+        if not monitor_data:
+            return None
+        
+        # Try different possible keys for Java version monitor
+        # Note: hudson.plugin.versioncolumn.JVMVersionMonitor is from the Version Column Plugin
+        possible_keys = [
+            "hudson.plugin.versioncolumn.JVMVersionMonitor",  # Version Column Plugin (most common)
+            "hudson.node_monitors.JVMVersionMonitor",
+            "hudson.node_monitors.JavaVersionMonitor",
+            "JVMVersionMonitor",
+            "JavaVersionMonitor"
+        ]
+        
+        for key in possible_keys:
+            if key in monitor_data:
+                version_data = monitor_data[key]
+                # Handle different response formats
+                if isinstance(version_data, dict):
+                    # May have 'version' or 'value' key
+                    version = version_data.get("version") or version_data.get("value")
+                    if version:
+                        return self._parse_java_version(str(version))
+                elif isinstance(version_data, str):
+                    # Direct string value (most common format)
+                    return self._parse_java_version(version_data)
+        
+        return None
+    
+    def _parse_java_version(self, version_string: str) -> Optional[str]:
+        """
+        Parse and normalize Java version string.
+        
+        Args:
+            version_string: Raw Java version string
+            
+        Returns:
+            Normalized version string (e.g., "11", "17", "8") or None
+        """
+        if not version_string:
+            return None
+        
+        # Extract major version from various formats:
+        # "1.8.0_352" -> "8"
+        # "11.0.16" -> "11"
+        # "17.0.5+8" -> "17"
+        # "OpenJDK 64-Bit Server VM (17.0.5+8)" -> "17"
+        
+        import re
+        
+        # Try to find version pattern
+        # Match patterns like "1.8", "11.0", "17.0", etc.
+        match = re.search(r'(\d+)\.(\d+)', version_string)
+        if match:
+            major = match.group(1)
+            minor = match.group(2)
+            
+            # Handle old Java versioning (1.8 -> 8, 1.7 -> 7)
+            if major == "1":
+                return minor
+            else:
+                return major
+        
+        # Fallback: try to find any number at the start
+        match = re.search(r'^(\d+)', version_string)
+        if match:
+            return match.group(1)
+        
+        # Return original if we can't parse it
+        return version_string
     
     def parse_node_data(self, computer_data: Dict[str, Any]) -> JenkinsNode:
         """
@@ -95,6 +176,9 @@ class JenkinsClient:
         if computer_data.get("offlineCause"):
             offline_cause = computer_data["offlineCause"].get("description")
         
+        # Extract Java version from monitor data
+        java_version = self._extract_java_version(computer_data.get("monitorData", {}))
+        
         return JenkinsNode(
             name=computer_data.get("displayName", ""),
             description=computer_data.get("description"),
@@ -104,6 +188,7 @@ class JenkinsClient:
             offline_cause=offline_cause,
             idle=computer_data.get("idle", True),
             temporarily_offline=computer_data.get("temporarilyOffline", False),
+            java_version=java_version,
             busy_executors=busy_executors,
             idle_executors=idle_executors
         )

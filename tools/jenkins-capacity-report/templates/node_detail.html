@@ -206,6 +206,33 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Jenkins link button styling */
+        .jenkins-link-btn {
+            display: inline-block;
+            background: #D33833;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(211, 56, 51, 0.3);
+        }
+        
+        .jenkins-link-btn:hover {
+            background: #b82e2a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(211, 56, 51, 0.4);
+        }
+        
+        .jenkins-link-btn svg {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -213,6 +240,14 @@
         <div class="header">
             <div class="header-content">
                 <h1>🖥️ {{ node.name }}</h1>
+                <a href="{{ jenkins_url }}/computer/{{ node.name }}" target="_blank" rel="noopener noreferrer" class="jenkins-link-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    View in Jenkins
+                </a>
                 <a href="{{ url_for('index') }}" class="back-link">← Back to Dashboard</a>
             </div>
             
@@ -285,6 +320,10 @@
                         <div class="label">Architecture</div>
                         <div class="value">{{ node.arch }}</div>
                     </div>
+                    <div class="info-item">
+                        <div class="label">Java Version</div>
+                        <div class="value">{{ node.java_version }}</div>
+                    </div>
                     {% if node.container_host %}
                     <div class="info-item">
                         <div class="label">Container Host</div>
@@ -319,7 +358,7 @@
                 {% if node.labels %}
                 <div class="labels-grid">
                     {% for label in node.labels|sort %}
-                    <a href="/label/{{ label }}" class="label-block">
+                    <a href="{{ url_for('label_summary', label_name=label) }}" class="label-block">
                         <div class="label-name">{{ label }}</div>
                     </a>
                     {% endfor %}
