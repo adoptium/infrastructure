@@ -118,13 +118,20 @@ hosts:
       - rise:
           ubuntu2404-riscv64-1: {ip: 62.210.163.198, user: ubuntu}
           ubuntu2404-riscv64-2: {ip: 62.210.163.10, user: ubuntu}
-          ubuntu2404-riscv64-3: {ip: 62.210.163.99, user: ubuntu}
           ubuntu2404-riscv64-4: {ip: 62.210.163.103, user: ubuntu}
           ubuntu2404-riscv64-5: {ip: 62.210.163.45, user: ubuntu}
           ubuntu2404-riscv64-6: {ip: 62.210.163.135, user: ubuntu}
           ubuntu2404-riscv64-7: {ip: 62.210.163.137, user: ubuntu}
           ubuntu2404-riscv64-8: {ip: 62.210.163.38, user: ubuntu}
           ubuntu2404-riscv64-9: {ip: 62.210.163.36, user: ubuntu}
+          ubuntu2404-riscv64-18: {ip: 62.210.163.61, user: ubuntu}
+          ubuntu2404-riscv64-19: {ip: 62.210.163.189, user: ubuntu}
+          ubuntu2404-riscv64-20: {ip: 62.210.163.62, user: ubuntu}
+          ubuntu2404-riscv64-21: {ip: 62.210.163.94, user: ubuntu}
+          ubuntu2404-riscv64-22: {ip: 62.210.163.126, user: ubuntu}
+          ubuntu2404-riscv64-23: {ip: 62.210.163.158, user: ubuntu}
+          ubuntu2404-riscv64-24: {ip: 62.210.163.190, user: ubuntu}
+          ubuntu2404-riscv64-25: {ip: 62.210.163.222, user: ubuntu}
 
       - skytap:
           ubuntu2404-ppc64le-1: {ip: 20.61.136.211}
