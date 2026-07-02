@@ -38,6 +38,13 @@ RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins:jenkins /home/jenkins/.ssh
 RUN chmod -R "g=,o=" /home/jenkins/.ssh
 
+# Create nagios user
+RUN useradd -m -d /home/nagios nagios
+RUN mkdir /home/nagios/.ssh
+RUN echo "Nagios_User_SSHKey" > /home/nagios/.ssh/authorized_keys
+RUN chown -R nagios /home/nagios/.ssh
+RUN chmod -R og-rwx /home/nagios/.ssh
+
 # Remove temporary files.
 RUN rm -rf /tmp/jdk25.tar.gz /tmp/ant* /tmp/jdk25.sig
 
