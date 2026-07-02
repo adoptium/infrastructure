@@ -53,6 +53,12 @@
     regexp: "Jenkins_User_SSHKey"
     replace: "{{ Jenkins_User_SSHKey }}"
 
+- name: Set nagios authorized_Key in dockerfiles
+  replace:
+    dest: /tmp/Dockerfile.{{ docker_image }}
+    regexp: "Nagios_User_SSHKey"
+    replace: "{{ Nagios_User_SSHKey }}"
+
 - name: Build {{ docker_image }} docker images {{ docker_build_command }}
   command: "{{ docker_build_command }} --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }}{{ arm32_suffix }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/"
 
