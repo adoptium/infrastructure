@@ -49,6 +49,7 @@ hosts:
 
       - azure:
           ubuntu2204-x64-1: {ip: 52.180.147.157, description: Xeon Platinum 8272CL, 16 cores, 64GB}
+          ubuntu2404-x64-2: {ip: 20.127.197.206, description: Xeon Platinum 8272CL, 8 cores, 32GB}
           win2022-x64-1: {ip: 48.217.233.156, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
           win2022-x64-2: {ip: 51.12.243.178, description: AMD EPYC 7763, 2 cores, 4GiB RAM}
           win2022-x64-3: {ip: 74.235.196.238, description: Intel Xeon PLattinum AMD EPYC 7763, 2 cores, 8GiB RAM}
