@@ -86,13 +86,14 @@ def dockerBuild(architecture, distro, staticdockerfile) {
     sh "rm -vf *.sha256"
     git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
     def git_sha = "${env.GIT_COMMIT.trim()}"
-    dockerImage =
-    docker.build("ghcr.io/adoptium/test-containers:${distro}-${architecture}",
-        "-f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/$staticdockerfile .")
-    // dockerhub is the ID of the credentials stored in Jenkins
     docker.withRegistry('https://ghcr.io', 'ghcr-adoptium') {
-        dockerImage.push()
-        sh "docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/test-containers:${distro}-${architecture} > ${distro}_linux-${architecture}.sha256"
+        sh """
+            docker buildx build --platform linux/$architecture \
+            --provenance=false \
+            -f ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/$staticdockerfile \
+            -t ghcr.io/adoptium/test-containers:${distro}-${architecture} --push .
+            docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/adoptium/test-containers:${distro}-${architecture} > ${distro}_linux-${architecture}.sha256
+        """
         archiveArtifacts artifacts: '*linux*.sha256', fingerprint: true
     }
 }
@@ -113,7 +114,7 @@ def dockerManifest() {
             docker manifest inspect $S390X 2>/dev/null | grep mediaType
             docker manifest inspect $PPC64LE 2>/dev/null | grep mediaType
             echo "Debug SF01"
-            docker manifest create $TARGET $AMD64 $ARM64 $S390X $PPC64LE
+            docker manifest create --amend $TARGET $AMD64 $ARM64 $S390X $PPC64LE
             docker manifest annotate $TARGET $AMD64 --arch amd64 --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64 --os linux
             docker manifest annotate $TARGET $S390X --arch s390x --os linux
@@ -125,7 +126,7 @@ def dockerManifest() {
             AMD64=${TARGET}-amd64
             ARM64=${TARGET}-arm64
 #           PPC64LE=${TARGET}-ppc64le
-            docker manifest create $TARGET $AMD64 $ARM64 # $PPC64LE
+            docker manifest create --amend $TARGET $AMD64 $ARM64 # $PPC64LE
             docker manifest annotate $TARGET $AMD64 --arch amd64     --os linux
             docker manifest annotate $TARGET $ARM64 --arch arm64     --os linux
 #            docker manifest annotate $TARGET $PPC64LE --arch ppc64le --os linux
