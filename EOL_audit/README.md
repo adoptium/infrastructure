@@ -76,7 +76,7 @@ No command-line arguments are required. The script reads all configuration from 
 
 ## Output
 
-Below is a small snipped of the expected output:
+Below is a small snippet of the expected output:
 
 ```json
 [
