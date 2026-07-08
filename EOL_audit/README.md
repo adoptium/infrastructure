@@ -31,7 +31,7 @@ pip install -r requirements.txt
 Create a `.env` file in the `EOL_audit/` directory (next to the script) with the following variables:
 
 ```dotenv
-url=https://your-jenkins-instance.example.com
+url=https://your-jenkins-instance.example.com:80
 username=your-jenkins-username
 password=your-jenkins-api-token
 ```
@@ -56,7 +56,7 @@ No command-line arguments are required. The script reads all configuration from 
 2. **Retrieve nodes** — Fetches all Jenkins nodes and filters to those whose names contain `test`, `build`, `dockerhost`, or `macos`.
 3. **Extract OS information** — Parses each node name with regular expressions to identify the OS family and version. The following platforms are recognised:
 
-   | OS | Example node name | Detected version |
+   | OS | Example node name | Example etected version |
    |---|---|---|
    | Ubuntu | `ubuntu2204-build` | `22.04` |
    | RHEL / UBI | `rhel9-test`, `ubi8-build` | `9`, `8` |
