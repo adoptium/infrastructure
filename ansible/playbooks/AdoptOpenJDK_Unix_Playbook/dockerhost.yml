@@ -37,6 +37,8 @@
     - Vendor
     - IPv6
     - Docker
+    - role: Qemu-Config   # Ubuntu 20+ x86_64 only — sets up QEMU binfmt with F flag for riscv64 container emulation
+      tags: [qemu_config, adoptopenjdk]
     - DockerStatic
     - role: housekeeping           # override mode when needed
       vars:
