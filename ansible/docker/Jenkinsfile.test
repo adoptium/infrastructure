@@ -143,7 +143,12 @@ def cosign() {
               IMAGE="$(cat $IMAGE_SHA)"
               echo "Running cosign against image $IMAGE"
               cosign sign "$IMAGE" --oidc-issuer=https://auth.eclipse.org/auth/realms/foundation-service-accounts --identity-token=token.txt -y
-              cosign verify "${IMAGE}" --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/foundation-service-accounts --certificate-identity=temurin-bot@eclipse.org
+              # next line could be explicit and use --certificate-oidc-issuer=https://auth.eclipse.org/auth/realms/foundation-service-accounts --certificate-identity=temurin-bot@eclipse.org
+              cosign verify --certificate-identity-regexp '.*' --certificate-oidc-issuer-regexp '.*' "${IMAGE}" | jq .
+              cosign download signature "$IMAGE" > signatures.json
+              jq -r '.Payload' signatures.json | while read -r payload; do
+                   echo "$payload" | base64 -d | jq .
+              done
             done
             rm -vf token.txt
         '''
