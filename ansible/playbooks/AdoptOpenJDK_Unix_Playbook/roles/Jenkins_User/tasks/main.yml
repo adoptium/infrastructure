@@ -114,3 +114,21 @@
     - ansible_distribution_major_version == "6" or ansible_distribution_major_version == "7"
   tags:
     - jenkins_user
+
+- name: Ensure proper limits are set in /etc/security/limits.conf (Ubuntu 22+)
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ Jenkins_Username }} {{ item.limit_type }} {{ item.limit_name }} {{ item.limit_value }}"
+    state: present
+  with_items:
+    - {limit_type: 'soft', limit_name: 'core', limit_value: 'unlimited'}
+    - {limit_type: 'hard', limit_name: 'core', limit_value: 'unlimited'}
+    - {limit_type: 'soft', limit_name: 'nofile', limit_value: '1048576'}
+    - {limit_type: 'hard', limit_name: 'nofile', limit_value: '1048576'}
+    - {limit_type: 'soft', limit_name: 'nproc', limit_value: 'unlimited'}
+    - {limit_type: 'hard', limit_name: 'nproc', limit_value: 'unlimited'}
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version | int >= 22
+  tags:
+    - jenkins_user

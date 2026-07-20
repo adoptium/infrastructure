@@ -22,3 +22,26 @@
     reload: yes
   when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "8"
   tags: adoptopenjdk
+
+- name: Set kernel.core_pattern in sysctl.conf (Ubuntu 22+)
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^kernel\.core_pattern\s*='
+    line: 'kernel.core_pattern = core.%p'
+    state: present
+    backup: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version | int >= 22
+  tags: adoptopenjdk
+
+- name: Apply sysctl settings immediately (Ubuntu 22+)
+  sysctl:
+    name: kernel.core_pattern
+    value: 'core.%p'
+    state: present
+    reload: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version | int >= 22
+  tags: adoptopenjdk
