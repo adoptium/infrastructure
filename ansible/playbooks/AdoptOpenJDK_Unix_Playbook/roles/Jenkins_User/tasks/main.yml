@@ -115,11 +115,13 @@
   tags:
     - jenkins_user
 
-- name: Ensure proper limits are set in /etc/security/limits.conf (Ubuntu 22+)
+- name: Ensure proper limits are set in /etc/security/limits.d/ (Ubuntu 22+)
   lineinfile:
-    path: /etc/security/limits.conf
+    path: /etc/security/limits.d/jenkins.conf
     line: "{{ Jenkins_Username }} {{ item.limit_type }} {{ item.limit_name }} {{ item.limit_value }}"
     state: present
+    create: true
+    mode: '0644'
   with_items:
     - {limit_type: 'soft', limit_name: 'core', limit_value: 'unlimited'}
     - {limit_type: 'hard', limit_name: 'core', limit_value: 'unlimited'}

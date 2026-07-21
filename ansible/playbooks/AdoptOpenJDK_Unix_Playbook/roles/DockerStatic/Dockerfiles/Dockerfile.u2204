@@ -28,6 +28,10 @@ RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
 
+# Allow core dumps for the jenkins user via PAM limits
+RUN echo "jenkins soft core unlimited" > /etc/security/limits.d/jenkins-core.conf \
+    && echo "jenkins hard core unlimited" >> /etc/security/limits.d/jenkins-core.conf
+
 RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 
