@@ -35,7 +35,7 @@ RUN su jenkins -c "mkdir -m 0755 /tmp/.X11-unix"
 RUN dnf install -y perl
 # turbojpeg needed as prereq for weston but it's not the UBI CRB repo so pull from CS10 one
 RUN dnf install -y --enablerepo=crb turbojpeg
-RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info
+RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info which
 RUN dnf install -y coreutils --allowerasing curl
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools
