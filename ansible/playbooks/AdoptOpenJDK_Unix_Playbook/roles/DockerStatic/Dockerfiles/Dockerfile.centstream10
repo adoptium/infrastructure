@@ -36,7 +36,7 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 CMD ["/usr/sbin/sshd","-D"]
 
 RUN dnf -y --enablerepo=crb install turbojpeg
-RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info
+RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info which
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools openssl
 # ENTRYPOINT /usr/lib/jvm/jdk25/bin/java
