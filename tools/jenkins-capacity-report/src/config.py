@@ -27,7 +27,8 @@ class Config:
         rbac_enabled: Optional[bool] = None,
         session_timeout_minutes: Optional[int] = None,
         flask_secret_key: Optional[str] = None,
-        node_patterns_config: Optional[str] = None
+        node_patterns_config: Optional[str] = None,
+        eol_status_file: Optional[str] = None
     ):
         """
         Initialize configuration.
@@ -43,12 +44,14 @@ class Config:
             session_timeout_minutes: Session timeout in minutes (overrides env var)
             flask_secret_key: Flask secret key for sessions (overrides env var)
             node_patterns_config: Path to node patterns JSON file (overrides env var)
+            eol_status_file: Path to EOL status JSON file produced by check_os_eol.py (overrides env var)
         """
         self.jenkins_url = jenkins_url or os.getenv("JENKINS_URL")
         self.username = username or os.getenv("JENKINS_USERNAME")
         self.api_token = api_token or os.getenv("JENKINS_API_TOKEN")
         self.cloud_config_file = cloud_config_file or os.getenv("CLOUD_CONFIG_FILE", "./data/clouds.xml.live")
         self.node_patterns_config = node_patterns_config or os.getenv("NODE_PATTERNS_CONFIG", "./config/node_patterns.json")
+        self.eol_status_file = eol_status_file or os.getenv("EOL_STATUS_FILE", "./data/eol_status.json")
         logger.info(f"Config initialized with cloud_config_file: {self.cloud_config_file}")
         logger.info(f"Config initialized with node_patterns_config: {self.node_patterns_config}")
         

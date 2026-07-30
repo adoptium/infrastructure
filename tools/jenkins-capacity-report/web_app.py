@@ -620,6 +620,39 @@ def is_cloud_config_available():
         logger.error(f"Error checking cloud config availability: {e}")
         return False
 
+
+def get_eol_data():
+    """Read EOL status data from the JSON file produced by check_os_eol.py.
+
+    Returns:
+        List of dicts with keys: name, os, version, isEOL, eolFrom
+        sorted by os (nulls last) then name.
+        Empty list if the file does not exist or cannot be parsed.
+    """
+    try:
+        eol_path = Path(config.eol_status_file)
+        if not eol_path.exists():
+            return []
+        import json
+        with eol_path.open() as f:
+            data = json.load(f)
+        # Sort: known OS first (alphabetically), then nulls; secondary sort by name
+        data.sort(key=lambda d: (d.get('os') is None, d.get('os') or '', d.get('name') or ''))
+        return data
+    except Exception as e:
+        logger.error(f"Error reading EOL status file: {e}")
+        return []
+
+
+def is_eol_data_available():
+    """Return True if the EOL status file exists and is non-empty."""
+    try:
+        eol_path = Path(config.eol_status_file)
+        return eol_path.exists() and eol_path.stat().st_size > 2
+    except Exception:
+        return False
+
+
 def recalculate_summary(nodes):
     """Recalculate capacity summary for a filtered list of nodes.
 
@@ -785,6 +818,10 @@ def index():
     cloud_capacity = get_cloud_capacity_data()
     cloud_config_available = is_cloud_config_available()
 
+    # EOL status data
+    eol_data = get_eol_data()
+    eol_data_available = is_eol_data_available()
+
     # Get current user role for UI permissions
     current_user = get_current_user()
     current_role = get_current_user_role()
@@ -800,6 +837,8 @@ def index():
         excluded_quick_stats=excluded_quick_stats,
         cloud_capacity=cloud_capacity,
         cloud_config_available=cloud_config_available,
+        eol_data=eol_data,
+        eol_data_available=eol_data_available,
         timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         current_user=current_user,
         current_role=current_role
@@ -1237,6 +1276,21 @@ def get_rbac_status():
     return jsonify({
         'rbac_enabled': config.rbac_enabled,
         'message': 'RBAC is enabled' if config.rbac_enabled else 'RBAC is disabled - all endpoints are accessible'
+    })
+
+
+@app.route('/api/eol-status', methods=['GET'])
+@optional_auth
+def eol_status():
+    """API endpoint returning EOL status data from the pre-generated JSON file."""
+    data = get_eol_data()
+    return jsonify({
+        'available': len(data) > 0,
+        'data': data,
+        'count': len(data),
+        'eol_count': sum(1 for d in data if d.get('isEOL') is True),
+        'supported_count': sum(1 for d in data if d.get('isEOL') is False),
+        'unknown_count': sum(1 for d in data if d.get('isEOL') is None),
     })
 
 
