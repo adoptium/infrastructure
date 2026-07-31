@@ -6,6 +6,7 @@ import sys
 import os
 import re
 import json
+import argparse
 from pathlib import Path
 from dotenv import load_dotenv
 import jenkins
@@ -256,27 +257,32 @@ def check_eol_status(os_info_list):
 
 def main():
     """Main function."""
-    print("Connecting to Jenkins server...")
+    parser = argparse.ArgumentParser(description="Check EOL status for Jenkins node operating systems.")
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help="Suppress informational output; print only the JSON result.")
+    args = parser.parse_args()
+
+    def log(msg):
+        if not args.quiet:
+            print(msg)
+
+    log("Connecting to Jenkins server...")
     server = create_jenkins_server()
-    print("Connected successfully!")
-    
-    print("\nRetrieving all nodes...")
+    log("Connected successfully!")
+
+    log("\nRetrieving all nodes...")
     nodes = get_all_nodes(server)
-    print(f"Found {len(nodes)} nodes")
-    
-    # Extract OS information
-    print("\nExtracting OS information...")
+    log(f"Found {len(nodes)} nodes")
+
+    log("\nExtracting OS information...")
     os_info = extract_os_info(nodes, server)
-    # # Check EOL status for each node
-    print("\nChecking EOL status from endoflife.date API...")
+
+    log("\nChecking EOL status from endoflife.date API...")
     eol_info = check_eol_status(os_info)
-    # Display results
-    print("\nNode EOL Information:")
-    
-    # Display as JSON
-    print("\nNode EOL Information (JSON):")
+
+    log("\nNode EOL Information (JSON):")
     print(json.dumps(eol_info, indent=2))
-    
+
     return 0
 
 if __name__ == "__main__":
