@@ -1301,7 +1301,7 @@
                         The EOL status file (<code>{{ config.eol_status_file if config is defined else 'data/eol_status.json' }}</code>) has not been generated yet.
                     </p>
                     <p style="color: #856404;">To generate it, run the following command from the repository root:</p>
-                    <pre style="background:#fff8e1; padding:12px; border-radius:6px; margin-top:10px; font-size:0.9em; overflow-x:auto;">python EOL_audit/check_os_eol.py &gt; tools/jenkins-capacity-report/data/eol_status.json</pre>
+                    <pre style="background:#fff8e1; padding:12px; border-radius:6px; margin-top:10px; font-size:0.9em; overflow-x:auto;">python EOL_audit/check_os_eol.py -q &gt; tools/jenkins-capacity-report/data/eol_status.json</pre>
                     <p style="color:#856404; margin-top:10px;">Then refresh the dashboard.</p>
                 </div>
                 {% endif %}
