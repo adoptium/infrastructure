@@ -1318,17 +1318,62 @@
 
                 {% if machine_audit_data and machine_audit_data | length > 0 %}
 
-                <!-- Search bar -->
-                <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
-                    <input type="text" id="audit-search" placeholder="Search machines…"
-                           oninput="filterAuditTable()"
-                           style="flex: 1; padding: 9px 14px; border: 2px solid #5B2A86; border-radius: 6px; font-size: 0.95em; outline: none;">
-                    <label style="font-size: 0.9em; color: #555; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                        <input type="checkbox" id="audit-missing-only" onchange="filterAuditTable()"
-                               style="width:16px; height:16px; accent-color:#dc3545; cursor:pointer;">
-                        Show only machines with missing packages
-                    </label>
-                    <span id="audit-filter-summary" style="font-size: 0.85em; color: #666; white-space: nowrap;"></span>
+                <!-- Tool filter panel -->
+                <div style="background:#f8f9fa; border:2px solid #5B2A86; border-radius:8px; padding:16px 20px; margin-bottom:20px;">
+
+                    <!-- Row 1: search + missing-only -->
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:14px;">
+                        <input type="text" id="audit-search" placeholder="Search machines…"
+                               oninput="filterAuditTable()"
+                               style="flex:1; padding:8px 13px; border:2px solid #5B2A86; border-radius:6px; font-size:0.95em; outline:none; background:white;">
+                        <label style="font-size:0.9em; color:#555; display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap;">
+                            <input type="checkbox" id="audit-missing-only" onchange="filterAuditTable()"
+                                   style="width:16px; height:16px; accent-color:#dc3545; cursor:pointer;">
+                            Show only machines with missing packages
+                        </label>
+                        <span id="audit-filter-summary" style="font-size:0.85em; color:#666; white-space:nowrap;"></span>
+                    </div>
+
+                    <!-- Row 2: tool bubbles + mode toggle -->
+                    <div style="display:flex; gap:16px; align-items:flex-start;">
+
+                        <!-- Bubble area -->
+                        <div style="flex:1;">
+                            <div style="font-size:0.8em; font-weight:600; color:#5B2A86; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Filter by tool</div>
+                            <div id="audit-tool-bubbles" style="display:flex; flex-wrap:wrap; gap:6px;">
+                                {% set all_tool_names = [] %}
+                                {% for m in machine_audit_data %}
+                                    {% set build_pkgs_b = m.packages.build_packages if m.packages is defined else {} %}
+                                    {% set test_pkgs_b  = m.packages.test_packages  if m.packages is defined else {} %}
+                                    {% for pkg_name in build_pkgs_b %}{% if pkg_name not in all_tool_names %}{% set _ = all_tool_names.append(pkg_name) %}{% endif %}{% endfor %}
+                                    {% for pkg_name in test_pkgs_b  %}{% if pkg_name not in all_tool_names %}{% set _ = all_tool_names.append(pkg_name) %}{% endif %}{% endfor %}
+                                {% endfor %}
+                                {% for tool in all_tool_names | sort %}
+                                <button type="button"
+                                        class="audit-tool-bubble"
+                                        data-tool="{{ tool }}"
+                                        onclick="toggleToolBubble(this)"
+                                        style="padding:4px 12px; border-radius:20px; border:2px solid #5B2A86; background:white; color:#5B2A86; font-size:0.85em; font-weight:600; cursor:pointer; transition:all 0.15s;">
+                                    {{ tool }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Mode toggle -->
+                        <div style="flex-shrink:0;">
+                            <div style="font-size:0.8em; font-weight:600; color:#5B2A86; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Mode</div>
+                            <div style="display:flex; border:2px solid #5B2A86; border-radius:6px; overflow:hidden;">
+                                <button type="button" id="audit-mode-or"  onclick="setAuditMode('OR')"
+                                        style="padding:6px 16px; border:none; background:#5B2A86; color:white; font-weight:700; font-size:0.9em; cursor:pointer;">OR</button>
+                                <button type="button" id="audit-mode-and" onclick="setAuditMode('AND')"
+                                        style="padding:6px 16px; border:none; background:white; color:#5B2A86; font-weight:700; font-size:0.9em; cursor:pointer; border-left:2px solid #5B2A86;">AND</button>
+                                <button type="button" id="audit-mode-not" onclick="setAuditMode('NOT')"
+                                        style="padding:6px 16px; border:none; background:white; color:#5B2A86; font-weight:700; font-size:0.9em; cursor:pointer; border-left:2px solid #5B2A86;">NOT</button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
                 <!-- Summary cards -->
@@ -1378,14 +1423,33 @@
                         {% set test_pkgs  = m.packages.test_packages  if m.packages is defined else {} %}
                         {% set all_pkgs   = (build_pkgs.values() | list) + (test_pkgs.values() | list) %}
                         {% set has_missing = all_pkgs | selectattr('installed', 'equalto', false) | list | length > 0 %}
+                        {% set installed_names = [] %}
+                        {% for pkg_name, pkg in build_pkgs.items() %}{% if pkg.installed %}{% set _ = installed_names.append(pkg_name) %}{% endif %}{% endfor %}
+                        {% for pkg_name, pkg in test_pkgs.items() %}{% if pkg.installed %}{% set _ = installed_names.append(pkg_name) %}{% endif %}{% endfor %}
                         <tr data-machine="{{ m.machine_name }}"
                             data-has-missing="{{ 'true' if has_missing else 'false' }}"
+                            data-installed-pkgs="{{ installed_names | join(',') }}"
                             {% if has_missing %}style="background: #fff8f8;"{% endif %}>
-                            <td style="font-weight: 600;">{{ m.machine_name }}</td>
+                            <td>
+                                <a href="{{ url_for('node_detail', node_name=m.machine_name) }}" style="color:#5B2A86; text-decoration:none; font-weight:600;">{{ m.machine_name }}</a>
+                                <a href="https://ci.adoptium.net/computer/{{ m.machine_name }}" target="_blank" rel="noopener noreferrer" class="jenkins-link-icon" title="View {{ m.machine_name }} in Jenkins">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#D33833" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                </a>
+                            </td>
                             <td>{{ m.os.name if m.os is defined else '—' }}</td>
                             <td>{{ m.os.version if m.os is defined else '—' }}</td>
                             <td>{{ m.os.architecture if m.os is defined else '—' }}</td>
-                            <td style="font-size: 0.85em; color: #555;">{{ m.last_executed_playbook if m.last_executed_playbook is defined else '—' }}</td>
+                            <td style="font-size: 0.85em; color: #555;">
+                                {% if 'test-docker' in m.machine_name %}
+                                    <em style="color: #888;">Playbooks do not run on static docker containers</em>
+                                {% else %}
+                                    {{ m.last_executed_playbook if m.last_executed_playbook is defined else '—' }}
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if build_pkgs %}
                                 <details>
@@ -1399,30 +1463,26 @@
                                             <span style="color:#28a745; font-weight:600;">All {{ b_total }} installed</span>
                                         {% endif %}
                                     </summary>
-                                    <table style="margin-top: 6px; margin-bottom: 2px; font-size: 0.85em; box-shadow: none; border-radius: 4px;">
-                                        <thead>
-                                            <tr>
-                                                <th style="background:#495057; padding: 6px 10px;">Package</th>
-                                                <th style="background:#495057; padding: 6px 10px;">Status</th>
-                                                <th style="background:#495057; padding: 6px 10px;">Path</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for pkg_name, pkg in build_pkgs.items() %}
-                                            <tr>
-                                                <td style="padding: 4px 10px;">{{ pkg_name }}</td>
-                                                <td style="padding: 4px 10px;">
-                                                    {% if pkg.installed %}
-                                                        <span class="eol-badge supported" style="font-size:0.8em;">✓ Installed</span>
-                                                    {% else %}
-                                                        <span class="eol-badge eol" style="font-size:0.8em;">✗ Missing</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td style="padding: 4px 10px; font-family: monospace; color: #555;">{{ pkg.path or '—' }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    <div style="margin-top: 6px; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; font-size: 0.85em;">
+                                        <div style="display: grid; grid-template-columns: 1fr 110px 1fr; background: #495057; color: white; font-weight: 600;">
+                                            <div style="padding: 5px 10px;">Package</div>
+                                            <div style="padding: 5px 10px;">Status</div>
+                                            <div style="padding: 5px 10px;">Path</div>
+                                        </div>
+                                        {% for pkg_name, pkg in build_pkgs.items() %}
+                                        <div style="display: grid; grid-template-columns: 1fr 110px 1fr; border-top: 1px solid #dee2e6;">
+                                            <div style="padding: 4px 10px;">{{ pkg_name }}</div>
+                                            <div style="padding: 4px 10px;">
+                                                {% if pkg.installed %}
+                                                    <span class="eol-badge supported" style="font-size:0.8em;">✓ Installed</span>
+                                                {% else %}
+                                                    <span class="eol-badge eol" style="font-size:0.8em;">✗ Missing</span>
+                                                {% endif %}
+                                            </div>
+                                            <div style="padding: 4px 10px; font-family: monospace; color: #555; word-break: break-all;">{{ pkg.path or '—' }}</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
                                 </details>
                                 {% else %}—{% endif %}
                             </td>
@@ -1439,30 +1499,26 @@
                                             <span style="color:#28a745; font-weight:600;">All {{ t_total }} installed</span>
                                         {% endif %}
                                     </summary>
-                                    <table style="margin-top: 6px; margin-bottom: 2px; font-size: 0.85em; box-shadow: none; border-radius: 4px;">
-                                        <thead>
-                                            <tr>
-                                                <th style="background:#495057; padding: 6px 10px;">Package</th>
-                                                <th style="background:#495057; padding: 6px 10px;">Status</th>
-                                                <th style="background:#495057; padding: 6px 10px;">Path</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for pkg_name, pkg in test_pkgs.items() %}
-                                            <tr>
-                                                <td style="padding: 4px 10px;">{{ pkg_name }}</td>
-                                                <td style="padding: 4px 10px;">
-                                                    {% if pkg.installed %}
-                                                        <span class="eol-badge supported" style="font-size:0.8em;">✓ Installed</span>
-                                                    {% else %}
-                                                        <span class="eol-badge eol" style="font-size:0.8em;">✗ Missing</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td style="padding: 4px 10px; font-family: monospace; color: #555;">{{ pkg.path or '—' }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    <div style="margin-top: 6px; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; font-size: 0.85em;">
+                                        <div style="display: grid; grid-template-columns: 1fr 110px 1fr; background: #495057; color: white; font-weight: 600;">
+                                            <div style="padding: 5px 10px;">Package</div>
+                                            <div style="padding: 5px 10px;">Status</div>
+                                            <div style="padding: 5px 10px;">Path</div>
+                                        </div>
+                                        {% for pkg_name, pkg in test_pkgs.items() %}
+                                        <div style="display: grid; grid-template-columns: 1fr 110px 1fr; border-top: 1px solid #dee2e6;">
+                                            <div style="padding: 4px 10px;">{{ pkg_name }}</div>
+                                            <div style="padding: 4px 10px;">
+                                                {% if pkg.installed %}
+                                                    <span class="eol-badge supported" style="font-size:0.8em;">✓ Installed</span>
+                                                {% else %}
+                                                    <span class="eol-badge eol" style="font-size:0.8em;">✗ Missing</span>
+                                                {% endif %}
+                                            </div>
+                                            <div style="padding: 4px 10px; font-family: monospace; color: #555; word-break: break-all;">{{ pkg.path or '—' }}</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
                                 </details>
                                 {% else %}—{% endif %}
                             </td>
@@ -2140,19 +2196,86 @@
 
         // ===== MACHINE AUDIT TAB FILTERS =====
 
+        let auditMode = 'OR'; // 'OR' | 'AND' | 'NOT'
+
+        function setAuditMode(mode) {
+            auditMode = mode;
+
+            // If switching to NOT, deselect all but the first selected bubble
+            if (mode === 'NOT') {
+                const selected = document.querySelectorAll('.audit-tool-bubble.selected');
+                selected.forEach((b, i) => { if (i > 0) deselectBubble(b); });
+            }
+
+            // Update button styles
+            ['OR', 'AND', 'NOT'].forEach(m => {
+                const btn = document.getElementById(`audit-mode-${m.toLowerCase()}`);
+                if (!btn) return;
+                btn.style.background = m === mode ? '#5B2A86' : 'white';
+                btn.style.color      = m === mode ? 'white'   : '#5B2A86';
+            });
+
+            filterAuditTable();
+        }
+
+        function selectBubble(btn) {
+            btn.classList.add('selected');
+            btn.style.background = '#5B2A86';
+            btn.style.color      = 'white';
+        }
+
+        function deselectBubble(btn) {
+            btn.classList.remove('selected');
+            btn.style.background = 'white';
+            btn.style.color      = '#5B2A86';
+        }
+
+        function toggleToolBubble(btn) {
+            const isSelected = btn.classList.contains('selected');
+
+            if (auditMode === 'NOT') {
+                // In NOT mode only one bubble may be active at a time
+                document.querySelectorAll('.audit-tool-bubble.selected').forEach(deselectBubble);
+                if (!isSelected) selectBubble(btn);
+            } else {
+                isSelected ? deselectBubble(btn) : selectBubble(btn);
+            }
+
+            filterAuditTable();
+        }
+
         function filterAuditTable() {
-            const search = (document.getElementById('audit-search')?.value || '').toLowerCase();
+            const search      = (document.getElementById('audit-search')?.value || '').toLowerCase();
             const missingOnly = document.getElementById('audit-missing-only')?.checked || false;
-            const rows = document.querySelectorAll('#audit-table tbody tr');
+            const rows        = document.querySelectorAll('#audit-table tbody tr');
+
+            const selectedTools = Array.from(
+                document.querySelectorAll('.audit-tool-bubble.selected')
+            ).map(b => b.getAttribute('data-tool'));
+
             let visible = 0;
 
             rows.forEach(row => {
-                const machine = (row.getAttribute('data-machine') || '').toLowerCase();
+                const machine    = (row.getAttribute('data-machine') || '').toLowerCase();
                 const hasMissing = row.getAttribute('data-has-missing') === 'true';
-                const matchesSearch = !search || machine.includes(search);
+                const installed  = (row.getAttribute('data-installed-pkgs') || '')
+                                     .split(',').map(s => s.trim()).filter(Boolean);
+
+                const matchesSearch  = !search      || machine.includes(search);
                 const matchesMissing = !missingOnly || hasMissing;
 
-                if (matchesSearch && matchesMissing) {
+                let matchesTool = true;
+                if (selectedTools.length > 0) {
+                    if (auditMode === 'OR') {
+                        matchesTool = selectedTools.some(t => installed.includes(t));
+                    } else if (auditMode === 'AND') {
+                        matchesTool = selectedTools.every(t => installed.includes(t));
+                    } else { // NOT
+                        matchesTool = !installed.includes(selectedTools[0]);
+                    }
+                }
+
+                if (matchesSearch && matchesMissing && matchesTool) {
                     row.style.display = '';
                     visible++;
                 } else {
