@@ -1391,8 +1391,7 @@
                             <th class="sortable" data-sort="version">Version</th>
                             <th class="sortable" data-sort="arch">Architecture</th>
                             <th class="sortable" data-sort="playbook">Last Playbook Run</th>
-                            <th class="sortable" data-sort="build">Build Packages</th>
-                            <th class="sortable" data-sort="test">Test Packages</th>
+                            <th class="sortable" data-sort="packages">Packages</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1429,50 +1428,31 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if build_pkgs %}
-                                {% set b_missing = build_pkgs.values() | selectattr('installed', 'equalto', false) | list | length %}
-                                {% set b_total   = build_pkgs | length %}
-                                {% set b_modal_id = 'pkg-modal-build-' ~ loop.index %}
-                                <!-- hidden modal data -->
-                                <div id="{{ b_modal_id }}" style="display:none;" data-timestamp="{{ m.timestamp if m.timestamp is defined else '' }}">
+                                {% set a_missing = all_pkgs | selectattr('installed', 'equalto', false) | list | length %}
+                                {% set a_total   = all_pkgs | length %}
+                                {% set modal_id  = 'pkg-modal-' ~ loop.index %}
+                                <!-- hidden modal data: build section then test section -->
+                                <div id="{{ modal_id }}" style="display:none;"
+                                     data-timestamp="{{ m.timestamp if m.timestamp is defined else '' }}">
+                                    <div data-section="Build Packages"></div>
                                     {% for pkg_name, pkg in build_pkgs.items() %}
                                     <div data-pkg="{{ pkg_name }}" data-installed="{{ 'true' if pkg.installed else 'false' }}" data-path="{{ pkg.path or '' }}"></div>
                                     {% endfor %}
-                                </div>
-                                <button type="button"
-                                        onclick="openPkgModal('{{ b_modal_id }}', '{{ m.machine_name }} — Build Packages')"
-                                        style="background:none; border:none; cursor:pointer; padding:0; text-align:left;">
-                                    {% if b_missing > 0 %}
-                                        <span style="color:#dc3545; font-weight:600;">{{ b_total - b_missing }}/{{ b_total }} installed</span>
-                                        &nbsp;<span class="eol-badge eol" style="font-size:0.8em;">{{ b_missing }} missing</span>
-                                    {% else %}
-                                        <span style="color:#28a745; font-weight:600;">All {{ b_total }} installed</span>
-                                    {% endif %}
-                                </button>
-                                {% else %}—{% endif %}
-                            </td>
-                            <td>
-                                {% if test_pkgs %}
-                                {% set t_missing = test_pkgs.values() | selectattr('installed', 'equalto', false) | list | length %}
-                                {% set t_total   = test_pkgs | length %}
-                                {% set t_modal_id = 'pkg-modal-test-' ~ loop.index %}
-                                <!-- hidden modal data -->
-                                <div id="{{ t_modal_id }}" style="display:none;" data-timestamp="{{ m.timestamp if m.timestamp is defined else '' }}">
+                                    <div data-section="Test Packages"></div>
                                     {% for pkg_name, pkg in test_pkgs.items() %}
                                     <div data-pkg="{{ pkg_name }}" data-installed="{{ 'true' if pkg.installed else 'false' }}" data-path="{{ pkg.path or '' }}"></div>
                                     {% endfor %}
                                 </div>
                                 <button type="button"
-                                        onclick="openPkgModal('{{ t_modal_id }}', '{{ m.machine_name }} — Test Packages')"
+                                        onclick="openPkgModal('{{ modal_id }}', '{{ m.machine_name }}')"
                                         style="background:none; border:none; cursor:pointer; padding:0; text-align:left;">
-                                    {% if t_missing > 0 %}
-                                        <span style="color:#dc3545; font-weight:600;">{{ t_total - t_missing }}/{{ t_total }} installed</span>
-                                        &nbsp;<span class="eol-badge eol" style="font-size:0.8em;">{{ t_missing }} missing</span>
+                                    {% if a_missing > 0 %}
+                                        <span style="color:#dc3545; font-weight:600;">{{ a_total - a_missing }}/{{ a_total }} installed</span>
+                                        &nbsp;<span class="eol-badge eol" style="font-size:0.8em;">{{ a_missing }} missing</span>
                                     {% else %}
-                                        <span style="color:#28a745; font-weight:600;">All {{ t_total }} installed</span>
+                                        <span style="color:#28a745; font-weight:600;">All {{ a_total }} installed</span>
                                     {% endif %}
                                 </button>
-                                {% else %}—{% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -2313,13 +2293,26 @@
                 rowsContainer.appendChild(tsRow);
             }
 
-            Array.from(source.children).forEach((node, i) => {
+            let pkgIndex = 0; // stripe counter resets per section
+            Array.from(source.children).forEach(node => {
+                // Section divider
+                const section = node.getAttribute('data-section');
+                if (section !== null) {
+                    pkgIndex = 0;
+                    const divider = document.createElement('div');
+                    divider.style.cssText = 'grid-column:1/-1; padding:7px 14px; font-weight:700; font-size:0.85em; text-transform:uppercase; letter-spacing:0.05em; background:#e9ecef; color:#495057; border-top:2px solid #dee2e6;';
+                    divider.style.display = 'block';
+                    divider.textContent = section;
+                    rowsContainer.appendChild(divider);
+                    return;
+                }
+
                 const pkg       = node.getAttribute('data-pkg');
                 const installed = node.getAttribute('data-installed') === 'true';
                 const path      = node.getAttribute('data-path') || '—';
 
                 const row = document.createElement('div');
-                row.style.cssText = `display:grid; grid-template-columns:1fr 120px 1fr; border-top:1px solid #dee2e6;${i % 2 === 1 ? ' background:#f8f9fa;' : ''}`;
+                row.style.cssText = `display:grid; grid-template-columns:1fr 120px 1fr; border-top:1px solid #dee2e6;${pkgIndex % 2 === 1 ? ' background:#f8f9fa;' : ''}`;
 
                 const badge = installed
                     ? '<span class="eol-badge supported" style="font-size:0.82em;">✓ Installed</span>'
@@ -2331,6 +2324,7 @@
                     <div style="padding:7px 14px; font-family:monospace; font-size:0.88em; color:#555; word-break:break-all;">${path}</div>
                 `;
                 rowsContainer.appendChild(row);
+                pkgIndex++;
             });
 
             const overlay = document.getElementById('pkg-modal-overlay');
