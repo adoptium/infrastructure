@@ -1382,34 +1382,6 @@
                     </div>
                 </div>
 
-                <!-- Summary cards -->
-                <div class="summary-section">
-                    <h2>🔎 Machine Audit Summary</h2>
-                    {% set total_machines = machine_audit_data | length %}
-                    {% set machines_with_missing = machine_audit_data | selectattr('packages') | list %}
-                    {% set missing_count = namespace(value=0) %}
-                    {% for m in machine_audit_data %}
-                        {% set all_pkgs = (m.packages.build_packages.values() | list) + (m.packages.test_packages.values() | list) if m.packages is defined else [] %}
-                        {% if all_pkgs | selectattr('installed', 'equalto', false) | list | length > 0 %}
-                            {% set missing_count.value = missing_count.value + 1 %}
-                        {% endif %}
-                    {% endfor %}
-                    <div class="eol-summary-cards">
-                        <div class="eol-summary-card">
-                            <div class="label">Total Machines</div>
-                            <div class="value" style="color:#5B2A86;">{{ total_machines }}</div>
-                        </div>
-                        <div class="eol-summary-card ok-card">
-                            <div class="label">All Packages Present</div>
-                            <div class="value">{{ total_machines - missing_count.value }}</div>
-                        </div>
-                        <div class="eol-summary-card eol-card">
-                            <div class="label">Missing Packages</div>
-                            <div class="value">{{ missing_count.value }}</div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Main audit table -->
                 <table class="sortable-table" id="audit-table">
                     <thead>
@@ -1462,7 +1434,7 @@
                                 {% set b_total   = build_pkgs | length %}
                                 {% set b_modal_id = 'pkg-modal-build-' ~ loop.index %}
                                 <!-- hidden modal data -->
-                                <div id="{{ b_modal_id }}" style="display:none;">
+                                <div id="{{ b_modal_id }}" style="display:none;" data-timestamp="{{ m.timestamp if m.timestamp is defined else '' }}">
                                     {% for pkg_name, pkg in build_pkgs.items() %}
                                     <div data-pkg="{{ pkg_name }}" data-installed="{{ 'true' if pkg.installed else 'false' }}" data-path="{{ pkg.path or '' }}"></div>
                                     {% endfor %}
@@ -1485,7 +1457,7 @@
                                 {% set t_total   = test_pkgs | length %}
                                 {% set t_modal_id = 'pkg-modal-test-' ~ loop.index %}
                                 <!-- hidden modal data -->
-                                <div id="{{ t_modal_id }}" style="display:none;">
+                                <div id="{{ t_modal_id }}" style="display:none;" data-timestamp="{{ m.timestamp if m.timestamp is defined else '' }}">
                                     {% for pkg_name, pkg in test_pkgs.items() %}
                                     <div data-pkg="{{ pkg_name }}" data-installed="{{ 'true' if pkg.installed else 'false' }}" data-path="{{ pkg.path or '' }}"></div>
                                     {% endfor %}
@@ -2328,6 +2300,18 @@
 
             const rowsContainer = document.getElementById('pkg-modal-rows');
             rowsContainer.innerHTML = '';
+
+            // Timestamp row
+            const timestamp = source.getAttribute('data-timestamp');
+            if (timestamp) {
+                const tsRow = document.createElement('div');
+                tsRow.style.cssText = 'display:grid; grid-template-columns:1fr 120px 1fr; border-top:1px solid #dee2e6; background:#f3e5f5;';
+                tsRow.innerHTML = `
+                    <div style="padding:7px 14px; font-weight:600; color:#5B2A86;">Audit timestamp</div>
+                    <div style="padding:7px 14px; grid-column:span 2; color:#5B2A86; font-family:monospace; font-size:0.9em;">${timestamp}</div>
+                `;
+                rowsContainer.appendChild(tsRow);
+            }
 
             Array.from(source.children).forEach((node, i) => {
                 const pkg       = node.getAttribute('data-pkg');
