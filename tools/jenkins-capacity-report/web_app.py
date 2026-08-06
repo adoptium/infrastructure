@@ -653,6 +653,37 @@ def is_eol_data_available():
         return False
 
 
+MACHINE_AUDIT_DIR = Path(os.getenv("MACHINE_AUDIT_DIR", "./data/machine_audit"))
+
+
+def get_machine_audit_data():
+    """Read all machine audit JSON files from MACHINE_AUDIT_DIR.
+
+    Returns a list of dicts, each containing the parsed JSON content plus a
+    ``machine_name`` key derived from the filename
+    (``<machine_name>_machine_info.json``).
+    Sorted alphabetically by machine_name.  Returns [] if the directory does
+    not exist or contains no matching files.
+    """
+    import json
+
+    results = []
+    if not MACHINE_AUDIT_DIR.exists():
+        return results
+
+    for json_file in sorted(MACHINE_AUDIT_DIR.glob("*_machine_info.json")):
+        machine_name = json_file.name.replace("_machine_info.json", "")
+        try:
+            with json_file.open() as f:
+                data = json.load(f)
+            data["machine_name"] = machine_name
+            results.append(data)
+        except Exception as e:
+            logger.warning(f"Could not parse machine audit file {json_file}: {e}")
+
+    return results
+
+
 def recalculate_summary(nodes):
     """Recalculate capacity summary for a filtered list of nodes.
 
@@ -826,6 +857,8 @@ def index():
     current_user = get_current_user()
     current_role = get_current_user_role()
 
+    machine_audit_data = get_machine_audit_data()
+
     return render_template(
         'dashboard.html',
         summary=active_summary,
@@ -839,6 +872,7 @@ def index():
         cloud_config_available=cloud_config_available,
         eol_data=eol_data,
         eol_data_available=eol_data_available,
+        machine_audit_data=machine_audit_data,
         timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         current_user=current_user,
         current_role=current_role
