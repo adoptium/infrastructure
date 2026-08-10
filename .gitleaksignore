@@ -1,0 +1,19 @@
+# .gitleaksignore
+#
+# Fingerprints of known false positives in this repository.
+# Each entry is the exact "Fingerprint" value from the gitleaks report output.
+# Fingerprints may include an optional commit SHA prefix; copy/paste the full value
+# from the report rather than relying on a specific format.
+#
+# To add a new entry: run `gitleaks detect --report-format json --report-path /tmp/gitleaks-report.json`,
+# identify the false positive in that report, and add its Fingerprint here
+# with a comment explaining why it is safe.
+#
+# DO NOT add entries for real secrets — rotate them instead.
+
+# Documentation example in RBAC-GUIDE.md showing curl usage with a placeholder token.
+# "YOUR_TOKEN" is an explicit placeholder string, not a real credential.
+tools/jenkins-capacity-report/docs/RBAC-GUIDE.md:curl-auth-header:155
+
+# Same documentation file, second example using X-Auth-Token header with placeholder.
+tools/jenkins-capacity-report/docs/RBAC-GUIDE.md:curl-auth-header:160
