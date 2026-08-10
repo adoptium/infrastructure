@@ -118,6 +118,8 @@ Test_Tool_Packages:
   - perl
   - xauth
   - xvfb
+  - x11-xkb-utils                # Required for Xvfb keyboard initialization
+  - xkb-data                     # Required for Xvfb keyboard initialization
   - binfmt-support
   - "{{ qemu_package }}"
   - unzip
