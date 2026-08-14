@@ -1,0 +1,19 @@
+---
+# Regenerates a single container. Called via include_tasks with a loop over aqa_containers.
+# Expected loop variable: container (a dict with keys: name, port, isArm32, dockerfile)
+
+- name: "Stop container {{ container.name }}"
+  command: "docker stop {{ container.name }}"
+
+- name: "Delete container {{ container.name }}"
+  command: "docker rm {{ container.name }}"
+
+- name: "Rebuild and rerun {{ container.name }}"
+  include_tasks: main.yml
+  vars:
+    # docker_image is the lowercase suffix, e.g. "u2404" or "ubi9"
+    docker_images: "{{ container.name.split('.')[0] | lower }}"
+    regen_port: "{{ container.port }}"
+    build_arm32: "{{ 'yes' if container.isArm32 else omit }}"
+    # Full path so the script module resolves correctly when called outside the role context
+    dockercpu_script: "{{ playbook_dir }}/roles/deploy_container/scripts/dockerCPU.sh"

@@ -16,5 +16,3 @@
       tags: deploy
     - role: deploy_container
       tags: deploy
-    - role: remove_container
-      tags: remove
