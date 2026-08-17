@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Adoptium-maintained libvirt box for Windows Server 2025.
+# Uses a locally-stored Adoptium box (adoptium/windows2025-libvirt) which
+# ships with WinRM pre-configured and VS Build Tools pre-installed, avoiding
+# the lengthy internet download during playbook runs.
+#
+# To register the box locally before first use:
+#   vagrant box add adoptium/windows2025-libvirt /path/to/windows2025-libvirt.box
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkW2025 do |adoptopenjdkW2025|
+    adoptopenjdkW2025.vm.box = "adoptium/windows2025-libvirt"
+    adoptopenjdkW2025.vm.hostname = "adoptopenjdkW2025"
+    adoptopenjdkW2025.vm.communicator = "winrm"
+    # SMB synced folders require the host to be macOS or Windows — Vagrant has
+    # no built-in SMB server on Linux regardless of whether Samba is installed.
+    adoptopenjdkW2025.vm.synced_folder ".", "/vagrant", disabled: true
+    adoptopenjdkW2025.vm.network :private_network, type: "dhcp"
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 12288
+    v.cpus = 4
+    v.machine_virtual_size = 130
+    v.machine_type    = "q35"
+    v.disk_bus        = "sata"
+    v.nic_model_type  = "e1000e"
+    v.cpu_mode        = "host-passthrough"
+    v.graphics_type   = "spice"
+    v.video_type      = "qxl"
+    v.qemu_use_agent  = true
+  end
+  config.vm.boot_timeout = 800
+end

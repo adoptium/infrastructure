@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Configure DPKG to be noninteractive
+export DEBIAN_FRONTEND=noninteractive
+
+# Pre-configure GRUB to prevent interactive prompts during upgrades
+echo "grub-pc grub-pc/install_devices_empty boolean true" | sudo debconf-set-selections
+echo "grub-pc grub-pc/install_devices string /dev/sda" | sudo debconf-set-selections
+
+# Update Repository Addresses For Debian
+sudo apt-get update
+sudo apt-get install tree -y
+sudo apt-get install software-properties-common -y
+sudo apt-get install gpg -y
+
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkD12 do |adoptopenjdkD12|
+    adoptopenjdkD12.vm.box = "generic/debian12"
+    adoptopenjdkD12.vm.synced_folder ".", "/vagrant", type: "rsync"
+    adoptopenjdkD12.vm.hostname = "adoptopenjdkD12"
+    adoptopenjdkD12.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 2560
+    v.cpus = 1
+  end
+end

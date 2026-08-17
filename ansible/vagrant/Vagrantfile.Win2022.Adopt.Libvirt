@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Adoptium-maintained libvirt box for Windows Server 2022.
+# Uses a locally-stored Adoptium box (adoptium/windows2022-libvirt) which
+# ships with WinRM pre-configured and VS Build Tools pre-installed, avoiding
+# the lengthy internet download during playbook runs.
+#
+# To register the box locally before first use:
+#   vagrant box add adoptium/windows2022-libvirt /path/to/windows2022-libvirt.box
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkW2022 do |adoptopenjdkW2022|
+    adoptopenjdkW2022.vm.box = "adoptium/windows2022-libvirt"
+    adoptopenjdkW2022.vm.hostname = "adoptopenjdkW2022"
+    adoptopenjdkW2022.vm.communicator = "winrm"
+    # SMB synced folders require the host to be macOS or Windows — Vagrant has
+    # no built-in SMB server on Linux regardless of whether Samba is installed.
+    adoptopenjdkW2022.vm.synced_folder ".", "/vagrant", disabled: true
+    adoptopenjdkW2022.vm.network :private_network, type: "dhcp"
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 12228
+    v.cpus = 4
+    v.machine_virtual_size = 130
+  end
+  config.vm.boot_timeout = 600
+end
