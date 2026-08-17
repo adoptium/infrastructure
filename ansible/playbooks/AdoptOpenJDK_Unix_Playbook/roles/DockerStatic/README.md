@@ -103,7 +103,7 @@ If any changes are found, open a new branch and commit these changes in a pull r
 
 ## Scheduled Static Docker Rebuilds
 
-The Adoptium infrastructure team periodically rebuilds all running static Docker containers on each dockerhost. This ensures containers are running from the latest version of their Dockerfile, picking up any base image updates, new tooling, or configuration changes that have been committed since the containers were originally deployed.
+The Adoptium infrastructure team periodically rebuilds all running static Docker containers on each Linux dockerhost. This ensures containers are running from the latest version of their Dockerfile, picking up any base image updates, new tooling, or configuration changes that have been committed since the containers were originally deployed.
 
 Rebuilds are carried out using the [`regenContainers.yml`](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/regenContainers.yml) playbook:
 
