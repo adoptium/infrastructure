@@ -14,7 +14,7 @@
   when: not docker_cpu_file.stat.exists
 
 - name: Run dockerCPU.sh script to determine which cpus to use
-  script: scripts/dockerCPU.sh {{ cpu_limit }}
+  script: "{{ dockercpu_script | default('scripts/dockerCPU.sh') }} {{ cpu_limit }}"
   args:
     executable: bash
   register: cpus_to_use
@@ -63,19 +63,26 @@
   command: "{{ docker_build_command }} --cpu-period=100000 --cpu-quota=800000 -t aqa_{{ docker_image }}{{ arm32_suffix }} --memory=6G -f /tmp/Dockerfile.{{ docker_image }} /tmp/"
 
 # Finds the highest port number already assigned and +1
+# Skipped when regen_port is defined (port is preserved from the previous container)
 - name: Find available port
   shell: docker ps --format \"\{\{\.Ports\}\}\" | awk -F[:-] '{print $2}' | sort | tail -n 1
   register: docker_port_output
+  when: regen_port is not defined
 
 - name: Set docker_port variable if empty
   set_fact:
     docker_port: 32000
-  when: docker_port_output.stdout == ""
+  when: regen_port is not defined and docker_port_output.stdout == ""
 
 - name: Set docker_port variable when non empty
   set_fact:
     docker_port: "{{ docker_port_output.stdout | int + 1 }}"
-  when: not (docker_port_output.stdout == "")
+  when: regen_port is not defined and not (docker_port_output.stdout == "")
+
+- name: Set docker_port from regen_port when regenerating
+  set_fact:
+    docker_port: "{{ regen_port }}"
+  when: regen_port is defined
 
 - name: Run {{ docker_image }} docker container
   command: "{{ docker_run_command }} --restart unless-stopped -p {{ docker_port }}:22 --cpuset-cpus={{ cpus_to_use.stdout_lines[0] }} --memory=6G --detach --name {{ docker_image | upper }}.{{ docker_port }}{{ arm32_suffix | upper }} aqa_{{ docker_image }}{{ arm32_suffix }}"

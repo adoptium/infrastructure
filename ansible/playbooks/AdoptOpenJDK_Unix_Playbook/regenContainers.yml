@@ -1,0 +1,95 @@
+---
+###############################
+# Adoptium - Ansible Playbook #
+###############################
+# This playbook regenerates all running Adoptium static Docker containers
+
+- name: Regenerate static Docker containers
+  hosts: all
+  gather_facts: yes
+
+  roles:
+    - role: Debug
+    - role: Get_Vendor_Files
+
+  tasks:
+    # Use a safe delimiter (|||) that cannot appear in any docker ps output field
+    - name: Get all aqa_ container details in one pass
+      shell: >-
+        docker ps --filter "status=running"
+        --format "{% raw %}{{.Names}}|||{{.Image}}|||{{.Ports}}{% endraw %}"
+        | grep -i 'aqa_'
+      register: running_containers_raw
+      changed_when: false
+      failed_when: false
+
+    - name: Build aqa_containers data structure
+      vars:
+        # Each line: "<name>|||<image>|||<ports>"
+        # e.g. "U2404.32001|||aqa_u2404|||0.0.0.0:32001->22/tcp"
+        parsed: >-
+          {{
+            running_containers_raw.stdout_lines
+            | map('split', '|||')
+            | list
+          }}
+        # Strip registry prefix, aqa_ prefix, .arm32 suffix, and :tag suffix
+        image_suffix: >-
+          {{
+            item[1] | regex_replace('^(localhost/)?aqa_', '')
+                    | regex_replace('\.arm32$', '')
+                    | regex_replace(':.*$', '')
+          }}
+        dockerfile_path: "roles/DockerStatic/Dockerfiles/Dockerfile.{{ image_suffix }}"
+        dockerfile_exists: "{{ lookup('first_found', dockerfile_path, errors='ignore') }}"
+      set_fact:
+        aqa_containers: >-
+          {{
+            aqa_containers | default([]) + [{
+              'name':       item[0],
+              'port':       item[0].split('.')[-2] if item[0].upper().endswith('.ARM32')
+                            else item[0].split('.')[-1],
+              'isArm32':    item[0].upper().endswith('.ARM32'),
+              'dockerfile': dockerfile_path if dockerfile_exists else None
+            }]
+          }}
+      loop: "{{ parsed }}"
+      when: running_containers_raw.stdout_lines | length > 0
+
+    - name: Display identified aqa_ containers
+      debug:
+        msg:
+          - "name:       {{ item.name }}"
+          - "port:       {{ item.port }}"
+          - "isArm32:    {{ item.isArm32 }}"
+          - "dockerfile: {{ item.dockerfile }}"
+      loop: "{{ aqa_containers | default([]) }}"
+      when: aqa_containers | default([]) | length > 0
+
+    - name: Report when no aqa_ containers are running
+      debug:
+        msg: "No running aqa_ containers found on this host."
+      when: aqa_containers | default([]) | length == 0
+
+    # Loop over each identified container and run the regen tasks.
+    # Containers with no matching Dockerfile are skipped.
+    - name: Regenerate container {{ container.name }}
+      include_tasks: roles/deploy_container/tasks/regen.yml
+      loop: "{{ aqa_containers | default([]) | selectattr('dockerfile', '!=', None) | list }}"
+      loop_control:
+        loop_var: container
+        label: "{{ container.name }}"
+
+    - name: Get running aqa_ containers after rebuild
+      shell: >-
+        docker ps --filter "status=running"
+        --format "{% raw %}{{.Names}}|||{{.Image}}|||{{.Ports}}{% endraw %}"
+        | grep -i 'aqa_'
+      register: rebuilt_containers_raw
+      changed_when: false
+      failed_when: false
+
+    - name: Display running aqa_ containers after rebuild
+      debug:
+        msg: "{{ item.split('|||') | join(' | ') }}"
+      loop: "{{ rebuilt_containers_raw.stdout_lines }}"
