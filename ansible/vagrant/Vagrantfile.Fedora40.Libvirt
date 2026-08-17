@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo dnf install -y cloud-utils-growpart xfsprogs
+# Detect the root disk and partition number dynamically.
+# Under libvirt/KVM the virtio-blk driver exposes disks as /dev/vda, not
+# /dev/sda (which is emulated SATA/SCSI and absent on this provider).
+# PKNAME gives the parent disk name; the partition number is stripped from
+# the end of the partition device name directly (avoids lsblk PARTNUM column
+# which is absent on some util-linux builds).
+ROOT_PART=$(findmnt -n -o SOURCE /)
+ROOT_DISK=$(lsblk -ndo PKNAME "${ROOT_PART}")
+ROOT_PARTNUM=$(echo "${ROOT_PART}" | grep -o '[0-9]*$')
+echo "Root partition: ${ROOT_PART}  disk: /dev/${ROOT_DISK}  partnum: ${ROOT_PARTNUM}"
+sudo growpart /dev/${ROOT_DISK} ${ROOT_PARTNUM}
+sudo xfs_growfs /
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkF40 do |adoptopenjdkF40|
+    adoptopenjdkF40.vm.box = "bento/fedora-40"
+    adoptopenjdkF40.vm.synced_folder ".", "/vagrant", type: "rsync"
+    adoptopenjdkF40.vm.hostname = "adoptopenjdkF40"
+    adoptopenjdkF40.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 4196
+    v.cpus = 1
+    v.machine_virtual_size = 75
+  end
+end
