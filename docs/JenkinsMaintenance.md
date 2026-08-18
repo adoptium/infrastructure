@@ -7,7 +7,7 @@ timing should typically avoid coinciding with release work, although if a
 release in the previous month is ongoing then the window can be delayed til
 the following Tuesday.
 
-Jenkins and it's plugins will be updated to the latest LTS every month. 
+Jenkins and it's plugins will be updated to the latest LTS every month. Alongside this we aim to [rebuild our linux static docker containers](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/README.md#scheduled-static-docker-rebuilds) at the same time to ensure that the containers are running off the latest changes to their Dockerfiles.
 Other services such as Bastillion, AWX, and Nagios will be updated as
 required on a quarterly basis (On the first month of each quarter) during
 the same window if required for security reasons. In some cases we may wish
