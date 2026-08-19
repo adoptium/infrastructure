@@ -7,6 +7,7 @@ import os
 import re
 import json
 import argparse
+from datetime import datetime, timezone
 from pathlib import Path
 from dotenv import load_dotenv
 import jenkins
@@ -186,11 +187,52 @@ def extract_os_info(nodes, server):
     
     return result
 
+# Operating systems that publish LTS releases — only these use the LTS lookup.
+OS_WITH_LTS = {'ubuntu'}
+
+def get_latest_version(os_name, base_url, cache):
+    """Return the latest relevant version for an OS, cached per OS.
+
+    For OS types that publish LTS releases (e.g. Ubuntu), return the name of
+    the most recent LTS release.  For all other OS types, return the name of
+    the overall latest release via the /releases/latest endpoint.
+    """
+    if os_name in cache:
+        return cache[os_name]
+
+    latest = None
+    try:
+        if os_name in OS_WITH_LTS:
+            # Fetch the full product listing and find the first LTS release
+            response = requests.get(f"{base_url}/{os_name}", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                releases = data.get('result', {}).get('releases', [])
+                for release in releases:
+                    if release.get('isLts') is True:
+                        latest = release.get('name')
+                        break
+        else:
+            # centos EOL tracking is done under the centos-stream product
+            lookup_name = 'centos-stream' if os_name == 'centos' else os_name
+            # Fetch only the latest release
+            response = requests.get(f"{base_url}/{lookup_name}/releases/latest", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                latest = data.get('result', {}).get('name')
+    except requests.exceptions.RequestException as e:
+        print(f"Warning: Could not retrieve product info for {os_name}: {e}")
+
+    cache[os_name] = latest
+    return latest
+
+
 def check_eol_status(os_info_list):
 
     result = []
     base_url = "https://endoflife.date/api/v1/products"
-    
+    lts_cache = {}
+
     for item in os_info_list:
         node_name = item['name']
         os_name = item['os']
@@ -203,6 +245,7 @@ def check_eol_status(os_info_list):
         # Initialize EOL fields
         is_eol = None
         eol_from = None
+        latest_lts = None
         
         # Skip if OS or version is unknown
         if os_name == 'unknown' or version == 'unknown':
@@ -211,11 +254,12 @@ def check_eol_status(os_info_list):
                 "os": os_name,
                 "version": version,
                 "isEOL": is_eol,
-                "eolFrom": eol_from
+                "eolFrom": eol_from,
+                "latestLts": latest_lts
             })
             continue
         
-        # Query the endoflife.date API
+        # Query the endoflife.date API for version-specific EOL data
         try:
             # API endpoint: /api/v1/products/{os}/releases/{version}
             url = f"{base_url}/{os_name}/releases/{version}"
@@ -243,14 +287,17 @@ def check_eol_status(os_info_list):
             print(f"Warning: Could not check EOL status for {node_name} ({os_name} {version}): {e}")
             is_eol = None
             eol_from = None
-        
+
+        # Fetch latest LTS for this OS (cached)
+        latest_lts = get_latest_version(os_name, base_url, lts_cache)
         # Add to result
         result.append({
             "name": node_name,
             "os": os_name,
             "version": version,
             "isEOL": is_eol,
-            "eolFrom": eol_from
+            "eolFrom": eol_from,
+            "latestLts": latest_lts
         })
     
     return result
@@ -281,7 +328,11 @@ def main():
     eol_info = check_eol_status(os_info)
 
     log("\nNode EOL Information (JSON):")
-    print(json.dumps(eol_info, indent=2))
+    output = {
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "EOL_data": eol_info
+    }
+    print(json.dumps(output, indent=2))
 
     return 0
 
