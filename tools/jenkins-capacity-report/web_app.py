@@ -625,23 +625,33 @@ def get_eol_data():
     """Read EOL status data from the JSON file produced by check_os_eol.py.
 
     Returns:
-        List of dicts with keys: name, os, version, isEOL, eolFrom
-        sorted by os (nulls last) then name.
-        Empty list if the file does not exist or cannot be parsed.
+        Tuple of (list, str|None):
+          - list of dicts with keys: name, os, version, isEOL, eolFrom, latestLts
+            sorted by os (nulls last) then name.
+            Empty list if the file does not exist or cannot be parsed.
+          - ISO-8601 timestamp string from the file, or None if unavailable.
     """
     try:
         eol_path = Path(config.eol_status_file)
         if not eol_path.exists():
-            return []
+            return [], None
         import json
         with eol_path.open() as f:
-            data = json.load(f)
+            raw = json.load(f)
+        # Support both the new wrapped format {timestamp, EOL_data:[...]}
+        # and the legacy flat-list format for backwards compatibility.
+        if isinstance(raw, dict):
+            data = raw.get('EOL_data', [])
+            eol_timestamp = raw.get('timestamp')
+        else:
+            data = raw
+            eol_timestamp = None
         # Sort: known OS first (alphabetically), then nulls; secondary sort by name
         data.sort(key=lambda d: (d.get('os') is None, d.get('os') or '', d.get('name') or ''))
-        return data
+        return data, eol_timestamp
     except Exception as e:
         logger.error(f"Error reading EOL status file: {e}")
-        return []
+        return [], None
 
 
 def is_eol_data_available():
@@ -850,7 +860,7 @@ def index():
     cloud_config_available = is_cloud_config_available()
 
     # EOL status data
-    eol_data = get_eol_data()
+    eol_data, eol_timestamp = get_eol_data()
     eol_data_available = is_eol_data_available()
 
     # Get current user role for UI permissions
@@ -872,6 +882,7 @@ def index():
         cloud_config_available=cloud_config_available,
         eol_data=eol_data,
         eol_data_available=eol_data_available,
+        eol_timestamp=eol_timestamp,
         machine_audit_data=machine_audit_data,
         timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         current_user=current_user,
@@ -1317,9 +1328,10 @@ def get_rbac_status():
 @optional_auth
 def eol_status():
     """API endpoint returning EOL status data from the pre-generated JSON file."""
-    data = get_eol_data()
+    data, eol_timestamp = get_eol_data()
     return jsonify({
         'available': len(data) > 0,
+        'timestamp': eol_timestamp,
         'data': data,
         'count': len(data),
         'eol_count': sum(1 for d in data if d.get('isEOL') is True),

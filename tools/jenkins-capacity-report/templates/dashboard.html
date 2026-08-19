@@ -601,6 +601,33 @@
         .eol-summary-card.ok-card  .value  { color: #28a745; }
         .eol-summary-card.unk-card .value  { color: #6c757d; }
 
+        /* Latest-version tooltip on EOL status badges */
+        .eol-tooltip-wrap {
+            position: relative;
+            display: inline-block;
+        }
+        .eol-tooltip-wrap[data-latest]::after {
+            content: "Latest: " attr(data-latest);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2328;
+            color: #fff;
+            font-size: 0.88em;
+            font-weight: 700;
+            white-space: nowrap;
+            padding: 7px 13px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            z-index: 100;
+        }
+        .eol-tooltip-wrap[data-latest]:hover::after {
+            opacity: 1;
+        }
+
         /* Jenkins link icon styling */
         .jenkins-link-icon {
             display: inline-block;
@@ -1234,7 +1261,11 @@
                 {% set unknown_count = eol_data | length - eol_count - supported_count %}
 
                 <div class="summary-section">
-                    <h2>⏳ OS End-of-Life Summary</h2>
+                    <h2>⏳ OS End-of-Life Summary
+                        {% if eol_timestamp %}
+                        <span style="font-size:0.6em; font-weight:400; color:#57606a; margin-left:10px;">Last updated: {{ eol_timestamp }}</span>
+                        {% endif %}
+                    </h2>
                     <div class="eol-summary-cards">
                         <div class="eol-summary-card">
                             <div class="label">Total Nodes Checked</div>
@@ -1280,6 +1311,11 @@
                                 <td>{{ entry.os or '—' }}</td>
                                 <td>{{ entry.version or '—' }}</td>
                                 <td>
+                                    {% if entry.latestLts %}
+                                        <span class="eol-tooltip-wrap" data-latest="{{ entry.latestLts }}">
+                                    {% else %}
+                                        <span class="eol-tooltip-wrap">
+                                    {% endif %}
                                     {% if entry.isEOL is true %}
                                         <span class="eol-badge eol">EOL</span>
                                     {% elif entry.isEOL is false %}
@@ -1287,6 +1323,7 @@
                                     {% else %}
                                         <span class="eol-badge unknown">Unknown</span>
                                     {% endif %}
+                                    </span>
                                 </td>
                                 <td>{{ entry.eolFrom or '—' }}</td>
                             </tr>
