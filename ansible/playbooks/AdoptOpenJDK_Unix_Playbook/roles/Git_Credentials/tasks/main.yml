@@ -1,0 +1,39 @@
+---
+###################
+# Git_Credentials #
+###################
+
+- name: Set home_folder default for Git_Credentials role
+  set_fact:
+    home_folder: "{{ home_folder | default('/home/' ~ Jenkins_Username) }}"
+  tags: [git_credentials, adoptopenjdk]
+
+###############
+# git config  #
+###############
+- name: Set git credential helper for Jenkins user
+  command: git config --global credential.helper store
+  become: yes
+  environment:
+    HOME: "{{ home_folder }}"
+  changed_when: false
+  when:
+    - ansible_distribution != "MacOSX"
+  tags:
+    - git_credentials
+    - adoptopenjdk
+    
+####################
+# git-credentials  #
+####################
+- name: Write git-credentials file for Jenkins user
+  copy:
+    content: "{{ git_credentials }}\n"
+    dest: "{{ home_folder }}/.git-credentials"
+    owner: "{{ Jenkins_Username }}"
+    group: "{{ Jenkins_Username }}"
+    mode: "0600"
+  no_log: true
+  when:
+    - ansible_distribution != "MacOSX"
+  tags: [git_credentials, adoptopenjdk]
