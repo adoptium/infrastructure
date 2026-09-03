@@ -6,7 +6,7 @@
 # It can be defined as 'all' or a specific group which the host belongs to.
 # For example, it can be 'all' or 'x86' for when a host is in the group 'x86'.
 - name: Ansible Unix playbook
-  hosts: all
+  hosts: "{{ Groups | default('localhost:build:test:perf:jck:!*zos*:!*win*:!*aix*') }}"
   gather_facts: yes
   tasks:
     - name: Run Tasks
@@ -21,9 +21,9 @@
   # Roles #
   #########
   roles:
-    # - role: logs
-    #   position: "Start"
-    #   tags: always
+    - role: logs
+      position: "Start"
+      tags: always
     - Debug
     - role: Get_Vendor_Files
       tags: [vendor_files, adoptopenjdk, jenkins_user, nagios_plugins, superuser]
@@ -183,6 +183,6 @@
         script_action: check              # check/delete
     - pandoc                      # Build Of Man Pages JDK24+
     - adopt_syscfg
-    # - role: logs
-    #   position: "End"
-    #   tags: always
+    - role: logs
+      position: "End"
+      tags: always
