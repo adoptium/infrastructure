@@ -1,9 +1,13 @@
 #!/bin/bash
 set -eu
 
-# Suppress ANSI progress-bar escape sequences (e.g. [KProgress: 37%) that
-# vagrant emits when a real terminal is detected.  In Jenkins these render as
-# thousands of individual log lines instead of a single updating line.
+# If the caller invoked us with bash -x, suppress xtrace immediately.
+# The script uses explicit echo statements for meaningful progress; xtrace
+# adds thousands of lines of noise (argument parsing, variable assignments,
+# [[ comparisons) with no diagnostic value in normal CI runs.
+{ set +x; } 2>/dev/null
+
+# Suppress ANSI colour codes from Vagrant output.
 export VAGRANT_NO_COLOR=1
 
 gitFork=''
@@ -341,7 +345,12 @@ startVMPlaybook()
 
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
 	# See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
-	BUILD_ID=dontKillMe vagrant up --provider "$provider"
+	# Filter [K progress lines — VAGRANT_NO_COLOR strips ANSI colour codes but not
+	# progress text.  Two formats appear: vagrant-libvirt volume upload emits
+	# "[KProgress: X%" and Vagrant's own box downloader emits "[KProgress: X%
+	# (Rate: ...)".  Both start with the ESC-erased "[K" prefix; filtering ^\[K
+	# catches both without being overly broad.
+	BUILD_ID=dontKillMe vagrant up --provider "$provider" 2>&1 | grep -v '^\[K'
 
 	# libvirt does not support forwarded ports; get SSH host/port from vagrant ssh-config.
 	# VirtualBox uses a NAT-forwarded port on 127.0.0.1, so retain the original path.
@@ -485,7 +494,9 @@ startVMPlaybookWin()
 	rm -f playbooks/AdoptOpenJDK_Windows_Playbook/hosts.*
 	# The BUILD_ID variable is required to stop Jenkins shutting down the wrong VMS
 	       # See https://github.com/adoptium/infrastructure/issues/1287#issuecomment-625142917
-	BUILD_ID=dontKillMe vagrant up --provider "$winProvider"
+	# Filter [K progress lines — same as the Unix path above; catches both libvirt
+	# volume upload and Vagrant box download progress output.
+	BUILD_ID=dontKillMe vagrant up --provider "$winProvider" 2>&1 | grep -v '^\[K'
 
 	# Rearm the evaluation license for 180 days to stop the VMs shutting down
 	# See: https://github.com/adoptium/infrastructure/issues/2056
@@ -558,7 +569,7 @@ startVMPlaybookWin()
 		local buildLogPath="$WORKSPACE/adoptopenjdkPBTests/logFiles/${gitFork}.${newGitBranch}.$OS.build_log"
 
 		# Restarting the VM as the shared folder disappears after the playbook runs due to the restarts in the playbook
-		vagrant halt && vagrant up
+		vagrant halt && vagrant up 2>&1 | grep -v '^\[K'
 
 		# Restarting the VM may change the port number; re-read from winrm-config for libvirt
 		if [[ "$winProvider" == "libvirt" ]]; then
@@ -590,8 +601,13 @@ startVMPlaybookWin()
 				winUploadFile() {
 					local src="$1" dst="$2"
 					local b64
+					# Suppress xtrace for the base64 capture and the winrm upload call —
+					# both contain the full encoded file content and flood the Jenkins log.
+					{ set +x; } 2>/dev/null
 					b64=$(base64 -w0 < "$src")
 					vagrant winrm -s powershell -e -c "[System.IO.File]::WriteAllBytes('${dst}', [System.Convert]::FromBase64String('${b64}'))"
+					{ set -x; } 2>/dev/null
+					echo "=== Uploaded: $src -> $dst"
 				}
 				vagrant winrm -s powershell -e -c 'New-Item -ItemType Directory -Force -Path C:\tmp\pbTestScripts | Out-Null'
 				for f in pbTestScripts/*; do

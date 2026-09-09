@@ -66,6 +66,8 @@ checkOS() {
                         osToDestroy="D8" ;;
                 "Debian10" | "debian10" | "D10" | "d10" )
                         osToDestroy="D10" ;;
+                "Debian11" | "debian11" | "D11" | "d11" )
+                        osToDestroy="D11" ;;
                 "Fedora40" | "fedora40" | "F40" | "f40" )
                         osToDestroy="F40" ;;
 		"FreeBSD12" | "freebsd12" | "F12" | "f12" )
@@ -77,7 +79,7 @@ checkOS() {
  "Windows2025" | "Win2025" | "W25" | "w25" )
   	                     osToDestroy="W2025";;
   	            "all" )
-  	                     osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 F40 FBSD12 Sol10 W2012 W2022 W2025" ;;
+  	                     osToDestroy="U16 U18 U20 U21 U22 C6 C7 C8 D8 D10 D11 F40 FBSD12 Sol10 W2012 W2022 W2025" ;;
 		"")
 			echo "No OS detected. Did you miss the '-o' option?" ; usage; exit 1;;
 		*) echo "$OS is not a currently supported OS" ; listOS; exit 1;
@@ -98,11 +100,38 @@ listOS() {
 		- CentOS8
 		- Debian8
 		- Debian10
+		- Debian11
 		- FreeBSD12
 		- Win2012
 		- Win2022
 		- Win2025"
 	echo
+}
+
+# Remove orphaned libvirt domains that vagrant has lost track of (e.g. after
+# an aborted Jenkins job).  vagrant global-status returns nothing for these,
+# but virsh still has them registered under the name ansible_adoptopenjdk<OS>.
+# Without this step, the next `vagrant up` fails with:
+#   "Name `ansible_adoptopenjdk<OS>` of domain about to create is already taken."
+cleanupOrphanedLibvirtDomains()
+{
+	local OS=$1
+	# vagrant-libvirt names domains as <folder>_<vm-define-name>.
+	# The Vagrantfile folder is always 'ansible', so the pattern is ansible_adoptopenjdk<OS>.
+	local domainPattern="ansible_adoptopenjdk${OS}"
+	local domains
+	domains=$(virsh list --all --name 2>/dev/null | grep -F "$domainPattern" || true)
+	if [[ -z "$domains" ]]; then
+		return
+	fi
+	while IFS= read -r domain; do
+		echo "=== Removing orphaned libvirt domain: $domain"
+		# destroy (power off) if running, then undefine and remove storage
+		virsh destroy "$domain" 2>/dev/null || true
+		virsh undefine "$domain" --remove-all-storage 2>/dev/null \
+			|| virsh undefine "$domain" 2>/dev/null \
+			|| echo "WARNING: could not undefine domain $domain"
+	done <<< "$domains"
 }
 
 destroyVMs() {
@@ -113,6 +142,13 @@ destroyVMs() {
 		echo "Destroyed all $OS vagrant VMs"
 	else
 		echo "No $1 vagrant VMs, moving on..."
+	fi
+	# Always clean up orphaned libvirt domains when virsh is available, regardless
+	# of whether --provider libvirt was passed.  The Jenkins pre-run cleanup calls
+	# this script without -p, so orphaned domains from prior aborted jobs would
+	# otherwise survive and cause "domain name already taken" on the next run.
+	if command -v virsh &>/dev/null; then
+		cleanupOrphanedLibvirtDomains "$OS"
 	fi
 	if [[ "$provider" == "libvirt" ]]; then
 		cleanupLibvirtVolumes "$OS"
