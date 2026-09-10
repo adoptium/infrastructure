@@ -356,9 +356,11 @@ startVMPlaybook()
 	# VirtualBox uses a NAT-forwarded port on 127.0.0.1, so retain the original path.
 	local sshHost="127.0.0.1"
 	if [[ "$provider" == "libvirt" ]]; then
-		local sshPort
-		sshHost=$(vagrant ssh-config | awk '/HostName/ { print $2 }')
-		sshPort=$(vagrant ssh-config | awk '/Port/ { print $2 }')
+		local sshPort vagrantKey sshCfg
+		sshCfg=$(vagrant ssh-config)
+		sshHost=$(echo "$sshCfg" | awk '/HostName/ { print $2 }')
+		sshPort=$(echo "$sshCfg" | awk '/Port/ { print $2 }')
+		vagrantKey=$(echo "$sshCfg" | awk '/IdentityFile/ { print $2 }')
 		vagrantPORT=$sshPort
 		rm -f playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
 		echo "[${sshHost}]:${sshPort}" >> playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
@@ -371,7 +373,13 @@ startVMPlaybook()
 	# ssh-keygen -R will fail if the known_hosts file does not exist
 	[ ! -r $HOME/.ssh/known_hosts ] && touch $HOME/.ssh/known_hosts && chmod 644 $HOME/.ssh/known_hosts
 	ssh-keygen -R $(cat playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx)
-	ssh-keyscan -p ${vagrantPORT} -H ${sshHost} >> $HOME/.ssh/known_hosts
+	# CentOS 6 runs OpenSSH 5.3 which only offers ssh-rsa host keys; modern OpenSSH
+	# (8.8+) disabled ssh-rsa by default, so we must request it explicitly here.
+	if [[ "$OS" == "CentOS6" ]]; then
+		ssh-keyscan -t ssh-rsa -p ${vagrantPORT} -H ${sshHost} >> $HOME/.ssh/known_hosts
+	else
+		ssh-keyscan -p ${vagrantPORT} -H ${sshHost} >> $HOME/.ssh/known_hosts
+	fi
 
 	sed -i -e "s/.*hosts:.*/  hosts: all/g" playbooks/AdoptOpenJDK_Unix_Playbook/main.yml
 	awk '{print}/^\[defaults\]$/{print "private_key_file = id_rsa"; print "remote_tmp = $HOME/.ansible/tmp"; print "timeout = 60"}' < ansible.cfg > ansible.cfg.tmp && mv ansible.cfg.tmp ansible.cfg
@@ -382,13 +390,29 @@ startVMPlaybook()
 	## If CentOS6 Delegate Playbook Run To Vagrant Machine Itself For Compatibility
 	if [ "$OS" == "CentOS6" ]; then
 		# Replace Remote Hosts File With Local Version
-		# vagrant ssh --command "cd /vagrant && pwd && echo localhost ansible_connection=local > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx"
 		echo "localhost ansible_connection=local" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
-		# SSH into machine and run the ansible playbook with the constructed args
-		vagrant ssh --command "cd /vagrant && eval ansible-playbook $args playbooks/AdoptOpenJDK_Unix_Playbook/main.yml | tee /vagrant/ansible_playbook.log"
+		# Under libvirt /vagrant is not available (synced folder disabled for CentOS 6
+		# compatibility with OpenSSH 5.x).  Copy the ansible workspace into the VM via
+		# scp, run the playbook there, then retrieve the log via scp.
+		if [[ "$provider" == "libvirt" ]]; then
+			# CentOS 6's OpenSSH 5.3 only offers ssh-rsa; add legacy algorithm flags so
+			# the modern host-side OpenSSH can negotiate with it.
+			# Use the Vagrant-managed private key (from vagrant ssh-config) — not $PWD/id_rsa,
+			# which is the playbook key and was never added to the guest's authorized_keys.
+			local sshLegacyOpts="-o HostKeyAlgorithms=ssh-rsa -o PubkeyAcceptedKeyTypes=ssh-rsa"
+			local scpOpts="-r -i ${vagrantKey} -P ${vagrantPORT} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${sshLegacyOpts}"
+			ssh -i ${vagrantKey} -p ${vagrantPORT} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${sshLegacyOpts} \
+				vagrant@${sshHost} "rm -rf /home/vagrant/ansible_workspace && mkdir -p /home/vagrant/ansible_workspace"
+			scp $scpOpts . vagrant@${sshHost}:/home/vagrant/ansible_workspace
+			vagrant ssh --command "cd /home/vagrant/ansible_workspace && eval ansible-playbook $args playbooks/AdoptOpenJDK_Unix_Playbook/main.yml | tee /home/vagrant/ansible_playbook.log"
+			scp $scpOpts vagrant@${sshHost}:/home/vagrant/ansible_playbook.log ansible_playbook.log
+		else
+			# SSH into machine and run the ansible playbook with the constructed args
+			vagrant ssh --command "cd /vagrant && eval ansible-playbook $args playbooks/AdoptOpenJDK_Unix_Playbook/main.yml | tee /vagrant/ansible_playbook.log"
+		fi
 		# Copy The Logfile To The Expected Destination
 		cp ansible_playbook.log "$WORKSPACE/adoptopenjdkPBTests/logFiles/$gitFork.$newGitBranch.$OS.log"
-		# Return The Temporary Hosts File To Orignal
+		# Return The Temporary Hosts File To Original
 		echo "[127.0.0.1]:${vagrantPORT}" > playbooks/AdoptOpenJDK_Unix_Playbook/hosts.unx
 	else
 		# Run the ansible playbook with the constructed args
