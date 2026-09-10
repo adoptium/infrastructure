@@ -3,8 +3,22 @@
 
 $script = <<SCRIPT
 # Configure DPKG to be noninteractive
-ENV DEBIAN_FRONTEND=noninteractive 
-# Update Repository Addresses For Debian
+export DEBIAN_FRONTEND=noninteractive
+# Debian 11 (Bullseye) reached EOL on 31 July 2024.  security.debian.org has
+# removed the bullseye pool, and archive.debian.org/debian-security does not
+# carry bullseye at all.  The only source with the full, consistent set of
+# bullseye-security packages is snapshot.debian.org.  Use the last snapshot
+# that contains the final published versions of all bullseye-security packages.
+# The Ansible playbook (Common/tasks/Debian.yml) performs the same redirect
+# before running apt-get upgrade.
+SNAP="http://snapshot.debian.org/archive/debian-security/20260223T102419Z"
+sudo find /etc/apt/sources.list /etc/apt/sources.list.d/ -name "*.list" 2>/dev/null \
+  -exec sudo sed -i \
+    -e "s|deb https\?://security\.debian\.org[^[:space:]]* bullseye-security|deb ${SNAP} bullseye-security|g" \
+    -e 's|https\?://deb\.debian\.org/debian|http://archive.debian.org/debian|g' \
+    {} +
+# Allow apt to use the archived (expired) Release files
+echo 'Acquire::Check-Valid-Until "false";' | sudo tee /etc/apt/apt.conf.d/99no-check-valid-until > /dev/null
 sudo apt-get update
 sudo apt-get install tree -y
 sudo apt-get install software-properties-common -y
@@ -22,8 +36,10 @@ Vagrant.configure("2") do |config|
   # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
   config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
 
+  config.vm.boot_timeout = 600
+
   config.vm.define :adoptopenjdkD11 do |adoptopenjdkD11|
-    adoptopenjdkD11.vm.box = "debian/bullseye64"
+    adoptopenjdkD11.vm.box = "generic/debian11"
     adoptopenjdkD11.vm.synced_folder ".", "/vagrant", type: "rsync"
     adoptopenjdkD11.vm.hostname = "adoptopenjdkD11"
     adoptopenjdkD11.vm.provision "shell", inline: $script, privileged: false

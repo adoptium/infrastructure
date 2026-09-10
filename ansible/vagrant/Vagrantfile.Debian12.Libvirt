@@ -5,9 +5,11 @@ $script = <<SCRIPT
 # Configure DPKG to be noninteractive
 export DEBIAN_FRONTEND=noninteractive
 
-# Pre-configure GRUB to prevent interactive prompts during upgrades
+# Pre-configure GRUB to prevent interactive prompts during upgrades.
+# Under KVM/virtio the primary disk is /dev/vda (not /dev/sda); the preseed
+# must reference the correct device or grub-install will fail during apt upgrade.
 echo "grub-pc grub-pc/install_devices_empty boolean true" | sudo debconf-set-selections
-echo "grub-pc grub-pc/install_devices string /dev/sda" | sudo debconf-set-selections
+echo "grub-pc grub-pc/install_devices string /dev/vda" | sudo debconf-set-selections
 
 # Update Repository Addresses For Debian
 sudo apt-get update

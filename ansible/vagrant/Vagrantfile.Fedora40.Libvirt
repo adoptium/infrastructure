@@ -15,6 +15,12 @@ ROOT_PARTNUM=$(echo "${ROOT_PART}" | grep -o '[0-9]*$')
 echo "Root partition: ${ROOT_PART}  disk: /dev/${ROOT_DISK}  partnum: ${ROOT_PARTNUM}"
 sudo growpart /dev/${ROOT_DISK} ${ROOT_PARTNUM}
 sudo xfs_growfs /
+# Put the host machine's SSH key into authorized_keys so Ansible can connect.
+# vagrantPlaybookCheck.sh generates a fresh id_rsa keypair each run and writes
+# the public key to /vagrant/id_rsa.pub before provisioning starts.
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
 SCRIPT
 
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
@@ -22,6 +28,8 @@ Vagrant.configure("2") do |config|
 
   # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
   config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.boot_timeout = 600
 
   config.vm.define :adoptopenjdkF40 do |adoptopenjdkF40|
     adoptopenjdkF40.vm.box = "bento/fedora-40"
