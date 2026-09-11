@@ -400,8 +400,12 @@ startVMPlaybook()
 			# Use the Vagrant-managed private key (from vagrant ssh-config) — not $PWD/id_rsa,
 			# which is the playbook key and was never added to the guest's authorized_keys.
 			local sshLegacyOpts="-o HostKeyAlgorithms=ssh-rsa -o PubkeyAcceptedKeyTypes=ssh-rsa"
-			local scpOpts="-r -i ${vagrantKey} -P ${vagrantPORT} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${sshLegacyOpts}"
-			ssh -i ${vagrantKey} -p ${vagrantPORT} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${sshLegacyOpts} \
+			# Pre-seed known_hosts for the direct ssh/scp calls below (which use bare host:port
+			# rather than the bracketed [host]:port format used earlier by ssh-keyscan).
+			ssh-keygen -R "[${sshHost}]:${vagrantPORT}" 2>/dev/null || true
+			ssh-keyscan -t ssh-rsa -p "${vagrantPORT}" -H "${sshHost}" >> "$HOME/.ssh/known_hosts"
+			local scpOpts="-r -i ${vagrantKey} -P ${vagrantPORT} ${sshLegacyOpts}"
+			ssh -i ${vagrantKey} -p ${vagrantPORT} ${sshLegacyOpts} \
 				vagrant@${sshHost} "rm -rf /home/vagrant/ansible_workspace && mkdir -p /home/vagrant/ansible_workspace"
 			scp $scpOpts . vagrant@${sshHost}:/home/vagrant/ansible_workspace
 			vagrant ssh --command "cd /home/vagrant/ansible_workspace && eval ansible-playbook $args playbooks/AdoptOpenJDK_Unix_Playbook/main.yml | tee /home/vagrant/ansible_playbook.log"
