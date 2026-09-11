@@ -1,0 +1,667 @@
+---
+########################################
+# AdoptOpenJDK - Ansible Playbook for: #
+#  -------- Vagrant (Libvirt) ---------#
+########################################
+#
+# Variant of vagrant.yml that configures the host for the Libvirt/KVM
+# provider instead of Oracle VirtualBox.  Intended for use with the
+# multi-provider Vagrantfiles created under ansible/vagrant/ (*.Libvirt).
+#
+# Key differences from vagrant.yml:
+#  - VirtualBox section is removed entirely.
+#  - libvirtd service is enabled and started.
+#  - Jenkins user is added to the libvirt and kvm groups.
+#  - vagrant-libvirt plugin is installed for each Jenkins user instead of
+#    vagrant-disksize (which calls VBoxManage internally).
+#  - VirtualBox pre-req packages (libvpx-dev, libsdl-ttf2.0-0, evince) are
+#    not installed.
+#  - vagrant-libvirt creates its own NAT management network ('vagrant-libvirt',
+#    192.168.121.0/24) automatically on first 'vagrant up' — no pre-existing
+#    libvirt network configuration is required.
+#
+# Multi-user / concurrent VM support:
+#  - vagrant-libvirt names libvirt domains as <working_dir_basename>_<vm_name>.
+#    When multiple Jenkins agents run on the same host from directories with the
+#    same basename (always 'ansible' in vagrantPlaybookCheck.sh), every agent
+#    trying to boot the same OS creates an identically named domain and the
+#    second 'vagrant up' fails with "domain already exists".
+#  - Fix: each Jenkins user gets a per-user ~/.vagrant.d/Vagrantfile that sets
+#    v.default_prefix to a unique value (the username).  This is the only knob
+#    available without modifying the per-OS Vagrantfiles.
+#  - Configure Jenkins_Users as a list of all agent usernames on this host.
+#    Single-agent hosts can leave it as a one-element list.
+#
+
+- name: Vagrant (Libvirt) playbook
+  hosts: all
+  gather_facts: yes
+  remote_user: root
+  become: yes
+  vars:
+    # Jenkins User Variables.
+    # For a single-agent host use a one-element list.
+    # For concurrent agents (vagrant1, vagrant2, ...) list every agent user —
+    # each will receive its own ~/.vagrant.d/Vagrantfile with a unique
+    # v.default_prefix so libvirt domain names never collide.
+    Jenkins_Users:
+      - vagrant1
+    Jenkins_User_SSHKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAxCd3s79093JrDHyJa4/BJFP7VNfPzKz0Jb2zjN39N90DxNDJPy/asNZrBhvTY2xUdAh7o4aWjcOjUJamqeBfLrmgoXgthNje+44bWl0i/XlFc8ujcx/ya6+dtpcV0+ZiyiDGAEXfiyI+UHFv2xEmNrSNiohPIGJqXbt0BD56aVHC8n3q7hZ5H6S1ZGyWLjlfLLJQojGlAsFFwN5DOkikZCKrCp76UKHtfN39tlypTmGSQO50pKX/oN9UivPfk5EuTaHoo5oGqaqS+at1J50PKkm/danXNZdxwGDV6OK6av3LTOKt8wdBnfSynIstJJYfrRN9/ltJ6EVmPoaycwDp jenkins@ci.adoptopenjdk.net"
+
+  tasks:
+    - name: Vagrant (Libvirt) playbook
+      block:
+        - name: Print facts
+          debug:
+            msg:
+              - "inventory_hostname: {{ inventory_hostname | default('***Undefined***') }} "
+              - "ansible_hostname: {{ ansible_hostname | default('***Undefined***') }}"
+              - "ansible_fqdn: {{ ansible_fqdn | default('***Undefined***') }}"
+              - "ansible_user: {{ ansible_user | default('***Undefined***') }}"
+              - "ansible_default_ipv4.address: {{ ansible_default_ipv4.address | default('***Undefined***') }}"
+              - "ansible_os_family: {{ ansible_os_family | default('***Undefined***') }} "
+              - "ansible_distribution: {{ ansible_distribution | default('***Undefined***') }} "
+              - "ansible_distribution_major_version: {{ ansible_distribution_major_version | default('***Undefined***') }} "
+              - "ansible_architecture: {{ ansible_architecture | default('***Undefined***') }} "
+              - "ansible_processor_vcpus: {{ ansible_processor_vcpus | default('***Undefined***') }} "
+              - "ansible_processor_cores: {{ ansible_processor_cores | default('***Undefined***') }} "
+
+        - name: Install pre-reqs
+          apt:
+            name: "{{ packages }}"
+            update_cache: yes
+          vars:
+            packages:
+              - software-properties-common
+              - tree
+              - zlib1g
+              - zlib1g-dev
+              - python3-pip
+              - python-is-python3
+              - build-essential
+              - gettext
+              - libcurl4-openssl-dev
+              - sshpass
+
+        - name: Run apt-get upgrade
+          apt: upgrade=safe update_cache=yes
+          tags: patch_update
+
+
+        - name: Pip install winrm modules
+          pip:
+            executable: /usr/bin/pip
+            name: ["requests-credssp", "pywinrm"]
+            extra_args: "--break-system-packages"
+
+        - name: Create tmp folder if necessary
+          file:
+            path: /tmp
+            state: directory
+
+        - name: Create /usr/lib/jvm if necessary
+          file:
+            path: /usr/lib/jvm
+            state: directory
+
+      ##########
+      # Java 8 #
+      ##########
+
+        - name: Check if jdk8 is already installed in the target location
+          shell: ls -ld /usr/lib/jvm/jdk8* >/dev/null 2>&1
+          failed_when: false
+          register: adoptopenjdk_installed
+          tags: java
+
+        - name: Check if there is a default java
+          shell: java -version >/dev/null 2>&1
+          failed_when: false
+          register: default_java
+          tags: java
+
+        - name: Install latest jdk8 release if not already installed
+          unarchive:
+            src: https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/adoptopenjdk?project=jdk
+            dest: /usr/lib/jvm
+            remote_src: yes
+          when:
+            - adoptopenjdk_installed.rc != 0
+          tags: java
+
+        # This is due to ansible not liking wildcard searches in the file module :(
+        - name: Find jdk8 folder in /usr/lib/jvm
+          find:
+            paths: /usr/lib/jvm
+            file_type: directory
+            contains: jdk8u*
+          register: jdk8_folder
+          when: default_java.rc != 0
+          tags: java
+        # There should only be one jdk8u* folder in /usr/lib/jvm, hence 'files[0]'
+        - name: Make jdk8 the default java
+          file:
+            src: "{{ jdk8_folder.files[0].path }}{{ item }}"
+            dest: /usr{{ item }}
+            state: link
+          with_items:
+            - /bin/java
+            - /bin/javac
+          when: default_java.rc != 0
+          tags: java
+
+      ###########
+      # Java 21 #
+      ###########
+
+        - name: Check if jdk-21 is already installed in the target location
+          shell: ls -ld /usr/lib/jvm/jdk-21 >/dev/null 2>&1
+          failed_when: false
+          register: jdk21_installed
+          changed_when: false
+          tags: java
+
+        - name: Download the Latest JDK21 OpenJDK tar.gz file via the API
+          get_url:
+            url: "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk"
+            dest: "/tmp/JDK21.tar.gz"
+          when: jdk21_installed.rc != 0
+          tags: java
+
+        - name: Install JDK21 if one not already installed
+          unarchive:
+            src: /tmp/JDK21.tar.gz
+            dest: /usr/lib/jvm
+            remote_src: yes
+          when: jdk21_installed.rc != 0
+          tags: java
+
+        - name: Remove Download JDK
+          file:
+            path: /tmp/JDK21.tar.gz
+            state: absent
+          when: jdk21_installed.rc != 0
+          tags: java
+
+      ###########
+      # Ansible #
+      ###########
+
+        - name: Check if Ansible is installed
+          shell: which ansible >/dev/null 2>&1
+          failed_when: false
+          register: ansible_installed
+          tags: ansible
+
+        - name: Add Ansible repository
+          apt_repository:
+            repo: ppa:ansible/ansible
+          when: ansible_installed.rc != 0
+          tags: ansible
+
+        - name: Install Ansible
+          apt:
+            name: ansible
+            update_cache: yes
+          when: ansible_installed.rc != 0
+          tags: ansible
+
+      #######
+      # Git #
+      #######
+
+        - name: Check if Git is installed
+          shell: git --version >/dev/null 2>&1
+          failed_when: false
+          register: git_installed
+          tags:
+            - skip_ansible_lint
+            - git
+
+        - name: Test if Git is installed at the correct version
+          shell: git --version | sed -e 's/git version //g' | awk -F'[.]' '{print $1 "." $2}'
+          when: git_installed.rc == 0
+          register: git_version
+          tags:
+            - skip_ansible_lint
+            - git
+
+        - name: Download Git Source
+          get_url:
+            url: https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz
+            dest: /tmp/git-2.15.0.tar.xz
+            mode: 0440
+            checksum: sha256:107116489f10b758b51af1c5dbdb9a274917b0fb67dc8eaefcdabc7bc3eb3e6a
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
+          tags: git
+
+        - name: Extract Git Source
+          unarchive:
+            src: /tmp/git-2.15.0.tar.xz
+            dest: /tmp/
+            copy: False
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
+          tags: git
+
+        - name: Compile and Install Git from Source
+          shell: cd /tmp/git-2.15.0 && ./configure --prefix=/usr/local --without-tcltk && make clean && make -j {{ ansible_processor_vcpus }} && sudo make install
+          become: yes
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
+          tags: git
+
+        - name: Remove system git if needed
+          apt:
+            name: git
+            state: absent
+          when:
+            - (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
+          tags: git
+
+        - name: Symlink git to /usr/bin/git
+          file:
+            src: /tmp/git-2.15.0/git
+            dest: /usr/bin/git
+            state: link
+          when:
+            - (git_installed.rc != 0 ) or (git_installed.rc == 0 and git_version.stdout is version_compare('2.15', operator='lt'))
+          tags: git
+
+      ###########
+      # Vagrant #
+      ###########
+
+        - name: Check if Vagrant is installed
+          shell: which vagrant >/dev/null 2>&1
+          failed_when: false
+          register: vagrant_installed
+          tags: vagrant
+
+        - name: Test if the Vagrant version is >2.1
+          shell: vagrant --version | sed -e 's/Vagrant //g' | awk -F'[.]' '{print $1 "." $2 "." $3}'
+          when: vagrant_installed.rc == 0
+          register: vagrant_version
+          tags: vagrant
+
+        - name: Download and add the HashiCorp GPG key
+          ansible.builtin.get_url:
+            url: https://apt.releases.hashicorp.com/gpg
+            dest: /tmp/hashicorp.gpg
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+        - name: Add the HashiCorp GPG key to the keyring
+          ansible.builtin.command:
+            cmd: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp.gpg
+            creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+        # HashiCorp does not publish a 'noble' (Ubuntu 24.04) apt repository.
+        # 'jammy' (Ubuntu 22.04) packages install and run correctly on Ubuntu 24.04.
+        # Using ansible.builtin.copy (not command+creates) so the correct content is
+        # always enforced idempotently, even if the file exists with wrong content.
+        - name: Add the HashiCorp repository
+          ansible.builtin.copy:
+            dest: /etc/apt/sources.list.d/hashicorp.list
+            content: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main\n"
+            owner: root
+            group: root
+            mode: '0644'
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+        - name: Update apt package index
+          ansible.builtin.apt:
+            update_cache: yes
+
+        - name: Install Vagrant
+          ansible.builtin.apt:
+            name: vagrant
+            state: present
+          when:
+            - (vagrant_installed.rc != 0) or (vagrant_installed.rc == 0 and vagrant_version.stdout is version_compare('2.2.19', operator='lt'))
+          tags: vagrant
+
+      ###############
+      # KVM/Libvirt #
+      ###############
+
+        - name: Install KVM and libvirt packages
+          apt:
+            name: "{{ packages }}"
+            state: present
+            update_cache: yes
+          vars:
+            packages:
+              - qemu-kvm
+              - virt-manager
+              - virtinst
+              - libvirt-clients
+              - bridge-utils
+              - libvirt-daemon-system
+              - qemu-system-x86
+              - qemu-system-s390x
+              - qemu-system-ppc
+              - qemu-system-arm
+              - qemu-system-misc
+              # Build dependencies required by the vagrant-libvirt gem
+              - ruby-dev
+              - libvirt-dev
+              - pkg-config
+              - gcc
+              - make
+          tags: libvirt
+
+        - name: Enable and start libvirtd
+          systemd:
+            name: libvirtd
+            enabled: yes
+            state: started
+          tags: libvirt
+
+        - name: Verify KVM kernel modules are loaded
+          shell: lsmod | grep -E '^kvm'
+          register: kvm_modules
+          changed_when: false
+          failed_when: false
+          tags: libvirt
+
+        - name: Warn if KVM modules are not loaded (nested virt or bare-metal required)
+          debug:
+            msg: >
+              WARNING: KVM kernel modules (kvm_intel / kvm_amd) are not loaded.
+              vagrant-libvirt will use QEMU software emulation which is significantly
+              slower.  Ensure hardware virtualisation is enabled in the host BIOS/UEFI
+              or that nested virtualisation is enabled for this VM.
+          when: kvm_modules.rc != 0
+          tags: libvirt
+
+        # NOTE: vagrant-libvirt does NOT use libvirt's built-in 'default' network
+        # (virbr0, 192.168.122.0/24).  It creates and manages its own separate NAT
+        # network named 'vagrant-libvirt' (192.168.121.0/24) automatically on the
+        # first 'vagrant up --provider libvirt'.  No virsh net-autostart or net-start
+        # commands are needed for this network — vagrant-libvirt handles it entirely.
+        # The SSH port-forward that vagrantPlaybookCheck.sh relies on (vagrant port ->
+        # [127.0.0.1]:PORT) is established over this management network.
+
+        # Samba is needed on the host for Windows Libvirt guests that use synced_folder
+        # type: "smb" (Vagrantfile.Win2022.Libvirt, Vagrantfile.Win2025.Libvirt).
+        # Linux/BSD Vagrantfiles use rsync and do not require this.
+        - name: Install Samba for Windows Libvirt guest synced folders (smb type)
+          apt:
+            name:
+              - samba
+              - samba-common-bin
+            state: present
+          tags:
+            - libvirt
+            - windows_libvirt
+
+        #################
+        # Jenkins Users #
+        #################
+        # All tasks in this section loop over Jenkins_Users so that a host with
+        # multiple concurrent Jenkins agents (vagrant1, vagrant2, ...) is fully
+        # configured in a single playbook run.
+
+        - name: Create Jenkins users
+          user:
+            name: "{{ item }}"
+            state: present
+            home: "/home/{{ item }}"
+            shell: /bin/bash
+          failed_when: false
+          loop: "{{ Jenkins_Users }}"
+          tags: jenkins_user
+
+        - name: Create Jenkins SSH folders
+          file:
+            path: "/home/{{ item }}/.ssh"
+            state: directory
+            owner: "{{ item }}"
+            group: "{{ item }}"
+            mode: '0700'
+          loop: "{{ Jenkins_Users }}"
+          tags: jenkins_user
+
+        - name: Add github.com to known_hosts for each Jenkins user
+          known_hosts:
+            name: github.com
+            key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+            path: "/home/{{ item }}/.ssh/known_hosts"
+            state: present
+          loop: "{{ Jenkins_Users }}"
+          tags: jenkins_user
+
+        - name: Set ownership of known_hosts for each Jenkins user
+          file:
+            path: "/home/{{ item }}/.ssh/known_hosts"
+            owner: "{{ item }}"
+            mode: '0644'
+          loop: "{{ Jenkins_Users }}"
+          tags: jenkins_user
+
+        - name: Add Jenkins users to audio group
+          user:
+            name: "{{ item }}"
+            groups: audio
+            append: yes
+          loop: "{{ Jenkins_Users }}"
+          tags: jenkins_user
+
+        - name: Add Jenkins users to libvirt group
+          user:
+            name: "{{ item }}"
+            groups: libvirt
+            append: yes
+          loop: "{{ Jenkins_Users }}"
+          tags:
+            - jenkins_user
+            - libvirt
+
+        - name: Add Jenkins users to kvm group
+          user:
+            name: "{{ item }}"
+            groups: kvm
+            append: yes
+          loop: "{{ Jenkins_Users }}"
+          tags:
+            - jenkins_user
+            - libvirt
+
+        - name: Set authorized key for each Jenkins user
+          authorized_key:
+            user: "{{ item }}"
+            state: present
+            key: "{{ Jenkins_User_SSHKey }}"
+          loop: "{{ Jenkins_Users }}"
+          when: Jenkins_User_SSHKey is defined
+          tags: jenkins_user
+
+
+        ############################################
+        # Per-user libvirt domain prefix isolation #
+        ############################################
+        # vagrant-libvirt names libvirt domains as:
+        #   <basename(Vagrantfile_dir)>_<vm_define_name>
+        # vagrantPlaybookCheck.sh always runs from a directory whose basename is
+        # 'ansible', so every user trying to boot the same OS would produce the
+        # same domain name (e.g. ansible_adoptopenjdkU20) and the second
+        # 'vagrant up' fails: "domain about to create is already taken".
+        #
+        # Setting v.default_prefix in ~/.vagrant.d/Vagrantfile overrides the
+        # working-directory-based prefix at the user level without touching any
+        # per-OS Vagrantfile.  Each Jenkins user gets its own username as prefix,
+        # producing unique domain names: vagrant1_adoptopenjdkU20, vagrant2_..., etc.
+        #
+        # ~/.vagrant.d/Vagrantfile is the standard Vagrant global config file —
+        # it is merged into every Vagrantfile that Vagrant processes for that user.
+
+        - name: Create ~/.vagrant.d directory for each Jenkins user
+          file:
+            path: "/home/{{ item }}/.vagrant.d"
+            state: directory
+            owner: "{{ item }}"
+            group: "{{ item }}"
+            mode: '0755'
+          loop: "{{ Jenkins_Users }}"
+          tags:
+            - jenkins_user
+            - libvirt
+
+        - name: Write per-user global Vagrantfile to set unique libvirt domain prefix
+          copy:
+            dest: "/home/{{ item }}/.vagrant.d/Vagrantfile"
+            owner: "{{ item }}"
+            group: "{{ item }}"
+            mode: '0644'
+            content: |
+              # Global Vagrantfile — applied to every 'vagrant up' run by this user.
+              # Sets v.default_prefix so libvirt domain names are unique per Jenkins
+              # agent user on this host (prevents "domain already exists" collisions
+              # when multiple agents boot the same OS concurrently).
+              Vagrant.configure("2") do |config|
+                config.vm.provider "libvirt" do |v|
+                  v.default_prefix = "{{ item }}_"
+                end
+              end
+          loop: "{{ Jenkins_Users }}"
+          tags:
+            - jenkins_user
+            - libvirt
+
+        #############################################
+        # Vagrant Plugins — installed per-user      #
+        # (Vagrant plugin state lives in ~/.vagrant.d)
+        #
+        # Plugins are installed as root with VAGRANT_HOME pointing at the
+        # user's ~/.vagrant.d directory.  This avoids requiring each Jenkins
+        # user to be in sudoers while still storing plugins in the correct
+        # per-user location.  Ownership of ~/.vagrant.d is corrected after.
+        #############################################
+
+        # vagrant-libvirt is installed via 'su -c' to run as the target user with
+        # their full login environment, ensuring Vagrant uses the correct ~/.vagrant.d.
+        # winrm, winrm-fs, and winrm-elevated are bundled as dependencies of
+        # vagrant-libvirt and are pulled in automatically — they do not need separate
+        # 'vagrant plugin install' calls and will not appear in 'vagrant plugin list'
+        # output (only explicitly installed top-level plugins are listed there).
+        - name: Install vagrant-libvirt plugin for each Jenkins user
+          shell: su -c 'vagrant plugin install vagrant-libvirt' - {{ item }}
+          register: libvirt_plugin_installed
+          changed_when: "'installed' in libvirt_plugin_installed.stdout"
+          failed_when: libvirt_plugin_installed.rc != 0 and 'already installed' not in libvirt_plugin_installed.stdout
+          loop: "{{ Jenkins_Users }}"
+          tags: vagrant_plugins
+
+        - name: Ensure vagrant-libvirt installed successfully for all users
+          fail:
+            msg: "Failed to install vagrant-libvirt for one or more users"
+          when: libvirt_plugin_installed.results | selectattr('failed', 'equalto', true) | list | length > 0
+          tags: vagrant_plugins
+
+        - name: Output plugin installation results
+          debug:
+            msg: "User {{ item.item }}: {{ item.stdout | default('skipped') }}"
+          loop: "{{ libvirt_plugin_installed.results }}"
+          tags: vagrant_plugins
+
+        ###############
+        # Validation  #
+        ###############
+
+        - name: Verify vagrant binary is present and version
+          command: vagrant --version
+          register: vagrant_ver
+          changed_when: false
+          tags: validate
+
+        # On Ubuntu 24 libvirtd is socket-activated — it starts on demand and
+        # exits when idle.  'inactive' is normal.  Check the socket is listening
+        # and that virsh can connect, rather than checking the service state.
+        - name: Verify libvirtd socket is enabled and listening
+          command: systemctl is-active libvirtd.socket
+          register: libvirtd_status
+          changed_when: false
+          failed_when: libvirtd_status.rc != 0
+          tags: validate
+
+        - name: Verify KVM modules are loaded
+          shell: lsmod | grep -E '^kvm'
+          register: kvm_check
+          changed_when: false
+          failed_when: false
+          tags: validate
+
+        - name: Verify virsh daemon connection
+          command: virsh version --daemon
+          register: virsh_check
+          changed_when: false
+          tags: validate
+
+        - name: Verify vagrant1 user groups (libvirt, kvm)
+          command: id {{ item }}
+          register: user_id_check
+          changed_when: false
+          loop: "{{ Jenkins_Users }}"
+          tags: validate
+
+        - name: Verify required Vagrant plugins for each user
+          shell: su -c 'vagrant plugin list' - {{ item }}
+          register: plugin_check
+          changed_when: false
+          loop: "{{ Jenkins_Users }}"
+          tags: validate
+
+        - name: Assert vagrant-libvirt plugin is present for each user
+          assert:
+            that: "'vagrant-libvirt' in item.stdout"
+            fail_msg: "vagrant-libvirt plugin missing for user {{ item.item }}"
+            success_msg: "vagrant-libvirt plugin present for user {{ item.item }}"
+          loop: "{{ plugin_check.results }}"
+          tags: validate
+
+        # winrm, winrm-fs, and winrm-elevated ship embedded with Vagrant itself at
+        # /opt/vagrant/embedded/gems/gems/ — they are available to all users without
+        # any plugin install.  Verify the embedded bundle rather than per-user dirs.
+        - name: Check winrm gems are present in Vagrant embedded bundle
+          shell: |
+            ls /opt/vagrant/embedded/gems/gems/ | grep -q '^winrm-[0-9]' &&
+            ls /opt/vagrant/embedded/gems/gems/ | grep -q '^winrm-fs-' &&
+            ls /opt/vagrant/embedded/gems/gems/ | grep -q '^winrm-elevated-'
+          changed_when: false
+          register: winrm_embedded_check
+          tags: validate
+
+        - name: Assert winrm gems are present in Vagrant embedded bundle
+          assert:
+            that: winrm_embedded_check.rc == 0
+            fail_msg: "One or more winrm gems missing from Vagrant embedded bundle — check Vagrant installation"
+            success_msg: "winrm, winrm-fs, winrm-elevated all present in Vagrant embedded bundle"
+          tags: validate
+
+        - name: Verify per-user global Vagrantfile exists with correct prefix
+          shell: grep "default_prefix" /home/{{ item }}/.vagrant.d/Vagrantfile
+          register: prefix_check
+          changed_when: false
+          failed_when: prefix_check.rc != 0
+          loop: "{{ Jenkins_Users }}"
+          tags: validate
+
+        - name: Print validation summary
+          debug:
+            msg:
+              - "=== Validation Summary ==="
+              - "Vagrant version    : {{ vagrant_ver.stdout }}"
+              - "libvirtd socket    : {{ libvirtd_status.stdout }} (service is socket-activated, starts on demand)"
+              - "KVM modules loaded : {{ 'yes' if kvm_check.rc == 0 else 'NO - software emulation only' }}"
+              - "virsh daemon       : {{ virsh_check.stdout_lines[0] | default('unavailable') }}"
+              - "Users configured   : {{ Jenkins_Users | join(', ') }}"
+              - "Plugin check       : {{ plugin_check.results | map(attribute='item') | list | zip(plugin_check.results | map(attribute='stdout') | list) | list }}"
+          tags: validate

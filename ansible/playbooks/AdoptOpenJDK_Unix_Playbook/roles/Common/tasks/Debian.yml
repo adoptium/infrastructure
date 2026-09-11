@@ -6,6 +6,65 @@
 #########################################
 # Configure Repos and Update the system #
 #########################################
+
+# Debian 11 (Bullseye) reached EOL on 31 July 2024. The security.debian.org
+# pool has been decommissioned and all packages return 404. This block MUST
+# run first — before any apt install or apt-get update — so that every
+# subsequent task in this file resolves packages from archive.debian.org
+# instead of the dead security pool.
+- name: "Debian 11: redirect all apt sources to archive.debian.org"
+  when: ansible_distribution_major_version == "11"
+  tags: patch_update
+  become: true
+  block:
+    - name: "Debian 11: find all apt source list files on guest"
+      ansible.builtin.find:
+        paths:
+          - /etc/apt/sources.list.d
+        patterns: "*.list"
+        file_type: file
+      register: apt_list_files
+
+    - name: "Debian 11: rewrite security.debian.org to snapshot.debian.org"
+      replace:
+        path: "{{ item }}"
+        regexp: 'deb https?://security\.debian\.org\S*\s+bullseye-security'
+        replace: 'deb http://snapshot.debian.org/archive/debian-security/20260223T102419Z bullseye-security'
+      loop: >-
+        {{ (['/etc/apt/sources.list'] +
+            apt_list_files.files | map(attribute='path') | list)
+           | select('string') | list }}
+
+    - name: "Debian 11: rewrite deb.debian.org references to archive"
+      replace:
+        path: "{{ item }}"
+        regexp: 'https?://deb\.debian\.org/debian'
+        replace: 'http://archive.debian.org/debian'
+      loop: >-
+        {{ (['/etc/apt/sources.list'] +
+            apt_list_files.files | map(attribute='path') | list)
+           | select('string') | list }}
+
+    - name: "Debian 11: allow expired Release files from archive"
+      copy:
+        dest: /etc/apt/apt.conf.d/99archive-debian
+        content: |
+          Acquire::Check-Valid-Until "false";
+        mode: '0644'
+
+    - name: "Debian 11: pin all packages from archive.debian.org at priority 1001"
+      copy:
+        dest: /etc/apt/preferences.d/99debian-archive
+        content: |
+          Package: *
+          Pin: origin archive.debian.org
+          Pin-Priority: 1001
+        mode: '0644'
+
+    - name: "Debian 11: refresh apt cache after source rewrite"
+      apt:
+        update_cache: yes
+
 - name: Allow https apt sources
   package: "name=apt-transport-https state=latest"
   tags: patch_update

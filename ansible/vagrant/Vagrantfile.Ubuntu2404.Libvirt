@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkU24 do |adoptopenjdkU24|
+    # generic/ubuntu2404 has networking issues under libvirt; bento/ubuntu-24.04
+    # has a cloud-init delay that causes the fog IP-wait timeout to fire.
+    # gusztavvargadr/ubuntu-server-2404-lts is a Packer-built server image with
+    # no cloud-init and explicit libvirt support.  Pinned to 2607.0.0 — the
+    # latest release (2607.1.0) dropped the libvirt provider.
+    adoptopenjdkU24.vm.box = "gusztavvargadr/ubuntu-server-2404-lts"
+    adoptopenjdkU24.vm.box_version = "2607.0.0"
+    adoptopenjdkU24.vm.synced_folder ".", "/vagrant", type: "rsync"
+    adoptopenjdkU24.vm.hostname = "adoptopenjdkU24"
+    adoptopenjdkU24.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 6144
+    v.cpus = 4
+  end
+end
