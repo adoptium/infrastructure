@@ -1,8 +1,8 @@
 # Vagrant Playbook Check — v2 Libvirt Changes
 
-This document covers the changes introduced in the `vpc_v2` branch that extend
-the Vagrant-based playbook test infrastructure with **KVM/libvirt** provider support
-alongside the existing VirtualBox path.
+This document covers the changes made to extend the Vagrant-based playbook test
+infrastructure with **KVM/libvirt** provider support alongside the existing VirtualBox
+path, as part of [infrastructure#4494](https://github.com/adoptium/infrastructure/issues/4494).
 
 ---
 
@@ -10,7 +10,7 @@ alongside the existing VirtualBox path.
 
 Previously all Vagrant-based testing used VirtualBox exclusively.  Machines that do
 not have VirtualBox available (e.g. bare-metal KVM hosts, certain CI agents) could
-not run `vagrantPlaybookCheck.sh`.  This branch adds a parallel libvirt provider path
+not run `vagrantPlaybookCheck.sh`.  These changes add a parallel libvirt provider path
 so the same test matrix can be executed on either hypervisor without modifying the
 playbooks or Vagrantfiles for the existing provider.
 
