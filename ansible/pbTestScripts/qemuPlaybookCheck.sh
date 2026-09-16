@@ -170,7 +170,7 @@ setupWorkspace() {
 		find "$workFolder" -type f | xargs rm -f
 		rm -rf "$workFolder"/openjdk-infrastructure "$workFolder"/openjdk-build
 	fi
-	if [[ ! -f "${workFolder}/${OS}.${ARCHITECTURE}.dsk" ]]; then 
+	if [[ ! -f "${workFolder}/${OS}.${ARCHITECTURE}.dsk" ]]; then
 		echo "Copying new disk image"
 		# Copy disk image and tools from imageLocation to workFolder
 		cp -r $imageLocation/$OS.$ARCHITECTURE/. $workFolder
@@ -178,11 +178,30 @@ setupWorkspace() {
 	else
 		echo "Using old disk image"
 	fi
+
+	# For RISC-V, extract kernel and initrd directly from the disk image
+	# This is required because modern QEMU/U-Boot versions are incompatible with
+	# the old Debian 11 RISC-V image — direct kernel boot bypasses U-Boot entirely
+	if [[ "$ARCHITECTURE" == "RISCV" ]]; then
+		if [[ ! -f "${workFolder}/vmlinux" || ! -f "${workFolder}/initrd.img" ]]; then
+			echo "Extracting kernel and initrd from RISC-V disk image"
+			sudo modprobe nbd max_part=8
+			sudo qemu-nbd --connect=/dev/nbd0 "${workFolder}/${OS}.${ARCHITECTURE}.dsk"
+			sleep 2
+			sudo mount -o ro /dev/nbd0p1 /mnt
+			sudo cp /mnt/boot/vmlinux-* "${workFolder}/vmlinux"
+			sudo cp /mnt/boot/initrd.img-* "${workFolder}/initrd.img"
+			sudo chown "$(id -u):$(id -g)" "${workFolder}/vmlinux" "${workFolder}/initrd.img"
+			sudo umount /mnt
+			sudo qemu-nbd --disconnect /dev/nbd0
+		fi
+	fi
 }
 
 runImage() {
 
 local EXTRA_ARGS=""
+local APPEND_ARGS=""
 local workFolder="$WORKSPACE/qemu_pbCheck"
 
 # Find/stop port collisions
@@ -207,10 +226,10 @@ done
 			export QEMUARCH="aarch64"
 			case $OS in
 				"UBUNTU18" )
-					export MACHINE="virt,gic-version=max"
-					export DRIVE="-drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
-					export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
-					export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu max";;
+						export MACHINE="virt,gic-version=max"
+						export DRIVE="-drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0"
+						export SSH_CMD="-netdev user,id=vnet,hostfwd=:127.0.0.1:$PORTNO-:22 -device virtio-net-pci,netdev=vnet"
+						export EXTRA_ARGS="-drive file=$workFolder/QEMU_EFI-flash.img,format=raw,if=pflash -drive file=$workFolder/flash1.img,format=raw,if=pflash -cpu cortex-a57";;
 				"DEBIAN10" )
 					export MACHINE="virt"
 					export DRIVE="-drive if=none,file=$workFolder/${OS}.${ARCHITECTURE}.dsk,id=hd -device virtio-blk-device,drive=hd"
@@ -228,7 +247,11 @@ done
 			export MACHINE="virt"
 			export DRIVE="-device virtio-blk-device,drive=hd -drive file=$workFolder/${OS}.${ARCHITECTURE}.dsk,if=none,id=hd"
 			export SSH_CMD="-device virtio-net-device,netdev=net -netdev user,id=net,hostfwd=tcp::$PORTNO-:22"
-			export EXTRA_ARGS="-kernel /usr/lib/riscv64-linux-gnu/opensbi/generic/fw_jump.elf -device loader,file=/usr/lib/u-boot/qemu-riscv64_smode/u-boot.bin,addr=0x80200000";;
+			# Boot directly with the kernel and initrd extracted from the disk image.
+			# Modern QEMU (8.x) loads OpenSBI automatically; U-Boot is incompatible
+			# with this old Debian 11 RISC-V image so we bypass it entirely.
+			export EXTRA_ARGS="-kernel $workFolder/vmlinux -initrd $workFolder/initrd.img"
+			export APPEND_ARGS="root=LABEL=rootfs rw console=ttyS0";;
 	esac
 	
 	# Run the command, mask output and send to background
@@ -238,20 +261,31 @@ done
      	  -M $MACHINE \
 	  $SSH_CMD \
 	  $DRIVE \
-     	  $EXTRA_ARGS \
+	  $EXTRA_ARGS \
+	  ${APPEND_ARGS:+-append "$APPEND_ARGS"} \
 	  -nographic) > "$workFolder/${OS}.${ARCHITECTURE}.startlog" 2>&1 &
 
 	echo "Machine is booting; logging console to $workFolder/${OS}.${ARCHITECTURE}.startlog"
-	echo "Please be patient - this can take up to 300 seconds"
+	echo "Please be patient - this can take up to 600 seconds"
+
+	# Generate SSH key before the boot loop so it is ready when the VM comes up
+	rm -f "$workFolder"/id_rsa*
+	ssh-keygen -q -f "$workFolder"/id_rsa -t rsa -N ''
+	ssh-keygen -q -R "[localhost]:$PORTNO"
 
 	SECONDS=0
 	while [ true ];
 	do
-		if tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | grep -q login; then
+		# Probe by attempting a real SSH connection; success means sshd is up
+		if sshpass -p 'password' ssh linux@localhost -p "$PORTNO" \
+			-o StrictHostKeyChecking=accept-new \
+			-o ConnectTimeout=10 \
+			-o BatchMode=no \
+			'uname -a' 2>/dev/null; then
 			echo "VM Booted after $SECONDS seconds"
 			break;
 		fi
-		if [ $SECONDS -gt 300 ]; then
+		if [ $SECONDS -gt 600 ]; then
 			echo -e "Timeout Reached. See log below:\n"
 			tail "$workFolder/${OS}.${ARCHITECTURE}.startlog" | sed 's/^/CONSOLE > /g'
 			echo
@@ -264,15 +298,8 @@ done
 		fi
 		sleep 10
 	done
-	# Remove old ssh key and create a new one
-	rm -f "$workFolder"/id_rsa*
-	ssh-keygen -q -f "$workFolder"/id_rsa -t rsa -N ''
-        ssh-keygen -q -R "[localhost]:$PORTNO"
-
-	# Required to auto-accept the host ECDSA key
-	sshpass -p 'password' ssh linux@localhost -p "$PORTNO" -o StrictHostKeyChecking=no 'uname -a' 
 	# Add ssh key to VM's authorized_keys
-	sshpass -p 'password' ssh-copy-id -p "$PORTNO" -i "$workFolder"/id_rsa.pub linux@localhost 
+	sshpass -p 'password' ssh-copy-id -p "$PORTNO" -i "$workFolder"/id_rsa.pub linux@localhost
 }
 
 ## Run the playbook ( and build/test the JDK if applicable )
@@ -281,7 +308,7 @@ runPlaybook() {
 	local workFolder="$WORKSPACE"/qemu_pbCheck
 	local pbLogPath="$workFolder/logFiles/$OS.$ARCHITECTURE.log"
 	local extraAnsibleArgs="$verbosity"
-        local gitURL="https://github.com/$gitFork/openjdk-infrastructure"
+        local gitURL="https://github.com/$gitFork/infrastructure"
 
 	# RISCV requires this be specified
 	if [[ $ARCHITECTURE == "RISCV" ]]; then
@@ -333,8 +360,13 @@ runPlaybook() {
 	fi
 }
 
-destroyVM() {	
-	local PID=$(ps -aux | grep "$PORTNO" | grep -v "grep" | awk '{ print $2 }')
+destroyVM() {
+	local PID
+	PID=$(ps -aux | grep "$PORTNO" | grep -v "grep" | awk '{ print $2 }')
+	if [[ -z "$PID" ]]; then
+		echo "No QEMU process found for port $PORTNO, nothing to kill"
+		return 0
+	fi
 	echo "Killing this process: $PID"
 	kill $PID
 }

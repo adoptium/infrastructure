@@ -34,7 +34,7 @@ processArgs() {
 			*) echo >&2 "Invalid option: ${opt}"; echo "This option was unrecognised."; usage; exit 1;;
 		esac
 	done
-	if [ -z "$JAVA_TO_BUILD:-}" ]; then
+	if [ -z "${JAVA_TO_BUILD:-}" ]; then
 		echo "You must use the '-v' option"
 		exit 1
 	fi

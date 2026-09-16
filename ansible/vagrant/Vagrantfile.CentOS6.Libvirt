@@ -1,0 +1,51 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+sudo sed -i -e 's!mirrorlist!#mirrorlist!g' /etc/yum.repos.d/CentOS-Base.repo
+sudo sed -i -e 's!#baseurl=http://mirror.centos.org/centos/\$releasever!baseurl=https://vault.centos.org/6.10/!g' /etc/yum.repos.d/CentOS-Base.repo
+sudo yum -y update
+sudo yum install -y libselinux-python
+sudo yum install -y ansible
+sudo mkdir /ansible
+sudo cp /etc/ansible/ansible.cfg /ansible
+sudo touch /ansible/hosts
+sudo sed -i 's?#inventory      = /etc/ansible/hosts?inventory = /ansible/hosts?g' /ansible/ansible.cfg
+echo "---------------------------------------------------------------------------------------"
+echo "*** Creating public-private keypair for ansible-playbook... for user '$USER' *** "
+yes y | ssh-keygen -t rsa -b 4096 -C "adoptopenjdk@gmail.com" -q -P "" -f $HOME/.ssh/id_rsa
+echo "---------------------------------------------------------------------------------------"
+echo "*** Public-private keypair for ansible-playbook... for user '$USER' has been created in *** "
+ls -lash $HOME/.ssh
+echo "---------------------------------------------------------------------------------------"
+echo "*** Creating 'hosts' file for ansible-playbook... ***"
+echo "localhost ansible_connection=local" | sudo tee /ansible/hosts
+echo "---------------------------------------------------------------------------------------"
+echo "*** '/ansible/hosts' file for ansible-playbook contains ***"
+cat /ansible/hosts
+echo "---------------------------------------------------------------------------------------"
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkC6 do |adoptopenjdkC6|
+    adoptopenjdkC6.vm.box = "generic/centos6"
+    # CentOS 6 ships OpenSSH 5.x which does not support the ControlMaster/
+    # ControlPersist options that Vagrant injects into the rsync SSH command,
+    # causing rsync to exit with code 255 before any bytes are transferred.
+    # Disable rsync and use the default 9p/virtiofs share instead, or simply
+    # disable syncing altogether since the provisioner script only writes to
+    # /vagrant (it does not read host files before provisioning runs).
+    adoptopenjdkC6.vm.synced_folder ".", "/vagrant", disabled: true
+    adoptopenjdkC6.vm.hostname = "adoptopenjdkC6"
+    adoptopenjdkC6.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 2560
+    v.cpus = 1
+  end
+end

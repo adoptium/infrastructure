@@ -26,6 +26,7 @@ hosts:
 
       - ibmcloud:
           vagrant-x64-1: {ip: 150.239.60.120, cloudloc: oj9, description: Bare metal machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
+          vagrant-x64-2: {ip: 149.81.38.120, user: ubuntu, cloudloc: oj9, description: Replacment ibmcloud machine to run vagrantPlaybookCheck and qemuPlaybookCheck}
 
   - build:
 

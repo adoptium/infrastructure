@@ -1,0 +1,74 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$script = <<SCRIPT
+# Configure DPKG to be noninteractive
+export DEBIAN_FRONTEND=noninteractive
+
+# Pre-configure GRUB to prevent interactive prompts during upgrades.
+# Under KVM/virtio the primary disk is /dev/vda (not /dev/sda); the preseed
+# must reference the correct device or grub-install will fail during apt upgrade.
+echo "grub-pc grub-pc/install_devices_empty boolean true" | sudo debconf-set-selections
+echo "grub-pc grub-pc/install_devices string /dev/vda" | sudo debconf-set-selections
+
+# Grow the root partition and filesystem to fill the full virtual disk.
+# The generic/ubuntu2004 box ships with a filesystem much smaller than the
+# 128G virtual disk, causing mkinitramfs to fail with ENOSPC (Error 24) when
+# apt upgrade installs a new kernel and tries to write /boot/initrd.img.
+# Detect root disk/partition dynamically (libvirt uses /dev/vda, not /dev/sda).
+sudo apt-get install -y cloud-guest-utils
+ROOT_PART=$(findmnt -n -o SOURCE /)
+ROOT_DISK=$(lsblk -ndo PKNAME "${ROOT_PART}")
+ROOT_PARTNUM=$(echo "${ROOT_PART}" | grep -o '[0-9]*$')
+echo "Root partition: ${ROOT_PART}  disk: /dev/${ROOT_DISK}  partnum: ${ROOT_PARTNUM}"
+sudo growpart /dev/${ROOT_DISK} ${ROOT_PARTNUM}
+sudo resize2fs "${ROOT_PART}"
+
+# The generic/ubuntu2004 box has a separate /boot partition (vda2, ~1 GB).
+# apt upgrade installs a new kernel alongside the box's original kernel, which
+# fills /boot and causes mkinitramfs to fail with Error 24 (ENOSPC).
+# Purge the box's original kernel packages first to free /boot space before
+# apt upgrade runs.  autoremove cleans up any remaining old dependencies.
+CURRENT_KERNEL=$(uname -r)
+sudo apt-get purge -y $(dpkg-query -W -f='${Package}\n' 'linux-image-*' 'linux-headers-*' 'linux-modules-*' 2>/dev/null \
+  | grep -v "^linux-image-${CURRENT_KERNEL}$" \
+  | grep -v "^linux-headers-${CURRENT_KERNEL}$" \
+  | grep -v "^linux-modules-${CURRENT_KERNEL}$" \
+  | grep -v "^linux-modules-extra-${CURRENT_KERNEL}$" \
+  | grep -v "linux-image-generic\|linux-headers-generic\|linux-cloud-tools-generic\|linux-tools-generic" \
+  ) || true
+sudo apt-get autoremove -y || true
+
+# Put the host machine's IP into the authorised_keys file on the VM
+if [ -r /vagrant/id_rsa.pub ]; then
+        mkdir -p $HOME/.ssh && cat /vagrant/id_rsa.pub >> $HOME/.ssh/authorized_keys
+fi
+# Add The PPA Repo To Get Later Version Of ansible
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt update
+SCRIPT
+
+# 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
+Vagrant.configure("2") do |config|
+
+  # Suppress vagrant-vbguest which probes VBoxManage even under libvirt
+  config.vbguest.auto_update = false if Vagrant.has_plugin?("vagrant-vbguest")
+
+  config.vm.define :adoptopenjdkU20 do |adoptopenjdkU20|
+    adoptopenjdkU20.vm.box = "generic/ubuntu2004"
+    adoptopenjdkU20.vm.synced_folder ".", "/vagrant", type: "rsync"
+    adoptopenjdkU20.vm.hostname = "adoptopenjdkU20"
+    adoptopenjdkU20.vm.provision "shell", inline: $script, privileged: false
+  end
+  config.vm.provider "libvirt" do |v|
+    v.memory = 2560
+    v.cpus = 1
+    # Extend the virtual disk to 200 GB before first boot so that the
+    # growpart/resize2fs provisioner can actually expand the root filesystem.
+    # generic/ubuntu2004 v4.3.12 leaves the partition only ~2015 sectors from
+    # the end of the default 128G disk, which is below growpart's 2048-sector
+    # fudge factor, causing mkinitramfs to fail with ENOSPC (Error 24) when
+    # apt upgrade installs a new kernel image.
+    v.machine_virtual_size = 200
+  end
+end
