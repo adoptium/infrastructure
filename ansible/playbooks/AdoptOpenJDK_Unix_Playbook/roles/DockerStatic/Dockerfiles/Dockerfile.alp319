@@ -1,7 +1,7 @@
 FROM alpine:3.19
 
 RUN apk --update add bash shadow openssh-server openssh-client unzip zip wget git curl make gcc perl xvfb \
-        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 msttcorefonts-installer fontconfig libxext freetype zlib fakeroot gnupg
+        libxrender libxi libxtst procps musl-dev perl-doc alsa-lib libx11 msttcorefonts-installer fontconfig libxext freetype zlib fakeroot gnupg python3 perl-test-simple
 
 # Add SSL Test packages
 RUN apk --update add openssl gnutls gnutls-dev gnutls-utils nss nss-dev nss-tools

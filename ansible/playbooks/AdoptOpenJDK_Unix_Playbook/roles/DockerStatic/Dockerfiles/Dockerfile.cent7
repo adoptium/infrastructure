@@ -16,7 +16,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 
 RUN yum -y update && yum clean all
 
-RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest-SHA perl-Data-Dumper gettext zlib-devel git curl curl-devel make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb which
+RUN yum -y update && yum install -y perl openssh-server unzip zip wget epel-release perl-devel perl-Digest-SHA perl-Data-Dumper gettext zlib-devel git curl curl-devel make gcc libXrender libXi libXtst fontconfig fakeroot xorg-x11-server-Xvfb which python3 perl-Test-Simple
 # Install OpenSSL Packages
 RUN yum install -y gnutls gnutls-utils nss-devel nss-tools
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
@@ -58,6 +58,11 @@ RUN rm -rf /tmp/git*
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 RUN yum update -y
+# Generate Asian locales
+RUN localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8 \
+ && localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8 \
+ && localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 \
+ && localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
 # ENTRYPOINT /usr/lib/jvm/jdk25/bin/java
 EXPOSE 22
 # Start with docker run -p 2222:22 UUID

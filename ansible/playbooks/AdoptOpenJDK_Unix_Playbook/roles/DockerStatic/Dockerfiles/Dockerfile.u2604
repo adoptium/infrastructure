@@ -45,11 +45,11 @@ RUN chmod -R og-rwx /home/nagios/.ssh
 RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 
-RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6 locales fontconfig fakeroot
+RUN apt-get update && apt-get install -qq -y git curl make gcc xvfb libxrender1 libxi6 libxtst6 locales python3 fontconfig fakeroot libtest-simple-perl
 # Install SSL Test packages
 RUN apt-get install -qq -y gnutls-bin libnss3 libnss3-tools libnss3-dev pkg-config weston
 
-RUN locale-gen en_US.utf8
+RUN locale-gen en_US.utf8 ja_JP.UTF-8 ko_KR.UTF-8 zh_CN.UTF-8 zh_TW.UTF-8
 
 EXPOSE 22
 # Start with docker run -p 2226:22 UUID

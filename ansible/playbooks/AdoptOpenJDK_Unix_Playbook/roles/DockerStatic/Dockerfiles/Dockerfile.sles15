@@ -31,10 +31,15 @@ RUN ssh-keygen -A
 
 CMD ["/usr/sbin/sshd", "-D"]
 
-RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server gawk hostname x11-tools xdpyinfo dejavu-fonts liberation-fonts
+RUN zypper update -y && zypper install -y git curl make gcc libXrender1 libXi6 libXtst6 fontconfig fakeroot xorg-x11-server gawk hostname x11-tools xdpyinfo dejavu-fonts liberation-fonts python3 glibc-locale perl-Test-Simple
 
 # Install SSL Test packages
 RUN zypper install -y gnutls mozilla-nss mozilla-nss-devel mozilla-nss-tools
+# Generate Asian locales
+RUN localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8 \
+ && localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8 \
+ && localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 \
+ && localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
 
 # Link libffi library (See https://github.com/adoptium/infrastructure/issues/3026#issuecomment-1589277527)
 RUN ln -s /usr/lib64/libffi.so.7 /usr/lib64/libffi.so.6

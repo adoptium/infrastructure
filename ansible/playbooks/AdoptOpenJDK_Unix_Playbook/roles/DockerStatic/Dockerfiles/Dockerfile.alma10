@@ -35,10 +35,16 @@ RUN su jenkins -c "mkdir -m 0755 /tmp/.X11-unix"
 RUN dnf install -y perl
 # turbojpeg needed as prereq for weston but it's not the UBI CRB repo so pull from CS10 one
 RUN dnf install -y --enablerepo=crb turbojpeg
-RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info which
+RUN dnf install -y git make gcc weston xwayland-run libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info which python3 perl-Test-Simple
 RUN dnf install -y coreutils --allowerasing curl
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools
+# Install locale support packages and generate Asian locales
+RUN dnf install -y glibc-locale-source glibc-langpack-ja glibc-langpack-ko glibc-langpack-zh
+RUN localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8 \
+ && localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8 \
+ && localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 \
+ && localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
 RUN dnf install -y openssh-server
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # RUN service ssh start
