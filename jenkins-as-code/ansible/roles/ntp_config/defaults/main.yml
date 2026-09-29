@@ -1,0 +1,10 @@
+---
+# Default variables for NTP configuration role
+
+# NTP service name (varies by Ubuntu version)
+# Ubuntu 20.04+: ntpsec
+# Older versions: ntp
+ntp_service: "ntpsec"
+ntp_package: "ntpsec"
+
+# Made with Bob

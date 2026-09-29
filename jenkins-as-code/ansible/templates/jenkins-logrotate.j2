@@ -1,0 +1,10 @@
+/var/log/jenkins/jenkins.log
+/var/log/jenkins/access.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

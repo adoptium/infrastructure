@@ -1,0 +1,10 @@
+---
+# Handlers for NTP configuration
+
+- name: restart ntp
+  systemd:
+    name: "{{ ntp_service | default('ntpsec') }}"
+    state: restarted
+  become: yes
+
+# Made with Bob

@@ -1,0 +1,484 @@
+---
+###############################################
+# Ubuntu 24 Jenkins User Setup - Ansible Playbook #
+###############################################
+# This playbook configures an Ubuntu 24.04 box with Jenkins user and SSH key
+# Usage: Run locally on the target host with:
+#   ansible-playbook ubuntu24-jenkins-setup.yml --connection=local
+
+- name: Configure Ubuntu 24 with Jenkins User
+  hosts: localhost
+  connection: local
+  become: yes
+  gather_facts: yes
+
+  vars:
+    # SSH public key for Jenkins user - override via JENKINS_SSH_KEY env var or inventory
+    jenkins_ssh_key: "{{ lookup('env', 'JENKINS_SSH_KEY') | default('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... jenkins@adoptopenjdk', true) }}"
+
+  roles:
+    - role: system_update
+      tags: system_update
+    - role: unattended_upgrades
+      tags: security
+    - role: ntp_config
+      tags: system
+    - role: fail2ban
+      tags: security
+
+  tasks:
+    - name: Verify we're running on Ubuntu 24.04
+      assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook is designed for Ubuntu 24.04"
+        success_msg: "Running on Ubuntu 24.04"
+      tags: always
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      tags: setup
+
+    - name: Install essential packages from Jenkins master
+      apt:
+        name:
+          # Core utilities
+          - openssh-server
+          - sudo
+          - python3
+          - python3-pip
+          - curl
+          - wget
+          - git
+          - rsync
+          - unzip
+          - zip
+          - bzip2
+          - xz-utils
+          - pigz
+          
+          # Development tools
+          - build-essential
+          - gcc
+          - make
+          - autoconf
+          - patch
+          - ant
+          
+          # System monitoring and management
+          - htop
+          - ncdu
+          - lsof
+          - strace
+          - nmap
+          - netcat-openbsd
+          - net-tools
+          - traceroute
+          - pciutils
+          - usbutils
+          
+          # Text editors
+          - vim
+          - nano
+          - joe
+          
+          # Terminal multiplexers
+          - screen
+          - tmux
+          
+          # Security and authentication
+          - fail2ban
+          - openssh-sftp-server
+          - ssl-cert
+          
+          # Networking
+          - bind9-host
+          - isc-dhcp-client
+          - ethtool
+          - fping
+          
+          # File systems and storage
+          - cifs-utils
+          - davfs2
+          - xfsprogs
+          - lvm2
+          - mdadm
+          
+          # Compression and archiving
+          - sharutils
+          
+          # Monitoring
+          - monitoring-plugins
+          - nagios-plugins
+          - qstat
+          
+          # Web server
+          - nginx
+          
+          # Time synchronization
+          - ntp
+          - ntpdate
+          
+          # Scheduling
+          - at
+          - cron
+          
+          # System utilities
+          - haveged
+          - cpufrequtils
+          - bc
+          - jq
+          - file
+          - less
+          - gawk
+          - gdisk
+          
+          # Version control
+          - mercurial
+          
+          # Repository management
+          - reprepro
+          
+          # Python environment
+          - virtualenv
+          - dh-python
+          - python3-bcrypt
+          
+          # Libraries
+          - libffi-dev
+          - libssl-dev
+          - libaugeas0
+          - augeas-lenses
+          
+          # Package management
+          - apt-transport-https
+          - software-properties-common
+          - unattended-upgrades
+          
+          # Misc utilities
+          - run-one
+          - speedtest-cli
+          - xauth
+          
+        state: present
+      tags: setup
+
+    ###############################################
+    # Install Adoptium Temurin JDK
+    ###############################################
+    - name: Add Adoptium GPG key
+      apt_key:
+        url: https://packages.adoptium.net/artifactory/api/gpg/key/public
+        state: present
+      tags: java
+
+    - name: Add Adoptium Temurin repository
+      apt_repository:
+        repo: "deb https://packages.adoptium.net/artifactory/deb {{ ansible_distribution_release }} main"
+        state: present
+        filename: adoptium
+      tags: java
+
+    - name: Update apt cache after adding Temurin repo
+      apt:
+        update_cache: yes
+      tags: java
+
+    - name: Install Temurin JDK
+      apt:
+        name: "{{ java_package }}"
+        state: present
+      tags: java
+
+    - name: Set JAVA_HOME environment variable
+      lineinfile:
+        path: /etc/environment
+        regexp: '^JAVA_HOME='
+        line: 'JAVA_HOME={{ java_home }}'
+        state: present
+      tags: java
+
+    - name: Verify Java installation
+      command: java -version
+      register: java_version
+      changed_when: false
+      tags: java
+
+    - name: Display Java version
+      debug:
+        msg: "{{ java_version.stderr_lines }}"
+      tags: java
+
+    ###############################################
+    # Check if UID/GID 1000 is already in use
+    ###############################################
+    - name: Check if UID 1000 is in use
+      shell: "getent passwd | awk -F: '$3 == 1000 {print $1}'"
+      register: uid_1000_user
+      changed_when: false
+      tags: jenkins_user
+
+    - name: Check if GID 1000 is in use
+      shell: "getent group | awk -F: '$3 == 1000 {print $1}'"
+      register: gid_1000_group
+      changed_when: false
+      tags: jenkins_user
+
+    - name: Display warning if UID 1000 is already in use
+      debug:
+        msg:
+          - "WARNING: UID 1000 is already in use by user: {{ uid_1000_user.stdout }}"
+          - "Jenkins user will be created with a system-assigned UID instead"
+      when: uid_1000_user.stdout != ""
+      tags: jenkins_user
+
+    - name: Display warning if GID 1000 is already in use
+      debug:
+        msg:
+          - "WARNING: GID 1000 is already in use by group: {{ gid_1000_group.stdout }}"
+          - "Jenkins group will be created with a system-assigned GID instead"
+      when: gid_1000_group.stdout != ""
+      tags: jenkins_user
+
+    ###############################################
+    # Create Jenkins user and group
+    ###############################################
+    - name: Create Jenkins user group
+      group:
+        name: "{{ jenkins_username }}"
+        gid: "{{ 1000 if gid_1000_group.stdout == '' else omit }}"
+        state: present
+      tags: jenkins_user
+
+    - name: Create Jenkins user
+      user:
+        name: "{{ jenkins_username }}"
+        uid: "{{ 1000 if uid_1000_user.stdout == '' else omit }}"
+        group: "{{ jenkins_username }}"
+        state: present
+        home: "{{ jenkins_home }}"
+        shell: /bin/bash
+        create_home: yes
+      tags: jenkins_user
+
+    - name: Get Jenkins user UID
+      command: id -u {{ jenkins_username }}
+      register: jenkins_uid
+      changed_when: false
+      tags: jenkins_user
+
+    - name: Get Jenkins group GID
+      command: getent group {{ jenkins_username }}
+      register: jenkins_gid_info
+      changed_when: false
+      tags: jenkins_user
+
+    - name: Display Jenkins user ID information
+      debug:
+        msg:
+          - "Jenkins user created with UID: {{ jenkins_uid.stdout }}"
+          - "Jenkins group created with GID: {{ jenkins_gid_info.stdout.split(':')[2] }}"
+      tags: jenkins_user
+
+    - name: Ensure .ssh directory exists for Jenkins user
+      file:
+        path: "{{ jenkins_home }}/.ssh"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0700'
+      tags: jenkins_user
+
+    - name: Set authorized key for Jenkins user
+      authorized_key:
+        user: "{{ jenkins_username }}"
+        state: present
+        key: "{{ jenkins_ssh_key }}"
+      tags: jenkins_user
+
+    - name: Add github.com to known_hosts
+      known_hosts:
+        name: github.com
+        key: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
+        path: "{{ jenkins_home }}/.ssh/known_hosts"
+        state: present
+      tags: jenkins_user
+
+    - name: Change ownership of jenkins' ~/.ssh/known_hosts
+      file:
+        path: "{{ jenkins_home }}/.ssh/known_hosts"
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0644'
+      tags: jenkins_user
+
+    - name: Unset password expiry for Jenkins user
+      command: chage -M -1 -E -1 {{ jenkins_username }}
+      tags: jenkins_user
+
+    - name: Ensure proper limits are set in /etc/security/limits.conf
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: "{{ jenkins_username }} {{ item.limit_type }} {{ item.limit_name }} {{ item.limit_value }}"
+        state: present
+      with_items:
+        - {limit_type: 'hard', limit_name: 'nofile', limit_value: '1048576'}
+        - {limit_type: 'soft', limit_name: 'nofile', limit_value: '1048576'}
+        - {limit_type: 'hard', limit_name: 'nproc', limit_value: 'unlimited'}
+        - {limit_type: 'soft', limit_name: 'nproc', limit_value: 'unlimited'}
+        - {limit_type: 'hard', limit_name: 'core', limit_value: 'unlimited'}
+        - {limit_type: 'soft', limit_name: 'core', limit_value: 'unlimited'}
+      tags: jenkins_user
+
+    ###############################################
+    # Nagios plugins symlink
+    ###############################################
+    - name: Ensure /usr/local/nagios directory exists
+      file:
+        path: /usr/local/nagios
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      tags: setup
+
+    - name: Create nagios libexec symlink to /usr/lib/nagios/plugins
+      file:
+        path: /usr/local/nagios/libexec
+        src: /usr/lib/nagios/plugins
+        state: link
+        owner: root
+        group: root
+      tags: setup
+
+    ###############################################
+    # SSH service
+    ###############################################
+    - name: Ensure SSH service is enabled and running
+      systemd:
+        name: ssh
+        state: started
+        enabled: yes
+      tags: setup
+
+    ###############################################
+    # Security Hardening - SSH Configuration
+    ###############################################
+    - name: Disable password authentication in SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+        backup: yes
+      notify: restart ssh
+      tags: security
+
+    - name: Allow root login via SSH with key-based authentication only
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Disable empty passwords
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitEmptyPasswords'
+        line: 'PermitEmptyPasswords no'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Enable public key authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PubkeyAuthentication'
+        line: 'PubkeyAuthentication yes'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Disable challenge-response authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?ChallengeResponseAuthentication'
+        line: 'ChallengeResponseAuthentication no'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Disable keyboard-interactive authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?KbdInteractiveAuthentication'
+        line: 'KbdInteractiveAuthentication no'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Set SSH protocol to 2 only
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Protocol'
+        line: 'Protocol 2'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Disable X11 forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?X11Forwarding'
+        line: 'X11Forwarding no'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Set maximum authentication attempts
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?MaxAuthTries'
+        line: 'MaxAuthTries 3'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Set login grace time
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?LoginGraceTime'
+        line: 'LoginGraceTime 60'
+        state: present
+      notify: restart ssh
+      tags: security
+
+    - name: Validate SSH configuration
+      command: sshd -t
+      changed_when: false
+      tags: security
+
+    - name: Display Jenkins user information
+      debug:
+        msg:
+          - "Jenkins user created successfully!"
+          - "Username: {{ jenkins_username }}"
+          - "Home directory: {{ jenkins_home }}"
+          - "SSH key configured: Yes"
+          - "Sudo access: No (production security)"
+          - "Security hardening: SSH password auth disabled, SSH-only access enforced"
+      tags: always
+
+  handlers:
+    - name: restart ssh
+      systemd:
+        name: ssh
+        state: restarted
+      tags: security
+
+# Made with Bob

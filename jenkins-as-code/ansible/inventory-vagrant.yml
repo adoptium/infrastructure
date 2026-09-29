@@ -1,0 +1,22 @@
+---
+# Vagrant/Development Jenkins Server Inventory
+# Use this for local development and testing with limited resources
+
+all:
+  hosts:
+    jenkins-vagrant:
+      ansible_host: localhost
+      ansible_connection: local
+      
+      # Fail2ban IP Whitelist - Local networks only
+      fail2ban_ignoreip: "127.0.0.1/8 ::1 10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
+      
+      # NTP configuration
+      ntp_service: ntpsec
+      ntp_package: ntpsec
+
+  vars:
+    # Environment identifier
+    jenkins_environment: development
+
+# Made with Bob

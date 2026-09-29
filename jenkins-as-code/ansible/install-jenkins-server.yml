@@ -1,0 +1,376 @@
+---
+###############################################
+# Jenkins Server Installation - Ansible Playbook
+###############################################
+# This playbook installs Jenkins server on Ubuntu 24.04
+# with the Jenkins home directory at /home/jenkins/.jenkins
+# to mirror the production Jenkins master configuration.
+#
+# Prerequisites:
+#   - Ubuntu 24.04 system
+#   - Jenkins user already created (run setup-jenkins-host.yml first)
+#   - Java 17 or later installed
+#
+# Usage:
+#   ansible-playbook install-jenkins-server.yml --connection=local
+
+- name: Install Jenkins Server
+  hosts: localhost
+  connection: local
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    ###############################################
+    # Pre-flight Checks
+    ###############################################
+    - name: Verify we're running on Ubuntu 24.04
+      assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+          - ansible_distribution_version == "24.04"
+        fail_msg: "This playbook is designed for Ubuntu 24.04"
+        success_msg: "Running on Ubuntu 24.04"
+      tags: always
+
+    - name: Check if Jenkins user exists
+      command: id {{ jenkins_username }}
+      register: jenkins_user_check
+      failed_when: false
+      changed_when: false
+      tags: always
+
+    - name: Fail if Jenkins user does not exist
+      fail:
+        msg: "Jenkins user does not exist. Please run setup-jenkins-host.yml first."
+      when: jenkins_user_check.rc != 0
+      tags: always
+
+    - name: Check Java installation
+      command: java -version
+      register: java_check
+      failed_when: false
+      changed_when: false
+      tags: always
+
+    - name: Fail if Java is not installed
+      fail:
+        msg: "Java is not installed. Please run setup-jenkins-host.yml first to install Java."
+      when: java_check.rc != 0
+      tags: always
+
+    ###############################################
+    # Detect Environment (Vagrant vs Production)
+    ###############################################
+    - name: Check if running inside a Vagrant box
+      stat:
+        path: /vagrant
+      register: vagrant_dir
+      tags: always
+
+    - name: Set listen address based on environment
+      set_fact:
+        effective_listen_address: "{{ '0.0.0.0' if vagrant_dir.stat.exists else jenkins_listen_address }}"
+      tags: always
+
+    - name: Display environment detection
+      debug:
+        msg: "Environment: {{ 'Vagrant (listen: 0.0.0.0)' if vagrant_dir.stat.exists else 'Production (listen: ' + jenkins_listen_address + ')' }}"
+      tags: always
+
+    ###############################################
+    # Detect System Memory and Calculate Heap Size
+    ###############################################
+    - name: Get total system memory in MB
+      set_fact:
+        total_memory_mb: "{{ (ansible_memtotal_mb | int) }}"
+      tags: always
+
+    - name: Calculate appropriate heap size based on system memory
+      set_fact:
+        calculated_heap_size: >-
+          {%- if jenkins_heap_size != 'auto' -%}
+            {{ jenkins_heap_size }}
+          {%- elif total_memory_mb | int >= 30720 -%}
+            19G
+          {%- elif total_memory_mb | int >= 14336 -%}
+            8G
+          {%- elif total_memory_mb | int >= 6144 -%}
+            4G
+          {%- else -%}
+            2G
+          {%- endif -%}
+      tags: always
+
+    - name: Display memory configuration
+      debug:
+        msg:
+          - "System Memory: {{ total_memory_mb }}MB"
+          - "Jenkins Heap Size: {{ calculated_heap_size }}"
+          - "Configuration: {{ 'Manual override' if jenkins_heap_size != 'auto' else 'Auto-detected' }}"
+      tags: always
+
+    - name: Build Jenkins JAVA_ARGS with calculated heap size
+      set_fact:
+        jenkins_java_opts: "-Dhudson.tasks.junit.TestResultAction.RESULT_CACHE_ENABLED=false -Dhudson.tasks.junit.History\\$HistoryTableResult.PREVIOUS_TEST_RESULT_BACKTRACK_BUILDS_MAX=1 -Djava.awt.headless=true -Xmx{{ calculated_heap_size }} -Dhudson.util.XStream2.collectionUpdateLimit=-1 -Xlog:gc*,gc+heap=info,gc+age=trace,gc+phases=trace,safepoint:file=/var/log/jenkins/gc.log:time,uptime,level,tags:filecount=5,filesize=50m"
+      tags: always
+
+    ###############################################
+    # Download and Verify Jenkins WAR
+    ###############################################
+    - name: Install required packages for Jenkins
+      apt:
+        name:
+          - curl
+          - fontconfig
+          - daemon
+        state: present
+      tags: jenkins_install
+
+    - name: Create Jenkins installation directory
+      file:
+        path: "{{ jenkins_install_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      tags: jenkins_install
+
+    - name: Download Jenkins WAR file
+      get_url:
+        url: "{{ jenkins_war_url }}"
+        dest: "{{ jenkins_war_path }}"
+        mode: '0644'
+        owner: root
+        group: root
+        timeout: 300
+      register: jenkins_war_download
+      tags: jenkins_install
+
+    - name: Calculate actual SHA256 checksum of downloaded WAR
+      stat:
+        path: "{{ jenkins_war_path }}"
+        checksum_algorithm: sha256
+        get_checksum: yes
+      register: actual_checksum
+      tags: jenkins_install
+
+    - name: Verify Jenkins WAR checksum
+      assert:
+        that:
+          - actual_checksum.stat.checksum == jenkins_war_sha256
+        fail_msg: "Jenkins WAR checksum verification failed! Expected: {{ jenkins_war_sha256 }}, Got: {{ actual_checksum.stat.checksum }}"
+        success_msg: "Jenkins WAR checksum verified successfully"
+      tags: jenkins_install
+
+    - name: Display Jenkins version information
+      debug:
+        msg:
+          - "Jenkins Version: {{ jenkins_version }}"
+          - "WAR Location: {{ jenkins_war_path }}"
+          - "SHA256 Checksum: {{ actual_checksum.stat.checksum }}"
+      tags: jenkins_install
+
+    ###############################################
+    # Configure Jenkins Home Directory
+    ###############################################
+    - name: Stop Jenkins service if running
+      systemd:
+        name: jenkins
+        state: stopped
+      failed_when: false
+      tags: jenkins_config
+
+    - name: Create Jenkins data directory
+      file:
+        path: "{{ jenkins_data_dir }}"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Create Jenkins cache directory
+      file:
+        path: /var/cache/jenkins
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Create Jenkins log directory
+      file:
+        path: /var/log/jenkins
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Install Jenkins logrotate config
+      template:
+        src: templates/jenkins-logrotate.j2
+        dest: /etc/logrotate.d/jenkins
+        owner: root
+        group: root
+        mode: '0644'
+      tags: jenkins_config
+
+    ###############################################
+    # Configure Jenkins Service
+    ###############################################
+    - name: Configure Jenkins defaults file
+      template:
+        src: templates/jenkins-defaults.j2
+        dest: /etc/default/jenkins
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      tags: jenkins_config
+
+    - name: Create Jenkins systemd service file
+      template:
+        src: templates/jenkins.service.j2
+        dest: /etc/systemd/system/jenkins.service
+        owner: root
+        group: root
+        mode: '0644'
+      tags: jenkins_config
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      tags: jenkins_config
+
+    ###############################################
+    # Configure Jenkins Plugins Directory
+    ###############################################
+    - name: Create Jenkins plugins directory
+      file:
+        path: "{{ jenkins_data_dir }}/plugins"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Create Jenkins updates directory
+      file:
+        path: "{{ jenkins_data_dir }}/updates"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Create Jenkins jobs directory
+      file:
+        path: "{{ jenkins_data_dir }}/jobs"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Create Jenkins workspace directory
+      file:
+        path: "{{ jenkins_data_dir }}/workspace"
+        state: directory
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0755'
+      tags: jenkins_config
+
+    - name: Suppress Jenkins setup wizard (lastExecVersion)
+      copy:
+        content: "{{ jenkins_version }}"
+        dest: "{{ jenkins_data_dir }}/jenkins.install.InstallUtil.lastExecVersion"
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0644'
+      tags: jenkins_config
+
+    - name: Suppress Jenkins setup wizard (UpgradeWizard state)
+      copy:
+        content: "done"
+        dest: "{{ jenkins_data_dir }}/jenkins.install.UpgradeWizard.state"
+        owner: "{{ jenkins_username }}"
+        group: "{{ jenkins_username }}"
+        mode: '0644'
+      tags: jenkins_config
+
+    ###############################################
+    # Start Jenkins Service
+    ###############################################
+    - name: Enable and start Jenkins service
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+      tags: jenkins_start
+
+    - name: Wait for Jenkins to start
+      wait_for:
+        port: "{{ jenkins_port }}"
+        delay: 10
+        timeout: 300
+      tags: jenkins_start
+
+    - name: Wait for Jenkins to be fully ready
+      uri:
+        url: "http://localhost:{{ jenkins_port }}/login"
+        status_code: 200
+        timeout: 5
+      register: jenkins_ready
+      until: jenkins_ready.status == 200
+      retries: 30
+      delay: 10
+      tags: jenkins_start
+
+    ###############################################
+    # Retrieve Initial Admin Password
+    ###############################################
+    - name: Check if initial admin password file exists
+      stat:
+        path: "{{ jenkins_data_dir }}/secrets/initialAdminPassword"
+      register: initial_password_file
+      tags: jenkins_start
+
+    - name: Read initial admin password
+      slurp:
+        src: "{{ jenkins_data_dir }}/secrets/initialAdminPassword"
+      register: initial_password
+      when: initial_password_file.stat.exists
+      tags: jenkins_start
+
+    - name: Display Jenkins installation information
+      debug:
+        msg:
+          - "=========================================="
+          - "Jenkins Installation Complete!"
+          - "=========================================="
+          - "Jenkins URL: http://{{ ansible_default_ipv4.address }}:{{ jenkins_port }}"
+          - "Jenkins Home: {{ jenkins_data_dir }}"
+          - "Jenkins User: {{ jenkins_username }}"
+          - ""
+          - "Initial Admin Password: {{ initial_password.content | b64decode | trim if initial_password_file.stat.exists else 'not found' }}"
+          - ""
+          - "Note: Setup wizard has been suppressed."
+          - "Jenkins will start directly to the login page."
+          - "=========================================="
+      tags: jenkins_start
+
+    - name: Display Jenkins service status
+      command: systemctl status jenkins --no-pager
+      register: jenkins_status
+      changed_when: false
+      tags: jenkins_start
+
+    - name: Show Jenkins service status
+      debug:
+        var: jenkins_status.stdout_lines
+      tags: jenkins_start
+
+# Made with Bob

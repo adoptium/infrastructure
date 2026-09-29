@@ -1,0 +1,21 @@
+---
+# Default variables for fail2ban role
+
+# IP addresses and networks that should NEVER be banned
+# Format: space-separated list of IPs/CIDR ranges
+# This matches the production Jenkins master configuration
+# Includes:
+#   - 127.0.0.1/8 ::1 (loopback)
+#   - 10.0.0.0/8 192.168.0.0/16 (private networks)
+#   - 78.47.239.96 46.224.123.39 178.62.115.224 20.90.182.165 (production trusted IPs)
+#
+# IMPORTANT: Review and update this list for your specific environment
+fail2ban_ignoreip: "127.0.0.1/8 ::1 10.0.0.0/8 192.168.0.0/16 78.47.239.96 46.224.123.39 178.62.115.224 20.90.182.165"
+
+# NTP service name (varies by Ubuntu version)
+# Ubuntu 20.04+: ntpsec
+# Older versions: ntp
+ntp_service: "ntpsec"
+ntp_package: "ntpsec"
+
+# Made with Bob
