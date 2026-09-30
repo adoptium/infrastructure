@@ -1,7 +1,12 @@
 FROM ubuntu:24.10
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip gnupg curl
+# Ubuntu 24.10 (oracular) is EOL — redirect apt sources to old-releases.
+# Ubuntu 24.10+ uses DEB822 format in ubuntu.sources, not sources.list.
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g; \
+            s|http://security.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' \
+    /etc/apt/sources.list.d/ubuntu.sources
+RUN apt-get update && apt-get install -qq -y perl openssh-server unzip zip gnupg curl jq
 
 # Get latest jdk25 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk25.tar.gz
