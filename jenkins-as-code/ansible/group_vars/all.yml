@@ -91,4 +91,3 @@ jenkins_listen_address: "127.0.0.1"
 # Filename of the application-config backup tarball (relative to the data/ directory
 # alongside this repository).  Used by restore-jenkins-app-config.yml.
 jenkins_backup_file: "jenkins-app-backup-20260706-113355.tar.gz"
-

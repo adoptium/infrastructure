@@ -1,7 +1,7 @@
 ---
 # Handlers for NTP configuration
 
-- name: restart ntp
+- name: Restart ntp
   systemd:
     name: "{{ ntp_service | default('ntpsec') }}"
     state: restarted

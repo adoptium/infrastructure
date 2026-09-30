@@ -59,7 +59,7 @@
           - bzip2
           - xz-utils
           - pigz
-          
+
           # Development tools
           - build-essential
           - gcc
@@ -67,7 +67,7 @@
           - autoconf
           - patch
           - ant
-          
+
           # System monitoring and management
           - htop
           - ncdu
@@ -79,53 +79,53 @@
           - traceroute
           - pciutils
           - usbutils
-          
+
           # Text editors
           - vim
           - nano
           - joe
-          
+
           # Terminal multiplexers
           - screen
           - tmux
-          
+
           # Security and authentication
           - fail2ban
           - openssh-sftp-server
           - ssl-cert
-          
+
           # Networking
           - bind9-host
           - isc-dhcp-client
           - ethtool
           - fping
-          
+
           # File systems and storage
           - cifs-utils
           - davfs2
           - xfsprogs
           - lvm2
           - mdadm
-          
+
           # Compression and archiving
           - sharutils
-          
+
           # Monitoring
           - monitoring-plugins
           - nagios-plugins
           - qstat
-          
+
           # Web server
           - nginx
-          
+
           # Time synchronization
           - ntp
           - ntpdate
-          
+
           # Scheduling
           - at
           - cron
-          
+
           # System utilities
           - haveged
           - cpufrequtils
@@ -135,34 +135,34 @@
           - less
           - gawk
           - gdisk
-          
+
           # Version control
           - mercurial
-          
+
           # Repository management
           - reprepro
-          
+
           # Python environment
           - virtualenv
           - dh-python
           - python3-bcrypt
-          
+
           # Libraries
           - libffi-dev
           - libssl-dev
           - libaugeas0
           - augeas-lenses
-          
+
           # Package management
           - apt-transport-https
           - software-properties-common
           - unattended-upgrades
-          
+
           # Misc utilities
           - run-one
           - speedtest-cli
           - xauth
-          
+
         state: present
       tags: setup
 
@@ -374,7 +374,7 @@
         line: 'PasswordAuthentication no'
         state: present
         backup: yes
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Allow root login via SSH with key-based authentication only
@@ -383,7 +383,7 @@
         regexp: '^#?PermitRootLogin'
         line: 'PermitRootLogin prohibit-password'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Disable empty passwords
@@ -392,7 +392,7 @@
         regexp: '^#?PermitEmptyPasswords'
         line: 'PermitEmptyPasswords no'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Enable public key authentication
@@ -401,7 +401,7 @@
         regexp: '^#?PubkeyAuthentication'
         line: 'PubkeyAuthentication yes'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Disable challenge-response authentication
@@ -410,7 +410,7 @@
         regexp: '^#?ChallengeResponseAuthentication'
         line: 'ChallengeResponseAuthentication no'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Disable keyboard-interactive authentication
@@ -419,7 +419,7 @@
         regexp: '^#?KbdInteractiveAuthentication'
         line: 'KbdInteractiveAuthentication no'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Set SSH protocol to 2 only
@@ -428,7 +428,7 @@
         regexp: '^#?Protocol'
         line: 'Protocol 2'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Disable X11 forwarding
@@ -437,7 +437,7 @@
         regexp: '^#?X11Forwarding'
         line: 'X11Forwarding no'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Set maximum authentication attempts
@@ -446,7 +446,7 @@
         regexp: '^#?MaxAuthTries'
         line: 'MaxAuthTries 3'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Set login grace time
@@ -455,7 +455,7 @@
         regexp: '^#?LoginGraceTime'
         line: 'LoginGraceTime 60'
         state: present
-      notify: restart ssh
+      notify: Restart ssh
       tags: security
 
     - name: Validate SSH configuration
@@ -475,7 +475,7 @@
       tags: always
 
   handlers:
-    - name: restart ssh
+    - name: Restart ssh
       systemd:
         name: ssh
         state: restarted

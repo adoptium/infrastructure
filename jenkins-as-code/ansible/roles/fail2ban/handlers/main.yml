@@ -1,7 +1,7 @@
 ---
 # Handlers for fail2ban configuration
 
-- name: restart fail2ban
+- name: Restart fail2ban
   systemd:
     name: fail2ban
     state: restarted
