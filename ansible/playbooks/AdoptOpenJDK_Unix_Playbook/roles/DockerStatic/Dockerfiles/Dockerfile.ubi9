@@ -8,16 +8,16 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.n
 RUN dnf -y update && dnf install -y perl openssh-server unzip zip wget epel-release
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Install Additional Repos
-RUN wget 'https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-9.0-26.el9.noarch.rpm' -O /tmp/gpgkey.rpm
-ARG GPG_CHECKSUM=8d601d9f96356a200ad6ed8e5cb49bbac4aa3c4b762d10a23e11311daa5711ca
+RUN wget 'https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/centos-gpg-keys-9.0-38.el9.noarch.rpm' -O /tmp/gpgkey.rpm
+ARG GPG_CHECKSUM=b6dcd5a16160ab017bf5e871975aef477d34ce61b660eeb3f4aa6973dcc6f916
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/gpgkey.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$GPG_CHECKSUM" ]; then \
            echo "Checksum mismatch! Aborting installation."; \
            exit 1; \
        fi
 RUN rpm -i '/tmp/gpgkey.rpm'
-RUN wget 'https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-9.0-26.el9.noarch.rpm' -O /tmp/centosrepos.rpm
-ARG REPO_CHECKSUM=eb3b55a5cf0e1a93a91cd2d39035bd1754b46f69ff3d062b3331e765b2345035
+RUN wget 'https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/centos-stream-repos-9.0-38.el9.noarch.rpm' -O /tmp/centosrepos.rpm
+ARG REPO_CHECKSUM=ae98322c35b3eb7b013c8989a8b318993e3bec71018e213f729a156c2bbd508d
 RUN ACTUAL_CHECKSUM=$(sha256sum /tmp/centosrepos.rpm | awk '{print $1}') \
     && if [ "$ACTUAL_CHECKSUM" != "$REPO_CHECKSUM" ]; then \
            echo "Checksum mismatch! Aborting installation."; \
