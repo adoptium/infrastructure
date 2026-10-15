@@ -195,6 +195,7 @@ When a desktop task is configured, `JenkinsAgent` has no logon trigger of its ow
 | Symptom | Cause | Solution |
 |---|---|---|
 | User not logged into console; `4625 C000006D/C000006A` in Event Log | Password mismatch between local user and the stored auto-logon password (LSA secret) | Re-run setup with the correct password or update local user password. |
+| After someone else signed in at the console, the VM does not return to the agent desktop on reboot | Windows replaced `DefaultUserName` with the last account to sign in | The `AutoLogonIdentity` task (SYSTEM) restores `DefaultUserName` at shutdown, logon and startup. If the task is missing, re-run setup (or `configure-agent-desktop.ps1 -AutoLogon`); `-Verify` reports it. |
 | `Java executable not found at '...'` | JDK is not installed at the default path | Install OpenJDK or pass `-Java "C:\path\to\bin\javaw.exe"`. |
 | Jenkins agent fails with `Failed to connect: Handshake error` | WebSocket mode attempted against controller | Inbound agent uses TCP port. Verify TCP inbound port is enabled in Jenkins controller. |
 | Desktop icons or wallpaper visible | `DesktopSettings` task has not completed | Run `Start-ScheduledTask DesktopSettings` or check `C:\DesktopSetup\desktop.log`. |

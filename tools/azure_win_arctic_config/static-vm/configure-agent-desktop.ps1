@@ -170,6 +170,7 @@ function Test-AutoLogon {
     Write-Check 'Auto-logon' $ok ("AutoAdminLogon={0} DefaultUserName={1} DefaultDomainName={2} Password(LSA)={3}{4}" -f `
         $wl.AutoAdminLogon, $wl.DefaultUserName, $wl.DefaultDomainName, $(if ($lsaSet) { 'set' } else { 'MISSING' }),
         $(if ($wl.DefaultPassword) { ' PLAINTEXT registry value present (re-run -AutoLogon to remove)' } else { '' }))
+    Write-Check 'AutoLogonIdentity task' ([bool](Get-ScheduledTask AutoLogonIdentity -ErrorAction SilentlyContinue)) 'restores DefaultUserName at shutdown, logon and startup'
     $s = Get-AgentSession
     $console = [DesktopSetupMain.Native]::WTSGetActiveConsoleSessionId()
     if ($s) {
@@ -241,6 +242,28 @@ if ($AutoLogon) {
     Remove-ItemProperty $winlogon -Name DefaultPassword -ErrorAction SilentlyContinue   # plaintext value; password is in the LSA secret
     Remove-ItemProperty $winlogon -Name AutoLogonCount -ErrorAction SilentlyContinue
     $plain = $null
+
+    # Windows can replace DefaultUserName with whichever account last signed in at the console, while
+    # the LSA password still belongs to $AgentUser. Restore the agent identity at shutdown/restart, after any logon, and
+    # at startup, so the next automatic logon targets the right account. The command is inline (not a
+    # script file under C:\DesktopSetup, which non-administrators may be able to modify) because the
+    # task runs as SYSTEM.
+    $repairCmd = "`$k='HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'; " +
+        "Set-ItemProperty `$k AutoAdminLogon '1'; " +
+        "Set-ItemProperty `$k DefaultUserName '$($AgentUser -replace "'", "''")'; " +
+        "Set-ItemProperty `$k DefaultDomainName '.'"
+    $repairArg = '-NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ' +
+        [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($repairCmd))
+    $shutdownTrigger = New-CimInstance -ClientOnly -Namespace Root/Microsoft/Windows/TaskScheduler -ClassName MSFT_TaskEventTrigger -Property @{
+        Enabled      = $true
+        Subscription = '<QueryList><Query Id="0" Path="System"><Select Path="System">*[System[Provider[@Name=''User32''] and EventID=1074]]</Select></Query></QueryList>'
+    }
+    Register-ScheduledTask -TaskName AutoLogonIdentity -Force `
+        -Action    (New-ScheduledTaskAction -Execute powershell.exe -Argument $repairArg) `
+        -Trigger   @((New-ScheduledTaskTrigger -AtStartup), (New-ScheduledTaskTrigger -AtLogOn), $shutdownTrigger) `
+        -Principal (New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest) `
+        -Settings  (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+                        -ExecutionTimeLimit (New-TimeSpan -Minutes 1)) | Out-Null
     Test-AutoLogon
     if (-not (Get-AgentSession)) { Write-Host '  Reboot for auto-logon to take effect: Restart-Computer' -ForegroundColor Cyan }
 }
