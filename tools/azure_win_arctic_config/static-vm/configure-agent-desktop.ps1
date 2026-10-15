@@ -87,6 +87,65 @@ Add-Type -Namespace DesktopSetupMain -Name Native -MemberDefinition @"
 [DllImport("kernel32.dll")] public static extern uint WTSGetActiveConsoleSessionId();
 "@
 
+# Winlogon reads the auto-logon password from the LSA secret "DefaultPassword" first, and
+# only falls back to the plaintext Winlogon\DefaultPassword registry value (readable by
+# non-admin users) if no secret exists. Store it as the LSA secret; keep the registry value absent.
+Add-Type -TypeDefinition @"
+using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+public static class AutoLogonLsa {
+    [StructLayout(LayoutKind.Sequential)] struct LSA_OBJECT_ATTRIBUTES { public int Length; public IntPtr RootDirectory; public IntPtr ObjectName; public int Attributes; public IntPtr SecurityDescriptor; public IntPtr SecurityQualityOfService; }
+    [StructLayout(LayoutKind.Sequential)] struct LSA_UNICODE_STRING { public ushort Length; public ushort MaximumLength; public IntPtr Buffer; }
+    [DllImport("advapi32.dll")] static extern uint LsaOpenPolicy(IntPtr system, ref LSA_OBJECT_ATTRIBUTES attrs, uint access, out IntPtr policy);
+    [DllImport("advapi32.dll")] static extern uint LsaStorePrivateData(IntPtr policy, ref LSA_UNICODE_STRING key, IntPtr data);
+    [DllImport("advapi32.dll")] static extern uint LsaRetrievePrivateData(IntPtr policy, ref LSA_UNICODE_STRING key, out IntPtr data);
+    [DllImport("advapi32.dll")] static extern uint LsaFreeMemory(IntPtr buffer);
+    [DllImport("advapi32.dll")] static extern uint LsaClose(IntPtr policy);
+    [DllImport("advapi32.dll")] static extern int LsaNtStatusToWinError(uint status);
+
+    const uint POLICY_GET_PRIVATE_INFORMATION = 0x4, POLICY_CREATE_SECRET = 0x20, STATUS_OBJECT_NAME_NOT_FOUND = 0xC0000034;
+
+    static void Check(uint status) { if (status != 0) throw new Win32Exception(LsaNtStatusToWinError(status)); }
+    static IntPtr Open() {
+        var attrs = new LSA_OBJECT_ATTRIBUTES(); IntPtr h;
+        attrs.Length = Marshal.SizeOf(attrs);
+        Check(LsaOpenPolicy(IntPtr.Zero, ref attrs, POLICY_GET_PRIVATE_INFORMATION | POLICY_CREATE_SECRET, out h));
+        return h;
+    }
+    static LSA_UNICODE_STRING Name(out IntPtr mem) {
+        const string n = "DefaultPassword";
+        mem = Marshal.StringToHGlobalUni(n);
+        return new LSA_UNICODE_STRING { Length = (ushort)(n.Length * 2), MaximumLength = (ushort)(n.Length * 2 + 2), Buffer = mem };
+    }
+    // Stores the Winlogon auto-logon password as the LSA secret "DefaultPassword".
+    public static void Set(string password) {
+        IntPtr h = Open(), nameMem; var name = Name(out nameMem);
+        IntPtr dataMem = Marshal.StringToHGlobalUni(password), dataPtr = IntPtr.Zero;
+        try {
+            var data = new LSA_UNICODE_STRING { Length = (ushort)(password.Length * 2), MaximumLength = (ushort)(password.Length * 2 + 2), Buffer = dataMem };
+            dataPtr = Marshal.AllocHGlobal(Marshal.SizeOf(data));
+            Marshal.StructureToPtr(data, dataPtr, false);
+            Check(LsaStorePrivateData(h, ref name, dataPtr));
+        } finally {
+            if (dataPtr != IntPtr.Zero) Marshal.FreeHGlobal(dataPtr);
+            Marshal.ZeroFreeGlobalAllocUnicode(dataMem); Marshal.FreeHGlobal(nameMem); LsaClose(h);
+        }
+    }
+    // Returns the stored password, or null if no LSA secret exists.
+    public static string Get() {
+        IntPtr h = Open(), nameMem; var name = Name(out nameMem);
+        try {
+            IntPtr p; uint s = LsaRetrievePrivateData(h, ref name, out p);
+            if (s == STATUS_OBJECT_NAME_NOT_FOUND) return null;
+            Check(s);
+            try { var d = (LSA_UNICODE_STRING)Marshal.PtrToStructure(p, typeof(LSA_UNICODE_STRING)); return Marshal.PtrToStringUni(d.Buffer, d.Length / 2); }
+            finally { LsaFreeMemory(p); }
+        } finally { Marshal.FreeHGlobal(nameMem); LsaClose(h); }
+    }
+}
+"@
+
 function Write-Check($name, [bool]$ok, $detail) {
     $c = if ($ok) { 'Green' } else { 'Yellow' }
     Write-Host ("  [{0}] {1}: {2}" -f $(if ($ok) { 'OK ' } else { '!! ' }), $name, $detail) -ForegroundColor $c
@@ -106,9 +165,11 @@ function Set-Dword($key, $name, $value) {
 # ----------------------------------------------------------------------------- checks
 function Test-AutoLogon {
     $wl = Get-ItemProperty $winlogon
-    $ok = $wl.AutoAdminLogon -eq '1' -and $wl.DefaultUserName -eq $AgentUser -and $wl.DefaultDomainName -eq '.' -and [bool]$wl.DefaultPassword
-    Write-Check 'Auto-logon' $ok ("AutoAdminLogon={0} DefaultUserName={1} DefaultDomainName={2} Password={3}" -f `
-        $wl.AutoAdminLogon, $wl.DefaultUserName, $wl.DefaultDomainName, $(if ($wl.DefaultPassword) { 'set' } else { 'MISSING' }))
+    $lsaSet = [bool][AutoLogonLsa]::Get()
+    $ok = $wl.AutoAdminLogon -eq '1' -and $wl.DefaultUserName -eq $AgentUser -and $wl.DefaultDomainName -eq '.' -and $lsaSet -and -not $wl.DefaultPassword
+    Write-Check 'Auto-logon' $ok ("AutoAdminLogon={0} DefaultUserName={1} DefaultDomainName={2} Password(LSA)={3}{4}" -f `
+        $wl.AutoAdminLogon, $wl.DefaultUserName, $wl.DefaultDomainName, $(if ($lsaSet) { 'set' } else { 'MISSING' }),
+        $(if ($wl.DefaultPassword) { ' PLAINTEXT registry value present (re-run -AutoLogon to remove)' } else { '' }))
     $s = Get-AgentSession
     $console = [DesktopSetupMain.Native]::WTSGetActiveConsoleSessionId()
     if ($s) {
@@ -173,10 +234,11 @@ if ($AutoLogon) {
     $ctx = [DirectoryServices.AccountManagement.PrincipalContext]::new('Machine', $env:COMPUTERNAME)
     if (-not $ctx.ValidateCredentials($AgentUser, $plain)) { $plain = $null; throw "Password is not valid for '$AgentUser' - nothing saved." }
     Enable-LocalUser -Name $AgentUser
+    [AutoLogonLsa]::Set($plain)
     Set-ItemProperty $winlogon -Name AutoAdminLogon    -Value '1'
     Set-ItemProperty $winlogon -Name DefaultUserName   -Value $AgentUser
     Set-ItemProperty $winlogon -Name DefaultDomainName -Value '.'      # local machine, survives renames
-    Set-ItemProperty $winlogon -Name DefaultPassword   -Value $plain -Type String
+    Remove-ItemProperty $winlogon -Name DefaultPassword -ErrorAction SilentlyContinue   # plaintext value; password is in the LSA secret
     Remove-ItemProperty $winlogon -Name AutoLogonCount -ErrorAction SilentlyContinue
     $plain = $null
     Test-AutoLogon
@@ -204,15 +266,37 @@ if ($JenkinsAgent) {
     # TCP inbound (no -webSocket).
     $arg = "-jar C:\jenkins\agent.jar -url `"$JenkinsUrl`" -name `"$NodeName`" -secret `"$plainSecret`" -workDir `"$WorkDir`""
     $plainSecret = $null
-    Register-ScheduledTask -TaskName JenkinsAgent -Force `
-        -Action    (New-ScheduledTaskAction -Execute $Java -Argument $arg) `
-        -Trigger   (New-ScheduledTaskTrigger -AtLogOn -User $userId) `
-        -Principal (New-ScheduledTaskPrincipal -UserId $userId -LogonType Interactive -RunLevel Highest) `
-        -Settings  (New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 5 `
-                        -RestartInterval (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries) | Out-Null
+    # Gate agent startup on desktop initialization: when DesktopSettings is configured (now or already
+    # registered), it starts JenkinsAgent when it finishes, so JenkinsAgent gets no logon trigger of
+    # its own. Without a desktop task the agent simply starts at logon (agent-only setup).
+    $gateOnDesktop = $Desktop -or $Resolution -or [bool](Get-ScheduledTask DesktopSettings -ErrorAction SilentlyContinue)
+    $reg = @{
+        TaskName  = 'JenkinsAgent'
+        Force     = $true
+        Action    = New-ScheduledTaskAction -Execute $Java -Argument $arg
+        Principal = New-ScheduledTaskPrincipal -UserId $userId -LogonType Interactive -RunLevel Highest
+        Settings  = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 5 `
+                        -RestartInterval (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    }
+    if (-not $gateOnDesktop) { $reg.Trigger = New-ScheduledTaskTrigger -AtLogOn -User $userId }
+    Register-ScheduledTask @reg | Out-Null
     $arg = $null
-    if (Get-AgentSession) { Start-ScheduledTask JenkinsAgent; Start-Sleep 20 }
-    Test-JenkinsAgent
+    # With -Desktop/-Resolution in this run, DesktopSettings (configured below) starts the agent when
+    # it finishes. Otherwise start it now, after any DesktopSettings run that is still in progress.
+    $deferToDesktop = $Desktop -or $Resolution
+    if ($deferToDesktop) {
+        Write-Host '  JenkinsAgent starts after DesktopSettings completes.'
+    } elseif (Get-AgentSession) {
+        if ($gateOnDesktop) {
+            for ($i = 0; $i -lt 18 -and (Get-ScheduledTask DesktopSettings).State -eq 'Running'; $i++) { Start-Sleep 5 }
+        }
+        if (-not $gateOnDesktop -or (Get-ScheduledTask DesktopSettings).State -ne 'Running') {
+            Start-ScheduledTask JenkinsAgent; Start-Sleep 20
+        } else {
+            Write-Host '  DesktopSettings is still running; JenkinsAgent starts when it finishes.' -ForegroundColor Cyan
+        }
+    }
+    if (-not $deferToDesktop) { Test-JenkinsAgent }
 }
 
 # ----------------------------------------------------------------------------- desktop + resolution
@@ -319,17 +403,18 @@ if (Test-Path $srKey) {
 rundll32.exe user32.dll,UpdatePerUserSystemParameters 1, True
 Set-TaskbarAutoHide
 # Restart explorer so HideIcons and StuckRects3 take effect, then re-apply auto-hide and close Start.
-Stop-Process -Name explorer -Force
+Get-Process explorer | Where-Object SessionId -eq $sess | Stop-Process -Force
 Start-Sleep 5; Wait-Taskbar; Start-Sleep 5
 Set-TaskbarAutoHide
-Stop-Process -Name StartMenuExperienceHost -Force
+Get-Process StartMenuExperienceHost | Where-Object SessionId -eq $sess | Stop-Process -Force
 Log 'Desktop: black background, no icons, taskbar auto-hide applied'
 '@
 
     $script = $common
     if ($Resolution) { $script += "`r`n" + $resolutionBlock }
     if ($Desktop)    { $script += "`r`n" + $desktopBlock }
-    $script += "`r`nLog 'Done'`r`n"
+    # JenkinsAgent has no logon trigger of its own (see the -JenkinsAgent block): start it once the desktop is ready.
+    $script += "`r`nLog 'Done'`r`nif (Get-ScheduledTask JenkinsAgent -ErrorAction SilentlyContinue) { Start-ScheduledTask JenkinsAgent; Log 'Started JenkinsAgent after desktop initialization' }`r`n"
     Set-Content "$setupDir\desktop.ps1" -Value $script -Encoding ASCII
 
     Register-ScheduledTask -TaskName DesktopSettings -Force `
@@ -340,6 +425,14 @@ Log 'Desktop: black background, no icons, taskbar auto-hide applied'
         -Settings  (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
                         -ExecutionTimeLimit (New-TimeSpan -Minutes 10)) | Out-Null
 
+    # An agent task registered earlier still has its own logon trigger and would race DesktopSettings.
+    if (-not $JenkinsAgent) {
+        $existing = Get-ScheduledTask JenkinsAgent -ErrorAction SilentlyContinue
+        if ($existing -and $existing.Triggers) {
+            Write-Warning 'JenkinsAgent still has its own logon trigger and can start before the desktop is ready. Re-run with -JenkinsAgent (and its parameters) to register it without one.'
+        }
+    }
+
     if (Get-AgentSession) {
         Start-ScheduledTask DesktopSettings
         Write-Host '  Applying now in the agent user''s session (about 20 s)...'
@@ -349,6 +442,7 @@ Log 'Desktop: black background, no icons, taskbar auto-hide applied'
     }
     Test-DesktopTask
     if ($Resolution) { Test-Resolution }
+    if ($JenkinsAgent -and (Get-AgentSession)) { Start-Sleep 10; Test-JenkinsAgent }
 }
 
 # ----------------------------------------------------------------------------- forward to console

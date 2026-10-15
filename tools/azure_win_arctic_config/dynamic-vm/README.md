@@ -167,6 +167,6 @@ Get-Content $env:TEMP\r.log -Tail 5
 
 ## 6. Security Guidelines
 
-1. **Stored Passwords**: Auto-logon stores credentials in `C:\ImageSetup\agent.pw` protected with ACLs limited to SYSTEM and Administrators.
+1. **Stored Passwords**: The password is kept in `C:\ImageSetup\agent.pw`, protected with ACLs limited to SYSTEM and Administrators. At boot, `autologon.ps1` stores it as the LSA secret `DefaultPassword` (encrypted; readable only by administrators and SYSTEM) and deletes the plaintext Winlogon `DefaultPassword` registry value, which non-administrator users can read. Because the agent account is a local administrator, anyone with administrator access to the VM can still recover the password; use a unique password for the agent account.
 2. **Password Rotation**: Rotate agent credentials by updating the password and capturing a new image version.
 3. **Transport Security**: Jenkins controller URLs must use `https://`.

@@ -170,6 +170,10 @@ For existing long-lived VMs where only specific parts of the configuration need 
 | `-JenkinsAgent` | Downloads `agent.jar` and registers `JenkinsAgent` task. |
 | `-Verify` | Reports current status of all settings. |
 
+`DesktopSettings` regenerates `C:\DesktopSetup\desktop.ps1` from the switches passed in that run, so a run with only `-Resolution` removes the desktop styling and a run with only `-Desktop` removes the resolution step. Pass every component you want enabled (for example `-Desktop -Resolution`) whenever you re-run it.
+
+When a desktop task is configured, `JenkinsAgent` has no logon trigger of its own. `DesktopSettings` starts it once the desktop is ready, so the agent does not accept jobs while the shell is still being reconfigured. An agent-only setup (no `-Desktop` or `-Resolution`, and no existing `DesktopSettings` task) starts at logon as before.
+
 ### Examples
 
 ```powershell
@@ -190,10 +194,11 @@ For existing long-lived VMs where only specific parts of the configuration need 
 
 | Symptom | Cause | Solution |
 |---|---|---|
-| User not logged into console; `4625 C000006D/C000006A` in Event Log | Password mismatch between local user and Winlogon registry | Re-run setup with the correct password or update local user password. |
+| User not logged into console; `4625 C000006D/C000006A` in Event Log | Password mismatch between local user and the stored auto-logon password (LSA secret) | Re-run setup with the correct password or update local user password. |
 | `Java executable not found at '...'` | JDK is not installed at the default path | Install OpenJDK or pass `-Java "C:\path\to\bin\javaw.exe"`. |
 | Jenkins agent fails with `Failed to connect: Handshake error` | WebSocket mode attempted against controller | Inbound agent uses TCP port. Verify TCP inbound port is enabled in Jenkins controller. |
 | Desktop icons or wallpaper visible | `DesktopSettings` task has not completed | Run `Start-ScheduledTask DesktopSettings` or check `C:\DesktopSetup\desktop.log`. |
+| Agent offline after logon | `JenkinsAgent` is started by `DesktopSettings`, which has not finished or failed | Check `C:\DesktopSetup\desktop.log` for `Started JenkinsAgent after desktop initialization`; run `Start-ScheduledTask JenkinsAgent` to start it manually. |
 | Firewall pop-up blocks automated tests | `NotifyOnListen` active on network profile | Re-run setup or execute: `Set-NetFirewallProfile -Profile Domain,Private,Public -NotifyOnListen False`. |
 
 ---
@@ -201,5 +206,5 @@ For existing long-lived VMs where only specific parts of the configuration need 
 ## 8. Security Guidelines
 
 1. **Passwords & Secrets**: Always input credentials via `Read-Host -AsSecureString` or secure environment variables. Never hard-code passwords in scripts or pass plain text on command lines.
-2. **Winlogon Registry**: Windows auto-logon stores the password in `HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`. Only local administrators and SYSTEM can access this registry key.
+2. **Auto-logon password**: The scripts store the auto-logon password as the LSA secret `DefaultPassword` (encrypted; readable only by administrators and SYSTEM), not in the plaintext `DefaultPassword` value under `HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`, which non-administrator users can read. Setup deletes any existing plaintext registry value, and `-Verify` reports `PLAINTEXT registry value present` if one is found. Because the agent account is a local administrator, anyone with administrator access to the VM can still recover the password; use a unique password for the agent account.
 3. **HTTPS Protocol**: Always supply Jenkins controller URLs using `https://`.

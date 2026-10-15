@@ -11,19 +11,17 @@
 #
 # The plugin prepends its own lines to this script, so a param() block would no
 # longer be the first statement and PowerShell rejects it. Use $args instead.
-#
-# REQUIRED: set $AgentUser to the agent user name passed to image-prep.ps1 -AgentUser.
 $JenkinsUrl = [string]$args[0]
 $VmName     = [string]$args[1]
 $Secret     = [string]$args[2]
 $AgentUser  = '<agent-user>'
 
 $ErrorActionPreference = 'Stop'
-if (-not $AgentUser -or $AgentUser -eq '<agent-user>') {
-    throw 'Set $AgentUser at the top of this script to the agent user name used with image-prep.ps1.'
-}
 if (-not $JenkinsUrl -or -not $VmName -or -not $Secret) {
     throw "Expected 3 arguments (Jenkins URL, VM name, secret); got $($args.Count)."
+}
+if ($JenkinsUrl -notmatch '^https://') {
+    throw 'Jenkins URL must use https:// (agent.jar runs with administrator privileges).'
 }
 # javaw.exe (not java.exe) so no console window appears on the interactive desktop.
 $java = 'C:\openjdk\jdk-21\bin\javaw.exe'
@@ -33,13 +31,10 @@ New-Item C:\jenkins, C:\workspace -ItemType Directory -Force | Out-Null
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072
 Invoke-WebRequest "${JenkinsUrl}jnlpJars/agent.jar" -OutFile C:\jenkins\agent.jar -UseBasicParsing
 
-# Machine-wide policy: disable Widgets / "News for you" on the taskbar.
-# Must be applied here (elevated init script) not in blank-desktop.ps1 (agent user session).
-$dshKey = 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh'
-if (-not (Test-Path $dshKey)) { New-Item $dshKey -Force | Out-Null }
-Set-ItemProperty $dshKey -Name AllowNewsAndInterests -Value 0 -Type DWord
+# No "Windows Firewall has blocked some features of OpenJDK Platform binary" pop-up for any JDK in any path.
+Set-NetFirewallProfile -Profile Domain, Private, Public -NotifyOnListen False
 
-# TCP inbound (no -webSocket): the WebSocket handshake failed during testing; re-test if you move to a different controller.
+# TCP inbound (no -webSocket): the WebSocket handshake fails against ci.adoptium.net.
 $arg = "-jar C:\jenkins\agent.jar -url `"$JenkinsUrl`" -name `"$VmName`" -secret `"$Secret`" -workDir C:\workspace"
 $user = "$env:COMPUTERNAME\$AgentUser"
 
@@ -64,6 +59,7 @@ Write-Host "JenkinsAgent task registered for $user"
 # ---------------------------------------------------------------------------
 @'
 $ErrorActionPreference = 'SilentlyContinue'
+$sess = (Get-Process -Id $PID).SessionId
 function Set-Dword($k, $n, $v) {
     if (-not (Test-Path $k)) { New-Item $k -Force | Out-Null }
     Set-ItemProperty $k -Name $n -Value $v -Type DWord
@@ -77,20 +73,14 @@ Set-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advan
 Set-Dword 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' TaskbarBadges 0
 Set-Dword 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' TaskbarFlashing 0
 
+# No Widgets / "News for you" on the taskbar (machine policy; this task runs elevated).
+Set-Dword 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh' AllowNewsAndInterests 0
+
 # No "Let's finish setting up your device", welcome experience, tips or suggestions.
 Set-Dword 'HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement' ScoobeSystemSettingEnabled 0
 $cdm = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
 foreach ($n in 'SubscribedContent-310093Enabled', 'SubscribedContent-338389Enabled',
                'SoftLandingEnabled', 'SystemPaneSuggestionsEnabled') { Set-Dword $cdm $n 0 }
-
-# Write StuckRects3 so explorer reads auto-hide from the registry on every restart,
-# making the setting survive Start menu interactions and focus changes permanently.
-# Byte 8 (0-indexed) of the binary value is the state flags: 0x03 = auto-hide, 0x02 = normal.
-$srKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'
-if (Test-Path $srKey) {
-    $sr = (Get-ItemProperty $srKey).Settings
-    if ($sr -and $sr.Count -ge 9) { $sr[8] = 0x03; Set-ItemProperty $srKey -Name Settings -Value $sr }
-}
 
 Add-Type -Namespace BlankDesktop -Name Native -MemberDefinition @"
 [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern bool SystemParametersInfo(int action, int param, string value, int flags);
@@ -110,10 +100,8 @@ function Wait-Taskbar {
         Start-Sleep 2
     }
 }
-# Auto-hide + hidden via the shell API: persists across explorer restarts.
-# ABS_AUTOHIDE (1) tells the shell to keep the taskbar hidden until the cursor
-# reaches the screen edge. SW_HIDE (0) additionally hides the window immediately so
-# it cannot pop up during test runs when a Java window is activated near the taskbar.
+# Auto-hide via the shell API: applies live and explorer persists it (StuckRects3 may not exist yet).
+# SW_HIDE (0) additionally hides the window immediately so it cannot pop up during test runs.
 function Set-TaskbarAutoHide {
     $hwnd = [BlankDesktop.Native]::FindWindow('Shell_TrayWnd', [NullString]::Value)
     $abd = New-Object BlankDesktop.Native+APPBARDATA
@@ -132,15 +120,15 @@ Start-Sleep 15
 rundll32.exe user32.dll,UpdatePerUserSystemParameters 1, True
 Set-TaskbarAutoHide
 
-# Restart explorer so HideIcons and StuckRects3 take effect (it relaunches itself), then re-apply auto-hide.
-Stop-Process -Name explorer -Force
+# Restart explorer so HideIcons takes effect (it relaunches itself), then re-apply auto-hide.
+Get-Process explorer | Where-Object SessionId -eq $sess | Stop-Process -Force
 Start-Sleep 5
 Wait-Taskbar
 Start-Sleep 5
 Set-TaskbarAutoHide
 
 # Close the Start menu if it is open (it relaunches on demand).
-Stop-Process -Name StartMenuExperienceHost -Force
+Get-Process StartMenuExperienceHost | Where-Object SessionId -eq $sess | Stop-Process -Force
 '@ | Set-Content C:\jenkins\blank-desktop.ps1 -Encoding ASCII
 
 Register-ScheduledTask -TaskName BlankDesktop -Force `
