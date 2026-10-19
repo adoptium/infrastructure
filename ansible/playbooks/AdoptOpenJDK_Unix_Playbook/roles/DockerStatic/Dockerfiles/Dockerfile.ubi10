@@ -49,6 +49,13 @@ RUN useradd -m -d /home/jenkins jenkins && \
 # Required for weston
 RUN su jenkins -c "mkdir -m 0755 /tmp/.X11-unix"
 
+# Create nagios user
+RUN useradd -m -d /home/nagios nagios
+RUN mkdir /home/nagios/.ssh
+RUN echo "Nagios_User_SSHKey" > /home/nagios/.ssh/authorized_keys
+RUN chown -R nagios /home/nagios/.ssh
+RUN chmod -R og-rwx /home/nagios/.ssh
+
 RUN dnf install -y perl
 # turbojpeg needed as prereq for weston but it's not the UBI CRB repo so pull from CS10 one
 RUN dnf install -y --enablerepo=crb turbojpeg

@@ -35,6 +35,13 @@ RUN chmod -R og-rwx /home/jenkins/.ssh
 RUN echo "jenkins soft core unlimited" > /etc/security/limits.d/jenkins-core.conf \
     && echo "jenkins hard core unlimited" >> /etc/security/limits.d/jenkins-core.conf
 
+# Create nagios user
+RUN useradd -m -d /home/nagios nagios
+RUN mkdir /home/nagios/.ssh
+RUN echo "Nagios_User_SSHKey" > /home/nagios/.ssh/authorized_keys
+RUN chown -R nagios /home/nagios/.ssh
+RUN chmod -R og-rwx /home/nagios/.ssh
+
 RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 
