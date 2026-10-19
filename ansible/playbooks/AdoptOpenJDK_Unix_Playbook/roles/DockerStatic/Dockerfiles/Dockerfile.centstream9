@@ -29,6 +29,14 @@ RUN mkdir /home/jenkins/.ssh
 RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
 RUN chown -R jenkins /home/jenkins/.ssh
 RUN chmod -R og-rwx /home/jenkins/.ssh
+
+# Create nagios user
+RUN useradd -m -d /home/nagios nagios
+RUN mkdir /home/nagios/.ssh
+RUN echo "Nagios_User_SSHKey" > /home/nagios/.ssh/authorized_keys
+RUN chown -R nagios /home/nagios/.ssh
+RUN chmod -R og-rwx /home/nagios/.ssh
+
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 
