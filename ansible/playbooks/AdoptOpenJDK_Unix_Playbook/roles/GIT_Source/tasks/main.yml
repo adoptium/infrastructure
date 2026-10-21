@@ -46,7 +46,7 @@
   tags: git_source
 
 - name: Download git source for CentOS 6
-  shell: "wget -q -O /tmp/git-2.15.0.tar.xz https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz"
+  shell: "curl -fsSL -o /tmp/git-2.15.0.tar.xz https://www.kernel.org/pub/software/scm/git/git-2.15.0.tar.xz"
   args:
     warn: false
   when:
