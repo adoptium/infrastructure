@@ -116,9 +116,7 @@
       when: ansible_architecture == 'x86_64'
       tags: [build_tools, build_tools_openj9]
     - role: dwarf_library         # OpenJ9
-      when:
-        - ansible_architecture == "aarch64"
-        - ansible_os_family == "RedHat"
+      when: ansible_os_family == "RedHat"
     - role: zulu7                 # JDK8 Build Bootstrap
       when: ansible_distribution != "MacOSX"
     - role: adoptopenjdk_install
