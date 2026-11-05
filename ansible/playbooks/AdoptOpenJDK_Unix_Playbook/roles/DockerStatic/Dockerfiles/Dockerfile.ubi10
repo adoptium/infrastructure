@@ -70,7 +70,8 @@ RUN localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8 \
  && localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 \
  && localedef -i zh_TW -c -f UTF-8 zh_TW.UTF-8
 RUN dnf install -y openssh-server
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
+# Jenkins nodes need ecdsa host keys
+RUN yes | ssh-keygen -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key -q -N ''
 # RUN service ssh start
 CMD ["/usr/sbin/sshd","-D"]
 # ENTRYPOINT /bin/bash

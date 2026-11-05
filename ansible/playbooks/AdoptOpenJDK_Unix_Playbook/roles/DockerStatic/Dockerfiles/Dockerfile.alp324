@@ -29,14 +29,12 @@ RUN sha512sum -c /tmp/ant.sha512
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
 
-# Create user jenkins with random password. Prevents locked user account that makes SSH'ing into
-# the container impossible.
-RUN groupadd -g 10001 jenkins
-RUN useradd -p $(tr -dc A-Za-z0-9 </dev/urandom | head -c 16) -s /bin/bash -m -d /home/jenkins -u 10000 -g 10001 jenkins
+# Set up jenkins user
+RUN useradd -m -d /home/jenkins jenkins
 RUN mkdir /home/jenkins/.ssh
 RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
-RUN chown -R jenkins:jenkins /home/jenkins/.ssh
-RUN chmod -R "g=,o=" /home/jenkins/.ssh
+RUN chown -R jenkins /home/jenkins/.ssh
+RUN chmod -R og-rwx /home/jenkins/.ssh
 
 # Create nagios user
 RUN useradd -m -d /home/nagios nagios
@@ -50,4 +48,6 @@ RUN rm -rf /tmp/jdk25.tar.gz /tmp/ant* /tmp/jdk25.sig
 
 # Start container with docker run -p 2222:22 UUID.
 CMD ["/usr/sbin/sshd","-D"]
+# Jenkins nodes need ecdsa host keys
+RUN yes | ssh-keygen -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key -q -N ''
 EXPOSE 22
