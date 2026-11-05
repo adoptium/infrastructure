@@ -29,12 +29,14 @@ RUN sha512sum -c /tmp/ant.sha512
 RUN unzip -q -d /usr/local /tmp/ant.zip
 RUN ln -s /usr/local/apache-ant-$ant_version/bin/ant /usr/bin/ant
 
-# Set up jenkins user
-RUN useradd -m -d /home/jenkins jenkins
+# Create user jenkins with random password. Prevents locked user account that makes SSH'ing into
+# the container impossible.
+RUN groupadd -g 10001 jenkins
+RUN useradd -p $(tr -dc A-Za-z0-9 </dev/urandom | head -c 16) -s /bin/bash -m -d /home/jenkins -u 10000 -g 10001 jenkins
 RUN mkdir /home/jenkins/.ssh
 RUN echo "Jenkins_User_SSHKey" > /home/jenkins/.ssh/authorized_keys
-RUN chown -R jenkins /home/jenkins/.ssh
-RUN chmod -R og-rwx /home/jenkins/.ssh
+RUN chown -R jenkins:jenkins /home/jenkins/.ssh
+RUN chmod -R "g=,o=" /home/jenkins/.ssh
 
 # Create nagios user
 RUN useradd -m -d /home/nagios nagios
