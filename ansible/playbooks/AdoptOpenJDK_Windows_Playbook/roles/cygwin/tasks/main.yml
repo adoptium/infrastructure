@@ -23,9 +23,8 @@
     url: "https://cygwin.com/setup-x86_64.exe"
     dest: "C:\\temp\\cygwin.exe"
     force: no
-    checksum: "2c9f2fb56e1fb687b5d9680afa8f8b06e6214f0e483096af0eae1946431226c5" # v3.6.7-1
+    checksum: "9d31ffc08b14eaaf5ddf15799a934f6bc1be3d87ed986736cb1980c508ed9502" # v3.6.7-1
     checksum_algorithm: sha256
-  when: not cygwin_installed.stat.exists
   register: cygwin_download
   tags: cygwin
 
@@ -36,6 +35,30 @@
   args:
     executable: powershell
   when: not cygwin_installed.stat.exists
+  tags: cygwin
+
+# Cygwin setup can leave perl without its core modules (perl_base files such as Config.pm and Encode.pm),
+# for example when it fails part way through extracting perl_base. Check that perl works and repair it if not.
+- name: Check that Cygwin perl can load its core modules
+  win_command: "{{ Cygwin_INST_DIR }}\\bin\\perl.exe -MEncode -MConfig -MPOSIX -MCwd -e 1"
+  register: cygwin_perl_check
+  failed_when: false
+  changed_when: false
+  tags: cygwin
+
+- name: Repair Cygwin perl_base
+  win_shell: |
+      $p = Start-Process -Wait -PassThru -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages perl,perl_base --quiet-mode --download --local-install --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir {{ Cygwin_PACKAGE_DIR }} --root {{ Cygwin_INST_DIR }}'
+      exit $p.ExitCode
+  args:
+    executable: powershell
+  when: cygwin_perl_check.rc != 0
+  tags: cygwin
+
+- name: Verify Cygwin perl can load its core modules
+  win_command: "{{ Cygwin_INST_DIR }}\\bin\\perl.exe -MEncode -MConfig -MPOSIX -MCwd -e 1"
+  changed_when: false
+  when: cygwin_perl_check.rc != 0
   tags: cygwin
 
 - name: Change git config to not replace Line endings

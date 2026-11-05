@@ -16,7 +16,7 @@
   block:
     - name: Download 7-Zip (required to unpack MinGW-W64)
       win_get_url:
-        url: https://www.7-zip.org/a/7z2201-x64.exe
+        url: https://github.com/ip7z/7zip/releases/download/22.01/7z2201-x64.exe
         dest: 'C:\temp\7z.exe'
         force: no
         checksum: b055fee85472921575071464a97a79540e489c1c3a14b9bdfbdbab60e17f36e4
