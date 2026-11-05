@@ -8,7 +8,7 @@
 # ---------------------------------------------------------------
 
 # A full list of software installed on the macOS runner can be found here:
-# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
+# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
 name: Jenkins Build Agent (macOS x64)
 run-name: Jenkins Build Agent (macOS x64) - ${{ inputs.agent_name }}
@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   agent:
-    runs-on: macos-15-intel
+    runs-on: macos-15
     timeout-minutes: 360
 
     steps:
@@ -44,8 +44,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify architecture
-        run: test "$(uname -m)" = x86_64
+      - name: Verify ARM64 host and x64 execution
+        run: |
+          test "$(uname -m)" = arm64
+          test "$(/usr/bin/arch -x86_64 /usr/bin/uname -m)" = x86_64
 
       - uses: ./.github/actions/setup-macos-build
 

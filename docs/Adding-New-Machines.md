@@ -352,7 +352,7 @@ via `run-name`. Each architecture has its own entry in the Actions sidebar.
 
 #### Experimental GitHub Actions macOS Build Agents
 
-The separate [Intel build workflow](../.github/workflows/jenkins-build-agent-macos15-intel.yml)
+The separate [x64-target build workflow](../.github/workflows/jenkins-build-agent-macos15-intel.yml)
 and [ARM64 build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
 add Temurin/HotSpot build prerequisites without slowing down the test workflows.
 These are opt-in evaluation agents, not replacements for release builders.
@@ -365,8 +365,17 @@ Use only `<template-name> ci.agent.dynamic` as labels. Do not add general
 `build`, test, or release-toolchain labels until compatibility is established.
 The existing test templates should continue pointing at the test workflows.
 
+Both build workflows use ARM64 `macos-15` hosted runners. The x64 template
+name and labels describe the **JDK target**, not the host architecture.
+Temurin selects `--openjdk-target=x86_64-apple-darwin` for an x64 build on
+ARM64, matching the existing Orka build approach; JDK 8 additionally runs
+under Rosetta. The x64 workflow verifies both its ARM64 host and actual
+Rosetta x86_64 execution before connecting. Existing x64 test agents still
+use Intel runners; neither test workflow is changed.
+
 For an evaluation build, override the matching Temurin build job's
 `BUILD_CONFIGURATION.NODE_LABEL` with `<template-name> && ci.agent.dynamic`.
+Keep `ARCHITECTURE=x64` for an x64 target, or `aarch64` for an ARM64 target.
 Disable `ENABLE_SIGNER`, `ENABLE_INSTALLERS`, `ENABLE_TESTS`,
 `ENABLE_TESTDYNAMICPARALLEL`, and `ENABLE_REPRODUCIBLE_COMPARE`; keep `RELEASE`
 and `WEEKLY` false. Archive the resulting JDK and run smoke checks before
@@ -412,9 +421,18 @@ images; the Xcode pin needs review if an image stops providing it.
 Record the actual runner image, compiler/SDK, build duration, disk use,
 and cold/warm setup times during evaluation. Building with a newer SDK does
 not establish compatibility with older supported macOS versions. Release
-reproducibility, signing/notarization, installers, JDK 8/11, and OpenJ9 require
+reproducibility, signing/notarization, installers, and OpenJ9 require
 separate validation; do not copy production signing credentials onto these
 experimental agents.
+
+JDK 11 ARM64 compiled and its archived binary passed smoke tests after the
+bootstrap alias was added. JDK 17 cross-compilation on ARM64 also produced
+an archive with x86_64 Java and HotSpot binaries. This does not establish
+compatibility for every JDK version or with older supported macOS versions.
+The JDK 8 x64 trial failed compiling the Serviceability Agent because SDK
+15.2 lacks `JavaNativeFoundation/JavaNativeFoundation.h`. It requires
+separate compatible SDK/toolchain provisioning or an upstream-supported
+solution; changing host architecture alone does not establish JDK 8 support.
 
 The initial trials, before the Xcode pin, compiled and archived successfully
 with Xcode 16.4, but the downstream Temurin SBOM content validator rejected that compiler
