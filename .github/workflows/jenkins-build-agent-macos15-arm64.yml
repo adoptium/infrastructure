@@ -62,7 +62,7 @@ jobs:
           AGENT_NAME: ${{ inputs.agent_name }}
           AGENT_SECRET: ${{ inputs.agent_secret }}
         run: |
-          java -jar agent.jar \
+          env -u AGENT_SECRET java -jar agent.jar \
             -url "$JENKINS_URL" \
             -secret "$AGENT_SECRET" \
             -name "$AGENT_NAME" \
