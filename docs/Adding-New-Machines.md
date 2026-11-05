@@ -321,6 +321,35 @@ If the playbook fails:
 
 Add the machine as a Jenkins agent. Configure with **minimal labels initially** - full labels will be added after testing.
 
+#### GitHub Actions macOS Test Agents
+
+The GitHub Actions cloud uses separate workflows for Intel
+([jenkins-agent-macos15-intel.yml](../.github/workflows/jenkins-agent-macos15-intel.yml),
+`macos-15-intel`) and Apple Silicon
+([jenkins-agent-macos15-arm64.yml](../.github/workflows/jenkins-agent-macos15-arm64.yml),
+`macos-15`). These are ephemeral test agents, not JDK build machines.
+
+In the `github-actions` cloud, configure an ARM64 template with:
+
+- **Template Name**: `gha-macos15-arm64`
+- **Labels**: initially only `gha-macos15-arm64 ci.agent.dynamic` for targeted validation; after
+  validation, add `gha arm64 aarch64 mac macos15 test sw.os.osx sw.os.mac
+  hw.arch.aarch64 ci.role.test ci.agent.dynamic`. Do not add build labels.
+- **Remote FS Root**: `/Users/runner/agent`
+- **Number of Executors**: `1`
+- **One-Shot Agent**: enabled
+- **Workflow File Name**: `jenkins-agent-macos15-arm64.yml`
+- **Git Ref**: the PR branch during validation, then `master` after merging
+- **Max Number of Agents**: a small trial limit within the cloud's overall limit
+
+Run AQA Grinder tests with `LABEL=gha-macos15-arm64 && ci.agent.dynamic` and
+`PLATFORM=aarch64_mac` for multiple supported JDK versions before enabling the
+general test labels. The dynamic label allows AQA to request a new agent when
+none is online.
+The workflows are named `Jenkins Agent (macOS x64)` and
+`Jenkins Agent (macOS Arm64)`, with the agent name appended to each run title
+via `run-name`. Each architecture has its own entry in the Actions sidebar.
+
 #### Create New Node
 
 1. **Login to Jenkins**: https://ci.adoptium.net
