@@ -332,7 +332,7 @@ The GitHub Actions cloud uses separate workflows for Intel
 In the `github-actions` cloud, configure an ARM64 template with:
 
 - **Template Name**: `gha-macos15-arm64`
-- **Labels**: initially only `gha-macos15-arm64` for targeted validation; after
+- **Labels**: initially only `gha-macos15-arm64 ci.agent.dynamic` for targeted validation; after
   validation, add `gha arm64 aarch64 mac macos15 test sw.os.osx sw.os.mac
   hw.arch.aarch64 ci.role.test ci.agent.dynamic`. Do not add build labels.
 - **Remote FS Root**: `/Users/runner/agent`
@@ -342,8 +342,10 @@ In the `github-actions` cloud, configure an ARM64 template with:
 - **Git Ref**: the PR branch during validation, then `master` after merging
 - **Max Number of Agents**: a small trial limit within the cloud's overall limit
 
-Run AQA Grinder tests with `LABEL=gha-macos15-arm64` and `PLATFORM=aarch64_mac` for
-multiple supported JDK versions before enabling the general test labels.
+Run AQA Grinder tests with `LABEL=gha-macos15-arm64 && ci.agent.dynamic` and
+`PLATFORM=aarch64_mac` for multiple supported JDK versions before enabling the
+general test labels. The dynamic label allows AQA to request a new agent when
+none is online.
 The workflows are named `Jenkins Agent (macOS x64)` and
 `Jenkins Agent (macOS Arm64)`, with the agent name appended to each run title
 via `run-name`. Each architecture has its own entry in the Actions sidebar.
