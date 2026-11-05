@@ -350,17 +350,17 @@ The workflows are named `Jenkins Agent (macOS x64)` and
 `Jenkins Agent (macOS Arm64)`, with the agent name appended to each run title
 via `run-name`. Each architecture has its own entry in the Actions sidebar.
 
-#### Experimental GitHub Actions macOS Build Agents
+#### GitHub Actions macOS Build Agents
 
 The [ARM64-hosted build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
 supports native ARM64 and cross-compiled x64 Temurin/HotSpot builds on `macos-15`.
-It is for evaluation, not releases; existing test workflows are unchanged.
+Existing test workflows are unchanged.
 
 Configure Jenkins cloud templates `gha-macos15-arm64-build` and
 `gha-macos15-x64-build` with:
 
 - **Workflow**: `jenkins-build-agent-macos15-arm64.yml` for both targets
-- **Git Ref**: the evaluation branch, then `master` after merging
+- **Git Ref**: the PR branch before merging, then `master`
 - **Remote root**: `/Users/runner/agent`
 - **Executors / max agents**: one each; enable one-shot mode
 - **Labels**: `<template-name> ci.agent.dynamic` only
