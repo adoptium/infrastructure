@@ -397,6 +397,15 @@ reproducibility, signing/notarization, installers, JDK 8/11, and OpenJ9 require
 separate validation; do not copy production signing credentials onto these
 experimental agents.
 
+The initial JDK 21 ARM64 trial compiled and archived successfully with Xcode
+16.4, but the downstream Temurin SBOM content validator rejected that compiler
+because it expects Xcode 15.2. The SBOM passed schema validation. Do not disable
+this policy check or misreport the compiler: production use needs either an
+approved toolchain-policy update or provisioning the required Xcode/SDK.
+A successful runner workflow alone does not establish a successful Jenkins
+build; check compilation, artifacts, downstream validation, and binary smoke
+tests separately.
+
 #### Create New Node
 
 1. **Login to Jenkins**: https://ci.adoptium.net
