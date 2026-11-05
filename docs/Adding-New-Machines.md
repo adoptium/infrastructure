@@ -374,8 +374,15 @@ considering wider deployment. Run a second build on the same architecture and
 branch to verify a warm dependency cache.
 
 The [shared setup action](../.github/actions/setup-macos-build/action.yml)
-uses the image's existing Xcode, Java installations, Ant, Maven, and utilities.
-It installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make,
+pins Xcode 16.0 (build 16A242d), the oldest version currently installed on both
+images. It selects the exact application with `DEVELOPER_DIR` and `xcode-select`,
+verifies the version/build, and passes `DEVELOPER_DIR` to Jenkins. Setup fails
+if that toolchain is removed or changed; it never falls back to the image's
+default. The image's `XCODE_16_DEVELOPER_DIR` variable is not an exact pin:
+it points to the newest installed 16.x release.
+
+The action uses existing Java installations, Ant, Maven, and utilities, and
+installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make,
 and Pandoc. Preinstalled JDKs are exposed as `JDK*_BOOT_DIR`; the Temurin build
 scripts can download other required bootstrap versions.
 
@@ -389,19 +396,22 @@ branch-scoped; a PR branch's cache will not automatically warm `master`.
 The cache is saved **before** Jenkins connects, so it contains no build
 workspaces, agent secrets, signing material, or compiler-output cache.
 
-Hosted runners have a six-hour job limit, finite CPU/RAM/disk, and rolling Xcode
-images. Record the actual runner image, compiler/SDK, build duration, disk use,
+Hosted runners have a six-hour job limit, finite CPU/RAM/disk, and rolling
+images; the Xcode pin needs review if an image stops providing it.
+Record the actual runner image, compiler/SDK, build duration, disk use,
 and cold/warm setup times during evaluation. Building with a newer SDK does
 not establish compatibility with older supported macOS versions. Release
 reproducibility, signing/notarization, installers, JDK 8/11, and OpenJ9 require
 separate validation; do not copy production signing credentials onto these
 experimental agents.
 
-The initial JDK 21 ARM64 trial compiled and archived successfully with Xcode
-16.4, but the downstream Temurin SBOM content validator rejected that compiler
+The initial trials, before the Xcode pin, compiled and archived successfully
+with Xcode 16.4, but the downstream Temurin SBOM content validator rejected that compiler
 because it expects Xcode 15.2. The SBOM passed schema validation. Do not disable
 this policy check or misreport the compiler: production use needs either an
 approved toolchain-policy update or provisioning the required Xcode/SDK.
+Pinning Xcode 16.0 prevents automatic compiler changes but does not satisfy
+the current 15.2 policy.
 A successful runner workflow alone does not establish a successful Jenkins
 build; check compilation, artifacts, downstream validation, and binary smoke
 tests separately.

@@ -4,6 +4,20 @@ description: Cache installed Homebrew dependencies before connecting a Jenkins b
 runs:
   using: composite
   steps:
+    - name: Select Xcode 16.0
+      shell: bash
+      env:
+        DEVELOPER_DIR: /Applications/Xcode_16.0.app/Contents/Developer
+      run: |
+        sudo xcode-select --switch "$DEVELOPER_DIR"
+        version="$(xcodebuild -version)"
+        printf '%s\n' "$version"
+        if [[ "$version" != $'Xcode 16.0\nBuild version 16A242d' ]]; then
+          echo "::error::Expected Xcode 16.0 (16A242d); refusing to use a different toolchain."
+          exit 1
+        fi
+        echo "DEVELOPER_DIR=$DEVELOPER_DIR" >> "$GITHUB_ENV"
+
     - name: Identify runner image
       id: image
       shell: bash
@@ -91,6 +105,7 @@ runs:
         ccache --version
         pandoc --version
         xcodebuild -version
+        xcrun --show-sdk-version
         xcrun --find clang
         xcrun --find metal
         sw_vers
