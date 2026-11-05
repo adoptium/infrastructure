@@ -374,8 +374,11 @@ considering wider deployment. Run a second build on the same architecture and
 branch to verify a warm dependency cache.
 
 The [shared setup action](../.github/actions/setup-macos-build/action.yml)
-pins Xcode 16.0 (build 16A242d), the oldest version currently installed on both
-images. It selects the exact application with `DEVELOPER_DIR` and `xcode-select`,
+pins Xcode 16.2 (build 16C5032a), the oldest installed version not affected by
+[JDK-8340341](https://bugs.openjdk.org/browse/JDK-8340341). Xcode 16.0 and 16.1
+have a compiler bug; the 16.0 ARM64 trial reproduced its `StackMapTable`
+`ClassFormatError` during JDK image generation. It selects the exact
+application with `DEVELOPER_DIR` and `xcode-select`,
 verifies the version/build, and passes `DEVELOPER_DIR` to Jenkins. It also
 repoints the runner's `/Applications/Xcode.app` symlink to that installation
 and verifies that it selects the same SDK: the Temurin scripts use this alias
@@ -414,8 +417,15 @@ with Xcode 16.4, but the downstream Temurin SBOM content validator rejected that
 because it expects Xcode 15.2. The SBOM passed schema validation. Do not disable
 this policy check or misreport the compiler: production use needs either an
 approved toolchain-policy update or provisioning the required Xcode/SDK.
-Pinning Xcode 16.0 prevents automatic compiler changes but does not satisfy
+Pinning Xcode 16.2 prevents automatic compiler changes but does not satisfy
 the current 15.2 policy.
+
+The workflows retain `-noReconnect` until the cloud plugin's
+[connection recovery fix](https://github.com/jenkinsci/github-actions-cloud-plugin/pull/15)
+is deployed. A transient connection loss can currently end a build even when
+Actions reports success. After upgrading the plugin, switch the agent command
+to `-noReconnectAfter 5m`: the plugin must disable reconnection explicitly
+before intentional node removal so that normal shutdown still exits promptly.
 A successful runner workflow alone does not establish a successful Jenkins
 build; check compilation, artifacts, downstream validation, and binary smoke
 tests separately.
