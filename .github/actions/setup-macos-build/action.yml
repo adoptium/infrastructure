@@ -1,0 +1,105 @@
+name: Prepare macOS JDK build tools
+description: Cache installed Homebrew dependencies before connecting a Jenkins build agent.
+
+runs:
+  using: composite
+  steps:
+    - name: Identify runner image
+      id: image
+      shell: bash
+      run: |
+        echo "version=${ImageOS:?}-${ImageVersion:?}" >> "$GITHUB_OUTPUT"
+
+    - name: Restore installed build tools
+      id: cache
+      uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+      with:
+        path: ${{ runner.temp }}/macos-build-tools
+        key: macos-build-tools-${{ runner.arch }}-${{ steps.image.outputs.version }}-${{ hashFiles('.github/actions/setup-macos-build/action.yml') }}
+
+    - name: Install and package missing build tools
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: '1'
+        HOMEBREW_NO_INSTALL_CLEANUP: '1'
+        HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: '1'
+      run: |
+        formulae=(autoconf automake bash ccache coreutils gnu-sed gnu-tar make pandoc)
+        missing=()
+        for formula in "${formulae[@]}"; do
+          if ! brew list --formula --versions "$formula" >/dev/null 2>&1; then
+            missing+=("$formula")
+          fi
+        done
+        if [[ ${#missing[@]} -gt 0 ]]; then
+          brew install "${missing[@]}"
+        fi
+
+        prefix="$(brew --prefix)"
+        cache="$RUNNER_TEMP/macos-build-tools"
+        mkdir -p "$cache"
+        {
+          printf '%s\n' "${formulae[@]}"
+          brew deps --installed --union "${formulae[@]}"
+        } | sort -u > "$cache/formulae"
+        : > "$cache/paths"
+        : > "$cache/linked"
+        while IFS= read -r formula; do
+          printf 'Cellar/%s\nopt/%s\n' "$formula" "$formula" >> "$cache/paths"
+          if [[ -L "$prefix/var/homebrew/linked/$formula" ]]; then
+            echo "$formula" >> "$cache/linked"
+          fi
+        done < "$cache/formulae"
+        /usr/bin/tar -cf "$cache/kegs.tar" -C "$prefix" -T "$cache/paths"
+
+    - name: Restore Homebrew links
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: '1'
+      run: |
+        cache="$RUNNER_TEMP/macos-build-tools"
+        /usr/bin/tar -xf "$cache/kegs.tar" -C "$(brew --prefix)"
+        while IFS= read -r formula; do
+          brew unlink "$formula"
+          brew link "$formula"
+        done < "$cache/linked"
+
+    - name: Verify build tools and configure environment
+      shell: bash
+      run: |
+        prefix="$(brew --prefix)"
+        bash_path="$prefix/bin/bash"
+        echo "$bash_path" | sudo tee -a /etc/shells
+        sudo dscl . -change /Users/runner UserShell /bin/bash "$bash_path"
+        echo "$prefix/bin" >> "$GITHUB_PATH"
+        echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
+        echo "SHELL=$bash_path" >> "$GITHUB_ENV"
+        echo "BASH=$bash_path" >> "$GITHUB_ENV"
+        for version in 11 17 21 25; do
+          jdk_home="$(/usr/libexec/java_home -v "$version")"
+          test -x "$jdk_home/bin/javac"
+          echo "JDK${version}_BOOT_DIR=$jdk_home" >> "$GITHUB_ENV"
+        done
+        "$bash_path" --version
+        autoconf --version
+        automake --version
+        gmake --version
+        gsed --version
+        ccache --version
+        pandoc --version
+        xcodebuild -version
+        xcrun --find clang
+        xcrun --find metal
+        sw_vers
+        sysctl hw.ncpu hw.memsize
+        df -h "$RUNNER_TEMP"
+
+    # Save before Jenkins jobs can modify the tools or leave credentials behind.
+    - name: Save installed build tools
+      if: steps.cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+      with:
+        path: ${{ runner.temp }}/macos-build-tools
+        key: ${{ steps.cache.outputs.cache-primary-key }}

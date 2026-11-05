@@ -350,6 +350,52 @@ The workflows are named `Jenkins Agent (macOS x64)` and
 `Jenkins Agent (macOS Arm64)`, with the agent name appended to each run title
 via `run-name`. Each architecture has its own entry in the Actions sidebar.
 
+#### Experimental GitHub Actions macOS Build Agents
+
+The separate [Intel build workflow](../.github/workflows/jenkins-build-agent-macos15-intel.yml)
+and [ARM64 build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
+add Temurin/HotSpot build prerequisites without slowing down the test workflows.
+These are opt-in evaluation agents, not replacements for release builders.
+
+Use separate cloud templates named `gha-macos15-x64-build` and
+`gha-macos15-arm64-build`, referencing the corresponding build workflow and
+the branch under evaluation. Set one executor, one-shot mode, remote root
+`/Users/runner/agent`, and initially at most one agent per template.
+Use only `<template-name> ci.agent.dynamic` as labels. Do not add general
+`build`, test, or release-toolchain labels until compatibility is established.
+The existing test templates should continue pointing at the test workflows.
+
+For an evaluation build, override the matching Temurin build job's
+`BUILD_CONFIGURATION.NODE_LABEL` with `<template-name> && ci.agent.dynamic`.
+Disable `ENABLE_SIGNER`, `ENABLE_INSTALLERS`, `ENABLE_TESTS`,
+`ENABLE_TESTDYNAMICPARALLEL`, and `ENABLE_REPRODUCIBLE_COMPARE`; keep `RELEASE`
+and `WEEKLY` false. Archive the resulting JDK and run smoke checks before
+considering wider deployment. Run a second build on the same architecture and
+branch to verify a warm dependency cache.
+
+The [shared setup action](../.github/actions/setup-macos-build/action.yml)
+uses the image's existing Xcode, Java installations, Ant, Maven, and utilities.
+It installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make,
+and Pandoc. Preinstalled JDKs are exposed as `JDK*_BOOT_DIR`; the Temurin build
+scripts can download other required bootstrap versions.
+
+Installed Homebrew kegs, their transitive dependencies, and `opt` links are
+cached, rather than only downloaded bottles. Cache hits restore and relink
+these packages without running `brew install`. Exact keys include architecture,
+runner image version, and setup-action content, with no cross-image fallback.
+Changing the setup action or runner image invalidates the cache. Caches are
+branch-scoped; a PR branch's cache will not automatically warm `master`.
+The cache is saved **before** Jenkins connects, so it contains no build
+workspaces, agent secrets, signing material, or compiler-output cache.
+
+Hosted runners have a six-hour job limit, finite CPU/RAM/disk, and rolling Xcode
+images. Record the actual runner image, compiler/SDK, build duration, disk use,
+and cold/warm setup times during evaluation. Building with a newer SDK does
+not establish compatibility with older supported macOS versions. Release
+reproducibility, signing/notarization, installers, JDK 8/11, and OpenJ9 require
+separate validation; do not copy production signing credentials onto these
+experimental agents.
+
 #### Create New Node
 
 1. **Login to Jenkins**: https://ci.adoptium.net
