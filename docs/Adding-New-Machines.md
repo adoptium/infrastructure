@@ -391,7 +391,11 @@ it points to the newest installed 16.x release.
 The action uses existing Java installations, Ant, Maven, and utilities, and
 installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make,
 and Pandoc. Preinstalled JDKs are exposed as `JDK*_BOOT_DIR`; the Temurin build
-scripts can download other required bootstrap versions.
+scripts can download other required bootstrap versions. `JDK10_BOOT_DIR`
+intentionally aliases the preinstalled JDK 11, because Temurin requests a
+JDK 10 bootstrap for JDK 11 and OpenJDK 11 accepts either version. This
+avoids downloading an obsolete JDK 10 on Intel and requesting a nonexistent
+macOS ARM64 JDK 10.
 
 Installed Homebrew kegs, their transitive dependencies, and their existing
 symlinks are cached, rather than only downloaded bottles. Cache hits restore

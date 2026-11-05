@@ -108,6 +108,10 @@ runs:
           jdk_home="$(/usr/libexec/java_home -v "$version")"
           test -x "$jdk_home/bin/javac"
           echo "JDK${version}_BOOT_DIR=$jdk_home" >> "$GITHUB_ENV"
+          if [[ "$version" == 11 ]]; then
+            # Temurin requests JDK 10 for JDK 11, which also accepts itself as a bootstrap.
+            echo "JDK10_BOOT_DIR=$jdk_home" >> "$GITHUB_ENV"
+          fi
         done
         "$bash_path" --version
         autoconf --version
