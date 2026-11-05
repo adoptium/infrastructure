@@ -353,105 +353,32 @@ via `run-name`. Each architecture has its own entry in the Actions sidebar.
 #### Experimental GitHub Actions macOS Build Agents
 
 The [ARM64-hosted build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
-supports both ARM64 and x64 Temurin/HotSpot targets without slowing down the test workflows.
-Build-tool setup is inline, so provisioning requires neither a repository
-checkout nor a local composite action.
-These are opt-in evaluation agents, not replacements for release builders.
+supports native ARM64 and cross-compiled x64 Temurin/HotSpot builds on `macos-15`.
+It is for evaluation, not releases; existing test workflows are unchanged.
 
-Use separate cloud templates named `gha-macos15-x64-build` and
-`gha-macos15-arm64-build`, both referencing `jenkins-build-agent-macos15-arm64.yml` and
-the branch under evaluation. Set one executor, one-shot mode, remote root
-`/Users/runner/agent`, and initially at most one agent per template.
-Use only `<template-name> ci.agent.dynamic` as labels. Do not add general
-`build`, test, or release-toolchain labels until compatibility is established.
-The existing test templates should continue pointing at the test workflows.
+Configure Jenkins cloud templates `gha-macos15-arm64-build` and
+`gha-macos15-x64-build` with:
 
-Both templates use the same ARM64 `macos-15` hosted workflow. The x64 template
-name and labels describe the **JDK target**, not the host architecture.
-Temurin selects `--openjdk-target=x86_64-apple-darwin` for an x64 build on
-ARM64, matching the existing Orka build approach; JDK 8 additionally runs
-under Rosetta. The workflow verifies both its ARM64 host and actual
-Rosetta x86_64 execution before connecting. Existing x64 test agents still
-use Intel runners; neither test workflow is changed.
+- **Workflow**: `jenkins-build-agent-macos15-arm64.yml` for both targets
+- **Git Ref**: the evaluation branch, then `master` after merging
+- **Remote root**: `/Users/runner/agent`
+- **Executors / max agents**: one each; enable one-shot mode
+- **Labels**: `<template-name> ci.agent.dynamic` only
 
-For an evaluation build, override the matching Temurin build job's
-`BUILD_CONFIGURATION.NODE_LABEL` with `<template-name> && ci.agent.dynamic`.
-Keep `ARCHITECTURE=x64` for an x64 target, or `aarch64` for an ARM64 target.
-Disable `ENABLE_SIGNER`, `ENABLE_INSTALLERS`, `ENABLE_TESTS`,
-`ENABLE_TESTDYNAMICPARALLEL`, and `ENABLE_REPRODUCIBLE_COMPARE`; keep `RELEASE`
-and `WEEKLY` false. Archive the resulting JDK and run smoke checks before
-considering wider deployment. Run a second build on the same architecture and
-branch to verify a warm dependency cache.
+Set the build job's `BUILD_CONFIGURATION.NODE_LABEL` to
+`<template-name> && ci.agent.dynamic` and `ARCHITECTURE` to `aarch64` or `x64`
+for the desired target, independently of the ARM64 host. Set `ENABLE_SIGNER`,
+`ENABLE_INSTALLERS`, `ENABLE_TESTS`, `ENABLE_TESTDYNAMICPARALLEL`,
+`ENABLE_REPRODUCIBLE_COMPARE`, `RELEASE`, and `WEEKLY` to false.
+Validate the archived JDK with smoke tests before wider use.
 
-The workflow pins Xcode 16.2 (build 16C5032a), the oldest installed version not affected by
-[JDK-8340341](https://bugs.openjdk.org/browse/JDK-8340341). Xcode 16.0 and 16.1
-have a compiler bug; the 16.0 ARM64 trial reproduced its `StackMapTable`
-`ClassFormatError` during JDK image generation. It selects the exact
-application with `DEVELOPER_DIR` and `xcode-select`,
-verifies the version/build, and passes `DEVELOPER_DIR` to Jenkins. It also
-repoints the runner's `/Applications/Xcode.app` symlink to that installation
-and verifies that it selects the same SDK: the Temurin scripts use this alias
-explicitly when setting `--with-sysroot`. A real application directory at the
-alias path is never replaced. Setup fails
-if that toolchain is removed or changed; it never falls back to the image's
-default. The image's `XCODE_16_DEVELOPER_DIR` variable is not an exact pin:
-it points to the newest installed 16.x release.
+The workflow pins Xcode 16.2 / SDK 15.2, verifies Rosetta, and caches installed
+Homebrew tools before connecting to Jenkins, without a checkout. Bump the
+cache key revision when changing the tool list or archive layout. Jobs have
+a six-hour limit; do not add production signing credentials or release labels.
 
-The workflow uses existing Java installations, Ant, Maven, and utilities, and
-installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make,
-and Pandoc. Preinstalled JDKs are exposed as `JDK*_BOOT_DIR`; the Temurin build
-scripts can download other required bootstrap versions. `JDK10_BOOT_DIR`
-intentionally aliases the preinstalled JDK 11, because Temurin requests a
-JDK 10 bootstrap for JDK 11 and OpenJDK 11 accepts either version. This
-avoids downloading an obsolete JDK 10 on Intel and requesting a nonexistent
-macOS ARM64 JDK 10.
-
-Installed Homebrew kegs, their transitive dependencies, and their existing
-symlinks are cached, rather than only downloaded bottles. Cache hits restore
-these packages without running `brew install` or `brew link`, preserving the
-runner image's partial/keg-only links (notably OpenSSL). Exact keys include architecture,
-runner image version, Xcode pin, and an explicit cache revision, with no cross-image fallback.
-Bump the cache key's `v1` revision when changing the tool list or archive layout;
-do not use `hashFiles` without a checkout. Runner image changes invalidate the cache. Caches are
-branch-scoped; a PR branch's cache will not automatically warm `master`.
-The cache is saved **before** Jenkins connects, so it contains no build
-workspaces, agent secrets, signing material, or compiler-output cache.
-
-Hosted runners have a six-hour job limit, finite CPU/RAM/disk, and rolling
-images; the Xcode pin needs review if an image stops providing it.
-Record the actual runner image, compiler/SDK, build duration, disk use,
-and cold/warm setup times during evaluation. Building with a newer SDK does
-not establish compatibility with older supported macOS versions. Release
-reproducibility, signing/notarization, installers, and OpenJ9 require
-separate validation; do not copy production signing credentials onto these
-experimental agents.
-
-JDK 11 ARM64 compiled and its archived binary passed smoke tests after the
-bootstrap alias was added. JDK 17 cross-compilation on ARM64 also produced
-an archive with x86_64 Java and HotSpot binaries. This does not establish
-compatibility for every JDK version or with older supported macOS versions.
-The JDK 8 x64 trial failed compiling the Serviceability Agent because SDK
-15.2 lacks `JavaNativeFoundation/JavaNativeFoundation.h`. It requires
-separate compatible SDK/toolchain provisioning or an upstream-supported
-solution; changing host architecture alone does not establish JDK 8 support.
-
-The initial trials, before the Xcode pin, compiled and archived successfully
-with Xcode 16.4, but the downstream Temurin SBOM content validator rejected that compiler
-because it expects Xcode 15.2. The SBOM passed schema validation. Do not disable
-this policy check or misreport the compiler: production use needs either an
-approved toolchain-policy update or provisioning the required Xcode/SDK.
-Pinning Xcode 16.2 prevents automatic compiler changes but does not satisfy
-the current 15.2 policy.
-
-The build workflow retains `-noReconnect` until the cloud plugin's
-[connection recovery fix](https://github.com/jenkinsci/github-actions-cloud-plugin/pull/15)
-is deployed. A transient connection loss can currently end a build even when
-Actions reports success. After upgrading the plugin, switch the agent command
-to `-noReconnectAfter 5m`: the plugin must disable reconnection explicitly
-before intentional node removal so that normal shutdown still exits promptly.
-A successful runner workflow alone does not establish a successful Jenkins
-build; check compilation, artifacts, downstream validation, and binary smoke
-tests separately.
+Known blockers: the SBOM compiler policy requires Xcode 15.2, and JDK 8 needs
+JavaNativeFoundation headers absent from SDK 15.2. Neither check is bypassed.
 
 #### Create New Node
 
