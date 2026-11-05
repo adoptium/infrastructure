@@ -44,16 +44,21 @@ runs:
           brew deps --installed --union "${formulae[@]}"
         } | sort -u > "$cache/formulae"
         : > "$cache/paths"
-        : > "$cache/linked"
+        cd "$prefix"
+        link_roots=()
+        for directory in bin etc include lib sbin share var/homebrew/linked; do
+          if [[ -d "$directory" ]]; then
+            link_roots+=("$directory")
+          fi
+        done
         while IFS= read -r formula; do
           printf 'Cellar/%s\nopt/%s\n' "$formula" "$formula" >> "$cache/paths"
-          if [[ -L "$prefix/var/homebrew/linked/$formula" ]]; then
-            echo "$formula" >> "$cache/linked"
-          fi
+          find "${link_roots[@]}" -type l -lname "*Cellar/$formula/*" >> "$cache/paths"
         done < "$cache/formulae"
         /usr/bin/tar -cf "$cache/kegs.tar" -C "$prefix" -T "$cache/paths"
 
-    - name: Restore Homebrew links
+    # Preserve the image's partial/keg-only linking, including its OpenSSL layout.
+    - name: Restore installed packages and links
       if: steps.cache.outputs.cache-hit == 'true'
       shell: bash
       env:
@@ -61,10 +66,6 @@ runs:
       run: |
         cache="$RUNNER_TEMP/macos-build-tools"
         /usr/bin/tar -xf "$cache/kegs.tar" -C "$(brew --prefix)"
-        while IFS= read -r formula; do
-          brew unlink "$formula"
-          brew link "$formula"
-        done < "$cache/linked"
 
     - name: Verify build tools and configure environment
       shell: bash

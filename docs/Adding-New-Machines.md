@@ -379,9 +379,10 @@ It installs missing Autoconf, Automake, Bash, ccache, GNU Coreutils/Sed/Tar/Make
 and Pandoc. Preinstalled JDKs are exposed as `JDK*_BOOT_DIR`; the Temurin build
 scripts can download other required bootstrap versions.
 
-Installed Homebrew kegs, their transitive dependencies, and `opt` links are
-cached, rather than only downloaded bottles. Cache hits restore and relink
-these packages without running `brew install`. Exact keys include architecture,
+Installed Homebrew kegs, their transitive dependencies, and their existing
+symlinks are cached, rather than only downloaded bottles. Cache hits restore
+these packages without running `brew install` or `brew link`, preserving the
+runner image's partial/keg-only links (notably OpenSSL). Exact keys include architecture,
 runner image version, and setup-action content, with no cross-image fallback.
 Changing the setup action or runner image invalidates the cache. Caches are
 branch-scoped; a PR branch's cache will not automatically warm `master`.
