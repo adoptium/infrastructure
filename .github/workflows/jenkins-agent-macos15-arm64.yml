@@ -1,0 +1,64 @@
+# GitHub Actions Cloud provisions one-shot Jenkins test agents on Apple Silicon.
+# Runner software: https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+
+name: Jenkins Agent (macOS Arm64)
+run-name: Jenkins Agent (macOS Arm64) - ${{ inputs.agent_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      jenkins_url:
+        description: 'Jenkins server URL (with trailing slash)'
+        required: true
+      agent_name:
+        description: 'Jenkins agent name'
+        required: true
+      agent_secret:
+        description: 'Jenkins agent secret'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  agent:
+    runs-on: macos-15
+    timeout-minutes: 360
+
+    steps:
+      - name: Mask secret
+        run: |
+          secret=$(jq -r '.inputs.agent_secret' "$GITHUB_EVENT_PATH")
+          echo "::add-mask::$secret"
+
+      - name: Upgrade bash
+        run: |
+          test "$(uname -m)" = arm64
+          brew install bash
+          bash_path="$(brew --prefix)/bin/bash"
+          echo "$bash_path" | sudo tee -a /etc/shells
+          sudo dscl . -change /Users/runner UserShell /bin/bash "$bash_path"
+          echo "$(brew --prefix)/bin" >> "$GITHUB_PATH"
+          echo "SHELL=$bash_path" >> "$GITHUB_ENV"
+          echo "BASH=$bash_path" >> "$GITHUB_ENV"
+          "$bash_path" --version
+
+      - name: Download Jenkins agent JAR
+        env:
+          JENKINS_URL: ${{ inputs.jenkins_url }}
+        run: |
+          curl -sSfL --retry 3 --retry-delay 5 -o agent.jar \
+            "${JENKINS_URL}jnlpJars/agent.jar"
+
+      - name: Connect to Jenkins
+        env:
+          JENKINS_URL: ${{ inputs.jenkins_url }}
+          AGENT_NAME: ${{ inputs.agent_name }}
+          AGENT_SECRET: ${{ inputs.agent_secret }}
+        run: |
+          java -jar agent.jar \
+            -url "$JENKINS_URL" \
+            -secret "$AGENT_SECRET" \
+            -name "$AGENT_NAME" \
+            -workDir "/Users/runner/agent" \
+            -noReconnect

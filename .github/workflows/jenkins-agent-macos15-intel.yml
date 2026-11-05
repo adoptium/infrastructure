@@ -10,7 +10,8 @@
 # A full list of software installed on the macOS runner can be found here:
 # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
 
-name: Jenkins Agent (macOS)
+name: Jenkins Agent (macOS x64)
+run-name: Jenkins Agent (macOS x64) - ${{ inputs.agent_name }}
 
 on:
   workflow_dispatch:
