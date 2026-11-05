@@ -1,5 +1,14 @@
-# GitHub Actions Cloud provisions one-shot Jenkins test agents on Apple Silicon.
-# Runner software: https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
+# ---------------------------------------------------------------
+# GitHub Actions workflow for Jenkins agent provisioning (macOS)
+# ---------------------------------------------------------------
+#
+# The GitHub Actions Cloud plugin triggers this workflow via
+# workflow_dispatch, passing the Jenkins URL, agent name, and
+# agent secret as inputs.
+# ---------------------------------------------------------------
+
+# A full list of software installed on the macOS runner can be found here:
+# https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
 name: Jenkins Agent (macOS Arm64)
 run-name: Jenkins Agent (macOS Arm64) - ${{ inputs.agent_name }}
