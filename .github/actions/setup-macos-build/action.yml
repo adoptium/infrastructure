@@ -16,6 +16,18 @@ runs:
           echo "::error::Expected Xcode 16.0 (16A242d); refusing to use a different toolchain."
           exit 1
         fi
+        if [[ ! -L /Applications/Xcode.app ]]; then
+          echo "::error::Expected /Applications/Xcode.app to be a symlink; refusing to replace an installation."
+          exit 1
+        fi
+        # Temurin selects its sysroot through this alias rather than DEVELOPER_DIR.
+        sudo ln -sfn "${DEVELOPER_DIR%/Contents/Developer}" /Applications/Xcode.app
+        sdk="$(xcrun --sdk macosx --show-sdk-path)"
+        if [[ ! "$sdk" -ef /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk ]]; then
+          echo "::error::The Xcode.app alias and pinned toolchain must select the same macOS SDK."
+          exit 1
+        fi
+        printf 'Pinned macOS SDK: %s (%s)\n' "$(xcrun --sdk macosx --show-sdk-version)" "$sdk"
         echo "DEVELOPER_DIR=$DEVELOPER_DIR" >> "$GITHUB_ENV"
 
     - name: Identify runner image

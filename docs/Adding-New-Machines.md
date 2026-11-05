@@ -376,7 +376,11 @@ branch to verify a warm dependency cache.
 The [shared setup action](../.github/actions/setup-macos-build/action.yml)
 pins Xcode 16.0 (build 16A242d), the oldest version currently installed on both
 images. It selects the exact application with `DEVELOPER_DIR` and `xcode-select`,
-verifies the version/build, and passes `DEVELOPER_DIR` to Jenkins. Setup fails
+verifies the version/build, and passes `DEVELOPER_DIR` to Jenkins. It also
+repoints the runner's `/Applications/Xcode.app` symlink to that installation
+and verifies that it selects the same SDK: the Temurin scripts use this alias
+explicitly when setting `--with-sysroot`. A real application directory at the
+alias path is never replaced. Setup fails
 if that toolchain is removed or changed; it never falls back to the image's
 default. The image's `XCODE_16_DEVELOPER_DIR` variable is not an exact pin:
 it points to the newest installed 16.x release.
