@@ -366,7 +366,8 @@ class MetricsTracker:
     def archive_and_cleanup(self) -> Dict[str, Any]:
         """
         Archive completed months and clean up metrics_history.json.
-        Only keeps current month's snapshots in the main file.
+        Keeps current month's snapshots, and those of any month that fails
+        to archive, in the main file.
         
         Returns:
             Dictionary with archiving results
@@ -393,7 +394,9 @@ class MetricsTracker:
             # Archive completed months (not current month)
             archived_months = []
             total_archived_snapshots = 0
-            
+            # Snapshots of months that failed to archive stay in the main file
+            unarchived_data = []
+
             for month, snapshots in sorted(by_month.items()):
                 if month < current_month:
                     try:
@@ -403,14 +406,15 @@ class MetricsTracker:
                         logger.info(f"Archived {len(snapshots)} snapshots for {month}")
                     except Exception as e:
                         logger.error(f"Failed to archive {month}: {e}")
-            
-            # Keep only current month's snapshots
+                        unarchived_data.extend(snapshots)
+
+            # Keep current month's snapshots and any that failed to archive
             current_month_data = by_month.get(current_month, [])
-            self._write_data(current_month_data)
+            self._write_data(unarchived_data + current_month_data)
             
             logger.info(f"Archiving complete: {len(archived_months)} month(s), "
                        f"{total_archived_snapshots} snapshots archived, "
-                       f"{len(current_month_data)} snapshots retained")
+                       f"{len(unarchived_data) + len(current_month_data)} snapshots retained")
         
         return {
             'archived_months': archived_months,
