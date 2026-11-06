@@ -373,12 +373,11 @@ for the desired target, independently of the ARM64 host. Set `ENABLE_SIGNER`,
 Validate the archived JDK with smoke tests before wider use.
 
 The workflow pins Xcode 16.2 / SDK 15.2, verifies Rosetta, and caches installed
-Homebrew tools before connecting to Jenkins, without a checkout. Bump the
-cache key revision when changing the tool list or archive layout. Jobs have
+Homebrew tools and Apple's JNF headers for JDK 8 before connecting, without a checkout. Bump the
+cache key revision when changing dependencies or archive layout. Jobs have
 a six-hour limit; do not add production signing credentials or release labels.
 
-Known blockers: the SBOM compiler policy requires Xcode 15.2, and JDK 8 needs
-JavaNativeFoundation headers absent from SDK 15.2. Neither check is bypassed.
+The SBOM compiler policy still requires Xcode 15.2; this check is not bypassed.
 
 #### Create New Node
 

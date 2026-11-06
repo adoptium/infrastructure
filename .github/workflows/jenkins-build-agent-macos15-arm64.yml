@@ -83,8 +83,8 @@ jobs:
         uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ${{ runner.temp }}/macos-build-tools
-          # Bump v1 when changing the tool list or archive layout; no checkout is needed.
-          key: macos-build-tools-${{ runner.arch }}-${{ steps.image.outputs.version }}-xcode16.2-v1
+          # Bump v2 when changing dependencies or archive layout; no checkout is needed.
+          key: macos-build-tools-${{ runner.arch }}-${{ steps.image.outputs.version }}-xcode16.2-v2
 
       - name: Install and package missing build tools
         if: steps.cache.outputs.cache-hit != 'true'
@@ -125,6 +125,20 @@ jobs:
           done < "$cache/formulae"
           /usr/bin/tar -cf "$cache/kegs.tar" -C "$prefix" -T "$cache/paths"
 
+      - name: Download JavaNativeFoundation headers
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          JNF_REF: 356491bda24e6c4781c6b650f4efda05a6bc1296
+          JNF_SHA256: 4303aa3b70f371e063316d3c7e30d0daddb901524c1d3930e96db7fa6f186059
+        run: |
+          archive="$RUNNER_TEMP/apple-openjdk.tar.gz"
+          curl -sSfL --retry 3 --retry-delay 5 -o "$archive" \
+            "https://github.com/apple/openjdk/archive/$JNF_REF.tar.gz"
+          echo "$JNF_SHA256  $archive" | shasum -a 256 -c -
+          /usr/bin/tar -xzf "$archive" -C "$RUNNER_TEMP/macos-build-tools" \
+            --strip-components=3 "openjdk-$JNF_REF/apple/JavaNativeFoundation/JavaNativeFoundation"
+          rm "$archive"
+
       # Preserve the image's partial/keg-only linking, including its OpenSSL layout.
       - name: Restore installed packages and links
         if: steps.cache.outputs.cache-hit == 'true'
@@ -133,6 +147,34 @@ jobs:
         run: |
           cache="$RUNNER_TEMP/macos-build-tools"
           /usr/bin/tar -xf "$cache/kegs.tar" -C "$(brew --prefix)"
+
+      # Match openjdk/jdk8u's submit workflow until JDK-8376511 removes this dependency.
+      - name: Restore missing JavaNativeFoundation SDK headers
+        run: |
+          sdk="$(xcrun --sdk macosx --show-sdk-path)"
+          framework="$sdk/System/Library/Frameworks/JavaNativeFoundation.framework"
+          jnf="$RUNNER_TEMP/macos-build-tools/JavaNativeFoundation"
+          if [[ ! -d "$framework/Versions/Current" ]]; then
+            echo "::error::The pinned SDK must provide the JavaNativeFoundation framework."
+            exit 1
+          fi
+          if [[ ! -f "$framework/Headers/JavaNativeFoundation.h" ]]; then
+            for path in "$framework/Headers" "$framework/Modules"; do
+              if [[ -e "$path" && ! -L "$path" ]]; then
+                echo "::error::Expected $path to be absent or a symlink; refusing to replace SDK content."
+                exit 1
+              fi
+            done
+            sudo mkdir -p "$framework/Versions/Current/Headers" "$framework/Versions/Current/Modules"
+            sudo cp "$jnf/"*.h "$framework/Versions/Current/Headers/"
+            sudo cp "$jnf/Modules/module.modulemap" "$framework/Versions/Current/Modules/"
+            sudo ln -sfn Versions/Current/Headers "$framework/Headers"
+            sudo ln -sfn Versions/Current/Modules "$framework/Modules"
+          fi
+          jdk_home="$(/usr/libexec/java_home -v 11)"
+          printf '#import <JavaNativeFoundation/JavaNativeFoundation.h>\n' | \
+            xcrun clang -arch x86_64 -x objective-c -fsyntax-only -isysroot "$sdk" \
+              -I "$jdk_home/include" -I "$jdk_home/include/darwin" -
 
       - name: Verify build tools and configure environment
         run: |
