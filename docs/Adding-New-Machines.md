@@ -350,6 +350,35 @@ The workflows are named `Jenkins Agent (macOS x64)` and
 `Jenkins Agent (macOS Arm64)`, with the agent name appended to each run title
 via `run-name`. Each architecture has its own entry in the Actions sidebar.
 
+#### GitHub Actions macOS Build Agents
+
+The [ARM64-hosted build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
+supports native ARM64 and cross-compiled x64 Temurin/HotSpot builds on `macos-15`.
+JDK 8 builds are not supported. Existing test workflows are unchanged.
+
+Configure Jenkins cloud templates `gha-macos15-arm64-build` and
+`gha-macos15-x64-build` with:
+
+- **Workflow**: `jenkins-build-agent-macos15-arm64.yml` for both targets
+- **Git Ref**: the PR branch before merging, then `master`
+- **Remote root**: `/Users/runner/agent`
+- **Executors / max agents**: one each; enable one-shot mode
+- **Labels**: `<template-name> ci.agent.dynamic` only
+
+Set the build job's `BUILD_CONFIGURATION.NODE_LABEL` to
+`<template-name> && ci.agent.dynamic` and `ARCHITECTURE` to `aarch64` or `x64`
+for the desired target, independently of the ARM64 host. Set `ENABLE_SIGNER`,
+`ENABLE_INSTALLERS`, `ENABLE_TESTS`, `ENABLE_TESTDYNAMICPARALLEL`,
+`ENABLE_REPRODUCIBLE_COMPARE`, `RELEASE`, and `WEEKLY` to false.
+Validate the archived JDK with smoke tests before wider use.
+
+The workflow pins Xcode 16.2 / SDK 15.2, verifies Rosetta, and caches installed
+Homebrew tools before connecting to Jenkins, without a checkout. Bump the
+cache key revision when changing the tool list or archive layout. Jobs have
+a six-hour limit; do not add production signing credentials or release labels.
+
+The SBOM compiler policy still requires Xcode 15.2; this check is not bypassed.
+
 #### Create New Node
 
 1. **Login to Jenkins**: https://ci.adoptium.net
