@@ -354,7 +354,7 @@ via `run-name`. Each architecture has its own entry in the Actions sidebar.
 
 The [ARM64-hosted build workflow](../.github/workflows/jenkins-build-agent-macos15-arm64.yml)
 supports native ARM64 and cross-compiled x64 Temurin/HotSpot builds on `macos-15`.
-Existing test workflows are unchanged.
+JDK 8 is x64-only on macOS. Existing test workflows are unchanged.
 
 Configure Jenkins cloud templates `gha-macos15-arm64-build` and
 `gha-macos15-x64-build` with:
@@ -373,8 +373,8 @@ for the desired target, independently of the ARM64 host. Set `ENABLE_SIGNER`,
 Validate the archived JDK with smoke tests before wider use.
 
 The workflow pins Xcode 16.2 / SDK 15.2, verifies Rosetta, and caches installed
-Homebrew tools and Apple's JNF headers for JDK 8 before connecting, without a checkout. Bump the
-cache key revision when changing dependencies or archive layout. Jobs have
+Homebrew tools and Apple's JNF headers for JDK 8 before connecting, without a
+checkout. Bump the cache key revision when changing dependencies or archive layout. Jobs have
 a six-hour limit; do not add production signing credentials or release labels.
 
 The SBOM compiler policy still requires Xcode 15.2; this check is not bypassed.
