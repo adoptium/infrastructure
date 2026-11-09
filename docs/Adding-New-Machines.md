@@ -329,6 +329,10 @@ The GitHub Actions cloud uses separate workflows for Intel
 ([jenkins-agent-macos15-arm64.yml](../.github/workflows/jenkins-agent-macos15-arm64.yml),
 `macos-15`). These are ephemeral test agents, not JDK build machines.
 
+Agents use `-noReconnectAfter 5m` to retry transient disconnects for up to five
+minutes. GitHub Actions Cloud plugin `44.v7f8624cd7e53` or newer is required
+for clean one-shot shutdown.
+
 In the `github-actions` cloud, configure an ARM64 template with:
 
 - **Template Name**: `gha-macos15-arm64`

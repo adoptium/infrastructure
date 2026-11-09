@@ -70,4 +70,4 @@ jobs:
             -secret "$AGENT_SECRET" \
             -name "$AGENT_NAME" \
             -workDir "/Users/runner/agent" \
-            -noReconnect
+            -noReconnectAfter 5m

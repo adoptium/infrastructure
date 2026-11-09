@@ -61,4 +61,4 @@ jobs:
             -secret "$AGENT_SECRET" \
             -name "${{ inputs.agent_name }}" \
             -workDir "/Users/runner/agent" \
-            -noReconnect
+            -noReconnectAfter 5m
