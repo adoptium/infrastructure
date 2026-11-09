@@ -377,6 +377,10 @@ Homebrew tools before connecting to Jenkins, without a checkout. Bump the
 cache key revision when changing the tool list or archive layout. Jobs have
 a six-hour limit; do not add production signing credentials or release labels.
 
+Agents use `-noReconnectAfter 5m` to retry transient disconnects for up to five
+minutes. GitHub Actions Cloud plugin `44.v7f8624cd7e53` or newer is required
+for clean one-shot shutdown.
+
 The SBOM compiler policy still requires Xcode 15.2; this check is not bypassed.
 
 #### Create New Node
