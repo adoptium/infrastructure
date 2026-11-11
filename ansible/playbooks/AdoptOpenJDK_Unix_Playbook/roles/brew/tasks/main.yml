@@ -1,0 +1,9 @@
+---
+########
+# brew #
+########
+
+- name: Install homebrew
+  include_tasks: brew.yml
+  when: ansible_distribution == "MacOSX"
+  tags: brew
