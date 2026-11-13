@@ -89,7 +89,19 @@
       changed_when: false
       failed_when: false
 
+    - name: Get ECDSA host public key from each rebuilt container
+      command:
+        argv: ["docker", "exec", "{{ item.split('|||')[0] }}", "cat", "/etc/ssh/ssh_host_ecdsa_key.pub"]
+      register: ecdsa_pubkeys
+      loop: "{{ rebuilt_containers_raw.stdout_lines }}"
+      changed_when: false
+      failed_when: false
+
     - name: Display running aqa_ containers after rebuild
       debug:
-        msg: "{{ item.split('|||') | join(' | ') }}"
-      loop: "{{ rebuilt_containers_raw.stdout_lines }}"
+        msg:
+          - "{{ item.item.split('|||') | join(' | ') }}"
+          - "ecdsa public key: {{ item.stdout if item.rc == 0 else 'unavailable: ' + (item.stderr | default('')) }}"
+      loop: "{{ ecdsa_pubkeys.results }}"
+      loop_control:
+        label: "{{ item.item.split('|||')[0] }}"

@@ -50,4 +50,6 @@ RUN rm -rf /tmp/jdk25.tar.gz /tmp/ant* /tmp/jdk25.sig
 
 # Start container with docker run -p 2222:22 UUID.
 CMD ["/usr/sbin/sshd","-D"]
+# Jenkins nodes need ecdsa host keys
+RUN yes | ssh-keygen -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key -q -N ''
 EXPOSE 22

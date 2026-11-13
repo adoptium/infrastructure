@@ -53,5 +53,7 @@ RUN apt-get install -qq -y gnutls-bin libnss3 libnss3-tools libnss3-dev pkg-conf
 
 RUN locale-gen en_US.utf8 ja_JP.UTF-8 ko_KR.UTF-8 zh_CN.UTF-8 zh_TW.UTF-8
 
+# Jenkins nodes need ecdsa host keys
+RUN yes | ssh-keygen -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key -q -N ''
 EXPOSE 22
 # Start with docker run -p 2226:22 UUID
