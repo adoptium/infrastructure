@@ -14,83 +14,83 @@ pipeline {
                         ], wait: true, propagate: true
                     }
                 }
-            //     stage('CentOS7 x64') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'amd64'),
-            //                 string(name: 'DISTRO', value: 'centos7'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
-            //                 string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&x64&&containerBuilder'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('CentOS7 aarch64') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'arm64'),
-            //                 string(name: 'DISTRO', value: 'centos7'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
-            //                 string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&aarch64'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('CentOS7 ppc64le') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'ppc64le'),
-            //                 string(name: 'DISTRO', value: 'centos7'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
-            //                 string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&ppc64le'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('Ubuntu16.04 armv7l') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'armv7l'),
-            //                 string(name: 'DISTRO', value: 'ubuntu1604'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu1604'),
-            //                 string(name: 'NODE_LABEL', value: 'docker&&linux&&aarch64'),
-            //                 booleanParam(name: 'IS_ARM32', value: true)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('Ubuntu20.04 riscv64') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'riscv64'),
-            //                 string(name: 'DISTRO', value: 'ubuntu2004'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu2004-riscv64'),
-            //                 string(name: 'NODE_LABEL', value: 'docker&&linux&&riscv64'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('Alpine3 x64') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'amd64'),
-            //                 string(name: 'DISTRO', value: 'alpine3'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
-            //                 string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&x64&&containerBuilder'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
-            //     stage('Alpine3 aarch64') {
-            //         steps {
-            //             build job: 'build-image-child', parameters: [
-            //                 string(name: 'ARCHITECTURE', value: 'arm64'),
-            //                 string(name: 'DISTRO', value: 'alpine3'),
-            //                 string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
-            //                 string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&aarch64'),
-            //                 booleanParam(name: 'IS_ARM32', value: false)
-            //             ], wait: true, propagate: true
-            //         }
-            //     }
+                stage('CentOS7 x64') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'amd64'),
+                            string(name: 'DISTRO', value: 'centos7'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
+                            string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&x64&&containerBuilder'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('CentOS7 aarch64') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'arm64'),
+                            string(name: 'DISTRO', value: 'centos7'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
+                            string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&aarch64'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('CentOS7 ppc64le') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'ppc64le'),
+                            string(name: 'DISTRO', value: 'centos7'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
+                            string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&ppc64le'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('Ubuntu16.04 armv7l') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'armv7l'),
+                            string(name: 'DISTRO', value: 'ubuntu1604'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu1604'),
+                            string(name: 'NODE_LABEL', value: 'docker&&linux&&aarch64'),
+                            booleanParam(name: 'IS_ARM32', value: true)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('Ubuntu20.04 riscv64') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'riscv64'),
+                            string(name: 'DISTRO', value: 'ubuntu2004'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu2004-riscv64'),
+                            string(name: 'NODE_LABEL', value: 'docker&&linux&&riscv64'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('Alpine3 x64') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'amd64'),
+                            string(name: 'DISTRO', value: 'alpine3'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
+                            string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&x64&&containerBuilder'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
+                stage('Alpine3 aarch64') {
+                    steps {
+                        build job: 'build-image-child', parameters: [
+                            string(name: 'ARCHITECTURE', value: 'arm64'),
+                            string(name: 'DISTRO', value: 'alpine3'),
+                            string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
+                            string(name: 'NODE_LABEL', value: 'dockerBuild&&linux&&aarch64'),
+                            booleanParam(name: 'IS_ARM32', value: false)
+                        ], wait: true, propagate: true
+                    }
+                }
             }
         }
     }

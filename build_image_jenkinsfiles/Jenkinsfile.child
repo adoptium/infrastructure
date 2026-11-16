@@ -13,6 +13,9 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    currentBuild.displayName = "#${BUILD_NUMBER} - ${params.DISTRO} (${params.ARCHITECTURE})"
+                    currentBuild.description = "Dockerfile: ${params.DOCKERFILE} on ${params.NODE_LABEL}"
+
                     if (params.IS_ARM32) {
                         dockerBuildArm32(params.ARCHITECTURE, params.DISTRO, params.DOCKERFILE)
                     } else {
