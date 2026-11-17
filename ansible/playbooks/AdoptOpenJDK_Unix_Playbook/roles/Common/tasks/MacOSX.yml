@@ -57,14 +57,6 @@
   tags:
     - skip_ansible_lint
 
-# Currently required to install packages. This can be removed once it installs on arm64
-- name: Install Rosetta 2
-  command: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-  when:
-    - ansible_architecture == "arm64"
-  tags:
-    - rosetta
-
 - name: Check if Homebrew is already installed
   stat:
     path: "{{ homebrew_path }}/brew"
@@ -156,15 +148,6 @@
     path: "{{ homebrew_path }}"
   when:
     - not (macos_version_number | regex_search("10.12"))
-  tags: build_tools
-
-- name: Install Build Tool Casks
-  become: true
-  become_user: "{{ ansible_user }}"
-  homebrew_cask:
-    name: "{{ Build_Tool_Casks }}"
-    state: present
-    path: "{{ homebrew_path }}"
   tags: build_tools
 
 - name: Install Test Tool Packages
