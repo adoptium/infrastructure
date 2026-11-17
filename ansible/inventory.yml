@@ -72,10 +72,6 @@ hosts:
           win11-x64-1: {ip: 20.56.162.171, user: adoptopenjdk}
           win11-aarch64-1: {ip: 20.4.31.184, user: adoptopenjdk}
 
-      - aws:
-          rhel76-armv8-1: {ip: 18.202.36.216, user: ec2-user}
-          rhel8-x64-1: {ip: 54.246.216.49}
-
       - osuosl:
           aix72-ppc64-1: {ip: 140.211.9.28, description: p8-aix1-adopt03.osuosl.org, 7200-04-02-2028}
           aix72-ppc64-2: {ip: 140.211.9.36, description: p8-aix1-adopt04.osuosl.org, 7200-02-05-1938}
