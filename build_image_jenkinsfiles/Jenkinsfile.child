@@ -1,0 +1,57 @@
+pipeline {
+    agent {
+        label "${params.NODE_LABEL}"
+    }
+    parameters {
+        string(name: 'ARCHITECTURE', defaultValue: 'amd64', description: 'Target architecture (e.g. amd64, arm64, ppc64le, riscv64, armv7l)')
+        string(name: 'DISTRO', defaultValue: 'centos7', description: 'Linux distribution (e.g. centos6, centos7, ubuntu1604, ubuntu2004, alpine3)')
+        string(name: 'DOCKERFILE', defaultValue: 'Dockerfile.CentOS7', description: 'Dockerfile name located in ansible/docker/')
+        string(name: 'NODE_LABEL', defaultValue: 'dockerBuild&&linux&&x64&&containerBuilder', description: 'Jenkins agent label expression')
+        booleanParam(name: 'IS_ARM32', defaultValue: false, description: 'Set to true for ARM32 / armv7l builds')
+    }
+    stages {
+        stage('Docker Build') {
+            steps {
+                script {
+                    currentBuild.displayName = "#${BUILD_NUMBER} - ${params.DISTRO} (${params.ARCHITECTURE})"
+                    currentBuild.description = "Dockerfile: ${params.DOCKERFILE} on ${params.NODE_LABEL}"
+
+                    if (params.IS_ARM32) {
+                        dockerBuildArm32(params.ARCHITECTURE, params.DISTRO, params.DOCKERFILE)
+                    } else {
+                        dockerBuild(params.ARCHITECTURE, params.DISTRO, params.DOCKERFILE)
+                    }
+                }
+            }
+        }
+    }
+}
+
+def dockerBuildArm32(architecture, distro, dockerfile) {
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    def ansible_arch = "armv7l"
+    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+        sh """
+            docker buildx build --platform linux/arm/v7 \
+            --provenance=false \
+            --build-arg git_sha=$git_sha --build-arg ansible_arch=$ansible_arch \
+            -f ansible/docker/$dockerfile \
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture .
+        """
+    }
+}
+
+def dockerBuild(architecture, distro, dockerfile) {
+    git poll: false, url: 'https://github.com/adoptium/infrastructure.git'
+    def git_sha = "${env.GIT_COMMIT.trim()}"
+    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+        sh """
+            docker buildx build --platform linux/$architecture \
+            --provenance=false \
+            --build-arg git_sha=$git_sha \
+            -f ansible/docker/$dockerfile \
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture .
+        """
+    }
+}
