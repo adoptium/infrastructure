@@ -83,6 +83,38 @@ Use the [DockerInventory.json](https://github.com/adoptium/infrastructure/blob/m
 
 After the playbook deletes the nodes, please update the DockerInventory.json file by following the instructions [here](https://github.com/adoptium/infrastructure/tree/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic#inventory).
 
+## Pull request checks
+
+Pull requests that change anything in this role are checked by the [DockerStatic Checker](https://github.com/adoptium/infrastructure/blob/master/.github/workflows/check_dockerstatic.yml) GitHub Action:
+
+* If only files in `Dockerfiles/` changed, only those Dockerfiles are built.
+* If any other file in the role changes (scripts, tasks, this README...) or the workflow itself changes, every Dockerfile is built.
+* Each image is then started and smoke tested: sshd is listening, password logins are disabled, the `jenkins` and `nagios` users and host keys exist, and the JDK and `ant` are installed and run.
+* Dockerfiles that download an aarch64 JDK (currently `centstream9` and `centstream10`) are built on an arm64 runner; everything else uses an x64 runner. A new Dockerfile only needs attention here if it is not x64: `select_dockerfiles.sh` detects aarch64 from the JDK download URL.
+* The `DockerStatic Check Result` job is a single check that passes if everything built (or nothing needed building) and is the one to require in branch protection.
+
+The same checks can be run locally with either docker or podman (set `CONTAINER_ENGINE=podman` to force an engine):
+
+```
+# Which Dockerfiles would CI build for my branch?
+scripts/select_dockerfiles.sh origin/master HEAD
+
+# Build and smoke test one Dockerfile (name with or without the "Dockerfile." prefix)
+scripts/build_and_test_dockerfile.sh u2404
+
+# Build only, and remove the image afterwards
+scripts/build_and_test_dockerfile.sh --build-only --rm-image u2404
+```
+
+Run these from this role directory. When testing an aarch64 Dockerfile on an x64 machine the build and static checks still run, but the JDK and `ant` are not executed.
+
+**Podman note:** `Dockerfile.ubi9` and `Dockerfile.ubi10` use the short image names `redhat/ubi9` and `redhat/ubi10`. Docker resolves these to Docker Hub, but podman refuses to resolve short names without a TTY (`short-name resolution enforced but cannot prompt without a TTY`). To build them with podman, point it at Docker Hub for unqualified names using a temporary registries file rather than editing the Dockerfiles:
+
+```
+printf 'unqualified-search-registries = ["docker.io"]\n' > /tmp/registries.conf
+CONTAINERS_REGISTRIES_CONF=/tmp/registries.conf CONTAINER_ENGINE=podman scripts/build_and_test_dockerfile.sh ubi9
+```
+
 ## Patching
 
 * The static containers are patched daily using this [script](https://github.com/adoptium/infrastructure/blob/master/ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/scripts/updatepackages.sh) which runs on a daily cron job on each of the dockerhost machines.

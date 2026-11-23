@@ -1,5 +1,11 @@
 # GH action workflow to check ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/*
-# trigger on PR towards 'master' branch when files in ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic changed
+# Triggers on PRs towards 'master' when anything in the DockerStatic role changes:
+#   * only the Dockerfiles that changed are built and smoke tested
+#   * if anything else in the role changes (scripts, tasks, README...) or this workflow changes, every Dockerfile is built
+#
+# The selection and build/test logic live in scripts so the same checks can be run locally (docker or podman):
+#   scripts/select_dockerfiles.sh        <base-ref> [head-ref]
+#   scripts/build_and_test_dockerfile.sh [--build-only] [--rm-image] <name, e.g. u2404>
 
 name: DockerStatic Checker
 
@@ -7,86 +13,77 @@ on:
   pull_request:
     paths:
     - .github/workflows/check_dockerstatic.yml
-    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/**
-    branches:         
+    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/**
+    branches:
     - master
+
 env:
-  ROOT_PATH: "ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/"
+  ROLE_PATH: "ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
-  check-alpine:
-    name: alpine
+  detect:
+    name: Select Dockerfiles
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 4
-      matrix:
-       include:
-         - os: alpine3.24
-           dockerfile: "Dockerfile.alp324"
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      count: ${{ steps.select.outputs.count }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Test Dockerfile on ${{ matrix.os }}
-      env:
-        DOCKERFILE: ${{ matrix.dockerfile }}
-      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+      with:
+        fetch-depth: 0
 
-  check-centos:
-    name: centos
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 4
-      matrix:
-       include:
-         - os: centos8
-           dockerfile: "Dockerfile.cent8"
-         - os: centos-stream-9
-           dockerfile: "Dockerfile.centstream9"
-         - os: centos-stream-10
-           dockerfile: "Dockerfile.centstream10"
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Test Dockerfile on ${{ matrix.os }}
+    - name: Select changed Dockerfiles
+      id: select
       env:
-        DOCKERFILE: ${{ matrix.dockerfile }}
-      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: ${{ env.ROLE_PATH }}/scripts/select_dockerfiles.sh "$BASE_SHA" "$HEAD_SHA"
 
-  check-fedora:
-    name: fedora
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.name }}
+    needs: detect
+    if: needs.detect.outputs.count != '0'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
     strategy:
-      fail-fast: true
-      max-parallel: 4
+      fail-fast: false
       matrix:
-       include:
-         - os: fedora44
-           dockerfile: "Dockerfile.f44"
+        include: ${{ fromJSON(needs.detect.outputs.matrix) }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Test Dockerfile on ${{ matrix.os }}
-      env:
-        DOCKERFILE: ${{ matrix.dockerfile }}
-      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
 
-  check-ubuntu:
-    name: ubuntu
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 4
-      matrix:
-       include:
-         - os: ubuntu24.04
-           dockerfile: "Dockerfile.u2404"
-         - os: ubuntu26.04
-           dockerfile: "Dockerfile.u2604"
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-    - name: Test Dockerfile on ${{ matrix.os }}
+    - name: Build and smoke test Dockerfile.${{ matrix.name }}
       env:
-        DOCKERFILE: ${{ matrix.dockerfile }}
-      run: docker build -f ${{ env.ROOT_PATH }}/${{ env.DOCKERFILE }} .
+        DOCKERFILE_NAME: ${{ matrix.name }}
+      run: ${{ env.ROLE_PATH }}/scripts/build_and_test_dockerfile.sh "$DOCKERFILE_NAME"
+
+  # Single, stable check to require in branch protection. Passes when no Dockerfiles needed building.
+  result:
+    name: DockerStatic Check Result
+    needs: [detect, build]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Check results
+      env:
+        DETECT_RESULT: ${{ needs.detect.result }}
+        BUILD_RESULT: ${{ needs.build.result }}
+      run: |
+        echo "detect: $DETECT_RESULT, build: $BUILD_RESULT"
+        if [[ "$DETECT_RESULT" != "success" ]]; then
+          echo "::error::Dockerfile selection failed"
+          exit 1
+        fi
+        if [[ "$BUILD_RESULT" != "success" && "$BUILD_RESULT" != "skipped" ]]; then
+          echo "::error::One or more Dockerfiles failed to build or failed their smoke test"
+          exit 1
+        fi
