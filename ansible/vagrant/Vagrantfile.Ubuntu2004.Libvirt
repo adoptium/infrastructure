@@ -48,6 +48,23 @@ sudo apt-add-repository ppa:ansible/ansible
 sudo apt update
 SCRIPT
 
+# generic/ubuntu2004 may hardcode global DNS servers (e.g. 4.2.2.1, 4.2.2.2,
+# 208.67.220.220) in systemd-resolved, which may be unreachable from the host
+# network. resolved sticks to the first one, so lookups fail. Clear them so only
+# the DHCP-provided libvirt dnsmasq (which forwards to the host's resolvers) is used.
+$dns_script = <<SCRIPT
+# The box forces DNSSEC=yes, but answers relayed via libvirt dnsmasq cannot be
+# validated ("DNSSEC validation failed: missing-key"), so disable validation.
+mkdir -p /etc/systemd/resolved.conf.d
+printf '[Resolve]\nDNS=\nFallbackDNS=\nDNSSEC=no\n' > /etc/systemd/resolved.conf.d/99-libvirt-dns.conf
+systemctl restart systemd-resolved
+# The box's netplan config also pins the same servers on eth0. Remove them so the
+# DHCP-supplied DNS (libvirt dnsmasq) is the only resolver, and apply immediately.
+sed -i '/^ *nameservers:/,/^ *addresses:/d' /etc/netplan/*.yaml
+netplan apply
+sleep 5
+SCRIPT
+
 # 2 = version of configuration file for Vagrant 1.1+ leading up to 2.0.x
 Vagrant.configure("2") do |config|
 
@@ -58,6 +75,7 @@ Vagrant.configure("2") do |config|
     adoptopenjdkU20.vm.box = "generic/ubuntu2004"
     adoptopenjdkU20.vm.synced_folder ".", "/vagrant", type: "rsync"
     adoptopenjdkU20.vm.hostname = "adoptopenjdkU20"
+    adoptopenjdkU20.vm.provision "shell", inline: $dns_script
     adoptopenjdkU20.vm.provision "shell", inline: $script, privileged: false
   end
   config.vm.provider "libvirt" do |v|

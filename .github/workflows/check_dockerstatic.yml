@@ -1,5 +1,5 @@
 # GH action workflow to check ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/Dockerfiles/*
-# Triggers on PRs towards 'master' when anything in the DockerStatic role changes:
+# Runs on every PR towards 'master'; builds only happen when something in the DockerStatic role changes:
 #   * only the Dockerfiles that changed are built and smoke tested
 #   * if anything else in the role changes (scripts, tasks, README...) or this workflow changes, every Dockerfile is built
 #
@@ -10,10 +10,9 @@
 name: DockerStatic Checker
 
 on:
+  # No 'paths' filter: the 'DockerStatic Check Result' job is meant to be a required check, so it must
+  # be reported on every PR. select_dockerfiles.sh returns an empty matrix when nothing relevant changed.
   pull_request:
-    paths:
-    - .github/workflows/check_dockerstatic.yml
-    - ansible/playbooks/AdoptOpenJDK_Unix_Playbook/roles/DockerStatic/**
     branches:
     - master
 

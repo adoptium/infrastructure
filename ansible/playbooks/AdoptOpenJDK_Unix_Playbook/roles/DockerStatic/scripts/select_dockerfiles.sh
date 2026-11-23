@@ -4,7 +4,7 @@
 # Rules:
 #   * Only changed Dockerfile.* files are selected, unless
 #   * any other file in the DockerStatic role (or this CI workflow) changed, in which case all are selected.
-#   * Deleted Dockerfiles are ignored.
+#   * Deleted Dockerfiles are not built, but deleting any other file in the role still selects all.
 #
 # Usage:   select_dockerfiles.sh <base-ref> [head-ref]      (head-ref defaults to HEAD)
 # Output:  a compact JSON array on stdout: [{"name":"u2404","runner":"ubuntu-latest"}, ...]
@@ -38,14 +38,17 @@ all_dockerfiles() {
 }
 
 # Three-dot diff: changes on the head side since it diverged from base, as a PR shows them.
-changed_files="$(git diff --name-only --diff-filter=d "$base...$head" -- "$ROLE_DIR" "$WORKFLOW")"
+changed_files="$(git diff --name-only "$base...$head" -- "$ROLE_DIR" "$WORKFLOW")"
 
 build_all=false
 selected=""
 while IFS= read -r file; do
     [[ -z "$file" ]] && continue
     if [[ "$file" == "$DOCKERFILE_DIR"/Dockerfile.* ]]; then
-        selected+="${file##*/Dockerfile.}"$'\n'
+        # A deleted Dockerfile has nothing left to build, so only select ones present in the head revision.
+        if git cat-file -e "$head:$file" 2>/dev/null; then
+            selected+="${file##*/Dockerfile.}"$'\n'
+        fi
     else
         # Anything else in the role (tasks, scripts, README...) or the workflow itself.
         build_all=true

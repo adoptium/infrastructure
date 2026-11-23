@@ -73,7 +73,7 @@
     argv: ["ss", "-H", "-tln", "sport = :25"]
   register: postfix_port_25
   changed_when: false
-  failed_when: postfix_port_25.stdout | length > 0
+  failed_when: postfix_port_25.rc != 0 or postfix_port_25.stdout | length > 0
   when:
     - postfix_queue.matched is defined
     - postfix_queue.matched == 0
