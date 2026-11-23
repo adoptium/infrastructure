@@ -1,4 +1,4 @@
-# Adoptium Build Image Jenkinsfiles
+# Adoptium Build Image Updater Jenkinsfiles
 
 This directory contains the Jenkins pipelines responsible for building and publishing the Adoptium build images used by the project for building JDKs, and pushing them to the [AdoptOpenJDK Docker Hub](https://hub.docker.com/u/adoptopenjdk).
 
