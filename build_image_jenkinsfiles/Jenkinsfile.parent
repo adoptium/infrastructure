@@ -6,7 +6,7 @@ pipeline {
                 stage('CentOS6 x64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'amd64'),
                                 string(name: 'DISTRO', value: 'centos6'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS6'),
@@ -19,7 +19,7 @@ pipeline {
                 stage('CentOS7 x64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'amd64'),
                                 string(name: 'DISTRO', value: 'centos7'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
@@ -32,7 +32,7 @@ pipeline {
                 stage('CentOS7 aarch64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'arm64'),
                                 string(name: 'DISTRO', value: 'centos7'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
@@ -45,7 +45,7 @@ pipeline {
                 stage('CentOS7 ppc64le') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'ppc64le'),
                                 string(name: 'DISTRO', value: 'centos7'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.CentOS7'),
@@ -58,7 +58,7 @@ pipeline {
                 stage('Ubuntu16.04 armv7l') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'armv7l'),
                                 string(name: 'DISTRO', value: 'ubuntu1604'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu1604'),
@@ -71,7 +71,7 @@ pipeline {
                 stage('Ubuntu20.04 riscv64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'riscv64'),
                                 string(name: 'DISTRO', value: 'ubuntu2004'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.Ubuntu2004-riscv64'),
@@ -84,7 +84,7 @@ pipeline {
                 stage('Alpine3 x64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'amd64'),
                                 string(name: 'DISTRO', value: 'alpine3'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
@@ -97,7 +97,7 @@ pipeline {
                 stage('Alpine3 aarch64') {
                     steps {
                         catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            build job: 'build-image-child', parameters: [
+                            build job: 'Build_Image_Updater_Child', parameters: [
                                 string(name: 'ARCHITECTURE', value: 'arm64'),
                                 string(name: 'DISTRO', value: 'alpine3'),
                                 string(name: 'DOCKERFILE', value: 'Dockerfile.Alpine3'),
@@ -111,7 +111,7 @@ pipeline {
         }
         stage('Docker Manifest') {
             steps {
-                build job: 'build-image-manifest', wait: true, propagate: true
+                build job: 'Post_Build_Docker_Manifest', wait: true, propagate: true
             }
         }
     } 
