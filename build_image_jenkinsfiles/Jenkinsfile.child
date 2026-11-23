@@ -13,6 +13,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    validateParameters()
+
                     currentBuild.displayName = "#${BUILD_NUMBER} - ${params.DISTRO} (${params.ARCHITECTURE})"
                     currentBuild.description = "Dockerfile: ${params.DOCKERFILE} on ${params.NODE_LABEL}"
 
@@ -23,6 +25,20 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+}
+
+// Update this function if adding new Dockerfiles or Achitectures
+def validateParameters() {
+    def allowedValues = [
+        ARCHITECTURE: ['amd64', 'arm64', 'ppc64le', 'riscv64', 'armv7l'],
+        DISTRO: ['centos6', 'centos7', 'ubuntu1604', 'ubuntu2004', 'alpine3'],
+        DOCKERFILE: ['Dockerfile.CentOS6', 'Dockerfile.CentOS7', 'Dockerfile.Ubuntu1604', 'Dockerfile.Ubuntu2004-riscv64', 'Dockerfile.Alpine3']
+    ]
+    allowedValues.each { name, values ->
+        if (!values.contains(params[name])) {
+            error("Unsupported value for ${name}: '${params[name]}'. Allowed values: ${values}")
         }
     }
 }
