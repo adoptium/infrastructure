@@ -37,7 +37,7 @@ def dockerBuildArm32(architecture, distro, dockerfile) {
             --provenance=false \
             --build-arg git_sha=$git_sha --build-arg ansible_arch=$ansible_arch \
             -f ansible/docker/$dockerfile \
-            -t adoptopenjdk/${distro}_build_image:linux-$architecture . --push
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture --push .
         """
     }
 }
@@ -51,7 +51,7 @@ def dockerBuild(architecture, distro, dockerfile) {
             --provenance=false \
             --build-arg git_sha=$git_sha \
             -f ansible/docker/$dockerfile \
-            -t adoptopenjdk/${distro}_build_image:linux-$architecture . --push
+            -t adoptopenjdk/${distro}_build_image:linux-$architecture --push .
         """
     }
 }
