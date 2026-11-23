@@ -13,7 +13,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
-                    validateParameters()
+                    validateParameters(params.ARCHITECTURE, params.DISTRO, params.DOCKERFILE)
 
                     currentBuild.displayName = "#${BUILD_NUMBER} - ${params.DISTRO} (${params.ARCHITECTURE})"
                     currentBuild.description = "Dockerfile: ${params.DOCKERFILE} on ${params.NODE_LABEL}"
@@ -29,17 +29,25 @@ pipeline {
     }
 }
 
-// Update this function if adding new Dockerfiles or Achitectures
-def validateParameters() {
-    def allowedValues = [
-        ARCHITECTURE: ['amd64', 'arm64', 'ppc64le', 'riscv64', 'armv7l'],
-        DISTRO: ['centos6', 'centos7', 'ubuntu1604', 'ubuntu2004', 'alpine3'],
-        DOCKERFILE: ['Dockerfile.CentOS6', 'Dockerfile.CentOS7', 'Dockerfile.Ubuntu1604', 'Dockerfile.Ubuntu2004-riscv64', 'Dockerfile.Alpine3']
+// Update this function if adding new Dockerfiles or Architectures
+def validateParameters(architecture, distro, dockerfile) {
+    def allowedConfigurations = [
+        [arch: 'amd64', distro: 'centos6', dockerfile: 'Dockerfile.CentOS6'],
+        [arch: 'amd64', distro: 'centos7', dockerfile: 'Dockerfile.CentOS7'],
+        [arch: 'arm64', distro: 'centos7', dockerfile: 'Dockerfile.CentOS7'],
+        [arch: 'ppc64le', distro: 'centos7', dockerfile: 'Dockerfile.CentOS7'],
+        [arch: 'armv7l', distro: 'ubuntu1604', dockerfile: 'Dockerfile.Ubuntu1604'],
+        [arch: 'riscv64', distro: 'ubuntu2004', dockerfile: 'Dockerfile.Ubuntu2004-riscv64'],
+        [arch: 'amd64', distro: 'alpine3', dockerfile: 'Dockerfile.Alpine3'],
+        [arch: 'arm64', distro: 'alpine3', dockerfile: 'Dockerfile.Alpine3']
     ]
-    allowedValues.each { name, values ->
-        if (!values.contains(params[name])) {
-            error("Unsupported value for ${name}: '${params[name]}'. Allowed values: ${values}")
-        }
+
+    boolean isValid = allowedConfigurations.any { cfg ->
+        cfg.arch == architecture && cfg.distro == distro && cfg.dockerfile == dockerfile
+    }
+
+    if (!isValid) {
+        error("Invalid parameter combination: ARCHITECTURE='${architecture}', DISTRO='${distro}', DOCKERFILE='${dockerfile}'. Allowed configurations are: ${allowedConfigurations}")
     }
 }
 
