@@ -34,6 +34,8 @@
     - role: Nagios_Plugins        # AdoptOpenJDK Infrastructure
       tags: [nagios_plugins, adoptopenjdk]
     - Security
+    - role: Postfix_Disable       # Disables the packer-image Postfix (self-signed snakeoil cert on port 25)
+      tags: [postfix_disable, security, adoptopenjdk]
     - Vendor
     - IPv6
     - Docker

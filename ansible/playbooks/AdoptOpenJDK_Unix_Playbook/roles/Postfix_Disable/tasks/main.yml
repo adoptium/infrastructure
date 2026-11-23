@@ -1,0 +1,80 @@
+---
+###################
+# Postfix_Disable #
+###################
+
+# Ubuntu cloud images built with packer ship Postfix listening on port 25 with the self-signed
+# "snakeoil" certificate (CN=packer). Nothing on the dockerhosts needs mail, and the listener is
+# reported by security scans (TLS 1.0/1.1 enabled, self-signed certificate, certificate for a
+# different hostname). Disabling and masking Postfix removes the listener and those findings.
+#
+# Safe to run on any host: it does nothing unless Postfix is installed, and it leaves Postfix
+# alone if the mail queue is not empty.
+
+- name: Check if Postfix is installed
+  stat:
+    path: /usr/sbin/postfix
+  register: postfix_binary
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_service_mgr == "systemd"
+  tags: [postfix_disable, security, adoptopenjdk]
+
+# Looks at the spool directly rather than running postqueue, which fails when Postfix is stopped.
+- name: Find queued mail
+  find:
+    paths:
+      - /var/spool/postfix/active
+      - /var/spool/postfix/incoming
+      - /var/spool/postfix/deferred
+      - /var/spool/postfix/hold
+      - /var/spool/postfix/maildrop
+    file_type: file
+    recurse: yes
+  register: postfix_queue
+  when:
+    - postfix_binary.stat is defined
+    - postfix_binary.stat.exists
+  tags: [postfix_disable, security, adoptopenjdk]
+
+- name: Warn that Postfix has queued mail and has been left running
+  debug:
+    msg: "Postfix has {{ postfix_queue.matched }} queued message(s). Postfix has not been disabled. Clear the queue (postqueue -p) and re-run."
+  when:
+    - postfix_queue.matched is defined
+    - postfix_queue.matched > 0
+  tags: [postfix_disable, security, adoptopenjdk]
+
+- name: Disable, stop and mask Postfix
+  systemd:
+    name: postfix
+    enabled: no
+    masked: yes
+    state: stopped
+  when:
+    - postfix_queue.matched is defined
+    - postfix_queue.matched == 0
+  tags: [postfix_disable, security, adoptopenjdk]
+
+# The template instance is only present on some Postfix packages, so a failure here is not an error.
+- name: Disable and stop the Postfix default instance unit
+  systemd:
+    name: postfix@-
+    enabled: no
+    state: stopped
+  failed_when: false
+  when:
+    - postfix_queue.matched is defined
+    - postfix_queue.matched == 0
+  tags: [postfix_disable, security, adoptopenjdk]
+
+- name: Check nothing is listening on port 25
+  command:
+    argv: ["ss", "-H", "-tln", "sport = :25"]
+  register: postfix_port_25
+  changed_when: false
+  failed_when: postfix_port_25.stdout | length > 0
+  when:
+    - postfix_queue.matched is defined
+    - postfix_queue.matched == 0
+  tags: [postfix_disable, security, adoptopenjdk]
