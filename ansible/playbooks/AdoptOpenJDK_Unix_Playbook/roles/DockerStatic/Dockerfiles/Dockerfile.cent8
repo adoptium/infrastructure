@@ -39,6 +39,17 @@ RUN chown -R nagios /home/nagios/.ssh
 RUN chmod -R og-rwx /home/nagios/.ssh
 
 # RUN service ssh start
+# Disable SSH password logins (key-only). OpenSSH 8.0 on CentOS 8 has no "Include /etc/ssh/sshd_config.d/*.conf"
+# in sshd_config, so a drop-in file would be ignored; edit sshd_config directly instead. The pattern only matches
+# "#Keyword" with no space after the "#", so prose comments are left alone. Append the setting if it is missing.
+# The build fails if the setting does not take effect.
+RUN mkdir -p /run/sshd \
+ && sed -i -E 's/^#?(PasswordAuthentication|KbdInteractiveAuthentication)[[:space:]].*/\1 no/' /etc/ssh/sshd_config \
+ && (grep -q '^PasswordAuthentication' /etc/ssh/sshd_config || echo 'PasswordAuthentication no' >> /etc/ssh/sshd_config) \
+ && (grep -q '^KbdInteractiveAuthentication' /etc/ssh/sshd_config || echo 'KbdInteractiveAuthentication no' >> /etc/ssh/sshd_config) \
+ && sshd -t \
+ && sshd -T | grep -qx 'passwordauthentication no' \
+ && sshd -T | grep -qx 'kbdinteractiveauthentication no'
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot which python3 perl-Test-Simple
 RUN rm /run/nologin

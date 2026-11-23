@@ -8,6 +8,8 @@ RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ""
 # Get latest jdk25 ga
 RUN wget -q 'https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse?project=jdk' -O /tmp/jdk25.tar.gz
 RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B
+# Without this, building on podman will fail when it gets to the verify stage (stale keybox lock)
+RUN rm -vf ~/.gnupg/public-keys.d/pubring.db.lock
 # Get sig file for latest jdk25 ga
 RUN wget -q `curl -s 'https://api.adoptium.net/v3/assets/feature_releases/25/ga?architecture=x64&heap_size=normal&image_type=jdk&jvm_impl=hotspot&os=linux&page=0&page_size=1&project=jdk&vendor=eclipse' | grep signature_link | awk '{split($0,a,"\""); print a[4]}'` -O /tmp/jdk25.sig
 RUN gpg --verify /tmp/jdk25.sig /tmp/jdk25.tar.gz
@@ -35,6 +37,14 @@ RUN chown -R nagios /home/nagios/.ssh
 RUN chmod -R og-rwx /home/nagios/.ssh
 
 # RUN service ssh start
+# Disable SSH password logins (key-only). sshd uses the first value it finds and reads sshd_config.d/ before
+# the rest of sshd_config, so a 00- drop-in wins over files such as 50-cloud-init.conf. The build fails if it does not take effect.
+RUN mkdir -p /run/sshd /etc/ssh/sshd_config.d \
+ && printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\n' > /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && chmod 600 /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && sshd -t \
+ && sshd -T | grep -qx 'passwordauthentication no' \
+ && sshd -T | grep -qx 'kbdinteractiveauthentication no'
 CMD ["/usr/sbin/sshd","-D"]
 RUN yum install -y git curl make gcc xorg-x11-server-Xvfb libXrender libXi libXtst procps glibc-langpack-en glibc-locale-source glibc-langpack-ja glibc-langpack-ko glibc-langpack-zh fontconfig which hostname fakeroot shared-mime-info python3 perl-Test-Simple
 # Install Packages For openssl
