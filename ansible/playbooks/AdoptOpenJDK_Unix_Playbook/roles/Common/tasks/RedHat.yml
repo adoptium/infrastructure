@@ -16,10 +16,25 @@
     - ansible_architecture == "x86_64"
   tags: patch_update
 
-- name: Import EPEL GPG key
+- name: Import EPEL GPG key (RHEL 10)
+  get_url:
+    url: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+    dest: /tmp/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+    mode: '0644'
+  when: ansible_distribution_major_version == "10"
+  tags: patch_update
+
+- name: Import EPEL GPG key (RHEL 10)
+  command:
+    cmd: rpm --import /tmp/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+  when: ansible_distribution_major_version == "10"
+  tags: patch_update
+
+- name: Import EPEL GPG key (RHEL 7, 8 and 9)
   rpm_key:
     state: present
     key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+  when: ansible_distribution_major_version != "10"
   tags: patch_update
 
 - name: Enable EPEL release for RHEL
