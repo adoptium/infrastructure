@@ -43,6 +43,14 @@ RUN chmod -R og-rwx /home/nagios/.ssh
 
 # RUN service ssh start
 RUN mkdir /var/run/sshd
+# Disable SSH password logins (key-only). sshd uses the first value it finds and reads sshd_config.d/ before
+# the rest of sshd_config, so a 00- drop-in wins over files such as 50-cloud-init.conf. The build fails if it does not take effect.
+RUN mkdir -p /run/sshd /etc/ssh/sshd_config.d \
+ && printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\n' > /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && chmod 600 /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && sshd -t \
+ && sshd -T | grep -qx 'passwordauthentication no' \
+ && sshd -T | grep -qx 'kbdinteractiveauthentication no'
 CMD ["/usr/sbin/sshd","-D"]
 RUN apt-get install git make gcc xvfb libxrender-dev libxi-dev libxtst-dev locales python3 fontconfig fakeroot libtest-simple-perl -y
 # Generate Asian locales

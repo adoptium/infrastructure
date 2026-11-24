@@ -54,6 +54,58 @@
     - Security == "Enabled"
   tags: [security, adoptopenjdk]
 
+# sshd uses the first value it finds and reads sshd_config.d/ before the rest of sshd_config, so files
+# such as 50-cloud-init.conf (PasswordAuthentication yes) override the lineinfile edits above.
+# A 00- drop-in sorts first and wins.
+- name: Security - Check for sshd_config.d
+  stat:
+    path: /etc/ssh/sshd_config.d
+  register: sshd_config_d
+  when:
+    - Security == "Enabled"
+    - ansible_system == "Linux"
+  tags: [security, adoptopenjdk]
+
+# Older OpenSSH (e.g. CentOS 6/7) has no Include support, so a drop-in would be silently ignored.
+- name: Security - Check sshd_config includes sshd_config.d
+  command: grep -Eqi '^[[:space:]]*Include[[:space:]].*sshd_config\.d' /etc/ssh/sshd_config
+  register: sshd_config_include
+  changed_when: false
+  failed_when: false
+  when:
+    - Security == "Enabled"
+    - ansible_system == "Linux"
+    - sshd_config_d.stat.isdir is defined
+    - sshd_config_d.stat.isdir
+  tags: [security, adoptopenjdk]
+
+- name: Security - Disable password authentication in an sshd_config.d drop-in
+  copy:
+    dest: /etc/ssh/sshd_config.d/00-disable-password.conf
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+    owner: root
+    group: root
+    mode: '0600'
+  when:
+    - Security == "Enabled"
+    - ansible_system == "Linux"
+    - sshd_config_include.rc is defined
+    - sshd_config_include.rc == 0
+  tags: [security, adoptopenjdk]
+
+# Runs before the restarts below, so a bad config stops the play while the running sshd is untouched.
+- name: Security - Validate sshd configuration
+  command: sshd -t
+  changed_when: false
+  when:
+    - Security == "Enabled"
+    - ansible_system == "Linux"
+    - sshd_config_include.rc is defined
+    - sshd_config_include.rc == 0
+  tags: [security, adoptopenjdk]
+
 - name: Restart ssh service
   service:
     name: ssh

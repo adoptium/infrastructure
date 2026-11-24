@@ -54,13 +54,23 @@ RUN chown -R nagios /home/nagios/.ssh
 RUN chmod -R og-rwx /home/nagios/.ssh
 
 # RUN service ssh start
+# Disable SSH password logins (key-only). sshd uses the first value it finds and reads sshd_config.d/ before
+# the rest of sshd_config, so a 00- drop-in wins over files such as 50-cloud-init.conf. The build fails if it does not take effect.
+RUN mkdir -p /run/sshd /etc/ssh/sshd_config.d \
+ && printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\n' > /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && chmod 600 /etc/ssh/sshd_config.d/00-disable-password.conf \
+ && sshd -t \
+ && sshd -T | grep -qx 'passwordauthentication no' \
+ && sshd -T | grep -qx 'kbdinteractiveauthentication no'
 CMD ["/usr/sbin/sshd","-D"]
 RUN dnf install -y git make gcc xorg-x11-server-Xvfb libXrender libXi libXtst fontconfig fakeroot procps-ng hostname diffutils shared-mime-info which python3 perl-Test-Simple
 RUN dnf install -y coreutils --allowerasing curl
 # Install SSL Test packages
 RUN dnf install -y gnutls gnutls-utils nss nss-tools
 # Install locale support packages and generate Asian locales
-RUN dnf install -y glibc-locale-source glibc-langpack-ja glibc-langpack-ko glibc-langpack-zh
+# The CentOS Stream repos added above can lag behind the UBI repos (e.g. glibc-common el9 vs el9_9), and the langpacks
+# are only available from CentOS, so take the whole glibc locale set from CentOS (downgrading glibc if required)
+RUN dnf install -y --disablerepo='ubi-9-*' --allowerasing glibc-locale-source glibc-langpack-ja glibc-langpack-ko glibc-langpack-zh
 RUN localedef -i ja_JP -c -f UTF-8 ja_JP.UTF-8 \
  && localedef -i ko_KR -c -f UTF-8 ko_KR.UTF-8 \
  && localedef -i zh_CN -c -f UTF-8 zh_CN.UTF-8 \
