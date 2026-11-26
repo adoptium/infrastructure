@@ -41,6 +41,22 @@
         jump: ACCEPT
         ip_version: ipv4
 
+    # The baseline firewall on the Marist SLES/RHEL hosts only accepts
+    # 127.0.0.1 -> 127.0.0.1 and then rejects everything else with
+    # icmp-host-prohibited. Connections from the host to its own address
+    # (e.g. JLM remote RMI stubs, NIO tests) are therefore refused with
+    # "No route to host". Accept all traffic arriving on the loopback interface.
+    - name: Add loopback INPUT rule for SLES and RHEL
+      iptables:
+        chain: INPUT
+        rule_num: 1
+        action: insert
+        in_interface: lo
+        jump: ACCEPT
+        ip_version: ipv4
+      when:
+        - ansible_distribution in ["SLES", "RedHat"]
+
     - name: Add Ubuntu multicast OUTPUT rule
       iptables:
         chain: OUTPUT
@@ -80,7 +96,9 @@
               add_rule_if_missing INPUT -i "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
               add_rule_if_missing OUTPUT -o "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
           else
+              # SLES and RHEL only: the role is not applied to other non-Ubuntu distributions
               add_rule_if_missing INPUT -i "${IFACE}" -p udp -d 224.0.0.0/4 -j ACCEPT
+              add_rule_if_missing INPUT -i lo -j ACCEPT
           fi
 
     - name: Persist multicast script on Ubuntu with if-up hook
@@ -96,15 +114,36 @@
         - ansible_distribution == "Ubuntu"
         - ansible_distribution_major_version in ["22", "24"]
 
-    - name: Persist multicast script on SLES and RHEL with rc.local
+    - name: Persist multicast script on RHEL with rc.local
       lineinfile:
         path: /etc/rc.d/rc.local
         line: /usr/local/sbin/multicast-iptables.sh
         create: yes
         mode: "0755"
       when:
-        - ansible_distribution in ["SLES", "RedHat"]
-        - >
-          (ansible_distribution == "SLES" and ansible_distribution_major_version in ["12", "15"])
-          or
-          (ansible_distribution == "RedHat" and ansible_distribution_major_version is version('7', '>='))
+        - ansible_distribution == "RedHat"
+        - ansible_distribution_major_version is version('7', '>=')
+
+    # SLES does not run /etc/rc.d/rc.local. rc-local.service runs
+    # /etc/init.d/boot.local if it is executable, so the script has to be
+    # called from there, after the iptables-restore that loads the baseline.
+    - name: Ensure boot.local exists with a shebang on SLES
+      copy:
+        dest: /etc/init.d/boot.local
+        content: "#!/bin/bash\n"
+        force: false
+        owner: root
+        group: root
+        mode: "0744"
+      when:
+        - ansible_distribution == "SLES"
+        - ansible_distribution_major_version in ["12", "15"]
+
+    - name: Persist multicast script on SLES with boot.local
+      lineinfile:
+        path: /etc/init.d/boot.local
+        line: /usr/local/sbin/multicast-iptables.sh
+        insertafter: '^iptables-restore'
+      when:
+        - ansible_distribution == "SLES"
+        - ansible_distribution_major_version in ["12", "15"]
