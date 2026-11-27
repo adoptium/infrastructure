@@ -134,3 +134,29 @@
     - ansible_distribution_major_version | int >= 22
   tags:
     - jenkins_user
+
+# RHEL 7 defaults give the jenkins agent a soft core limit of 0 (inherited from
+# systemd) and a soft nproc of 4096 (/etc/security/limits.d/20-nproc.conf).
+# - CreateCoredumpOnCrash.java fails its 'ulimit -c' precondition when core is 0
+# - com/sun/jdi/ThreadMemoryLeakTest.java fails with "unable to create native
+#   thread" (pthread_create EAGAIN) when nproc is 4096
+# SLES has neither problem. The file name sorts after 20-nproc.conf.
+# The Jenkins agent must reconnect for new limits to apply.
+- name: Ensure proper limits are set in /etc/security/limits.d/ (RHEL s390x)
+  lineinfile:
+    path: /etc/security/limits.d/91-jenkins.conf
+    line: "{{ Jenkins_Username }} {{ item.limit_type }} {{ item.limit_name }} {{ item.limit_value }}"
+    state: present
+    create: true
+    mode: '0644'
+  with_items:
+    - {limit_type: 'soft', limit_name: 'core', limit_value: 'unlimited'}
+    - {limit_type: 'hard', limit_name: 'core', limit_value: 'unlimited'}
+    - {limit_type: 'soft', limit_name: 'nproc', limit_value: 'unlimited'}
+    - {limit_type: 'hard', limit_name: 'nproc', limit_value: 'unlimited'}
+  when:
+    - ansible_architecture == "s390x"
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version | int >= 7
+  tags:
+    - jenkins_user
