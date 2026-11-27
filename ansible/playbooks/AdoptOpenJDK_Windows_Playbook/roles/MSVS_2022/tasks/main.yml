@@ -110,11 +110,13 @@
   register: vs2022_installed
 
 # Download & Install VS2022 When No Layout & Not AdoptOpenJDK
-# This is the download to install the same payloads as the adoptium layout above
-- name: Download VS Build Tools install for 17.12.12
+# VS2022 17.14 fixes the JDK17 gtest C2244 compiler error.
+# https://github.com/adoptium/infrastructure/issues/4557
+# The Adoptium offline layout above still needs to be updated to match.
+- name: Download VS Build Tools install for 17.14.45
   win_get_url:
-    url: 'https://download.visualstudio.microsoft.com/download/pr/8eb6bd5d-4ec9-4328-a0e7-f59e7e51fdca/9b748c66ba6a2b22f346cc113f354ded3b202b53a109fff93111167741acb6c1/vs_BuildTools.exe' # 17.12.12
-    checksum: 9b748c66ba6a2b22f346cc113f354ded3b202b53a109fff93111167741acb6c1
+    url: 'https://download.visualstudio.microsoft.com/download/pr/95995f57-8355-4ff5-8d90-a7e1669fb3b3/310c13b8238876afb4e823a91112230ee2d2c5a45c431d4062af7aadedff9c4c/vs_BuildTools.exe' # 17.14.45
+    checksum: 310c13b8238876afb4e823a91112230ee2d2c5a45c431d4062af7aadedff9c4c
     checksum_algorithm: sha256
     dest: 'C:\temp\vs_BuildTools22.exe'
     force: no
